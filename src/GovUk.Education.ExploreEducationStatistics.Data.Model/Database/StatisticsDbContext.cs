@@ -95,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureRscRegion(modelBuilder);
             ConfigureSponsor(modelBuilder);
             ConfigureWard(modelBuilder);
+            ConfigurePlanningArea(modelBuilder);
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
@@ -364,7 +365,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .OwnsOne(level => level.Ward,
                     builder => builder.HasIndex(ward => ward.Code));
         }
-
+        
+        private static void ConfigurePlanningArea(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Location>()
+                .OwnsOne(level => level.PlanningArea,
+                    builder => builder.HasIndex(planningArea => planningArea.Code));
+        }
+        
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeoJson>().HasNoKey().ToView("geojson");

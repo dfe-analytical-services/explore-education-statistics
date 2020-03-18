@@ -42,7 +42,7 @@ function accordionSectionUpdateHeading(
   setMethodology: React.Dispatch<React.SetStateAction<MethodologyContent>>,
   sectionId: string,
 ): EditableAccordionSectionProps['onHeadingChange'] {
-  return async function(heading: string) {
+  return async function updateContentSectionHeading(heading: string) {
     const newSection = await methodologyService.updateContentSectionHeading(
       methodology.id,
       sectionId,

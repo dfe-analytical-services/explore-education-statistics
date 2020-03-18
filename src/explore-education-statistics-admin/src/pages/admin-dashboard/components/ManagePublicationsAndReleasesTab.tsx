@@ -9,7 +9,7 @@ import {
   AdminDashboardRelease,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ErrorSummary, {

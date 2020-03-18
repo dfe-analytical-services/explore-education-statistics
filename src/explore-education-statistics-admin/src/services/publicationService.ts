@@ -30,6 +30,7 @@ export interface EditableContentBlock {
   tables?: Table[];
   summary?: Summary;
   comments: ExtendedComment[];
+  order?: number;
 }
 
 export type EditableRelease = AbstractRelease<EditableContentBlock>;

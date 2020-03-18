@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -130,9 +129,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
                 subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
 
-            var list = new List<ReleaseViewModel>
+            var list = new List<MyReleaseViewModel>
             {
-                new ReleaseViewModel
+                new MyReleaseViewModel
                 {
                     Id = Guid.NewGuid()
                 }
@@ -171,9 +170,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
                 subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
 
-            var list = new List<ReleaseViewModel>
+            var list = new List<MyReleaseViewModel>
             {
-                new ReleaseViewModel
+                new MyReleaseViewModel
                 {
                     Id = Guid.NewGuid()
                 }

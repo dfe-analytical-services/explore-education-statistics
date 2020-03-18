@@ -1,3 +1,4 @@
+import EditableLink from '@admin/components/editable/EditableLink';
 import Link from '@admin/components/Link';
 import { relatedInformationService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
@@ -14,7 +15,6 @@ import { EditingContext } from '@common/modules/find-statistics/util/wrapEditabl
 import { BasicLink } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
 import React, { useContext, useState } from 'react';
-import EditableLink from './EditableLink';
 
 interface Props {
   release: ManageContentPageViewModel['release'];

@@ -1,5 +1,5 @@
-import React from 'react';
 import { fireEvent, render, wait } from '@testing-library/react';
+import React from 'react';
 import Wizard from '../Wizard';
 import WizardStep from '../WizardStep';
 
@@ -285,16 +285,33 @@ describe('Wizard', () => {
     expect(step3).toHaveClass('stepActive');
   });
 
-  test('scrolls to and focuses first step when mounted', () => {
+  test('does not scroll or focus first step when mounted by default', () => {
     const { container } = render(
       <Wizard id="test-wizard">
-        <WizardStep>
-          {({ setCurrentStep }) => (
-            <button type="button" onClick={() => setCurrentStep(3)}>
-              Go to step 3
-            </button>
-          )}
-        </WizardStep>
+        <WizardStep>Step 1</WizardStep>
+        <WizardStep>Step 2</WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
+    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
+    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+
+    expect(step1).not.toHaveFocus();
+    expect(step1).not.toHaveScrolledIntoView();
+
+    expect(step2).not.toHaveScrolledIntoView();
+    expect(step2).not.toHaveFocus();
+
+    expect(step3).not.toHaveScrolledIntoView();
+    expect(step3).not.toHaveFocus();
+  });
+
+  test('scrolls to and focuses first step when `scrollOnMount` is true', () => {
+    const { container } = render(
+      <Wizard id="test-wizard" scrollOnMount>
+        <WizardStep>Step 1</WizardStep>
         <WizardStep>Step 2</WizardStep>
         <WizardStep>Step 3</WizardStep>
       </Wizard>,
@@ -333,19 +350,10 @@ describe('Wizard', () => {
     const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
     const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
 
-    expect(step1).toHaveFocus();
-    expect(step1).toHaveScrolledIntoView();
-
-    expect(step2).not.toHaveFocus();
-    expect(step2).not.toHaveScrolledIntoView();
-
-    expect(step3).not.toHaveFocus();
-    expect(step3).not.toHaveScrolledIntoView();
-
     fireEvent.click(getByText('Go to step 3'));
 
     expect(step1).not.toHaveFocus();
-    expect(step1).toHaveScrolledIntoView();
+    expect(step1).not.toHaveScrolledIntoView();
 
     expect(step2).not.toHaveFocus();
     expect(step2).not.toHaveScrolledIntoView();

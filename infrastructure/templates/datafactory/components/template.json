@@ -1687,6 +1687,26 @@
                                     },
                                     {
                                         "source": {
+                                            "name": "PlanningArea_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "PlanningArea_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "PlanningArea_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "PlanningArea_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
                                             "name": "Region_Code",
                                             "type": "String"
                                         },

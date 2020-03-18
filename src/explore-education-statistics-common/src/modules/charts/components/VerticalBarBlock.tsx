@@ -1,18 +1,19 @@
+import parseNumber from '@common/lib/utils/number/parseNumber';
 import '@common/modules/charts/components/charts.scss';
 import {
+  AxisConfiguration,
   ChartDefinition,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
-  conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Bar,
   BarChart,
@@ -25,7 +26,12 @@ import {
   YAxis,
 } from 'recharts';
 
-export type VerticalBarProps = StackedBarProps;
+export interface VerticalBarProps extends StackedBarProps {
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+}
 
 const VerticalBarBlock = ({
   data,
@@ -69,27 +75,28 @@ const VerticalBarBlock = ({
       >
         <CartesianGrid
           strokeDasharray="3 3"
-          vertical={axes.minor?.showGrid !== false}
+          vertical={axes.minor.showGrid !== false}
           horizontal={axes.major.showGrid !== false}
         />
 
         <YAxis
           type="number"
           dataKey="value"
-          hide={axes.minor?.visible === false}
-          unit={axes.minor?.unit}
+          hide={!axes.minor.visible}
+          unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
-          width={conditionallyAdd(axes.minor?.size)}
+          width={parseNumber(axes.minor.size)}
         />
 
         <XAxis
           type="category"
           dataKey="name"
-          hide={axes.major.visible === false}
+          hide={!axes.major.visible}
           unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
+          height={parseNumber(axes.major.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
@@ -116,7 +123,7 @@ const VerticalBarBlock = ({
           />
         ))}
 
-        {axes.minor?.referenceLines?.map(referenceLine => (
+        {axes.minor.referenceLines?.map(referenceLine => (
           <ReferenceLine
             key={`${referenceLine.position}_${referenceLine.label}`}
             y={referenceLine.position}
@@ -128,10 +135,9 @@ const VerticalBarBlock = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const verticalBarBlockDefinition: ChartDefinition = {
   type: 'verticalbar',
   name: 'Vertical bar',
-
   capabilities: {
     dataSymbols: false,
     stackable: true,
@@ -142,8 +148,14 @@ const definition: ChartDefinition = {
     hasAxes: true,
     hasReferenceLines: true,
     hasLegend: true,
+    requiresGeoJson: false,
   },
-
+  options: {
+    defaults: {
+      height: 300,
+      legend: 'top',
+    },
+  },
   data: [
     {
       type: 'bar',
@@ -152,24 +164,21 @@ const definition: ChartDefinition = {
       targetAxis: 'xaxis',
     },
   ],
-
-  axes: [
-    {
+  axes: {
+    major: {
       id: 'major',
-      title: 'X Axis',
+      title: 'X Axis (major axis)',
       type: 'major',
-      defaultDataType: 'timePeriod',
+      defaults: {
+        groupBy: 'timePeriod',
+      },
     },
-    {
+    minor: {
       id: 'minor',
-      title: 'Y Axis',
+      title: 'Y Axis (minor axis)',
       type: 'minor',
     },
-  ],
-
-  requiresGeoJson: false,
+  },
 };
 
-VerticalBarBlock.definition = definition;
-
-export default VerticalBarBlock;
+export default memo(VerticalBarBlock);

@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -15,23 +19,27 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class SplitFileService : ISplitFileService
     {
         private readonly IFileStorageService _fileStorageService;
+        private readonly ILogger<ISplitFileService> _logger;
         
         private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
         {
             GeographicLevel.Institution,
             GeographicLevel.Provider,
-            GeographicLevel.School
+            GeographicLevel.School,
+            GeographicLevel.PlanningArea
         };
         
-        public SplitFileService(IFileStorageService fileStorageService)
+        public SplitFileService(IFileStorageService fileStorageService, ILogger<ISplitFileService> logger)
         {
             _fileStorageService = fileStorageService;
+            _logger = logger;
         }
 
         public async Task SplitDataFile(
@@ -39,11 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImportMessage message,
             SubjectData subjectData)
         {
-            var csvLines = subjectData.GetCsvLines().ToList();
-
-            if (csvLines.Count() > message.RowsPerBatch + 1)
+            if (subjectData.GetCsvTable().Rows.Count > message.RowsPerBatch)
             {
-                await SplitFiles(message, csvLines, subjectData, collector);
+                _logger.LogInformation($"Splitting Datafile: {message.DataFileName}");
+                await SplitFiles(message, subjectData, collector);
+                _logger.LogInformation($"Split of Datafile: {message.DataFileName} complete");
             }
             // Else perform any additional validation & pass on file to message queue for import
             else
@@ -54,41 +62,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private async Task SplitFiles(
             ImportMessage message,
-            IEnumerable<string> csvLines,
             SubjectData subjectData,
             ICollector<ImportMessage> collector)
         {
-            var enumerable = csvLines.ToList();
-            var header = enumerable.First();
-            var headers = header.Split(',').ToList();
-            var batches = enumerable.Skip(1).Batch(message.RowsPerBatch);
+            var csvTable = subjectData.GetCsvTable();
+            var headerList = CsvUtil.GetColumnValues(csvTable.Columns);
+            var batches = csvTable.Rows.OfType<DataRow>().Batch(message.RowsPerBatch);
             var batchCount = 1;
-            var numRows = enumerable.Count();
+            var numRows = csvTable.Rows.Count + 1;
             var messages = new List<ImportMessage>();
 
             foreach (var batch in batches)
             {
                 var fileName = $"{FileStoragePathUtils.BatchesDir}/{message.DataFileName}_{batchCount:000000}";
-                var lines = batch.ToList();
                 var mStream = new MemoryStream();
                 var writer = new StreamWriter(mStream);
-                var actualLines = 0;
                 writer.Flush();
-
-                // Insert the header at the beginning of each file/batch
-                writer.WriteLine(header);
-                foreach (var line in from line in lines let s = line.Split(',') where !IsGeographicLevelIgnored(s, headers) select line)
-                {
-                    writer.WriteLine(line);
-                    writer.Flush();
-                    actualLines++;
-                }
                 
+                var table = new DataTable();
+                CopyColumns(csvTable, table);
+                CopyRows(table, batch.ToList(), headerList);
+
                 // If no lines then don't create a batch or message
-                if (actualLines == 0)
+                if (table.Rows.Count == 0)
                 {
                     continue;
                 }
+
+                WriteDataTableToStream(table, writer);
+                writer.Flush();
 
                 await _fileStorageService.UploadDataFileAsync(
                     message.Release.Id,
@@ -145,6 +147,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
             }
             throw new InvalidGeographicLevelException(value);
+        }
+        
+        private static void WriteDataTableToStream(DataTable dataTable, TextWriter tw)
+        {
+            var csvWriter = new CsvWriter(tw, new CsvConfiguration(CultureInfo.InvariantCulture));
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                csvWriter.WriteField(column.ColumnName);
+            }
+
+            csvWriter.NextRecord();
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                for (var i = 0; i < dataTable.Columns.Count; i++)
+                {
+                    csvWriter.WriteField(row[i]);
+                }
+                csvWriter.NextRecord();
+            }
+        }
+
+        private static void CopyColumns(DataTable source, DataTable target)
+        {
+            foreach (DataColumn column in source.Columns)
+            {
+                column.CopyTo(target);
+            }
+        }
+
+        private static void CopyRows(DataTable target, IEnumerable<DataRow> rows, List<string> headerList)
+        {
+            foreach (var row in from line in rows let s = CsvUtil.GetRowValues(line) where !IsGeographicLevelIgnored(s, headerList) select line)
+            {
+                target.Rows.Add(row.ItemArray);
+            }
         }
     }
 }

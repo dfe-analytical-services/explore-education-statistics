@@ -206,8 +206,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(originalReleaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ => _persistenceHelper.CheckEntityExists<Release>(newReleaseId))
-                .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async newRelease =>
                 {
                     var blobContainer = await GetCloudBlobContainer();

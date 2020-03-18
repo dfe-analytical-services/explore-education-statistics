@@ -1,7 +1,7 @@
-import React, { cloneElement, ReactElement, ReactNode } from 'react';
-import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
-import { Draggable } from 'react-beautiful-dnd';
 import styles from '@admin/components/DraggableAccordionSection.module.scss';
+import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
+import React, { cloneElement, ReactElement } from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 
 interface DraggableAccordionSectionProps {
   id: string;
@@ -9,7 +9,6 @@ interface DraggableAccordionSectionProps {
   index: number;
   openAll: boolean;
   section: ReactElement<EditableAccordionSectionProps>;
-  headingButtons?: ReactNode[];
 }
 
 const DraggableAccordionSection = ({
@@ -18,7 +17,6 @@ const DraggableAccordionSection = ({
   index,
   openAll,
   section,
-  headingButtons,
 }: DraggableAccordionSectionProps) => {
   if (isReordering) {
     return (
@@ -29,19 +27,14 @@ const DraggableAccordionSection = ({
             ref={draggableProvided.innerRef}
             className={styles.dragContainer}
           >
+            <span
+              {...draggableProvided.dragHandleProps}
+              className={styles.dragHandle}
+            />
             {cloneElement<EditableAccordionSectionProps>(section, {
               index,
               open: false,
               canToggle: false,
-              canEditHeading: section.props.canEditHeading && !isReordering,
-              headingButtons: [
-                ...(headingButtons || []),
-                <span
-                  key="drag_handle"
-                  className={styles.dragHandle}
-                  {...draggableProvided.dragHandleProps}
-                />,
-              ],
             })}
           </div>
         )}
@@ -52,7 +45,6 @@ const DraggableAccordionSection = ({
   return cloneElement<EditableAccordionSectionProps>(section, {
     index,
     open: openAll,
-    headingButtons,
   });
 };
 

@@ -265,6 +265,11 @@ def user_checks_list_contains_x_elements(list_locator, num):
   if len(labels) != int(num):
     raise AssertionError(f'Found {len(labels)} in list, not {num}. Locator: "{list_locator}"')
 
+def user_checks_list_contains_at_least_x_elements(list_locator, num):
+  labels = sl.get_list_items(list_locator)
+  if len(labels) < int(num):
+    raise AssertionError(f'Found {len(labels)} in list, not {num}. Locator: "{list_locator}"')
+
 def user_checks_list_contains_label(list_locator, label):
   labels = sl.get_list_items(list_locator)
   if label not in labels:

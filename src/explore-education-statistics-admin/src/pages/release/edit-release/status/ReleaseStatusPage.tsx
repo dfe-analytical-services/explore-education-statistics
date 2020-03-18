@@ -1,8 +1,8 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import ManageReleaseContext from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/service';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import permissionService from '@admin/services/permissions/permissionService';
 import service from '@admin/services/release/edit-release/status/service';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -46,7 +46,7 @@ const ReleaseStatusPage = () => {
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 
-  const { releaseId, onChangeReleaseStatus } = useContext(ManageReleaseContext);
+  const { releaseId, onChangeReleaseStatus } = useManageReleaseContext();
 
   useEffect(() => {
     Promise.all([

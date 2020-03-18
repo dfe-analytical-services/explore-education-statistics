@@ -1,6 +1,6 @@
 import { BasicPublicationDetails } from '@admin/services/common/types';
 import { ReleasePublicationStatus } from '@admin/services/release/types';
-import * as React from 'react';
+import { createContext, useContext } from 'react';
 
 export interface ManageRelease {
   publication: BasicPublicationDetails;
@@ -8,4 +8,19 @@ export interface ManageRelease {
   onChangeReleaseStatus: (status: Partial<ReleasePublicationStatus>) => void;
 }
 
-export default React.createContext<ManageRelease>({} as ManageRelease);
+const ManageReleaseContext = createContext<ManageRelease | undefined>(
+  undefined,
+);
+
+export function useManageReleaseContext() {
+  const context = useContext(ManageReleaseContext);
+
+  if (context === undefined) {
+    throw new Error(
+      'useManageReleaseContext must be used within a ManageReleaseContext',
+    );
+  }
+  return context;
+}
+
+export default ManageReleaseContext;

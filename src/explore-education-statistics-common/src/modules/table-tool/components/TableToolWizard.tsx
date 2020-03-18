@@ -1,5 +1,5 @@
-/* eslint-disable no-shadow */
-import { ConfirmContextProvider } from '@common/context/ConfirmContext';
+import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
+import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@common/modules/table-tool/components/FiltersForm';
@@ -66,6 +66,7 @@ export interface TableToolWizardProps {
   releaseId?: string;
   initialState?: TableToolState;
   finalStep?: (props: FinalStepProps) => ReactElement;
+  scrollOnMount?: boolean;
   onTableCreated?: (response: {
     query: TableDataQuery;
     table: FullTable;
@@ -81,6 +82,8 @@ const TableToolWizard = ({
   finalStep,
   onTableCreated,
 }: TableToolWizardProps) => {
+  const { withoutErrorHandling } = useErrorControl();
+
   const [publication, setPublication] = useState<Publication>();
   const [subjects, setSubjects] = useState<PublicationSubject[]>([]);
 
@@ -98,13 +101,15 @@ const TableToolWizard = ({
 
   useEffect(() => {
     if (releaseId) {
-      tableBuilderService
-        .getReleaseMeta(releaseId)
-        .then(({ subjects: releaseSubjects }) => {
-          setSubjects(releaseSubjects);
-        });
+      withoutErrorHandling(async () => {
+        const {
+          subjects: nextSubjects,
+        } = await tableBuilderService.getReleaseMeta(releaseId);
+
+        setSubjects(nextSubjects);
+      });
     }
-  }, [releaseId]);
+  }, [releaseId, withoutErrorHandling]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,

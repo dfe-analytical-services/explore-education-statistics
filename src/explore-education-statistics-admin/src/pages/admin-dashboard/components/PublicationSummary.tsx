@@ -34,6 +34,8 @@ const PublicationSummary = ({
     publication &&
     !publication.releases.some(r => r.amendment && r.originalId === release.id);
 
+  // BAU-324 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
+  const showAmendmentButton = () => true;
   return (
     <>
       <SummaryList>
@@ -70,7 +72,9 @@ const PublicationSummary = ({
               .map(release => (
                 <li key={release.id}>
                   <NonScheduledReleaseSummary
-                    onClickAmendRelease={setAmendReleaseId}
+                    onClickAmendRelease={
+                      showAmendmentButton() && setAmendReleaseId
+                    }
                     onClickCancelAmendment={setCancelAmendmentReleaseId}
                     release={release}
                   />
