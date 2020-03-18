@@ -10,7 +10,7 @@ import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { formatTestId } from '@common/util/test-utils';
+import { formatTestId } from '@common/utils/test-utils';
 import React, { useContext, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 

@@ -9,9 +9,9 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import Yup from '@common/lib/validation/yup';
 import { ThemeMeta } from '@common/modules/table-tool/services/tableBuilderService';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';

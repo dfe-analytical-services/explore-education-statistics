@@ -6,14 +6,14 @@ import {
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
 import React, { ReactNode } from 'react';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import LazyLoad from 'react-lazyload';
 
 interface Props {

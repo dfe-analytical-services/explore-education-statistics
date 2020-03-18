@@ -1,5 +1,5 @@
 import { useDesktopMedia } from '@common/hooks/useMedia';
-import findAllParents from '@common/lib/dom/findAllParents';
+import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
 import React, {
   createElement,

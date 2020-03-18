@@ -1,5 +1,4 @@
 import ButtonText from '@common/components/ButtonText';
-import cartesian from '@common/lib/utils/cartesian';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import {
   CategoryFilter,
@@ -8,6 +7,7 @@ import {
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import cartesian from '@common/utils/cartesian';
 import React from 'react';
 import { utils, writeFile } from 'xlsx';
 

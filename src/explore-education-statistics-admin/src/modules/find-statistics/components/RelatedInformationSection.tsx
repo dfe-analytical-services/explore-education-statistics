@@ -10,9 +10,9 @@ import {
   FormFieldTextInput,
   Formik,
 } from '@common/components/form';
-import Yup from '@common/lib/validation/yup';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { BasicLink } from '@common/services/publicationService';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useContext, useState } from 'react';
 

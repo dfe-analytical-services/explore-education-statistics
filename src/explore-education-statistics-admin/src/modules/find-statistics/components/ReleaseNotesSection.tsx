@@ -9,14 +9,14 @@ import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
-import Yup from '@common/lib/validation/yup';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { ReleaseNote } from '@common/services/publicationService';
 import {
   dateToDayMonthYear,
   DayMonthYearInputs,
   dayMonthYearInputsToDate,
-  ReleaseNote,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import merge from 'lodash/merge';
 import React, { useContext, useState } from 'react';

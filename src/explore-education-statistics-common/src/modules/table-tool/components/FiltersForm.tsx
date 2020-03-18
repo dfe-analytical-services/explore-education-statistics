@@ -5,20 +5,20 @@ import {
   FormGroup,
   Formik,
 } from '@common/components/form';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import Yup from '@common/lib/validation/yup';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import {
   FilterOption,
   PublicationSubjectMeta,
 } from '@common/modules/table-tool/services/tableBuilderService';
-import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
+import { Dictionary } from '@common/types';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';
-import SummaryListItem from '@common/components/SummaryListItem';
-import SummaryList from '@common/components/SummaryList';
-import { Dictionary } from '@common/types';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';

@@ -10,8 +10,8 @@ import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
-import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 

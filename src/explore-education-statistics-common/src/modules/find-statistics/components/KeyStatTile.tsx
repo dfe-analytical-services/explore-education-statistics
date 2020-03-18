@@ -1,11 +1,11 @@
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import formatPretty from '@common/lib/utils/number/formatPretty';
 import { AxiosErrorHandler } from '@common/services/api/Client';
 import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
+import formatPretty from '@common/utils/number/formatPretty';
 import React, { ReactNode, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './SummaryRenderer.module.scss';

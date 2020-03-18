@@ -5,9 +5,9 @@ import {
 import { openAllParentDetails } from '@common/components/Details';
 import FormComboBox from '@common/components/form/FormComboBox';
 import { openAllParentTabSections } from '@common/components/TabsSection';
-import findAllByText from '@common/lib/dom/findAllByText';
-import findAllParents from '@common/lib/dom/findAllParents';
-import findPreviousSibling from '@common/lib/dom/findPreviousSibling';
+import findAllByText from '@common/utils/dom/findAllByText';
+import findAllParents from '@common/utils/dom/findAllParents';
+import findPreviousSibling from '@common/utils/dom/findPreviousSibling';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 import React, { Component, ReactNode } from 'react';

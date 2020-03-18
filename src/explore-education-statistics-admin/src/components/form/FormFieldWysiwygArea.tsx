@@ -1,11 +1,11 @@
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import { Field, FieldProps } from 'formik';
-import React from 'react';
-import classNames from 'classnames';
 import FormWysiwygArea, {
   FormWysiwygAreaProps,
 } from '@admin/components/form/FormWysiwygArea';
 import FormGroup from '@common/components/form/FormGroup';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import classNames from 'classnames';
+import { Field, FieldProps } from 'formik';
+import React from 'react';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;

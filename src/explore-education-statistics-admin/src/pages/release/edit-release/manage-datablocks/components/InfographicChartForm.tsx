@@ -11,7 +11,7 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 

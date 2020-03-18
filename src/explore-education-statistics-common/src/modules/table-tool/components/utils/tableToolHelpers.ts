@@ -1,4 +1,3 @@
-import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
@@ -9,6 +8,7 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
+import mapValuesWithKeys from '@common/utils/mapValuesWithKeys';
 import sortBy from 'lodash/sortBy';
 
 export const transformTableMetaFiltersToCategoryFilters = (
