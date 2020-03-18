@@ -5,11 +5,9 @@ import { FormSelect } from '@common/components/form';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import {
   locationLevelKeys,
-  LocationLevelKeys,
   TimePeriodQuery,
 } from '@common/modules/table-tool/services/tableBuilderService';
 import React, { useMemo, useState } from 'react';
-import { DataBlockRequest } from '@common/services/dataBlockService';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;
@@ -68,6 +66,7 @@ const KeyIndicatorSelectForm = ({
         label={label}
         value={selectedDataBlockId}
         onChange={e => setSelectedDataBlockId(e.target.value)}
+        order={[]}
         options={[
           {
             label: 'Select a data block',
