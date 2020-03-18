@@ -796,6 +796,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                                 .HasForeignKey("LocationId");
                         });
 
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.PlanningArea", "PlanningArea", b1 =>
+                        {
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Code")
+                                .HasColumnType("nvarchar(450)");
+
+                            b1.Property<string>("Name")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.WithOwner()
+                                .HasForeignKey("LocationId");
+                        });
+
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Region", "Region", b1 =>
                         {
                             b1.Property<Guid>("LocationId")

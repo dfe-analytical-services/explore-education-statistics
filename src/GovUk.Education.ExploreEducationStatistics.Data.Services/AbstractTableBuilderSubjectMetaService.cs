@@ -10,8 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public abstract class AbstractTableBuilderSubjectMetaService
     {
         private readonly IFilterItemService _filterItemService;
-        private static IEqualityComparer<Filter> FilterComparer { get; } = new FilterEqualityComparer();
-        private static IEqualityComparer<FilterGroup> FilterGroupComparer { get; } = new FilterGroupEqualityComparer();
 
         protected AbstractTableBuilderSubjectMetaService(IFilterItemService filterItemService)
         {
@@ -21,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         protected Dictionary<string, FilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
         {
             return _filterItemService.GetFilterItems(observations)
-                .GroupBy(item => item.FilterGroup.Filter, item => item, FilterComparer)
+                .GroupBy(item => item.FilterGroup.Filter, item => item, Filter.IdComparer)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
                     itemsGroupedByFilter => new FilterMetaViewModel
@@ -29,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Hint = itemsGroupedByFilter.Key.Hint,
                         Legend = itemsGroupedByFilter.Key.Label,
                         Options = itemsGroupedByFilter
-                            .GroupBy(item => item.FilterGroup, item => item, FilterGroupComparer)
+                            .GroupBy(item => item.FilterGroup, item => item, FilterGroup.IdComparer)
                             .ToDictionary(
                                 itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
                                 itemsGroupedByFilterGroup => BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key,
@@ -108,40 +106,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private string GetTotalValue(IEnumerable<FilterItem> filterItems)
         {
             return _filterItemService.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
-        }
-
-        private sealed class FilterEqualityComparer : IEqualityComparer<Filter>
-        {
-            public bool Equals(Filter x, Filter y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return x.Id == y.Id;
-            }
-
-            public int GetHashCode(Filter obj)
-            {
-                return obj.Id.GetHashCode();
-            }
-        }
-
-        private sealed class FilterGroupEqualityComparer : IEqualityComparer<FilterGroup>
-        {
-            public bool Equals(FilterGroup x, FilterGroup y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return x.Id == y.Id;
-            }
-
-            public int GetHashCode(FilterGroup obj)
-            {
-                return obj.Id.GetHashCode();
-            }
         }
     }
 }

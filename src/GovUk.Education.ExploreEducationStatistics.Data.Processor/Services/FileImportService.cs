@@ -41,13 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 var subjectData = await _fileStorageService.GetSubjectData(message);
                 var subject = GetSubject(message, subjectData.Name, context);
+                var csvTable = subjectData.GetCsvTable();
+                var metaTable = subjectData.GetMetaTable();
                 
                 context.Database.BeginTransaction();
                 
                 _importerService.ImportObservations(
-                    subjectData.GetCsvLines().ToList(),
+                    csvTable.Columns,
+                    csvTable.Rows,
                     subject,
-                    _importerService.GetMeta(subjectData.GetMetaLines().ToList(), subject, context),
+                    _importerService.GetMeta(metaTable, subject, context),
                     message.BatchNo,
                     message.RowsPerBatch,
                     context
@@ -66,13 +69,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var batch = subjectData.GetCsvLines().ToList();
-            var metaLines = subjectData.GetMetaLines().ToList();
             var subject = GetSubject(message, subjectData.Name, context);
+            var csvTable = subjectData.GetCsvTable();
+            var metaTable = subjectData.GetMetaTable();
 
             _importerService.ImportFiltersLocationsAndSchools(
-                batch,
-                _importerService.GetMeta(metaLines, subject, context),
+                csvTable.Columns,
+                csvTable.Rows,
+                _importerService.GetMeta(metaTable, subject, context),
                 subject,
                 context);
         }

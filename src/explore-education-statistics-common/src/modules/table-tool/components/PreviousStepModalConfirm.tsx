@@ -1,5 +1,5 @@
 import ModalConfirm from '@common/components/ModalConfirm';
-import { useConfirmContext } from '@common/context/ConfirmContext';
+import { useConfirmContext } from '@common/contexts/ConfirmContext';
 import React from 'react';
 
 const PreviousStepModalConfirm = () => {

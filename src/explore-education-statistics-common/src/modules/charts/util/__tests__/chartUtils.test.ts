@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { ChartMetaData } from '@common/modules/charts/types/chart';
+import {
+  AxisConfiguration,
+  ChartDataSet,
+  ChartMetaData,
+} from '@common/modules/charts/types/chart';
 
 import Data from '@common/modules/charts/util/__tests__/__data__/chartUtils.data';
 import {
@@ -7,10 +11,6 @@ import {
   createSortedDataForAxis,
   parseMetaData,
 } from '@common/modules/charts/util/chartUtils';
-import {
-  AxisConfiguration,
-  ChartDataSet,
-} from '@common/services/publicationService';
 
 describe('chartUtils', () => {
   const dataSet23_1_72: ChartDataSet = {
@@ -38,10 +38,10 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
-      name: meta.indicators['26'].label,
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [dataSet26_1_72],
+      visible: true,
     };
 
     const chartData = createDataForAxis(
@@ -79,12 +79,12 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const axis: AxisConfiguration = {
-      name: meta.indicators['99'].label,
       type: 'major',
       groupBy: 'timePeriod',
       sortBy: '99_1_72_____',
       sortAsc: true,
       dataSets: [dataSet99_1_72],
+      visible: true,
     };
 
     const chartData = createSortedDataForAxis(
@@ -122,10 +122,10 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
-      name: meta.indicators['26'].label,
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [dataSet26_1_72, dataSet23_1_72],
+      visible: true,
     };
 
     const chartData = createDataForAxis(
@@ -168,10 +168,10 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const minorAxisConfiguration: AxisConfiguration = {
-      name: meta.indicators['26'].label,
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
+      visible: true,
     };
 
     const chartData = createDataForAxis(
@@ -214,10 +214,10 @@ describe('chartUtils', () => {
     const chartMeta = parseMetaData(meta) as ChartMetaData;
 
     const axisConfig: AxisConfiguration = {
-      name: meta.indicators['26'].label,
       type: 'major',
       groupBy: 'timePeriod',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
+      visible: true,
     };
 
     const chartData = createDataForAxis(

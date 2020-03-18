@@ -1,6 +1,5 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import { ErrorControlState } from '@admin/contexts/ErrorControlContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { ContactDetails } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
@@ -18,6 +17,7 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import Yup from '@common/lib/validation/yup';
 import {
   dateToDayMonthYear,

@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import Button from '@common/components/Button';
-import { FormSelect } from '@common/components/form';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Details from '@common/components/Details';
+import { FormSelect } from '@common/components/form';
+import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import { TimePeriodQuery } from '@common/modules/table-tool/services/tableBuilderService';
 import { DataBlock } from '@common/services/dataBlockService';
-import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;
@@ -20,7 +20,7 @@ const KeyIndicatorSelectForm = ({
   hideCancel = false,
   label = 'Select a key indicator',
 }: Props) => {
-  const { availableDataBlocks } = useContext(EditingContext);
+  const { availableDataBlocks } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const [keyIndicatorDatablocks, setKeyIndicatorDatablocks] = useState<

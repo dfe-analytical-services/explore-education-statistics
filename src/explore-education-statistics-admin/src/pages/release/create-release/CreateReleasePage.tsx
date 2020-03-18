@@ -82,7 +82,12 @@ const CreateReleasePage = ({
     );
 
     const createdRelease = await service.createRelease(createReleaseDetails);
-    history.push(summaryRoute.generateLink(publicationId, createdRelease.id));
+    history.push(
+      summaryRoute.generateLink({
+        publicationId,
+        releaseId: createdRelease.id,
+      }),
+    );
   }, errorCodeMappings);
 
   const cancelHandler = () =>

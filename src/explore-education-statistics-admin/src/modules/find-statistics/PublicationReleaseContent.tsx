@@ -1,22 +1,20 @@
+import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
+import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
+import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { DataBlock as DataBlockModel } from '@common/services/dataBlockService';
-import { Dictionary } from '@common/types';
-import classNames from 'classnames';
-import React, { useCallback, useState } from 'react';
-import ContentBlocks from './components/EditableContentBlocks';
+import React, { useContext, useMemo, useCallback } from 'react';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
@@ -26,97 +24,69 @@ export interface RendererProps {
   releaseId?: string;
 }
 
-interface Props {
-  editing: boolean;
-  content: ManageContentPageViewModel;
+const PublicationReleaseContent = () => {
+  const { isEditing } = useContext(EditingContext);
+  const { release } = useReleaseState();
+  const {
+    addContentSectionBlock,
+    updateContentSectionBlock,
+    deleteContentSectionBlock,
+  } = useReleaseActions();
 
-  styles: Dictionary<string>;
+  const releaseCount = useMemo(() => {
+    if (release) {
+      return (
+        release.publication.otherReleases.length +
+        release.publication.legacyReleases.length
+      );
+    }
+    return 0;
+  }, [release]);
 
-  logEvent?: (...params: string[]) => void;
-
-  onReleaseChange?: (content: ManageContentPageViewModel['release']) => void;
-
-  availableDataBlocks: DataBlockModel[];
-}
-
-const nullLogEvent = () => {};
-
-const PublicationReleaseContent = ({
-  editing = true,
-  content,
-  styles,
-  logEvent = nullLogEvent,
-  onReleaseChange,
-  availableDataBlocks: initialAvailableDataBlocks,
-}: Props) => {
-  const [release, setRelease] = useState(content.release);
-
-  const setReleaseAndTriggerOnReleaseChange = useCallback(
-    (newRelease: ManageContentPageViewModel['release']) => {
-      if (onReleaseChange) onReleaseChange(newRelease);
-      setRelease(newRelease);
-    },
-    [setRelease, onReleaseChange],
-  );
-
-  const [availableDataBlocks, setAvailableDataBlocks] = useState(
-    initialAvailableDataBlocks,
-  );
-
-  const updateAvailableDataBlocks = () => {
-    releaseContentService
-      .getAvailableDataBlocks(release.id)
-      .then(newAvailableDataBlocks => {
-        setAvailableDataBlocks(newAvailableDataBlocks);
-      });
-  };
-
-  const releaseCount = React.useMemo(
-    () =>
-      release.publication.otherReleases.length +
-      release.publication.legacyReleases.length,
-    [
-      release.publication.legacyReleases.length,
-      release.publication.otherReleases.length,
-    ],
-  );
-
-  const publication = React.useMemo(() => release.publication, [release]);
-
-  const onAccordionContentChange = useCallback(
-    newContent => {
-      setReleaseAndTriggerOnReleaseChange({
-        ...release,
-        content: newContent,
-      });
-    },
-    [release, setReleaseAndTriggerOnReleaseChange],
-  );
-
-  const onSummaryContentChange = useCallback(
-    newContent => {
-      setReleaseAndTriggerOnReleaseChange({
-        ...release,
-        summarySection: {
-          ...release.summarySection,
-          content: newContent,
+  const addSummaryBlock = useCallback(() => {
+    if (release)
+      addContentSectionBlock({
+        releaseId: release.id,
+        sectionId: release.summarySection.id,
+        sectionKey: 'summarySection',
+        block: {
+          type: 'MarkdownBlock',
+          order: 0,
+          body: '',
         },
       });
+  }, [release, addContentSectionBlock]);
+
+  const summaryBlockUpdate = useCallback(
+    (blockId, bodyContent) => {
+      if (release)
+        updateContentSectionBlock({
+          releaseId: release.id,
+          sectionId: release.summarySection.id,
+          blockId,
+          sectionKey: 'summarySection',
+          bodyContent,
+        });
     },
-    [release, setReleaseAndTriggerOnReleaseChange],
+    [release, updateContentSectionBlock],
   );
 
+  const summaryBlockDelete = useCallback(
+    (blockId: string) => {
+      if (release)
+        deleteContentSectionBlock({
+          releaseId: release.id,
+          sectionId: release.summarySection.id,
+          blockId,
+          sectionKey: 'summarySection',
+        });
+    },
+    [release, deleteContentSectionBlock],
+  );
+
+  if (release === undefined) return null;
   return (
-    <EditingContext.Provider
-      value={{
-        isEditing: editing,
-        releaseId: release.id,
-        isReviewing: false,
-        isCommenting: true,
-        availableDataBlocks,
-        updateAvailableDataBlocks,
-      }}
-    >
+    <>
       <h1 className="govuk-heading-l">
         <span className="govuk-caption-l">
           {`${
@@ -126,40 +96,37 @@ const PublicationReleaseContent = ({
             '/',
           )}`}
         </span>
-        {publication.title}
+        {release.publication.title}
       </h1>
 
-      <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
+      <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <div className="govuk-grid-row">
             <BasicReleaseSummary release={release} />
           </div>
 
           {release.summarySection && (
-            <ContentBlocks
-              sectionId={release.summarySection.id}
-              publication={publication}
-              id={release.summarySection.id as string}
-              addContentButtonText="Add summary content"
-              content={release.summarySection.content}
-              canAddSingleBlock
-              textOnly
-              onContentChange={onSummaryContentChange}
-            />
+            <>
+              <ContentBlocks
+                sectionId={release.summarySection.id}
+                publication={release.publication}
+                id={release.summarySection.id as string}
+                content={release.summarySection.content}
+                onBlockContentChange={summaryBlockUpdate}
+                onBlockDelete={summaryBlockDelete}
+              />
+              {release.summarySection.content?.length === 0 && (
+                <div className="govuk-!-margin-bottom-8 dfe-align--center">
+                  <Button variant="secondary" onClick={addSummaryBlock}>
+                    Add a summary text block
+                  </Button>
+                </div>
+              )}
+            </>
           )}
 
-          {release.downloadFiles && !editing && (
-            <Details
-              summary="Download data files"
-              onToggle={(open: boolean) =>
-                open &&
-                logEvent(
-                  'Downloads',
-                  'Release page download data files dropdown opened',
-                  window.location.pathname,
-                )
-              }
-            >
+          {release.downloadFiles && !isEditing && (
+            <Details summary="Download data files">
               <ul className="govuk-list govuk-list--bullet">
                 {release.downloadFiles.map(
                   ({ extension, name, path, size }) => (
@@ -179,7 +146,7 @@ const PublicationReleaseContent = ({
               </ul>
             </Details>
           )}
-          {!editing && (
+          {!isEditing && (
             <PageSearchForm
               id="search-form"
               inputLabel="Search in this release page."
@@ -205,17 +172,7 @@ const PublicationReleaseContent = ({
               </dd>
               {releaseCount > 0 && (
                 <dd>
-                  <Details
-                    summary={`See ${releaseCount} other releases`}
-                    onToggle={(open: boolean) =>
-                      open &&
-                      logEvent(
-                        'Other Releases',
-                        'Release page other releases dropdown opened',
-                        window.location.pathname,
-                      )
-                    }
-                  >
+                  <Details summary={`See ${releaseCount} other releases`}>
                     <ul className="govuk-list">
                       {[
                         ...release.publication.otherReleases.map(
@@ -230,7 +187,7 @@ const PublicationReleaseContent = ({
                           ({ id, description, url }) => [
                             description,
                             <li key={id} data-testid="other-release-item">
-                              {!editing ? (
+                              {!isEditing ? (
                                 <a href={url}>{description}</a>
                               ) : (
                                 <a>{description}</a>
@@ -256,24 +213,16 @@ const PublicationReleaseContent = ({
 
       <hr />
 
-      <ReleaseHeadlines
-        release={release}
-        setRelease={setReleaseAndTriggerOnReleaseChange}
-      />
+      <ReleaseHeadlines release={release} />
 
       <ReleaseContentAccordion
-        releaseId={release.id}
-        publication={publication}
+        release={release}
         accordionId="contents-accordion"
         sectionName="Contents"
-        onContentChange={onAccordionContentChange}
       />
 
-      <AdminPublicationReleaseHelpAndSupportSection
-        publication={publication}
-        release={release}
-      />
-    </EditingContext.Provider>
+      <AdminPublicationReleaseHelpAndSupportSection release={release} />
+    </>
   );
 };
 

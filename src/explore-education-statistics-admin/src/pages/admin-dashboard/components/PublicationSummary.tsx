@@ -5,27 +5,17 @@ import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSumma
 import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
-import service from '@admin/services/release/create-release/service';
-import Button from '@common/components/Button';
-import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { formatTestId } from '@common/util/test-utils';
-import React, { useContext, useState } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
+import React, { useContext } from 'react';
 
 export interface Props {
   publication: AdminDashboardPublication;
 }
 
-const PublicationSummary = ({
-  publication,
-  history,
-}: Props & RouteComponentProps) => {
+const PublicationSummary = ({ publication }: Props) => {
   const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
-  const [amendReleaseId, setAmendReleaseId] = useState<string>();
-  // BAU-324 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
-  const showAmendmentButton = () => false;
   return (
     <>
       <SummaryList>
@@ -62,32 +52,21 @@ const PublicationSummary = ({
                 <ReleaseSummary
                   release={release}
                   actions={
-                    <>
-                      <ButtonLink
-                        to={summaryRoute.generateLink(
-                          publication.id,
-                          release.id,
-                        )}
-                        testId={formatTestId(
-                          `Edit release link for ${
-                            publication.title
-                          }, ${getReleaseSummaryLabel(release)}`,
-                        )}
-                      >
-                        {release.permissions.canUpdateRelease
-                          ? 'Edit this release'
-                          : 'View this release'}
-                      </ButtonLink>
-                      {showAmendmentButton() &&
-                        release.permissions.canMakeAmendmentOfRelease && (
-                          <Button
-                            className="govuk-button--secondary govuk-!-margin-left-4"
-                            onClick={() => setAmendReleaseId(release.id)}
-                          >
-                            Amend this release
-                          </Button>
-                        )}
-                    </>
+                    <ButtonLink
+                      to={summaryRoute.generateLink({
+                        publicationId: publication.id,
+                        releaseId: release.id,
+                      })}
+                      testId={formatTestId(
+                        `Edit release link for ${
+                          publication.title
+                        }, ${getReleaseSummaryLabel(release)}`,
+                      )}
+                    >
+                      {release.permissions.canUpdateRelease
+                        ? 'Edit this release'
+                        : 'View this release'}
+                    </ButtonLink>
                   }
                 />
               </li>
@@ -120,31 +99,8 @@ const PublicationSummary = ({
           </ButtonLink>
         </SummaryListItem>
       </SummaryList>
-
-      {amendReleaseId && (
-        <ModalConfirm
-          title="Confirm you want to amend this live release"
-          onConfirm={async () =>
-            service
-              .createReleaseAmendment(amendReleaseId)
-              .then(amendment =>
-                history.push(
-                  summaryRoute.generateLink(publication.id, amendment.id),
-                ),
-              )
-          }
-          onExit={() => setAmendReleaseId(undefined)}
-          onCancel={() => setAmendReleaseId(undefined)}
-          mounted
-        >
-          <p>
-            Please note, any changes made to this live release must be approved
-            before updates can be published.
-          </p>
-        </ModalConfirm>
-      )}
     </>
   );
 };
 
-export default withRouter(PublicationSummary);
+export default PublicationSummary;

@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> RscRegion { get; set; }
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
+        public IEnumerable<string> PlanningArea { get; set; }
         public bool IncludeGeoJson { get; set; }
 
         public static SubjectMetaQueryContext FromObservationQueryContext(
@@ -51,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 RscRegion = observationQueryContext.RscRegion,
                 Sponsor = observationQueryContext.Sponsor,
                 Ward = observationQueryContext.Ward,
+                PlanningArea = observationQueryContext.PlanningArea,
                 IncludeGeoJson = observationQueryContext.IncludeGeoJson
             };
         }

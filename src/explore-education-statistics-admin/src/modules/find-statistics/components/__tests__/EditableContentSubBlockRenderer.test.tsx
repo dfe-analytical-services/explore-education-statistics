@@ -1,7 +1,7 @@
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { render } from '@testing-library/react';
 import React from 'react';
-import EditableContentSubBlockRenderer from '../EditableContentSubBlockRenderer';
+import EditableContentSubBlockRenderer from '@admin/components/editable/EditableContentSubBlockRenderer';
 
 describe('EditableContentSubBlockRenderer', () => {
   test('Renders non-editable Markdown block correctly', () => {
@@ -9,21 +9,17 @@ describe('EditableContentSubBlockRenderer', () => {
       <EditingContext.Provider
         value={{
           isEditing: true,
-          releaseId: '',
-          isReviewing: false,
-          isCommenting: false,
-          availableDataBlocks: [],
         }}
       >
         <EditableContentSubBlockRenderer
-          id="test"
-          index={1}
           block={{
             id: 'block-000',
             comments: [],
             type: 'MarkDownBlock',
             body: 'test',
           }}
+          onDelete={() => {}}
+          onContentChange={async () => {}}
         />
       </EditingContext.Provider>,
     );
@@ -36,16 +32,10 @@ describe('EditableContentSubBlockRenderer', () => {
       <EditingContext.Provider
         value={{
           isEditing: true,
-          releaseId: '',
-          isReviewing: false,
-          isCommenting: false,
-          availableDataBlocks: [],
         }}
       >
         <EditableContentSubBlockRenderer
           canDelete
-          id="test"
-          index={1}
           editable
           block={{
             id: 'block-000',
@@ -53,6 +43,8 @@ describe('EditableContentSubBlockRenderer', () => {
             type: 'MarkDownBlock',
             body: 'test',
           }}
+          onDelete={() => {}}
+          onContentChange={async () => {}}
         />
       </EditingContext.Provider>,
     );

@@ -1,7 +1,5 @@
 import Link from '@admin/components/Link';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import {
   getSelectedTimePeriodCoverageLabel,
   getTimePeriodCoverageDateRangeStringLong,
@@ -12,7 +10,7 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
@@ -22,7 +20,7 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@common/services/publicationService';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {
   releaseSummaryDetails: ReleaseSummaryDetails;
@@ -34,9 +32,7 @@ interface ReleaseSummaryModel {
 const ReleaseSummaryPage = () => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
-  const { publication, releaseId } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { publication, releaseId } = useManageReleaseContext();
 
   useEffect(() => {
     Promise.all([
@@ -110,7 +106,10 @@ const ReleaseSummaryPage = () => {
           {model.canEditRelease && (
             <div className="dfe-align--right">
               <Link
-                to={summaryEditRoute.generateLink(publication.id, releaseId)}
+                to={summaryEditRoute.generateLink({
+                  publicationId: publication.id,
+                  releaseId,
+                })}
               >
                 Edit release summary
               </Link>

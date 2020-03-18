@@ -1,15 +1,14 @@
 import styles from '@admin/components/wysiwyg.module.scss';
+// @ts-ignore
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // No types generated for ckeditor 5 for react
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
-// @ts-ignore
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
-import classnames from 'classnames';
-import React, { ChangeEvent } from 'react';
-import marked from 'marked';
-import TurndownService from 'turndown';
 import ModalConfirm from '@common/components/ModalConfirm';
+import classnames from 'classnames';
+import marked from 'marked';
+import React, { ChangeEvent, useMemo, useState } from 'react';
+import TurndownService from 'turndown';
 
 interface Props {
   editable?: boolean;
@@ -18,8 +17,9 @@ interface Props {
   resolveComments?: boolean;
   content: string;
   toolbarConfig?: string[];
+  insideAccordion?: boolean;
   useMarkdown?: boolean;
-  onContentChange?: (content: string) => Promise<unknown>;
+  onContentChange: (content: string) => void;
   onDelete?: () => void;
 }
 
@@ -48,35 +48,31 @@ const WysiwygEditor = ({
   canDelete = false,
   content,
   onContentChange,
+  insideAccordion,
   toolbarConfig,
   onDelete,
   useMarkdown = false,
 }: Props) => {
-  const [editing, setEditing] = React.useState(false);
-  const [saved, setSaved] = React.useState(false);
-  const [temporaryContent, setTemporaryContent] = React.useState(() => {
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [temporaryContent, setTemporaryContent] = useState(() => {
     if (useMarkdown) return marked(content);
     return content;
   });
-  const [showConfirmation, setShowConfirmation] = React.useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const turndownService = React.useMemo(() => new TurndownService(), []);
+  const turndownService = useMemo(() => new TurndownService(), []);
 
   const save = () => {
-    if (onContentChange) {
-      let contentChangeContent = temporaryContent;
+    setEditing(false);
+    let contentChangeContent = temporaryContent;
 
-      if (useMarkdown) {
-        contentChangeContent = turndownService.turndown(contentChangeContent);
-      }
-      onContentChange(contentChangeContent).then(() => {
-        setEditing(false);
-        setSaved(true);
-      });
-    } else {
-      setEditing(false);
-      setSaved(true);
+    if (useMarkdown) {
+      contentChangeContent = turndownService.turndown(contentChangeContent);
     }
+
+    onContentChange(contentChangeContent);
+    setSaved(true);
   };
 
   return (
@@ -151,6 +147,33 @@ const WysiwygEditor = ({
             editor={ClassicEditor}
             config={{
               toolbar: toolbarConfig || toolbarConfigs.full,
+              heading: insideAccordion && {
+                options: [
+                  {
+                    model: 'paragraph',
+                    title: 'Paragraph',
+                    class: 'ck-heading_paragraph',
+                  },
+                  {
+                    model: 'heading3',
+                    view: 'h3',
+                    title: 'Heading 3',
+                    class: 'ck-heading_heading3',
+                  },
+                  {
+                    model: 'heading4',
+                    view: 'h4',
+                    title: 'Heading 4',
+                    class: 'ck-heading_heading4',
+                  },
+                  {
+                    model: 'heading5',
+                    view: 'h5',
+                    title: 'Heading 5',
+                    class: 'ck-heading_heading5',
+                  },
+                ],
+              },
             }}
             data={temporaryContent}
             onChange={(event: ChangeEvent, editor: { getData(): string }) => {

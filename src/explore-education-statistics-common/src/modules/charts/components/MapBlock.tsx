@@ -3,9 +3,13 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import {
+  AxisConfiguration,
+  AxisGroupBy,
+  ChartDataSet,
   ChartDefinition,
   ChartMetaData,
   ChartProps,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
@@ -18,19 +22,20 @@ import {
   DataBlockData,
   DataBlockGeoJsonProperties,
 } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  AxisGroupBy,
-  ChartDataSet,
-  DataSetConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 
 import 'leaflet/dist/leaflet.css';
-import React from 'react';
+import React, {
+  createRef,
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
@@ -44,10 +49,13 @@ type MapBlockProperties = DataBlockGeoJsonProperties & {
 
 export type MapFeature = Feature<Geometry, MapBlockProperties>;
 
-export interface MapProps extends ChartProps {
+export interface MapBlockProps extends ChartProps {
   position?: { lat: number; lng: number };
   maxBounds?: LatLngBounds;
   geographicId?: string;
+  axes: {
+    major: AxisConfiguration;
+  };
 }
 
 interface IdValue {
@@ -262,9 +270,9 @@ function useCallbackRef<T extends (...args: never[]) => unknown>(
   callback: () => T,
   deps: unknown[] | undefined,
 ) {
-  const ref = React.useRef<T>();
+  const ref = useRef<T>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     ref.current = callback();
   }, deps); // eslint-disable-line
 
@@ -296,41 +304,41 @@ const MapBlock = ({
   height,
   labels,
   axes,
-}: MapProps) => {
-  const mapRef = React.createRef<Map>();
-  const geoJsonRef = React.createRef<GeoJSON>();
-  const container = React.createRef<HTMLDivElement>();
-  const ukRef = React.createRef<GeoJSON>();
+}: MapBlockProps) => {
+  const mapRef = createRef<Map>();
+  const geoJsonRef = createRef<GeoJSON>();
+  const container = createRef<HTMLDivElement>();
+  const ukRef = createRef<GeoJSON>();
 
-  const [geometry, setGeometry] = React.useState<
+  const [geometry, setGeometry] = useState<
     FeatureCollection<Geometry, DataBlockGeoJsonProperties>
   >();
 
-  const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>();
+  const [ukGeometry, setUkGeometry] = useState<FeatureCollection>();
 
-  const intersectionObserver = React.useRef<IntersectionObserver>();
+  const intersectionObserver = useRef<IntersectionObserver>();
 
-  const [dataSetOptions, setDataSetOptions] = React.useState<SelectOption[]>();
+  const [dataSetOptions, setDataSetOptions] = useState<SelectOption[]>();
 
-  const [majorOptions, setMajorOptions] = React.useState<SelectOption[]>([]);
+  const [majorOptions, setMajorOptions] = useState<SelectOption[]>([]);
 
-  const [legend, setLegend] = React.useState<LegendEntry[]>([]);
+  const [legend, setLegend] = useState<LegendEntry[]>([]);
 
-  const [selectedDataSetKey, setSelectedDataSetKey] = React.useState<string>();
+  const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>();
 
-  const [selectedLocation, setSelectedLocation] = React.useState<string>('');
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
 
-  const [results, setResults] = React.useState<IdValue[]>([]);
+  const [results, setResults] = useState<IdValue[]>([]);
 
-  const [chartData, setChartData] = React.useState<ChartData[]>();
+  const [chartData, setChartData] = useState<ChartData[]>();
 
   // enforce that the Map only responds to being grouped by locations
-  const [axisMajor, setAxisMajor] = React.useState<AxisConfiguration>({
+  const [axisMajor, setAxisMajor] = useState<AxisConfiguration>({
     ...axes.major,
     groupBy: 'locations',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     setAxisMajor({
       ...axes.major,
       groupBy: 'locations',
@@ -338,14 +346,14 @@ const MapBlock = ({
   }, [axes.major]);
 
   // initialise
-  React.useEffect(() => {
+  useEffect(() => {
     import('@common/modules/charts/files/ukGeoJson.json').then(imported => {
       setUkGeometry(imported.default as FeatureCollection);
     });
   }, []);
 
   // resize handler
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (container.current) {
       intersectionObserver.current = registerResizingCheck(
         container.current,
@@ -368,7 +376,7 @@ const MapBlock = ({
   }, [container, mapRef]);
 
   // initialise on prop changes
-  React.useEffect(() => {
+  useEffect(() => {
     const generatedChartData = createSortedAndMappedDataForAxis(
       axisMajor,
       data.result,
@@ -384,7 +392,7 @@ const MapBlock = ({
     setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
   }, [data, axisMajor, meta, labels]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       selectedDataSetKey === undefined ||
       labels[selectedDataSetKey] === undefined
@@ -396,14 +404,14 @@ const MapBlock = ({
   }, [axisMajor.dataSets, axisMajor.groupBy, labels, selectedDataSetKey]);
 
   // update settings for the data sets
-  React.useEffect(() => {
+  useEffect(() => {
     setDataSetOptions(
       generateDataOptions(axisMajor.dataSets, labels, axisMajor.groupBy),
     );
   }, [axisMajor.dataSets, axisMajor.groupBy, labels]);
 
   // force a refresh of the leaflet element if width or height are changed
-  React.useEffect(() => {
+  useEffect(() => {
     if (mapRef.current) {
       mapRef.current.leafletElement.invalidateSize();
     }
@@ -411,7 +419,7 @@ const MapBlock = ({
   }, [width, height]);
 
   // Rebuild the geometry if the selection has changed
-  React.useEffect(() => {
+  useEffect(() => {
     if (chartData && selectedDataSetKey && labels[selectedDataSetKey]) {
       const {
         geometry: newGeometry,
@@ -545,7 +553,7 @@ const MapBlock = ({
   };
 
   // reset the GeoJson layer if the geometry is changed, updating the component doesn't do it once it's rendered
-  React.useEffect(() => {
+  useEffect(() => {
     if (geoJsonRef.current) {
       geoJsonRef.current.leafletElement.clearLayers();
 
@@ -702,12 +710,9 @@ const MapBlock = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const mapBlockDefinition: ChartDefinition = {
   type: 'map',
   name: 'Geographic',
-
-  height: 600,
-
   capabilities: {
     dataSymbols: false,
     stackable: false,
@@ -718,8 +723,14 @@ const definition: ChartDefinition = {
     hasAxes: false,
     hasReferenceLines: false,
     hasLegend: false,
+    requiresGeoJson: true,
   },
-
+  options: {
+    defaults: {
+      height: 600,
+      legend: 'none',
+    },
+  },
   data: [
     {
       type: 'geojson',
@@ -728,19 +739,16 @@ const definition: ChartDefinition = {
       targetAxis: 'geojson',
     },
   ],
-
-  axes: [
-    {
+  axes: {
+    major: {
       id: 'geojson',
-      title: 'geojson',
+      title: 'GeoJSON (major axis)',
       type: 'major',
-      forcedDataType: 'locations',
+      constants: {
+        groupBy: 'locations',
+      },
     },
-  ],
-
-  requiresGeoJson: true,
+  },
 };
 
-MapBlock.definition = definition;
-
-export default MapBlock;
+export default memo(MapBlock);

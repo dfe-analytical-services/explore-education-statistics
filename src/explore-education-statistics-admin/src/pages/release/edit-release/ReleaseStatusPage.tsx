@@ -1,10 +1,8 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/service';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import permissionService from '@admin/services/permissions/permissionService';
 import service from '@admin/services/release/edit-release/status/service';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -15,7 +13,7 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -48,7 +46,7 @@ const ReleaseStatusPage = () => {
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useManageReleaseContext();
 
   useEffect(() => {
     Promise.all([

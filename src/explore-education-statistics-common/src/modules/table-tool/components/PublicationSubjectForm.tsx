@@ -2,10 +2,10 @@ import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubject } from '@common/modules/table-tool/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
+import { PublicationSubject } from '@common/modules/table-tool/services/tableBuilderService';
 import { FormikProps } from 'formik';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -16,18 +16,15 @@ interface FormValues {
 
 export type PublicationSubjectFormSubmitHandler = (values: {
   subjectId: string;
-  subjectName: string;
 }) => void;
 
+const formId = 'publicationSubjectForm';
+
 interface Props {
+  initialValues?: { subjectId: string };
   onSubmit: PublicationSubjectFormSubmitHandler;
   options: PublicationSubject[];
-  initialValues?: { subjectId?: string };
 }
-const initialiseSubjectName = (
-  sid: string,
-  options: PublicationSubject[],
-): string => (options.find(({ id }) => sid === id) || { label: '' }).label;
 
 const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -37,38 +34,25 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
-    initialValues: { subjectId: initialSubjectId = '' } = {},
+    initialValues = {
+      subjectId: '',
+    },
   } = props;
 
-  const [subjectName, setSubjectName] = useState(() =>
-    initialiseSubjectName(initialSubjectId, options),
-  );
-
   const formikRef = useRef<Formik<FormValues>>(null);
-  const formId = 'publicationSubjectForm';
 
-  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
-    setSubjectName('');
-  });
+  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
+
+  const getSubjectName = (subjectId: string): string => {
+    const matching = options.find(({ id }) => subjectId === id);
+    return matching?.label ?? '';
+  };
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
       Choose a subject
     </WizardStepHeading>
   );
-
-  const initialValues = {
-    subjectId: initialSubjectId,
-  };
-
-  useEffect(() => {
-    if (formikRef.current) {
-      formikRef.current.setValues({
-        subjectId: `${initialSubjectId}`,
-      });
-    }
-    setSubjectName(initialiseSubjectName(initialSubjectId, options));
-  }, [options, initialSubjectId]);
 
   return (
     <Formik<FormValues>
@@ -83,7 +67,6 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
       onSubmit={async ({ subjectId }) => {
         await onSubmit({
           subjectId,
-          subjectName,
         });
         goToNextStep();
       }}
@@ -100,18 +83,21 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
               }))}
               id={`${formId}-subjectId`}
               disabled={form.isSubmitting}
-              onChange={(event, option) => {
-                setSubjectName(option.label);
-              }}
             />
 
-            <WizardStepFormActions {...props} form={form} formId={formId} />
+            {options.length > 0 ? (
+              <WizardStepFormActions {...props} form={form} formId={formId} />
+            ) : (
+              <p>No subjects available for this release.</p>
+            )}
           </Form>
         ) : (
           <>
             {stepHeading}
             <SummaryList noBorder>
-              <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
+              <SummaryListItem term="Subject">
+                {getSubjectName(form.values.subjectId)}
+              </SummaryListItem>
             </SummaryList>
           </>
         );

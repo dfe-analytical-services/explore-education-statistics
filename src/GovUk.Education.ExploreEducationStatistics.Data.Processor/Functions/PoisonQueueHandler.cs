@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -22,15 +23,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ILogger logger
         )
         {
-            var errors = new List<string> {"File failed to import for unknown reason in upload processing stage."};
-
             await _batchService.FailImport(
                 message.Release.Id.ToString(),
                 message.OrigDataFileName,
-                errors
+                new List<ValidationError>
+                {
+                    new ValidationError("File failed to import for unknown reason in upload processing stage.")
+                }.AsEnumerable()
             );
         }
-
 
         [FunctionName("ImportObservationsPoisonHandler")]
         public async void ImportObservationsPoisonQueueHandler(
@@ -38,12 +39,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ImportMessage message,
             ILogger logger)
         {
-            var errors = new List<string> {"File failed to import for unknown reason in observation import stage."};
-
             await _batchService.FailImport(
                 message.Release.Id.ToString(),
                 message.OrigDataFileName,
-                errors
+                new List<ValidationError>
+                {
+                    new ValidationError("File failed to import for unknown reason in upload processing stage.")
+                }.AsEnumerable()
             );
         }
     }

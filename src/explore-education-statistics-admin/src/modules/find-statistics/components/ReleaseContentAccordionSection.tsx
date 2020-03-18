@@ -1,112 +1,151 @@
-import { EditableContentBlock } from '@admin/services/publicationService';
-import React, { MouseEventHandler, ReactNode, useCallback } from 'react';
-import ContentBlock, {
-  ReorderHook,
-} from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
 import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
-import classnames from 'classnames';
-import styles from '@admin/modules/find-statistics/components/ReleaseContentAccordion.module.scss';
 import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import { AbstractRelease } from '@common/services/publicationService';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
+import { EditableRelease } from '@admin/services/publicationService';
+import Button from '@common/components/Button';
+import React, { useCallback, useState } from 'react';
+import AddDataBlockButton from './AddDataBlockButton';
 
 export interface ReleaseContentAccordionSectionProps {
-  id?: string;
+  id: string;
   contentItem: ContentType;
   index: number;
-  publication: AbstractRelease<EditableContentBlock>['publication'];
-  headingButtons?: ReactNode[];
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
-  onContentChange?: (content?: EditableContentBlock[]) => void;
-  canToggle?: boolean;
   onRemoveSection?: EditableAccordionSectionProps['onRemoveSection'];
+  canAddBlocks?: boolean;
+  release: EditableRelease;
 }
 
 const ReleaseContentAccordionSection = ({
-  id,
+  release,
+  id: sectionId,
   index,
   contentItem,
-  publication,
-  headingButtons,
-  canToggle = true,
   onHeadingChange,
-  onContentChange,
   onRemoveSection,
+  canAddBlocks = true,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
   const { caption, heading } = contentItem;
+  const { content: sectionContent = [] } = contentItem;
+  const [isReordering, setIsReordering] = useState(false);
+  const {
+    addContentSectionBlock,
+    attachContentSectionBlock,
+    deleteContentSectionBlock,
+    updateContentSectionBlock,
+    updateSectionBlockOrder,
+  } = useReleaseActions();
 
-  const [isReordering, setIsReordering] = React.useState(false);
+  const addBlockToAccordionSection = useCallback(() => {
+    addContentSectionBlock({
+      releaseId: release.id,
+      sectionId,
+      sectionKey: 'content',
+      block: {
+        type: 'MarkdownBlock',
+        order: sectionContent.length,
+        body: '',
+      },
+    });
+  }, [release.id, sectionId, sectionContent.length, addContentSectionBlock]);
 
-  const [content, setContent] = React.useState(contentItem.content);
-
-  const saveOrder = React.useRef<ReorderHook>();
-
-  const onReorderClick: MouseEventHandler = e => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    if (isReordering) {
-      if (saveOrder.current) {
-        saveOrder.current(contentItem.id).then(() => setIsReordering(false));
-      } else {
-        setIsReordering(false);
-      }
-    } else {
-      setIsReordering(true);
-    }
-  };
-
-  const handleContentChange = React.useCallback(
-    (newContent?: EditableContentBlock[]) => {
-      setContent(newContent);
-      if (onContentChange) {
-        onContentChange(newContent);
-      }
+  const attachDataBlockToAccordionSection = useCallback(
+    (datablockId: string) => {
+      attachContentSectionBlock({
+        releaseId: release.id,
+        sectionId,
+        sectionKey: 'content',
+        block: {
+          contentBlockId: datablockId,
+          order: sectionContent.length,
+        },
+      });
     },
-    [onContentChange],
+    [release.id, sectionId, sectionContent.length, attachContentSectionBlock],
   );
 
-  const handleReorder = useCallback(ord => {
-    saveOrder.current = ord;
-  }, []);
+  const updateBlockInAccordionSection = useCallback(
+    (blockId, bodyContent) => {
+      updateContentSectionBlock({
+        releaseId: release.id,
+        sectionId,
+        blockId,
+        sectionKey: 'content',
+        bodyContent,
+      });
+    },
+    [release.id, sectionId, updateContentSectionBlock],
+  );
+
+  const removeBlockFromAccordionSection = useCallback(
+    (blockId: string) =>
+      deleteContentSectionBlock({
+        releaseId: release.id,
+        sectionId,
+        blockId,
+        sectionKey: 'content',
+      }),
+    [release.id, sectionId, deleteContentSectionBlock],
+  );
+
+  const reorderBlocksInAccordionSection = useCallback(
+    order => {
+      updateSectionBlockOrder({
+        releaseId: release.id,
+        sectionId,
+        sectionKey: 'content',
+        order,
+      });
+    },
+    [release.id, sectionId, updateSectionBlockOrder],
+  );
 
   return (
     <AccordionSection
-      id={id}
+      id={sectionId}
       index={index}
       heading={heading || ''}
       caption={caption}
-      canToggle={canToggle}
-      headingButtons={[
-        content && content.length > 1 && (
-          <button
-            key="toggle_reordering"
-            className={classnames(styles.toggleContentDragging)}
-            type="button"
-            onClick={onReorderClick}
-          >
-            {isReordering ? 'Save order' : 'Reorder Content'}
-          </button>
-        ),
-        ...(headingButtons || []),
-      ]}
-      canEditHeading
       onHeadingChange={onHeadingChange}
       onRemoveSection={onRemoveSection}
+      sectionId={sectionId}
+      headerButtons={
+        <Button
+          onClick={() => setIsReordering(!isReordering)}
+          className={`govuk-button ${!isReordering &&
+            'govuk-button--secondary'}`}
+        >
+          {isReordering ? 'Save section order' : 'Reorder this section'}
+        </Button>
+      }
       {...restOfProps}
     >
-      <ContentBlock
+      <ContentBlocks
         id={`${heading}-content`}
         isReordering={isReordering}
-        canAddBlocks
-        sectionId={id}
-        content={content}
-        publication={publication}
-        onContentChange={handleContentChange}
-        onReorder={handleReorder}
+        sectionId={sectionId}
+        onBlockSaveOrder={reorderBlocksInAccordionSection}
+        onBlockContentChange={updateBlockInAccordionSection}
+        onBlockDelete={removeBlockFromAccordionSection}
+        content={sectionContent}
+        allowComments
+        insideAccordion
       />
+
+      {!isReordering && canAddBlocks && (
+        <div className="govuk-!-margin-bottom-8 dfe-align--center">
+          <Button variant="secondary" onClick={addBlockToAccordionSection}>
+            Add text block
+          </Button>
+          <AddDataBlockButton
+            onAddDataBlock={attachDataBlockToAccordionSection}
+          />
+        </div>
+      )}
     </AccordionSection>
   );
 };

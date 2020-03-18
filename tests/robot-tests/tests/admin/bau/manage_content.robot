@@ -76,6 +76,8 @@ Add key statistics summary content to release
     user presses keys   Test key statistics summary text for Manage content test %{RUN_IDENTIFIER}
     user clicks element  xpath://button[text()="Save"]
 
+    user waits until page contains   Test key statistics summary text for Manage content test %{RUN_IDENTIFIER}
+
 Add accordion sections to release
     [Tags]  HappyPath
     user clicks element   xpath://button[text()="Add new section"]
