@@ -162,8 +162,8 @@ user waits until page contains heading
   wait until page contains element   xpath://h1[contains(.,"${text}")]   timeout=${wait}
 
 user waits until page contains accordion section
-  [Arguments]   ${section_title}
-  user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]
+  [Arguments]   ${section_title}     ${wait}=${timeout}
+  user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
 
 user checks element contains
   [Arguments]   ${element}    ${text}
