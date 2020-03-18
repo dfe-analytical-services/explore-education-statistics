@@ -8,7 +8,7 @@ import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';

@@ -5,8 +5,8 @@ import {
   FormGroup,
   Formik,
 } from '@common/components/form';
-import createErrorHelper from '@common/validation/validation/createErrorHelper';
-import Yup from '@common/validation/validation/yup';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import Yup from '@common/validation/yup';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { useCookies } from '@frontend/hooks/useCookies';

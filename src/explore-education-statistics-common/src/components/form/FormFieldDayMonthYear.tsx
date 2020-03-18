@@ -1,6 +1,6 @@
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import createErrorHelper from '@common/validation/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/createErrorHelper';
 import { Field, FieldProps } from 'formik';
 import React, { ReactNode } from 'react';
 

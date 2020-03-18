@@ -1,7 +1,7 @@
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
-import createErrorHelper from '@common/validation/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/createErrorHelper';
 import { connect, FormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
 import get from 'lodash/get';

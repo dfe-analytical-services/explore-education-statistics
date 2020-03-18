@@ -16,7 +16,7 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import parseNumber from '@common/utils/number/parseNumber';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import React, { useCallback } from 'react';
 import { Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';

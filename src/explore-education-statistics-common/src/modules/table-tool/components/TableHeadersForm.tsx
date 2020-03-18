@@ -5,7 +5,7 @@ import { Filter } from '@common/modules/table-tool/types/filters';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { PickByType } from '@common/types';
 import reorder from '@common/utils/reorder';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import classNames from 'classnames';
 import { Form, FormikProps } from 'formik';
 import React, { useMemo } from 'react';

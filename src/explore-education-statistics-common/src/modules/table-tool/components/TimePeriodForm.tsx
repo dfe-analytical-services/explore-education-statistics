@@ -12,7 +12,7 @@ import {
   PublicationSubjectMeta,
   TimePeriodQuery,
 } from '@common/modules/table-tool/services/tableBuilderService';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useMemo, useRef } from 'react';
 import { InjectedWizardProps } from './Wizard';

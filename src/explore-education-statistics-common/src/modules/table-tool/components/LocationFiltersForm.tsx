@@ -8,7 +8,7 @@ import {
   PublicationSubjectMeta,
 } from '@common/modules/table-tool/services/tableBuilderService';
 import { Dictionary, PartialRecord } from '@common/types/util';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import mapValues from 'lodash/mapValues';
 import sortBy from 'lodash/sortBy';

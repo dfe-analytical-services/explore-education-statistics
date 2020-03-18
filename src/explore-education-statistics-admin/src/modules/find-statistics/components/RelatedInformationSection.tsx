@@ -12,7 +12,7 @@ import {
 } from '@common/components/form';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { BasicLink } from '@common/services/publicationService';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useContext, useState } from 'react';
 

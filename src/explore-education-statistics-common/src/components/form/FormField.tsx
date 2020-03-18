@@ -1,4 +1,4 @@
-import createErrorHelper from '@common/validation/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/createErrorHelper';
 import { Field, FieldProps } from 'formik';
 import React, {
   ChangeEventHandler,

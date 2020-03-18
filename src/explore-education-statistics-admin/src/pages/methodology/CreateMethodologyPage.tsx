@@ -24,7 +24,7 @@ import {
   dayMonthYearInputsToDate,
   dayMonthYearValuesToInputs,
 } from '@common/utils/date/dayMonthYear';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';

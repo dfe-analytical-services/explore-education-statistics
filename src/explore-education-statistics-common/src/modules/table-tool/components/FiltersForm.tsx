@@ -13,8 +13,8 @@ import {
   PublicationSubjectMeta,
 } from '@common/modules/table-tool/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import createErrorHelper from '@common/validation/validation/createErrorHelper';
-import Yup from '@common/validation/validation/yup';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';

@@ -18,7 +18,7 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';

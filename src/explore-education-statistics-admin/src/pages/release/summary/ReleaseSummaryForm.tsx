@@ -20,7 +20,7 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { Dictionary } from '@common/types';
 import { DayMonthYearInputs } from '@common/utils/date/dayMonthYear';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';

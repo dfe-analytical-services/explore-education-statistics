@@ -1,7 +1,7 @@
 import FormTextArea, {
   FormTextAreaProps,
 } from '@common/components/form/FormTextArea';
-import createErrorHelper from '@common/validation/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/createErrorHelper';
 import classNames from 'classnames';
 import { Field, FieldProps } from 'formik';
 import React from 'react';

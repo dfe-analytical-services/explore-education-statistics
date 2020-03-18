@@ -10,8 +10,8 @@ import {
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { ThemeMeta } from '@common/modules/table-tool/services/tableBuilderService';
-import createErrorHelper from '@common/validation/validation/createErrorHelper';
-import Yup from '@common/validation/validation/yup';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';

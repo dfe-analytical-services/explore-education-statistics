@@ -3,7 +3,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { PublicationSubject } from '@common/modules/table-tool/services/tableBuilderService';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useRef } from 'react';
 import { InjectedWizardProps } from './Wizard';

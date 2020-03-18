@@ -17,7 +17,7 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import remove from 'lodash/remove';

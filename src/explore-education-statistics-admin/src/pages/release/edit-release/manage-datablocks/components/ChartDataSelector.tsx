@@ -17,7 +17,7 @@ import {
 } from '@common/modules/charts/util/chartUtils';
 import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import React, { useMemo, useState } from 'react';

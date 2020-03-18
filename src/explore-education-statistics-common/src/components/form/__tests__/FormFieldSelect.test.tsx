@@ -1,4 +1,4 @@
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { fireEvent, render, wait } from '@testing-library/react';
 import { Formik, FormikProps } from 'formik';
 import React from 'react';

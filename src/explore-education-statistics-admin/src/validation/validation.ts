@@ -2,7 +2,7 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearIsEmpty,
 } from '@common/utils/date/dayMonthYear';
-import Yup from '@common/validation/validation/yup';
+import Yup from '@common/validation/yup';
 import { isValid, parse } from 'date-fns';
 
 const yupNumberOrUndefinedIfBlank = Yup.mixed().transform((val: string) =>
