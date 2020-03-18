@@ -3,22 +3,13 @@
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
 const DotEnv = require('dotenv');
-const DotEnvPlugin = require('dotenv-webpack');
 const fs = require('fs');
 const compose = require('lodash/fp/compose');
 const withImages = require('next-images');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
-const { BUILD_ENV } = process.env;
-
-if (['local', 'example'].includes(BUILD_ENV)) {
-  throw new Error('Invalid BUILD_ENV provided');
-}
-
-const localEnvFile = fs.existsSync('.env.local') ? '.env.local' : '.env';
-
-const envFilePath = BUILD_ENV ? `.env.${BUILD_ENV}` : localEnvFile;
+const envFilePath = fs.existsSync('.env.local') ? '.env.local' : '.env';
 const envConfig = DotEnv.parse(fs.readFileSync(envFilePath));
 
 const createPlugin = plugin => {
@@ -123,6 +114,12 @@ const withESLint = createPlugin((config, options) => {
 });
 
 const nextConfig = {
+  publicRuntimeConfig: {
+    ...envConfig,
+    APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
+    GA_TRACKING_ID: process.env.GA_TRACKING_ID,
+    HOTJAR_ID: process.env.HOTJAR_ID,
+  },
   webpack(config, options) {
     const { dev, isServer } = options;
 
@@ -154,13 +151,6 @@ const nextConfig = {
         );
       }
     }
-
-    config.plugins.push(
-      new DotEnvPlugin({
-        path: envFilePath,
-        safe: true,
-      }),
-    );
 
     config.resolve.alias = {
       ...config.resolve.alias,
