@@ -31,18 +31,19 @@ const KeyStatTile = ({
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
   >(response);
-
   const [config, setConfig] = useState<KeyStatConfig | undefined>();
 
   useEffect(() => {
-    if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject({
-        ...dataBlockRequest,
-        includeGeoJson: false,
-      })
-        .then(setDataBlockResponse)
-        .catch(handleApiErrors);
-    } else {
+    DataBlockService.getDataBlockForSubject({
+      ...dataBlockRequest,
+      includeGeoJson: false,
+    })
+      .then(setDataBlockResponse)
+      .catch(handleApiErrors);
+  }, [dataBlockRequest]);
+
+  useEffect(() => {
+    if (dataBlockResponse) {
       const [indicatorKey, theIndicator] = Object.entries(
         dataBlockResponse.metaData.indicators,
       )[0];
@@ -53,7 +54,7 @@ const KeyStatTile = ({
         )}${theIndicator.unit}`,
       });
     }
-  }, [dataBlockResponse, dataBlockRequest, handleApiErrors]);
+  }, [dataBlockResponse, handleApiErrors]);
 
   return (
     <div className={styles.keyStatTile}>
