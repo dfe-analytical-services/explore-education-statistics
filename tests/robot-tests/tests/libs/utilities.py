@@ -49,6 +49,9 @@ def user_checks_accordion_is_in_position(header_starts_with, position):
   if not elem.text.strip().startswith(header_starts_with):
     raise AssertionError(f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
 
+def user_checks_there_are_x_accordion_sections(num):
+  sl.page_should_contain_element('xpath:.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")]', limit=num)
+
 def user_verifies_accordion_is_open(section_text):
   try:
     sl.driver \

@@ -10,6 +10,8 @@ Suite Teardown    user closes the browser
 Validate Analyst1 can see correct themes and topics
     [Tags]  HappyPath
     user selects theme "Pupils and schools" and topic "Pupil absence" from the admin dashboard
+    user waits until page contains accordion section  Pupil absence in schools in England     60
+
     user checks list contains label   css:#selectTheme   Pupils and schools
     user checks list contains x elements   css:#selectTopic   2
     user checks list contains label   css:#selectTopic   Exclusions
@@ -30,15 +32,16 @@ Validate Analyst1 can see correct scheduled releases
     user clicks element   css:#scheduled-releases-tab
     user checks element contains  css:#scheduled-releases   There are currently no scheduled releases
 
-Validate Analyst1 cannot create a publication for Pupils and schools theme
+Validate Analyst1 cannot create a publication for Pupils absence topic
     [Tags]  HappyPath
-    user selects theme "Pupils and schools" and topic "Pupil absence" from the admin dashboard
-    user selects from list by label   css:#selectTheme   Pupils and schools
-    user waits until page contains accordion section  Pupil absence in schools in England
+    user clicks element   css:#my-publications-tab
+    user waits until page contains element   css:#selectTheme
+    user waits until page contains element   xpath://h3[text()="Pupil absence"]
     user checks page does not contain element   xpath://a[text()="Create new publication"]
 
 Validate Analyst1 cannot create a release for Pupil absence topic
     [Tags]  HappyPath
+    user waits until page contains accordion section  Pupil absence in schools in England
     user opens accordion section  Pupil absence in schools in England
     user checks page does not contain element   xpath://*[data-testid="Create new release link for Pupil absence in schools in England"]
 
@@ -87,16 +90,18 @@ Validate Analyst1 can see Manage content page
     user clicks element   xpath://a[text()="Manage content"]
     user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]    120
 
+Validate Manage content page is in Edit mode
+    [Tags]  HappyPath   Failing
     user waits until page contains element   css:#pageMode
     user checks page contains element  css:#pageMode-edit[checked]
     user checks page does not contain element   css:#pageMode-preview[checked]
 
 Validate Analyst1 can see Manage content page key stats
-    [Tags]  HappyPath   Failing
+    [Tags]  HappyPath
     [Documentation]   EES-1508
-    user waits until page contains key stat tile   Overall absence rate        4.6%    60
-    user waits until page contains key stat tile   Authorised absence rate     3.5%
-    user waits until page contains key stat tile   Unauthorised absence rate   1.1%
+    user waits until page contains key stat tile   Overall absence rate        4.7%    60
+    user waits until page contains key stat tile   Authorised absence rate     3.4%
+    user waits until page contains key stat tile   Unauthorised absence rate   1.3%
     user checks element count is x    css:[data-testid="key-stat-tile"]   3
 
 Validate Analyst1 can see Manage content page accordion sections
@@ -113,7 +118,7 @@ Validate Analyst1 can see Manage content page accordion sections
     user checks accordion is in position  Regional and local authority (LA) breakdown  9
     user checks accordion is in position  Methodology                       10
     user checks accordion is in position  Contact us                        11
-    user checks element count is x   xpath://*[@class="govuk-accordion__section"]   11
+    user checks there are x accordion sections  11
 
 Validate Analyst1 cannot Approve a Pupil absence in schools in England release
     [Tags]  HappyPath
