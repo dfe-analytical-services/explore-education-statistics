@@ -12,14 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         public ApproveSpecificMethodologyAuthorizationHandler() : base(
             new CanApproveAllMethodologiesAuthorizationHandler())
         {}
-    }
-    
-    public class CanApproveAllMethodologiesAuthorizationHandler : 
-        EntityAuthorizationHandler<ApproveSpecificMethodologyRequirement, Methodology>
-    {
-        public CanApproveAllMethodologiesAuthorizationHandler() 
-            : base(ctx => 
-                ctx.Entity.Status != MethodologyStatus.Approved 
-                && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.ApproveAllMethodologies)) {}
+        
+        public class CanApproveAllMethodologiesAuthorizationHandler : 
+            EntityAuthorizationHandler<ApproveSpecificMethodologyRequirement, Methodology>
+        {
+            public CanApproveAllMethodologiesAuthorizationHandler() 
+                : base(ctx => 
+                    ctx.Entity.Status != MethodologyStatus.Approved 
+                    && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.ApproveAllMethodologies)) {}
+        }
     }
 }

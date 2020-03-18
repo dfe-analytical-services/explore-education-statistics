@@ -63,6 +63,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         {
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanUpdateRelease);
         }
+        
+        // BAU-324 - temporary stop-gap to prevent data files from being amended during a Release Amendment.
+        // Allowing data files to be changed on a Release Amendment is being tackled in the follow-up "Phase 2"
+        // Release Versioning tickets
+        [HttpGet("release/{releaseId}/update-data-files")]
+        public Task<ActionResult<bool>> CanUpdateReleaseDataFiles(Guid releaseId)
+        {
+            return CheckPolicyAgainstEntity<Release>(releaseId, async release =>
+            {
+                if (release.Version > 0)
+                {
+                    return new ForbidResult();
+                }
+
+                return await _userService.CheckCanUpdateRelease(release);
+            });
+        }
 
         [HttpGet("release/{releaseId}/status/draft")]
         public Task<ActionResult<bool>> CanMarkReleaseAsDraft(Guid releaseId)
@@ -80,6 +97,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         public Task<ActionResult<bool>> CanApproveRelease(Guid releaseId)
         {
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanApproveRelease);
+        }
+
+        [HttpGet("release/{releaseId}/amend")]
+        public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseId)
+        {
+            return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanMakeAmendmentOfRelease);
         }
 
         [HttpGet("release/{releaseId}/prerelease/status")]

@@ -29,6 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     .Result
                     .OnSuccess(_ => true)
                     .OrElse(() => false)
+                    .Right,
+                
+                CanMakeAmendmentOfRelease = _userService
+                    .CheckCanMakeAmendmentOfRelease(source)
+                    .Result
+                    .OnSuccess(_ => true)
+                    .OrElse(() => false)
                     .Right
             };
         }

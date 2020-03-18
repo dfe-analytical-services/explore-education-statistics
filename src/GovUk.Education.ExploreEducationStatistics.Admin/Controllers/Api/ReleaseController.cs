@@ -25,23 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [ApiController]
     [Authorize]
     public class ReleasesController : ControllerBase
-    {
-        public static readonly Regex[] AllowedChartFileTypes = {
-            new Regex(@"^image/.*") 
-        };
-        
-        public static readonly Regex[] AllowedAncillaryFileTypes = {
-            new Regex(@"^image/.*"),
-            new Regex(@"^(application|text)/csv$"),
-            new Regex(@"^text/plain$"),
-            new Regex(@"^application/pdf$"),
-            new Regex(@"^application/msword$"),
-            new Regex(@"^application/vnd.ms-excel$"),
-            new Regex(@"^application/vnd.openxmlformats(.*)$"),
-            new Regex(@"^application/vnd.oasis.opendocument(.*)$"),
-            new Regex(@"^application/CDFV2$"), 
-        };
-        
+    {   
         private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
@@ -101,6 +85,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
         
+        [HttpPost("release/{releaseId}/amendment")]
+        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
+        {
+            return await _releaseService
+                .CreateReleaseAmendmentAsync(releaseId)
+                .HandleFailuresOr(Ok);
+        }
+        
         // GET api/release/{releaseId}/data
         [HttpGet("release/{releaseId}/data")]
         [Produces("application/json")]
@@ -148,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false, AllowedAncillaryFileTypes)
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
                 .HandleFailuresOr(Ok);
         }
 
@@ -163,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, true, AllowedChartFileTypes)
+                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, true)
                 .HandleFailuresOr(Ok);
         }
 
