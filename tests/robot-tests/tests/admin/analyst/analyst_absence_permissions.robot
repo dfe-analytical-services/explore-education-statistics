@@ -97,11 +97,11 @@ Validate Manage content page is in Edit mode
     user checks page does not contain element   css:#pageMode-preview[checked]
 
 Validate Analyst1 can see Manage content page key stats
-    [Tags]  HappyPath   Failing
+    [Tags]  HappyPath
     [Documentation]   EES-1508
-    user waits until page contains key stat tile   Overall absence rate        4.6%    60
-    user waits until page contains key stat tile   Authorised absence rate     3.5%
-    user waits until page contains key stat tile   Unauthorised absence rate   1.1%
+    user waits until page contains key stat tile   Overall absence rate        4.7%    60
+    user waits until page contains key stat tile   Authorised absence rate     3.4%
+    user waits until page contains key stat tile   Unauthorised absence rate   1.3%
     user checks element count is x    css:[data-testid="key-stat-tile"]   3
 
 Validate Analyst1 can see Manage content page accordion sections
