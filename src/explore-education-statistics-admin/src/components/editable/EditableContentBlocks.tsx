@@ -7,6 +7,7 @@ import PreviewContentBlocks, {
 } from '@common/modules/find-statistics/components/ContentBlocks';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
+import orderBy from 'lodash/orderBy';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
@@ -42,7 +43,7 @@ const EditableContentBlocks = ({
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    setContentBlocks(content);
+    setContentBlocks(orderBy(content, 'order'));
   }, [content]);
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import EditableAccordion from '@admin/components/EditableAccordion';
 import { MethodologyContent } from '@admin/services/methodology/types';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import orderBy from 'lodash/orderBy';
 import React, { useCallback, useContext } from 'react';
 import useMethodologyActions from '../context/useMethodologyActions';
 import MethodologyAccordionSection from './MethodologyAccordionSection';
@@ -50,17 +51,19 @@ const MethodologyAccordion = ({
       onAddSection={onAddSection}
       onSaveOrder={reorderAccordionSections}
     >
-      {(isAnnex ? methodology.annexes : methodology.content).map(
-        (accordionSection, index) => (
-          <MethodologyAccordionSection
-            methodologyId={methodology.id}
-            key={accordionSection.id}
-            content={accordionSection}
-            isAnnex={isAnnex}
-            index={index}
-          />
-        ),
-      )}
+      {orderBy(
+        isAnnex ? methodology.annexes : methodology.content,
+        'order',
+      ).map((accordionSection, index) => (
+        <MethodologyAccordionSection
+          id={accordionSection.id}
+          methodologyId={methodology.id}
+          key={accordionSection.id}
+          content={accordionSection}
+          isAnnex={isAnnex}
+          index={index}
+        />
+      ))}
     </EditableAccordion>
   );
 };

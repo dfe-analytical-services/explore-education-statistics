@@ -186,6 +186,7 @@ const EditableAccordion = ({
             key="add_section"
             onClick={onAddSection}
             className={styles.addSectionButton}
+            disabled={isReordering}
           >
             Add new section
           </Button>

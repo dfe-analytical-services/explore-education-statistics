@@ -12,6 +12,7 @@ interface MethodologyAccordionSectionProps {
   isAnnex?: boolean;
   methodologyId: string;
   index: number;
+  id: string;
 }
 
 const MethodologyAccordionSection = ({
