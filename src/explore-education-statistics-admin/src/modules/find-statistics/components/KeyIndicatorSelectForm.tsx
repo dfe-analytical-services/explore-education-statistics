@@ -3,9 +3,13 @@ import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import { TimePeriodQuery } from '@common/modules/table-tool/services/tableBuilderService';
-import { DataBlock } from '@common/services/dataBlockService';
-import React, { useEffect, useState } from 'react';
+import {
+  locationLevelKeys,
+  LocationLevelKeys,
+  TimePeriodQuery,
+} from '@common/modules/table-tool/services/tableBuilderService';
+import React, { useMemo, useState } from 'react';
+import { DataBlockRequest } from '@common/services/dataBlockService';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;
@@ -23,27 +27,18 @@ const KeyIndicatorSelectForm = ({
   const { availableDataBlocks } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
-  const [keyIndicatorDatablocks, setKeyIndicatorDatablocks] = useState<
-    DataBlock[]
-  >([]);
-
-  useEffect(() => {
-    setKeyIndicatorDatablocks(
-      availableDataBlocks.filter(db => {
-        return (
-          Object.entries(db.dataBlockRequest).filter(([key, val]) => {
-            // only want datablocks with (<2) of each filter type (filter, time period, location and indicator)
-            if (key === 'timePeriod') {
-              return !(
-                (val as TimePeriodQuery).startYear ===
-                (val as TimePeriodQuery).endYear
-              );
-            }
-            return Array.isArray(val) ? val.length > 1 : false;
-          }).length === 0
-        );
-      }),
-    );
+  const keyIndicatorDatablocks = useMemo(() => {
+    return availableDataBlocks.filter(db => {
+      const req = db.dataBlockRequest;
+      const timePeriod = req.timePeriod as TimePeriodQuery;
+      return (
+        req.indicators.length !== 1 ||
+        timePeriod.startYear !== timePeriod.endYear ||
+        locationLevelKeys.some(key => req[key]?.length !== 1)
+        // NOTE(mark): No check for number of filters because they cannot tell us whether
+        // there is a single result
+      );
+    });
   }, [availableDataBlocks]);
 
   function getKeyStatPreview() {
