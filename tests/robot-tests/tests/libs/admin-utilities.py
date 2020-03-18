@@ -61,11 +61,17 @@ def user_opens_editable_accordion_section(section_elem):
     except:
         raise AssertionError('Cannot click accordion section element')
 
-def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout=10):
+def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout=30):
     try:
         elem = section_elem.find_element_by_xpath('.//button[text()="Add content"]')
     except Exception as e:
         raise AssertionError(f'Failed to get "Add content" button element for accordion section element\nException: ', e)
+
+    max_time = time.time() + timeout
+    while (not elem.is_enabled()) and (time.time() < max_time):
+        time.sleep(0.5)
+    if time.time() >= max_time:
+        raise AssertionError(f'Failed to click "Add content" button for accordion section element. It wasn\'t enabled!')
 
     try:
         elem.click()
@@ -79,6 +85,7 @@ def user_clicks_add_content_for_editable_accordion_section(section_elem, timeout
             return
         except:
             time.sleep(0.5)
+    sl.capture_page_screenshot()
     raise AssertionError('Failed to find new empty content section')
 
 def user_checks_accordion_section_contains_X_blocks(section_elem, num_blocks):
@@ -103,6 +110,8 @@ def user_adds_content_to_accordion_section_content_block(section_elem, block_num
         section_elem.find_element_by_xpath(f'.//button[text()="Save"]').click()
     except:
         raise AssertionError(f'Failed to find Save button for content block')
+
+    sl.wait_until_page_contains_element(f'//p[text()="{content}"]')
 
 def user_checks_accordion_section_content_block_contains_text(section_elem, block_num, content):
     try:

@@ -1,7 +1,14 @@
+import { generatePath } from 'react-router';
+
+const route = '/theme/:themeId/topic/:topicId/create-publication';
+
 export default {
   createPublication: {
-    route: '/theme/:themeId/topic/:topicId/create-publication',
+    route,
     generateLink: (themeId: string, topicId: string) =>
-      `/theme/${themeId}/topic/${topicId}/create-publication`,
+      generatePath(route, {
+        themeId,
+        topicId,
+      }),
   },
 };

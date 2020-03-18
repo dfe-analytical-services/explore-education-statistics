@@ -395,6 +395,14 @@
     },
     "devopsSPN": {
       "type": "string"
+    }, 
+    "storageAccountPrefix": {
+      "type": "string",
+      "defaultValue": "storage"
+    },
+    "detailedErrors": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
@@ -411,7 +419,7 @@
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
-    "coreStorageAccountName": "[concat(parameters('subscription'), 'storageeescore')]",
+    "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
@@ -421,7 +429,7 @@
     "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
-    "notificationsStorageAccountName": "[concat(parameters('subscription'), 'storageeesnotify')]",
+    "notificationsStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eesnotify')]",
     "notificationsStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsStorageAccountName'))]",
     "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
@@ -562,6 +570,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -641,6 +650,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -775,6 +785,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -843,6 +854,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
               "http://127.0.0.1"
@@ -1018,7 +1030,7 @@
         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_LOAD_CERTIFICATES": "*",
-        "ASPNETCORE_DETAILEDERRORS": "true",
+        "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]",
         "NotifyInviteTemplateId": "[parameters('notifyInviteTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
@@ -1987,6 +1999,7 @@
         "cors": {
           "allowedOrigins": [
             "[concat('https://', parameters('domain'))]",
+            "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
             "https://localhost:3000",
             "http://localhost:3000",
             "http://127.0.0.1"

@@ -16,7 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // The Mime project is generally very good at determining mime types from file contents
             var mimeType = GuessMagicInfo(file.OpenReadStream(), MagicOpenFlags.MAGIC_MIME_TYPE);
 
-            if (mimeType != null && mimeType != "application/octet-stream")
+            if (mimeType != null &&
+                mimeType != "application/octet-stream" &&
+                mimeType != "application/zip")
             {
                 return mimeType;
             }

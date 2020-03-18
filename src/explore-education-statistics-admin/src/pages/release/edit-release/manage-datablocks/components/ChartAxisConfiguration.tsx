@@ -1,31 +1,40 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import Button from '@common/components/Button';
+import Effect from '@common/components/Effect';
 import {
-  FormCheckbox,
+  Form,
+  FormFieldRadioGroup,
+  FormFieldSelect,
   FormFieldset,
+  FormFieldTextInput,
   FormGroup,
-  FormRadioGroup,
+  Formik,
   FormTextInput,
 } from '@common/components/form';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import parseNumber from '@common/lib/utils/number/parseNumber';
+import Yup from '@common/lib/validation/yup';
 import {
+  AxisConfiguration,
+  AxisGroupBy,
   ChartCapabilities,
+  ChartDataSet,
   ChartMetaData,
+  DataSetConfiguration,
+  ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
   createSortedAndMappedDataForAxis,
 } from '@common/modules/charts/util/chartUtils';
 import { DataBlockData } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  AxisGroupBy,
-  ChartDataSet,
-  DataSetConfiguration,
-  ReferenceLine,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Schema } from 'yup';
+
+type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
 
 interface Props {
   id: string;
@@ -33,533 +42,419 @@ interface Props {
   configuration: AxisConfiguration;
   data: DataBlockData;
   meta: ChartMetaData;
-  labels: Dictionary<DataSetConfiguration>;
+  labels?: Dictionary<DataSetConfiguration>;
   capabilities: ChartCapabilities;
-  onConfigurationChange: (configuration: AxisConfiguration) => void;
   dataSets: ChartDataSet[];
+  onChange: (configuration: AxisConfigurationChangeValue) => void;
+  onSubmit: (configuration: AxisConfiguration) => void;
 }
-
-const getSortOptions = (
-  labels: Dictionary<DataSetConfiguration>,
-): SelectOption[] => {
-  return [
-    {
-      label: 'default',
-      value: 'name',
-    },
-    ...Object.values(labels).map<SelectOption>(config => ({
-      label: config.label,
-      value: config.value,
-    })),
-  ];
-};
-
-const getAxisLabels = (
-  configuration: AxisConfiguration,
-  data: DataBlockData,
-  meta: ChartMetaData,
-  labels: Dictionary<DataSetConfiguration>,
-  dataSets: ChartDataSet[],
-): SelectOption[] => {
-  const configurationWithDataSet: AxisConfiguration = {
-    ...configuration,
-    dataRange: [undefined, undefined],
-    dataSets,
-  };
-
-  const chartData: ChartData[] = createSortedAndMappedDataForAxis(
-    configurationWithDataSet,
-    data.result,
-    meta,
-    labels,
-  );
-
-  return [
-    {
-      label: 'default',
-      value: '',
-    },
-    ...chartData.map(({ name }, index) => ({
-      label: name,
-      value: `${index}`,
-    })),
-  ];
-};
 
 const ChartAxisConfiguration = ({
   id,
   configuration,
   data,
   meta,
-  labels,
+  labels = {},
   capabilities,
-  onConfigurationChange,
   dataSets = [],
+  onChange,
+  onSubmit,
 }: Props) => {
-  const [axisConfiguration, setAxisConfiguration] = useState<AxisConfiguration>(
-    configuration,
-  );
+  const sortOptions = useMemo<SelectOption[]>(() => {
+    return [
+      {
+        label: 'Default',
+        value: 'name',
+      },
+      ...Object.values(labels).map<SelectOption>(config => ({
+        label: config.label,
+        value: config.value,
+      })),
+    ];
+  }, [labels]);
 
-  const [sortOptions, setSortOptions] = useState<SelectOption[]>(() =>
-    getSortOptions(labels),
-  );
+  const limitOptions = useMemo<SelectOption[]>(() => {
+    const configurationWithDataSet: AxisConfiguration = {
+      ...configuration,
+      min: 0,
+      max: undefined,
+      dataSets,
+    };
 
-  useEffect(() => {
-    setAxisConfiguration(configuration);
-  }, [configuration]);
+    const chartData: ChartData[] = createSortedAndMappedDataForAxis(
+      configurationWithDataSet,
+      data.result,
+      meta,
+      labels,
+    );
 
-  const [limitOptions, setLimitOptions] = useState<SelectOption[]>(() =>
-    getAxisLabels(configuration, data, meta, labels, dataSets),
-  );
-
-  const [dataRangeMin, setDataRangeMin] = useState<string>(
-    `${configuration.dataRange || [''][0]}`,
-  );
-  const [dataRangeMax, setDataRangeMax] = useState<string>(
-    `${configuration.dataRange || ['', ''][1]}`,
-  );
-
-  const updateAxisConfiguration = (newValues: object) => {
-    const newConfiguration = { ...axisConfiguration, ...newValues };
-    setAxisConfiguration(newConfiguration);
-    if (onConfigurationChange) onConfigurationChange(newConfiguration);
-  };
-
-  const updateDataRangeMin = (value: string) => {
-    setDataRangeMin(value);
-    const valueOrUndef = value === '' ? undefined : value;
-    updateAxisConfiguration({
-      dataRange: [
-        valueOrUndef,
-        configuration.dataRange && configuration.dataRange[1],
-      ],
-    });
-  };
-
-  const updateDataRangeMax = (value: string) => {
-    setDataRangeMax(value);
-    const valueOrUndef =
-      value === '' ? undefined : Number.parseInt(value, 10) + 1;
-    updateAxisConfiguration({
-      dataRange: [
-        configuration.dataRange && configuration.dataRange[0],
-        valueOrUndef,
-      ],
-    });
-  };
-
-  const getTickSpacing = (): number => {
-    if (axisConfiguration) {
-      const { tickSpacing } = axisConfiguration;
-      if (tickSpacing) {
-        return Number(tickSpacing);
-      }
-    }
-    return 1;
-  };
-
-  useEffect(() => {
-    setAxisConfiguration(configuration);
-    setSortOptions(getSortOptions(labels));
-
-    setLimitOptions(getAxisLabels(configuration, data, meta, labels, dataSets));
-
-    // updateAxisConfiguration({dataRange: configuration.dataRange});
-  }, [configuration, data, meta, labels, dataSets]);
+    return [
+      {
+        label: 'Default',
+        value: '',
+      },
+      ...chartData.map(({ name }, index) => ({
+        label: name,
+        value: `${index}`,
+      })),
+    ];
+  }, [configuration, data, dataSets, labels, meta]);
 
   const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
     position: '',
     label: '',
   });
-  const [referenceOptions] = useState<SelectOption[]>(() => {
-    if (axisConfiguration.groupBy) {
+
+  const referenceOptions = useMemo<SelectOption[]>(() => {
+    if (configuration.groupBy) {
       return [
         { label: 'Select', value: '' },
-        ...Object.values(meta[axisConfiguration.groupBy]).map(({ label }) => ({
+        ...Object.values(meta[configuration.groupBy]).map(({ label }) => ({
           label,
           value: label,
         })),
       ];
     }
     return [];
-  });
+  }, [configuration.groupBy, meta]);
+
+  const normalizeValues = (values: AxisConfiguration): AxisConfiguration => {
+    // Values of min/max may be treated as strings by Formik
+    // due to the way they are encoded in the form input value.
+    return {
+      ...values,
+      min: parseNumber(values.min),
+      max: parseNumber(values.max),
+      size: parseNumber(values.size),
+      tickSpacing: parseNumber(values.tickSpacing),
+    };
+  };
+
+  const handleFormChange = useCallback(
+    (values: AxisConfigurationChangeValue) => {
+      onChange({
+        ...normalizeValues(values),
+        isValid: values.isValid,
+      });
+    },
+    [onChange],
+  );
 
   return (
-    <div className={styles.chartAxesConfiguration}>
-      <form>
-        <FormFieldset id={id} legend={axisConfiguration.title}>
-          <FormGroup>
-            {axisConfiguration.type === 'major' &&
-              !capabilities.fixedAxisGroupBy && (
-                <>
-                  <FormSelect
-                    id={`${id}_groupBy`}
-                    label="Group data by"
-                    name={`${id}_groupBy`}
-                    value={axisConfiguration.groupBy}
-                    onChange={e => {
-                      updateAxisConfiguration({ groupBy: e.target.value });
-                    }}
-                    options={[
-                      {
-                        label: 'Time periods',
-                        value: 'timePeriod' as AxisGroupBy,
-                      },
-                      {
-                        label: 'Locations',
-                        value: 'locations' as AxisGroupBy,
-                      },
-                      {
-                        label: 'Indicators',
-                        value: 'indicators' as AxisGroupBy,
-                      },
-                      {
-                        label: 'Filters',
-                        value: 'filters' as AxisGroupBy,
-                      },
-                    ]}
-                  />
+    <Formik<AxisConfiguration>
+      initialValues={configuration}
+      onSubmit={values => {
+        onSubmit(normalizeValues(values));
+      }}
+      validationSchema={Yup.object<Partial<AxisConfiguration>>({
+        size: Yup.number()
+          .required('Enter size of axis')
+          .positive('Size of axis must be positive'),
+        sortAsc: Yup.boolean(),
+        tickConfig: Yup.string().oneOf(
+          ['default', 'startEnd', 'custom'],
+          'Select a valid tick display type',
+        ) as Schema<AxisConfiguration['tickConfig']>,
+        tickSpacing: Yup.number().when('tickConfig', {
+          is: 'custom',
+          then: Yup.number()
+            .required('Enter tick spacing')
+            .positive('Tick spacing must be positive'),
+        }),
+        max: Yup.number(),
+        min: Yup.number(),
+        visible: Yup.boolean(),
+      })}
+      render={form => (
+        <Form id={id}>
+          <Effect
+            value={{
+              ...form.values,
+              isValid: form.isValid,
+            }}
+            onChange={handleFormChange}
+          />
 
-                  <hr />
-                </>
-              )}
+          <FormGroup>
+            {configuration.type === 'major' && !capabilities.fixedAxisGroupBy && (
+              <FormFieldSelect<AxisConfiguration>
+                id={`${id}-groupBy`}
+                label="Group data by"
+                name="groupBy"
+                options={[
+                  {
+                    label: 'Time periods',
+                    value: 'timePeriod' as AxisGroupBy,
+                  },
+                  {
+                    label: 'Locations',
+                    value: 'locations' as AxisGroupBy,
+                  },
+                  {
+                    label: 'Indicators',
+                    value: 'indicators' as AxisGroupBy,
+                  },
+                  {
+                    label: 'Filters',
+                    value: 'filters' as AxisGroupBy,
+                  },
+                ]}
+              />
+            )}
 
             {capabilities.hasAxes && (
-              <>
-                <FormCheckbox
-                  id={`${id}_show`}
-                  name={`${id}_show`}
-                  label="Show axis labels?"
-                  checked={axisConfiguration.visible}
-                  onChange={e => {
-                    updateAxisConfiguration({ visible: e.target.checked });
-                  }}
-                  value="show"
-                  conditional={
-                    <React.Fragment>
-                      <FormTextInput
-                        id={`${id}_unit`}
-                        label="Override displayed unit"
-                        name="unit"
-                        hint="Leave blank to set default from metadata"
-                        width={10}
-                        onChange={e =>
-                          updateAxisConfiguration({ unit: e.target.value })
-                        }
-                        defaultValue={axisConfiguration.unit}
-                      />
-                    </React.Fragment>
-                  }
-                />
-                <hr />
-
-                <FormTextInput
-                  id={`${id}_size`}
-                  name={`${id}_size`}
-                  type="number"
-                  min="0"
-                  max="100"
-                  label="Size of axis (px)"
-                  width={3}
-                  defaultValue={axisConfiguration.size}
-                  onChange={e =>
-                    updateAxisConfiguration({ size: e.target.value })
-                  }
-                />
-                <hr />
-              </>
+              <FormFieldTextInput<AxisConfiguration>
+                id={`${id}-size`}
+                name="size"
+                type="number"
+                min="0"
+                max="100"
+                label="Size of axis (px)"
+                width={3}
+              />
             )}
 
             {capabilities.gridLines && (
-              <React.Fragment>
-                <FormCheckbox
-                  id={`${id}_grid`}
-                  name={`${id}_grid`}
-                  label="Show grid lines"
-                  onChange={e =>
-                    updateAxisConfiguration({ showGrid: e.target.checked })
-                  }
-                  checked={axisConfiguration.showGrid}
-                  value="grid"
-                />
-                <hr />
-              </React.Fragment>
-            )}
-
-            {axisConfiguration.type === 'minor' && (
-              <React.Fragment>
-                <FormFieldset
-                  id="axis_range"
-                  legend="Axis range"
-                  legendSize="m"
-                >
-                  <p className="govuk-hint">
-                    Leaving these values blank will set them to 'auto'
-                  </p>
-                  <div className={styles.axisRange}>
-                    <FormGroup className={styles.formGroup}>
-                      <FormTextInput
-                        id={`${id}_min`}
-                        name={`${id}_min`}
-                        type="number"
-                        width={10}
-                        label="Minimum value"
-                        defaultValue={axisConfiguration.min}
-                        onChange={e =>
-                          updateAxisConfiguration({ min: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <FormGroup className={styles.formGroup}>
-                      <FormTextInput
-                        id={`${id}_max`}
-                        name={`${id}_max`}
-                        type="number"
-                        width={10}
-                        label="Maximum Value"
-                        defaultValue={axisConfiguration.max}
-                        onChange={e =>
-                          updateAxisConfiguration({ max: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                  </div>
-                </FormFieldset>
-                <hr />
-              </React.Fragment>
+              <FormFieldCheckbox<AxisConfiguration>
+                id={`${id}-showGrid`}
+                name="showGrid"
+                label="Show grid lines"
+              />
             )}
 
             {capabilities.hasAxes && (
-              <>
-                <FormRadioGroup
-                  id={`${id}_tick_type`}
-                  name="tick_Type"
-                  legend="Tick display type"
-                  legendSize="m"
-                  value={axisConfiguration.tickConfig}
-                  onChange={e => {
-                    updateAxisConfiguration({ tickConfig: e.target.value });
-                  }}
-                  order={[]}
-                  options={[
-                    {
-                      value: 'default',
-                      label: 'Automatic',
-                    },
-                    {
-                      label: 'Start and end only',
-                      value: 'startEnd',
-                    },
-                    {
-                      label: 'Custom',
-                      value: 'custom',
-                      conditional: (
-                        <FormTextInput
-                          id={`${id}_tick_spacing`}
-                          name={`${id}_tick_spacing`}
-                          type="number"
-                          width={10}
-                          label="Every nth value"
-                          defaultValue={`${getTickSpacing()}`}
-                          onChange={e => {
-                            const theValue = parseInt(e.target.value, 10);
-                            if (theValue > 0 && e.target.value !== '') {
-                              updateAxisConfiguration({
-                                tickSpacing: `${theValue}`,
-                              });
-                            }
-                          }}
-                        />
-                      ),
-                    },
-                  ]}
+              <FormFieldCheckbox<AxisConfiguration>
+                id={`${id}-visible`}
+                name="visible"
+                label="Show axis labels?"
+                conditional={
+                  <FormFieldTextInput<AxisConfiguration>
+                    id={`${id}-unit`}
+                    label="Override displayed unit"
+                    name="unit"
+                    hint="Leave blank to set default from metadata"
+                    width={10}
+                  />
+                }
+              />
+            )}
+          </FormGroup>
+
+          {configuration.type === 'minor' && (
+            <FormFieldset
+              id={`${id}-minorAxisRange`}
+              legend="Axis range"
+              legendSize="m"
+              hint="Leaving these values blank will set them to 'auto'"
+            >
+              <div className={styles.axisRange}>
+                <FormFieldTextInput<AxisConfiguration>
+                  id={`${id}-minorMin`}
+                  name="min"
+                  type="number"
+                  width={10}
+                  label="Minimum value"
+                  formGroupClass="govuk-!-margin-right-2"
                 />
-                <hr />
-              </>
-            )}
+                <FormFieldTextInput<AxisConfiguration>
+                  id={`${id}-minorMax`}
+                  name="max"
+                  type="number"
+                  width={10}
+                  label="Maximum value"
+                />
+              </div>
+            </FormFieldset>
+          )}
 
-            {axisConfiguration.type === 'major' && (
-              <React.Fragment>
-                <FormFieldset
-                  id={`${id}sort_order_set`}
-                  legend="Sorting"
-                  legendSize="m"
-                >
-                  <FormGroup>
-                    <FormSelect
-                      id={`${id}_sort_by`}
-                      name="sort_by"
-                      label="Sort data by"
-                      order={[]}
-                      value={axisConfiguration.sortBy}
-                      onChange={e => {
-                        updateAxisConfiguration({ sortBy: e.target.value });
-                      }}
-                      options={sortOptions}
+          {capabilities.hasAxes && (
+            <FormFieldRadioGroup<AxisConfiguration>
+              id={`${id}-tickConfig`}
+              name="tickConfig"
+              legend="Tick display type"
+              legendSize="m"
+              order={[]}
+              options={[
+                {
+                  value: 'default',
+                  label: 'Automatic',
+                },
+                {
+                  label: 'Start and end only',
+                  value: 'startEnd',
+                },
+                {
+                  label: 'Custom',
+                  value: 'custom',
+                  conditional: (
+                    <FormFieldTextInput<AxisConfiguration>
+                      id={`${id}-tickSpacing`}
+                      name="tickSpacing"
+                      type="number"
+                      width={10}
+                      label="Every nth value"
                     />
-                  </FormGroup>
-                  <FormGroup>
-                    <FormCheckbox
-                      id={`${id}_sort_asc`}
-                      name="sort_asc"
-                      label="Sort Ascending"
-                      value="asc"
-                      defaultChecked={axisConfiguration.sortAsc}
-                      onChange={e => {
-                        updateAxisConfiguration({ sortAsc: e.target.checked });
-                      }}
-                    />
-                  </FormGroup>
-                </FormFieldset>
+                  ),
+                },
+              ]}
+            />
+          )}
 
-                <hr />
+          {configuration.type === 'major' && (
+            <>
+              <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
+                <FormFieldSelect<AxisConfiguration>
+                  id={`${id}-sortBy`}
+                  name="sortBy"
+                  label="Sort data by"
+                  order={[]}
+                  options={sortOptions}
+                />
+                <FormFieldCheckbox<AxisConfiguration>
+                  id={`${id}-sortAsc`}
+                  name="sortAsc"
+                  label="Sort Ascending"
+                />
+              </FormFieldset>
 
-                <FormFieldset
-                  id={`${id}sort_order_set`}
-                  legend="Limiting data"
-                  legendSize="m"
-                >
-                  <FormGroup>
-                    <FormSelect
-                      id={`${id}dataRangeMin`}
-                      label="Minimum"
-                      name="minimum"
-                      value={dataRangeMin}
-                      options={limitOptions}
-                      order={[]}
-                      onChange={e => updateDataRangeMin(e.target.value)}
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <FormSelect
-                      id={`${id}dataRangeMin`}
-                      label="Maximum"
-                      name="maximum"
-                      value={dataRangeMax}
-                      options={limitOptions}
-                      order={[]}
-                      onChange={e => updateDataRangeMax(e.target.value)}
-                    />
-                  </FormGroup>
-                </FormFieldset>
+              <FormFieldset
+                id={`${id}-majorAxisRange`}
+                legend="Limiting data"
+                legendSize="m"
+              >
+                <FormFieldSelect<AxisConfiguration>
+                  id={`${id}-majorMin`}
+                  label="Minimum"
+                  name="min"
+                  options={limitOptions}
+                  order={[]}
+                />
+                <FormFieldSelect<AxisConfiguration>
+                  id={`${id}-majorMax`}
+                  label="Maximum"
+                  name="max"
+                  options={limitOptions}
+                  order={[]}
+                />
+              </FormFieldset>
+            </>
+          )}
 
-                <hr />
-              </React.Fragment>
-            )}
+          {capabilities.hasReferenceLines && (
+            <table className="govuk-table">
+              <caption className="govuk-heading-m">Reference lines</caption>
+              <thead>
+                <tr>
+                  <th>Position</th>
+                  <th>Label</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {form.values.referenceLines &&
+                  form.values.referenceLines.map((refLine, idx) => (
+                    <tr key={`${refLine.label}_${refLine.position}`}>
+                      <td>{refLine.position}</td>
+                      <td>{refLine.label}</td>
+                      <td>
+                        <button
+                          className="govuk-button govuk-button--secondary govuk-!-margin-0"
+                          type="button"
+                          onClick={() => {
+                            const newReferenceLines = [
+                              ...(form.values.referenceLines || []),
+                            ];
+                            newReferenceLines.splice(idx, 1);
 
-            {capabilities.hasReferenceLines && (
-              <table className="govuk-table">
-                <caption className="govuk-heading-m">Reference lines</caption>
-                <thead>
-                  <tr>
-                    <th>Position</th>
-                    <th>Label</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {axisConfiguration.referenceLines &&
-                    axisConfiguration.referenceLines.map((rl, idx) => (
-                      <tr key={`${rl.label}_${rl.position}`}>
-                        <td>{rl.position}</td>
-                        <td>{rl.label}</td>
-                        <td>
-                          <button
-                            className="govuk-button govuk-button--secondary govuk-!-margin-0"
-                            type="button"
-                            onClick={() => {
-                              const newReferenceLines = [
-                                ...(axisConfiguration.referenceLines || []),
-                              ];
-                              newReferenceLines.splice(idx, 1);
-                              updateAxisConfiguration({
-                                referenceLines: newReferenceLines,
-                              });
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  <tr>
-                    <td>
-                      {axisConfiguration.type === 'minor' && (
-                        <FormTextInput
-                          name=""
-                          id=""
-                          label=""
-                          type="text"
-                          defaultValue={`${referenceLine.position}`}
-                          onChange={e => {
-                            setReferenceLine({
-                              ...referenceLine,
-                              position: e.target.value,
-                            });
+                            form.setFieldValue(
+                              'referenceLines',
+                              newReferenceLines,
+                            );
                           }}
-                        />
-                      )}
-                      {axisConfiguration.type === 'major' && (
-                        <FormSelect
-                          name=""
-                          id=""
-                          label=""
-                          value={referenceLine.position}
-                          order={[]}
-                          onChange={e => {
-                            setReferenceLine({
-                              ...referenceLine,
-                              position: e.target.value,
-                            });
-                          }}
-                          options={referenceOptions}
-                        />
-                      )}
-                    </td>
-                    <td>
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                <tr>
+                  <td>
+                    {form.values.type === 'minor' && (
                       <FormTextInput
-                        name=""
-                        id=""
+                        name={`referenceLines[${form.values.referenceLines?.length}].position`}
+                        id={`${id}-referenceLines-position`}
                         label=""
                         type="text"
-                        defaultValue={referenceLine.label}
+                        defaultValue={`${referenceLine.position}`}
                         onChange={e => {
                           setReferenceLine({
                             ...referenceLine,
-                            label: e.target.value,
+                            position: e.target.value,
                           });
                         }}
                       />
-                    </td>
-                    <td>
-                      <button
-                        disabled={
-                          referenceLine.position === '' ||
-                          referenceLine.label === ''
-                        }
-                        className="govuk-button govuk-!-margin-bottom-0"
-                        type="button"
-                        onClick={() => {
-                          updateAxisConfiguration({
-                            referenceLines: [
-                              ...(axisConfiguration.referenceLines || []),
-                              referenceLine,
-                            ],
+                    )}
+                    {form.values.type === 'major' && (
+                      <FormSelect
+                        name={`referenceLines[${form.values.referenceLines?.length}].position`}
+                        id={`${id}-referenceLines-position`}
+                        label=""
+                        value={referenceLine.position}
+                        order={[]}
+                        onChange={e => {
+                          setReferenceLine({
+                            ...referenceLine,
+                            position: e.target.value,
                           });
-                          setReferenceLine({ label: '', position: '' });
                         }}
-                      >
-                        Add
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            )}
-          </FormGroup>
-        </FormFieldset>
-      </form>
-    </div>
+                        options={referenceOptions}
+                      />
+                    )}
+                  </td>
+                  <td>
+                    <FormTextInput
+                      name={`referenceLines[${form.values.referenceLines?.length}].label`}
+                      id={`${id}-referenceLines-label`}
+                      label=""
+                      type="text"
+                      defaultValue={referenceLine.label}
+                      onChange={e => {
+                        setReferenceLine({
+                          ...referenceLine,
+                          label: e.target.value,
+                        });
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <button
+                      disabled={
+                        referenceLine.position === '' ||
+                        referenceLine.label === ''
+                      }
+                      className="govuk-button govuk-!-margin-bottom-0"
+                      type="button"
+                      onClick={() => {
+                        form.setFieldValue('referenceLines', [
+                          ...(form.values.referenceLines || []),
+                          referenceLine,
+                        ]);
+
+                        setReferenceLine({ label: '', position: '' });
+                      }}
+                    >
+                      Add
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
+
+          <Button type="submit">Save chart options</Button>
+        </Form>
+      )}
+    />
   );
 };
 

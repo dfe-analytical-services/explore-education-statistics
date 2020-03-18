@@ -1,21 +1,18 @@
-import React, { useContext, useState } from 'react';
-import {
-  AbstractRelease,
-  Publication,
-  ContentSection,
-} from '@common/services/publicationService';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import ModalConfirm from '@common/components/ModalConfirm';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import {
+  AbstractRelease,
+  ContentSection,
+  Publication,
+} from '@common/services/publicationService';
+import React, { useContext, useState } from 'react';
 import DatablockSelectForm from './DatablockSelectForm';
 
 interface Props {
   release: AbstractRelease<EditableContentBlock, Publication>;
-  setRelease: (
-    newRelease: AbstractRelease<EditableContentBlock, Publication>,
-  ) => void;
   isEditing?: boolean;
   updating?: boolean;
 }
@@ -32,53 +29,15 @@ export function hasSecondaryStats(
   );
 }
 
-export const AddSecondaryStats = ({
-  release,
-  setRelease,
-  updating = false,
-}: Props) => {
-  const { isEditing, updateAvailableDataBlocks } = useContext(EditingContext);
+export const AddSecondaryStats = ({ release, updating = false }: Props) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const { isEditing } = useContext(EditingContext);
 
-  async function removeSecondarySectionBlock() {
-    return new Promise(async resolve => {
-      if (
-        release.keyStatisticsSecondarySection &&
-        release.keyStatisticsSecondarySection.id &&
-        release.keyStatisticsSecondarySection.content
-      ) {
-        await Promise.all(
-          release.keyStatisticsSecondarySection.content.map(
-            (content: EditableContentBlock) => {
-              return releaseContentService.deleteContentSectionBlock(
-                release.id,
-                // @ts-ignore will be defined, due to above if statement
-                release.keyStatisticsSecondarySection.id,
-                content.id,
-              );
-            },
-          ),
-        ).then(() => {
-          if (updateAvailableDataBlocks) {
-            updateAvailableDataBlocks();
-          }
-
-          setRelease({
-            ...release,
-            keyStatisticsSecondarySection: release.keyStatisticsSecondarySection
-              ? {
-                  ...release.keyStatisticsSecondarySection,
-                  content: [] as EditableContentBlock[],
-                }
-              : undefined,
-          });
-          resolve();
-        });
-      }
-      resolve();
-    });
-  }
+  const {
+    attachContentSectionBlock,
+    deleteContentSectionBlock,
+  } = useReleaseActions();
 
   if (!isEditing) return null;
   if (!isFormOpen)
@@ -104,8 +63,23 @@ export const AddSecondaryStats = ({
         )}
 
         <ModalConfirm
-          onConfirm={async () => {
-            await removeSecondarySectionBlock();
+          onConfirm={() => {
+            if (release.keyStatisticsSecondarySection?.content) {
+              Promise.all(
+                release.keyStatisticsSecondarySection.content.map(
+                  async (content: EditableContentBlock) => {
+                    if (release.keyStatisticsSecondarySection?.content) {
+                      await deleteContentSectionBlock({
+                        releaseId: release.id,
+                        sectionId: release.keyStatisticsSecondarySection.id,
+                        blockId: content.id,
+                        sectionKey: 'keyStatisticsSecondarySection',
+                      });
+                    }
+                  },
+                ),
+              );
+            }
             setShowConfirmation(false);
           }}
           onExit={() => {
@@ -133,34 +107,32 @@ export const AddSecondaryStats = ({
             release.keyStatisticsSecondarySection &&
             release.keyStatisticsSecondarySection.id
           ) {
-            await removeSecondarySectionBlock();
-            await releaseContentService
-              .attachContentSectionBlock(
-                release.id,
-                release.keyStatisticsSecondarySection &&
-                  release.keyStatisticsSecondarySection.id,
-                {
-                  contentBlockId: selectedDataBlockId,
-                  order: 0,
-                },
-              )
-              .then(v => {
-                if (updateAvailableDataBlocks) {
-                  updateAvailableDataBlocks();
-                }
-                return v;
-              });
-            const keyStatisticsSecondarySection = await releaseContentService.getContentSection(
-              release.id,
-              release.keyStatisticsSecondarySection.id,
-            );
-            if (keyStatisticsSecondarySection) {
-              setRelease({
-                ...release,
-                keyStatisticsSecondarySection,
-              });
-              setIsFormOpen(false);
+            if (release.keyStatisticsSecondarySection?.content) {
+              await Promise.all(
+                release.keyStatisticsSecondarySection.content.map(
+                  async (content: EditableContentBlock) => {
+                    if (release.keyStatisticsSecondarySection?.content) {
+                      await deleteContentSectionBlock({
+                        releaseId: release.id,
+                        sectionId: release.keyStatisticsSecondarySection.id,
+                        blockId: content.id,
+                        sectionKey: 'keyStatisticsSecondarySection',
+                      });
+                    }
+                  },
+                ),
+              );
             }
+            await attachContentSectionBlock({
+              releaseId: release.id,
+              sectionId: release.keyStatisticsSecondarySection.id,
+              sectionKey: 'keyStatisticsSecondarySection',
+              block: {
+                contentBlockId: selectedDataBlockId,
+                order: 0,
+              },
+            });
+            setIsFormOpen(false);
           }
         }}
         onCancel={() => {

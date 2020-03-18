@@ -1,8 +1,6 @@
 import ReleaseFootnotesSection from '@admin/pages/release/edit-release/data/ReleaseFootnotesSection';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/service';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import permissionService from '@admin/services/permissions/permissionService';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import {
   Footnote,
@@ -12,7 +10,7 @@ import {
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';
 
@@ -24,9 +22,7 @@ export interface FootnotesData {
 }
 
 const ReleaseDataPage = () => {
-  const { publication, releaseId } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { publication, releaseId } = useManageReleaseContext();
 
   const [footnotesData, setFootnotesData] = useState<FootnotesData>();
   const [activeTab, setActiveTab] = useState<string>('');

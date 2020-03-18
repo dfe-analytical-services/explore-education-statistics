@@ -12,6 +12,9 @@
   :global(.dfe-width-container--wide) {
     figcaption {
       max-width: 66.6%;
+      @media print {
+        max-width: 100%;
+      }
     }
   }
 }

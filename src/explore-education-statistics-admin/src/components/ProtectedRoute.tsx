@@ -1,8 +1,8 @@
 import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import { ErrorControlContext } from '@admin/contexts/ErrorControlContext';
 import signInService from '@admin/services/sign-in/service';
 import { User } from '@admin/services/sign-in/types';
+import { ErrorControlContext } from '@common/contexts/ErrorControlContext';
 import React, { useContext } from 'react';
 import { Redirect, Route, RouteComponentProps, RouteProps } from 'react-router';
 
@@ -74,7 +74,7 @@ const ProtectedRoute = ({
   return (
     <Route
       {...rest}
-      component={(props: RouteComponentProps) => (
+      render={(props: RouteComponentProps) => (
         <AuthenticationCheckingComponent
           {...props}
           component={component}

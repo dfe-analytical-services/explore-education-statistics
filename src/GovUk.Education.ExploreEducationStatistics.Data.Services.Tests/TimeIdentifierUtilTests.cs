@@ -108,7 +108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 TaxYear,
                 EndOfMarch,
                 FiveHalfTerms,
-                SixHalfTerms
+                SixHalfTerms,
+                ReportingYear
             }, TimeIdentifierUtil.GetYears());
         }
 

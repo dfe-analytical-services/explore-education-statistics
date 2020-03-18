@@ -7,10 +7,14 @@ export type ImportStatusCode =
   | 'NOT_FOUND'
   | 'FAILED';
 
+export interface ErrorObj {
+  Message: string;
+}
+
 export interface ImportStatus {
   status: ImportStatusCode;
   percentageComplete?: string;
-  errors?: string[];
+  errors?: ErrorObj[];
   numberOfRows: number;
 }
 

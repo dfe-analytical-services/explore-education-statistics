@@ -9,6 +9,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps } from 'react-router';
 import ManageReleaseContext from './ManageReleaseContext';
+import { ReleaseProvider } from './edit-release/content/ReleaseContext';
 
 interface MatchProps {
   publicationId: string;
@@ -30,7 +31,7 @@ const ManageReleasePageContainer = ({
   const currentRouteIndex =
     viewRoutes.findIndex(
       route =>
-        route.generateLink(publicationId, releaseId) === location.pathname,
+        route.generateLink({ publicationId, releaseId }) === location.pathname,
     ) || 0;
 
   const previousRoute =
@@ -44,14 +45,14 @@ const ManageReleasePageContainer = ({
   const previousSection = previousRoute
     ? {
         label: previousRoute.title,
-        linkTo: previousRoute.generateLink(publicationId, releaseId),
+        linkTo: previousRoute.generateLink({ publicationId, releaseId }),
       }
     : undefined;
 
   const nextSection = nextRoute
     ? {
         label: nextRoute.title,
-        linkTo: nextRoute.generateLink(publicationId, releaseId),
+        linkTo: nextRoute.generateLink({ publicationId, releaseId }),
       }
     : undefined;
 
@@ -89,7 +90,7 @@ const ManageReleasePageContainer = ({
                 <li key={route.path}>
                   <NavLink
                     key={route.path}
-                    to={route.generateLink(publicationId, releaseId)}
+                    to={route.generateLink({ publicationId, releaseId })}
                   >
                     {route.title}
                   </NavLink>
@@ -104,14 +105,11 @@ const ManageReleasePageContainer = ({
               releaseId,
             }}
           >
-            {releaseRoutes.manageReleaseRoutes.map(route => (
-              <Route
-                exact
-                key={route.path}
-                path={route.path}
-                component={route.component}
-              />
-            ))}
+            <ReleaseProvider>
+              {releaseRoutes.manageReleaseRoutes.map(route => (
+                <Route exact key={route.path} {...route} />
+              ))}
+            </ReleaseProvider>
           </ManageReleaseContext.Provider>
 
           <PreviousNextLinks

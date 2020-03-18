@@ -31,6 +31,9 @@
     },
     "dataApiUrl": {
       "value": "data.test.explore-education-statistics.service.gov.uk"
+    },
+    "detailedErrors": {
+      "value": true
     }
   }
 }

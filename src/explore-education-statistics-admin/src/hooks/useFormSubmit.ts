@@ -1,8 +1,8 @@
-import { useErrorControl } from '@admin/contexts/ErrorControlContext';
 import handleServerSideValidation, {
   ServerValidationErrors,
   ServerValidationMessageMapper,
 } from '@common/components/form/util/serverValidationHandler';
+import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import { AxiosError } from 'axios';
 import { FormikActions } from 'formik';
 import { useMemo } from 'react';
@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 export type UseFormSubmit<FormValues> = (
   values: FormValues,
   formikActions: FormikActions<FormValues>,
-) => Promise<void>;
+) => Promise<void> | void;
 
 const isServerValidationError = (error: AxiosError) => {
   if (!error.isAxiosError || !error.response?.data) {

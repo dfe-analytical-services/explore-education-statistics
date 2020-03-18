@@ -1,7 +1,7 @@
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import classNames from 'classnames';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
-import classNames from 'classnames';
 import FormGroup from './FormGroup';
 import FormTextInput, { FormTextInputProps } from './FormTextInput';
 
@@ -34,7 +34,20 @@ const FormFieldTextInput = <T extends {}>(props: Props<T>) => {
               [formGroupClass || '']: formGroupClass,
             })}
           >
-            <FormTextInput {...childProps} {...field} error={errorMessage} />
+            <FormTextInput
+              {...childProps}
+              {...field}
+              error={errorMessage}
+              onChange={e => {
+                if (props.onChange) {
+                  props.onChange(e);
+                }
+
+                if (!e.isDefaultPrevented()) {
+                  field.onChange(e);
+                }
+              }}
+            />
           </FormGroup>
         );
       }}

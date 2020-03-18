@@ -129,10 +129,10 @@ const AdminDashboardPage = () => {
                 noReleasesMessage="There are currently no draft releases"
                 actions={release => (
                   <ButtonLink
-                    to={summaryRoute.generateLink(
-                      release.publicationId,
-                      release.id,
-                    )}
+                    to={summaryRoute.generateLink({
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                    })}
                   >
                     View and edit release
                   </ButtonLink>
@@ -149,10 +149,10 @@ const AdminDashboardPage = () => {
                 noReleasesMessage="There are currently no scheduled releases"
                 actions={release => (
                   <ButtonLink
-                    to={summaryRoute.generateLink(
-                      release.publicationId,
-                      release.id,
-                    )}
+                    to={summaryRoute.generateLink({
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                    })}
                   >
                     Preview release
                   </ButtonLink>

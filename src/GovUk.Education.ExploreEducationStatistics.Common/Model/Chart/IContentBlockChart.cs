@@ -15,14 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         map,
         infographic
     }
-    
+
     [JsonConverter(typeof(ContentBlockChartConverter))]
     public interface IContentBlockChart
     {
         string Type { get; }
         string Title { get; set; }
         int Height { get; set; }
-        int Width { get; set; }
+        int? Width { get; set; }
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Type => ChartType.line.ToString();
         public string Title { get; set; }
-        public int Width { get; set; }
+        public int? Width { get; set; }
         public int Height { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Type =>  ChartType.horizontalbar.ToString();
         public string Title { get; set; }
-        public int Width { get; set; }
+        public int? Width { get; set; }
         public int Height { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
         public bool Stacked;
         public string Title { get; set; }
-        public int Width { get; set; }
+        public int? Width { get; set; }
         public int Height { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Type =>  ChartType.map.ToString();
         public string Title { get; set; }
-        public int Width { get; set; }
+        public int? Width { get; set; }
         public int Height { get; set; }
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Type =>  ChartType.infographic.ToString();
         public string Title { get; set; }
-        public int Width { get; set; }
+        public int? Width { get; set; }
         public int Height { get; set; }
 
         public string ReleaseId;
