@@ -10,12 +10,12 @@ import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { ReleaseNote } from '@common/services/publicationService';
 import {
   dateToDayMonthYear,
   DayMonthYearInputs,
   dayMonthYearInputsToDate,
-  ReleaseNote,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/validation/yup';
 import { FormikProps } from 'formik';
 import merge from 'lodash/merge';

@@ -23,7 +23,7 @@ import {
   DayMonthYearInputs,
   dayMonthYearInputsToDate,
   dayMonthYearValuesToInputs,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/validation/yup';
 import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';

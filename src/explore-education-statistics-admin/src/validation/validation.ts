@@ -1,7 +1,7 @@
 import {
   dayMonthYearIsComplete,
   dayMonthYearIsEmpty,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/validation/yup';
 import { isValid, parse } from 'date-fns';
 

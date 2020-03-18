@@ -3,11 +3,11 @@ import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
+import { ReleaseStatus } from '@common/services/publicationService';
 import {
   dayMonthYearInputsToDate,
   dayMonthYearInputsToValues,
-  ReleaseStatus,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
 import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
 import { EditFormValues } from '../summary/ReleaseSummaryForm';
 
