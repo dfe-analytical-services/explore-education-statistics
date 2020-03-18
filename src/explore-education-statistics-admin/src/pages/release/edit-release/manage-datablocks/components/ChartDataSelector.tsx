@@ -3,7 +3,6 @@ import { ChartDataSetAndConfiguration } from '@admin/pages/release/edit-release/
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect, Formik } from '@common/components/form';
-import Yup from '@common/lib/validation/yup';
 import {
   ChartCapabilities,
   ChartDefinition,
@@ -18,6 +17,7 @@ import {
 } from '@common/modules/charts/util/chartUtils';
 import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
 import { Dictionary } from '@common/types';
+import Yup from '@common/validation/validation/yup';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import React, { useMemo, useState } from 'react';

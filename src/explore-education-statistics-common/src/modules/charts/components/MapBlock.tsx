@@ -1,6 +1,5 @@
 import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
-import formatPretty from '@common/lib/utils/number/formatPretty';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import {
   AxisConfiguration,
@@ -23,6 +22,7 @@ import {
   DataBlockGeoJsonProperties,
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
+import formatPretty from '@common/utils/number/formatPretty';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';

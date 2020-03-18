@@ -11,7 +11,7 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/validation/yup';
 import React, { useEffect, useState } from 'react';
 
 interface Model {

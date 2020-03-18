@@ -7,7 +7,7 @@ import {
   Formik,
 } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useRef } from 'react';
 

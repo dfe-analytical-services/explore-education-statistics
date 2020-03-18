@@ -3,7 +3,6 @@ import { toolbarConfigs } from '@admin/components/WysiwygEditor';
 import Button from '@common/components/Button';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import formatPretty from '@common/lib/utils/number/formatPretty';
 import KeyStatTile, {
   KeyStatConfig,
   KeyStatProps,
@@ -12,6 +11,7 @@ import styles from '@common/modules/find-statistics/components/SummaryRenderer.m
 import DataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
+import formatPretty from '@common/utils/number/formatPretty';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 

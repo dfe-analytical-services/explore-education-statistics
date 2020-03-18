@@ -1,4 +1,4 @@
-import parseNumber from '@common/lib/utils/number/parseNumber';
+import parseNumber from '@common/utils/number/parseNumber';
 
 describe('parseNumber', () => {
   test('parses string to numbers', () => {

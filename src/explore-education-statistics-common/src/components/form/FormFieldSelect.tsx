@@ -1,4 +1,4 @@
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/validation/createErrorHelper';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
 import FormGroup from './FormGroup';

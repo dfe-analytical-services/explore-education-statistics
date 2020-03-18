@@ -11,7 +11,7 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/validation/yup';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 

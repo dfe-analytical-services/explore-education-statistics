@@ -1,6 +1,3 @@
-import React, { useState } from 'react';
-import Page from '@frontend/components/Page';
-import Link from '@frontend/components/Link';
 import {
   Form,
   FormFieldRadioGroup,
@@ -8,10 +5,13 @@ import {
   FormGroup,
   Formik,
 } from '@common/components/form';
-import { FormikProps } from 'formik';
-import Yup from '@common/lib/validation/yup';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/validation/createErrorHelper';
+import Yup from '@common/validation/validation/yup';
+import Link from '@frontend/components/Link';
+import Page from '@frontend/components/Page';
 import { useCookies } from '@frontend/hooks/useCookies';
+import { FormikProps } from 'formik';
+import React, { useState } from 'react';
 import styles from './CookiesIndexPage.module.scss';
 
 interface FormValues {

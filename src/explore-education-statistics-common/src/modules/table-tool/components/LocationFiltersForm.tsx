@@ -1,14 +1,14 @@
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup';
+import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import {
   FilterOption,
   LocationLevelKeys,
   PublicationSubjectMeta,
 } from '@common/modules/table-tool/services/tableBuilderService';
-import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { Dictionary, PartialRecord } from '@common/types/util';
+import Yup from '@common/validation/validation/yup';
 import { FormikProps } from 'formik';
 import mapValues from 'lodash/mapValues';
 import sortBy from 'lodash/sortBy';

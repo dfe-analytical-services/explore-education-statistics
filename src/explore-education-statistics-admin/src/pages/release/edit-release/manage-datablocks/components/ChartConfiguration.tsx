@@ -10,13 +10,13 @@ import {
   Formik,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
-import parseNumber from '@common/lib/utils/number/parseNumber';
-import Yup from '@common/lib/validation/yup';
 import {
   ChartDefinition,
   ChartMetaData,
 } from '@common/modules/charts/types/chart';
 import { DataBlockResponse } from '@common/services/dataBlockService';
+import parseNumber from '@common/utils/number/parseNumber';
+import Yup from '@common/validation/validation/yup';
 import React, { useCallback } from 'react';
 import { Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';

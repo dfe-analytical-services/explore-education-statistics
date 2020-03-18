@@ -19,11 +19,11 @@ import {
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
-import Yup from '@common/lib/validation/yup';
 import {
   emptyDayMonthYear,
   Publication,
 } from '@common/services/publicationService';
+import Yup from '@common/validation/validation/yup';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';

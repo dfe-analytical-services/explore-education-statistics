@@ -9,7 +9,6 @@ import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
-import Yup from '@common/lib/validation/yup';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import {
   dateToDayMonthYear,
@@ -17,6 +16,7 @@ import {
   dayMonthYearInputsToDate,
   ReleaseNote,
 } from '@common/services/publicationService';
+import Yup from '@common/validation/validation/yup';
 import { FormikProps } from 'formik';
 import merge from 'lodash/merge';
 import React, { useContext, useState } from 'react';

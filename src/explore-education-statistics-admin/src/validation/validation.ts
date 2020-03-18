@@ -1,8 +1,8 @@
-import Yup from '@common/lib/validation/yup';
 import {
   dayMonthYearIsComplete,
   dayMonthYearIsEmpty,
 } from '@common/services/publicationService';
+import Yup from '@common/validation/validation/yup';
 import { isValid, parse } from 'date-fns';
 
 const yupNumberOrUndefinedIfBlank = Yup.mixed().transform((val: string) =>

@@ -11,7 +11,7 @@ import {
   Formik,
 } from '@common/components/form';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/validation/yup';
 import { Form, FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';

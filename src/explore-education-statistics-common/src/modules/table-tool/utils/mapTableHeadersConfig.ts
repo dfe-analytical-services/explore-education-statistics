@@ -1,4 +1,3 @@
-import isGuid from '@common/lib/utils/string/isGuid';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
 import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
@@ -10,6 +9,7 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import isGuid from '@common/utils/string/isGuid';
 import compact from 'lodash/compact';
 
 const isTimePeriod = (value: string): boolean => {

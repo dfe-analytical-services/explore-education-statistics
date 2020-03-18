@@ -1,4 +1,4 @@
-import isComponentType from '@common/lib/type-guards/components/isComponentType';
+import isComponentType from '@common/utils/type-guards/components/isComponentType';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
 import MethodologyHeader, { MethodologyHeaderProps } from './MethodologyHeader';
 
