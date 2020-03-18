@@ -20,38 +20,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             
         }
-    }
     
-    public class CanSeeAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
+        public class CanSeeAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
             ViewSpecificReleaseRequirement>
-    {
-        public CanSeeAllReleasesAuthorizationHandler() 
-            : base(SecurityClaimTypes.AccessAllReleases) {}
-    }
+        {
+            public CanSeeAllReleasesAuthorizationHandler() 
+                : base(SecurityClaimTypes.AccessAllReleases) {}
+        }
     
-    public class HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler
-        : HasRoleOnReleaseAuthorizationHandler<ViewSpecificReleaseRequirement>
-    {
-        public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, ctx => ContainsUnrestrictedViewerRole(ctx.Roles))
-        {}
-    }
+        public class HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler
+            : HasRoleOnReleaseAuthorizationHandler<ViewSpecificReleaseRequirement>
+        {
+            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
+                : base(context, ctx => ContainsUnrestrictedViewerRole(ctx.Roles))
+            {}
+        }
     
-    public class HasPreReleaseRoleWithinAccessWindowAuthorizationHandler
-        : HasRoleOnReleaseAuthorizationHandler<ViewSpecificReleaseRequirement>
-    {
-        public HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
-            ContentDbContext context, IPreReleaseService preReleaseService) 
-            : base(context, ctx =>
-            {
-                if (!ContainsPreReleaseViewerRole(ctx.Roles))
+        public class HasPreReleaseRoleWithinAccessWindowAuthorizationHandler
+            : HasRoleOnReleaseAuthorizationHandler<ViewSpecificReleaseRequirement>
+        {
+            public HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
+                ContentDbContext context, IPreReleaseService preReleaseService) 
+                : base(context, ctx =>
                 {
-                    return false;
-                }
+                    if (!ContainsPreReleaseViewerRole(ctx.Roles))
+                    {
+                        return false;
+                    }
 
-                var windowStatus = preReleaseService.GetPreReleaseWindowStatus(ctx.Release, UtcNow);
-                return windowStatus.PreReleaseAccess == PreReleaseAccess.Within;
-            })
-        {}
+                    var windowStatus = preReleaseService.GetPreReleaseWindowStatus(ctx.Release, UtcNow);
+                    return windowStatus.PreReleaseAccess == PreReleaseAccess.Within;
+                })
+            {}
+        }
     }
 }

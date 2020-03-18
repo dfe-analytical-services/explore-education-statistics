@@ -116,6 +116,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
+        public void CreateReleaseAmendmentAsync()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.CreateReleaseAmendmentAsync(_release.Id),  
+                _release,
+                CanMakeAmendmentOfSpecificRelease);
+        }
+        
+        [Fact]
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 

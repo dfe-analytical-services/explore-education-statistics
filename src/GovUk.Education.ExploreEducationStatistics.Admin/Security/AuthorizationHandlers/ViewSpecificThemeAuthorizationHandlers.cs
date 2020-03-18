@@ -19,39 +19,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             
         }
-    }
     
-    public class CanSeeAllThemesAuthorizationHandler : HasClaimAuthorizationHandler<
+        public class CanSeeAllThemesAuthorizationHandler : HasClaimAuthorizationHandler<
             ViewSpecificThemeRequirement>
-    {
-        public CanSeeAllThemesAuthorizationHandler() 
-            : base(SecurityClaimTypes.AccessAllTopics) {}
-    }
-    
-    public class HasRoleOnAnyChildPublicationAuthorizationHandler
-        : AuthorizationHandler<ViewSpecificThemeRequirement, Theme>
-    {
-        private readonly ContentDbContext _context;
-
-        public HasRoleOnAnyChildPublicationAuthorizationHandler(ContentDbContext context)
         {
-            _context = context;
+            public CanSeeAllThemesAuthorizationHandler() 
+                : base(SecurityClaimTypes.AccessAllTopics) {}
         }
-
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext, 
-            ViewSpecificThemeRequirement requirement, Theme theme)
+    
+        public class HasRoleOnAnyChildPublicationAuthorizationHandler
+            : AuthorizationHandler<ViewSpecificThemeRequirement, Theme>
         {
-            var userId = authContext.User.GetUserId();
-            
-            if (await _context
-                .UserReleaseRoles
-                .Include(r => r.Release)
-                .ThenInclude(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .Where(r => r.UserId == userId)
-                .AnyAsync(r => r.Release.Publication.Topic.ThemeId == theme.Id))
+            private readonly ContentDbContext _context;
+
+            public HasRoleOnAnyChildPublicationAuthorizationHandler(ContentDbContext context)
             {
-                authContext.Succeed(requirement);
+                _context = context;
+            }
+
+            protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext, 
+                ViewSpecificThemeRequirement requirement, Theme theme)
+            {
+                var userId = authContext.User.GetUserId();
+            
+                if (await _context
+                    .UserReleaseRoles
+                    .Include(r => r.Release)
+                    .ThenInclude(r => r.Publication)
+                    .ThenInclude(p => p.Topic)
+                    .Where(r => r.UserId == userId)
+                    .AnyAsync(r => r.Release.Publication.Topic.ThemeId == theme.Id))
+                {
+                    authContext.Succeed(requirement);
+                }
             }
         }
     }

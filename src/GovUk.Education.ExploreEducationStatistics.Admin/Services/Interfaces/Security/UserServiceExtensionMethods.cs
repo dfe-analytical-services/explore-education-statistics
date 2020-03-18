@@ -177,6 +177,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(release, SecurityPolicies.CanApproveSpecificRelease);
         }
         
+        public static Task<Either<ActionResult, Release>> CheckCanMakeAmendmentOfRelease(
+            this IUserService userService, Release release)
+        {
+            return userService.DoCheck(release, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
+        }
+        
         public static Task<Either<ActionResult, bool>> CheckCanViewPrereleaseContactsList(
             this IUserService userService)
         {

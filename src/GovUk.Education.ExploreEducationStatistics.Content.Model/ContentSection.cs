@@ -37,6 +37,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         [JsonIgnore]
         public ContentSectionType Type { get; set; }
+
+        public ContentSection CreateReleaseAmendment(CreateAmendmentContext ctx, ReleaseContentSection newParent)
+        {
+            var copy = MemberwiseClone() as ContentSection;
+            copy.Id = Guid.NewGuid();
+            ctx.OldToNewIdContentSectionMappings.Add(this, copy);
+            
+            copy.Release = newParent;
+            
+            copy.Content = copy
+                .Content
+                .Select(content => content.CreateReleaseAmendment(ctx, copy))
+                .ToList();
+
+            return copy;
+        }
     }
     
     [AttributeUsage(AttributeTargets.Field)]
@@ -80,6 +96,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public abstract string Type { get; set; }
 
         public List<Comment> Comments { get; set; }
+
+        public IContentBlock CreateReleaseAmendment(CreateAmendmentContext ctx, ContentSection newParent)
+        {
+            var copy = MemberwiseClone() as IContentBlock;
+            copy.Id = Guid.NewGuid();
+            ctx.OldToNewIdContentBlockMappings.Add(this, copy);
+
+            if (newParent != null)
+            {
+                copy.ContentSection = newParent;
+                copy.ContentSectionId = newParent.Id;
+            }
+
+            // start a new amendment with no comments
+            copy.Comments = new List<Comment>();
+            return copy;
+        }
     }
 
     public class MarkDownBlock : IContentBlock
@@ -238,6 +271,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string? ResolvedBy { get; set; }
         public DateTime? ResolvedOn { get; set; }
         public CommentState State { get; set; }
-
     }
 }

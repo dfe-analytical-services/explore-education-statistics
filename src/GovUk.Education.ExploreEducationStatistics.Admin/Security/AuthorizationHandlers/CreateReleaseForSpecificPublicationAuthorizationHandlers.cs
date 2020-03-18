@@ -13,12 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         public CreateReleaseForSpecificPublicationAuthorizationHandler() : base(
             new CanCreateReleaseForAnyPublicationAuthorizationHandler())
         {}
-    }
     
-    public class CanCreateReleaseForAnyPublicationAuthorizationHandler : 
-        HasClaimAuthorizationHandler<CreateReleaseForSpecificPublicationRequirement>
-    {
-        public CanCreateReleaseForAnyPublicationAuthorizationHandler() 
-            : base(SecurityClaimTypes.CreateAnyRelease) {}
+        public class CanCreateReleaseForAnyPublicationAuthorizationHandler : 
+            HasClaimAuthorizationHandler<CreateReleaseForSpecificPublicationRequirement>
+        {
+            public CanCreateReleaseForAnyPublicationAuthorizationHandler() 
+                : base(SecurityClaimTypes.CreateAnyRelease) {}
+        }
     }
 }
