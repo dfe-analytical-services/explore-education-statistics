@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                             new MarkDownBlock
                                             {
                                                 Id = new Guid("e2b96bea-fbbb-4089-ad9c-fecba58ee054"),
-                                                Body = SampleMarkDownContent.Content[new Guid("4a2bbe3a-ff63-4e00-a792-12a25fb10b71")]
+                                                Body = SampleMarkDownContent.Content[new Guid("7eeb1478-ab26-4b70-9128-b976429efa2f")]
                                             }
                                         }
                                     }
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                             new MarkDownBlock
                                             {
                                                 Id = new Guid("e4e88dd8-eef7-4ed5-a3f2-a92e5a328e05"),
-                                                Body = SampleMarkDownContent.Content[new Guid("97892e60-510b-4b95-be35-a23ba1c98d9b")]
+                                                Body = SampleMarkDownContent.Content[new Guid("7eeb1478-ab26-4b70-9128-b976429efa2f")]
                                             }
                                         }
                                     }
