@@ -124,6 +124,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
+        public void DeleteReleaseAsync()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.DeleteReleaseAsync(_release.Id),  
+                _release,
+                CanDeleteSpecificRelease);
+        }
+        
+        [Fact]
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
