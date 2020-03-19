@@ -77,9 +77,6 @@ export const methodologyReducer: Reducer<
           `ADD_BLOCK_TO_SECTION: Error - Section "${sectionKey}" could not be found.`,
         );
       }
-
-      // .comments needs initialising to array as will be undefined if empty
-      const newBlock = { ...block, comments: block.comments || [] };
       const matchingSection = draft.methodology[sectionKey].find(
         section => section.id === sectionId,
       );
