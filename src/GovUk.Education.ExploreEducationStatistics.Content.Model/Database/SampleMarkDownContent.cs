@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 - secondary schools
 - special schools
 
-They also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.
+They also include information for [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.
 
 We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).
 
@@ -58,11 +58,11 @@ In 2016/17, 91.8% of primary, secondary and special school pupils missed at leas
             },
             {
                 new Guid("8a8add13-368c-4067-9210-166bb19a00c1"),
-                @"The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015 to 16 but still down from 43.3% in 2011 to 12.
+                @"The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015/16 but still down from 43.3% in 2011/12.
 
 It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).
 
-Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
+Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015/16."
             },
             {
                 new Guid("4aa06200-406b-4f5a-bee4-19e3b83eb1d2"),
@@ -191,7 +191,7 @@ Persistent absence rate:
             },
             {
                 new Guid("97c54e5f-2406-4333-851d-b6c9cc4bf612"),
-                @"The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous 2 years.
+                @"The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous two years.
 
 Absence recorded for 4-year-olds is not treated as authorised or unauthorised and only reported as overall absence."
             },
@@ -207,7 +207,7 @@ The [persistent absence](../glossary#persistent-absence) rate increased to 73.9%
 
 **Overall absence**
 
-Similar to 2015/16, the 3 regions with the highest rates across all school types were:
+Similar to 2015/16, the three regions with the highest rates across all school types were:
 
 * North East - 4.9%
 
