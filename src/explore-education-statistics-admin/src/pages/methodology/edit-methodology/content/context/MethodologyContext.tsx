@@ -35,7 +35,9 @@ export const methodologyReducer: Reducer<
     case 'REMOVE_BLOCK_FROM_SECTION': {
       const { sectionId, blockId, sectionKey } = action.payload.meta;
       if (!draft.methodology?.[sectionKey]) {
-        throw new Error('REMOVE_BLOCK_FROM_SECTION: failed');
+        throw new Error(
+          `REMOVE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+        );
       }
 
       const matchingSection = draft.methodology[sectionKey].find(
@@ -51,7 +53,9 @@ export const methodologyReducer: Reducer<
       const { block, meta } = action.payload;
       const { sectionId, blockId, sectionKey } = meta;
       if (!draft.methodology?.[sectionKey]) {
-        throw new Error('UPDATE_BLOCK_FROM_SECTION: failed');
+        throw new Error(
+          `UPDATE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+        );
       }
       const matchingSection = draft.methodology[sectionKey].find(
         section => section.id === sectionId,
@@ -69,7 +73,9 @@ export const methodologyReducer: Reducer<
       const { block, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
       if (!draft.methodology?.[sectionKey]) {
-        throw new Error('ADD_BLOCK_TO_SECTION: failed');
+        throw new Error(
+          `ADD_BLOCK_TO_SECTION: Error - Section "${sectionKey}" could not be found.`,
+        );
       }
 
       // .comments needs initialising to array as will be undefined if empty
@@ -90,7 +96,9 @@ export const methodologyReducer: Reducer<
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
       if (!draft.methodology?.[sectionKey]) {
-        throw new Error('UPDATE_SECTION_CONTENT: failed');
+        throw new Error(
+          `UPDATE_SECTION_CONTENT: Error - Section "${sectionKey}" could not be found.`,
+        );
       }
 
       const matchingSection = draft.methodology[sectionKey].find(
