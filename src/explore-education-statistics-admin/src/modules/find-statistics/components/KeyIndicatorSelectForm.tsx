@@ -7,6 +7,7 @@ import {
   locationLevelKeys,
   TimePeriodQuery,
 } from '@common/modules/table-tool/services/tableBuilderService';
+import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 
 interface Props {
@@ -80,10 +81,13 @@ const KeyIndicatorSelectForm = ({
             label: 'Select a data block',
             value: '',
           },
-          ...keyIndicatorDatablocks.map(dataBlock => ({
-            label: dataBlock.name || '',
-            value: dataBlock.id || '',
-          })),
+          ...orderBy(
+            keyIndicatorDatablocks.map(dataBlock => ({
+              label: dataBlock.name || '',
+              value: dataBlock.id || '',
+            })),
+            'label',
+          ),
         ]}
       />
       {getKeyStatPreview()}
