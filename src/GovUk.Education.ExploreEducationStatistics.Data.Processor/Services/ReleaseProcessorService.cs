@@ -42,14 +42,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ReleaseFiles
                 .Include(
                     f => f.ReleaseFileReference)
-                .First(
+                .FirstOrDefault(
                     f => f.ReleaseId == release.Id 
                     && f.ReleaseFileReference.Filename == message.DataFileName);
 
-            releaseFileLink.ReleaseFileReference.SubjectId = subject.Id;
-            contentDbContext.Update(releaseFileLink);
-            contentDbContext.SaveChanges();
-            
+            if (releaseFileLink != null)
+            {
+                releaseFileLink.ReleaseFileReference.SubjectId = subject.Id;
+                contentDbContext.Update(releaseFileLink);
+                contentDbContext.SaveChanges();
+            }
+
             return subject;
         }
 

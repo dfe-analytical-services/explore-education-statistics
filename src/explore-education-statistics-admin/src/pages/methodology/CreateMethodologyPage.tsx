@@ -18,13 +18,13 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
-import Yup from '@common/lib/validation/yup';
 import {
   dateToDayMonthYear,
   DayMonthYearInputs,
   dayMonthYearInputsToDate,
   dayMonthYearValuesToInputs,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';

@@ -1,5 +1,5 @@
 import { useDesktopMedia } from '@common/hooks/useMedia';
-import isComponentType from '@common/lib/type-guards/components/isComponentType';
+import isComponentType from '@common/utils/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
   cloneElement,

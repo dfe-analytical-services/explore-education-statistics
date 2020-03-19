@@ -1,7 +1,7 @@
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
+import { fireEvent, render, wait } from '@testing-library/react';
 import { Formik } from 'formik';
 import React from 'react';
-import { fireEvent, render, wait } from '@testing-library/react';
 import FormFieldCheckboxSearchGroup from '../FormFieldCheckboxSearchGroup';
 
 jest.mock('lodash/debounce');

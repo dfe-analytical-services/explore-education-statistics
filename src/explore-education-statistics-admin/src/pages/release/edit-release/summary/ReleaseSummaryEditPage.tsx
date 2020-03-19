@@ -14,7 +14,7 @@ import {
 import {
   dateToDayMonthYear,
   dayMonthYearValuesToInputs,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
