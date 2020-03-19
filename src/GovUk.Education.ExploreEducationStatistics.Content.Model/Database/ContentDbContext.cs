@@ -2566,12 +2566,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new MarkDownBlock
                 {
-                    Id = new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
-                    ContentSectionId = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
-                    Body = SampleMarkDownContent.Content[new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d")]
-                },
-                new MarkDownBlock
-                {
                     Id = new Guid("2c369594-3bbc-40b4-ad19-196c923f5c7f"),
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                     Body = SampleMarkDownContent.Content[new Guid("2c369594-3bbc-40b4-ad19-196c923f5c7f")]
@@ -2778,7 +2772,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new MarkDownBlock
                 {
                     Id = new Guid("b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9"),
-                    ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Order = 1,
                     Body = " * pupils missed on average 8.2 school days\n" +
                            " * overall and unauthorised absence rates up on 2015/16\n" +

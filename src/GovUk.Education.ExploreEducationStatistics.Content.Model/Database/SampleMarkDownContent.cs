@@ -22,7 +22,15 @@ We use the key measures of [overall absence](../glossary#overall-absence) and [p
 
 The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.
 
-They're also used for policy development as key indicators in behaviour and school attendance policy."
+They're also used for policy development as key indicators in behaviour and school attendance policy.
+
+Within this release, absence by reason is broken down in three different ways:
+
+* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences
+
+* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions
+
+* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
             },
             {
                 new Guid("2c369594-3bbc-40b4-ad19-196c923f5c7f"),
@@ -73,16 +81,6 @@ The [overall absence](../glossary#overall-absence) rate for persistent absentees
 **Illness absence rate**
 
 The illness absence rate is almost 4 times higher for persistent absentees at 7.6% compared to 2% for other pupils."
-            },
-            {
-                new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
-                @"These have been broken down into the following:
-
-* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences
-
-* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions
-
-* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
             },
             {
                 new Guid("2ef5f84f-e151-425d-8906-2921712f9157"),
