@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseService
                 .GetLatestReleaseAsync(publicationId)
-                .HandleFailuresOr(releaseId => new OkObjectResult(releaseId));
+                .HandleFailuresOrOk();
         }
         
         [HttpGet("releases/draft")]

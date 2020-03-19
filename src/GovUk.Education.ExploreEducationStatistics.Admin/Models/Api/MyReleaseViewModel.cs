@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public bool Amendment { get; set; }
         
-        // TODO DW - this'll need to be a "PreviousVersionGuid" if we need to keep a version history of all Release
+        // TODO BAU-419 - this'll need to be a "PreviousVersionId" if we need to keep a version history of all Release
         // versions - otherwise if we just need to keep the current live one and a single "amendment" one, that'd make
         // things easier
         public Guid OriginalId { get; set; }

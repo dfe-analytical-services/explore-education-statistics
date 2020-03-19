@@ -4,7 +4,7 @@ import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummary
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import Button from '@common/components/Button';
-import { formatTestId } from '@common/util/test-utils';
+import { formatTestId } from '@common/utils/test-utils';
 import React from 'react';
 
 interface Props {

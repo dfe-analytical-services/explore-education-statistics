@@ -64,8 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Call the method under test
             var actionResult = await controller.AddAncillaryFilesAsync(_releaseId, "File name", ancillaryFile);
-            var unboxed = AssertOkResult(actionResult);
-            Assert.NotNull(unboxed);
+            AssertOkResult(actionResult);
         }
 
         [Fact]
@@ -95,8 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             // Call the method under test
             var result = await controller.GetAncillaryFilesAsync(_releaseId);
-            var unboxed = AssertOkResult(result);
-            Assert.NotNull(unboxed);
+            AssertOkResult(result);
         }
 
         [Fact(Skip="Needs principal setting")]
@@ -113,8 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            var unboxed = AssertOkResult(result);
-            Assert.NotNull(unboxed);
+            AssertOkResult(result);
         }
 
         [Fact(Skip="Needs principal setting")]
@@ -182,8 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Call the method under test
             var result = await controller.DeleteDataFiles(_releaseId, "datafilename","subject title");
-            var unboxed = AssertOkResult(result);
-            Assert.NotNull(unboxed);
+            AssertOkResult(result);
         }
 
         [Fact]
@@ -248,8 +244,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Method under test
             var result = await controller.GetTemplateReleaseAsync(_releaseId);
-            var unboxed = AssertOkResult(result);
-            Assert.NotNull(unboxed);
+            AssertOkResult(result);
+            
         }
 
         private static IFormFile MockFile(string fileName)
@@ -269,11 +265,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static T AssertOkResult<T>(ActionResult<T> result) where T : class
         {
-            Assert.IsAssignableFrom<ActionResult<T>>(result);
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            var okObjectResult = result.Result as OkObjectResult;
-            Assert.IsAssignableFrom<T>(okObjectResult?.Value);
-            return okObjectResult?.Value as T;
+            Assert.IsAssignableFrom<T>(result.Value);
+            return result.Value;
         }
         
         private static void AssertNotFound<T>(ActionResult<T> result) where T : class
