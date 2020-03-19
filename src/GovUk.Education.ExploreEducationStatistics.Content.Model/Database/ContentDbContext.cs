@@ -1992,7 +1992,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     },
                     Published = new DateTime(2018, 6, 14),
                     Slug = "2018",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     Created = new DateTime(2019, 8, 1, 9, 30, 33, DateTimeKind.Utc),
                     CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
@@ -2791,9 +2791,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
                     Order = 1,
                     Body =
-                        "* majority of applicants received a preferred offer\n" +
-                        "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
-                        "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
+                        "* The rate of permanent exclusions has increased since last year from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17. The number of exclusions has also increased, from 6,685 to 7,720.\n" +
+                        "* The rate of fixed period exclusions have also increased since last year from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17. The number of exclusions has also increased, from 339,360 to 381,865.\n" +
+                        "* There were 183,475 pupil enrolments, 2.29 per cent, with at least one fixed term exclusion in 2016/17, up from 167,125 pupil enrolments, 2.11 per cent, in 2015/16.\n"
                 },
                 new MarkDownBlock
                 {
