@@ -2772,12 +2772,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new MarkDownBlock
                 {
                     Id = new Guid("b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9"),
-                    ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
+                    ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
                     Order = 1,
-                    Body = " * pupils missed on average 8.2 school days\n" +
-                           " * overall and unauthorised absence rates up on 2015/16\n" +
-                           " * unauthorised absence rise due to higher rates of unauthorised holidays\n" +
-                           " * 10% of pupils persistently absent during 2016/17"
+                    Body = "* pupils missed on average 8.2 school days\n" +
+                           "* overall and unauthorised absence rates up on 2015/16\n" +
+                           "* unauthorised absence rise due to higher rates of unauthorised holidays\n" +
+                           "* 10% of pupils persistently absent during 2016/17\n"
                 },
                 new MarkDownBlock
                 {
