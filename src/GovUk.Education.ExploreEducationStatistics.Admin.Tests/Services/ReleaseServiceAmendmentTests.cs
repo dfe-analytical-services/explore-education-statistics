@@ -418,10 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var index = amendment.RelatedInformation.IndexOf(amended);
                     var original = release.RelatedInformation[index];
-                    Assert.True(amended.Id != Guid.Empty);
-                    Assert.NotEqual(original.Id, amended.Id);
-                    Assert.Equal(original.Description, amended.Description);
-                    Assert.Equal(original.Url, amended.Url);
+                    AssertAmendedBasicLinkCorrect(amended, original);
                 });
                 
                 Assert.Equal(release.Updates.Count, amendment.Updates.Count);
@@ -429,12 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var index = amendment.Updates.IndexOf(amended);
                     var original = release.Updates[index];
-                    Assert.True(amended.Id != Guid.Empty);
-                    Assert.NotEqual(original.Id, amended.Id);
-                    Assert.Equal(original.On, amended.On);
-                    Assert.Equal(original.Reason, amended.Reason);
-                    Assert.Equal(amendment, amended.Release);
-                    Assert.Equal(amendment.Id, amended.ReleaseId);
+                    AssertAmendedUpdateCorrect(amended, original, amendment);
                 });
              
                 Assert.Equal(release.Content.Count, amendment.Content.Count);
@@ -442,33 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var index = amendment.Content.IndexOf(amended);
                     var original = release.Content[index];
-                    Assert.Equal(amendment, amended.Release);
-                    Assert.Equal(amendment.Id, amended.ReleaseId);
-                    Assert.True(amended.ContentSectionId != Guid.Empty);
-                    Assert.NotEqual(original.ContentSectionId, amended.ContentSectionId);
-
-                    var originalSection = original.ContentSection;
-                    var amendedSection = amended.ContentSection;
-
-                    Assert.NotEqual(originalSection.Id, amendedSection.Id);
-                    Assert.Equal(originalSection.Caption, amendedSection.Caption);
-                    Assert.Equal(originalSection.Heading, amendedSection.Heading);
-                    Assert.Equal(originalSection.Order, amendedSection.Order);
-                    Assert.Equal(originalSection.Type, amendedSection.Type);
-                    Assert.Equal(originalSection.Content.Count, amendedSection.Content.Count);
-                    
-                    amendedSection.Content.ForEach(amendedBlock =>
-                    {
-                        var originalBlock = originalSection.Content.Find(b => b.Order == amendedBlock.Order);
-
-                        Assert.NotEqual(originalBlock.Id, amendedBlock.Id);
-                        Assert.Equal(originalBlock.Order, amendedBlock.Order);
-                        Assert.Equal(originalBlock.Type, amendedBlock.Type);
-                        Assert.Equal(amendedSection, amendedBlock.ContentSection);
-                        Assert.Equal(amendedSection.Id, amendedBlock.ContentSectionId);
-                        Assert.NotEmpty(originalBlock.Comments);
-                        Assert.Empty(amendedBlock.Comments);
-                    });
+                    AssertAmendedContentSectionCorrect(amendment, amended, original);
                 });
                 
                 Assert.Equal(release.ContentBlocks.Count, amendment.ContentBlocks.Count);
@@ -495,18 +461,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 Assert.Equal(userReleaseRoles.Count, amendmentReleaseRoles.Count);
                 var approverAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Approver);
-                Assert.NotEqual(approverReleaseRole.Id, approverAmendmentRole.Id);
-                Assert.Equal(amendment, approverAmendmentRole.Release);
-                Assert.Equal(amendment.Id, approverAmendmentRole.ReleaseId);
-                Assert.Equal(approverReleaseRole.UserId, approverAmendmentRole.UserId);
-                Assert.Equal(approverReleaseRole.Role, approverAmendmentRole.Role);
+                AssertAmendedReleaseRoleCorrect(approverReleaseRole, approverAmendmentRole, amendment);
 
                 var contributorAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Contributor);
                 Assert.NotEqual(contributorReleaseRole.Id, contributorAmendmentRole.Id);
-                Assert.Equal(amendment, contributorAmendmentRole.Release);
-                Assert.Equal(amendment.Id, contributorAmendmentRole.ReleaseId);
-                Assert.Equal(contributorReleaseRole.UserId, contributorAmendmentRole.UserId);
-                Assert.Equal(contributorReleaseRole.Role, contributorAmendmentRole.Role);
+                AssertAmendedReleaseRoleCorrect(contributorReleaseRole, contributorAmendmentRole, amendment);
 
                 var amendmentDataFiles = context
                     .ReleaseFiles
@@ -519,18 +478,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var amendmentDataFile = amendmentDataFiles[0];
                 var originalFile = releaseFiles.First(f =>
                     f.ReleaseFileReference.Filename == amendmentDataFile.ReleaseFileReference.Filename);
-                AssertReleaseFileEqual(originalFile, amendmentDataFile, amendment);
+                AssertAmendedReleaseFileCorrect(originalFile, amendmentDataFile, amendment);
 
                 var amendmentDataFile2 = amendmentDataFiles[1];
                 var originalFile2 = releaseFiles.First(f =>
                     f.ReleaseFileReference.Filename == amendmentDataFile2.ReleaseFileReference.Filename);
-                AssertReleaseFileEqual(originalFile2, amendmentDataFile2, amendment);
+                AssertAmendedReleaseFileCorrect(originalFile2, amendmentDataFile2, amendment);
 
                 Assert.True(amendment.Amendment);
             }
         }
 
-       private static void AssertReleaseFileEqual(ReleaseFile originalFile, ReleaseFile amendmentDataFile, Release amendment)
+       private static void AssertAmendedBasicLinkCorrect(BasicLink amended, BasicLink original)
+       {
+           Assert.True(amended.Id != Guid.Empty);
+           Assert.NotEqual(original.Id, amended.Id);
+           Assert.Equal(original.Description, amended.Description);
+           Assert.Equal(original.Url, amended.Url);
+       }
+
+       private static void AssertAmendedUpdateCorrect(Update amended, Update original, Release amendment)
+       {
+           Assert.True(amended.Id != Guid.Empty);
+           Assert.NotEqual(original.Id, amended.Id);
+           Assert.Equal(original.On, amended.On);
+           Assert.Equal(original.Reason, amended.Reason);
+           Assert.Equal(amendment, amended.Release);
+           Assert.Equal(amendment.Id, amended.ReleaseId);
+       }
+
+       private static void AssertAmendedContentSectionCorrect(Release amendment, ReleaseContentSection amended,
+           ReleaseContentSection original)
+       {
+           Assert.Equal(amendment, amended.Release);
+           Assert.Equal(amendment.Id, amended.ReleaseId);
+           Assert.True(amended.ContentSectionId != Guid.Empty);
+           Assert.NotEqual(original.ContentSectionId, amended.ContentSectionId);
+
+           var originalSection = original.ContentSection;
+           var amendedSection = amended.ContentSection;
+
+           Assert.NotEqual(originalSection.Id, amendedSection.Id);
+           Assert.Equal(originalSection.Caption, amendedSection.Caption);
+           Assert.Equal(originalSection.Heading, amendedSection.Heading);
+           Assert.Equal(originalSection.Order, amendedSection.Order);
+           Assert.Equal(originalSection.Type, amendedSection.Type);
+           Assert.Equal(originalSection.Content.Count, amendedSection.Content.Count);
+
+           amendedSection.Content.ForEach(amendedBlock =>
+           {
+               var originalBlock = originalSection.Content.Find(b => b.Order == amendedBlock.Order);
+               AssertAmendedContentBlockCorrect(originalBlock, amendedBlock, amendedSection);
+           });
+       }
+
+       private static void AssertAmendedContentBlockCorrect(IContentBlock originalBlock, IContentBlock amendedBlock,
+           ContentSection amendedSection)
+       {
+           Assert.NotEqual(originalBlock.Id, amendedBlock.Id);
+           Assert.Equal(originalBlock.Order, amendedBlock.Order);
+           Assert.Equal(originalBlock.Type, amendedBlock.Type);
+           Assert.Equal(amendedSection, amendedBlock.ContentSection);
+           Assert.Equal(amendedSection.Id, amendedBlock.ContentSectionId);
+           Assert.NotEmpty(originalBlock.Comments);
+           Assert.Empty(amendedBlock.Comments);
+       }
+
+       private static void AssertAmendedReleaseRoleCorrect(UserReleaseRole original, UserReleaseRole amended,
+           Release amendment)
+       {
+           Assert.NotEqual(original.Id, amended.Id);
+           Assert.Equal(amendment, amended.Release);
+           Assert.Equal(amendment.Id, amended.ReleaseId);
+           Assert.Equal(original.UserId, amended.UserId);
+           Assert.Equal(original.Role, amended.Role);
+       }
+
+       private static void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile, Release amendment)
        {
            // assert it's a new link table entry between the Release amendment and the data file reference 
            Assert.NotEqual(originalFile.Id, amendmentDataFile.Id);
