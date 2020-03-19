@@ -241,17 +241,17 @@ All figures are based on unrounded data so constituent parts may not add up due 
                 new Guid("70546a7d-5edd-4b8f-b096-cfd50153f4cb"),
                 @"The number of [permanent exclusions](../glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.
 
-This works out to an average 40.6 permanent exclusions per day - up from an 35.2 per day in 2015/16.
+This works out to an average 40.6 permanent exclusions per day - up from 35.2 per day in 2015/16.
 
-The permanent exclusion rate has also increased to 0.10% of pupils - up from from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000."
+The permanent exclusion rate has also increased to 0.10% of pupils - up from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000."
             },
             {
                 new Guid("81d8eba2-9cba-4b04-bb02-e00ace5c4418"),
                 @"Most occurred in secondary schools which accounted for 83% of all permanent exclusions.
 
-The [permanent exclusion](../glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
+The [permanent exclusion](../glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
 
-The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from from 0.08% in 2015/16.
+The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from 0.08% in 2015/16.
 
 The rate generally followed a downward trend after 2006/07 - when it stood at 0.12%.
 
@@ -261,7 +261,7 @@ However, since 2012/13 it has been on the rise although rates are still lower no
                 new Guid("7971329a-9e16-468b-9eb3-62bfc384b5a3"),
                 @"The number of fixed-period exclusionshas increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.
 
-This works out to around 2,010 fixed-period exclusions per day - up from an 1,786 per day in 2015/16."
+This works out to around 2,010 fixed-period exclusions per day - up from 1,786 per day in 2015/16."
             },
             {
                 new Guid("e9462ed0-10dc-4ff5-8cda-f8c3b66f2714"),
@@ -317,7 +317,7 @@ Remained the most common reason for permanent exclusions accounting for 2,755 (3
 
 However, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](../glossary#fixed-period-exclusion).
 
-Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 %) of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
+Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
 
 All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent disruptive behaviour and other reasons saw the largest increases."
             },
