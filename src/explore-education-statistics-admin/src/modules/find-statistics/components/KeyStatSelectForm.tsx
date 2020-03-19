@@ -34,6 +34,7 @@ const KeyStatSelectForm = ({
         key => req[key]?.length !== 1,
       );
       if (!hasSingleLocation) {
+        // eslint-disable-next-line no-console
         console.warn(
           'dataBlockRequest should contain single location from locationLevelKeys!',
         );
