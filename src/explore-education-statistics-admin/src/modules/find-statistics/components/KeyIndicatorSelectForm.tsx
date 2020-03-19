@@ -29,6 +29,14 @@ const KeyIndicatorSelectForm = ({
     return availableDataBlocks.filter(db => {
       const req = db.dataBlockRequest;
       const timePeriod = req.timePeriod as TimePeriodQuery;
+      if (
+        Object.keys(req).filter(key => locationLevelKeys.includes(key as any))
+          .length !== 1
+      ) {
+        console.log(
+          'WARN: Request should contain single location from locationLevelKeys!',
+        );
+      }
       return (
         req.indicators.length !== 1 ||
         timePeriod.startYear !== timePeriod.endYear ||
