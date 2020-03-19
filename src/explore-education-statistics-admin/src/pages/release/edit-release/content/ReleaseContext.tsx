@@ -126,7 +126,7 @@ export const releaseReducer: Reducer<
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
       if (!draft.release?.[sectionKey]) {
-        throw new Error('ADD_BLOCK_TO_SECTION: failed');
+        throw new Error('UPDATE_SECTION_CONTENT: failed');
       }
 
       if (sectionKey === 'content') {

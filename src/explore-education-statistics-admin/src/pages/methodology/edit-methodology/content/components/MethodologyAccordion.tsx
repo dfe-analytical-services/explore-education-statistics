@@ -3,16 +3,17 @@ import { MethodologyContent } from '@admin/services/methodology/types';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback, useContext } from 'react';
+import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
 import MethodologyAccordionSection from './MethodologyAccordionSection';
 
 export interface MethodologyAccordionProps {
-  isAnnex?: boolean;
+  sectionKey: ContentSectionKeys;
   methodology: MethodologyContent;
 }
 
 const MethodologyAccordion = ({
-  isAnnex = false,
+  sectionKey,
   methodology,
 }: MethodologyAccordionProps) => {
   const { isEditing } = useContext(EditingContext);
@@ -20,7 +21,6 @@ const MethodologyAccordion = ({
     addContentSection,
     updateContentSectionsOrder,
   } = useMethodologyActions();
-  const sectionKey = isAnnex ? 'annexes' : 'content';
 
   const onAddSection = useCallback(
     () =>
@@ -43,16 +43,17 @@ const MethodologyAccordion = ({
     [methodology.id, updateContentSectionsOrder],
   );
 
-  if (isAnnex && !isEditing && methodology.annexes.length < 1) return null;
+  if (sectionKey === 'annexes' && !isEditing && methodology.annexes.length < 1)
+    return null;
   return (
     <EditableAccordion
       id={`methodology-accordion-${sectionKey}`}
-      sectionName={isAnnex ? 'Annexes' : 'Content'}
+      sectionName={sectionKey === 'annexes' ? 'Annexes' : 'Content'}
       onAddSection={onAddSection}
       onSaveOrder={reorderAccordionSections}
     >
       {orderBy(
-        isAnnex ? methodology.annexes : methodology.content,
+        sectionKey === 'annexes' ? methodology.annexes : methodology.content,
         'order',
       ).map((accordionSection, index) => (
         <MethodologyAccordionSection
@@ -60,7 +61,7 @@ const MethodologyAccordion = ({
           methodologyId={methodology.id}
           key={accordionSection.id}
           content={accordionSection}
-          isAnnex={isAnnex}
+          sectionKey={sectionKey}
           index={index}
         />
       ))}

@@ -6,17 +6,18 @@ import { EditingContext } from '@common/modules/find-statistics/util/wrapEditabl
 import { ContentSection } from '@common/services/publicationService';
 import React, { useCallback, useContext, useState } from 'react';
 import useMethodologyActions from '../context/useMethodologyActions';
+import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 
 interface MethodologyAccordionSectionProps {
   content: ContentSection<EditableContentBlock>;
-  isAnnex?: boolean;
+  sectionKey: ContentSectionKeys;
   methodologyId: string;
   index: number;
   id: string;
 }
 
 const MethodologyAccordionSection = ({
-  isAnnex = false,
+  sectionKey,
   content,
   methodologyId,
   ...restOfProps
@@ -44,7 +45,7 @@ const MethodologyAccordionSection = ({
         order: sectionContent.length,
         body: '',
       },
-      isAnnex,
+      sectionKey,
     });
   }, [methodologyId, sectionId, sectionContent.length, addContentSectionBlock]);
 
@@ -55,7 +56,7 @@ const MethodologyAccordionSection = ({
         sectionId,
         blockId,
         bodyContent,
-        isAnnex,
+        sectionKey,
       });
     },
     [methodologyId, sectionId, updateContentSectionBlock],
@@ -67,7 +68,7 @@ const MethodologyAccordionSection = ({
         methodologyId,
         sectionId,
         blockId,
-        isAnnex,
+        sectionKey,
       }),
     [methodologyId, sectionId, deleteContentSectionBlock],
   );
@@ -78,19 +79,19 @@ const MethodologyAccordionSection = ({
         methodologyId,
         sectionId,
         order,
-        isAnnex,
+        sectionKey,
       });
     },
     [methodologyId, sectionId, updateSectionBlockOrder],
   );
 
   const onSaveHeading = useCallback(
-    (title: string) =>
+    (newHeading: string) =>
       updateContentSectionHeading({
         methodologyId,
         sectionId,
-        title,
-        isAnnex,
+        heading: newHeading,
+        sectionKey,
       }),
     [methodologyId, sectionId, updateContentSectionHeading],
   );
@@ -100,7 +101,7 @@ const MethodologyAccordionSection = ({
       removeContentSection({
         methodologyId,
         sectionId,
-        isAnnex,
+        sectionKey,
       }),
     [],
   );

@@ -8,7 +8,6 @@ import { ContentSectionKeys } from './MethodologyContextActionTypes';
 
 export default function useMethodologyActions() {
   const dispatch = useMethodologyDispatch();
-  const annexes = 'annexes';
 
   const getMethodologyContent = useCallback(
     async (methodologyId: string) => {
@@ -34,23 +33,27 @@ export default function useMethodologyActions() {
     methodologyId,
     sectionId,
     blockId,
-    isAnnex = false,
+    sectionKey,
   }: {
     methodologyId: string;
     sectionId: string;
     blockId: string;
-    isAnnex?: boolean;
+    sectionKey: ContentSectionKeys;
   }) {
-    await methodologyService.deleteContentSectionBlock(
+    await methodologyService.deleteContentSectionBlock({
       methodologyId,
       sectionId,
       blockId,
-      isAnnex,
-    );
+      sectionKey,
+    });
     dispatch({
       type: 'REMOVE_BLOCK_FROM_SECTION',
       payload: {
-        meta: { sectionId, blockId, sectionKey: isAnnex ? annexes : 'content' },
+        meta: {
+          sectionId,
+          blockId,
+          sectionKey,
+        },
       },
     });
   }
@@ -60,25 +63,29 @@ export default function useMethodologyActions() {
     sectionId,
     blockId,
     bodyContent,
-    isAnnex = false,
+    sectionKey,
   }: {
     methodologyId: string;
     sectionId: string;
     blockId: string;
     bodyContent: string;
-    isAnnex?: boolean;
+    sectionKey: ContentSectionKeys;
   }) {
-    const updateBlock = await methodologyService.updateContentSectionBlock(
+    const updateBlock = await methodologyService.updateContentSectionBlock({
       methodologyId,
       sectionId,
       blockId,
-      { body: bodyContent },
-      isAnnex,
-    );
+      block: { body: bodyContent },
+      sectionKey,
+    });
     dispatch({
       type: 'UPDATE_BLOCK_FROM_SECTION',
       payload: {
-        meta: { sectionId, blockId, sectionKey: isAnnex ? annexes : 'content' },
+        meta: {
+          sectionId,
+          blockId,
+          sectionKey,
+        },
         block: updateBlock,
       },
     });
@@ -88,24 +95,24 @@ export default function useMethodologyActions() {
     methodologyId,
     sectionId,
     block,
-    isAnnex = false,
+    sectionKey,
   }: {
     methodologyId: string;
     sectionId: string;
 
     block: ContentBlockPostModel;
-    isAnnex?: boolean;
+    sectionKey: ContentSectionKeys;
   }) {
-    const newBlock = await methodologyService.addContentSectionBlock(
+    const newBlock = await methodologyService.addContentSectionBlock({
       methodologyId,
       sectionId,
       block,
-      isAnnex,
-    );
+      sectionKey,
+    });
     dispatch({
       type: 'ADD_BLOCK_TO_SECTION',
       payload: {
-        meta: { sectionId, sectionKey: isAnnex ? annexes : 'content' },
+        meta: { sectionId, sectionKey },
         block: newBlock,
       },
     });
@@ -115,23 +122,20 @@ export default function useMethodologyActions() {
     methodologyId,
     sectionId,
     order,
-    isAnnex = false,
+    sectionKey,
   }: {
     methodologyId: string;
     sectionId: string;
     order: Dictionary<number>;
-    isAnnex?: boolean;
+    sectionKey: ContentSectionKeys;
   }) {
     const sectionContent = await methodologyService.updateContentSectionBlocksOrder(
-      methodologyId,
-      sectionId,
-      order,
-      isAnnex,
+      { methodologyId, sectionId, order, sectionKey },
     );
     dispatch({
       type: 'UPDATE_SECTION_CONTENT',
       payload: {
-        meta: { sectionId, sectionKey: isAnnex ? annexes : 'content' },
+        meta: { sectionId, sectionKey },
         sectionContent,
       },
     });
@@ -149,7 +153,7 @@ export default function useMethodologyActions() {
     const newSection = await methodologyService.addContentSection({
       methodologyId,
       order,
-      isAnnexes: sectionKey === annexes,
+      sectionKey,
     });
     dispatch({
       type: 'ADD_CONTENT_SECTION',
@@ -172,7 +176,7 @@ export default function useMethodologyActions() {
     const content = await methodologyService.updateContentSectionsOrder({
       methodologyId,
       order,
-      isAnnexes: sectionKey === annexes,
+      sectionKey,
     });
     dispatch({
       type: 'SET_CONTENT',
@@ -186,22 +190,22 @@ export default function useMethodologyActions() {
   async function removeContentSection({
     methodologyId,
     sectionId,
-    isAnnex = false,
+    sectionKey,
   }: {
     methodologyId: string;
     sectionId: string;
-    isAnnex?: boolean;
+    sectionKey: ContentSectionKeys;
   }) {
-    const content = await methodologyService.removeContentSection(
+    const content = await methodologyService.removeContentSection({
       methodologyId,
       sectionId,
-      isAnnex,
-    );
+      sectionKey,
+    });
     dispatch({
       type: 'SET_CONTENT',
       payload: {
         content,
-        sectionKey: isAnnex ? annexes : 'content',
+        sectionKey,
       },
     });
   }
@@ -209,25 +213,25 @@ export default function useMethodologyActions() {
   async function updateContentSectionHeading({
     methodologyId,
     sectionId,
-    title,
-    isAnnex,
+    heading,
+    sectionKey,
   }: {
     methodologyId: string;
     sectionId: string;
-    title: string;
-    isAnnex?: boolean;
+    heading: string;
+    sectionKey: ContentSectionKeys;
   }) {
-    const section = await methodologyService.updateContentSectionHeading(
+    const section = await methodologyService.updateContentSectionHeading({
       methodologyId,
       sectionId,
-      title,
-      isAnnex,
-    );
+      heading,
+      sectionKey,
+    });
 
     dispatch({
       type: 'UPDATE_CONTENT_SECTION',
       payload: {
-        meta: { sectionId, sectionKey: isAnnex ? annexes : 'content' },
+        meta: { sectionId, sectionKey },
         section,
       },
     });

@@ -79,9 +79,9 @@ export const methodologyReducer: Reducer<
       );
       if (!matchingSection) return draft;
       if (Array.isArray(matchingSection.content)) {
-        matchingSection.content.push(newBlock);
+        matchingSection.content.push(block);
       } else {
-        matchingSection.content = [newBlock];
+        matchingSection.content = [block];
       }
 
       return draft;
@@ -90,7 +90,7 @@ export const methodologyReducer: Reducer<
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
       if (!draft.methodology?.[sectionKey]) {
-        throw new Error('ADD_BLOCK_TO_SECTION: failed');
+        throw new Error('UPDATE_SECTION_CONTENT: failed');
       }
 
       const matchingSection = draft.methodology[sectionKey].find(

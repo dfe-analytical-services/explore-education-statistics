@@ -1,3 +1,4 @@
+import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContextActionTypes';
 import {
   CreateMethodologyRequest,
   MethodologyContent,
@@ -5,9 +6,9 @@ import {
   UpdateMethodologyStatusRequest,
 } from '@admin/services/methodology/types';
 import {
-  ContentSectionViewModel,
-  ContentBlockPutModel,
   ContentBlockPostModel,
+  ContentBlockPutModel,
+  ContentSectionViewModel,
 } from '@admin/services/release/edit-release/content/types';
 import client from '@admin/services/util/service';
 import { Dictionary } from '@common/types';
@@ -36,30 +37,41 @@ const methodologyService = {
   addContentSection({
     methodologyId,
     order,
-    isAnnexes = false,
+    sectionKey,
   }: {
     methodologyId: string;
     order: number;
-    isAnnexes?: boolean;
+    sectionKey: ContentSectionKeys;
   }): Promise<ContentSectionViewModel> {
+    if (sectionKey === 'content')
+      return client.post(`methodology/${methodologyId}/content/sections/add`, {
+        order,
+      });
     return client.post(
-      `methodology/${methodologyId}/content/sections/add${
-        isAnnexes ? '?type=annexes' : ''
-      }`,
+      `methodology/${methodologyId}/content/sections/add?type=${sectionKey}`,
       { order },
     );
   },
 
-  updateContentSectionHeading(
-    methodologyId: string,
-    sectionId: string,
-    heading: string,
-    isAnnexes = false,
-  ): Promise<ContentSectionViewModel> {
+  updateContentSectionHeading({
+    methodologyId,
+    sectionId,
+    heading,
+    sectionKey,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    heading: string;
+    sectionKey: ContentSectionKeys;
+  }): Promise<ContentSectionViewModel> {
+    if (sectionKey === 'content')
+      return client.put(
+        `methodology/${methodologyId}/content/section/${sectionId}/heading`,
+        { heading },
+      );
+
     return client.put(
-      `methodology/${methodologyId}/content/section/${sectionId}/heading${
-        isAnnexes ? '?type=annexes' : ''
-      }`,
+      `methodology/${methodologyId}/content/section/${sectionId}/heading?type=${sectionKey}`,
       { heading },
     );
   },
@@ -67,29 +79,40 @@ const methodologyService = {
   updateContentSectionsOrder({
     methodologyId,
     order,
-    isAnnexes = false,
+    sectionKey,
   }: {
     methodologyId: string;
     order: Dictionary<number>;
-    isAnnexes?: boolean;
+    sectionKey: ContentSectionKeys;
   }): Promise<ContentSectionViewModel[]> {
+    if (sectionKey === 'content')
+      return client.put(
+        `methodology/${methodologyId}/content/sections/order`,
+        order,
+      );
+
     return client.put(
-      `methodology/${methodologyId}/content/sections/order${
-        isAnnexes ? '?type=annexes' : ''
-      }`,
+      `methodology/${methodologyId}/content/sections/order?type=${sectionKey}`,
       order,
     );
   },
 
-  removeContentSection(
-    methodologyId: string,
-    sectionId: string,
-    isAnnexes = false,
-  ): Promise<ContentSectionViewModel[]> {
+  removeContentSection({
+    methodologyId,
+    sectionId,
+    sectionKey,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    sectionKey: ContentSectionKeys;
+  }): Promise<ContentSectionViewModel[]> {
+    if (sectionKey === 'content')
+      return client.delete(
+        `methodology/${methodologyId}/content/section/${sectionId}`,
+      );
+
     return client.delete(
-      `methodology/${methodologyId}/content/section/${sectionId}${
-        isAnnexes ? '?type=annexes' : ''
-      }`,
+      `methodology/${methodologyId}/content/section/${sectionId}?type=${sectionKey}`,
     );
   },
 
@@ -105,58 +128,94 @@ const methodologyService = {
     return client.put(`/methodology/${methodologyId}/status`, updateRequest);
   },
 
-  addContentSectionBlock(
-    methodologyId: string,
-    sectionId: string,
-    block: ContentBlockPostModel,
-    isAnnexes = false,
-  ): Promise<EditableContentBlock> {
+  addContentSectionBlock({
+    methodologyId,
+    sectionId,
+    block,
+    sectionKey,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    block: ContentBlockPostModel;
+    sectionKey: ContentSectionKeys;
+  }): Promise<EditableContentBlock> {
+    if (sectionKey === 'content')
+      return client.post<EditableContentBlock>(
+        `/methodology/${methodologyId}/content/section/${sectionId}/blocks/add`,
+        block,
+      );
+
     return client.post<EditableContentBlock>(
-      `/methodology/${methodologyId}/content/section/${sectionId}/blocks/add${
-        isAnnexes ? '?type=annexes' : ''
-      }`,
+      `/methodology/${methodologyId}/content/section/${sectionId}/blocks/add?type=${sectionKey}`,
       block,
     );
   },
 
-  deleteContentSectionBlock(
-    methodologyId: string,
-    sectionId: string,
-    blockId: string,
-    isAnnexes = false,
-  ): Promise<ContentSectionViewModel[]> {
+  deleteContentSectionBlock({
+    methodologyId,
+    sectionId,
+    blockId,
+    sectionKey,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    blockId: string;
+    sectionKey: ContentSectionKeys;
+  }): Promise<ContentSectionViewModel[]> {
+    if (sectionKey === 'content')
+      return client.delete(
+        `methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}`,
+      );
+
     return client.delete(
-      `methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}${
-        isAnnexes ? '?type=annexes' : ''
-      }`,
+      `methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}?type=${sectionKey}`,
     );
   },
 
-  updateContentSectionBlock(
-    methodologyId: string,
-    sectionId: string,
-    blockId: string,
-    block: ContentBlockPutModel,
-    isAnnexes = false,
-  ): Promise<EditableContentBlock> {
+  updateContentSectionBlock({
+    methodologyId,
+    sectionId,
+    blockId,
+    block,
+    sectionKey,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    blockId: string;
+    block: ContentBlockPutModel;
+    sectionKey: ContentSectionKeys;
+  }): Promise<EditableContentBlock> {
+    if (sectionKey === 'content')
+      return client.put(
+        `methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}`,
+        block,
+      );
+
     return client.put(
-      `methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}${
-        isAnnexes ? '?type=annexes' : ''
-      }`,
+      `methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}?type=${sectionKey}`,
       block,
     );
   },
 
-  updateContentSectionBlocksOrder(
-    methodologyId: string,
-    sectionId: string,
-    order: Dictionary<number>,
-    isAnnexes = false,
-  ): Promise<EditableContentBlock[]> {
+  updateContentSectionBlocksOrder({
+    methodologyId,
+    sectionId,
+    order,
+    sectionKey,
+  }: {
+    methodologyId: string;
+    sectionId: string;
+    order: Dictionary<number>;
+    sectionKey: ContentSectionKeys;
+  }): Promise<EditableContentBlock[]> {
+    if (sectionKey === 'content')
+      return client.put<EditableContentBlock[]>(
+        `methodology/${methodologyId}/content/section/${sectionId}/blocks/order`,
+        order,
+      );
+
     return client.put<EditableContentBlock[]>(
-      `methodology/${methodologyId}/content/section/${sectionId}/blocks/order${
-        isAnnexes ? '?type=annexes' : ''
-      }`,
+      `methodology/${methodologyId}/content/section/${sectionId}/blocks/order?type=${sectionKey}`,
       order,
     );
   },

@@ -119,11 +119,17 @@ const MethodologyContentPage = ({
                   )}
                 </div>
               </div>
-              <MethodologyAccordion methodology={methodology} />
+              <MethodologyAccordion
+                methodology={methodology}
+                sectionKey="content"
+              />
               {!isEditing && methodology.annexes.length ? (
                 <h2>Annexes</h2>
               ) : null}
-              <MethodologyAccordion methodology={methodology} isAnnex />
+              <MethodologyAccordion
+                methodology={methodology}
+                sectionKey="annexes"
+              />
             </section>
           </div>
         </EditingContext.Provider>
