@@ -7,11 +7,13 @@ import ContentBlock from '@common/modules/find-statistics/components/ContentBloc
 import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
   Release,
   ReleaseType,
 } from '@common/services/publicationService';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@common/utils/date/dayMonthYear';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';

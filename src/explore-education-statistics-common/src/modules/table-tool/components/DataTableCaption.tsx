@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
-import commaList from '@common/lib/utils/string/commaList';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import commaList from '@common/utils/string/commaList';
 import classNames from 'classnames';
 import React from 'react';
 

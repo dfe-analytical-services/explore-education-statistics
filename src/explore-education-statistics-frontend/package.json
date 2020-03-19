@@ -179,6 +179,8 @@
     ]
   },
   "jest-junit": {
-    "ancestorSeparator": " › "
+    "ancestorSeparator": " › ",
+    "suiteName": "Frontend Jest tests",
+    "outputName": "junit-frontend.xml"
   }
 }

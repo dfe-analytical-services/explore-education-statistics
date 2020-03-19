@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -12,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
@@ -51,65 +51,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         public async void ProcessUploads(
             [QueueTrigger("imports-pending")] ImportMessage message,
             ILogger logger,
-            ExecutionContext context,
+            ExecutionContext executionContext,
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
-            logger.LogInformation($"Validating Datafile: {message.DataFileName}");
-
             if (message.Seeding)
             {
                 await _batchService.CreateImport(message.Release.Id.ToString(), message.DataFileName, 0, message);
             }
 
             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);
-            
-            var (errors, totalObservationCount, filteredObservationCount) =
-                _validatorService.ValidateAndCountRows(await _fileStorageService.GetSubjectData(message));
+            var subjectData = await _fileStorageService.GetSubjectData(message);
 
-            if (errors.Count == 0)
-            {
-                logger.LogInformation($"Validating Datafile: {message.OrigDataFileName} - complete");
-
-                try
+            await _validatorService.Validate(subjectData.GetMetaTable(), subjectData.GetCsvTable(), executionContext, message)
+                .OnSuccess(async result =>
                 {
-                    message.RowsPerBatch = Convert.ToInt32(LoadAppSettings(context).GetValue<string>("RowsPerBatch"));
-                    message.TotalRows = filteredObservationCount;
-                    message.NumBatches = FileStorageUtils.GetNumBatches(totalObservationCount, message.RowsPerBatch);
+                    try
+                    {
+                        message.RowsPerBatch = result.RowsPerBatch;
+                        message.TotalRows = result.FilteredObservationCount;
+                        message.NumBatches = result.NumBatches;
 
-                    await _batchService.UpdateStoredMessage(message);
+                        await _batchService.UpdateStoredMessage(message);
+                        await ProcessSubject(message, DbUtils.CreateStatisticsDbContext(), DbUtils.CreateContentDbContext(), subjectData);
+                        await _splitFileService.SplitDataFile(collector, message, subjectData);
+                    }
+                    catch (Exception e)
+                    {
+                        var ex = GetInnerException(e);
+
+                        await _batchService.FailImport(
+                            message.Release.Id.ToString(),
+                            message.OrigDataFileName,
+                            new List<ValidationError> {new ValidationError(ex.Message)}
+                        );
                     
-                    logger.LogInformation($"Datafile: {message.DataFileName} is valid");
-                    var subjectData = await ProcessSubject(message, DbUtils.CreateDbContext());
-                    logger.LogInformation($"Splitting Datafile: {message.DataFileName} if > {message.RowsPerBatch} lines");
-                    await _splitFileService.SplitDataFile(collector, message, subjectData);
-                    logger.LogInformation($"Split of Datafile: {message.DataFileName} - complete");
-                }
-                catch (Exception e)
-                {
-                    var ex = GetInnerException(e);
+                        logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
+                                           $"{message.DataFileName} : {ex.Message}");
+                    }
 
+                    return true;
+                })
+                .OnFailure(async errors =>
+                {
                     await _batchService.FailImport(
                         message.Release.Id.ToString(),
                         message.OrigDataFileName,
-                        new List<string> {ex.Message}
+                        errors
                     );
-                    
-                    logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
-                                    $"{message.DataFileName} : {ex.Message}");
-                }
-            }
-            else
-            {
-                await _batchService.FailImport(
-                    message.Release.Id.ToString(),
-                    message.OrigDataFileName,
-                    errors
-                );
                 
-                logger.LogError(
-                    $"Import FAILED for {message.DataFileName}...check log");
-            }
+                    logger.LogError($"Import FAILED for {message.DataFileName}...check log");
+                    return true;
+                });
         }
 
         [FunctionName("ImportObservations")]
@@ -119,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             try
             {
-                await _fileImportService.ImportObservations(message, DbUtils.CreateDbContext());
+                await _fileImportService.ImportObservations(message, DbUtils.CreateStatisticsDbContext());
             }
             catch (Exception e)
             {
@@ -128,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 {
                     logger.LogInformation($"{GetType().Name} : Handling known exception when processing Datafile: " +
                                        $"{message.DataFileName} : {exception.Message} : transaction will be retried");
-                    throw e;
+                    throw;
                 }
                 
                 var ex = GetInnerException(e);
@@ -136,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 await _batchService.FailImport(
                     message.Release.Id.ToString(),
                     message.OrigDataFileName,
-                    new List<string> {ex.Message}
+                    new List<ValidationError> {new ValidationError(ex.Message)}
                 );
                     
                 logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
@@ -144,54 +137,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
         }
         
-        private async Task<SubjectData> ProcessSubject(ImportMessage message, StatisticsDbContext dbContext)
+        private async Task ProcessSubject(ImportMessage message, StatisticsDbContext statisticsDbContext, ContentDbContext contentDbContext, SubjectData subjectData)
         {
             var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
             
             // If already reached Phase 2 then don't re-create the subject
             if ((int)status > (int)IStatus.RUNNING_PHASE_1)
             {
-                return await _fileStorageService.GetSubjectData(message); 
+                return; 
             }
 
-            var subjectData = await _fileStorageService.GetSubjectData(message);
-            var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, dbContext);
+            var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, statisticsDbContext, contentDbContext);
             
-            _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, dbContext);
+            _importerService.ImportMeta(subjectData.GetMetaTable(), subject, statisticsDbContext);
 
             if (message.Seeding)
             {
-                SampleGuids.GenerateIndicatorGuids(dbContext);
-                SampleGuids.GenerateFilterGuids(dbContext);
-                SampleGuids.GenerateFilterGroupGuids(dbContext);
+                SampleGuids.GenerateIndicatorGuids(statisticsDbContext);
+                SampleGuids.GenerateFilterGuids(statisticsDbContext);
+                SampleGuids.GenerateFilterGroupGuids(statisticsDbContext);
             }
 
-            await dbContext.SaveChangesAsync();
+            await statisticsDbContext.SaveChangesAsync();
 
-            _fileImportService.ImportFiltersLocationsAndSchools(message, dbContext);
+            _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
             
             if (message.Seeding)
             {
-                SampleGuids.GenerateFilterGuids(dbContext);
-                SampleGuids.GenerateFilterGroupGuids(dbContext);
-                SampleGuids.GenerateFilterItemGuids(dbContext);
+                SampleGuids.GenerateFilterGuids(statisticsDbContext);
+                SampleGuids.GenerateFilterGroupGuids(statisticsDbContext);
+                SampleGuids.GenerateFilterItemGuids(statisticsDbContext);
             }
 
-            await dbContext.SaveChangesAsync();
-            
+            await statisticsDbContext.SaveChangesAsync();
             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
                 IStatus.RUNNING_PHASE_2);
-
-            return subjectData;
-        }
-
-        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
-        {
-            return new ConfigurationBuilder()
-                .SetBasePath(context.FunctionAppDirectory)
-                .AddJsonFile("local.settings.json", true, true)
-                .AddEnvironmentVariables()
-                .Build();
         }
 
         private static Exception GetInnerException(Exception ex)

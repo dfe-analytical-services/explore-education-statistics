@@ -43,6 +43,12 @@
     },
     "dataApiUrl": {
       "value": "data.dev.explore-education-statistics.service.gov.uk"
+    },
+    "detailedErrors": {
+      "value": true
+    },
+    "storageAccountPrefix": {
+      "value": "sa"
     }
   }
 }

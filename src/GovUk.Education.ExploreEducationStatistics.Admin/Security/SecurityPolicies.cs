@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanMarkSpecificReleaseAsDraft,
         CanSubmitSpecificReleaseToHigherReview,
         CanApproveSpecificRelease,
+        CanMakeAmendmentOfSpecificRelease,
 
         /**
          * Pre Release management

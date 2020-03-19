@@ -1,59 +1,62 @@
 import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
-import ChartConfiguration, {
-  ChartOptions,
-} from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
-import ChartDataSelector, {
-  ChartDataSetAndConfiguration,
-  SelectedData,
-} from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
+import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
+import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
-
+import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
-import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
-import Infographic from '@common/modules/charts/components/Infographic';
-import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
-import MapBlock from '@common/modules/charts/components/MapBlock';
-import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
 import {
+  horizontalBarBlockDefinition,
+  HorizontalBarProps,
+} from '@common/modules/charts/components/HorizontalBarBlock';
+import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
+import {
+  lineChartBlockDefinition,
+  LineChartProps,
+} from '@common/modules/charts/components/LineChartBlock';
+import {
+  mapBlockDefinition,
+  MapBlockProps,
+} from '@common/modules/charts/components/MapBlock';
+import {
+  verticalBarBlockDefinition,
+  VerticalBarProps,
+} from '@common/modules/charts/components/VerticalBarBlock';
+import {
+  AxesConfiguration,
+  AxisType,
   ChartDefinition,
   ChartMetaData,
+  ChartProps,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
-import {
-  generateKeyFromDataSet,
-  parseMetaData,
-} from '@common/modules/charts/util/chartUtils';
+import { parseMetaData } from '@common/modules/charts/util/chartUtils';
+import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import {
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  Chart,
-  ChartDataSet,
-  DataSetConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useMemo } from 'react';
+
+const chartDefinitions: ChartDefinition[] = [
+  lineChartBlockDefinition,
+  verticalBarBlockDefinition,
+  horizontalBarBlockDefinition,
+  mapBlockDefinition,
+];
 
 interface Props {
   data: DataBlockResponse;
-  initialConfiguration?: Chart;
-  onChartSave?: (
-    props: ChartRendererProps,
-  ) => Promise<ChartRendererProps | undefined>;
+  initialConfiguration?: ChartRendererProps;
+  onChartSave?: (props: ChartRendererProps) => void;
 
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }
@@ -83,11 +86,11 @@ function getReduceMetaDataForAxis(
 }
 
 function generateAxesMetaData(
-  axes: Dictionary<AxisConfiguration>,
+  axes: AxesConfiguration,
   data: DataBlockResponse,
   metaData: ChartMetaData,
 ) {
-  return Object.values(axes).reduce(
+  return Object.values(axes as Required<AxesConfiguration>).reduce(
     (allValues, axis) => ({
       ...allValues,
       ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data, metaData), {}),
@@ -96,13 +99,6 @@ function generateAxesMetaData(
   );
 }
 
-const chartTypes: ChartDefinition[] = [
-  LineChartBlock.definition,
-  VerticalBarBlock.definition,
-  HorizontalBarBlock.definition,
-  MapBlock.definition,
-];
-
 const emptyMetadata = {
   timePeriod: {},
   filters: {},
@@ -110,432 +106,216 @@ const emptyMetadata = {
   locations: {},
 };
 
-enum SaveState {
-  Unsaved,
-  Error,
-  Saved,
-}
-
-// need a constant reference as there are dependencies on this not changing if it isn't set
 const ChartBuilder = ({
   data,
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
 }: Props) => {
-  const [selectedChartType, setSelectedChartType] = useState<
-    ChartDefinition | undefined
-  >();
-
   const metaData = useMemo(
     () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
     [data.metaData],
   );
 
-  const [chartOptions, setChartOptions] = useState<ChartOptions>({
-    stacked: false,
-    legend: 'top',
-    height: 300,
-    title: '',
-  });
+  const { state: chartBuilderState, actions } = useChartBuilderReducer(
+    initialConfiguration,
+  );
 
-  const previousAxesConfiguration = useRef<Dictionary<AxisConfiguration>>({});
+  const {
+    axes,
+    definition,
+    options,
+    dataSetAndConfiguration,
+    isValid,
+  } = chartBuilderState;
 
-  const [chartSaveState, setChartSaveState] = useState(SaveState.Unsaved);
-
-  const [axesConfiguration, realSetAxesConfiguration] = useState<
-    Dictionary<AxisConfiguration>
-  >({});
-
-  const [dataSetAndConfiguration, setDataSetAndConfiguration] = useState<
-    ChartDataSetAndConfiguration[]
-  >([]);
-
-  const setAxesConfiguration = (config: Dictionary<AxisConfiguration>) => {
-    previousAxesConfiguration.current = config;
-    realSetAxesConfiguration(config);
-  };
-
-  const onDataAdded = (addedData: SelectedData) => {
-    setChartSaveState(SaveState.Unsaved);
-
-    const newDataSetConfig = [...dataSetAndConfiguration, addedData];
-
-    setDataSetAndConfiguration(newDataSetConfig);
-  };
-
-  const onDataRemoved = (removedData: SelectedData, index: number) => {
-    setChartSaveState(SaveState.Unsaved);
-
-    const newDataSets = [...dataSetAndConfiguration];
-
-    newDataSets.splice(index, 1);
-    setDataSetAndConfiguration(newDataSets);
-  };
-
-  const [chartLabels, setChartLabels] = useState<
-    Dictionary<DataSetConfiguration>
-  >({});
-  useEffect(() => {
-    setChartLabels({
+  const labels: Dictionary<DataSetConfiguration> = useMemo(
+    () => ({
       ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-        (mapped, { configuration }) => ({
-          ...mapped,
-          [configuration.value]: configuration,
-        }),
+        (acc, { configuration }) => {
+          acc[configuration.value] = configuration;
+
+          return acc;
+        },
         {},
       ),
-      ...generateAxesMetaData(axesConfiguration, data, metaData),
-    });
-  }, [dataSetAndConfiguration, axesConfiguration, data, metaData]);
-
-  const [majorAxisDataSets, setMajorAxisDataSets] = useState<ChartDataSet[]>(
-    [],
+      ...generateAxesMetaData(axes, data, metaData),
+    }),
+    [axes, data, dataSetAndConfiguration, metaData],
   );
-  useEffect(() => {
-    setMajorAxisDataSets(dataSetAndConfiguration.map(dsc => dsc.dataSet));
-  }, [dataSetAndConfiguration]);
 
-  // build the properties that is used to render the chart from the selections made
-  const [renderedChartProps, setRenderedChartProps] = useState<
-    ChartRendererProps
-  >();
-  useEffect(() => {
-    if (
-      selectedChartType &&
-      (selectedChartType.axes.length === 0 ||
-        (selectedChartType.axes.length > 0 &&
-          majorAxisDataSets.length > 0 &&
-          axesConfiguration.major))
-    ) {
-      setRenderedChartProps({
-        ...chartOptions,
-        type: selectedChartType.type,
-        data,
-        meta: metaData,
-        axes: {
-          major: {
-            ...axesConfiguration.major,
-            dataSets: majorAxisDataSets,
-          },
-          minor: {
-            ...axesConfiguration.minor,
-            dataSets: [],
-          },
-        },
-        labels: chartLabels,
-        releaseId: data.releaseId,
-        getInfographic: editReleaseDataService.downloadChartFile,
-      });
-    } else {
-      setRenderedChartProps(undefined);
+  const chartProps = useMemo<ChartRendererProps | undefined>(() => {
+    if (!definition) {
+      return undefined;
     }
-  }, [
-    selectedChartType,
-    axesConfiguration,
-    dataSetAndConfiguration,
-    data,
-    metaData,
-    chartOptions,
-    chartLabels,
-    majorAxisDataSets,
-  ]);
 
-  const previousSelectionChartType = useRef<ChartDefinition>();
-  // set defaults for a selected chart type
-  useEffect(() => {
-    if (previousSelectionChartType.current !== selectedChartType) {
-      previousSelectionChartType.current = selectedChartType;
-
-      if (selectedChartType) {
-        const newAxesConfiguration = selectedChartType.axes.reduce<
-          Dictionary<AxisConfiguration>
-        >((axesConfigurationDictionary, axisDefinition) => {
-          const previousConfig =
-            (previousAxesConfiguration.current &&
-              previousAxesConfiguration.current[axisDefinition.type]) ||
-            {};
-
-          return {
-            ...axesConfigurationDictionary,
-
-            [axisDefinition.type]: {
-              referenceLines: [],
-              min: '0',
-              max: '',
-              tickSpacing: '',
-              unit: '',
-              tickConfig: 'default',
-
-              ...previousConfig,
-
-              // hard-coded defaults
-              type: axisDefinition.type,
-              name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-              groupBy:
-                axisDefinition.forcedDataType ||
-                previousConfig.groupBy ||
-                axisDefinition.defaultDataType,
-              dataSets:
-                axisDefinition.type === 'major'
-                  ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                  : [],
-
-              // defaults that can be undefined and may be overriden
-              visible:
-                previousConfig.visible === undefined
-                  ? true
-                  : previousConfig.visible,
-              showGrid:
-                previousConfig.showGrid === undefined
-                  ? true
-                  : previousConfig.showGrid,
-              size:
-                previousConfig.size === undefined ? '50' : previousConfig.size,
-              sortBy: previousConfig.sortBy || 'name',
-              sortAsc: previousConfig.sortAsc || true,
-            },
-          };
-        }, {});
-
-        setAxesConfiguration(newAxesConfiguration);
-      }
-    }
-  }, [selectedChartType, dataSetAndConfiguration]);
-
-  const extractInitialChartOptions = (
-    {
-      type,
-      stacked = false,
-      legend = 'top',
-      height = 300,
-      width,
-      title = '',
-      fileId,
-      geographicId,
+    const baseProps: ChartProps = {
+      ...options,
+      data,
+      axes,
+      meta: metaData,
       labels,
-      axes,
-    }: Chart = {
-      stacked: false,
-      legend: 'top',
-      height: 300,
-      title: '',
-    },
-  ) => {
-    let checkLabels = labels;
-
-    if (labels) {
-      checkLabels = Object.keys(labels).reduce<
-        Dictionary<DataSetConfiguration>
-      >(
-        (newLabels, key) => ({
-          ...newLabels,
-          [key]: {
-            ...labels[key],
-            value: labels[key].value || key,
-          },
-        }),
-        {},
-      );
-    }
-
-    return {
-      type,
-      options: {
-        stacked,
-        legend,
-        height,
-        width,
-        title,
-        fileId,
-        geographicId,
-      },
-      axes,
-      labels: checkLabels,
     };
-  };
 
-  const saveChart = useCallback(async () => {
-    setChartSaveState(SaveState.Unsaved);
-    if (renderedChartProps && onChartSave) {
-      try {
-        await onChartSave(renderedChartProps);
-        setChartSaveState(SaveState.Saved);
-      } catch (_) {
-        setChartSaveState(SaveState.Error);
-      }
+    switch (definition.type) {
+      case 'infographic':
+        return {
+          ...baseProps,
+          labels: {},
+          type: 'infographic',
+          releaseId: data.releaseId,
+          getInfographic: editReleaseDataService.downloadChartFile,
+        };
+      case 'line':
+        return {
+          ...(baseProps as LineChartProps),
+          type: 'line',
+        };
+      case 'horizontalbar':
+        return {
+          ...(baseProps as HorizontalBarProps),
+          type: 'horizontalbar',
+        };
+      case 'verticalbar':
+        return {
+          ...(baseProps as VerticalBarProps),
+          type: 'verticalbar',
+        };
+      case 'map':
+        return {
+          ...(baseProps as MapBlockProps),
+          type: 'map',
+        };
+      default:
+        return undefined;
     }
-  }, [onChartSave, renderedChartProps]);
+  }, [axes, data, definition, labels, metaData, options]);
 
-  // initial chart options set up
-  useEffect(() => {
-    const initial = extractInitialChartOptions(initialConfiguration);
+  const handleBoundaryLevelChange = useCallback(
+    (boundaryLevel: string) => {
+      if (onRequiresDataUpdate)
+        onRequiresDataUpdate({
+          boundaryLevel: boundaryLevel
+            ? Number.parseInt(boundaryLevel, 10)
+            : undefined,
+        });
+    },
+    [onRequiresDataUpdate],
+  );
 
-    setChartSaveState(SaveState.Unsaved);
-
-    setSelectedChartType(
-      () => initial && chartTypes.find(({ type }) => type === initial.type),
-    );
-
-    setChartOptions({ ...initial.options });
-
-    if (initial.labels) {
-      setChartLabels(initial.labels);
+  const handleChartSave = useCallback(async () => {
+    if (!isChartRenderable(chartProps) && !isValid) {
+      return;
     }
 
-    if (initial.axes && initial.labels) {
-      setAxesConfiguration(
-        (initial.axes as unknown) as Dictionary<AxisConfiguration>,
-      );
-
-      if (initial.axes.major && initial.axes.major.dataSets && initial.labels) {
-        const dataSetAndConfig = initial.axes.major.dataSets
-          .map(dataSet => {
-            const key = generateKeyFromDataSet(dataSet);
-            const configuration = initial.labels && initial.labels[key];
-            return { dataSet, configuration };
-          })
-          .filter(dsc => dsc.configuration !== undefined);
-
-        // @ts-ignore ... because Typescript is a pain
-        setDataSetAndConfiguration(dataSetAndConfig);
-      }
+    if (onChartSave) {
+      await onChartSave(chartProps as ChartRendererProps);
     }
-  }, [initialConfiguration]);
+  }, [chartProps, isValid, onChartSave]);
 
   return (
     <div className={styles.editor}>
       <ChartTypeSelector
-        chartTypes={chartTypes}
-        onSelectChart={chart => {
-          setChartSaveState(SaveState.Unsaved);
-          setSelectedChartType(chart);
-        }}
-        selectedChartType={selectedChartType}
+        chartDefinitions={chartDefinitions}
+        selectedChartDefinition={definition}
         geoJsonAvailable={data.metaData.geoJsonAvailable}
+        onSelectChart={actions.updateChartDefinition}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
-        <a
-          href="#"
-          onClick={e => {
-            e.preventDefault();
-            setChartSaveState(SaveState.Unsaved);
-            setSelectedChartType(Infographic.definition);
+        <ButtonText
+          onClick={() => {
+            actions.updateChartDefinition(infographicBlockDefinition);
           }}
         >
           Choose an infographic as alternative
-        </a>
+        </ButtonText>
       </div>
 
-      {selectedChartType && (
+      {definition && (
         <Details summary="Chart preview" open>
           <div className="govuk-width-container">
-            {renderedChartProps === undefined ? (
+            {isChartRenderable(chartProps) ? (
+              <ChartRenderer {...chartProps} />
+            ) : (
               <div className={styles.previewPlaceholder}>
-                {selectedChartType.axes.length > 0 ? (
+                {Object.keys(axes).length > 0 ? (
                   <p>Add data to view a preview of the chart</p>
                 ) : (
-                  <p>
-                    Configure the {selectedChartType.name} to view a preview
-                  </p>
+                  <p>Configure the {definition.name} to view a preview</p>
                 )}
               </div>
-            ) : (
-              <ChartRenderer {...renderedChartProps} />
             )}
           </div>
         </Details>
       )}
 
-      {selectedChartType && (
-        <Tabs id="ChartTabs">
-          {selectedChartType.data.length > 0 && (
-            <TabsSection title="Data">
-              <h2 className="govuk-heading-m">
-                Add data from the existing dataset to the chart
-              </h2>
+      {definition && (
+        <Tabs id="chartBuilder-tabs">
+          {definition.data.length > 0 && (
+            <TabsSection
+              title="Data"
+              headingTitle="Add data from the existing dataset to the chart"
+            >
               <ChartDataSelector
-                onDataAdded={onDataAdded}
-                onDataRemoved={onDataRemoved}
-                onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
-                  setChartSaveState(SaveState.Unsaved);
-                  setDataSetAndConfiguration([...newData]);
-                }}
+                canSaveChart={isValid}
                 metaData={metaData}
                 selectedData={dataSetAndConfiguration}
-                chartType={selectedChartType}
-                capabilities={selectedChartType.capabilities}
+                chartType={definition}
+                capabilities={definition.capabilities}
+                onDataAdded={actions.addDataSet}
+                onDataRemoved={actions.removeDataSet}
+                onDataChanged={actions.updateDataSet}
+                onSubmit={handleChartSave}
               />
             </TabsSection>
           )}
 
-          <TabsSection title="Chart configuration">
-            <h2 className="govuk-heading-m">Chart configuration</h2>
+          <TabsSection
+            title="Chart configuration"
+            headingTitle="Chart configuration"
+          >
             <ChartConfiguration
-              selectedChartType={selectedChartType}
-              chartOptions={chartOptions}
-              onChange={chartOptionsValue => {
-                setChartSaveState(SaveState.Unsaved);
-                setChartOptions(chartOptionsValue);
-              }}
-              onBoundaryLevelChange={boundaryLevel => {
-                setChartSaveState(SaveState.Unsaved);
-                if (onRequiresDataUpdate)
-                  onRequiresDataUpdate({
-                    boundaryLevel: boundaryLevel
-                      ? Number.parseInt(boundaryLevel, 10)
-                      : undefined,
-                  });
-              }}
+              selectedChartType={definition}
+              chartOptions={options}
               meta={metaData}
               data={data}
+              onBoundaryLevelChange={handleBoundaryLevelChange}
+              onChange={actions.updateChartOptions}
+              onSubmit={handleChartSave}
             />
           </TabsSection>
 
-          {Object.entries(axesConfiguration).map(([key, axis]) => (
-            <TabsSection title={axis.name} key={key}>
-              <div className={styles.axesOptions}>
+          {Object.entries(
+            definition.axes as Required<ChartDefinition['axes']>,
+          ).map(([key, axis]) => {
+            const axisConfiguration = axes[key as AxisType];
+
+            if (!axisConfiguration) {
+              return null;
+            }
+
+            return (
+              <TabsSection
+                key={key}
+                id={`${key}-tab`}
+                title={axis.title}
+                headingTitle={axis.title}
+              >
                 <ChartAxisConfiguration
                   id={key}
-                  configuration={axis}
-                  capabilities={selectedChartType.capabilities}
+                  configuration={axisConfiguration}
+                  capabilities={definition.capabilities}
                   data={data}
                   meta={metaData}
-                  labels={chartLabels}
-                  dataSets={axis.type === 'major' ? majorAxisDataSets : []}
-                  onConfigurationChange={updatedConfig => {
-                    setChartSaveState(SaveState.Unsaved);
-                    setAxesConfiguration({
-                      ...axesConfiguration,
-                      [key]: updatedConfig,
-                    });
-                  }}
+                  labels={chartProps?.labels}
+                  dataSets={axisConfiguration?.dataSets}
+                  onChange={actions.updateChartAxis}
+                  onSubmit={handleChartSave}
                 />
-              </div>
-            </TabsSection>
-          ))}
+              </TabsSection>
+            );
+          })}
         </Tabs>
-      )}
-
-      {selectedChartType && renderedChartProps && (
-        <>
-          <button type="button" className="govuk-button" onClick={saveChart}>
-            Save chart options
-          </button>
-
-          {chartSaveState !== SaveState.Unsaved && (
-            <div>
-              {chartSaveState === SaveState.Saved && (
-                <span>Chart has been saved</span>
-              )}
-              {chartSaveState === SaveState.Error && (
-                <span>
-                  An error occurred saving the chart, please try again later
-                </span>
-              )}
-            </div>
-          )}
-        </>
       )}
     </div>
   );

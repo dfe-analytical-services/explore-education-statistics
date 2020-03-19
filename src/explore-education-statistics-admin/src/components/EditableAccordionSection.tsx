@@ -85,6 +85,7 @@ const EditableAccordionSection = ({
           <span
             className={classNames(
               'govuk-accordion__section-button',
+              'govuk-!-width-three-quarters',
               styles['editable-header'],
             )}
           >
@@ -123,20 +124,20 @@ const EditableAccordionSection = ({
         <div>
           {onHeadingChange &&
             (isEditingHeading ? (
-              <Button onClick={saveHeading}>Save title</Button>
+              <Button onClick={saveHeading}>Save section title</Button>
             ) : (
               <Button
                 type="button"
                 onClick={() => setIsEditingHeading(!isEditingHeading)}
                 variant="secondary"
               >
-                Edit title
+                Edit section title
               </Button>
             ))}
           {headerButtons}
           {!!onRemoveSection && (
             <Button onClick={() => setShowRemoveModal(true)} variant="warning">
-              Remove section
+              Remove this section
               <ModalConfirm
                 title="Are you sure?"
                 mounted={showRemoveModal}

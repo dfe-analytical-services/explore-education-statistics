@@ -18,13 +18,13 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
-import Yup from '@common/lib/validation/yup';
-import { DayMonthYearInputs } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import { DayMonthYearInputs } from '@common/utils/date/dayMonthYear';
+import Yup from '@common/validation/yup';
+import { endOfDay, format, isValid } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
-import { endOfDay, format, isValid } from 'date-fns';
 
 export interface EditFormValues {
   timePeriodCoverageCode: string;

@@ -19,11 +19,9 @@ import {
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
-import Yup from '@common/lib/validation/yup';
-import {
-  emptyDayMonthYear,
-  Publication,
-} from '@common/services/publicationService';
+import { Publication } from '@common/services/publicationService';
+import { emptyDayMonthYear } from '@common/utils/date/dayMonthYear';
+import Yup from '@common/validation/yup';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
@@ -82,7 +80,12 @@ const CreateReleasePage = ({
     );
 
     const createdRelease = await service.createRelease(createReleaseDetails);
-    history.push(summaryRoute.generateLink(publicationId, createdRelease.id));
+    history.push(
+      summaryRoute.generateLink({
+        publicationId,
+        releaseId: createdRelease.id,
+      }),
+    );
   }, errorCodeMappings);
 
   const cancelHandler = () =>

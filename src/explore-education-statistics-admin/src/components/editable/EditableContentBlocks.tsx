@@ -23,6 +23,7 @@ export interface EditableContentBlocksProps extends ContentBlockProps {
   sectionId: string;
   editable?: boolean;
   isReordering?: boolean;
+  insideAccordion?: boolean;
   allowComments: boolean;
   onBlockSaveOrder?: (order: Dictionary<number>) => void;
   onBlockContentChange: (blockId: string, content: string) => void;
@@ -34,6 +35,7 @@ const EditableContentBlocks = ({
   sectionId,
   editable = true,
   isReordering = false,
+  insideAccordion,
   allowComments = false,
   onBlockSaveOrder,
   onBlockContentChange,
@@ -126,6 +128,7 @@ const EditableContentBlocks = ({
                 editable={editable && !isReordering}
                 canDelete={!isReordering}
                 block={block}
+                insideAccordion={insideAccordion}
                 onContentChange={newContent =>
                   onBlockContentChange(block.id, newContent)
                 }

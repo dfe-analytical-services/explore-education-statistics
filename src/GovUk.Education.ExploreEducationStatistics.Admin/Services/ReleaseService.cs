@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -43,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ITableStorageService _tableStorageService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
-	private readonly IFootnoteService _footnoteService;
+	    private readonly IFootnoteService _footnoteService;
 
         // TODO PP-318 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -114,6 +113,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync();
                     return await GetReleaseForIdAsync(release.Id);
                 });
+        }
+
+        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
+                .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
+                .OnSuccess(originalRelease =>
+                    CreateBasicReleaseAmendment(originalRelease)
+                    .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
+                    .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Ancillary))
+                    .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Chart))
+                    .OnSuccess(amendment => CopyDataFileLinks(originalRelease, amendment))
+                    .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id)));
+        }
+
+        private async Task<Either<ActionResult, Release>> CopyReleaseTeam(Guid originalReleaseId, Release amendment)
+        {
+            var newRoles = _context
+                .UserReleaseRoles
+                .Where(r => r.ReleaseId == originalReleaseId)
+                .Select(r => r.CreateReleaseAmendment(amendment));
+
+            await _context.AddRangeAsync(newRoles);
+            await _context.SaveChangesAsync();
+            return amendment;
+        }
+
+        private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release release)
+        {
+            var amendment = release.CreateReleaseAmendment(DateTime.UtcNow, _userService.GetUserId());
+            _context.Releases.Add(amendment);
+            await _context.SaveChangesAsync();
+            return amendment;
+        }
+
+        private async Task<Either<ActionResult, Release>> CopyDataFileLinks(Release originalRelease, Release newRelease)
+        {
+            var releaseFileCopies = _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Where(f => f.ReleaseId == originalRelease.Id)
+                .Select(f => f.CreateReleaseAmendment(newRelease));
+
+            await _context.AddRangeAsync(releaseFileCopies);
+            await _context.SaveChangesAsync();
+            return newRelease;
+        }
+
+        private Task<Either<ActionResult, Release>> CopyReleaseFilesOfType(
+            Guid originalReleaseId, Release newRelease, ReleaseFileTypes type)
+        {
+            return _fileStorageService
+                .CopyReleaseFilesAsync(originalReleaseId, newRelease.Id, type);
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
@@ -400,6 +453,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
                 .Include(r => r.Type);
+        }
+        
+        public static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)
+        {
+            // Require publication / release / contact / type graph to be able to work out:
+            // If the release is the latest
+            // The contact
+            // The type
+            return values.Include(r => r.Publication)
+                .Include(r => r.Content)
+                .ThenInclude(c => c.ContentSection)
+                .ThenInclude(c => c.Content)
+                .Include(r => r.Updates)
+                .Include(r => r.ContentBlocks)
+                .ThenInclude(r => r.ContentBlock);
         }
     }
 

@@ -4,10 +4,8 @@ import {
   IdTitlePair,
   UserDetails,
 } from '@admin/services/common/types';
-import {
-  DayMonthYearValues,
-  ReleaseStatus,
-} from '@common/services/publicationService';
+import { ReleaseStatus } from '@common/services/publicationService';
+import { DayMonthYearValues } from '@common/utils/date/dayMonthYear';
 
 export interface ThemeAndTopics {
   title: string;
@@ -49,6 +47,7 @@ export interface AdminDashboardRelease {
   higherReviewComments: Comment[];
   permissions: {
     canUpdateRelease: boolean;
+    canMakeAmendmentOfRelease: boolean;
   };
 }
 

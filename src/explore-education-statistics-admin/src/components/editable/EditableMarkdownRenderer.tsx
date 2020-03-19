@@ -9,6 +9,7 @@ export type MarkdownRendererProps = RendererProps &
     canDelete?: boolean;
     onDelete: () => void;
     toolbarConfig?: string[];
+    insideAccordion?: boolean;
     editable?: boolean;
     onContentChange: (content: string) => void;
   };
@@ -16,6 +17,7 @@ export type MarkdownRendererProps = RendererProps &
 const EditingMarkdownRenderer = ({
   source = '',
   canDelete,
+  insideAccordion,
   toolbarConfig,
   onDelete,
   editable = true,
@@ -24,6 +26,7 @@ const EditingMarkdownRenderer = ({
   return (
     <WysiwygEditor
       content={source}
+      insideAccordion={insideAccordion}
       canDelete={canDelete}
       editable={editable}
       useMarkdown

@@ -1,5 +1,5 @@
 import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
-import permissionsService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import {
   EditableContentBlock,
   ExtendedComment,
@@ -61,7 +61,7 @@ export default function useReleaseActions() {
         release,
         availableDataBlocks,
       } = await releaseContentService.getContent(releaseId);
-      const canUpdateRelease = await permissionsService.canUpdateRelease(
+      const canUpdateRelease = await permissionService.canUpdateRelease(
         releaseId,
       );
       dispatch({

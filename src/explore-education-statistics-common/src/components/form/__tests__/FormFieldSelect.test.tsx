@@ -1,7 +1,7 @@
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
+import { fireEvent, render, wait } from '@testing-library/react';
 import { Formik, FormikProps } from 'formik';
 import React from 'react';
-import { fireEvent, render, wait } from '@testing-library/react';
 import FormFieldSelect from '../FormFieldSelect';
 
 describe('FormFieldSelect', () => {

@@ -14,6 +14,7 @@ function EditableContentSubBlockRenderer({
   block,
   editable,
   releaseId,
+  insideAccordion,
   onContentChange,
   canDelete = false,
   onDelete,
@@ -24,6 +25,7 @@ function EditableContentSubBlockRenderer({
         <EditableMarkdownRenderer
           editable={editable}
           contentId={block.id}
+          insideAccordion={insideAccordion}
           source={block.body}
           canDelete={canDelete}
           onDelete={onDelete}
@@ -46,6 +48,7 @@ function EditableContentSubBlockRenderer({
       return (
         <EditableHtmlRenderer
           editable={editable}
+          insideAccordion={insideAccordion}
           contentId={block.id}
           source={block.body}
           canDelete={canDelete}

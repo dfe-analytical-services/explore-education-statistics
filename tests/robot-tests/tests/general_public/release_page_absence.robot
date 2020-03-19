@@ -81,16 +81,16 @@ Validate absence_in_prus.csv file can be downloaded
     user closes details dropdown     Download data files
 
 Validate Key Statistics data block -- Summary tab
-    [Documentation]  DFE-915   EES-806
+    [Documentation]  DFE-915   EES-806   EES-1508
     [Tags]  HappyPath
     #user waits until page contains element   css:#keystats-summary    90
     user waits until page contains element   xpath://h3[text()="Overall absence rate"]    90
     user waits until page contains element   xpath://h3[text()="Authorised absence rate"]    90
     user waits until page contains element   xpath://h3[text()="Unauthorised absence rate"]    90
 
-    user checks key stat tile contents   Overall absence rate         4.6%   Up from 4.6% in 2015/16
-    user checks key stat tile contents   Authorised absence rate      3.5%   Similar to previous years
-    user checks key stat tile contents   Unauthorised absence rate    1.1%   Up from 1.1% in 2015/16
+    user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
+    user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
+    user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
 
     #user checks key stat bullet exists   pupils missed on average 8.2 school days
     #user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
@@ -135,7 +135,7 @@ Validate Key Statistics data block -- Data tables tab
 Validate Key Statistics data block -- Charts tab
    [Tags]  HappyPath
    user clicks element   css:#headlines-section-3-tab   # Click Chart tab
-   user checks element is visible  css:.recharts-responsive-container
+   user waits until element is visible  css:.recharts-responsive-container
    # TODO: Possible to verify chart?
 
 Validate accordion sections order

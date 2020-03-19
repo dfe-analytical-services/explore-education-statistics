@@ -1,12 +1,13 @@
 import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
+import { ChartDataSetAndConfiguration } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect, Formik } from '@common/components/form';
-import Yup from '@common/lib/validation/yup';
 import {
   ChartCapabilities,
   ChartDefinition,
   ChartMetaData,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import {
   colours,
@@ -15,11 +16,8 @@ import {
   symbols,
 } from '@common/modules/charts/util/chartUtils';
 import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
-import {
-  ChartDataSet,
-  DataSetConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import Yup from '@common/validation/yup';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import React, { useMemo, useState } from 'react';
@@ -39,29 +37,28 @@ export interface SelectedData {
 }
 
 interface Props {
+  canSaveChart?: boolean;
   chartType: ChartDefinition;
   selectedData?: ChartDataSetAndConfiguration[];
   metaData: ChartMetaData;
+  capabilities: ChartCapabilities;
   onDataAdded?: (data: SelectedData) => void;
   onDataRemoved?: (data: SelectedData, index: number) => void;
   onDataChanged?: (data: SelectedData[]) => void;
-  capabilities: ChartCapabilities;
-}
-
-export interface ChartDataSetAndConfiguration {
-  dataSet: ChartDataSet;
-  configuration: DataSetConfiguration;
+  onSubmit: (data: SelectedData[]) => void;
 }
 
 const formId = 'chartDataSelectorForm';
 
 const ChartDataSelector = ({
+  canSaveChart,
   metaData,
+  capabilities,
+  selectedData = [],
   onDataRemoved,
   onDataAdded,
   onDataChanged,
-  selectedData = [],
-  capabilities,
+  onSubmit,
 }: Props) => {
   const indicatorOptions = useMemo(
     () => [
@@ -96,7 +93,6 @@ const ChartDataSelector = ({
 
   return (
     <Formik<FormValues>
-      enableReinitialize
       initialValues={{
         filters: mapValues(metaData.filters, () => ''),
         indicator: '',
@@ -125,18 +121,18 @@ const ChartDataSelector = ({
           );
         }
 
-        const dataSet = {
-          filters: filterOptions,
-          indicator,
-        };
-
         const name = `${metaData.indicators[indicator].label}${
-          dataSet.filters.length
-            ? ` (${dataSet.filters
+          filterOptions.length
+            ? ` (${filterOptions
                 .map(filter => filtersByValue[filter].label)
                 .join(', ')})`
             : ''
         }`;
+
+        const dataSet = {
+          filters: filterOptions,
+          indicator,
+        };
 
         const newChartData = {
           dataSet,
@@ -146,7 +142,7 @@ const ChartDataSelector = ({
             label: name,
             colour: colours[chartData.length % colours.length],
             symbol: symbols[chartData.length % symbols.length],
-            unit: metaData.indicators[dataSet.indicator].unit || '',
+            unit: metaData.indicators[indicator].unit || '',
           },
         };
 
@@ -250,9 +246,12 @@ const ChartDataSelector = ({
                           onConfigurationChange={(
                             value: DataSetConfiguration,
                           ) => {
-                            chartData[index].configuration = value;
-
                             const newData = [...chartData];
+
+                            newData[index] = {
+                              ...newData[index],
+                              configuration: value,
+                            };
 
                             setChartData(newData);
 
@@ -266,6 +265,17 @@ const ChartDataSelector = ({
                   </div>
                 </React.Fragment>
               ))}
+
+              <hr />
+
+              <Button
+                disabled={!canSaveChart}
+                onClick={() => {
+                  onSubmit(chartData);
+                }}
+              >
+                Save chart options
+              </Button>
             </>
           )}
         </>

@@ -52,17 +52,17 @@ exports[`DataBlock renders map instead of chart 1`] = `
                 <option
                   value="23_1_2_____"
                 >
-                  Label 23_1_2
+                  Unauthorised absence rate
                 </option>
                 <option
                   value="26_1_2_____"
                 >
-                  Label 26_1_2
+                  Overall absence rate
                 </option>
                 <option
                   value="28_1_2_____"
                 >
-                  Label 28_1_2
+                  Authorised absence rate
                 </option>
               </select>
             </div>
@@ -109,7 +109,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
       >
         <div
           class="map dfe-print-break-avoid leaflet-container leaflet-grab leaflet-touch-drag"
-          style="width: 800px; height: 600px; position: relative;"
+          style="width: 900px; height: 300px; position: relative;"
           tabindex="0"
         >
           <div
@@ -149,6 +149,18 @@ exports[`DataBlock renders map instead of chart 1`] = `
                     class="leaflet-interactive"
                     d="M0 0"
                     fill="#3f0000"
+                    fill-opacity="0.2"
+                    fill-rule="evenodd"
+                    stroke="#3388ff"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-opacity="1"
+                    stroke-width="3"
+                  />
+                  <path
+                    class="leaflet-interactive"
+                    d="M0 0"
+                    fill="#ff0000"
                     fill-opacity="0.2"
                     fill-rule="evenodd"
                     stroke="#3388ff"
@@ -233,7 +245,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             class="govuk-heading-s"
           >
             Key to 
-            Label 23_1_2
+            Unauthorised absence rate
           </h3>
           <dl
             class="govuk-list"
@@ -247,7 +259,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
               >
                  
               </span>
-               -3% to -3%
+               3.0% to 3.3%
             </dd>
             <dd
               class="legend"
@@ -258,7 +270,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
               >
                  
               </span>
-               -3% to -3%
+               3.3% to 3.5%
             </dd>
             <dd
               class="legend"
@@ -269,7 +281,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
               >
                  
               </span>
-               -3% to -2%
+               3.5% to 3.8%
             </dd>
             <dd
               class="legend"
@@ -280,7 +292,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
               >
                  
               </span>
-               -2% to -2%
+               3.8% to 4.0%
             </dd>
             <dd
               class="legend"
@@ -291,7 +303,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
               >
                  
               </span>
-               -2% to -2%
+               4.0% to 4.3%
             </dd>
           </dl>
         </div>

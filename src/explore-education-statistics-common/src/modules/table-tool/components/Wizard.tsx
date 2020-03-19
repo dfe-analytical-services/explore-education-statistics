@@ -1,9 +1,17 @@
-import isComponentType from '@common/lib/type-guards/components/isComponentType';
-import React, { Children, cloneElement, ReactElement, useState } from 'react';
+import isComponentType from '@common/utils/type-guards/components/isComponentType';
+import React, {
+  Children,
+  cloneElement,
+  FunctionComponentElement,
+  ReactElement,
+  useEffect,
+  useState,
+} from 'react';
 import styles from './Wizard.module.scss';
 import WizardStep, { WizardStepProps } from './WizardStep';
 
 export interface InjectedWizardProps {
+  shouldScroll: boolean;
   stepNumber: number;
   currentStep: number;
   setCurrentStep(step: number): void;
@@ -16,22 +24,32 @@ interface Props {
   children: ReactElement | (ReactElement | undefined | boolean)[];
   initialStep?: number;
   id: string;
+  scrollOnMount?: boolean;
   onStepChange?: (
     nextStep: number,
     previousStep: number,
   ) => void | number | Promise<number> | Promise<void>;
 }
 
-const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
+const Wizard = ({
+  children,
+  initialStep = 1,
+  id,
+  scrollOnMount = false,
+  onStepChange,
+}: Props) => {
+  const [shouldScroll, setShouldScroll] = useState(scrollOnMount);
   const [currentStep, setCurrentStepState] = useState(initialStep);
 
   const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, WizardStep),
-  ) as ReactElement[];
+  ) as FunctionComponentElement<WizardStepProps & InjectedWizardProps>[];
 
   const lastStep = filteredChildren.length;
 
   const setCurrentStep = async (nextStep: number) => {
+    setShouldScroll(true);
+
     if (onStepChange) {
       const next = await onStepChange(nextStep, currentStep);
 
@@ -41,7 +59,7 @@ const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentStepState(initialStep);
   }, [initialStep]);
 
@@ -50,9 +68,10 @@ const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
       {filteredChildren.map((child, index) => {
         const stepNumber = index + 1;
 
-        return cloneElement<WizardStepProps | InjectedWizardProps>(child, {
+        return cloneElement<WizardStepProps & InjectedWizardProps>(child, {
           stepNumber,
           currentStep,
+          shouldScroll,
           async setCurrentStep(nextStep: number) {
             if (nextStep <= lastStep && nextStep >= 1) {
               await setCurrentStep(nextStep);

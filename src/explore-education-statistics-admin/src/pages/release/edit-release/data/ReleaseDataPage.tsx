@@ -1,6 +1,6 @@
 import ReleaseFootnotesSection from '@admin/pages/release/edit-release/data/ReleaseFootnotesSection';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import {
   Footnote,
@@ -31,12 +31,12 @@ const ReleaseDataPage = () => {
     Promise.all([
       footnotesService.getReleaseFootnoteData(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ]).then(([{ meta, footnotes: footnotesList }, canUpdateReleaseResult]) => {
+    ]).then(([{ meta, footnotes: footnotesList }, canUpdateRelease]) => {
       setFootnotesData({
         footnoteMeta: meta,
         footnotes: footnotesList,
         footnoteMetaGetters: generateFootnoteMetaMap(meta),
-        canUpdateRelease: canUpdateReleaseResult,
+        canUpdateRelease,
       });
     });
   }, [releaseId]);

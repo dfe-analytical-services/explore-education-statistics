@@ -11,7 +11,7 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
@@ -30,10 +30,10 @@ interface FormValues {
   fileId: string;
 }
 
-interface InfographicChartOptionsProps {
+interface Props {
   releaseId: string;
   fileId?: string;
-  onChange: (fileId: string) => void;
+  onSubmit: (fileId: string) => void;
 }
 
 const loadChartFilesAndMapToSelectOptionAsync = (
@@ -53,11 +53,7 @@ const loadChartFilesAndMapToSelectOptionAsync = (
   });
 };
 
-const InfographicChartForm = ({
-  releaseId,
-  fileId,
-  onChange,
-}: InfographicChartOptionsProps) => {
+const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
   const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
   const [uploading, setUploading] = useState(false);
@@ -76,7 +72,7 @@ const InfographicChartForm = ({
         })
         .then(() => loadChartFilesAndMapToSelectOptionAsync(releaseId))
         .then(setChartFileOptions)
-        .then(() => onChange((values.file as File).name))
+        .then(() => onSubmit((values.file as File).name))
         .finally(() => {
           setUploading(false);
         });
@@ -124,8 +120,8 @@ const InfographicChartForm = ({
                 <ModalConfirm
                   mounted={deleteFile}
                   title="Confirm deletion of infographic"
-                  onExit={() => toggleDeleteFile(false)}
-                  onCancel={() => toggleDeleteFile(false)}
+                  onExit={toggleDeleteFile.off}
+                  onCancel={toggleDeleteFile.off}
                   onConfirm={async () => {
                     // eslint-disable-next-line no-unused-expressions
                     form.values.fileId &&
@@ -135,8 +131,8 @@ const InfographicChartForm = ({
                           loadChartFilesAndMapToSelectOptionAsync(releaseId),
                         )
                         .then(setChartFileOptions);
-                    onChange('');
-                    toggleDeleteFile(false);
+                    onSubmit('');
+                    toggleDeleteFile.off();
                   }}
                 >
                   <p>

@@ -215,6 +215,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<ReleaseFile> ReleaseFiles { get; set; }
+        public DbSet<ReleaseFileReference> ReleaseFileReferences { get; set; }
         public DbSet<ContentSection> ContentSections { get; set; }
         public DbSet<IContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
@@ -224,10 +226,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
-        public virtual DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
+        public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public DbSet<Update> Update { get; set; }
         public DbSet<User> Users { get; set; }
-        public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+        public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
 
         public DbSet<Comment> Comment { get; set; }
         public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
@@ -276,6 +278,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFile>()
+                .HasOne(r => r.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFileReference>()
+                .HasOne(r => r.Release)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
@@ -2812,7 +2824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = 2012,
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
                             EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
@@ -2847,7 +2859,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=""/glossary#overall-absence"">More >>></a>",
+                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils.",
                         }
                     },
                     Tables = new List<Table>
@@ -2859,10 +2871,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -2966,7 +2974,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = 2012,
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
                             EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
@@ -3001,7 +3009,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of authorised absences as a percentage of the overall school population. <a href=""/glossary#authorised-absence"">More >>></a>",
+                            @"Number of authorised absences as a percentage of the overall school population.",
                         }
                     },
                     Tables = new List<Table>
@@ -3013,10 +3021,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -3096,7 +3100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = 2012,
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
                             EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
@@ -3131,7 +3135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of unauthorised absences as a percentage of the overall school population. <a href=""/glossary#unauthorised-absence"">More >>></a>"
+                            @"Number of unauthorised absences as a percentage of the overall school population."
                         }
                     },
                     Tables = new List<Table>
@@ -3143,10 +3147,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>

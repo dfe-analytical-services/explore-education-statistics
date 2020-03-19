@@ -1,4 +1,12 @@
-import { ChartMetaData } from '@common/modules/charts/types/chart';
+import {
+  AxisConfiguration,
+  AxisGroupBy,
+  ChartDataSet,
+  ChartMetaData,
+  ChartSymbol,
+  DataSetConfiguration,
+  LabelConfiguration,
+} from '@common/modules/charts/types/chart';
 import {
   FilterOption,
   PublicationSubjectMeta,
@@ -8,15 +16,8 @@ import {
   Location,
   Result,
 } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  AxisGroupBy,
-  ChartDataSet,
-  ChartSymbol,
-  DataSetConfiguration,
-  LabelConfiguration,
-} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import parseNumber from '@common/utils/number/parseNumber';
 import difference from 'lodash/difference';
 import omit from 'lodash/omit';
 import { AxisDomain } from 'recharts';
@@ -329,17 +330,16 @@ export function createSortedDataForAxis(
     meta,
   ).map(mapFunction);
 
-  const sorted = sortChartData(
+  const sortedData = sortChartData(
     chartData,
     axisConfiguration.sortBy,
     axisConfiguration.sortAsc !== false,
   );
 
-  if (axisConfiguration.dataRange) {
-    return sorted.slice(...axisConfiguration.dataRange);
-  }
-
-  return sorted;
+  return sortedData.slice(
+    axisConfiguration.min ?? 0,
+    axisConfiguration.max ?? sortedData.length,
+  );
 }
 
 export function createSortedAndMappedDataForAxis(
@@ -386,13 +386,6 @@ export function populateDefaultChartProps(
   };
 }
 
-export const conditionallyAdd = (size?: string, add?: number) => {
-  if (size) {
-    return +size + (add === undefined ? 0 : add);
-  }
-  return add;
-};
-
 const calculateMinMaxReduce = (
   { min, max }: { min: number; max: number },
   next: string,
@@ -420,16 +413,6 @@ export function calculateDataRange(chartData: ChartData[]) {
     max: -Infinity,
   });
 }
-
-const parseNumberOrDefault = (
-  number: string | undefined,
-  def: number,
-): number => {
-  const parsed = number === undefined ? undefined : Number.parseFloat(number);
-
-  if (parsed === undefined || Number.isNaN(parsed)) return def;
-  return parsed;
-};
 
 export function getNiceMaxValue(maxValue: number) {
   if (maxValue === 0) {
@@ -459,7 +442,7 @@ function calculateMinorTicks(
   config: string | undefined,
   min: number,
   max: number,
-  spacing = '5',
+  spacing = 5,
 ): number[] | undefined {
   let spacingValue = +spacing;
 
@@ -505,9 +488,9 @@ function calculateMajorTicks(
   categories: string[],
   min: number,
   max: number,
-  spacing = '1',
+  spacing = 1,
 ): string[] | undefined {
-  let spacingValue = parseInt(spacing, 10);
+  let spacingValue = spacing;
 
   if (spacingValue <= 0) spacingValue = 1.0;
   if (
@@ -545,8 +528,8 @@ export function generateMinorAxis(
 ) {
   const { min, max } = calculateDataRange(chartData);
 
-  const axisMin = parseNumberOrDefault(axis.min, min);
-  const axisMax = parseNumberOrDefault(axis.max, getNiceMaxValue(max));
+  const axisMin = parseNumber(axis.min) ?? min;
+  const axisMax = parseNumber(axis.max) ?? getNiceMaxValue(max);
 
   const domain: [AxisDomain, AxisDomain] = [axisMin, axisMax];
 
@@ -563,16 +546,16 @@ export function generateMajorAxis(
   chartData: ChartData[],
   axis: AxisConfiguration,
 ) {
-  const majorAxisCateories = chartData.map(({ name }) => name);
+  const majorAxisCategories = chartData.map(({ name }) => name);
 
-  const min = parseNumberOrDefault(axis.min, 0);
-  const max = parseNumberOrDefault(axis.max, majorAxisCateories.length - 1);
+  const min = parseNumber(axis.min) ?? 0;
+  const max = parseNumber(axis.max) ?? majorAxisCategories.length - 1;
 
   const domain: [AxisDomain, AxisDomain] = [min, max];
 
   const ticks = calculateMajorTicks(
     axis.tickConfig,
-    majorAxisCateories,
+    majorAxisCategories,
     min,
     max,
     axis.tickSpacing,

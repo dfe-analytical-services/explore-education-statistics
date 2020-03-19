@@ -10,18 +10,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificMethodologyAuthorizationHandler : CompoundAuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
     {
         public UpdateSpecificMethodologyAuthorizationHandler() : base(
-            new UpdateSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler())
+            new CanUpdateAllMethodologiesAuthorizationHandler())
         {}
-    }
     
-    public class UpdateSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler 
-        : EntityAuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
-    {
-        public UpdateSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler()
-            : base(ctx =>
-                ctx.Entity.Status != MethodologyStatus.Approved && 
-                SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllMethodologies)
-            )
-        {}
+        public class CanUpdateAllMethodologiesAuthorizationHandler 
+            : EntityAuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
+        {
+            public CanUpdateAllMethodologiesAuthorizationHandler()
+                : base(ctx =>
+                    ctx.Entity.Status != MethodologyStatus.Approved && 
+                    SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllMethodologies)
+                )
+            {}
+        }
     }
 }

@@ -1,22 +1,23 @@
 import '@common/modules/charts/components/charts.scss';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
+  AxisConfiguration,
   ChartDefinition,
   ChartProps,
+  ChartSymbol,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
-  conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
-import { ChartSymbol } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import parseNumber from '@common/utils/number/parseNumber';
 
-import React from 'react';
+import React, { memo } from 'react';
 import {
   CartesianGrid,
   Legend,
@@ -55,7 +56,12 @@ const generateLegendType = (symbol: LegendType | undefined): LegendType => {
   return symbol;
 };
 
-export type LineChartProps = ChartProps;
+export interface LineChartProps extends ChartProps {
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+}
 
 const LineChartBlock = ({
   data,
@@ -111,20 +117,21 @@ const LineChartBlock = ({
         <YAxis
           type="number"
           dataKey="value"
-          hide={axes.minor.visible === false}
-          unit={axes.minor?.unit}
+          hide={!axes.minor.visible}
+          unit={axes.minor.unit}
           scale="auto"
           {...minorDomainTicks}
-          width={conditionallyAdd(axes.minor.size)}
+          width={parseNumber(axes.minor.size)}
         />
 
         <XAxis
           type="category"
           dataKey="name"
-          hide={axes.major.visible === false}
+          hide={!axes.major.visible}
           unit={axes.major.unit}
           scale="auto"
           {...majorDomainTicks}
+          height={parseNumber(axes.major.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
@@ -153,7 +160,7 @@ const LineChartBlock = ({
           />
         ))}
 
-        {axes.minor?.referenceLines?.map(referenceLine => (
+        {axes.minor.referenceLines?.map(referenceLine => (
           <ReferenceLine
             key={`${referenceLine.position}_${referenceLine.label}`}
             y={referenceLine.position}
@@ -165,10 +172,9 @@ const LineChartBlock = ({
   );
 };
 
-const definition: ChartDefinition = {
+export const lineChartBlockDefinition: ChartDefinition = {
   type: 'line',
   name: 'Line',
-
   capabilities: {
     dataSymbols: true,
     stackable: false,
@@ -179,8 +185,14 @@ const definition: ChartDefinition = {
     hasAxes: true,
     hasReferenceLines: true,
     hasLegend: true,
+    requiresGeoJson: false,
   },
-
+  options: {
+    defaults: {
+      height: 300,
+      legend: 'top',
+    },
+  },
   data: [
     {
       type: 'line',
@@ -189,24 +201,21 @@ const definition: ChartDefinition = {
       targetAxis: 'xaxis',
     },
   ],
-
-  axes: [
-    {
+  axes: {
+    major: {
       id: 'xaxis',
-      title: 'X Axis',
+      title: 'X Axis (major axis)',
       type: 'major',
-      defaultDataType: 'timePeriod',
+      defaults: {
+        groupBy: 'timePeriod',
+      },
     },
-    {
+    minor: {
       id: 'yaxis',
-      title: 'Y Axis',
+      title: 'Y Axis (minor axis)',
       type: 'minor',
     },
-  ],
-
-  requiresGeoJson: false,
+  },
 };
 
-LineChartBlock.definition = definition;
-
-export default LineChartBlock;
+export default memo(LineChartBlock);

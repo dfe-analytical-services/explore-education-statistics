@@ -1,10 +1,7 @@
+import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
-import {
-  DataBlockLocation,
-  DataBlockRequest,
-} from '@common/services/dataBlockService';
-import { Dictionary } from '@common/types';
-import { PositionType } from 'recharts';
+import { DataBlockRequest } from '@common/services/dataBlockService';
+import { DayMonthYearValues } from '@common/utils/date/dayMonthYear';
 import { contentApi } from './api';
 
 export type ReleaseStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
@@ -63,113 +60,7 @@ export interface DataQuery {
   body: string;
 }
 
-export interface ReferenceLine {
-  label: string;
-  position: number | string;
-}
-
-export interface Axis {
-  title: string;
-  key?: string[];
-  min?: number;
-  max?: number;
-  size?: number;
-}
-
-export type ChartType =
-  | 'line'
-  | 'verticalbar'
-  | 'horizontalbar'
-  | 'map'
-  | 'infographic';
-
-export interface ChartDataSet {
-  indicator: string;
-  filters: string[];
-  location?: DataBlockLocation;
-  timePeriod?: string;
-}
-
-export interface OptionalChartDataSet {
-  indicator?: string;
-  filters?: string[];
-  location?: string[];
-  timePeriod?: string;
-}
-
-export type ChartSymbol =
-  | 'circle'
-  | 'cross'
-  | 'diamond'
-  | 'square'
-  | 'star'
-  | 'triangle'
-  | 'wye';
-
-export type LineStyle = 'solid' | 'dashed' | 'dotted';
-
-export interface LabelConfiguration {
-  label: string;
-}
-
-export interface DataSetConfiguration extends LabelConfiguration {
-  value: string;
-  name?: string;
-  unit?: string;
-  colour?: string;
-  symbol?: ChartSymbol;
-  lineStyle?: LineStyle;
-}
-
-export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
-
-export type AxisType = 'major' | 'minor';
-
-export type LabelPosition = 'axis' | 'graph' | PositionType;
-
-export interface AxisConfiguration {
-  name: string;
-  type: AxisType;
-  groupBy?: AxisGroupBy;
-  sortBy?: string;
-  sortAsc?: boolean;
-  dataSets: ChartDataSet[];
-  dataRange?: [number | undefined, number | undefined];
-
-  referenceLines?: ReferenceLine[];
-
-  visible?: boolean;
-  title?: string;
-  unit?: string;
-  showGrid?: boolean;
-  labelPosition?: LabelPosition;
-  size?: string;
-
-  min?: string;
-  max?: string;
-
-  tickConfig?: 'default' | 'startEnd' | 'custom';
-  tickSpacing?: string;
-}
-
-export interface AxesConfiguration {
-  major: AxisConfiguration;
-  minor?: AxisConfiguration;
-}
-
-export interface Chart {
-  type?: ChartType;
-  title?: string;
-  height?: number;
-  width?: number;
-  labels?: Dictionary<DataSetConfiguration>;
-  axes?: AxesConfiguration;
-  legend?: 'none' | 'top' | 'bottom';
-  legendHeight?: string;
-  stacked?: boolean;
-  fileId?: string;
-  geographicId?: string;
-}
+export type Chart = ChartRendererProps;
 
 export interface Table {
   indicators: string[];
@@ -269,73 +160,6 @@ export interface AbstractRelease<
   }[];
   prerelease?: boolean;
 }
-
-export interface DayMonthYearValues {
-  day?: number;
-  month?: number;
-  year?: number;
-}
-
-export interface DayMonthYearInputs {
-  day: string;
-  month: string;
-  year: string;
-}
-
-export const dayMonthYearValuesToInputs = (
-  dmy?: DayMonthYearValues,
-): DayMonthYearInputs => ({
-  day: dmy && dmy.day ? dmy.day.toString() : '',
-  month: dmy && dmy.month ? dmy.month.toString() : '',
-  year: dmy && dmy.year ? dmy.year.toString() : '',
-});
-
-export const dayMonthYearInputsToValues = (
-  dmy: DayMonthYearInputs,
-): DayMonthYearValues => ({
-  day: dmy.day ? parseInt(dmy.day, 10) : undefined,
-  month: dmy.month ? parseInt(dmy.month, 10) : undefined,
-  year: dmy.year ? parseInt(dmy.year, 10) : undefined,
-});
-
-export const dateToDayMonthYear = (date?: Date) => {
-  return {
-    day: date && date.getDate(),
-    month: date && date.getMonth() + 1,
-    year: date && date.getFullYear(),
-  };
-};
-
-export const emptyDayMonthYear = (): DayMonthYearInputs => ({
-  day: '',
-  month: '',
-  year: '',
-});
-
-export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
-  return dmy && dmy.day && dmy.month && dmy.year;
-};
-
-export const dayMonthYearIsEmpty = (dmy?: DayMonthYearValues) => {
-  return !dmy || (!dmy.day && !dmy.month && !dmy.year);
-};
-
-export const dayMonthYearToDate = (dmy?: DayMonthYearValues) => {
-  if (!dmy) {
-    throw Error(`Couldn't convert undefined DayMonthYearValues to Date`);
-  }
-  if (!dayMonthYearIsComplete(dmy)) {
-    throw Error(
-      `Couldn't convert DayMonthYearValues ${JSON.stringify(
-        dmy,
-      )} to Date - missing required value`,
-    );
-  }
-  return new Date(Date.UTC(dmy.year || 0, (dmy.month || 0) - 1, dmy.day));
-};
-
-export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
-  dayMonthYearToDate(dayMonthYearInputsToValues(dmy));
 
 export type Release = AbstractRelease<ContentBlock>;
 

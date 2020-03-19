@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -42,6 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         
         // ideally this would be detected as application/msexcel or application/vnd.ms-excel, but this is close enough
         private static readonly FileInfo Xls = new FileInfo("test.xls", "application/CDFV2");
+        private static readonly FileInfo Xlsx = new FileInfo("test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        private static readonly FileInfo Xlsx2 = new FileInfo("test2.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         private static readonly FileInfo Csv = new FileInfo("test.csv", "application/csv");
         private static readonly FileInfo Txt = new FileInfo("test.txt", "text/plain");
         private static readonly FileInfo Pdf = new FileInfo("test.pdf", "application/pdf");
@@ -71,6 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Ods,
             Odt,
             Xls,
+            Xlsx,
+            Xlsx2,
             Csv,
             Txt,
             Pdf,
@@ -110,6 +113,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AssertMimeTypeCorrect(Xls);
         }
         
+        [Fact]
+        public void GetMimeType_Xlsx()
+        {
+            AssertMimeTypeCorrect(Xlsx);
+        }
+
+        [Fact]
+        public void GetMimeType_Xlsx2()
+        {
+            AssertMimeTypeCorrect(Xlsx2);
+        }
+
         [Fact]
         public void GetMimeType_Csv()
         {
@@ -159,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AllTypes.ForEach(type =>
             {
                 var expectedToSucceed = ImageTypes.Contains(type);
-                AssertHasMatchingMimeType(type, ReleasesController.AllowedChartFileTypes.ToList(), expectedToSucceed);
+                AssertHasMatchingMimeType(type, FileStorageService.AllowedChartFileTypes.ToList(), expectedToSucceed);
             });
         }
         
@@ -169,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // check that all types are valid for ancillary file uploads
             AllTypes.ForEach(type =>
             {
-                AssertHasMatchingMimeType(type, ReleasesController.AllowedAncillaryFileTypes.ToList(), true);
+                AssertHasMatchingMimeType(type, FileStorageService.AllowedAncillaryFileTypes.ToList(), true);
             });
         }
         
@@ -181,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AllTypes.ForEach(type =>
             {
                 var expectedToSucceed = CsvTypes.Contains(type);
-                AssertHasMatchingMimeType(type, FileStorageService.CsvMimeTypes.ToList(), expectedToSucceed);
+                AssertHasMatchingMimeType(type, FileStorageService.AllowedCsvMimeTypes.ToList(), expectedToSucceed);
             });
         }
         

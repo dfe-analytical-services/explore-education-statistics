@@ -1,5 +1,5 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import permissionService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import editReleaseDataService, {
   AncillaryFile,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
@@ -14,7 +14,7 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';

@@ -11,7 +11,7 @@ Library    utilities.py
 ${browser}    chrome
 ${headless}   1
 
-${timeout}          20
+${timeout}          30
 ${implicit_wait}    3
 
 *** Keywords ***
@@ -158,12 +158,12 @@ user waits until page contains link
   page should contain link   ${link_text}
 
 user waits until page contains heading
-  [Arguments]   ${text}
-  wait until page contains element   xpath://h1[contains(.,"${text}")]
+  [Arguments]   ${text}    ${wait}=${timeout}
+  wait until page contains element   xpath://h1[contains(.,"${text}")]   timeout=${wait}
 
 user waits until page contains accordion section
-  [Arguments]   ${section_title}
-  user waits until page contains element  xpath://*[@class="govuk-accordion__section-button" and text()="${section_title}"]
+  [Arguments]   ${section_title}     ${wait}=${timeout}
+  user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
 
 user checks element contains
   [Arguments]   ${element}    ${text}
@@ -271,7 +271,6 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list item "${dtText}" should be "${ddText}"
-  scroll element into view  xpath://dl//dt[contains(text(),"${dtText}")]
   user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
 user selects from list by label
@@ -349,6 +348,6 @@ user checks publication bullet does not contain link
   user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
 
 user waits until page contains key stat tile
-  [Arguments]  ${title}  ${value}
-  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]
+  [Arguments]  ${title}   ${value}   ${wait}=${timeout}
+  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]    ${wait}
 

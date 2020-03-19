@@ -6,6 +6,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="CsvHelper" Version="15.0.1" />
     <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.5" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="10.0.3" />
@@ -16,6 +17,7 @@
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.12.0-beta2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Importer\GovUk.Education.ExploreEducationStatistics.Data.Importer.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.csproj" />

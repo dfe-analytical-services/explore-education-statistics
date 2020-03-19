@@ -1,11 +1,19 @@
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/createErrorHelper';
 import { connect, FormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
 import get from 'lodash/get';
-import React, { ReactNode, useEffect, useState } from 'react';
+import isEqual from 'lodash/isEqual';
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 interface Props {
   children: ReactNode;
@@ -38,7 +46,9 @@ const Form = ({
   formik,
   showSubmitError = false,
 }: Props & { formik: FormikContext<{}> }) => {
-  const { errors, touched } = formik;
+  const { errors, touched, values, submitCount, submitForm } = formik;
+
+  const previousValues = useRef(values);
 
   const { getAllErrors } = createErrorHelper({
     errors,
@@ -49,46 +59,51 @@ const Form = ({
   const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
 
   useEffect(() => {
-    if (!formik.submitCount) {
+    // If form has changed at all, we should remove the submit error
+    if (!submitCount || !isEqual(values, previousValues.current)) {
       setSubmitError(undefined);
     }
-  }, [submitError, formik.submitCount]);
 
-  const summaryErrors: ErrorSummaryMessage[] = Object.entries(getAllErrors())
-    .filter(([errorName]) => get(touched, errorName))
-    .map(([errorName, message]) => ({
-      id: `${id}-${camelCase(errorName)}`,
-      message: typeof message === 'string' ? message : '',
-    }));
+    previousValues.current = values;
+  }, [submitError, submitCount, values]);
 
-  const allErrors = submitError
-    ? [...summaryErrors, submitError]
-    : summaryErrors;
+  const allErrors = useMemo(() => {
+    const summaryErrors: ErrorSummaryMessage[] = Object.entries(getAllErrors())
+      .filter(([errorName]) => get(touched, errorName))
+      .map(([errorName, message]) => ({
+        id: `${id}-${camelCase(errorName)}`,
+        message: typeof message === 'string' ? message : '',
+      }));
 
-  return (
-    <form
-      id={id}
-      onSubmit={async event => {
-        setSubmitted(true);
-        setSubmitError(undefined);
-        event.preventDefault();
+    return submitError ? [...summaryErrors, submitError] : summaryErrors;
+  }, [getAllErrors, id, submitError, touched]);
 
-        try {
-          await formik.submitForm();
-        } catch (error) {
-          if (error) {
-            if (showSubmitError) {
-              setSubmitError({
-                id: submitId,
-                message: error.message,
-              });
-            } else {
-              throw error;
-            }
+  const handleSubmit = useCallback(
+    async event => {
+      setSubmitted(true);
+      setSubmitError(undefined);
+      event.preventDefault();
+
+      try {
+        await submitForm();
+      } catch (error) {
+        if (error) {
+          if (showSubmitError) {
+            setSubmitError({
+              id: submitId,
+              message: error.message,
+            });
+          } else {
+            throw error;
           }
         }
-      }}
-    >
+      }
+    },
+    [submitForm, showSubmitError, submitId],
+  );
+
+  return (
+    <form id={id} onSubmit={handleSubmit}>
       <ErrorSummary
         errors={allErrors}
         id={`${id}-summary`}

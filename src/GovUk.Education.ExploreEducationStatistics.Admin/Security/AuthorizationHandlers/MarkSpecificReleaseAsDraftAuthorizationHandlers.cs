@@ -13,27 +13,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : CompoundAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement, Release>
     {
         public MarkSpecificReleaseAsDraftAuthorizationHandler(ContentDbContext context) : base(
-            new MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler(),
-            new MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler(context))
+            new CanMarkAllReleasesAsDraftAuthorizationHandler(),
+            new HasEditorRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
-    }
+        
+        public class CanMarkAllReleasesAsDraftAuthorizationHandler 
+            : EntityAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement, Release>
+        {
+            public CanMarkAllReleasesAsDraftAuthorizationHandler() 
+                : base(ctx => 
+                    ctx.Entity.Status != ReleaseStatus.Approved 
+                    && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.MarkAllReleasesAsDraft)) {}
+        }
     
-    public class MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler 
-        : EntityAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement, Release>
-    {
-        public MarkSpecificReleaseAsDraftCanMarkAllReleasesAsDraftAuthorizationHandler() 
-            : base(ctx => 
-                ctx.Entity.Status != ReleaseStatus.Approved 
-                && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.MarkAllReleasesAsDraft)) {}
-    }
-    
-    public class MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler
-        : HasRoleOnReleaseAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement>
-    {
-        public MarkSpecificReleaseAsDraftHasRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, ctx => ctx.Release.Status != ReleaseStatus.Approved && ContainsEditorRole(ctx.Roles))
-        {}
+        public class HasEditorRoleOnReleaseAuthorizationHandler
+            : HasRoleOnReleaseAuthorizationHandler<MarkSpecificReleaseAsDraftRequirement>
+        {
+            public HasEditorRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
+                : base(context, ctx => ctx.Release.Status != ReleaseStatus.Approved && ContainsEditorRole(ctx.Roles))
+            {}
+        }
     }
 }
