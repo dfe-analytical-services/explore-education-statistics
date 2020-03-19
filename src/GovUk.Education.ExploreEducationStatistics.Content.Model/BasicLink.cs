@@ -9,5 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Description { get; set; }
 
         public string Url { get; set; }
+
+        public BasicLink CreateCopy()
+        {
+            return MemberwiseClone() as BasicLink;
+        }
     }
 }

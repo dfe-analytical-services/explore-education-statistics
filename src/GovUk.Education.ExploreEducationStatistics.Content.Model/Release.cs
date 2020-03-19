@@ -212,19 +212,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Release CreateReleaseAmendment(DateTime createdDate, Guid createdByUserId)
         {
             var amendment = MemberwiseClone() as Release;
-            amendment.Id = Guid.NewGuid();
-            var ctx = new CreateAmendmentContext(this, amendment);
 
+            // set new values for fields that should be altered in the amended Release rather than copied from the 
+            // original Release
+            amendment.Id = Guid.NewGuid();
             amendment.Published = null;
+            amendment.PublishScheduled = null;
             amendment.Status = ReleaseStatus.Draft;
             amendment.Created = createdDate;
-            amendment.CreatedBy = null;
             amendment.CreatedById = createdByUserId;
             amendment.Version = Version + 1;
+            amendment.OriginalId = Id;
+            amendment.InternalReleaseNote = null;
             
+            var ctx = new CreateAmendmentContext(this, amendment);
+
             amendment.Content = amendment
                 .Content
                 .Select(content => content.CreateReleaseAmendment(ctx))
+                .ToList();
+
+            amendment.RelatedInformation = amendment
+                .RelatedInformation
+                .Select(link =>
+                {
+                    var copy = link.CreateCopy();
+                    copy.Id = Guid.NewGuid();
+                    return copy;
+                })
                 .ToList();
             
             amendment.Updates = amendment
