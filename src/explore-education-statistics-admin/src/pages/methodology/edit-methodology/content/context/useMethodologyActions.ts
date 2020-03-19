@@ -1,5 +1,5 @@
 import methodologyService from '@admin/services/methodology/methodologyService';
-import permissionsService from '@admin/services/permissions/service';
+import permissionService from '@admin/services/permissions/permissionService';
 import { Dictionary } from '@admin/types';
 import { useCallback } from 'react';
 import { ContentBlockPostModel } from 'src/services/release/edit-release/content/types';
@@ -15,7 +15,7 @@ export default function useMethodologyActions() {
       const methodology = await methodologyService.getMethodologyContent(
         methodologyId,
       );
-      const canUpdateMethodology = await permissionsService.canUpdateMethodology(
+      const canUpdateMethodology = await permissionService.canUpdateMethodology(
         methodologyId,
       );
       dispatch({
