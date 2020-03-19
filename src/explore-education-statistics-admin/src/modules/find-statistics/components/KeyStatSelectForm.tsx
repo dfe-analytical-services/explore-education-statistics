@@ -30,18 +30,18 @@ const KeyStatSelectForm = ({
     return availableDataBlocks.filter(db => {
       const req = db.dataBlockRequest;
       const timePeriod = req.timePeriod as TimePeriodQuery;
-      if (
-        Object.keys(req).filter(key => locationLevelKeys.includes(key as any))
-          .length !== 1
-      ) {
-        console.log(
-          'WARN: Request should contain single location from locationLevelKeys!',
+      const hasSingleLocation = !locationLevelKeys.some(
+        key => req[key]?.length !== 1,
+      );
+      if (!hasSingleLocation) {
+        console.warn(
+          'dataBlockRequest should contain single location from locationLevelKeys!',
         );
       }
       return (
         req.indicators.length !== 1 ||
         timePeriod.startYear !== timePeriod.endYear ||
-        locationLevelKeys.some(key => req[key]?.length !== 1)
+        !hasSingleLocation
         // NOTE(mark): No check for number of filters because they cannot tell us whether
         // there is a single result
       );
