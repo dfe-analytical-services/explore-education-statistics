@@ -7,12 +7,14 @@ import StepNavItem from './components/StepByStepItem';
 import imageContentEdit from './images/guidance/guidance-content-edit.png';
 import imageCommentAdd from './images/guidance/guidance-content-comments-add.png';
 import imageCommentSave from './images/guidance/guidance-content-comment-save.png';
+import imageContentAddTextBlock from './images/guidance/guidance-content-add-text.png';
 import imageContentEditButton from './images/guidance/guidance-content-edit-button.png';
 import imageContentSave from './images/guidance/guidance-content-save.png';
 import imageAddDatablock from './images/guidance/guidance-content-add-datablock.png';
 import imageEmbedDatablock from './images/guidance/guidance-content-add-embed-data.png';
 import imageKeyStatBtn from './images/guidance/guidance-content-keystat-btn.png';
 import imageKeyStatSelect from './images/guidance/guidance-content-embed-keystat.png';
+import imageKeyStatEdit from './images/guidance/guidance-content-edit-keystat.png';
 import imageKeyStatGuidance from './images/guidance/guidance-content-add-guidance.png';
 import imageKeyStatMultiple from './images/guidance/guidance-content-add-multiple-stats.png';
 import imageRelatedBtn from './images/guidance/guidance-content-add-related.png';
@@ -69,21 +71,20 @@ const DocumentationManageContent = () => {
               </p>
               <h3>Before you start</h3>
               <p>
-                Make sure you and the members of your [roduction team understand
+                Make sure you and the members of your production team understand
                 who's responsible for the content within the different sections
                 of your release.
               </p>
               <h3>Do</h3>
               <p>
                 To create and edit any content and add comments to your release
-                - select the 'Add / view comments and edit content' radio
-                button.
+                - select the 'Add / view comments' radio button.
               </p>
-              <ul className="govuk-list govuk-list--bullet">
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
                     Select the 'Add / view comments and edit content' radio
-                    button.
+                    button located in the bottom left of the screen.
                   </h4>{' '}
                   <p>
                     This will be selected by default when you enter this page.
@@ -140,45 +141,44 @@ const DocumentationManageContent = () => {
                 they're no longer relevant.
               </p>
               <h3>Do</h3>
-              <p>
-                1. To add and view comments - select any of the 'Add / view
-                comments to section' links within the orange boxes down the left
-                hand side of a release.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
-                  <h4>Select 'Add / view comments' link</h4>
+                  <h4>
+                    To add and view comments - select any of the 'Add / view
+                    comments to section' links within the orange boxes down the
+                    left hand side of a release.
+                  </h4>
+                  <p>Select 'Add / view comments' link</p>
+                  <img
+                    src={imageCommentAdd}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
                 </li>
-              </ul>
-              <img
-                src={imageCommentAdd}
-                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                alt=""
-              />
-              <p>
-                2. To add comments - add them into the text box and select the
-                green 'Submit' button.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <h4>Add comments and select green 'Submit' button.</h4>
+                  <h4>
+                    To add comments - add them into the text box and select the
+                    green 'Submit' button.
+                  </h4>
+                  <p>Add comments and select green 'Submit' button.</p>
+                  <img
+                    src={imageCommentSave}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
                 </li>
-              </ul>
-              <img
-                src={imageCommentSave}
-                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                alt=""
-              />
-              <p>
-                3. To resolve comments - select the grey 'Resolve' button if
-                you’ve dealt with them or select 'Remove' if they're no longer
-                relevant.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
+                {/*
                 <li>
-                  <h4>Select grey 'Resolve' button or select 'Remove'</h4>
+                  <h4>
+                    To resolve comments - select the grey 'Resolve' button if
+                    you’ve dealt with them or select 'Remove' if they're no
+                    longer relevant.
+                  </h4>
+                  <p>Select grey 'Resolve' button or select 'Remove'</p>
                 </li>
+                */}
               </ul>
+
               <h3>Help and support</h3>
               <p>
                 If you have any issues adding, viewing or resolving comments
@@ -229,212 +229,238 @@ const DocumentationManageContent = () => {
                 </li>
               </ul>
               <h3>Do</h3>
-              <p>
-                1. To add content to or edit content within any section - select
-                the green 'Edit this section' button in the top right-hand
-                corner of any section.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
-                    Select 'Edit' button on the grey editable content blocks
+                    To add content to or edit content within any section -
+                    select the 'Add text block' button, a text area will appear
+                    which you will then be able to edit.
                   </h4>
-                </li>
-              </ul>
-              <img
-                src={imageContentEditButton}
-                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                alt=""
-              />
-              <p>
-                Add and edit content in the same way you would using Word or in
-                an email and then select the green 'Save' button when you've
-                finished.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <h4>Add and edit content and select green 'Save' button</h4>
-                </li>
-              </ul>
-              <img
-                src={imageContentSave}
-                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                alt=""
-              />
-              <p>
-                If you're adding or editing content to 'Latest headline facts
-                and figures' section read and refer to the guidance and tips
-                about 'Key indicators' in our{' '}
-                <Link to="/documentation/style-guide">
-                  Content design style guide
-                </Link>
-                .
-              </p>
-              <p>
-                2. To add tables and charts to a section - select the 'Add data
-                block' button.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <h4>Select 'Add data block' button</h4>
-                </li>
-              </ul>
-              <img
-                src={imageAddDatablock}
-                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                alt=""
-              />
-              <p>
-                Select the related data block you're looking for using the
-                'Select a data block' dropdown and the tables will appear.
-                Select the 'Embed' button and the charts will be added to the
-                section.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <h4>
-                    Select data block using 'Select a data block' dropdown
-                  </h4>
-                </li>
-              </ul>
-              <img
-                src={imageEmbedDatablock}
-                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                alt=""
-              />
-              <p>
-                3. To add key indicators to the 'Headline facts and figures'
-                section - select the green 'Add key statistic' button.
-              </p>
-              <p>
-                Our research has shown you should aim to add up to a maximum of
-                6 key indicators within this section.
-              </p>
-              <p>
-                You'll also need to add text to 'Guidance title' and 'Guidance
-                text' text boxes to explain what the indicator means.
-              </p>
-              <p>
-                Read and refer to the guidance and tips about 'Key indicators'
-                in our{' '}
-                <Link to="/documentation/style-guide">
-                  Content design style guide
-                </Link>
-              </p>
-              <p>Select the green 'Save' button when you've finished.</p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <h4>Select green 'Add key statistic' button</h4>
-                  <img
-                    src={imageKeyStatBtn}
-                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                    alt=""
-                  />
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li>
+                      <h5>
+                        If you want to add a new content block select the 'Add
+                        text block' button
+                      </h5>
+                      <img
+                        src={imageContentAddTextBlock}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                    <li>
+                      <h5>
+                        Select 'Edit' button when hovering on the grey editable
+                        content blocks
+                      </h5>
+                      <img
+                        src={imageContentEditButton}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                    <li>
+                      <h5>
+                        Add and edit content and select green 'Save' button
+                      </h5>
+                      <p>
+                        Add and edit content in the same way you would using
+                        Word or in an email and then select the green 'Save'
+                        button when you've finished.
+                      </p>
+                      <img
+                        src={imageContentSave}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                  </ul>
                 </li>
                 <li>
                   <h4>
-                    Choose key statistic from drop down list and select green
-                    'Embed' button
+                    To add tables and charts to a section - select the 'Add data
+                    block' button.
                   </h4>
-                  <img
-                    src={imageKeyStatSelect}
-                    className=" govuk-!-margin-bottom-9"
-                    alt=""
-                    width="300"
-                  />
-                </li>
-                <li>
-                  <h4>Add guidance text</h4>
-                  <img
-                    src={imageKeyStatGuidance}
-                    className="govuk-!-margin-bottom-9"
-                    alt=""
-                    width="300"
-                  />
-                </li>
-                <li>
-                  <h4>Add up to a maximum of 6 key indicators</h4>
-                  <img
-                    src={imageKeyStatMultiple}
-                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                    alt=""
-                  />
-                </li>
-              </ul>
-              <p>
-                4. To add related information - add the related information
-                title and link to the text boxes and then select the green 'Add
-                related information'.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <h4>Select 'Add related information button'</h4>
-                  <img
-                    src={imageRelatedBtn}
-                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                    alt=""
-                  />
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li>
+                      <h5>Select 'Add data block' button</h5>
+                      <img
+                        src={imageAddDatablock}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                    <li>
+                      <h5>
+                        Select data block using 'Select a data block' dropdown
+                      </h5>
+                      <p>
+                        Select the related data block you're looking for using
+                        the 'Select a data block' dropdown and the tables will
+                        appear. Select the 'Embed' button and the charts will be
+                        added to the section.
+                      </p>
+                      <img
+                        src={imageEmbedDatablock}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                  </ul>
                 </li>
                 <li>
                   <h4>
-                    Add title and link and select green 'Add related
-                    information'
+                    To add key indicators to the 'Headline facts and figures'
+                    section - select the green 'Add key statistic' button.
                   </h4>
-                  <img
-                    src={imageRelatedAdd}
-                    className="govuk-!-margin-bottom-9"
-                    alt=""
-                    width="300"
-                  />
+                  <p>
+                    Our research has shown you should aim to add up to a maximum
+                    of 6 key indicators within this section.
+                  </p>
+                  <p>
+                    You'll also need to add text to the 'Guidance text' text box
+                    to explain what the indicator means.
+                  </p>
+                  <p>
+                    Read and refer to the guidance and tips about 'Key
+                    indicators' in our{' '}
+                    <Link to="/documentation/style-guide">
+                      Content design style guide
+                    </Link>
+                  </p>
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li>
+                      <h5>Select green 'Add key statistic' button</h5>
+                      <img
+                        src={imageKeyStatBtn}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                    <li>
+                      <h5>
+                        Choose key statistic from drop down list and select
+                        green 'Embed' button
+                      </h5>
+                      <img
+                        src={imageKeyStatSelect}
+                        className="govuk-!-width-three-quarters  govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                    <li>
+                      <h5>
+                        Select the green 'Edit' button to add trend and guidance
+                        details
+                      </h5>
+                      <img
+                        src={imageKeyStatEdit}
+                        className="govuk-!-margin-bottom-9"
+                        alt=""
+                        width="300"
+                      />
+                    </li>
+                    <li>
+                      <h5>Add guidance text</h5>
+                      <img
+                        src={imageKeyStatGuidance}
+                        className="govuk-!-margin-bottom-9"
+                        alt=""
+                        width="300"
+                      />
+                      <p>
+                        Select the green 'Save' button when you've finished.
+                      </p>
+                    </li>
+                    <li>
+                      <h5>Add up to a maximum of 6 key indicators</h5>
+                      <img
+                        src={imageKeyStatMultiple}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                  </ul>
                 </li>
-              </ul>
-              <p>
-                5. To add and edit content to the 'Help and support' section of
-                your release contact:{' '}
-              </p>
-              <strong>Explore education statistics team </strong>
-              <p>
-                Email <br />
-                <a href="mailto:explore.statistics@education.gov.uk">
-                  explore.statistics@education.gov.uk
-                </a>
-              </p>
-              <h3>Don't</h3>
-              <p>
-                Don't worry if you haven't got all the content to complete your
-                release. You can come back and add it later.
-              </p>
-              <h3>Help and support</h3>
-              <p>
-                If you have any questions about how to write and present content
-                contact your nominated 'Content Design Champion'.
-              </p>
-              <p>
-                If you have any issues adding or editing content within the
-                admin system:{' '}
-              </p>
-              <strong>Explore education statistics team </strong>
-              <p>
-                Email <br />
-                <a href="mailto:explore.statistics@education.gov.uk">
-                  explore.statistics@education.gov.uk
-                </a>
-              </p>
-              <h3>Next steps</h3>
-              <p>
-                Don't worry if you haven't got all the content to complete your
-                release. You can come back and add it later.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <Link to="/documentation/content-design-standards-guide">
-                    Content design standards guide
-                  </Link>
+                  <h4>
+                    To add related information - add the related information
+                    title and link to the text boxes and then select the green
+                    'Add related information'.
+                  </h4>
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li>
+                      <h5>Select 'Add related information button'</h5>
+                      <img
+                        src={imageRelatedBtn}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                    <li>
+                      <h5>
+                        Add title and link and select green 'Add related
+                        information'
+                      </h5>
+                      <img
+                        src={imageRelatedAdd}
+                        className="govuk-!-margin-bottom-9"
+                        alt=""
+                        width="300"
+                      />
+                    </li>
+                  </ul>
                 </li>
                 <li>
-                  <Link to="/documentation/style-guide">
-                    Content design style guide
-                  </Link>
+                  <h4>
+                    To add and edit content to the 'Help and support' section of
+                    your release contact:{' '}
+                  </h4>
+                  <strong>Explore education statistics team </strong>
+                  <p>
+                    Email <br />
+                    <a href="mailto:explore.statistics@education.gov.uk">
+                      explore.statistics@education.gov.uk
+                    </a>
+                  </p>
+                  <h3>Don't</h3>
+                  <p>
+                    Don't worry if you haven't got all the content to complete
+                    your release. You can come back and add it later.
+                  </p>
+                  <h3>Help and support</h3>
+                  <p>
+                    If you have any questions about how to write and present
+                    content contact your nominated 'Content Design Champion'.
+                  </p>
+                  <p>
+                    If you have any issues adding or editing content within the
+                    admin system:{' '}
+                  </p>
+                  <strong>Explore education statistics team </strong>
+                  <p>
+                    Email <br />
+                    <a href="mailto:explore.statistics@education.gov.uk">
+                      explore.statistics@education.gov.uk
+                    </a>
+                  </p>
+                  <h3>Next steps</h3>
+                  <p>
+                    Don't worry if you haven't got all the content to complete
+                    your release. You can come back and add it later.
+                  </p>
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li>
+                      <Link to="/documentation/content-design-standards-guide">
+                        Content design standards guide
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/documentation/style-guide">
+                        Content design style guide
+                      </Link>
+                    </li>
+                  </ul>
                 </li>
               </ul>
             </StepNavItem>
@@ -456,50 +482,50 @@ const DocumentationManageContent = () => {
                 into any order which you think will make most sense to users.
               </p>
               <h3>Do</h3>
-              <p>
-                1. To add a new section - select the green 'Add new section'
-                button.
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <h4>Select green 'Add new section' button</h4>
-                  <img
-                    src={imageSectionAdd}
-                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                    alt=""
-                  />
-                </li>
-              </ul>
-              <p>2. To reorder your sections:</p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>select the grey 'Reorder sections' button</li>
-                <li>
-                  reorder them using the 3 grey lines on the right-hand side of
-                  each section
-                </li>
-                <li>select the green 'Save reordering' button</li>
-              </ul>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <h4>Select 'Reorder sections' button</h4>
-                  <img
-                    src={imageReorderBtn}
-                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                    alt=""
-                  />
-                </li>
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
-                    Reorder using 3 grey lines and select green 'Save
-                    reordering' button
+                    To add a new section - select the green 'Add new section'
+                    button.
                   </h4>
-                  <img
-                    src={imageReorderSection}
-                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
-                    alt=""
-                  />
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li>
+                      <h5>Select green 'Add new section' button</h5>
+                      <img
+                        src={imageSectionAdd}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <h4>To reorder your sections:</h4>
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li>
+                      <h5>select the grey 'Reorder sections' button</h5>
+                      <img
+                        src={imageReorderBtn}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                    <li>
+                      <h5>
+                        reorder them using the 3 grey lines on the right-hand
+                        side of each section, once in the correct order select
+                        the green 'Save reordering' button
+                      </h5>
+                      <img
+                        src={imageReorderSection}
+                        className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                        alt=""
+                      />
+                    </li>
+                  </ul>
                 </li>
               </ul>
+
               <h3>Don't</h3>
               <p>
                 Don't worry if you haven't got all the content to complete your
