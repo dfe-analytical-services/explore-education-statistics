@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -435,6 +434,153 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(latest);
                 Assert.Equal(latestRelease.Id, latest.Id);
                 Assert.Equal("June 2036", latest.Title);
+            }
+        }
+        
+        [Fact]
+        public void DeleteReleaseAsync()
+        {
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+            
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                PublicationId = publication.Id
+            };
+            
+            var userReleaseRole = new UserReleaseRole
+            {
+                Id = Guid.NewGuid(),
+                UserId = _userId,
+                ReleaseId = release.Id
+            };
+
+            var userReleaseInvite = new UserReleaseInvite
+            {
+                Id = Guid.NewGuid(),
+                ReleaseId = release.Id
+            };
+            
+            var anotherRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                PublicationId = publication.Id
+            };
+            
+            var anotherUserReleaseRole = new UserReleaseRole
+            {
+                Id = Guid.NewGuid(),
+                ReleaseId = anotherRelease.Id
+            };
+
+            var anotherUserReleaseInvite = new UserReleaseInvite
+            {
+                Id = Guid.NewGuid(),
+                ReleaseId = anotherRelease.Id
+            };
+            
+            using (var context = InMemoryApplicationDbContext("DeleteReleaseAsync"))
+            {
+                context.Add(publication);
+                context.AddRange(release, anotherRelease);
+                context.AddRange(userReleaseRole, anotherUserReleaseRole);
+                context.AddRange(userReleaseInvite, anotherUserReleaseInvite);
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("DeleteReleaseAsync"))
+            {
+                var releaseService = new ReleaseService(context, AdminMapper(),
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object);
+
+                // Method under test 
+                var result = releaseService.DeleteReleaseAsync(release.Id).Result.Right;
+                Assert.True(result);
+            }
+            
+            using (var context = InMemoryApplicationDbContext("DeleteReleaseAsync"))
+            {
+                // assert that soft-deleted entities are no longer discoverable by default
+                var unableToFindDeletedRelease = context
+                    .Releases
+                    .FirstOrDefault(r => r.Id == release.Id);
+                
+                Assert.Null(unableToFindDeletedRelease);
+                
+                var unableToFindDeletedReleaseRole = context
+                    .UserReleaseRoles
+                    .FirstOrDefault(r => r.Id == userReleaseRole.Id);
+                
+                Assert.Null(unableToFindDeletedReleaseRole);
+
+                var unableToFindDeletedReleaseInvite = context
+                    .UserReleaseInvites
+                    .FirstOrDefault(r => r.Id == userReleaseInvite.Id);
+                
+                Assert.Null(unableToFindDeletedReleaseInvite);
+                
+                // assert that soft-deleted entities do not appear via references from other entities by default
+                var publicationWithoutDeletedRelease = context
+                    .Publications
+                    .Include(p => p.Releases)
+                    .AsNoTracking()
+                    .First(p => p.Id == publication.Id);
+                Assert.Single(publicationWithoutDeletedRelease.Releases);
+                Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.Releases[0].Id);
+
+                // assert that soft-deleted entities have had their soft-deleted flag set to true
+                var updatedRelease = context
+                    .Releases
+                    .IgnoreQueryFilters()
+                    .First(r => r.Id == release.Id);
+                
+                Assert.True(updatedRelease.SoftDeleted);
+
+                var updatedReleaseRole = context
+                    .UserReleaseRoles
+                    .IgnoreQueryFilters()
+                    .First(r => r.Id == userReleaseRole.Id);
+                
+                Assert.True(updatedReleaseRole.SoftDeleted);
+
+                var updatedReleaseInvite = context
+                    .UserReleaseInvites
+                    .IgnoreQueryFilters()
+                    .First(r => r.Id == userReleaseInvite.Id);
+                
+                Assert.True(updatedReleaseInvite.SoftDeleted);
+                
+                // assert that soft-deleted entities appear via references from other entities when explicitly searched for
+                var publicationWithDeletedRelease = context
+                    .Publications
+                    .Include(p => p.Releases)
+                    .IgnoreQueryFilters()
+                    .AsNoTracking()
+                    .First(p => p.Id == publication.Id);
+                Assert.Equal(2, publicationWithDeletedRelease.Releases.Count);
+                Assert.Equal(updatedRelease.Id, publicationWithDeletedRelease.Releases[0].Id);
+                Assert.Equal(anotherRelease.Id, publicationWithDeletedRelease.Releases[1].Id);
+                Assert.True(publicationWithDeletedRelease.Releases[0].SoftDeleted);
+                Assert.False(publicationWithDeletedRelease.Releases[1].SoftDeleted);
+                
+                // assert that other entities were not accidentally soft-deleted
+                var retrievedAnotherReleaseRole = context
+                    .UserReleaseRoles
+                    .First(r => r.Id == anotherUserReleaseRole.Id);
+                
+                Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
+
+                var retrievedAnotherReleaseInvite = context
+                    .UserReleaseInvites
+                    .First(r => r.Id == anotherUserReleaseInvite.Id);
+                
+                Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
             }
         }
 
