@@ -13,51 +13,55 @@ Go to Table Tool page
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until page contains heading  Create your own tables online
 
-Select "Pupil absence" publication
+Select Exclusions publication
     [Tags]  HappyPath
     user opens details dropdown    Pupils and schools
-    user opens details dropdown    Pupil absence
-    user selects radio      Pupil absence in schools in England
+    user opens details dropdown    Exclusions
+    user selects radio      Permanent and fixed-period exclusions in England
     user clicks element    css:#publicationForm-submit
     user waits until element is visible  xpath://h2[text()="Choose a subject"]
-    user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
+    user checks previous table tool step contains  1   Publication   Permanent and fixed-period exclusions in England
 
-Select subject "Absence by characteristic"
+Select subject "Exclusions by geographic level"
     [Tags]  HappyPath
-    user selects radio   Absence by characteristic
+    user selects radio   Exclusions by geographic level
     user clicks element   css:#publicationSubjectForm-submit
     user waits until element is visible  xpath://h2[text()="Choose locations"]
-    user checks previous table tool step contains  2    Subject     Absence by characteristic
+    user checks previous table tool step contains  2    Subject     Exclusions by geographic level
 
-Select Location Country, England
+Select Locations LA, Bury, Sheffield, York
     [Tags]  HappyPath
-    user opens details dropdown     National
-    user clicks checkbox    England
+    user opens details dropdown     Local Authority
+    user clicks checkbox    Bury
+    user clicks checkbox    Sheffield
+    user clicks checkbox    York
     user clicks element     css:#locationFiltersForm-submit
     # Extra timeout until EES-315/316
     user waits until element is visible  xpath://h2[text()="Choose time period"]   90
-    user checks previous table tool step contains  3    National    England
+    user checks previous table tool step contains  3    Local Authority    Bury
+    user checks previous table tool step contains  3    Local Authority    Sheffield
+    user checks previous table tool step contains  3    Local Authority    York
 
 Select Start date and End date
     [Tags]  HappyPath
-    user selects start date     2012/13
-    user selects end date       2015/16
+    user selects start date     2006/07
+    user selects end date       2008/09
     user clicks element     css:#timePeriodForm-submit
     user waits until element is visible  xpath://h2[text()="Choose your filters"]
-    user checks previous table tool step contains  4    Start date    2012/13
-    user checks previous table tool step contains  4    End date      2015/16
+    user checks previous table tool step contains  4    Start date    2006/07
+    user checks previous table tool step contains  4    End date      2016/17
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks subheaded indicator checkbox   Absence fields        Authorised absence rate
-    user clicks subheaded indicator checkbox   Absence fields        Overall absence rate
-    user clicks subheaded indicator checkbox   Absence fields        Unauthorised absence rate
+    user clicks indicator checkbox  Number of pupils
+    user clicks indicator checkbox  Number of permanent exclusions
+    user clicks indicator checkbox  Number of fixed period exclusions
 
 Select Characteristics
     [Tags]   HappyPath
-    user opens details dropdown     Characteristic
-    user clicks category checkbox   Characteristic   Gender female
-    user clicks category checkbox   Characteristic   Gender male
+    user opens details dropdown     School type
+    user clicks category checkbox   School type   State-funded primary
+    user clicks category checkbox   School type   State-funded secondary
 
 Create table
     [Tags]  HappyPath
@@ -67,11 +71,13 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   England
-    user checks results table column heading contains  css:table  2   1   2012/13
-    user checks results table column heading contains  css:table  2   2   2013/14
-    user checks results table column heading contains  css:table  2   3   2014/15
-    user checks results table column heading contains  css:table  2   4   2015/16
+    user checks results table column heading contains  css:table  1   1   State-funded secondary
+    user checks results table column heading contains  css:table  1   2   State-funded primary
+    user checks results table column heading contains  css:table  2   1   2006/07
+    user checks results table column heading contains  css:table  2   2   2007/08
+    user checks results table column heading contains  css:table  2   3   2008/09
+    user checks results table column heading contains  css:table  2   4   2009/10
+    sleep   100000
 
 Validate Gender male Authorised absence rate row
     [Tags]  HappyPath
