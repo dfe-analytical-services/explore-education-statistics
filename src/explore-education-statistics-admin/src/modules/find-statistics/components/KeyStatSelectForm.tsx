@@ -17,16 +17,16 @@ interface Props {
   label?: string;
 }
 
-const KeyIndicatorSelectForm = ({
+const KeyStatSelectForm = ({
   onSelect,
   onCancel = () => {},
   hideCancel = false,
-  label = 'Select a key indicator',
+  label = 'Select a key statistic',
 }: Props) => {
   const { availableDataBlocks } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
-  const keyIndicatorDatablocks = useMemo(() => {
+  const keyStatDatablocks = useMemo(() => {
     return availableDataBlocks.filter(db => {
       const req = db.dataBlockRequest;
       const timePeriod = req.timePeriod as TimePeriodQuery;
@@ -82,7 +82,7 @@ const KeyIndicatorSelectForm = ({
             value: '',
           },
           ...orderBy(
-            keyIndicatorDatablocks.map(dataBlock => ({
+            keyStatDatablocks.map(dataBlock => ({
               label: dataBlock.name || '',
               value: dataBlock.id || '',
             })),
@@ -103,4 +103,4 @@ const KeyIndicatorSelectForm = ({
   );
 };
 
-export default KeyIndicatorSelectForm;
+export default KeyStatSelectForm;
