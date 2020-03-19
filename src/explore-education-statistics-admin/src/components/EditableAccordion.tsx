@@ -6,7 +6,6 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
-import classnames from 'classnames';
 import React, {
   createRef,
   ReactElement,
@@ -51,7 +50,6 @@ const mapReactNodeToChildSection = (children: ReactNode): ChildSection[] =>
 const EditableAccordion = ({
   children,
   id,
-
   sectionName,
   onSaveOrder,
   onAddSection,
@@ -181,9 +179,8 @@ const EditableAccordion = ({
       </DroppableAccordion>
 
       <div className="govuk-accordion" style={{ border: 'none' }}>
-        <div className={classnames('govuk-accordion__controls')}>
+        <div className="govuk-accordion__controls">
           <Button
-            key="add_section"
             onClick={onAddSection}
             className={styles.addSectionButton}
             disabled={isReordering}
