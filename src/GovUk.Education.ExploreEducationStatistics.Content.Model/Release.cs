@@ -228,12 +228,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             var ctx = new CreateAmendmentContext(this, amendment);
 
             amendment.Content = amendment
-                .Content
+                .Content?
                 .Select(content => content.CreateReleaseAmendment(ctx))
                 .ToList();
 
             amendment.RelatedInformation = amendment
-                .RelatedInformation
+                .RelatedInformation?
                 .Select(link =>
                 {
                     var copy = link.CreateCopy();
@@ -243,12 +243,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 .ToList();
             
             amendment.Updates = amendment
-                .Updates
+                .Updates?
                 .Select(update => update.CreateReleaseAmendment(ctx))
                 .ToList();
             
             amendment.ContentBlocks = amendment
-                .ContentBlocks
+                .ContentBlocks?
                 .Select(releaseContentBlock => releaseContentBlock.CreateReleaseAmendment(ctx))
                 .ToList();
             

@@ -73,7 +73,7 @@ const PublicationSummary = ({
                 <li key={release.id}>
                   <NonScheduledReleaseSummary
                     onClickAmendRelease={
-                      showAmendmentButton() && setAmendReleaseId
+                      showAmendmentButton() ? setAmendReleaseId : undefined
                     }
                     onClickCancelAmendment={setCancelAmendmentReleaseId}
                     release={release}
@@ -113,13 +113,14 @@ const PublicationSummary = ({
         <ModalConfirm
           title="Confirm you want to amend this live release"
           onConfirm={async () =>
-            service
-              .createReleaseAmendment(amendReleaseId)
-              .then(amendment =>
-                history.push(
-                  summaryRoute.generateLink(publication.id, amendment.id),
-                ),
-              )
+            service.createReleaseAmendment(amendReleaseId).then(amendment =>
+              history.push(
+                summaryRoute.generateLink({
+                  publicationId: publication.id,
+                  releaseId: amendment.id,
+                }),
+              ),
+            )
           }
           onExit={() => setAmendReleaseId(undefined)}
           onCancel={() => setAmendReleaseId(undefined)}

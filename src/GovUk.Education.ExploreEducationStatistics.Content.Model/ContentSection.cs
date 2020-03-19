@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.Release = newParent;
             
             copy.Content = copy
-                .Content
+                .Content?
                 .Select(content => content.CreateReleaseAmendment(ctx, copy))
                 .ToList();
 

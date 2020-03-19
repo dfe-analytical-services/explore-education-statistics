@@ -3,7 +3,7 @@ import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataP
 import ReleaseManageDataBlocksPage, {
   ReleaseManageDataBlocksPageParams,
 } from '@admin/pages/release/edit-release/manage-datablocks/ReleaseManageDataBlocksPage';
-import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
+import ReleasePublishStatusPage from '@admin/pages/release/edit-release/status/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
 import permissionService from '@admin/services/permissions/permissionService';

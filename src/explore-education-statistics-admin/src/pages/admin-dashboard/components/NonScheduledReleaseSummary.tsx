@@ -1,7 +1,5 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import ReleaseSummary, {
-  Props as ReleaseSummaryProps,
-} from '@admin/pages/admin-dashboard/components/ReleaseSummary';
+import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
@@ -28,10 +26,10 @@ const NonScheduledReleaseSummary = ({
           {release.amendment ? (
             <>
               <ButtonLink
-                to={summaryRoute.generateLink(
-                  release.publicationId,
-                  release.id,
-                )}
+                to={summaryRoute.generateLink({
+                  publicationId: release.publicationId,
+                  releaseId: release.id,
+                })}
                 testId={formatTestId(
                   `Edit release amendment link for ${
                     release.publicationTitle
@@ -43,11 +41,11 @@ const NonScheduledReleaseSummary = ({
                   : 'View this release amendment'}
               </ButtonLink>
               <ButtonLink
-                to={summaryRoute.generateLink(
-                  release.publicationId,
+                to={summaryRoute.generateLink({
+                  publicationId: release.publicationId,
                   // TODO DW - previousReleaseId
-                  release.originalId,
-                )}
+                  releaseId: release.originalId,
+                })}
                 className="govuk-button--secondary govuk-!-margin-left-4"
                 testId={formatTestId(
                   `View original release link for ${
@@ -61,10 +59,10 @@ const NonScheduledReleaseSummary = ({
           ) : (
             <>
               <ButtonLink
-                to={summaryRoute.generateLink(
-                  release.publicationId,
-                  release.id,
-                )}
+                to={summaryRoute.generateLink({
+                  publicationId: release.publicationId,
+                  releaseId: release.id,
+                })}
                 testId={formatTestId(
                   `Edit release link for ${
                     release.publicationTitle

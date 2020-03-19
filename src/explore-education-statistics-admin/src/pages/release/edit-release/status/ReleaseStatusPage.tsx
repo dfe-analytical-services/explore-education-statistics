@@ -13,7 +13,7 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import Yup from '@common/lib/validation/yup';
 import { ReleaseStatus } from '@common/services/publicationService';
 import { FormikProps } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const errorCodeMappings = [
   errorCodeToFieldError(

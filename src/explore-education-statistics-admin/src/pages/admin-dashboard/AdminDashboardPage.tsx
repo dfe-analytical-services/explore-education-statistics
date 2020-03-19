@@ -156,10 +156,10 @@ const AdminDashboardPage = () => {
                     release={release}
                     actions={
                       <ButtonLink
-                        to={summaryRoute.generateLink(
-                          release.publicationId,
-                          release.id,
-                        )}
+                        to={summaryRoute.generateLink({
+                          publicationId: release.publicationId,
+                          releaseId: release.id,
+                        })}
                       >
                         Preview release
                       </ButtonLink>

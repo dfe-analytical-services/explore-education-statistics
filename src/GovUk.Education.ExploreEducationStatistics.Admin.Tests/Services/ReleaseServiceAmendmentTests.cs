@@ -396,12 +396,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(newReleaseId, amendment.Id);
                 Assert.Null(amendment.PublishScheduled);
                 Assert.Null( amendment.Published);
-                Assert.Equal(version + 1, amendment.Version);
+                Assert.Equal(release.Version + 1, amendment.Version);
                 Assert.Equal(ReleaseStatus.Draft, amendment.Status);
                 Assert.Equal(release.Id, amendment.Original.Id);
-                Assert.Equal(releaseId, amendment.OriginalId);
-                Assert.Equal(_userId, amendment.CreatedBy.Id);
-                Assert.Equal(_userId, amendment.CreatedById);
+                Assert.Equal(release.Id, amendment.OriginalId);
+                Assert.Equal(createdBy.Id, amendment.CreatedBy.Id);
+                Assert.Equal(createdBy.Id, amendment.CreatedById);
                 Assert.True(amendment.Created.CompareTo(DateTime.UtcNow.AddSeconds(-1)) > 0 
                             && amendment.Created.CompareTo(DateTime.UtcNow) <= 0);
                 Assert.Null(amendment.InternalReleaseNote);
