@@ -2566,6 +2566,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new MarkDownBlock
                 {
+                    Id = new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
+                    ContentSectionId = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
+                    Body = SampleMarkDownContent.Content[new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d")]
+                },
+                new MarkDownBlock
+                {
                     Id = new Guid("2c369594-3bbc-40b4-ad19-196c923f5c7f"),
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                     Body = SampleMarkDownContent.Content[new Guid("2c369594-3bbc-40b4-ad19-196c923f5c7f")]
@@ -2587,12 +2593,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("4aa06200-406b-4f5a-bee4-19e3b83eb1d2"),
                     ContentSectionId = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
                     Body = SampleMarkDownContent.Content[new Guid("4aa06200-406b-4f5a-bee4-19e3b83eb1d2")]
-                },
-                new MarkDownBlock
-                {
-                    Id = new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
-                    ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
-                    Body = SampleMarkDownContent.Content[new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d")]
                 },
                 new MarkDownBlock
                 {
