@@ -1,6 +1,6 @@
+import { MethodologyContent } from '@admin/services/methodology/types';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { produce } from 'immer';
-import { MethodologyContent } from 'src/services/methodology/types';
 import {
   MethodologyContextState,
   methodologyReducer as originalMethodologyReducer,

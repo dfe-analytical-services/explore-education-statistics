@@ -1,6 +1,6 @@
+import { MethodologyContent } from '@admin/services/methodology/types';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { ContentSection } from '@common/services/publicationService';
-import { MethodologyContent } from 'src/services/methodology/types';
 import { MethodologyContextState } from './MethodologyContext';
 
 export type ContentSectionKeys = keyof Pick<

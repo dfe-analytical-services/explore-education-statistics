@@ -1,8 +1,8 @@
 import methodologyService from '@admin/services/methodology/methodologyService';
 import permissionService from '@admin/services/permissions/permissionService';
+import { ContentBlockPostModel } from '@admin/services/release/edit-release/content/types';
 import { Dictionary } from '@admin/types';
 import { useCallback } from 'react';
-import { ContentBlockPostModel } from 'src/services/release/edit-release/content/types';
 import { useMethodologyDispatch } from './MethodologyContext';
 import { ContentSectionKeys } from './MethodologyContextActionTypes';
 

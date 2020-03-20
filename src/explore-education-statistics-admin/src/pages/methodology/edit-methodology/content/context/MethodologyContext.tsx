@@ -1,6 +1,6 @@
+import { MethodologyContent } from '@admin/services/methodology/types';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
-import { MethodologyContent } from 'src/services/methodology/types';
 import { Reducer, useImmerReducer } from 'use-immer';
 import MethodologyDispatchAction from './MethodologyContextActionTypes';
 
