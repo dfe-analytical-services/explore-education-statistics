@@ -108,6 +108,8 @@ const MethodologyAccordionSection = ({
 
   return (
     <EditableAccordionSection
+      {...content}
+      {...restOfProps}
       heading={heading}
       caption={caption}
       isReordering={isReordering}
@@ -120,10 +122,8 @@ const MethodologyAccordionSection = ({
           {isReordering ? 'Save section order' : 'Reorder this section'}
         </Button>
       }
-      {...content}
       onHeadingChange={onSaveHeading}
       onRemoveSection={removeSection}
-      {...restOfProps}
     >
       <ContentBlocks
         id={`${heading}-content`}

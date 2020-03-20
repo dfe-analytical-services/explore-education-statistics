@@ -48,23 +48,22 @@ const MethodologyAccordion = ({
   return (
     <EditableAccordion
       id={`methodology-accordion-${sectionKey}`}
-      sectionName={sectionKey === 'annexes' ? 'Annexes' : 'Content'}
+      sectionName={sectionKey}
       onAddSection={onAddSection}
       onSaveOrder={reorderAccordionSections}
     >
-      {orderBy(
-        sectionKey === 'annexes' ? methodology.annexes : methodology.content,
-        'order',
-      ).map((accordionSection, index) => (
-        <MethodologyAccordionSection
-          id={accordionSection.id}
-          methodologyId={methodology.id}
-          key={accordionSection.id}
-          content={accordionSection}
-          sectionKey={sectionKey}
-          index={index}
-        />
-      ))}
+      {orderBy(methodology[sectionKey], 'order').map(
+        (accordionSection, index) => (
+          <MethodologyAccordionSection
+            id={accordionSection.id}
+            methodologyId={methodology.id}
+            key={accordionSection.id}
+            content={accordionSection}
+            sectionKey={sectionKey}
+            index={index}
+          />
+        ),
+      )}
     </EditableAccordion>
   );
 };

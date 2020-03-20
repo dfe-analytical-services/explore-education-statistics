@@ -4,8 +4,11 @@ import { MethodologyContent } from 'src/services/methodology/types';
 import { Reducer, useImmerReducer } from 'use-immer';
 import MethodologyDispatchAction from './MethodologyContextActionTypes';
 
-type MethodologyContextDispatch = (action: MethodologyDispatchAction) => void;
-type MethodologyContextState = {
+export type MethodologyContextDispatch = (
+  action: MethodologyDispatchAction,
+) => void;
+
+export type MethodologyContextState = {
   methodology: MethodologyContent | undefined;
   canUpdateMethodology: boolean;
 };
@@ -170,12 +173,4 @@ function useMethodologyDispatch() {
   return context;
 }
 
-export {
-  MethodologyProvider,
-  useMethodologyState,
-  useMethodologyDispatch,
-  // eslint-disable-next-line no-undef
-  MethodologyContextState,
-  // eslint-disable-next-line no-undef
-  MethodologyContextDispatch,
-};
+export { MethodologyProvider, useMethodologyState, useMethodologyDispatch };
