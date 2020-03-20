@@ -221,7 +221,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<IContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
-        public DbSet<InsetTextBlock> InsetTextBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
@@ -349,14 +348,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("HtmlBlock_Body");
-
-            modelBuilder.Entity<InsetTextBlock>()
-                .Property(block => block.Body)
-                .HasColumnName("InsetTextBlock_Body");
-
-            modelBuilder.Entity<InsetTextBlock>()
-                .Property(block => block.Heading)
-                .HasColumnName("InsetTextBlock_Heading");
 
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
