@@ -8,8 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -388,26 +390,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private string GetContentSectionHeading(DataBlock block)
-        {
-            var section = block.ContentSection;
-
-            if (section == null)
-            {
-                return null;
-            }
-
-            switch (block.ContentSection.Type)
-            {
-                case ContentSectionType.Generic: return section.Heading;
-                case ContentSectionType.ReleaseSummary: return "Release Summary";
-                case ContentSectionType.Headlines: return "Headlines";
-                case ContentSectionType.KeyStatistics: return "Key Statistics";
-                case ContentSectionType.KeyStatisticsSecondary: return "Key Statistics";
-                default: return block.ContentSection.Type.ToString();
-            }
-        }
-
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
@@ -428,6 +410,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _tableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
                         });
                 });
+        }
+
+        public async Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async _ =>
+                {
+                    var fileLink = await _context
+                        .ReleaseFiles
+                        .Include(f => f.ReleaseFileReference)
+                        .FirstOrDefaultAsync(f =>
+                            f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
+
+                    if (fileLink == null)
+                    {
+                        return new ImportStatus
+                        {
+                            Status = IStatus.NOT_FOUND.GetEnumValue()
+                        };
+                    }
+                    
+                    var fileReference = fileLink.ReleaseFileReference;
+
+                    return await _importStatusService.GetImportStatus(fileReference.ReleaseId.ToString(), dataFileName);
+                });
+        }
+
+        private string GetContentSectionHeading(DataBlock block)
+        {
+            var section = block.ContentSection;
+
+            if (section == null)
+            {
+                return null;
+            }
+
+            switch (block.ContentSection.Type)
+            {
+                case ContentSectionType.Generic: return section.Heading;
+                case ContentSectionType.ReleaseSummary: return "Release Summary";
+                case ContentSectionType.Headlines: return "Headlines";
+                case ContentSectionType.KeyStatistics: return "Key Statistics";
+                case ContentSectionType.KeyStatisticsSecondary: return "Key Statistics";
+                default: return block.ContentSection.Type.ToString();
+            }
         }
 
         private async Task DeleteChartFiles(DeleteDataFilePlan deletePlan)

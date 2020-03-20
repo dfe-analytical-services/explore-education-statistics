@@ -18,6 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type);
 
+        Task<IEnumerable<FileInfo>> ListFilesFromBlobStorage(Guid releaseId, ReleaseFileTypes type);
+        
         Task<Either<ActionResult, IEnumerable<Common.Model.FileInfo>>> ListPublicFilesPreview(Guid releaseId);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile file,

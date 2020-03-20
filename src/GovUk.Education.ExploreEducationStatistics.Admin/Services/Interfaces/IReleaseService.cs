@@ -38,5 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string dataFileName, string subjectTitle);
         
         Task<Either<ActionResult, IEnumerable<FileInfo>>>  DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle);
+
+        Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName);
     }
 }

@@ -178,27 +178,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var blobContainer = await GetCloudBlobContainer();
+                    if (type == ReleaseFileTypes.Data) {
+                        
+                        var blobContainer = await GetCloudBlobContainer();
 
-                    IEnumerable<Models.FileInfo> files = blobContainer
-                        .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
-                        .Where(blob => !IsBatchedDataFile(blob, releaseId))
-                        .OfType<CloudBlockBlob>()
-                        .Select(file => new Models.FileInfo
-                        {
-                            Extension = GetExtension(file),
-                            Name = GetName(file),
-                            Path = file.Name,
-                            Size = GetSize(file),
-                            MetaFileName = GetMetaFileName(file),
-                            Rows = GetNumberOfRows(file),
-                            UserName = GetUserName(file),
-                            Created = file.Properties.Created
-                        })
-                        .OrderBy(info => info.Name);
+                        var dataFiles = _context
+                            .ReleaseFiles
+                            .Include(f => f.ReleaseFileReference)
+                            .Where(f => f.ReleaseId == releaseId)
+                            .ToList();
 
-                    return files;
+                        var filesWithMetadata = dataFiles
+                            .Select(async fileLink =>
+                            {
+                                var fileReference = fileLink.ReleaseFileReference;
+                                var file = blobContainer.GetBlockBlobReference(AdminReleasePathWithFileReference(fileReference, type));
+                                await file.FetchAttributesAsync();
+                                return new Models.FileInfo
+                                {
+                                    Extension = GetExtension(file),
+                                    Name = GetName(file),
+                                    Path = file.Name,
+                                    Size = GetSize(file),
+                                    MetaFileName = GetMetaFileName(file),
+                                    Rows = GetNumberOfRows(file),
+                                    UserName = GetUserName(file),
+                                    Created = file.Properties.Created
+                                };
+                            });
+
+                        return (await Task.WhenAll(filesWithMetadata))
+                            .OrderBy(file => file.Name)
+                            .AsEnumerable();
+                    }
+                    
+                    return await ListFilesFromBlobStorage(releaseId, type);
                 });
+        }
+
+        public async Task<IEnumerable<Models.FileInfo>> ListFilesFromBlobStorage(Guid releaseId, ReleaseFileTypes type)
+        {
+            var blobContainer = await GetCloudBlobContainer();
+
+            IEnumerable<Models.FileInfo> files = blobContainer
+                .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
+                .Where(blob => !IsBatchedDataFile(blob, releaseId))
+                .OfType<CloudBlockBlob>()
+                .Select(file => new Models.FileInfo
+                {
+                    Extension = GetExtension(file),
+                    Name = GetName(file),
+                    Path = file.Name,
+                    Size = GetSize(file),
+                    MetaFileName = GetMetaFileName(file),
+                    Rows = GetNumberOfRows(file),
+                    UserName = GetUserName(file),
+                    Created = file.Properties.Created
+                })
+                .OrderBy(info => info.Name);
+
+            return files;
+        }
+
+        private string AdminReleasePathWithFileReference(ReleaseFileReference fileReference, ReleaseFileTypes type)
+        {
+            return AdminReleasePath(fileReference.ReleaseId, type, fileReference.Filename);
         }
 
         public Task<Either<ActionResult, Release>> CopyReleaseFilesAsync(Guid originalReleaseId, Guid newReleaseId, ReleaseFileTypes type)

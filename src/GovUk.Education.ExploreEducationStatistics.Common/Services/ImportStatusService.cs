@@ -66,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
         {
+            
             // Need to define the extra columns to retrieve
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId, 

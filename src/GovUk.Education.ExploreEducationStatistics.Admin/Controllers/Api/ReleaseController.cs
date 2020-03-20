@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,14 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IImportStatusService _importStatusService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public ReleasesController(IImportService importService,
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
-            IImportStatusService importStatusService,
             IReleaseStatusService releaseStatusService,
             UserManager<ApplicationUser> userManager
             )
@@ -43,7 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
-            _importStatusService = importStatusService;
             _releaseStatusService = releaseStatusService;
             _userManager = userManager;
         }
@@ -237,9 +233,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
-        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(Guid releaseId, string fileName)
+        public Task<ActionResult<ImportStatus>> GetDataUploadStatus(Guid releaseId, string fileName)
         {
-            return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
+            return _releaseService
+                .GetDataFileImportStatus(releaseId, fileName)
+                .HandleFailuresOrOk();
         }
 
         [HttpGet("release/{releaseId}/data/{fileName}/{subjectTitle}/delete-plan")]
