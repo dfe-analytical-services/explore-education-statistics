@@ -8,6 +8,7 @@ import DataBlockService, {
 import formatPretty from '@common/utils/number/formatPretty';
 import React, { ReactNode, useEffect, useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import styles from './SummaryRenderer.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
@@ -20,24 +21,22 @@ export interface KeyStatConfig {
   value: string;
 }
 
-const KeyStatTile = ({
-  dataBlockRequest,
-  summary,
-  children,
-  handleApiErrors,
-}: KeyStatProps) => {
+const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
+  const { withoutErrorHandling } = useErrorControl();
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
   >();
 
   useEffect(() => {
-    DataBlockService.getDataBlockForSubject({
-      ...dataBlockRequest,
-      includeGeoJson: false,
-    })
-      .then(setDataBlockResponse)
-      .catch(handleApiErrors);
-  }, [dataBlockRequest, handleApiErrors]);
+    withoutErrorHandling(async () => {
+      setDataBlockResponse(
+        await DataBlockService.getDataBlockForSubject({
+          ...dataBlockRequest,
+          includeGeoJson: false,
+        }),
+      );
+    });
+  }, [dataBlockRequest, withoutErrorHandling]);
 
   const config: KeyStatConfig = useMemo(() => {
     if (dataBlockResponse) {
