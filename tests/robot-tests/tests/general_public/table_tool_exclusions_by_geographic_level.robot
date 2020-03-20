@@ -49,7 +49,7 @@ Select Start date and End date
     user clicks element     css:#timePeriodForm-submit
     user waits until element is visible  xpath://h2[text()="Choose your filters"]
     user checks previous table tool step contains  4    Start date    2006/07
-    user checks previous table tool step contains  4    End date      2016/17
+    user checks previous table tool step contains  4    End date      2008/09
 
 Select Indicators
     [Tags]  HappyPath
@@ -76,169 +76,20 @@ Validate results table column headings
     user checks results table column heading contains  css:table  2   1   2006/07
     user checks results table column heading contains  css:table  2   2   2007/08
     user checks results table column heading contains  css:table  2   3   2008/09
-    user checks results table column heading contains  css:table  2   4   2009/10
-    sleep   100000
+    user checks results table column heading contains  css:table  2   4   2006/07
+    user checks results table column heading contains  css:table  2   5   2007/08
+    user checks results table column heading contains  css:table  2   6   2008/09
 
-Validate Gender male Authorised absence rate row
+Validate Bury Number of fixed period exclusions row
     [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Authorised absence rate
-    user checks row contains heading  ${row}  Authorised absence rate
-    user checks row cell contains text  ${row}    1     4.2%
-    user checks row cell contains text  ${row}    2     3.4%
-    user checks row cell contains text  ${row}    3     3.6%
-    user checks row cell contains text  ${row}    4     3.5%
-
-Validate Gender male Overall absence rate row
-    [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Overall absence rate
-    user checks row contains heading  ${row}  Overall absence rate
-    user checks row cell contains text  ${row}    1     5.2%
-    user checks row cell contains text  ${row}    2     4.5%
-    user checks row cell contains text  ${row}    3     4.6%
-    user checks row cell contains text  ${row}    4     4.6%
-
-Validate Gender male Unauthorised absence rate row
-    [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Unauthorised absence rate
-    user checks row contains heading  ${row}  Unauthorised absence rate
-    user checks row cell contains text  ${row}    1     1.1%
-    user checks row cell contains text  ${row}    2     1.1%
-    user checks row cell contains text  ${row}    3     1.1%
-    user checks row cell contains text  ${row}    4     1.1%
-
-Validate Gender female Authorised absence rate row
-    [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Authorised absence rate
-    user checks row contains heading  ${row}  Authorised absence rate
-    user checks row cell contains text  ${row}    1     4.2%
-    user checks row cell contains text  ${row}    2     3.5%
-    user checks row cell contains text  ${row}    3     3.5%
-    user checks row cell contains text  ${row}    4     3.4%
-
-Validate Gender female Overall absence rate row
-    [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Overall absence rate
-    user checks row contains heading  ${row}  Overall absence rate
-    user checks row cell contains text  ${row}    1     5.3%
-    user checks row cell contains text  ${row}    2     4.5%
-    user checks row cell contains text  ${row}    3     4.6%
-    user checks row cell contains text  ${row}    4     4.5%
-
-Validate Gender female Unauthorised absence rate row
-    [Tags]  HappyPath
-    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Unauthorised absence rate
-    user checks row contains heading  ${row}  Unauthorised absence rate
-    user checks row cell contains text  ${row}    1     1.1%
-    user checks row cell contains text  ${row}    2     1.1%
-    user checks row cell contains text  ${row}    3     1.1%
-    user checks row cell contains text  ${row}    4     1.1%
-
-Reorder Gender to be column
-    [Tags]  HappyPath
-    user opens details dropdown     Re-order table headers
-    user sets focus to element  xpath://legend[text()="Row group 1"]/../../..
-    user presses keys    SPACE
-    user presses keys    ARROW_DOWN
-    user presses keys    SPACE
-
-Reorder England to be row
-    [Tags]  HappyPath
-    user waits until page contains element   xpath://legend[text()="Column group 2"]
-    user checks page does not contain element   xpath://legend[text()="Row group 1"]
-    user sets focus to element   xpath://legend[text()="Column group 2"]/../../..
-    user presses keys    SPACE
-    user presses keys    ARROW_UP
-    user presses keys    SPACE
-    user waits until page contains element   xpath://legend[text()="Row group 1"]
-    user checks page does not contain element   xpath://legend[text()="Column group 2"]
-
-Reorder Gender male to be second
-    [Tags]  HappyPath
-    user sets focus to element   xpath://strong[text()="Gender male"]/../..  # The /../.. to get to a focusable element
-    user presses keys    SPACE
-    user presses keys    ARROW_DOWN
-    user presses keys    SPACE
-
-Reorder Authorised absence rate to be last
-    [Tags]  HappyPath
-    user sets focus to element  xpath://strong[text()="Authorised absence rate"]/../..  # The /../.. to get to a focusable element
-    user presses keys    SPACE
-    user presses keys    ARROW_DOWN
-    user presses keys    ARROW_DOWN
-    user presses keys    ARROW_DOWN  # Three time to ensure
-    user presses keys    SPACE
-
-Reorder Overall absence rate to be first
-    [Tags]  HappyPath
-    user sets focus to element  xpath://strong[text()="Overall absence rate"]/../..  # The /../.. to get to a focusable element
-    user presses keys    SPACE
-    user presses keys    ARROW_UP
-    user presses keys    SPACE
-
-Reorder 2012/13 to be last
-    [Tags]  HappyPath
-    user sets focus to element  xpath://strong[text()="2012/13"]/../..  # The /../.. to get to a focusable element
-    user presses keys    SPACE
-    user presses keys    ARROW_DOWN
-    user presses keys    ARROW_DOWN
-    user presses keys    ARROW_DOWN
-    user presses keys    SPACE
-
-Click Re-order table button
-    [Tags]  HappyPath
-    user clicks element     xpath://button[text()="Re-order table"]
-
-Validate results table column headings after reordering
-    [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   Gender female
-    user checks results table column heading contains  css:table  1   2   Gender male
-    user checks results table column heading contains  css:table  2   1   2013/14
-    user checks results table column heading contains  css:table  2   2   2014/15
-    user checks results table column heading contains  css:table  2   3   2015/16
-    user checks results table column heading contains  css:table  2   4   2012/13
-    user checks results table column heading contains  css:table  2   5   2013/14
-    user checks results table column heading contains  css:table  2   6   2014/15
-    user checks results table column heading contains  css:table  2   7   2015/16
-    user checks results table column heading contains  css:table  2   8   2012/13
-
-Validate results table row headings after reordering
-    [Tags]  HappyPath
-    user checks results table row heading contains  1    1      England
-    user checks results table row heading contains  1    2      Overall absence rate
-    user checks results table row heading contains  2    1      Unauthorised absence rate
-    user checks results table row heading contains  3    1      Authorised absence rate
-
-Validate rows after reordering
-    [Tags]  HappyPath
-    # Overall absence rate
-    user checks results table cell contains  1    1     4.5%
-    user checks results table cell contains  1    2     4.6%
-    user checks results table cell contains  1    3     4.5%
-    user checks results table cell contains  1    4     5.3%
-    user checks results table cell contains  1    5     4.5%
-    user checks results table cell contains  1    6     4.6%
-    user checks results table cell contains  1    7     4.6%
-    user checks results table cell contains  1    8     5.2%
-
-    # Unauthorised absence rate
-    user checks results table cell contains  2    1     1.1%
-    user checks results table cell contains  2    2     1.1%
-    user checks results table cell contains  2    3     1.1%
-    user checks results table cell contains  2    4     1.1%
-    user checks results table cell contains  2    5     1.1%
-    user checks results table cell contains  2    6     1.1%
-    user checks results table cell contains  2    7     1.1%
-    user checks results table cell contains  2    8     1.1%
-
-    # Authorised absence rate
-    user checks results table cell contains  3    1     3.5%
-    user checks results table cell contains  3    2     3.5%
-    user checks results table cell contains  3    3     3.4%
-    user checks results table cell contains  3    4     4.2%
-    user checks results table cell contains  3    5     3.4%
-    user checks results table cell contains  3    6     3.6%
-    user checks results table cell contains  3    7     3.5%
-    user checks results table cell contains  3    8     4.2%
+    ${row}=  user gets row with group and indicator   xpath://table  Bury   Number of fixed period exclusions
+    user checks row contains heading  ${row}  Number of fixed period exclusions
+    user checks row cell contains text  ${row}    1     1,539
+    user checks row cell contains text  ${row}    2     1,469
+    user checks row cell contains text  ${row}    3     1,298
+    user checks row cell contains text  ${row}    4     95
+    user checks row cell contains text  ${row}    5     106
+    user checks row cell contains text  ${row}    6     111
 
 User generates a permanent link
     [Tags]   HappyPath
@@ -250,54 +101,105 @@ User validates permanent link works correctly
     [Tags]   HappyPath
     user clicks link   View permanent link
     select window    NEW
-    user waits until page contains heading  'Absence by characteristic' from 'Pupil absence in schools in England'
+    user waits until page contains heading  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
 
-User validates permalink table
+User validates permalink contains correct date
+    ${date}=  get datetime  %d %B %Y
+    user checks page contains element   xpath://*[@data-testid="created-date"]//time[text()="${date}"]
+
+User validates permalink table headers
     [Tags]   HappyPath
-    user checks results table column heading contains  css:table  1   1   England
-    user checks results table column heading contains  css:table  2   1   2012/13
-    user checks results table column heading contains  css:table  2   2   2013/14
-    user checks results table column heading contains  css:table  2   3   2014/15
-    user checks results table column heading contains  css:table  2   4   2015/16
+    user checks results table column heading contains  css:table  1   1   State-funded secondary
+    user checks results table column heading contains  css:table  1   2   State-funded primary
+    user checks results table column heading contains  css:table  2   1   2006/07
+    user checks results table column heading contains  css:table  2   2   2007/08
+    user checks results table column heading contains  css:table  2   3   2008/09
+    user checks results table column heading contains  css:table  2   4   2006/07
+    user checks results table column heading contains  css:table  2   5   2007/08
+    user checks results table column heading contains  css:table  2   6   2008/09
 
-    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Authorised absence rate
-    user checks row contains heading  ${row}  Authorised absence rate
-    user checks row cell contains text  ${row}    1     4.2%
-    user checks row cell contains text  ${row}    2     3.4%
-    user checks row cell contains text  ${row}    3     3.6%
-    user checks row cell contains text  ${row}    4     3.5%
+User validates permalink table rows for Bury
+    ${row}=  user gets row with group and indicator   xpath://table  Bury   Number of fixed period exclusions
+    user checks row contains heading  ${row}  Number of fixed period exclusions
+    user checks row cell contains text  ${row}    1     1,539
+    user checks row cell contains text  ${row}    2     1,469
+    user checks row cell contains text  ${row}    3     1,298
+    user checks row cell contains text  ${row}    4     95
+    user checks row cell contains text  ${row}    5     106
+    user checks row cell contains text  ${row}    6     111
 
-    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Overall absence rate
-    user checks row contains heading  ${row}  Overall absence rate
-    user checks row cell contains text  ${row}    1     5.2%
-    user checks row cell contains text  ${row}    2     4.5%
-    user checks row cell contains text  ${row}    3     4.6%
-    user checks row cell contains text  ${row}    4     4.6%
+    ${row}=  user gets row with group and indicator   xpath://table  Bury   Number of permanent exclusions
+    user checks row contains heading  ${row}  Number of permanent exclusions
+    user checks row cell contains text  ${row}    1     74
+    user checks row cell contains text  ${row}    2     75
+    user checks row cell contains text  ${row}    3     65
+    user checks row cell contains text  ${row}    4     4
+    user checks row cell contains text  ${row}    5     3
+    user checks row cell contains text  ${row}    6     x
 
-    ${row}=  user gets row with group and indicator   xpath://table  Gender male   Unauthorised absence rate
-    user checks row contains heading  ${row}  Unauthorised absence rate
-    user checks row cell contains text  ${row}    1     1.1%
-    user checks row cell contains text  ${row}    2     1.1%
-    user checks row cell contains text  ${row}    3     1.1%
-    user checks row cell contains text  ${row}    4     1.1%
+    ${row}=  user gets row with group and indicator   xpath://table  Bury   Number of pupils
+    user checks row contains heading  ${row}  Number of pupils
+    user checks row cell contains text  ${row}    1     11,618
+    user checks row cell contains text  ${row}    2     11,389
+    user checks row cell contains text  ${row}    3     11,217
+    user checks row cell contains text  ${row}    4     16,058
+    user checks row cell contains text  ${row}    5     15,978
+    user checks row cell contains text  ${row}    6     16,088
 
-    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Authorised absence rate
-    user checks row contains heading  ${row}  Authorised absence rate
-    user checks row cell contains text  ${row}    1     4.2%
-    user checks row cell contains text  ${row}    2     3.5%
-    user checks row cell contains text  ${row}    3     3.5%
-    user checks row cell contains text  ${row}    4     3.4%
+User validates permalink table rows for Sheffield
+    ${row}=  user gets row with group and indicator   xpath://table  Sheffield   Number of fixed period exclusions
+    user checks row contains heading  ${row}  Number of fixed period exclusions
+    user checks row cell contains text  ${row}    1     5,351
+    user checks row cell contains text  ${row}    2     3,869
+    user checks row cell contains text  ${row}    3     3,374
+    user checks row cell contains text  ${row}    4     539
+    user checks row cell contains text  ${row}    5     425
+    user checks row cell contains text  ${row}    6     362
 
-    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Overall absence rate
-    user checks row contains heading  ${row}  Overall absence rate
-    user checks row cell contains text  ${row}    1     5.3%
-    user checks row cell contains text  ${row}    2     4.5%
-    user checks row cell contains text  ${row}    3     4.6%
-    user checks row cell contains text  ${row}    4     4.5%
+    ${row}=  user gets row with group and indicator   xpath://table  Sheffield   Number of permanent exclusions
+    user checks row contains heading  ${row}  Number of permanent exclusions
+    user checks row cell contains text  ${row}    1     12
+    user checks row cell contains text  ${row}    2     8
+    user checks row cell contains text  ${row}    3     4
+    user checks row cell contains text  ${row}    4     0
+    user checks row cell contains text  ${row}    5     x
+    user checks row cell contains text  ${row}    6     0
 
-    ${row}=  user gets row with group and indicator   xpath://table  Gender female   Unauthorised absence rate
-    user checks row contains heading  ${row}  Unauthorised absence rate
-    user checks row cell contains text  ${row}    1     1.1%
-    user checks row cell contains text  ${row}    2     1.1%
-    user checks row cell contains text  ${row}    3     1.1%
-    user checks row cell contains text  ${row}    4     1.1%
+    ${row}=  user gets row with group and indicator   xpath://table  Sheffield   Number of pupils
+    user checks row contains heading  ${row}  Number of pupils
+    user checks row cell contains text  ${row}    1     31,261
+    user checks row cell contains text  ${row}    2     31,105
+    user checks row cell contains text  ${row}    3     30,948
+    user checks row cell contains text  ${row}    4     42,091
+    user checks row cell contains text  ${row}    5     41,843
+    user checks row cell contains text  ${row}    6     41,650
+
+User validates permalink table rows for York
+    ${row}=  user gets row with group and indicator   xpath://table  York   Number of fixed period exclusions
+    user checks row contains heading  ${row}  Number of fixed period exclusions
+    user checks row cell contains text  ${row}    1     1,073
+    user checks row cell contains text  ${row}    2     1,214
+    user checks row cell contains text  ${row}    3     892
+    user checks row cell contains text  ${row}    4     190
+    user checks row cell contains text  ${row}    5     147
+    user checks row cell contains text  ${row}    6     126
+
+    ${row}=  user gets row with group and indicator   xpath://table  York   Number of permanent exclusions
+    user checks row contains heading  ${row}  Number of permanent exclusions
+    user checks row cell contains text  ${row}    1     55
+    user checks row cell contains text  ${row}    2     25
+    user checks row cell contains text  ${row}    3     3
+    user checks row cell contains text  ${row}    4     3
+    user checks row cell contains text  ${row}    5     x
+    user checks row cell contains text  ${row}    6     0
+
+    ${row}=  user gets row with group and indicator   xpath://table  York   Number of pupils
+    user checks row contains heading  ${row}  Number of pupils
+    user checks row cell contains text  ${row}    1     10,179
+    user checks row cell contains text  ${row}    2     9,955
+    user checks row cell contains text  ${row}    3     9,870
+    user checks row cell contains text  ${row}    4     13,145
+    user checks row cell contains text  ${row}    5     13,009
+    user checks row cell contains text  ${row}    6     12,884
+
+
