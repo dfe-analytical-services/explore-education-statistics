@@ -6,6 +6,7 @@ import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile'
 import {
   locationLevelKeys,
   TimePeriodQuery,
+  LocationLevelKeys,
 } from '@common/modules/table-tool/services/tableBuilderService';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
@@ -30,19 +31,24 @@ const KeyStatSelectForm = ({
     return availableDataBlocks.filter(db => {
       const req = db.dataBlockRequest;
       const timePeriod = req.timePeriod as TimePeriodQuery;
-      const hasSingleLocation = !locationLevelKeys.some(
-        key => req[key]?.length !== 1,
+
+      const reqLocationLevels = Object.keys(req).filter(key =>
+        locationLevelKeys.includes(key as LocationLevelKeys),
       );
-      if (!hasSingleLocation) {
+      const hasSingleLocation =
+        reqLocationLevels.length === 1 &&
+        req[reqLocationLevels[0] as LocationLevelKeys]?.length === 1;
+
+      if (!locationLevelKeys.some(key => req[key])) {
         // eslint-disable-next-line no-console
         console.warn(
-          'dataBlockRequest should contain single location from locationLevelKeys!',
+          'dataBlockRequest should contain at least one location level from locationLevelKeys!',
         );
       }
       return (
-        req.indicators.length !== 1 ||
-        timePeriod.startYear !== timePeriod.endYear ||
-        !hasSingleLocation
+        req.indicators.length === 1 &&
+        timePeriod.startYear === timePeriod.endYear &&
+        hasSingleLocation
         // NOTE(mark): No check for number of filters because they cannot tell us whether
         // there is a single result
       );
