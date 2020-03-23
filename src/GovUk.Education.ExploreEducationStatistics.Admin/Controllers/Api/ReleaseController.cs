@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(Guid releaseId)
         {
             return await _fileStorageService
-                .ListFilesAsync(releaseId, ReleaseFileTypes.Data)
+                .ListFilesAsync(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
                 .HandleFailuresOrOk();
         }
 

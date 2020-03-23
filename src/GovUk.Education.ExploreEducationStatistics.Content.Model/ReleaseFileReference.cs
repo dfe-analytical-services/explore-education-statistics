@@ -1,4 +1,5 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -15,5 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid? SubjectId { get; set; }
         
         public string Filename { get; set; }
+        
+        public ReleaseFileTypes ReleaseFileType { get; set; }
     }
 }

@@ -76,7 +76,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public static string AdminReleaseDirectoryPath(string releaseId, ReleaseFileTypes type)
         {
-            return $"{AdminReleaseDirectoryPath(releaseId)}{type.GetEnumLabel()}/";
+            return $"{AdminReleaseDirectoryPath(releaseId)}{GetUploadFolderForType(type).GetEnumLabel()}/";
+        }
+
+        private static ReleaseFileTypes GetUploadFolderForType(ReleaseFileTypes type)
+        {
+            return type == ReleaseFileTypes.Metadata ? ReleaseFileTypes.Data : type;
         }
 
         /**

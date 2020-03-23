@@ -19,6 +19,7 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInf
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
+    // TODO BAU-405 - temporary code to help seed the Release-File tables from Blob storage 
     [Route("api")]
     [ApiController]
     [Authorize]

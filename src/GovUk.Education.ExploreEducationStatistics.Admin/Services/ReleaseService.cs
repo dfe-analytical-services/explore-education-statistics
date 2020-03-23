@@ -157,9 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
-                    .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Ancillary))
-                    .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Chart))
-                    .OnSuccess(amendment => CopyDataFileLinks(originalRelease, amendment))
+                    .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id)));
         }
 
@@ -183,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return amendment;
         }
 
-        private async Task<Either<ActionResult, Release>> CopyDataFileLinks(Release originalRelease, Release newRelease)
+        private async Task<Either<ActionResult, Release>> CopyFileLinks(Release originalRelease, Release newRelease)
         {
             var releaseFileCopies = _context
                 .ReleaseFiles
@@ -194,13 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _context.AddRangeAsync(releaseFileCopies);
             await _context.SaveChangesAsync();
             return newRelease;
-        }
-
-        private Task<Either<ActionResult, Release>> CopyReleaseFilesOfType(
-            Guid originalReleaseId, Release newRelease, ReleaseFileTypes type)
-        {
-            return _fileStorageService
-                .CopyReleaseFilesAsync(originalReleaseId, newRelease.Id, type);
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
