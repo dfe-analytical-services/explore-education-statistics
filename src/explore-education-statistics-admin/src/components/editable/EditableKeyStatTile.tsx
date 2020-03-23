@@ -31,7 +31,6 @@ const EditableKeyStatTile = ({
   isEditing = false,
   onRemove,
   onSubmit,
-  dataBlockResponse: response,
   dataBlockRequest,
   id,
   name,
@@ -40,7 +39,7 @@ const EditableKeyStatTile = ({
 }: EditableKeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
-  >(response);
+  >();
   const [config, setConfig] = useState<KeyStatConfig>({
     indicatorLabel: '',
     value: '',
@@ -88,7 +87,6 @@ const EditableKeyStatTile = ({
         id={id}
         name={name}
         {...props}
-        dataBlockResponse={dataBlockResponse}
         summary={summary}
       />
     );
@@ -190,7 +188,6 @@ const EditableKeyStatTile = ({
           id={id}
           name={name}
           {...props}
-          dataBlockResponse={dataBlockResponse}
           summary={summary}
         >
           <div className={styles.keyStatEdit}>
