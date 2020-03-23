@@ -21,7 +21,7 @@ Validate Analyst1 can see correct draft releases
     [Tags]  HappyPath
     user checks element should contain   css:#draft-releases-tab   View draft releases
     user clicks element   css:#draft-releases-tab
-    user checks draft releases tab contains publication  Pupil absence in schools in England
+    user waits until draft releases tab contains publication  Pupil absence in schools in England
     user checks draft releases tab publication has release   Pupil absence in schools in England    Academic Year, 2016 to 2017 (Live - Latest release)
     user checks draft releases tab contains publication  Permanent and fixed-period exclusions in England
     user checks draft releases tab publication has release   Permanent and fixed-period exclusions in England    Academic Year, 2016 to 2017 (Live - Latest release)
@@ -30,7 +30,7 @@ Validate Analyst1 can see correct scheduled releases
     [Tags]  HappyPath
     user checks element should contain   css:#scheduled-releases-tab   View scheduled releases (0)
     user clicks element   css:#scheduled-releases-tab
-    user checks element contains  css:#scheduled-releases   There are currently no scheduled releases
+    user waits until element contains  css:#scheduled-releases   There are currently no scheduled releases
 
 Validate Analyst1 cannot create a publication for Pupils absence topic
     [Tags]  HappyPath
