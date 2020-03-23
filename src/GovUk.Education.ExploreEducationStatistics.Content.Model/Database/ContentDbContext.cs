@@ -221,7 +221,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<IContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
-        public DbSet<InsetTextBlock> InsetTextBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
@@ -349,14 +348,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("HtmlBlock_Body");
-
-            modelBuilder.Entity<InsetTextBlock>()
-                .Property(block => block.Body)
-                .HasColumnName("InsetTextBlock_Body");
-
-            modelBuilder.Entity<InsetTextBlock>()
-                .Property(block => block.Heading)
-                .HasColumnName("InsetTextBlock_Heading");
 
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
@@ -1992,7 +1983,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     },
                     Published = new DateTime(2018, 6, 14),
                     Slug = "2018",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     Created = new DateTime(2019, 8, 1, 9, 30, 33, DateTimeKind.Utc),
                     CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
@@ -2590,12 +2581,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new MarkDownBlock
                 {
-                    Id = new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
-                    ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
-                    Body = SampleMarkDownContent.Content[new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d")]
-                },
-                new MarkDownBlock
-                {
                     Id = new Guid("2ef5f84f-e151-425d-8906-2921712f9157"),
                     ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
                     Body = SampleMarkDownContent.Content[new Guid("2ef5f84f-e151-425d-8906-2921712f9157")]
@@ -2778,12 +2763,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new MarkDownBlock
                 {
                     Id = new Guid("b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9"),
-                    ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                    ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
                     Order = 1,
-                    Body = " * pupils missed on average 8.2 school days\n" +
-                           " * overall and unauthorised absence rates up on 2015/16\n" +
-                           " * unauthorised absence rise due to higher rates of unauthorised holidays\n" +
-                           " * 10% of pupils persistently absent during 2016/17"
+                    Body = "* pupils missed on average 8.2 school days\n" +
+                           "* overall and unauthorised absence rates up on 2015/16\n" +
+                           "* unauthorised absence rise due to higher rates of unauthorised holidays\n" +
+                           "* 10% of pupils persistently absent during 2016/17\n"
                 },
                 new MarkDownBlock
                 {
@@ -2791,9 +2776,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
                     Order = 1,
                     Body =
-                        "* majority of applicants received a preferred offer\n" +
-                        "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
-                        "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
+                        "* The rate of permanent exclusions has increased since last year from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17. The number of exclusions has also increased, from 6,685 to 7,720.\n" +
+                        "* The rate of fixed period exclusions have also increased since last year from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17. The number of exclusions has also increased, from 339,360 to 381,865.\n" +
+                        "* There were 183,475 pupil enrolments, 2.29 per cent, with at least one fixed term exclusion in 2016/17, up from 167,125 pupil enrolments, 2.11 per cent, in 2015/16.\n"
                 },
                 new MarkDownBlock
                 {

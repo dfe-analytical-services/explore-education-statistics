@@ -6,12 +6,11 @@ import DataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import formatPretty from '@common/utils/number/formatPretty';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './SummaryRenderer.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
-  dataBlockResponse?: DataBlockResponse;
   children?: ReactNode;
   handleApiErrors?: AxiosErrorHandler;
 }
@@ -21,39 +20,35 @@ export interface KeyStatConfig {
   value: string;
 }
 
-const KeyStatTile = ({
-  dataBlockRequest,
-  summary,
-  dataBlockResponse: response,
-  children,
-  handleApiErrors,
-}: KeyStatProps) => {
+const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
-  >(response);
-
-  const [config, setConfig] = useState<KeyStatConfig | undefined>();
+  >();
 
   useEffect(() => {
-    if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject({
-        ...dataBlockRequest,
-        includeGeoJson: false,
-      })
-        .then(setDataBlockResponse)
-        .catch(handleApiErrors);
-    } else {
+    DataBlockService.getDataBlockForSubject({
+      ...dataBlockRequest,
+      includeGeoJson: false,
+    }).then(setDataBlockResponse);
+  }, [dataBlockRequest]);
+
+  const config: KeyStatConfig = useMemo(() => {
+    if (dataBlockResponse) {
       const [indicatorKey, theIndicator] = Object.entries(
         dataBlockResponse.metaData.indicators,
       )[0];
-      setConfig({
+      return {
         indicatorLabel: theIndicator.label,
         value: `${formatPretty(
           dataBlockResponse.result[0].measures[indicatorKey],
         )}${theIndicator.unit}`,
-      });
+      };
     }
-  }, [dataBlockResponse, dataBlockRequest, handleApiErrors]);
+    return {
+      indicatorLabel: '',
+      value: '',
+    };
+  }, [dataBlockResponse]);
 
   return (
     <div className={styles.keyStatTile}>

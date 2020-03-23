@@ -286,8 +286,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                 return await UpdateMarkDownBlock((MarkDownBlock) blockToUpdate, request.Body);
                             case ContentBlockType.HtmlBlock:
                                 return await UpdateHtmlBlock((HtmlBlock) blockToUpdate, request.Body);
-                            case ContentBlockType.InsetTextBlock:
-                                return await UpdateInsetTextBlock((InsetTextBlock) blockToUpdate, request.Heading, request.Body);
                             case ContentBlockType.DataBlock:
                                 return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
                             default:
@@ -552,14 +550,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private async Task<Either<ActionResult, IContentBlock>> UpdateHtmlBlock(HtmlBlock blockToUpdate,
             string body)
         {
-            blockToUpdate.Body = body;
-            return await SaveContentBlock(blockToUpdate);
-        }
-
-        private async Task<Either<ActionResult, IContentBlock>> UpdateInsetTextBlock(InsetTextBlock blockToUpdate,
-            string heading, string body)
-        {
-            blockToUpdate.Heading = heading;
             blockToUpdate.Body = body;
             return await SaveContentBlock(blockToUpdate);
         }
