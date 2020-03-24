@@ -114,6 +114,7 @@ const PublicationReleaseContent = () => {
                 content={release.summarySection.content}
                 onBlockContentChange={summaryBlockUpdate}
                 onBlockDelete={summaryBlockDelete}
+                allowComments
               />
               {release.summarySection.content?.length === 0 && (
                 <div className="govuk-!-margin-bottom-8 dfe-align--center">

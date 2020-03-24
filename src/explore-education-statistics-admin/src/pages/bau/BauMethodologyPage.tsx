@@ -1,5 +1,5 @@
 import Page from '@admin/components/Page';
-import methodologyService from '@admin/services/methodology/service';
+import methodologyService from '@admin/services/methodology/methodologyService';
 import { MethodologyStatusListItem } from '@admin/services/methodology/types';
 import React, { useEffect, useState } from 'react';
 
