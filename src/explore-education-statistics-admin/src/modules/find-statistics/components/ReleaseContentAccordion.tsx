@@ -5,6 +5,7 @@ import {
   EditableRelease,
 } from '@admin/services/publicationService';
 import { AbstractRelease } from '@common/services/publicationService';
+import orderBy from 'lodash/orderBy';
 import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
@@ -46,12 +47,11 @@ const ReleaseContentAccordion = ({
   return (
     <Accordion
       id={accordionId}
-      canReorder
       sectionName={sectionName}
       onSaveOrder={reorderAccordionSections}
       onAddSection={addAccordionSection}
     >
-      {release.content.map((accordionSection, index) => (
+      {orderBy(release.content, 'order').map((accordionSection, index) => (
         <ReleaseContentAccordionSection
           release={release}
           id={accordionSection.id}

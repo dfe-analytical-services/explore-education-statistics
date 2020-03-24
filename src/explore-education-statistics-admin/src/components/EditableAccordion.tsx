@@ -6,7 +6,6 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
-import classnames from 'classnames';
 import React, {
   createRef,
   ReactElement,
@@ -20,7 +19,6 @@ import styles from './EditableAccordion.module.scss';
 import { EditableAccordionSectionProps } from './EditableAccordionSection';
 
 export interface EditableAccordionProps extends AccordionProps {
-  canReorder?: boolean;
   sectionName?: string;
   onSaveOrder: (order: Dictionary<number>) => Promise<unknown>;
   onAddSection: () => Promise<unknown>;
@@ -52,7 +50,6 @@ const mapReactNodeToChildSection = (children: ReactNode): ChildSection[] =>
 const EditableAccordion = ({
   children,
   id,
-  canReorder,
   sectionName,
   onSaveOrder,
   onAddSection,
@@ -140,8 +137,7 @@ const EditableAccordion = ({
       <h2 className="govuk-heading-l reorderable-relative">
         {sectionName}
         {isError && <span className={styles.error}>An error occurred</span>}
-        {canReorder &&
-          currentChildren.length > 1 &&
+        {currentChildren.length > 1 &&
           (!isReordering ? (
             <Button
               variant="secondary"
@@ -182,19 +178,17 @@ const EditableAccordion = ({
         </div>
       </DroppableAccordion>
 
-      {canReorder && (
-        <div className="govuk-accordion" style={{ border: 'none' }}>
-          <div className={classnames('govuk-accordion__controls')}>
-            <Button
-              key="add_section"
-              onClick={onAddSection}
-              className={styles.addSectionButton}
-            >
-              Add new section
-            </Button>
-          </div>
+      <div className="govuk-accordion" style={{ border: 'none' }}>
+        <div className="govuk-accordion__controls">
+          <Button
+            onClick={onAddSection}
+            className={styles.addSectionButton}
+            disabled={isReordering}
+          >
+            Add new section
+          </Button>
         </div>
-      )}
+      </div>
     </DragDropContext>
   );
 };

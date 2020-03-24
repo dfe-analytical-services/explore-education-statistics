@@ -7,6 +7,7 @@ import PreviewContentBlocks, {
 } from '@common/modules/find-statistics/components/ContentBlocks';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
+import orderBy from 'lodash/orderBy';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
@@ -17,7 +18,7 @@ export type EditableContentType = ContentType;
 
 export type ReorderHook = (sectionId?: string) => Promise<void>;
 
-export interface Props extends ContentBlockProps {
+export interface EditableContentBlocksProps extends ContentBlockProps {
   content: ContentType;
   sectionId: string;
   editable?: boolean;
@@ -39,12 +40,12 @@ const EditableContentBlocks = ({
   onBlockSaveOrder,
   onBlockContentChange,
   onBlockDelete,
-}: Props) => {
+}: EditableContentBlocksProps) => {
   const [contentBlocks, setContentBlocks] = useState<ContentType>();
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    setContentBlocks(content);
+    setContentBlocks(orderBy(content, 'order'));
   }, [content]);
 
   useEffect(() => {

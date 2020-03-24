@@ -133,6 +133,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
               content={release.headlinesSection.content}
               onBlockContentChange={headlinesBlockUpdate}
               onBlockDelete={headlinesBlockDelete}
+              allowComments
             />
 
             {release.headlinesSection.content?.length === 0 && (

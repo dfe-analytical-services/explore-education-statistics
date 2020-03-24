@@ -1,7 +1,7 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { MethodologyStatus } from '@admin/services/common/types';
-import service from '@admin/services/methodology/service';
+import methodologyService from '@admin/services/methodology/methodologyService';
 import permissionService from '@admin/services/permissions/permissionService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -41,7 +41,7 @@ const MethodologyStatusPage = ({
 
   useEffect(() => {
     Promise.all([
-      service.getMethodologyStatus(methodologyId),
+      methodologyService.getMethodologyStatus(methodologyId),
       permissionService.canMarkMethodologyAsDraft(methodologyId),
       permissionService.canApproveMethodology(methodologyId),
     ]).then(([methodologyStatus, canMarkAsDraft, canApprove]) => {
@@ -67,16 +67,18 @@ const MethodologyStatusPage = ({
   }, [methodologyId, showForm]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
-    await service.updateMethodologyStatus(methodologyId, values).then(() => {
-      if (model) {
-        setModel({
-          ...model,
-          methodologyStatus: values.status,
-        });
-      }
+    await methodologyService
+      .updateMethodologyStatus(methodologyId, values)
+      .then(() => {
+        if (model) {
+          setModel({
+            ...model,
+            methodologyStatus: values.status,
+          });
+        }
 
-      setShowForm(false);
-    });
+        setShowForm(false);
+      });
   });
 
   if (!model) return null;

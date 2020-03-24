@@ -45,7 +45,6 @@ const DataBlockRenderer = ({ datablock, renderType }: Props) => {
         });
     }
   }, [datablock, dataBlockResponse]);
-
   if (!dataBlockResponse && !!error) {
     return <>{error}</>;
   }
