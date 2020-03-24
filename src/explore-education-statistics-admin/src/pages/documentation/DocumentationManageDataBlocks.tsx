@@ -24,7 +24,7 @@ import imageDataBlockCopyChartPermalink from './images/guidance/guidance-datablo
 import imageDataBlockDelete from './images/guidance/guidance-datablocks-delete.png';
 import imageDataBlockDeleteTable from './images/guidance/guidance-datablocks-delete-table.png';
 import imageDataBlockDeleteChart from './images/guidance/guidance-datablocks-delete-chart.png';
-import imageFootnotesEdit from './images/guidance/guidance-footnotes-edit.jpg';
+import imageFootnotesEdit from './images/guidance/guidance-footnotes-edit.png';
 
 const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);

@@ -4,24 +4,25 @@ import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
-import imageDataTab from './images/guidance/guidance-data-tab.jpg';
-import imageDataChooseFile from './images/guidance/guidance-data-choose-file.jpg';
-import imageDataChooseMetaFile from './images/guidance/guidance-data-choose-meta-file.jpg';
-import imageDataTitle from './images/guidance/guidance-data-title.jpg';
-import imageDataUpload from './images/guidance/guidance-data-upload.jpg';
+import imageDataTab from './images/guidance/guidance-data-tab.png';
+import imageDataChooseFile from './images/guidance/guidance-data-choose-file.png';
+import imageDataChooseMetaFile from './images/guidance/guidance-data-choose-meta-file.png';
+import imageDataTitle from './images/guidance/guidance-data-title.png';
+import imageDataUpload from './images/guidance/guidance-data-upload.png';
 import imageDataCurrentData from './images/guidance/guidance-data-current-data.png';
-import imageDataActions from './images/guidance/guidance-data-actions.jpg';
-import imageFootnotesTab from './images/guidance/guidance-footnotes-tab.jpg';
-import imageFootnotesConfig from './images/guidance/guidance-footnotes-config.jpg';
-import imageFootnotesSave from './images/guidance/guidance-footnotes-save.jpg';
-import imageFootnotesSummary from './images/guidance/guidance-footnotes-summary.jpg';
-import imageFootnotesEdit from './images/guidance/guidance-footnotes-edit.jpg';
-import imageFileTab from './images/guidance/guidance-file-tab.jpg';
-import imageFileUpload from './images/guidance/guidance-file-choose.jpg';
-import imageFileTitle from './images/guidance/guidance-file-title.jpg';
-import imageFileSave from './images/guidance/guidance-file-save.jpg';
-import imageFileSummary from './images/guidance/guidance-file-summary.jpg';
-import imageFileDelete from './images/guidance/guidance-file-delete.jpg';
+import imageDataActions from './images/guidance/guidance-data-actions.png';
+import imageFootnotesTab from './images/guidance/guidance-footnotes-tab.png';
+import imageFootnotesSelect from './images/guidance/guidance-footnotes-select.png';
+import imageFootnotesConfig from './images/guidance/guidance-footnotes-config.png';
+import imageFootnotesSave from './images/guidance/guidance-footnotes-save.png';
+import imageFootnotesSummary from './images/guidance/guidance-footnotes-summary.png';
+import imageFootnotesEdit from './images/guidance/guidance-footnotes-edit.png';
+import imageFileTab from './images/guidance/guidance-file-tab.png';
+import imageFileUpload from './images/guidance/guidance-file-choose.png';
+import imageFileTitle from './images/guidance/guidance-file-title.png';
+import imageFileSave from './images/guidance/guidance-file-save.png';
+import imageFileSummary from './images/guidance/guidance-file-summary.png';
+import imageFileDelete from './images/guidance/guidance-file-delete.png';
 
 const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -77,6 +78,25 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 Make sure you and the members of your production team understand
                 who’s responsible for the data within your release.
               </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>
+                  make sure your data has passed the screening checks in our{' '}
+                  <a href="https://github.com/dfe-analytical-services/ees-data-screener">
+                    R Project
+                  </a>{' '}
+                </li>
+                <li>
+                  if your data doesn’t meet these standards, you won’t be able
+                  to upload it to your release
+                </li>
+                <li>
+                  if you have any issues uploading data and files, or questions
+                  about data standards contact:{' '}
+                  <a href="mailto:explore.statistics@education.gov.uk">
+                    explore.statistics@education.gov.uk
+                  </a>
+                </li>
+              </ul>
               <h3>Do</h3>
               <p>
                 Make sure any data and metadata files titles you add stick to
@@ -323,6 +343,17 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                   </h4>
                   <img
                     src={imageFootnotesTab}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    You will see a list of each uploaded subject, together with
+                    any available indicators and filters.
+                  </h4>
+                  <img
+                    src={imageFootnotesSelect}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />

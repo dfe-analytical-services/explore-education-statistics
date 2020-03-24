@@ -4,7 +4,7 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
-import imageCreatePublication from './images/guidance/guidance-publication-create.jpg';
+import imageCreatePublication from './images/guidance/guidance-publication-create.png';
 import imageContactPublication from './images/guidance/guidance-publication-contact.jpg';
 import imageProductionTeamPublication from './images/guidance/guidance-publication-production-team.jpg';
 import imageEditDeletePublication from './images/guidance/guidance-publication-edit-delete.jpg';
