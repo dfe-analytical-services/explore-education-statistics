@@ -74,42 +74,6 @@ const methodologyReducer = (
 ) => produce(initial, draft => originalMethodologyReducer(draft, action));
 
 describe('MethodologyContext', () => {
-  test('CLEAR_STATE clears state', () => {
-    expect(
-      methodologyReducer(
-        {
-          methodology: basicMethodology,
-          canUpdateMethodology: true,
-        },
-        { type: 'CLEAR_STATE' },
-      ),
-    ).toEqual({
-      methodology: undefined,
-      canUpdateMethodology: false,
-    });
-  });
-
-  test('SET_STATE sets the state', () => {
-    expect(
-      methodologyReducer(
-        {
-          methodology: undefined,
-          canUpdateMethodology: false,
-        },
-        {
-          type: 'SET_STATE',
-          payload: {
-            methodology: basicMethodology,
-            canUpdateMethodology: true,
-          },
-        },
-      ),
-    ).toEqual({
-      methodology: basicMethodology,
-      canUpdateMethodology: true,
-    });
-  });
-
   test('REMOVE_BLOCK_FROM_SECTION removes a block from a section', () => {
     const sectionKey = 'annexes';
     const keyStatsSection = basicMethodology[sectionKey][0];
@@ -135,12 +99,12 @@ describe('MethodologyContext', () => {
       },
     );
 
-    expect(methodology?.[sectionKey][0].content?.length).toEqual(
+    expect(methodology[sectionKey][0].content?.length).toEqual(
       originalLength - 1,
     );
 
     expect(
-      methodology?.[sectionKey][0].content?.filter(
+      methodology[sectionKey][0].content?.filter(
         block => block.id === removingBlockId,
       ),
     ).toHaveLength(0);
@@ -171,10 +135,10 @@ describe('MethodologyContext', () => {
       },
     );
 
-    expect(methodology?.content[0].content?.length).toEqual(originalLength - 1);
+    expect(methodology.content[0].content?.length).toEqual(originalLength - 1);
 
     expect(
-      methodology?.content[0].content?.filter(
+      methodology.content[0].content?.filter(
         block => block.id === removingBlockId,
       ),
     ).toHaveLength(0);
@@ -209,7 +173,7 @@ describe('MethodologyContext', () => {
     );
 
     expect(
-      (methodology?.[sectionKey][0].content as EditableContentBlock[])[0].body,
+      (methodology[sectionKey][0].content as EditableContentBlock[])[0].body,
     ).toEqual(newBody);
   });
 
@@ -243,7 +207,7 @@ describe('MethodologyContext', () => {
     );
 
     expect(
-      (methodology?.content[0].content as EditableContentBlock[])[0].body,
+      (methodology.content[0].content as EditableContentBlock[])[0].body,
     ).toEqual(newBody);
   });
 
@@ -277,12 +241,10 @@ describe('MethodologyContext', () => {
       },
     );
 
-    expect(methodology?.[sectionKey][0].content).toHaveLength(
-      originalLength + 1,
-    );
+    expect(methodology[sectionKey][0].content).toHaveLength(originalLength + 1);
 
     expect(
-      (methodology?.[sectionKey][0].content as EditableContentBlock[])[
+      (methodology[sectionKey][0].content as EditableContentBlock[])[
         originalLength
       ].id,
     ).toEqual(newBlock.id);
@@ -320,13 +282,12 @@ describe('MethodologyContext', () => {
     );
 
     expect(
-      methodology?.content[0].content as EditableContentBlock[],
+      methodology.content[0].content as EditableContentBlock[],
     ).toHaveLength(originalLength + 1);
 
     expect(
-      (methodology?.content[0].content as EditableContentBlock[])[
-        originalLength
-      ].id,
+      (methodology.content[0].content as EditableContentBlock[])[originalLength]
+        .id,
     ).toEqual(newBlock.id);
   });
 
@@ -352,9 +313,9 @@ describe('MethodologyContext', () => {
       },
     );
 
-    expect(methodology?.content).toHaveLength(originalLength + 1);
+    expect(methodology.content).toHaveLength(originalLength + 1);
 
-    expect(methodology?.content[originalLength].id).toEqual('new-section-1');
+    expect(methodology.content[originalLength].id).toEqual('new-section-1');
   });
 
   test("SET_CONTENT sets the methodology's content", () => {
@@ -379,9 +340,9 @@ describe('MethodologyContext', () => {
       },
     );
 
-    expect(methodology?.content[0].order).toEqual(contentSectionsLength - 1);
-    expect(methodology?.content[1].order).toEqual(contentSectionsLength - 2);
-    expect(methodology?.content).toHaveLength(contentSectionsLength);
+    expect(methodology.content[0].order).toEqual(contentSectionsLength - 1);
+    expect(methodology.content[1].order).toEqual(contentSectionsLength - 2);
+    expect(methodology.content).toHaveLength(contentSectionsLength);
   });
 
   test('UPDATE_CONTENT_SECTION updates a content section', () => {
@@ -404,8 +365,8 @@ describe('MethodologyContext', () => {
       },
     );
 
-    expect(methodology?.content[0].id).toEqual(basicSection.id);
-    expect(methodology?.content[0].caption).toEqual('updated caption');
-    expect(methodology?.content[0].heading).toEqual('updated heading');
+    expect(methodology.content[0].id).toEqual(basicSection.id);
+    expect(methodology.content[0].caption).toEqual('updated caption');
+    expect(methodology.content[0].heading).toEqual('updated heading');
   });
 });
