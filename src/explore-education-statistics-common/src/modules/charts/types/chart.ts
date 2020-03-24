@@ -12,6 +12,7 @@ import {
   LabelValueMetadata,
   LabelValueUnitMetadata,
 } from '@common/services/dataBlockService';
+import { Footnote } from '@common/services/types/footnotes';
 import { Dictionary } from '@common/types';
 import { ReactNode } from 'react';
 import { LegendProps, PositionType } from 'recharts';
@@ -90,6 +91,7 @@ export type AxesConfiguration = {
 };
 
 export interface ChartMetaData {
+  footnotes: Footnote[];
   filters: PublicationSubjectMeta['filters'];
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;

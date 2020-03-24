@@ -1,4 +1,4 @@
-import CollapsibleList from '@common/components/CollapsibleList';
+import FigureFootnotes from '@common/components/FigureFootnotes';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
@@ -102,17 +102,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           />
         </div>
 
-        {footnotes.length > 0 && (
-          <>
-            <h2 className="govuk-heading-m">Footnotes</h2>
-
-            <CollapsibleList listStyle="number">
-              {footnotes.map(footnote => (
-                <li key={footnote.id}>{footnote.label}</li>
-              ))}
-            </CollapsibleList>
-          </>
-        )}
+        <FigureFootnotes footnotes={footnotes} />
       </figure>
     );
   },

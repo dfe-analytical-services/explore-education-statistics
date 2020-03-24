@@ -570,6 +570,7 @@ export function parseMetaData(
 
   return {
     filters: metaData.filters,
+    footnotes: metaData.footnotes,
     indicators: metaData.indicators,
     locations: metaData.locations,
     boundaryLevels: metaData.boundaryLevels,
