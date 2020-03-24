@@ -5,15 +5,15 @@ import Link from '@admin/components/Link';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageChoosePublication from './images/guidance/guidance-publication-select.png';
-import imageCreateReleaseButton from './images/guidance/guidance-create-release-button.jpg';
-import imageCreateReleaseEditSummary from './images/guidance/guidance-create-release-edit-summary.jpg';
-import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.jpg';
+import imageCreateReleaseButton from './images/guidance/guidance-create-release-button.png';
+import imageCreateReleaseEditSummary from './images/guidance/guidance-create-release-edit-summary.png';
+import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.png';
 import imageCreateReleaseDataTab from './images/guidance/guidance-data-tab.png';
 import imageCreateReleaseFootnotesTab from './images/guidance/guidance-footnotes-tab.png';
 import imageCreateReleaseFileTab from './images/guidance/guidance-file-tab.png';
 import imageCreateReleaseDatablockCreate from './images/guidance/guidance-datablocks-create.png';
-import imageCreateReleaseDatablockSaved from './images/guidance/guidance-datablocks-delete.png';
-import imageCreateReleaseManageContent from './images/guidance/guidance-manage-content.jpg';
+import imageCreateReleaseDatablockSaved from './images/guidance/guidance-datablocks-configure.png';
+import imageCreateReleaseManageContent from './images/guidance/guidance-content-edit.png';
 import imageSelectTheme from './images/guidance/guidance-publication-select-theme.png';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
