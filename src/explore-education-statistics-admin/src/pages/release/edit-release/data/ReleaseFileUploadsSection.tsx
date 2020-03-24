@@ -2,6 +2,7 @@ import useFormSubmit from '@admin/hooks/useFormSubmit';
 import permissionService from '@admin/services/permissions/permissionService';
 import editReleaseDataService, {
   AncillaryFile,
+  DataFile,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -18,6 +19,7 @@ import Yup from '@common/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -50,10 +52,11 @@ interface Props {
 const formId = 'fileUploadForm';
 
 const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
-  const [files, setFiles] = useState<AncillaryFile[]>();
+  const [files, setFiles] = useState<AncillaryFile[]>([]);
   const [deleteFileName, setDeleteFileName] = useState('');
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -81,13 +84,36 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   };
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+    setIsUploading(true);
     await editReleaseDataService.uploadAncillaryFile(releaseId, {
       name: values.name,
       file: values.file as File,
     });
-
+    setIsUploading(false);
     await resetPage(actions);
   }, errorCodeMappings);
+
+  const handleDelete = async (
+    ancillaryFileToDelete: string,
+    form: FormikActions<{}>,
+  ) => {
+    const ancilliaryFiles = [...files];
+    const fileToDelete = ancilliaryFiles.find(
+      file => file.filename === ancillaryFileToDelete,
+    );
+
+    if (!fileToDelete) {
+      return;
+    }
+    fileToDelete.isDeleting = true;
+    setDeleteFileName('');
+    await editReleaseDataService
+      .deleteAncillaryFile(releaseId, deleteFileName)
+      .finally(() => {
+        fileToDelete.isDeleting = false;
+        resetPage(form);
+      });
+  };
 
   return (
     <Formik<FormValues>
@@ -106,6 +132,9 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
           <Form id={formId}>
             {canUpdateRelease && (
               <>
+                {isUploading && (
+                  <LoadingSpinner text="Uploading files" overlay />
+                )}
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
                   legend="Upload file"
@@ -169,6 +198,10 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                         }}
                         open={openedAccordions.includes(accId)}
                       >
+                        {file.isDeleting && (
+                          <LoadingSpinner text="Deleting files" overlay />
+                        )}
+                        ;
                         <SummaryList key={file.filename}>
                           <SummaryListItem term="Name">
                             <h4 className="govuk-heading-m">{file.title}</h4>
@@ -216,14 +249,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
               title="Confirm deletion of file"
               onExit={() => setDeleteFileName('')}
               onCancel={() => setDeleteFileName('')}
-              onConfirm={async () => {
-                await editReleaseDataService.deleteAncillaryFile(
-                  releaseId,
-                  deleteFileName,
-                );
-                setDeleteFileName('');
-                resetPage(form);
-              }}
+              onConfirm={() => handleDelete(deleteFileName, form)}
             >
               <p>
                 This file will no longer be available for use in this release

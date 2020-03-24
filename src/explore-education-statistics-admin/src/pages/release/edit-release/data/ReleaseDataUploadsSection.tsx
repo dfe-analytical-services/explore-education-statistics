@@ -162,8 +162,8 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     dataFileToDelete: DeleteDataFile,
     form: FormikActions<{}>,
   ) => {
-    const updatedDataFiles = [...dataFiles];
-    const fileToDelete = updatedDataFiles.find(
+    const files = [...dataFiles];
+    const fileToDelete = files.find(
       file => file.filename === dataFileToDelete.file.filename,
     );
 

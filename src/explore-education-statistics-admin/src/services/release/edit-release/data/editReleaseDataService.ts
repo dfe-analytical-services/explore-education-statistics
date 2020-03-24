@@ -63,6 +63,7 @@ export interface AncillaryFile {
     size: number;
     unit: string;
   };
+  isDeleting?: boolean;
 }
 
 export interface UploadAncillaryFileRequest {
