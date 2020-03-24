@@ -147,7 +147,7 @@ function MethodologyProvider({
   children,
 }: MethodologyProviderProps) {
   const [state, dispatch] = useImmerReducer(methodologyReducer, {
-    methodology: methodology,
+    methodology,
     canUpdateMethodology: false,
   });
   return (
