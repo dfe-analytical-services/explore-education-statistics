@@ -113,10 +113,14 @@ const ChartBuilder = ({
   initialConfiguration,
   onRequiresDataUpdate,
 }: Props) => {
-  const metaData: ChartMetaData = useMemo(
-    () => parseMetaData(data.metaData) ?? emptyMetadata,
-    [data.metaData],
-  );
+  const metaData: ChartMetaData = useMemo(() => {
+    return {
+      ...(parseMetaData(data.metaData) ?? emptyMetadata),
+      // Don't bother showing footnotes as
+      // this uses up valuable screen space.
+      footnotes: [],
+    };
+  }, [data.metaData]);
 
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
     initialConfiguration,
