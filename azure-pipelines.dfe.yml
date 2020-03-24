@@ -157,7 +157,7 @@ jobs:
         inputs:
           command: custom
           verbose: false
-          customCommand: 'run bootstrap -- --scope=explore-education-statistics-{admin,common}'
+          customCommand: 'run bootstrap'
       - task: Npm@1
         displayName: 'npm run format'
         inputs:
@@ -209,7 +209,7 @@ jobs:
           command: 'custom'
           workingDir: '.'
           verbose: false
-          customCommand: 'run bootstrap -- --scope=explore-education-statistics-{common,frontend}'
+          customCommand: 'run bootstrap'
       - script: 'npm audit --json >> audit.json'
         workingDirectory: 'src/explore-education-statistics-frontend'
         displayName: 'Run npm audit'
@@ -276,7 +276,7 @@ jobs:
           command: 'custom'
           workingDir: '.'
           verbose: false
-          customCommand: 'run bootstrap:prod -- --scope=explore-education-statistics-{common,frontend}'
+          customCommand: 'run bootstrap:prod'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
