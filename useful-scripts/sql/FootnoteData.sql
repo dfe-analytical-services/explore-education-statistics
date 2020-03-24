@@ -108,10 +108,12 @@ DELETE FROM Footnote WHERE 1=1;
 --
 -- Footnotes
 --
+
+-- Absence footnotes
 DECLARE @footnote_id_1 uniqueidentifier = 'fbb6262f-213a-453a-98ca-b832d6ae1c16';
 DECLARE @footnote_id_2 uniqueidentifier = 'e9076bab-6ff7-4c92-8972-2fb4affbe977';
 DECLARE @footnote_id_3 uniqueidentifier = '128c6153-4937-40da-a99f-e137fc8c41e5';
-DECLARE @footnote_id_4 uniqueidentifier = '41c1eb5a-8415-45eb-bc49-cfa42382ebba';
+-- footnote_id_4 removed as part of BAU-424
 DECLARE @footnote_id_5 uniqueidentifier = '6c06f733-c30b-45e1-980a-b587e923f73b';
 DECLARE @footnote_id_6 uniqueidentifier = 'b678373f-dfa2-41ad-817e-3f011d1b5173';
 DECLARE @footnote_id_7 uniqueidentifier = '7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2';
@@ -141,10 +143,6 @@ VALUES (@footnote_id_2,
 INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_3,
         'Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
-
-INSERT INTO Footnote (Id, Content, ReleaseId)
-VALUES (@footnote_id_4,
-        'Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
 INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_5, 'x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
@@ -215,11 +213,109 @@ INSERT INTO Footnote (Id, Content, ReleaseId)
 VALUES (@footnote_id_22,
         'Only overall absence is recorded for pupils aged 4, absences are not categorised as authorised or unauthorised.', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5');
 
+-- Exclusions footnotes
+DECLARE @footnote_id_23 uniqueidentifier = '16514a6b-4a4c-4200-83c8-c0e3c93a866c';
+DECLARE @footnote_id_24 uniqueidentifier = 'a02f6380-311b-4551-a42e-ba4091879ed8';
+DECLARE @footnote_id_25 uniqueidentifier = 'b5c6814b-78d7-4bf9-b894-92caf334d432';
+DECLARE @footnote_id_26 uniqueidentifier = 'e43f4a88-5cd0-4cad-b84c-d5390f0ecd0f';
+DECLARE @footnote_id_27 uniqueidentifier = '1cf61bb7-b8fc-44ae-a272-e3b2d87d3cf4';
+DECLARE @footnote_id_28 uniqueidentifier = 'a18f2ab2-663a-45cd-8cea-86c716c0453c';
+DECLARE @footnote_id_29 uniqueidentifier = '58717767-3cf5-42b1-8e7a-6c247dfcfc02';
+DECLARE @footnote_id_30 uniqueidentifier = '2b87e363-3a9c-4f43-88c0-e8a602e4c3c0';
+DECLARE @footnote_id_31 uniqueidentifier = '27b8480c-4a53-4385-afb1-69e76f627885';
+DECLARE @footnote_id_32 uniqueidentifier = 'c549699c-83cb-49a3-85a7-6c5e2a91c2b7';
+DECLARE @footnote_id_33 uniqueidentifier = '2eb0b631-48c7-4f4e-b91d-dab25bb9e9a3';
+DECLARE @footnote_id_34 uniqueidentifier = 'eaae1d1f-6e28-4570-b0dd-966366950e60';
+DECLARE @footnote_id_35 uniqueidentifier = '95a70fdf-ea82-4276-869a-22879c5ced20';
+DECLARE @footnote_id_36 uniqueidentifier = '2185b382-8be9-4e48-aba0-096cf5d9b3a3';
+DECLARE @footnote_id_37 uniqueidentifier = '9544977a-24e9-4aee-80d7-77d7cf805986';
+DECLARE @footnote_id_38 uniqueidentifier = 'f2f400ac-b977-4c40-aa34-4a93ef1202f0';
+DECLARE @footnote_id_39 uniqueidentifier = '31457a0b-042c-41a6-9df8-5e4b26e98d6b';
+DECLARE @footnote_id_40 uniqueidentifier = '5c06d319-a0a1-48ed-b747-6a6f8d1354e3';
+DECLARE @footnote_id_41 uniqueidentifier = 'e6890af0-28ae-44c6-8ca9-eaddfb7a381f';
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_23,
+        'The number of permanent exclusions expressed as a percentage of the number of pupils in January each year.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_24,
+        'The number of pupil enrolments receiving one or more fixed period exclusion expressed as a percentage of the number of pupils in January each year.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_25,
+        'The number of fixed period exclusions expressed as a percentage of the number of pupils in January each year.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_26,
+        'Includes pupils who are sole or dual main registrations. Includes boarding pupils.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_27,
+        'SEN status is as recorded at the time of exclusion. For enrolments the SEN status at the time of the most recent exclusion is used.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_28,
+        'Education, Health and Care (EHC) plans were introduced from September 2014 as part of a range of SEND reforms.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_29,
+        'Figures are presented for pupils with a Statement of SEN, Education, Health and Care plan or SEN support and recorded primary need. This excludes those with SEN support who are yet to be assessed for a type of need and those with school action provision. SEN status is as recorded at the time of exclusion. For enrolments the SEN status at the time of the most recent exclusion is used.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_30,
+        'For enrolments the national curriculum year of the most recent exclusion is used.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_31,
+        'Free school meal eligibility as at January each year.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_32,
+        'Pupils who have been classified according to their ethnic group, excluding White British.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_33,
+        'Ethnic group is at January each year.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_34,
+        'Includes pupils whose ethnic information was not sought or was refused or could not be determined.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_35,
+        'Income Deprivation Affecting Children Index at Super Output Area level based on the location of the school. Includes all schools which returned information on exclusions.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_36,
+        'Length of exclusion in days is derived from the number of sessions where one session equates to half a school day. Part days have been counted as one school day.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_37,
+        'The number of open schools as at January plus the number of schools which opened after January but reported exclusions.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_38,
+        'State-funded primary schools include all primary academies, including free schools.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_39,
+        'State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_40,
+        'Special schools include maintained special schools, non-maintained special schools and special academies. Excludes general hospital schools.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+INSERT INTO Footnote (Id, Content, ReleaseId)
+VALUES (@footnote_id_41,
+        'x - 1 or 2 pupils, or a percentage based on 1 or 2.', 'e7774a74-1f62-4b76-b9b5-84f14dac7278');
+
+
 --
 -- Subjects
 --
 
-
+-- Absence subjects
 DECLARE @subject_absence_by_characteristic   NVARCHAR(max) = 'Absence by characteristic';
 DECLARE @subject_absence_by_geographic_level NVARCHAR(max) = 'Absence by geographic level';
 DECLARE @subject_absence_by_term             NVARCHAR(max) = 'Absence by term';
@@ -227,14 +323,6 @@ DECLARE @subject_absence_for_four_year_olds  NVARCHAR(max) = 'Absence for four y
 DECLARE @subject_absence_in_prus             NVARCHAR(max) = 'Absence in prus';
 DECLARE @subject_absence_number_missing      NVARCHAR(max) = 'Absence number missing at least one session by reason';
 DECLARE @subject_absence_rate_percent_bands  NVARCHAR(max) = 'Absence rate percent bands';
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_by_term, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, @footnote_id_4;
 
 EXEC InsertSubjectFootnote @subject_absence_by_characteristic, @footnote_id_5;
 EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, @footnote_id_5;
@@ -252,11 +340,29 @@ EXEC InsertSubjectFootnote @subject_absence_in_prus, @footnote_id_6;
 EXEC InsertSubjectFootnote @subject_absence_number_missing, @footnote_id_6;
 EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, @footnote_id_6;
 
+-- Exclusion subjects
+DECLARE @subject_duration_of_fixed_exclusions                     NVARCHAR(max) = 'Duration of fixed exclusions';
+DECLARE @subject_exclusions_by_characteristic                     NVARCHAR(max) = 'Exclusions by characteristic';
+DECLARE @subject_exclusions_by_geographic_level                   NVARCHAR(max) = 'Exclusions by geographic level';
+DECLARE @subject_exclusions_by_reason                             NVARCHAR(max) = 'Exclusions by reason';
+DECLARE @subject_number_of_fixed_exclusions                       NVARCHAR(max) = 'Number of fixed exclusions';
+DECLARE @subject_total_days_missed_due_to_fixed_period_exclusions NVARCHAR(max) = 'Total days missed due to fixed period exclusions';
+
+EXEC InsertSubjectFootnote @subject_duration_of_fixed_exclusions, @footnote_id_36;
+
+EXEC InsertSubjectFootnote @subject_duration_of_fixed_exclusions, @footnote_id_41;
+EXEC InsertSubjectFootnote @subject_exclusions_by_characteristic, @footnote_id_41;
+EXEC InsertSubjectFootnote @subject_exclusions_by_geographic_level, @footnote_id_41;
+EXEC InsertSubjectFootnote @subject_exclusions_by_reason, @footnote_id_41;
+EXEC InsertSubjectFootnote @subject_number_of_fixed_exclusions, @footnote_id_41;
+EXEC InsertSubjectFootnote @subject_total_days_missed_due_to_fixed_period_exclusions, @footnote_id_41;
+
+
 --
 -- Indicators
 --
 
-
+-- Absence indicators
 DECLARE @indicator_sess_overall_percent NVARCHAR(max) = 'sess_overall_percent';
 DECLARE @indicator_sess_authorised_percent NVARCHAR(max) = 'sess_authorised_percent';
 DECLARE @indicator_sess_unauthorised_percent NVARCHAR(max) = 'sess_unauthorised_percent';
@@ -405,6 +511,32 @@ EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_enr
 EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_sess_overall, @footnote_id_22;
 EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_sess_overall_percent, @footnote_id_22;
 
+-- Exclusion indicators
+DECLARE @indicator_permanent_exclusion_rate NVARCHAR(max) = 'perm_excl_rate';
+DECLARE @indicator_fixed_period_exclusion_rate NVARCHAR(max) = 'fixed_excl_rate';
+DECLARE @indicator_number_of_pupils NVARCHAR(max) = 'headcount';
+DECLARE @indicator_number_of_schools NVARCHAR(max) = 'num_schools';
+DECLARE @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions NVARCHAR(max) = 'one_plus_fixed_rate';
+DECLARE @indicator_number_of_pupils_with_one_or_more_fixed_period_exclusions NVARCHAR(max) = 'one_plus_fixed';
+
+EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_permanent_exclusion_rate, @footnote_id_23;
+EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_permanent_exclusion_rate, @footnote_id_23;
+
+EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_24;
+EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_24;
+
+EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_fixed_period_exclusion_rate, @footnote_id_25;
+EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_fixed_period_exclusion_rate, @footnote_id_25;
+
+EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_number_of_pupils, @footnote_id_26;
+EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_number_of_pupils, @footnote_id_26;
+
+EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_number_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_30;
+EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_30;
+
+EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_number_of_schools, @footnote_id_37;
+
+
 
 --
 -- Filter Items
@@ -416,6 +548,14 @@ DECLARE @filterItem_State_funded_secondary NVARCHAR(max) = 'State-funded seconda
 DECLARE @filterItem_Special NVARCHAR(max) = 'Special';
 DECLARE @filterItem_Social_emotional_and_mental_health NVARCHAR(max) = 'SEN primary need Social emotional and mental health';
 DECLARE @filterItem_Ethnicity_Minority_Ethnic_Group NVARCHAR(max) = 'Ethnicity Minority Ethnic Group';
+
+DECLARE @filterItem_SEN_provision_SEN_with_statement_EHC NVARCHAR(max) = 'SEN provision SEN with statement EHC';
+DECLARE @filterItem_ethnicity_minority_ethnic_pupil NVARCHAR(max) = 'Ethnicity Minority ethnic pupil';
+DECLARE @filterItem_ethnicity_minority_ethnic_pupil_male NVARCHAR(max) = 'Ethnicity Minority ethnic pupil Male';
+DECLARE @filterItem_ethnicity_minority_ethnic_pupil_female NVARCHAR(max) = 'Ethnicity Minor ethnic pupil Female';
+DECLARE @filterItem_ethnicity_unclassified NVARCHAR(max) = 'Ethnicity Unclassified';
+DECLARE @filterItem_ethnicity_unclassified_male NVARCHAR(max) = 'Ethnicity Unclassified Male';
+DECLARE @filterItem_ethnicity_unclassified_female NVARCHAR(max) = 'Ethnicity Unclassified Female';
 
 EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_State_funded_primary, @footnote_id_1;
 EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_State_funded_primary, @footnote_id_1;
@@ -442,6 +582,37 @@ EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_Et
 
 EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_Social_emotional_and_mental_health, @footnote_id_20;
 
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_SEN_provision_SEN_with_statement_EHC, @footnote_id_28;
+
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil, @footnote_id_32;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil_male, @footnote_id_32;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil_female, @footnote_id_32;
+
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_unclassified, @footnote_id_34;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_unclassified_male, @footnote_id_34;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_unclassified_female, @footnote_id_34;
+
+EXEC InsertFilterItemFootnote @subject_duration_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_State_funded_primary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_geographic_level, @filterItem_State_funded_primary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_State_funded_primary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_total_days_missed_due_to_fixed_period_exclusions, @filterItem_State_funded_primary, @footnote_id_38;
+
+EXEC InsertFilterItemFootnote @subject_duration_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_State_funded_secondary, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_geographic_level, @filterItem_State_funded_secondary, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_State_funded_secondary, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_total_days_missed_due_to_fixed_period_exclusions, @filterItem_State_funded_secondary, @footnote_id_39;
+
+EXEC InsertFilterItemFootnote @subject_duration_of_fixed_exclusions, @filterItem_Special, @footnote_id_40;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_Special, @footnote_id_40;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_geographic_level, @filterItem_Special, @footnote_id_40;
+EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_Special, @footnote_id_40;
+EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_Special, @footnote_id_40;
+EXEC InsertFilterItemFootnote @subject_total_days_missed_due_to_fixed_period_exclusions, @filterItem_Special, @footnote_id_40;
+
 
 --
 -- Filters
@@ -461,9 +632,29 @@ EXEC InsertFilterFootnote @subject_absence_by_characteristic, @filter_Characteri
 
 DECLARE @filterGroup_SEN_provision NVARCHAR(max) = 'SEN provision';
 DECLARE @filterGroup_SEN_primary_need NVARCHAR(max) = 'SEN primary need';
+DECLARE @filterGroup_NC_year NVARCHAR(max) = 'NC year';
+DECLARE @filterGroup_NC_year_and_gender NVARCHAR(max) = 'NC year and gender';
+DECLARE @filterGroup_FSM_eligible NVARCHAR(max) = 'FSM eligible';
+DECLARE @filterGroup_FSM_eligible_in_last_6_years NVARCHAR(max) = 'FSM eligible in last 6 years';
+DECLARE @filterGroup_ethnicity NVARCHAR(max) = 'Ethnicity';
+DECLARE @filterGroup_ethnicity_and_gender NVARCHAR(max) = 'Ethnicity and gender';
+DECLARE @filterGroup_IDACI_decile NVARCHAR(max) = 'IDACI decile';
 
 EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_17;
 EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_19;
+
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_SEN_provision, @footnote_id_27;
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_29;
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_NC_year, @footnote_id_30;
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_NC_year_and_gender, @footnote_id_30;
+
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_FSM_eligible, @footnote_id_31;
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_FSM_eligible_in_last_6_years, @footnote_id_31;
+
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_ethnicity, @footnote_id_33;
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_ethnicity_and_gender, @footnote_id_33;
+
+EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_IDACI_decile, @footnote_id_35;
 
 DROP PROCEDURE InsertSubjectFootnote;
 DROP PROCEDURE InsertIndicatorFootnote;
