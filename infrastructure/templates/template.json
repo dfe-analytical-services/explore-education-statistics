@@ -181,19 +181,33 @@
         "false"
       ],
       "metadata": {
-        "descritpion": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+        "description": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
     },
     "publicAppBasicAuthUsername": {
       "type": "string",
       "metadata": {
-        "descritpion": "Username protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+        "description": "Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
     },
     "publicAppBasicAuthPassword": {
       "type": "securestring",
       "metadata": {
-        "descritpion": "Password protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+        "description": "Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+    "publicAppGATrackingId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Google Analytics tracking ID for the public app. Leave as empty string to disable Google Analytics"
+      }
+    },
+    "publicAppHotjarId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Hotjar ID for the public app. Leave as empty string to disable Hotjar"
       }
     },
 
@@ -395,7 +409,7 @@
     },
     "devopsSPN": {
       "type": "string"
-    }, 
+    },
     "storageAccountPrefix": {
       "type": "string",
       "defaultValue": "storage"
@@ -1184,56 +1198,38 @@
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true,
+          "requestTracingEnabled": true
           // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "12.13.0"
-            },
-            {
-              "name": "NODE_ENV",
-              "value": "production"
-            },
-            {
-              "name": "CONTENT_API_BASE_URL",
-              "value": "[concat('https://', parameters('contentApiUrl'),'/api')]"
-            },
-            {
-              "name": "DATA_API_BASE_URL",
-              "value": "[concat('https://', parameters('dataApiUrl'),'/api')]"
-            },
-            {
-              "name": "FUNCTION_API_BASE_URL",
-              "value": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]"
-            },
-            {
-              "name": "BASIC_AUTH",
-              "value": "[parameters('publicAppBasicAuth')]"
-            },
-            {
-              "name": "BASIC_AUTH_USERNAME",
-              "value": "[parameters('publicAppBasicAuthUsername')]"
-            },
-            {
-              "name": "BASIC_AUTH_PASSWORD",
-              "value": "[parameters('publicAppBasicAuthPassword')]"
-            },
-            {
-              "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "1"
-            }
-          ]
         }
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('publicAppInsights'))]"
       ]
+    },
+    {
+      "name": "[concat(variables('publicAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
+      ],
+      "properties": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2015-05-01').InstrumentationKey]",
+        "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
+        "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
+        "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
+        "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
+        "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
+        "FUNCTION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
+        "HOTJAR_ID": "[parameters('publicAppHotjarId')]",
+        "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
+        "NODE_ENV": "production",
+        "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "12.13.0",
+        "WEBSITE_RUN_FROM_PACKAGE": "1"
+      }
     },
     {
       "type": "Microsoft.Web/serverfarms",
