@@ -1,15 +1,14 @@
-import CollapsibleList from '@common/components/CollapsibleList';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { ChartMetaData } from '@common/modules/charts/types/chart';
-import { parseMetaData } from '@common/modules/charts/util/chartUtils';
-import DataBlockService, {
-  DataBlock,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
-import React, { useEffect, useState } from 'react';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
+import { ChartMetaData } from '@common/modules/charts/types/chart';
+import { parseMetaData } from '@common/modules/charts/util/chartUtils';
+import dataBlockService, {
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
+import { DataBlock } from '@common/services/types/blocks';
+import React, { useEffect, useState } from 'react';
 import TimePeriodDataTableRenderer from './TimePeriodDataTableRenderer';
 
 interface DataBlockWithOptionalResponse extends DataBlock {
@@ -17,34 +16,36 @@ interface DataBlockWithOptionalResponse extends DataBlock {
 }
 
 interface Props {
-  datablock: DataBlockWithOptionalResponse;
-  renderType: 'table' | 'chart';
+  dataBlock: DataBlockWithOptionalResponse;
+  type: 'table' | 'chart';
 }
 
 /**
- * Component that takes a **datablock** (with optional **datablock**.dataBlockResponse)
- * and a **renderType** to handle rendering of tables/charts from datablock data.
+ * Component that takes a {@param dataBlock} (with optional response)
+ * and a {@param type} to handle rendering of tables/charts from
+ * data block data.
  *
- * The component will handle the gathering of the datablockResponse if it was not provided.
- *
- * Acts as a _"shim"_ component to gather and transform datablock props into properties expected by the data/UI rendering components
+ * The component will handle requesting the data block's
+ * response if it was not provided.
  */
-const DataBlockRenderer = ({ datablock, renderType }: Props) => {
+const DataBlockRenderer = ({ dataBlock, type }: Props) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
-  >(datablock.dataBlockResponse);
+  >(dataBlock.dataBlockResponse);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
     if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject(datablock.dataBlockRequest)
+      dataBlockService
+        .getDataBlockForSubject(dataBlock.dataBlockRequest)
         .then(setDataBlockResponse)
         .catch(() => {
           setDataBlockResponse(undefined);
-          setError('Unable to get data reponse from the server');
+          setError('Unable to get data response from the server');
         });
     }
-  }, [datablock, dataBlockResponse]);
+  }, [dataBlock, dataBlockResponse]);
+
   if (!dataBlockResponse && !!error) {
     return <>{error}</>;
   }
@@ -53,23 +54,19 @@ const DataBlockRenderer = ({ datablock, renderType }: Props) => {
     return <LoadingSpinner text="Loading data" />;
   }
 
-  if (renderType === 'table') {
+  if (type === 'table') {
     return (
       <>
         <TimePeriodDataTableRenderer
-          heading={datablock.heading}
+          heading={dataBlock.heading}
           response={dataBlockResponse}
-          tableHeaders={
-            datablock.tables &&
-            datablock.tables[0] &&
-            datablock.tables[0].tableHeaders
-          }
+          tableHeaders={dataBlock.tables?.[0]?.tableHeaders}
         />
       </>
     );
   }
 
-  if (renderType === 'chart') {
+  if (type === 'chart') {
     // There is a presumption that the configuration from the API is valid.
     // The data coming from the API is required to be optional for the ChartRenderer
     // But the data for the charts is required. The charts have validation that
@@ -77,7 +74,7 @@ const DataBlockRenderer = ({ datablock, renderType }: Props) => {
     const chartRendererProps = {
       data: dataBlockResponse,
       meta: parseMetaData(dataBlockResponse.metaData) as ChartMetaData,
-      ...(datablock.charts && datablock.charts[0]),
+      ...(dataBlock.charts && dataBlock.charts[0]),
     } as ChartRendererProps;
 
     return <ChartRenderer {...chartRendererProps} />;

@@ -1,7 +1,8 @@
 import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
 import permissionService from '@admin/services/permissions/permissionService';
 import {
-  EditableContentBlock,
+  EditableBlock,
+  EditableRelease,
   ExtendedComment,
 } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
@@ -10,18 +11,15 @@ import {
   ContentBlockPostModel,
 } from '@admin/services/release/edit-release/content/types';
 import { Dictionary } from '@admin/types';
-import {
-  AbstractRelease,
-  ContentSection,
-} from '@common/services/publicationService';
+import { ContentSection } from '@common/services/publicationService';
 import { useCallback } from 'react';
 import { useReleaseDispatch } from './ReleaseContext';
 import { ContentSectionKeys } from './ReleaseContextActionTypes';
 
 const contentSectionComments = (
-  contentSection?: ContentSection<EditableContentBlock>,
-) => {
-  if (contentSection?.content?.length) {
+  contentSection: ContentSection<EditableBlock>,
+): ExtendedComment[] => {
+  if (contentSection.content?.length) {
     return contentSection.content.reduce<ExtendedComment[]>(
       (allCommentsForSection, content) => {
         content.comments.forEach(comment =>
@@ -36,7 +34,7 @@ const contentSectionComments = (
   return [];
 };
 
-const getUnresolveComments = (release: AbstractRelease<EditableContentBlock>) =>
+const getUnresolvedComments = (release: EditableRelease) =>
   [
     ...contentSectionComments(release.summarySection),
     ...contentSectionComments(release.keyStatisticsSection),
@@ -57,17 +55,20 @@ export default function useReleaseActions() {
   const getReleaseContent = useCallback(
     async ({ releaseId }: { releaseId: string }) => {
       dispatch({ type: 'CLEAR_STATE' });
+
       const {
         release,
         availableDataBlocks,
       } = await releaseContentService.getContent(releaseId);
+
       const canUpdateRelease = await permissionService.canUpdateRelease(
         releaseId,
       );
+
       dispatch({
         type: 'SET_STATE',
         payload: {
-          unresolvedComments: getUnresolveComments(release),
+          unresolvedComments: getUnresolvedComments(release),
           release,
           availableDataBlocks,
           canUpdateRelease,

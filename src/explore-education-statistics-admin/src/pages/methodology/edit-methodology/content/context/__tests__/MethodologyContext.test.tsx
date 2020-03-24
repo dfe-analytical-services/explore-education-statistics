@@ -252,6 +252,7 @@ describe('MethodologyContext', () => {
     const section = basicMethodology[sectionKey][0];
     const newBlock: EditableContentBlock = {
       id: '123',
+      order: 1,
       body: 'This section is empty...',
       comments: [],
       type: 'MarkDownBlock',
@@ -293,6 +294,7 @@ describe('MethodologyContext', () => {
 
     const newBlock: EditableContentBlock = {
       id: '123',
+      order: 0,
       body: 'This section is empty...',
       comments: [],
       type: 'MarkDownBlock',
@@ -344,6 +346,7 @@ describe('MethodologyContext', () => {
             heading: 'A new section',
             id: 'new-section-1',
             order: basicMethodology.content.length,
+            content: [],
           },
         },
       },

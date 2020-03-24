@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
-const ContentBlockDroppable = ({
+const BlockDroppable = ({
   draggable,
   droppableId,
   children,
@@ -31,4 +31,4 @@ const ContentBlockDroppable = ({
   );
 };
 
-export default ContentBlockDroppable;
+export default BlockDroppable;

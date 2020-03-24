@@ -1,35 +1,18 @@
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import {
-  AbstractRelease,
-  ContentSection,
-  Publication,
-} from '@common/services/publicationService';
 import React, { useContext, useState } from 'react';
 import DatablockSelectForm from './DatablockSelectForm';
 
 interface Props {
-  release: AbstractRelease<EditableContentBlock, Publication>;
+  release: EditableRelease;
   isEditing?: boolean;
   updating?: boolean;
 }
 
-export function hasSecondaryStats(
-  keyStatisticsSecondarySection:
-    | ContentSection<EditableContentBlock>
-    | undefined,
-) {
-  return !!(
-    keyStatisticsSecondarySection &&
-    keyStatisticsSecondarySection.content &&
-    keyStatisticsSecondarySection.content.length
-  );
-}
-
-export const AddSecondaryStats = ({ release, updating = false }: Props) => {
+const AddSecondaryStats = ({ release, updating = false }: Props) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const { isEditing } = useContext(EditingContext);
@@ -67,7 +50,7 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
             if (release.keyStatisticsSecondarySection?.content) {
               Promise.all(
                 release.keyStatisticsSecondarySection.content.map(
-                  async (content: EditableContentBlock) => {
+                  async content => {
                     if (release.keyStatisticsSecondarySection?.content) {
                       await deleteContentSectionBlock({
                         releaseId: release.id,
@@ -110,7 +93,7 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
             if (release.keyStatisticsSecondarySection?.content) {
               await Promise.all(
                 release.keyStatisticsSecondarySection.content.map(
-                  async (content: EditableContentBlock) => {
+                  async content => {
                     if (release.keyStatisticsSecondarySection?.content) {
                       await deleteContentSectionBlock({
                         releaseId: release.id,
@@ -142,3 +125,5 @@ export const AddSecondaryStats = ({ release, updating = false }: Props) => {
     </>
   );
 };
+
+export default AddSecondaryStats;

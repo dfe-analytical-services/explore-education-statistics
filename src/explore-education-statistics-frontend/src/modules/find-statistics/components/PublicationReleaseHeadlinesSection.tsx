@@ -1,12 +1,12 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
+import BlockRenderer from '@common/modules/find-statistics/components/BlockRenderer';
+import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
-import { DataBlock } from '@common/services/dataBlockService';
 import { Publication, Release } from '@common/services/publicationService';
+import { DataBlock } from '@common/services/types/blocks';
 import React from 'react';
-import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 
 interface Props
   extends Pick<
@@ -44,7 +44,7 @@ const HeadlinesSection = ({
             return a.order - b.order;
           })
           .map((block, i) => (
-            <ContentSubBlockRenderer
+            <BlockRenderer
               key={block.id}
               id={`headlines-section-${i}`}
               publication={publication}
@@ -52,28 +52,24 @@ const HeadlinesSection = ({
             />
           ))}
       </TabsSection>
-      {keyStatisticsSecondarySection &&
-        keyStatisticsSecondarySection.content &&
-        keyStatisticsSecondarySection.content[0] && (
-          <TabsSection title="Table">
-            <DataBlockRenderer
-              datablock={keyStatisticsSecondarySection.content[0] as DataBlock}
-              renderType="table"
-            />
-          </TabsSection>
-        )}
-      {keyStatisticsSecondarySection &&
-        keyStatisticsSecondarySection.content &&
-        keyStatisticsSecondarySection.content[0] &&
-        keyStatisticsSecondarySection.content[0].charts &&
-        keyStatisticsSecondarySection.content[0].charts[0] && (
-          <TabsSection title="Chart">
-            <DataBlockRenderer
-              datablock={keyStatisticsSecondarySection.content[0] as DataBlock}
-              renderType="chart"
-            />
-          </TabsSection>
-        )}
+
+      {keyStatisticsSecondarySection?.content?.[0] && (
+        <TabsSection title="Table">
+          <DataBlockRenderer
+            dataBlock={keyStatisticsSecondarySection.content[0]}
+            type="table"
+          />
+        </TabsSection>
+      )}
+
+      {keyStatisticsSecondarySection?.content?.[0]?.charts?.[0] && (
+        <TabsSection title="Chart">
+          <DataBlockRenderer
+            dataBlock={keyStatisticsSecondarySection.content[0]}
+            type="chart"
+          />
+        </TabsSection>
+      )}
     </Tabs>
   );
 };

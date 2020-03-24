@@ -1,20 +1,24 @@
 import {
+  EditableBlock,
   EditableRelease,
   ExtendedComment,
 } from '@admin/services/publicationService';
-import { DataBlock } from '@common/services/dataBlockService';
+import { ContentSection } from '@common/services/publicationService';
+import { BaseBlock, DataBlock } from '@common/services/types/blocks';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
-import ReleaseDispatchAction from './ReleaseContextActionTypes';
+import { ReleaseDispatchAction } from './ReleaseContextActionTypes';
 
 export type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
+
 export type ReleaseContextState = {
   release: EditableRelease | undefined;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
   unresolvedComments: ExtendedComment[];
 };
+
 type ReleaseProviderProps = { children: ReactNode };
 
 const ReleaseStateContext = createContext<ReleaseContextState | undefined>(
@@ -43,23 +47,31 @@ export const releaseReducer: Reducer<
     }
     case 'REMOVE_BLOCK_FROM_SECTION': {
       const { sectionId, blockId, sectionKey } = action.payload.meta;
-      if (!draft.release?.[sectionKey]) {
+
+      const matchingSection = draft.release?.[sectionKey] as
+        | ContentSection<BaseBlock>
+        | ContentSection<BaseBlock>[]
+        | undefined;
+
+      if (!matchingSection) {
         throw new Error(
           `REMOVE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
         );
       }
 
-      if (sectionKey === 'content') {
-        const matchingSection = draft.release[sectionKey].find(
+      if (Array.isArray(matchingSection)) {
+        const matchingContentSection = matchingSection.find(
           section => section.id === sectionId,
         );
-        if (matchingSection?.content) {
-          remove(matchingSection.content, content => content.id === blockId);
+
+        if (matchingContentSection) {
+          remove(
+            matchingContentSection.content,
+            content => content.id === blockId,
+          );
         }
-      } else if (draft.release[sectionKey]) {
-        const matchingSection = draft.release[sectionKey];
-        if (matchingSection?.content)
-          remove(matchingSection.content, content => content.id === blockId);
+      } else {
+        remove(matchingSection.content, content => content.id === blockId);
       }
 
       return draft;
@@ -67,90 +79,116 @@ export const releaseReducer: Reducer<
     case 'UPDATE_BLOCK_FROM_SECTION': {
       const { block, meta } = action.payload;
       const { sectionId, blockId, sectionKey } = meta;
-      if (!draft.release?.[sectionKey]) {
+
+      const matchingSection = draft.release?.[sectionKey] as
+        | ContentSection<BaseBlock>
+        | ContentSection<BaseBlock>[]
+        | undefined;
+
+      if (!matchingSection) {
         throw new Error(
           `UPDATE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
         );
       }
-      if (sectionKey === 'content') {
-        const matchingSection = draft.release[sectionKey].find(
+
+      if (Array.isArray(matchingSection)) {
+        const matchingContentSection = matchingSection.find(
           section => section.id === sectionId,
         );
-        if (matchingSection?.content) {
-          const blockIndex = matchingSection.content.findIndex(
+
+        if (matchingContentSection) {
+          const blockIndex = matchingContentSection.content.findIndex(
             contentBlock => contentBlock.id === blockId,
           );
+
+          matchingContentSection.content[blockIndex] = block;
+        }
+      } else {
+        const blockIndex = matchingSection.content.findIndex(
+          contentBlock => contentBlock.id === blockId,
+        );
+
+        if (blockIndex !== -1) {
           matchingSection.content[blockIndex] = block;
         }
-      } else if (draft.release[sectionKey]) {
-        const matchingSection = draft.release[sectionKey];
-        if (matchingSection?.content) {
-          const blockIndex = matchingSection.content.findIndex(
-            contentBlock => contentBlock.id === blockId,
-          );
-          if (blockIndex !== -1) {
-            matchingSection.content[blockIndex] = block;
-          }
-        }
       }
+
       return draft;
     }
     case 'ADD_BLOCK_TO_SECTION': {
       const { block, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
-      if (!draft.release?.[sectionKey]) {
+
+      const matchingSection = draft.release?.[sectionKey] as
+        | ContentSection<BaseBlock>
+        | ContentSection<BaseBlock>[]
+        | undefined;
+
+      if (!matchingSection) {
         throw new Error(
           `ADD_BLOCK_TO_SECTION: Error - Section "${sectionKey}" could not be found.`,
         );
       }
 
-      if (sectionKey === 'content') {
-        // .comments needs initialising to array as will be undefined if empty
-        const newBlock = { ...block, comments: block.comments || [] };
-        const matchingSection = draft.release[sectionKey].find(
+      // comments needs initialising to array as will be undefined if empty
+      const newBlock: EditableBlock = {
+        ...block,
+        comments: block.comments || [],
+      };
+
+      if (Array.isArray(matchingSection)) {
+        const matchingContentSection = matchingSection.find(
           section => section.id === sectionId,
         );
-        if (!matchingSection) return draft;
-        if (Array.isArray(matchingSection.content)) {
-          matchingSection.content.push(newBlock);
-        } else {
-          matchingSection.content = [newBlock];
+
+        if (matchingContentSection) {
+          matchingContentSection.content.push(newBlock);
         }
-      } else if (draft.release?.[sectionKey]) {
-        const matchingSection = draft.release[sectionKey];
-        if (matchingSection) {
-          if (Array.isArray(matchingSection.content)) {
-            matchingSection.content.push(block);
-          } else {
-            matchingSection.content = [block];
-          }
-        }
+      } else {
+        matchingSection.content.push(newBlock);
       }
+
       return draft;
     }
     case 'UPDATE_SECTION_CONTENT': {
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
-      if (!draft.release?.[sectionKey]) {
+
+      const matchingSection = draft.release?.[sectionKey] as
+        | ContentSection<BaseBlock>
+        | ContentSection<BaseBlock>[]
+        | undefined;
+
+      if (!matchingSection) {
         throw new Error(
           `UPDATE_SECTION_CONTENT: Error - Section "${sectionKey}" could not be found.`,
         );
       }
 
-      if (sectionKey === 'content') {
-        const matchingSection = draft.release[sectionKey].find(
+      if (Array.isArray(matchingSection)) {
+        const matchingContentSection = matchingSection.find(
           section => section.id === sectionId,
         );
-        if (matchingSection) matchingSection.content = sectionContent;
-      } else if (draft.release?.[sectionKey]) {
-        const matchingSection = draft.release[sectionKey];
-        if (matchingSection) matchingSection.content = sectionContent;
+
+        if (matchingContentSection) {
+          matchingContentSection.content = sectionContent;
+        }
+      } else {
+        matchingSection.content = sectionContent;
       }
+
       return draft;
     }
     case 'ADD_CONTENT_SECTION': {
       const { section } = action.payload;
-      if (draft.release) draft.release.content.push(section);
+
+      if (draft.release) {
+        draft.release.content.push({
+          ...section,
+          content: [],
+        });
+      }
+
       return draft;
     }
     case 'SET_CONTENT': {
@@ -158,6 +196,7 @@ export const releaseReducer: Reducer<
       if (draft.release) {
         draft.release.content = content;
       }
+
       return draft;
     }
     case 'UPDATE_CONTENT_SECTION': {
@@ -168,7 +207,10 @@ export const releaseReducer: Reducer<
         const sectionIndex = draft.release.content.findIndex(
           accordionSection => accordionSection.id === sectionId,
         );
-        if (sectionIndex !== -1) draft.release.content[sectionIndex] = section;
+
+        if (sectionIndex !== -1) {
+          draft.release.content[sectionIndex] = section;
+        }
       }
       return draft;
     }

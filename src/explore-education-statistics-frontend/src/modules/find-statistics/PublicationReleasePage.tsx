@@ -3,8 +3,8 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
-import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
+import BlockRenderer from '@common/modules/find-statistics/components/BlockRenderer';
+import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
@@ -151,7 +151,7 @@ class PublicationReleasePage extends Component<Props> {
             </div>
 
             {(data.summarySection.content || []).map((block, i) => (
-              <ContentSubBlockRenderer
+              <BlockRenderer
                 key={block.id}
                 id={`summary-section-${i}`}
                 publication={data.publication}
@@ -343,7 +343,7 @@ class PublicationReleasePage extends Component<Props> {
                   caption={caption}
                   key={order}
                 >
-                  <ContentBlock
+                  <SectionBlocks
                     content={content}
                     id={`content_${order}`}
                     publication={data.publication}

@@ -1,6 +1,7 @@
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import { ContentBlock, Publication } from '@common/services/publicationService';
 import ButtonLink from '@common/components/ButtonLink';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
+import { Publication } from '@common/services/publicationService';
+import { Block } from '@common/services/types/blocks';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
@@ -10,13 +11,13 @@ export type SectionToggleHandler = (section: {
 }) => void;
 
 interface Props {
-  block?: ContentBlock;
+  block?: Block;
   id: string;
   publication?: Publication;
   onToggle?: SectionToggleHandler;
 }
 
-const ContentSubBlockRenderer = ({
+const BlockRenderer = ({
   block,
   id,
   publication,
@@ -32,16 +33,6 @@ const ContentSubBlockRenderer = ({
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: block.body }}
         />
-      );
-    case 'InsetTextBlock':
-      return (
-        <div className="govuk-inset-text">
-          {block.heading && (
-            <h3 className="govuk-heading-s">{block.heading}</h3>
-          )}
-
-          <ReactMarkdown className="govuk-body" source={block.body} />
-        </div>
       );
     case 'DataBlock':
       return (
@@ -81,4 +72,4 @@ const ContentSubBlockRenderer = ({
   }
 };
 
-export default ContentSubBlockRenderer;
+export default BlockRenderer;

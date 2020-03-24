@@ -1,4 +1,4 @@
-import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
+import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -16,13 +16,13 @@ import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilder
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
-import DataBlockService, {
-  DataBlock,
+import dataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { useContext, useEffect, useState, useCallback } from 'react';
+import { DataBlock } from '@common/services/types/blocks';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import AddSecondaryStats from './AddSecondaryStats';
 import KeyStatistics from './KeyStatistics';
-import { AddSecondaryStats, hasSecondaryStats } from './KeyStatisticsSecondary';
 
 interface Props {
   release: EditableRelease;
@@ -36,35 +36,41 @@ const ReleaseHeadlines = ({ release }: Props) => {
     updateContentSectionBlock,
   } = useReleaseActions();
 
-  const [secondaryStatsDatablock, setSecondaryStatsDatablockData] = useState<{
-    datablock: DataBlock;
+  const [secondaryStatsDataBlock, setSecondaryStatsDataBlockData] = useState<{
+    dataBlock: DataBlock;
     data: FullTable;
     chartProps: ChartRendererProps | undefined;
   }>();
 
   useEffect(() => {
-    setSecondaryStatsDatablockData(undefined);
-    if (hasSecondaryStats(release.keyStatisticsSecondarySection)) {
-      const secondaryDatablock =
-        // @ts-ignore above if statement ensures it is defined
+    setSecondaryStatsDataBlockData(undefined);
+    if (release.keyStatisticsSecondarySection?.content?.length) {
+      const secondaryDataBlock =
         release.keyStatisticsSecondarySection.content[0];
-      DataBlockService.getDataBlockForSubject(
-        secondaryDatablock.dataBlockRequest as TableDataQuery,
-      ).then(data => {
-        let chartProps;
-        if (data && secondaryDatablock.charts && secondaryDatablock.charts[0]) {
-          chartProps = {
-            data,
-            meta: parseMetaData(data.metaData),
-            ...secondaryDatablock.charts[0],
-          };
-        }
-        setSecondaryStatsDatablockData({
-          datablock: secondaryDatablock as DataBlock,
-          data: mapDataBlockResponseToFullTable(data as DataBlockResponse),
-          chartProps: chartProps as ChartRendererProps,
+
+      dataBlockService
+        .getDataBlockForSubject(
+          secondaryDataBlock.dataBlockRequest as TableDataQuery,
+        )
+        .then(data => {
+          let chartProps;
+          if (
+            data &&
+            secondaryDataBlock.charts &&
+            secondaryDataBlock.charts[0]
+          ) {
+            chartProps = {
+              data,
+              meta: parseMetaData(data.metaData),
+              ...secondaryDataBlock.charts[0],
+            };
+          }
+          setSecondaryStatsDataBlockData({
+            dataBlock: secondaryDataBlock as DataBlock,
+            data: mapDataBlockResponseToFullTable(data as DataBlockResponse),
+            chartProps: chartProps as ChartRendererProps,
+          });
         });
-      });
     }
   }, [release.keyStatisticsSecondarySection]);
 
@@ -74,7 +80,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
       sectionId: release.headlinesSection.id,
       sectionKey: 'headlinesSection',
       block: {
-        type: 'MarkdownBlock',
+        type: 'MarkDownBlock',
         order: 0,
         body: '',
       },
@@ -112,7 +118,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
         Headline facts and figures - {release.yearTitle}
       </h2>
 
-      {hasSecondaryStats(release.keyStatisticsSecondarySection) ? (
+      {release.keyStatisticsSecondarySection?.content?.length ? (
         <AddSecondaryStats release={release} isEditing={isEditing} updating />
       ) : (
         <AddSecondaryStats release={release} isEditing={isEditing} />
@@ -126,7 +132,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
             )}
           </section>
           <section id="headlines">
-            <ContentBlocks
+            <EditableSectionBlocks
               sectionId={release.headlinesSection.id}
               publication={release.publication}
               id={release.headlinesSection.id}
@@ -145,52 +151,41 @@ const ReleaseHeadlines = ({ release }: Props) => {
             )}
           </section>
         </TabsSection>
-        {release.keyStatisticsSecondarySection &&
-          release.keyStatisticsSecondarySection.content &&
-          release.keyStatisticsSecondarySection.content.length && [
+        {release.keyStatisticsSecondarySection?.content?.length && [
+          <TabsSection key="table" id="headline-secondary-table" title="Table">
+            {secondaryStatsDataBlock ? (
+              <TimePeriodDataTable
+                fullTable={secondaryStatsDataBlock.data}
+                tableHeadersConfig={
+                  secondaryStatsDataBlock?.dataBlock.tables?.[0]?.tableHeaders
+                    ? mapTableHeadersConfig(
+                        secondaryStatsDataBlock?.dataBlock.tables?.[0]
+                          ?.tableHeaders,
+                        secondaryStatsDataBlock.data.subjectMeta,
+                      )
+                    : getDefaultTableHeaderConfig(
+                        secondaryStatsDataBlock.data.subjectMeta,
+                      )
+                }
+              />
+            ) : (
+              <LoadingSpinner text="Loading secondary statistics" />
+            )}
+          </TabsSection>,
+          release.keyStatisticsSecondarySection.content?.[0]?.charts.length && (
             <TabsSection
-              key="table"
-              id="headline-secondary-table"
-              title="Table"
+              key="chart"
+              id="headline-secondary-chart"
+              title="Chart"
             >
-              {secondaryStatsDatablock ? (
-                <TimePeriodDataTable
-                  fullTable={secondaryStatsDatablock.data}
-                  tableHeadersConfig={
-                    secondaryStatsDatablock.datablock.tables?.[0]?.tableHeaders
-                      ? mapTableHeadersConfig(
-                          secondaryStatsDatablock.datablock.tables?.[0]
-                            ?.tableHeaders,
-                          secondaryStatsDatablock.data.subjectMeta,
-                        )
-                      : getDefaultTableHeaderConfig(
-                          secondaryStatsDatablock.data.subjectMeta,
-                        )
-                  }
-                />
+              {secondaryStatsDataBlock && secondaryStatsDataBlock.chartProps ? (
+                <ChartRenderer {...secondaryStatsDataBlock.chartProps} />
               ) : (
                 <LoadingSpinner text="Loading secondary statistics" />
               )}
-            </TabsSection>,
-            release.keyStatisticsSecondarySection.content &&
-              release.keyStatisticsSecondarySection.content[0] &&
-              release.keyStatisticsSecondarySection.content[0].charts &&
-              release.keyStatisticsSecondarySection.content[0].charts
-                .length && (
-                <TabsSection
-                  key="chart"
-                  id="headline-secondary-chart"
-                  title="Chart"
-                >
-                  {secondaryStatsDatablock &&
-                  secondaryStatsDatablock.chartProps ? (
-                    <ChartRenderer {...secondaryStatsDatablock.chartProps} />
-                  ) : (
-                    <LoadingSpinner text="Loading secondary statistics" />
-                  )}
-                </TabsSection>
-              ),
-          ]}
+            </TabsSection>
+          ),
+        ]}
       </Tabs>
     </section>
   );

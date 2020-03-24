@@ -14,7 +14,7 @@ export type MarkdownRendererProps = RendererProps &
     onContentChange: (content: string) => void;
   };
 
-const EditingMarkdownRenderer = ({
+const EditableMarkdownRenderer = ({
   source = '',
   canDelete,
   insideAccordion,
@@ -36,8 +36,5 @@ const EditingMarkdownRenderer = ({
     />
   );
 };
-const EditableMarkdownRenderer = wrapEditableComponent(
-  EditingMarkdownRenderer,
-  ReactMarkdown,
-);
-export default EditableMarkdownRenderer;
+
+export default wrapEditableComponent(EditableMarkdownRenderer, ReactMarkdown);

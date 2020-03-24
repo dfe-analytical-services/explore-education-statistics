@@ -1,25 +1,17 @@
+import BlockDraggable from '@admin/modules/find-statistics/components/BlockDraggable';
+import BlockDroppable from '@admin/modules/find-statistics/components/BlockDroppable';
 import Comments from '@admin/modules/find-statistics/components/Comments';
-import ContentBlockDraggable from '@admin/modules/find-statistics/components/ContentBlockDraggable';
-import ContentBlockDroppable from '@admin/modules/find-statistics/components/ContentBlockDroppable';
-import { EditableRelease } from '@admin/services/publicationService';
-import PreviewContentBlocks, {
-  ContentBlockProps,
-} from '@common/modules/find-statistics/components/ContentBlocks';
+import { EditableBlock } from '@admin/services/publicationService';
+import SectionBlocks, { BlocksProps } from '@common/modules/find-statistics/components/SectionBlocks';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
+import EditableBlockRenderer from './EditableBlockRenderer';
 
-type ContentType = EditableRelease['content'][0]['content'];
-
-export type EditableContentType = ContentType;
-
-export type ReorderHook = (sectionId?: string) => Promise<void>;
-
-export interface EditableContentBlocksProps extends ContentBlockProps {
-  content: ContentType;
+export interface Props extends BlocksProps {
+  content: EditableBlock[];
   sectionId: string;
   editable?: boolean;
   isReordering?: boolean;
@@ -30,7 +22,7 @@ export interface EditableContentBlocksProps extends ContentBlockProps {
   onBlockDelete: (blockId: string) => void;
 }
 
-const EditableContentBlocks = ({
+const EditableSectionBlocks = ({
   content = [],
   sectionId,
   editable = true,
@@ -40,21 +32,21 @@ const EditableContentBlocks = ({
   onBlockSaveOrder,
   onBlockContentChange,
   onBlockDelete,
-}: EditableContentBlocksProps) => {
-  const [contentBlocks, setContentBlocks] = useState<ContentType>();
+}: Props) => {
+  const [blocks, setBlocks] = useState<EditableBlock[]>();
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    setContentBlocks(orderBy(content, 'order'));
+    setBlocks(orderBy(content, 'order'));
   }, [content]);
 
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else if (!isReordering) {
-      if (onBlockSaveOrder && contentBlocks !== undefined)
+      if (onBlockSaveOrder && blocks !== undefined)
         onBlockSaveOrder(
-          contentBlocks.reduce<Dictionary<number>>(
+          blocks.reduce<Dictionary<number>>(
             (map, { id: blockId }, index) => ({
               ...map,
               [blockId]: index,
@@ -63,6 +55,7 @@ const EditableContentBlocks = ({
           ),
         );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReordering]);
 
   const onDragEnd = useCallback(
@@ -70,16 +63,16 @@ const EditableContentBlocks = ({
       const { source, destination, type } = result;
 
       if (type === 'content' && destination) {
-        const newContentBlocks = [...(contentBlocks || [])];
-        const [removed] = newContentBlocks.splice(source.index, 1);
-        newContentBlocks.splice(destination.index, 0, removed);
-        setContentBlocks(newContentBlocks);
+        const newBlocks = [...(blocks || [])];
+        const [removed] = newBlocks.splice(source.index, 1);
+        newBlocks.splice(destination.index, 0, removed);
+        setBlocks(newBlocks);
       }
     },
-    [contentBlocks],
+    [blocks],
   );
 
-  if (contentBlocks === undefined || contentBlocks.length === 0) {
+  if (blocks === undefined || blocks.length === 0) {
     return (
       <div className="govuk-inset-text">
         There is no content for this section.
@@ -89,17 +82,14 @@ const EditableContentBlocks = ({
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <ContentBlockDroppable
-        draggable={isReordering}
-        droppableId={`${sectionId}`}
-      >
-        {contentBlocks.map((block, index) => (
+      <BlockDroppable draggable={isReordering} droppableId={`${sectionId}`}>
+        {blocks.map((block, index) => (
           <div
             key={`content-section-${block.id}`}
             id={`content-section-${block.id}`}
             className="govuk-!-margin-bottom-9"
           >
-            <ContentBlockDraggable
+            <BlockDraggable
               draggable={isReordering}
               draggableId={`${block.id}`}
               key={`${block.id}`}
@@ -115,16 +105,16 @@ const EditableContentBlocks = ({
                       canResolve={false}
                       canComment
                       onCommentsChange={async comments => {
-                        const newBlocks = [...contentBlocks];
+                        const newBlocks = [...blocks];
                         newBlocks[index] = { ...newBlocks[index], comments };
-                        setContentBlocks(newBlocks);
+                        setBlocks(newBlocks);
                       }}
                     />
                   )}
                 </>
               )}
 
-              <EditableContentSubBlockRenderer
+              <EditableBlockRenderer
                 editable={editable && !isReordering}
                 canDelete={!isReordering}
                 block={block}
@@ -134,17 +124,12 @@ const EditableContentBlocks = ({
                 }
                 onDelete={() => onBlockDelete(block.id)}
               />
-            </ContentBlockDraggable>
+            </BlockDraggable>
           </div>
         ))}
-      </ContentBlockDroppable>
+      </BlockDroppable>
     </DragDropContext>
   );
 };
 
-const ContentBlocks = wrapEditableComponent(
-  EditableContentBlocks,
-  PreviewContentBlocks,
-);
-
-export default ContentBlocks;
+export default wrapEditableComponent(EditableSectionBlocks, SectionBlocks);

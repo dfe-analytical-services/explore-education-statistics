@@ -5,10 +5,9 @@ import {
 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import _dataBlockService, {
-  DataBlockRequest,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-import { Chart } from '@common/services/publicationService';
+import { Chart, DataBlockRequest } from '@common/services/types/blocks';
 import { render, wait } from '@testing-library/react';
 import React from 'react';
 import DataBlock from '../DataBlock';

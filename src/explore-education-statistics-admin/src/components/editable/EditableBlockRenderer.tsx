@@ -1,16 +1,14 @@
 import EditableDataBlock from '@admin/components/editable/EditableDataBlock';
 import EditableHtmlRenderer from '@admin/components/editable/EditableHtmlRenderer';
-import EditableMarkdownRenderer, {
-  MarkdownRendererProps,
-} from '@admin/components/editable/EditableMarkdownRenderer';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import EditableMarkdownRenderer, { MarkdownRendererProps } from '@admin/components/editable/EditableMarkdownRenderer';
+import { EditableBlock } from '@admin/services/publicationService';
 import React from 'react';
 
 interface Props extends MarkdownRendererProps {
-  block: EditableContentBlock;
+  block: EditableBlock;
 }
 
-function EditableContentSubBlockRenderer({
+function EditableBlockRenderer({
   block,
   editable,
   releaseId,
@@ -57,8 +55,8 @@ function EditableContentSubBlockRenderer({
         />
       );
     default:
-      return <div>Unable to edit content type {block.type}</div>;
+      return <div>Unable to edit content</div>;
   }
 }
 
-export default EditableContentSubBlockRenderer;
+export default EditableBlockRenderer;

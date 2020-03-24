@@ -11,16 +11,21 @@ import TimePeriodDataTableRenderer, {
 } from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
 import DataBlockService, {
   DataBlockData,
-  DataBlockRequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import {
   Chart,
-  DataQuery,
+  DataBlockRequest,
   Summary,
   Table,
-} from '@common/services/publicationService';
+} from '@common/services/types/blocks';
 import React, { Component, MouseEvent, ReactNode } from 'react';
+
+export interface DataQuery {
+  method: string;
+  path: string;
+  body: string;
+}
 
 export interface DataBlockProps {
   id: string;
