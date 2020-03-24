@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import Button from '@common/components/Button';
+import React, { useState } from 'react';
 import DatablockSelectForm from './DatablockSelectForm';
 
 interface AddContentButtonProps {
@@ -21,7 +21,7 @@ const AddDataBlockButton = ({ onAddDataBlock }: AddContentButtonProps) => {
     />
   ) : (
     <Button variant="secondary" onClick={() => setShowForm(true)}>
-      Add DataBlock
+      Add data block
     </Button>
   );
 };
