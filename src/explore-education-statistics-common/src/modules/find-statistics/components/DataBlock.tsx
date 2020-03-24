@@ -196,12 +196,17 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             )}
 
             {charts && charts.length > 0 && (
-              <TabsSection
-                datablockId={id}
-                id={`${id}-charts`}
-                title="Charts"
-                lazy={false}
-              >
+              <TabsSection id={`${id}-charts`} title="Charts" lazy={false}>
+                <a
+                  className="govuk-visually-hidden"
+                  href={`#${id}-tables`}
+                  aria-live="assertive"
+                >
+                  If you are using a keyboard or a screen reader you may wish to
+                  view the accessible table instead. Press enter to switch to
+                  the data tables tab.
+                </a>
+
                 {charts.map((chart, idx) => {
                   const key = `${id}_chart_${idx}`;
 
