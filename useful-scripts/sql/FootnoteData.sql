@@ -552,7 +552,7 @@ DECLARE @filterItem_Ethnicity_Minority_Ethnic_Group NVARCHAR(max) = 'Ethnicity M
 DECLARE @filterItem_SEN_provision_SEN_with_statement_EHC NVARCHAR(max) = 'SEN provision SEN with statement EHC';
 DECLARE @filterItem_ethnicity_minority_ethnic_pupil NVARCHAR(max) = 'Ethnicity Minority ethnic pupil';
 DECLARE @filterItem_ethnicity_minority_ethnic_pupil_male NVARCHAR(max) = 'Ethnicity Minority ethnic pupil Male';
-DECLARE @filterItem_ethnicity_minority_ethnic_pupil_female NVARCHAR(max) = 'Ethnicity Minor ethnic pupil Female';
+DECLARE @filterItem_ethnicity_minority_ethnic_pupil_female NVARCHAR(max) = 'Ethnicity Minority ethnic pupil Female';
 DECLARE @filterItem_ethnicity_unclassified NVARCHAR(max) = 'Ethnicity Unclassified';
 DECLARE @filterItem_ethnicity_unclassified_male NVARCHAR(max) = 'Ethnicity Unclassified Male';
 DECLARE @filterItem_ethnicity_unclassified_female NVARCHAR(max) = 'Ethnicity Unclassified Female';
@@ -619,26 +619,50 @@ EXEC InsertFilterItemFootnote @subject_total_days_missed_due_to_fixed_period_exc
 --
 
 
-DECLARE @filter_Characteristic NVARCHAR(max) = 'Characteristic';
-
-EXEC InsertFilterFootnote @subject_absence_by_characteristic, @filter_Characteristic, @footnote_id_15;
-EXEC InsertFilterFootnote @subject_absence_by_characteristic, @filter_Characteristic, @footnote_id_16;
+-- DECLARE @filter_Characteristic NVARCHAR(max) = 'Characteristic';
+-- EXEC InsertFilterFootnote @subject_absence_by_characteristic, @filter_Characteristic, @footnote_id_15;
 
 
 --
 -- Filter Groups
 --
 
-
+DECLARE @filterGroup_gender NVARCHAR(max) = 'Gender';
+DECLARE @filterGroup_ethnic_group_major NVARCHAR(max) = 'Ethnic group major';
+DECLARE @filterGroup_ethnic_group_minor NVARCHAR(max) = 'Ethnic group minor';
+DECLARE @filterGroup_NC_year NVARCHAR(max) = 'NC year';
+DECLARE @filterGroup_FSM NVARCHAR(max) = 'FSM';
+DECLARE @filterGroup_FSM_ever_6 NVARCHAR(max) = 'FSM ever 6';
 DECLARE @filterGroup_SEN_provision NVARCHAR(max) = 'SEN provision';
 DECLARE @filterGroup_SEN_primary_need NVARCHAR(max) = 'SEN primary need';
-DECLARE @filterGroup_NC_year NVARCHAR(max) = 'NC year';
+DECLARE @filterGroup_first_language NVARCHAR(max) = 'First language';
+
 DECLARE @filterGroup_NC_year_and_gender NVARCHAR(max) = 'NC year and gender';
 DECLARE @filterGroup_FSM_eligible NVARCHAR(max) = 'FSM eligible';
 DECLARE @filterGroup_FSM_eligible_in_last_6_years NVARCHAR(max) = 'FSM eligible in last 6 years';
 DECLARE @filterGroup_ethnicity NVARCHAR(max) = 'Ethnicity';
 DECLARE @filterGroup_ethnicity_and_gender NVARCHAR(max) = 'Ethnicity and gender';
 DECLARE @filterGroup_IDACI_decile NVARCHAR(max) = 'IDACI decile';
+
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_gender, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_ethnic_group_major, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_ethnic_group_minor, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_NC_year, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_FSM, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_FSM_ever_6, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_first_language, @footnote_id_15;
+
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_gender, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_ethnic_group_major, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_ethnic_group_minor, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_NC_year, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_FSM, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_FSM_ever_6, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_first_language, @footnote_id_16;
 
 EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_17;
 EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_19;
