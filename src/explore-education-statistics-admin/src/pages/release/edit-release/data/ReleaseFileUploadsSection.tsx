@@ -199,7 +199,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                         open={openedAccordions.includes(accId)}
                       >
                         {file.isDeleting && (
-                          <LoadingSpinner text="Deleting files" overlay />
+                          <LoadingSpinner text="Deleting file" overlay />
                         )}
                         ;
                         <SummaryList key={file.filename}>
