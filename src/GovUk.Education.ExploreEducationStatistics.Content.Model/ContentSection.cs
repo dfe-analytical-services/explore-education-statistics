@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         KeyStatisticsSecondary,
         Headlines
     }
-    
+
     public class ContentSection
     {
         public Guid Id { get; set; }
@@ -34,18 +34,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<IContentBlock> Content { get; set; }
 
         public ReleaseContentSection? Release { get; set; }
-        
-        [JsonIgnore]
-        public ContentSectionType Type { get; set; }
+
+        [JsonIgnore] public ContentSectionType Type { get; set; }
 
         public ContentSection CreateReleaseAmendment(CreateAmendmentContext ctx, ReleaseContentSection newParent)
         {
             var copy = MemberwiseClone() as ContentSection;
             copy.Id = Guid.NewGuid();
             ctx.OldToNewIdContentSectionMappings.Add(this, copy);
-            
+
             copy.Release = newParent;
-            
+
             copy.Content = copy
                 .Content
                 .Select(content => content.CreateReleaseAmendment(ctx, copy))
@@ -54,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             return copy;
         }
     }
-    
+
     [AttributeUsage(AttributeTargets.Field)]
     public class ContentBlockClassType : Attribute
     {
@@ -65,32 +64,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         [ContentBlockClassType(Type = typeof(MarkDownBlock))]
         MarkDownBlock,
-        
+
         [ContentBlockClassType(Type = typeof(HtmlBlock))]
         HtmlBlock,
-        
-        [ContentBlockClassType(Type = typeof(InsetTextBlock))]
-        InsetTextBlock,
-        
+
         [ContentBlockClassType(Type = typeof(DataBlock))]
         DataBlock
     }
 
     [JsonConverter(typeof(ContentBlockConverter))]
     [KnownType(typeof(MarkDownBlock))]
-    [KnownType(typeof(InsetTextBlock))]
     [KnownType(typeof(DataBlock))]
     [KnownType(typeof(HtmlBlock))]
     public abstract class IContentBlock
     {
         public Guid Id { get; set; }
 
-        [JsonIgnore]
-        public ContentSection ContentSection { get; set; }
+        [JsonIgnore] public ContentSection ContentSection { get; set; }
 
-        [JsonIgnore]
-        public Guid? ContentSectionId { get; set; }
-        
+        [JsonIgnore] public Guid? ContentSectionId { get; set; }
+
         public int Order { get; set; }
 
         public abstract string Type { get; set; }
@@ -119,9 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public MarkDownBlock()
         {
-            
         }
-        
+
         public string Body { get; set; }
 
         public override string Type { get; set; } = ContentBlockType.MarkDownBlock.ToString();
@@ -131,39 +123,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public HtmlBlock()
         {
-            
         }
-        
+
         public string Body { get; set; }
 
         public override string Type { get; set; } = ContentBlockType.HtmlBlock.ToString();
-    }
-
-    public class InsetTextBlock : IContentBlock
-    {
-        public InsetTextBlock()
-        {
-            
-        }
-        
-        public string Heading { get; set; }
-
-        public string Body { get; set; }
-
-        public override string Type { get; set; } = ContentBlockType.InsetTextBlock.ToString();
     }
 
     public class DataBlock : IContentBlock
     {
         public DataBlock()
         {
-            
         }
-        
+
         public string Heading { get; set; }
-        
+
         public string Name { get; set; }
-        
+
         public string Source { get; set; }
 
         public ObservationQueryContext DataBlockRequest { get; set; }
@@ -218,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             this.value = value;
         }
     }
-    
+
     public class TableOption
     {
         public string label { get; set; }
@@ -237,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public static class ContentBlockUtil
     {
-        public static ContentBlockType GetContentBlockTypeEnumValueFromType<T>() 
+        public static ContentBlockType GetContentBlockTypeEnumValueFromType<T>()
             where T : IContentBlock
         {
             var enumValues = new List<ContentBlockType>(Enum
@@ -245,8 +221,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             return enumValues.Find(value => GetContentBlockClassTypeFromEnumValue(value) == typeof(T));
         }
-        
-        public static Type GetContentBlockClassTypeFromEnumValue(ContentBlockType enumValue) 
+
+        public static Type GetContentBlockClassTypeFromEnumValue(ContentBlockType enumValue)
         {
             return enumValue.GetEnumAttribute<ContentBlockClassType>().Type;
         }
@@ -262,7 +238,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class Comment
     {
-
         public Guid Id { get; set; }
         public Guid? IContentBlockId { get; set; }
         public string Name { get; set; }
