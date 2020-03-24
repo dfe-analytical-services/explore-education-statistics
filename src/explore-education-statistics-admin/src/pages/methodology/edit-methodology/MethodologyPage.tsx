@@ -105,7 +105,7 @@ const MethodologyPage = ({
             </ul>
           </nav>
 
-          <MethodologyProvider>
+          <MethodologyProvider methodology={methodology}>
             <Switch>
               {methodologyRoutes.map(route => (
                 <Route

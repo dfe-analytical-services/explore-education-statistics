@@ -2,7 +2,7 @@ import { MethodologyContent } from '@admin/services/methodology/types';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
-import MethodologyDispatchAction from './MethodologyContextActionTypes';
+import { MethodologyDispatchAction } from './MethodologyContextActionTypes';
 
 export type MethodologyContextDispatch = (
   action: MethodologyDispatchAction,
@@ -12,7 +12,10 @@ export type MethodologyContextState = {
   methodology: MethodologyContent | undefined;
   canUpdateMethodology: boolean;
 };
-type MethodologyProviderProps = { children: ReactNode };
+type MethodologyProviderProps = {
+  methodology: MethodologyContent;
+  children: ReactNode;
+};
 
 const MethodologyStateContext = createContext<
   MethodologyContextState | undefined
@@ -139,9 +142,12 @@ export const methodologyReducer: Reducer<
   }
 };
 
-function MethodologyProvider({ children }: MethodologyProviderProps) {
+function MethodologyProvider({
+  methodology,
+  children,
+}: MethodologyProviderProps) {
   const [state, dispatch] = useImmerReducer(methodologyReducer, {
-    methodology: undefined,
+    methodology: methodology,
     canUpdateMethodology: false,
   });
   return (

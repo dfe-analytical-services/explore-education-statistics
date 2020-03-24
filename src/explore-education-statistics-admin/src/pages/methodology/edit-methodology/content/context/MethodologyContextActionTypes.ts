@@ -71,7 +71,7 @@ export type UpdateContentSection = {
   };
 };
 
-type MethodologyDispatchAction =
+export type MethodologyDispatchAction =
   | ClearState
   | SetState
   | RemoveBlockFromSection
@@ -81,6 +81,3 @@ type MethodologyDispatchAction =
   | AddContentSection
   | SetMethodologyContent
   | UpdateContentSection;
-
-// eslint-disable-next-line no-undef
-export default MethodologyDispatchAction;

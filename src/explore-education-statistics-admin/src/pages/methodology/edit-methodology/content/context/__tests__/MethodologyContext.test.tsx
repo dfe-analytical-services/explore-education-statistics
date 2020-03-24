@@ -5,7 +5,7 @@ import {
   MethodologyContextState,
   methodologyReducer as originalMethodologyReducer,
 } from '../MethodologyContext';
-import MethodologyDispatchAction from '../MethodologyContextActionTypes';
+import { MethodologyDispatchAction } from '../MethodologyContextActionTypes';
 
 const basicMethodology: MethodologyContent = {
   id: 'methodology-0',

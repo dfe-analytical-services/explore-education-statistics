@@ -5,24 +5,14 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import PageSearchForm from '@common/components/PageSearchForm';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import React, { useState } from 'react';
 import MethodologyAccordion from './components/MethodologyAccordion';
 import { useMethodologyState } from './context/MethodologyContext';
-import useMethodologyActions from './context/useMethodologyActions';
 
-const MethodologyContentPage = ({
-  match,
-}: RouteComponentProps<{ methodologyId: string }>) => {
-  const { methodologyId } = match.params;
+const MethodologyContentPage = () => {
   const [isEditing, setIsEditing] = useState(true);
 
   const { methodology } = useMethodologyState();
-  const { getMethodologyContent } = useMethodologyActions();
-
-  useEffect(() => {
-    getMethodologyContent(methodologyId);
-  }, [methodologyId]);
 
   if (methodology)
     return (
