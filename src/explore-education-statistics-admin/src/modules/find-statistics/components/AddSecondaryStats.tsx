@@ -4,7 +4,7 @@ import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React, { useContext, useState } from 'react';
-import DatablockSelectForm from './DatablockSelectForm';
+import DataBlockSelectForm from './DataBlockSelectForm';
 
 interface Props {
   release: EditableRelease;
@@ -83,7 +83,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
 
   return (
     <>
-      <DatablockSelectForm
+      <DataBlockSelectForm
         label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
         onSelect={async selectedDataBlockId => {
           if (

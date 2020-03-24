@@ -2,9 +2,7 @@ import { useReleaseState } from '@admin/pages/release/edit-release/content/Relea
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import DataBlock, {
-  DataBlockProps,
-} from '@common/modules/find-statistics/components/DataBlock';
+import DataBlock, { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
 import React, { useState } from 'react';
 
 interface Props {
@@ -14,7 +12,7 @@ interface Props {
   label?: string;
 }
 
-const DatablockSelectForm = ({
+const DataBlockSelectForm = ({
   onSelect,
   onCancel = () => {},
   hideCancel = false,
@@ -23,9 +21,9 @@ const DatablockSelectForm = ({
   const { availableDataBlocks } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
-  const getDBPreview = (datablockId: string) => {
+  const getDataBlockPreview = (dataBlockId: string) => {
     const selectedDataBlock = availableDataBlocks.find(
-      datablock => datablock.id === datablockId,
+      dataBlock => dataBlock.id === dataBlockId,
     );
     return selectedDataBlock ? (
       <section>
@@ -65,7 +63,7 @@ const DatablockSelectForm = ({
       <Button className="govuk-button--secondary" onClick={onCancel}>
         Cancel
       </Button>
-      {getDBPreview(selectedDataBlockId)}
+      {getDataBlockPreview(selectedDataBlockId)}
       {selectedDataBlockId !== '' && (
         <>
           <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
@@ -80,4 +78,4 @@ const DatablockSelectForm = ({
   );
 };
 
-export default DatablockSelectForm;
+export default DataBlockSelectForm;

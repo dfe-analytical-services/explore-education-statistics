@@ -6,8 +6,8 @@ import {
   TimePeriodOption,
 } from '@common/modules/table-tool/services/tableBuilderService';
 import { dataApi } from '@common/services/api';
-import { Footnote } from '@common/services/types/footnotes';
 import { DataBlockRequest } from '@common/services/types/blocks';
+import { Footnote } from '@common/services/types/footnotes';
 import { Dictionary, PartialRecord } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
 
@@ -127,7 +127,7 @@ export interface DataBlockResponse extends DataBlockData {
   metaData: DataBlockMetadata;
 }
 
-const DataBlockService = {
+const dataBlockService = {
   async getDataBlockForSubject(
     request: DataBlockRequest,
   ): Promise<DataBlockResponse | undefined> {
@@ -139,4 +139,4 @@ const DataBlockService = {
   },
 };
 
-export default DataBlockService;
+export default dataBlockService;

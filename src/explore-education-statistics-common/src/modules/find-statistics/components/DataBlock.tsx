@@ -9,7 +9,7 @@ import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
 } from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
-import DataBlockService, {
+import dataBlockService, {
   DataBlockData,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
@@ -79,7 +79,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     this.setState({ isLoading: true, isError: false });
 
     if (dataBlockRequest) {
-      const result = await DataBlockService.getDataBlockForSubject(
+      const result = await dataBlockService.getDataBlockForSubject(
         dataBlockRequest,
       );
 
