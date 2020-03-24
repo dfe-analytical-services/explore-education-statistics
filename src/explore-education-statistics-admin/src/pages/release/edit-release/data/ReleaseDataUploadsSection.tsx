@@ -95,7 +95,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     boolean
   >();
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -148,13 +148,13 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   };
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
-    setIsSaving(true);
+    setIsUploading(true);
     await editReleaseDataService.uploadDataFiles(releaseId, {
       subjectTitle: values.subjectTitle,
       dataFile: values.dataFile as File,
       metadataFile: values.metadataFile as File,
     });
-    setIsSaving(false);
+    setIsUploading(false);
     await resetPage(actions);
   }, errorCodeMappings);
 
@@ -212,7 +212,9 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
           <Form id={formId}>
             {canUpdateRelease && (
               <>
-                {isSaving && <LoadingSpinner text="Uploading files" overlay />}
+                {isUploading && (
+                  <LoadingSpinner text="Uploading files" overlay />
+                )}
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
                   legend="Add new data to release"
