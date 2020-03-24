@@ -77,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var existingLinks = _contentDbContext
                         .ReleaseFiles
+                        .Include(f => f.ReleaseFileReference)
                         .Where(f => f.ReleaseId == releaseId)
                         .ToList();
                         
