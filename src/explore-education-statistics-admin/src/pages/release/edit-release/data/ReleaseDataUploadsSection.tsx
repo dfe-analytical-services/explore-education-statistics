@@ -22,6 +22,7 @@ import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -94,6 +95,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     boolean
   >();
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -146,14 +148,37 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   };
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+    setIsSaving(true);
     await editReleaseDataService.uploadDataFiles(releaseId, {
       subjectTitle: values.subjectTitle,
       dataFile: values.dataFile as File,
       metadataFile: values.metadataFile as File,
     });
-
+    setIsSaving(false);
     await resetPage(actions);
   }, errorCodeMappings);
+
+  const handleDelete = async (
+    dataFileToDelete: DeleteDataFile,
+    form: FormikActions<{}>,
+  ) => {
+    const updatedDataFiles = [...dataFiles];
+    const fileToDelete = updatedDataFiles.find(
+      file => file.filename === dataFileToDelete.file.filename,
+    );
+
+    if (!fileToDelete) {
+      return;
+    }
+    fileToDelete.isDeleting = true;
+    setDeleteDataFile(undefined);
+    await editReleaseDataService
+      .deleteDataFiles(releaseId, (deleteDataFile as DeleteDataFile).file)
+      .finally(() => {
+        fileToDelete.isDeleting = false;
+        resetPage(form);
+      });
+  };
 
   return (
     <Formik<FormValues>
@@ -187,6 +212,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
           <Form id={formId}>
             {canUpdateRelease && (
               <>
+                {isSaving && <LoadingSpinner text="Uploading files" overlay />}
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
                   legend="Add new data to release"
@@ -290,6 +316,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                         }}
                         open={openedAccordions.includes(accId)}
                       >
+                        {dataFile.isDeleting && (
+                          <LoadingSpinner text="Deleting files" overlay />
+                        )}
+                        ;
                         <SummaryList
                           key={dataFile.filename}
                           additionalClassName="govuk-!-margin-bottom-9"
@@ -382,17 +412,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                 title="Confirm deletion of selected data files"
                 onExit={() => setDeleteDataFile(undefined)}
                 onCancel={() => setDeleteDataFile(undefined)}
-                onConfirm={async () => {
-                  await editReleaseDataService
-                    .deleteDataFiles(
-                      releaseId,
-                      (deleteDataFile as DeleteDataFile).file,
-                    )
-                    .finally(() => {
-                      setDeleteDataFile(undefined);
-                      resetPage(form);
-                    });
-                }}
+                onConfirm={() => handleDelete(deleteDataFile, form)}
               >
                 <p>
                   This data will no longer be available for use in this release.

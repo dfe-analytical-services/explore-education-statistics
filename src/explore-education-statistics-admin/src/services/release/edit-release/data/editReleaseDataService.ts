@@ -47,6 +47,7 @@ export interface DataFile {
   userName: string;
   created: Date;
   canDelete?: boolean;
+  isDeleting?: boolean;
 }
 
 export interface UploadDataFilesRequest {
