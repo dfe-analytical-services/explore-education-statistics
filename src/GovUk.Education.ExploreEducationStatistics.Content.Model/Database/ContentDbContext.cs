@@ -4451,7 +4451,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     Min = 0,
                                     Max = 5,
-                                    TickConfig = 1
+                                    TickConfig = TickConfig.custom,
+                                    TickSpacing = 1,
                                     Title = "Absence Rate"
                                 }
                             },
