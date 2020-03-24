@@ -99,14 +99,6 @@ function generateAxesMetaData(
   );
 }
 
-const emptyMetadata: ChartMetaData = {
-  footnotes: [],
-  timePeriod: {},
-  filters: {},
-  indicators: {},
-  locations: {},
-};
-
 const ChartBuilder = ({
   data,
   onChartSave,

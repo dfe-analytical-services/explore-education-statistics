@@ -47,7 +47,13 @@ const MethodologyAccordionSection = ({
       },
       sectionKey,
     });
-  }, [methodologyId, sectionId, sectionContent.length, addContentSectionBlock]);
+  }, [
+    addContentSectionBlock,
+    methodologyId,
+    sectionId,
+    sectionContent.length,
+    sectionKey,
+  ]);
 
   const updateBlockInAccordionSection = useCallback(
     (blockId, bodyContent) => {
@@ -59,7 +65,7 @@ const MethodologyAccordionSection = ({
         sectionKey,
       });
     },
-    [methodologyId, sectionId, updateContentSectionBlock],
+    [methodologyId, sectionId, sectionKey, updateContentSectionBlock],
   );
 
   const removeBlockFromAccordionSection = useCallback(
@@ -70,7 +76,7 @@ const MethodologyAccordionSection = ({
         blockId,
         sectionKey,
       }),
-    [methodologyId, sectionId, deleteContentSectionBlock],
+    [deleteContentSectionBlock, methodologyId, sectionId, sectionKey],
   );
 
   const reorderBlocksInAccordionSection = useCallback(
@@ -82,7 +88,7 @@ const MethodologyAccordionSection = ({
         sectionKey,
       });
     },
-    [methodologyId, sectionId, updateSectionBlockOrder],
+    [methodologyId, sectionId, sectionKey, updateSectionBlockOrder],
   );
 
   const onSaveHeading = useCallback(
@@ -93,7 +99,7 @@ const MethodologyAccordionSection = ({
         heading: newHeading,
         sectionKey,
       }),
-    [methodologyId, sectionId, updateContentSectionHeading],
+    [methodologyId, sectionId, sectionKey, updateContentSectionHeading],
   );
 
   const removeSection = useCallback(
@@ -103,7 +109,7 @@ const MethodologyAccordionSection = ({
         sectionId,
         sectionKey,
       }),
-    [],
+    [methodologyId, removeContentSection, sectionId, sectionKey],
   );
 
   return (
