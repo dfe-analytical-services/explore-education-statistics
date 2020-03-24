@@ -1,8 +1,5 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ChartRenderer, {
-  ChartRendererProps,
-} from '@common/modules/charts/components/ChartRenderer';
-import { ChartMetaData } from '@common/modules/charts/types/chart';
+import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import dataBlockService, {
   DataBlockResponse,
@@ -46,7 +43,7 @@ const DataBlockRenderer = ({ dataBlock, type }: Props) => {
     }
   }, [dataBlock, dataBlockResponse]);
 
-  if (!dataBlockResponse && !!error) {
+  if (!dataBlockResponse && error) {
     return <>{error}</>;
   }
 
@@ -54,30 +51,30 @@ const DataBlockRenderer = ({ dataBlock, type }: Props) => {
     return <LoadingSpinner text="Loading data" />;
   }
 
-  if (type === 'table') {
+  if (type === 'table' && dataBlock.tables.length) {
     return (
       <>
         <TimePeriodDataTableRenderer
           heading={dataBlock.heading}
           response={dataBlockResponse}
-          tableHeaders={dataBlock.tables?.[0]?.tableHeaders}
+          tableHeaders={dataBlock.tables[0].tableHeaders}
         />
       </>
     );
   }
 
-  if (type === 'chart') {
+  if (type === 'chart' && dataBlock.charts.length) {
     // There is a presumption that the configuration from the API is valid.
     // The data coming from the API is required to be optional for the ChartRenderer
     // But the data for the charts is required. The charts have validation that
     // prevent them from attempting to render.
-    const chartRendererProps = {
-      data: dataBlockResponse,
-      meta: parseMetaData(dataBlockResponse.metaData) as ChartMetaData,
-      ...(dataBlock.charts && dataBlock.charts[0]),
-    } as ChartRendererProps;
-
-    return <ChartRenderer {...chartRendererProps} />;
+    return (
+      <ChartRenderer
+        {...dataBlock.charts[0]}
+        data={dataBlockResponse}
+        meta={parseMetaData(dataBlockResponse.metaData)}
+      />
+    );
   }
 
   return null;

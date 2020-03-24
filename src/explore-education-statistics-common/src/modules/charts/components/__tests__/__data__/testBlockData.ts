@@ -411,7 +411,7 @@ const metaData: DataBlockMetadata = {
   },
 };
 
-const chartMetaData: ChartMetaData = parseMetaData(metaData) as ChartMetaData;
+const chartMetaData: ChartMetaData = parseMetaData(metaData);
 
 export const testChartPropsWithData1: ChartProps = {
   data,

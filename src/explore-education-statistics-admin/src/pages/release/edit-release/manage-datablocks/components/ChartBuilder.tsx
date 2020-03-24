@@ -115,7 +115,7 @@ const ChartBuilder = ({
 }: Props) => {
   const metaData: ChartMetaData = useMemo(() => {
     return {
-      ...(parseMetaData(data.metaData) ?? emptyMetadata),
+      ...parseMetaData(data.metaData),
       // Don't bother showing footnotes as
       // this uses up valuable screen space.
       footnotes: [],
