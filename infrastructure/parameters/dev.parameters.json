@@ -46,6 +46,9 @@
     },
     "detailedErrors": {
       "value": true
+    },
+    "storageAccountPrefix": {
+      "value": "sa"
     }
   }
 }

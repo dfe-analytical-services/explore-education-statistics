@@ -1,4 +1,4 @@
-import isGuid from '@common/lib/utils/string/isGuid';
+import isGuid from '@common/utils/string/isGuid';
 
 describe('isGuid', () => {
   test('returns true when given a v4 uuid', () => {

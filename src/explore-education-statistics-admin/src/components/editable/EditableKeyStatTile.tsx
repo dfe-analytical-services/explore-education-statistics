@@ -3,7 +3,6 @@ import { toolbarConfigs } from '@admin/components/WysiwygEditor';
 import Button from '@common/components/Button';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import formatPretty from '@common/lib/utils/number/formatPretty';
 import KeyStatTile, {
   KeyStatConfig,
   KeyStatProps,
@@ -12,6 +11,7 @@ import styles from '@common/modules/find-statistics/components/SummaryRenderer.m
 import DataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
+import formatPretty from '@common/utils/number/formatPretty';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
@@ -31,7 +31,6 @@ const EditableKeyStatTile = ({
   isEditing = false,
   onRemove,
   onSubmit,
-  dataBlockResponse: response,
   dataBlockRequest,
   id,
   name,
@@ -40,7 +39,7 @@ const EditableKeyStatTile = ({
 }: EditableKeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
-  >(response);
+  >();
   const [config, setConfig] = useState<KeyStatConfig>({
     indicatorLabel: '',
     value: '',
@@ -88,7 +87,6 @@ const EditableKeyStatTile = ({
         id={id}
         name={name}
         {...props}
-        dataBlockResponse={dataBlockResponse}
         summary={summary}
       />
     );
@@ -190,7 +188,6 @@ const EditableKeyStatTile = ({
           id={id}
           name={name}
           {...props}
-          dataBlockResponse={dataBlockResponse}
           summary={summary}
         >
           <div className={styles.keyStatEdit}>

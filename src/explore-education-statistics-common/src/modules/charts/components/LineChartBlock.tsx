@@ -1,4 +1,3 @@
-import parseNumber from '@common/lib/utils/number/parseNumber';
 import '@common/modules/charts/components/charts.scss';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
@@ -16,6 +15,7 @@ import {
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
 import { Dictionary } from '@common/types';
+import parseNumber from '@common/utils/number/parseNumber';
 
 import React, { memo } from 'react';
 import {

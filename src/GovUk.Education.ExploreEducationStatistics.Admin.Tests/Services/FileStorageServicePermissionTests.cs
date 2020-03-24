@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -36,8 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new Mock<IFormFile>().Object, 
                     "", 
                     ReleaseFileTypes.Ancillary, 
-                    false,
-                    new Regex[] {}
+                    false
                     ), 
                 CanUpdateSpecificRelease);
         }
@@ -116,10 +113,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private void AssertSecurityPoliciesChecked<T>(
             Func<FileStorageService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (contentDbContext, subjectService, userService, releaseHelper, fileTypeService) = Mocks();
+            var (configuration, subjectService, userService, releaseHelper, fileTypeService, contentDbContext) = Mocks();
 
-            var service = new FileStorageService(contentDbContext.Object, subjectService.Object, 
-                userService.Object, releaseHelper.Object, fileTypeService.Object);
+            var service = new FileStorageService(configuration.Object, subjectService.Object, 
+                userService.Object, releaseHelper.Object, fileTypeService.Object, contentDbContext.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
@@ -129,7 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ISubjectService>,
             Mock<IUserService>, 
             Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IFileTypeService>) Mocks()
+            Mock<IFileTypeService>,
+            Mock<ContentDbContext>) Mocks()
         {
             var mockConf= new Mock<IConfiguration>();
             mockConf.Setup(c => c.GetSection(It.IsAny<string>())).Returns(new Mock<IConfigurationSection>().Object);  
@@ -139,7 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<ISubjectService>(), 
                 new Mock<IUserService>(), 
                 MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
-                new Mock<IFileTypeService>());
+                new Mock<IFileTypeService>(),
+                new Mock<ContentDbContext>());
         }
     }
 }

@@ -61,8 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
 
-            CreateMap<InsetTextBlock, InsetTextBlockViewModel>();
-
             CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
         }
 

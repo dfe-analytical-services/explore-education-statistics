@@ -277,8 +277,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                                 return await UpdateMarkDownBlock((MarkDownBlock) blockToUpdate, request.Body, methodology);
                             case ContentBlockType.HtmlBlock:
                                 return await UpdateHtmlBlock((HtmlBlock) blockToUpdate, request.Body, methodology);
-                            case ContentBlockType.InsetTextBlock:
-                                return await UpdateInsetTextBlock((InsetTextBlock) blockToUpdate, request.Heading, request.Body, methodology);
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
@@ -341,14 +339,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, IContentBlock>> UpdateHtmlBlock(HtmlBlock blockToUpdate,
             string body, Methodology methodology)
         {
-            blockToUpdate.Body = body;
-            return await SaveMethodology(blockToUpdate, methodology);
-        }
-
-        private async Task<Either<ActionResult, IContentBlock>> UpdateInsetTextBlock(InsetTextBlock blockToUpdate,
-            string heading, string body, Methodology methodology)
-        {
-            blockToUpdate.Heading = heading;
             blockToUpdate.Body = body;
             return await SaveMethodology(blockToUpdate, methodology);
         }

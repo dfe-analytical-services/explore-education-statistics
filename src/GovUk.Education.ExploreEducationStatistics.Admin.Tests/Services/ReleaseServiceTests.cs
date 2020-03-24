@@ -100,10 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Content = new List<IContentBlock>
                                         {
                                             // TODO currently is not copied - should it be?
-                                            new HtmlBlock
+                                            new MarkDownBlock
                                             {
                                                 Id = new Guid("e2b96bea-fbbb-4089-ad9c-fecba58ee054"),
-                                                Body = @"<div></div>"
+                                                Body = SampleMarkDownContent.Content[new Guid("7eeb1478-ab26-4b70-9128-b976429efa2f")]
                                             }
                                         }
                                     }
@@ -122,11 +122,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Content = new List<IContentBlock>
                                         {
                                             // TODO currently is not copied - should it be?
-                                            new InsetTextBlock
+                                            new MarkDownBlock
                                             {
-                                                Id = new Guid("34884271-a30a-4cbd-9c08-e6d11d7f8c8e"),
-                                                Body = "Text",
-                                                Heading = "Heading"
+                                                Id = new Guid("e4e88dd8-eef7-4ed5-a3f2-a92e5a328e05"),
+                                                Body = SampleMarkDownContent.Content[new Guid("7eeb1478-ab26-4b70-9128-b976429efa2f")]
                                             }
                                         }
                                     }

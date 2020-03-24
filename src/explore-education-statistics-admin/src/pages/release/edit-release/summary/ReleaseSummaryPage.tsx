@@ -19,7 +19,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
 import React, { useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {

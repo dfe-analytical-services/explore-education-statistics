@@ -1,4 +1,3 @@
-import parseNumber from '@common/lib/utils/number/parseNumber';
 import {
   AxisConfiguration,
   AxisGroupBy,
@@ -18,6 +17,7 @@ import {
   Result,
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
+import parseNumber from '@common/utils/number/parseNumber';
 import difference from 'lodash/difference';
 import omit from 'lodash/omit';
 import { AxisDomain } from 'recharts';

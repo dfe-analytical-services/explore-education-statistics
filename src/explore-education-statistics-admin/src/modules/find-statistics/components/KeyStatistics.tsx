@@ -10,7 +10,7 @@ import {
   Publication,
 } from '@common/services/publicationService';
 import React, { useCallback, useEffect, useState } from 'react';
-import KeyIndicatorSelectForm from './KeyIndicatorSelectForm';
+import KeyStatSelectForm from './KeyStatSelectForm';
 
 export interface KeyStatisticsProps {
   release: AbstractRelease<EditableContentBlock, Publication>;
@@ -119,7 +119,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   return (
     <>
       {isFormOpen ? (
-        <KeyIndicatorSelectForm
+        <KeyStatSelectForm
           onSelect={addKeyStatToSection}
           onCancel={() => setIsFormOpen(false)}
         />

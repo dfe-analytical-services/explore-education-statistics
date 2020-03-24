@@ -13,27 +13,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : CompoundAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement, Release>
     {
         public SubmitSpecificReleaseToHigherReviewAuthorizationHandler(ContentDbContext context) : base(
-            new SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler(),
-            new SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(context))
+            new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(),
+            new HasEditorRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
-    }
-    
-    public class SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler 
-        : EntityAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement, Release>
-    {
-        public SubmitSpecificReleaseToHigherReviewCanSubmitAllReleasesAuthorizationHandler() 
-            : base(ctx => 
-                ctx.Entity.Status != ReleaseStatus.Approved 
-                && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.SubmitAllReleasesToHigherReview)) {}
-    }
+        
+        public class CanSubmitAllReleasesToHigherReviewAuthorizationHandler 
+            : EntityAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement, Release>
+        {
+            public CanSubmitAllReleasesToHigherReviewAuthorizationHandler() 
+                : base(ctx => 
+                    ctx.Entity.Status != ReleaseStatus.Approved 
+                    && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.SubmitAllReleasesToHigherReview)) {}
+        }
 
-    public class SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler
-        : HasRoleOnReleaseAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement>
-    {
-        public SubmitSpecificReleaseToHigherReviewHasRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, ctx => ctx.Release.Status != ReleaseStatus.Approved && ContainsEditorRole(ctx.Roles))
-        {}
+        public class HasEditorRoleOnReleaseAuthorizationHandler
+            : HasRoleOnReleaseAuthorizationHandler<SubmitSpecificReleaseToHigherReviewRequirement>
+        {
+            public HasEditorRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
+                : base(context, ctx => ctx.Release.Status != ReleaseStatus.Approved && ContainsEditorRole(ctx.Roles))
+            {}
+        }
     }
 }

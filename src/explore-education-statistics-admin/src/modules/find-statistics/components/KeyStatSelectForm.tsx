@@ -3,9 +3,12 @@ import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import { TimePeriodQuery } from '@common/modules/table-tool/services/tableBuilderService';
-import { DataBlock } from '@common/services/dataBlockService';
-import React, { useEffect, useState } from 'react';
+import {
+  locationLevelKeys,
+  TimePeriodQuery,
+} from '@common/modules/table-tool/services/tableBuilderService';
+import orderBy from 'lodash/orderBy';
+import React, { useMemo, useState } from 'react';
 
 interface Props {
   onSelect: (selectedDataBlockId: string) => void;
@@ -14,36 +17,36 @@ interface Props {
   label?: string;
 }
 
-const KeyIndicatorSelectForm = ({
+const KeyStatSelectForm = ({
   onSelect,
   onCancel = () => {},
   hideCancel = false,
-  label = 'Select a key indicator',
+  label = 'Select a key statistic',
 }: Props) => {
   const { availableDataBlocks } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
-  const [keyIndicatorDatablocks, setKeyIndicatorDatablocks] = useState<
-    DataBlock[]
-  >([]);
-
-  useEffect(() => {
-    setKeyIndicatorDatablocks(
-      availableDataBlocks.filter(db => {
-        return (
-          Object.entries(db.dataBlockRequest).filter(([key, val]) => {
-            // only want datablocks with (<2) of each filter type (filter, time period, location and indicator)
-            if (key === 'timePeriod') {
-              return !(
-                (val as TimePeriodQuery).startYear ===
-                (val as TimePeriodQuery).endYear
-              );
-            }
-            return Array.isArray(val) ? val.length > 1 : false;
-          }).length === 0
+  const keyStatDatablocks = useMemo(() => {
+    return availableDataBlocks.filter(db => {
+      const req = db.dataBlockRequest;
+      const timePeriod = req.timePeriod as TimePeriodQuery;
+      const hasSingleLocation = !locationLevelKeys.some(
+        key => req[key]?.length !== 1,
+      );
+      if (!hasSingleLocation) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          'dataBlockRequest should contain single location from locationLevelKeys!',
         );
-      }),
-    );
+      }
+      return (
+        req.indicators.length !== 1 ||
+        timePeriod.startYear !== timePeriod.endYear ||
+        !hasSingleLocation
+        // NOTE(mark): No check for number of filters because they cannot tell us whether
+        // there is a single result
+      );
+    });
   }, [availableDataBlocks]);
 
   function getKeyStatPreview() {
@@ -73,15 +76,19 @@ const KeyIndicatorSelectForm = ({
         label={label}
         value={selectedDataBlockId}
         onChange={e => setSelectedDataBlockId(e.target.value)}
+        order={[]}
         options={[
           {
             label: 'Select a data block',
             value: '',
           },
-          ...keyIndicatorDatablocks.map(dataBlock => ({
-            label: dataBlock.name || '',
-            value: dataBlock.id || '',
-          })),
+          ...orderBy(
+            keyStatDatablocks.map(dataBlock => ({
+              label: dataBlock.name || '',
+              value: dataBlock.id || '',
+            })),
+            'label',
+          ),
         ]}
       />
       {getKeyStatPreview()}
@@ -97,4 +104,4 @@ const KeyIndicatorSelectForm = ({
   );
 };
 
-export default KeyIndicatorSelectForm;
+export default KeyStatSelectForm;

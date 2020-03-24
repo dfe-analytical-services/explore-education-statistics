@@ -17,7 +17,7 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import remove from 'lodash/remove';
@@ -88,16 +88,29 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
+  // BAU-324 - temporary stopgap until Release Versioning phase 2 is tackled, to prevent data files being changed on a
+  // Release amendment
+  const [canUpdateReleaseDataFiles, setCanUpdateReleaseDataFiles] = useState<
+    boolean
+  >();
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
 
   useEffect(() => {
     Promise.all([
       editReleaseDataService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ]).then(([releaseDataFiles, canUpdateReleaseResponse]) => {
-      setDataFiles(releaseDataFiles);
-      setCanUpdateRelease(canUpdateReleaseResponse);
-    });
+      permissionService.canUpdateReleaseDataFiles(releaseId),
+    ]).then(
+      ([
+        releaseDataFiles,
+        canUpdateReleaseResponse,
+        canUpdateReleaseDataFilesResponse,
+      ]) => {
+        setDataFiles(releaseDataFiles);
+        setCanUpdateRelease(canUpdateReleaseResponse);
+        setCanUpdateReleaseDataFiles(canUpdateReleaseDataFilesResponse);
+      },
+    );
   }, [publicationId, releaseId]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
@@ -243,7 +256,13 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
             {typeof canUpdateRelease !== 'undefined' &&
               !canUpdateRelease &&
-              'Release has been approved, and can no longer be updated.'}
+              !canUpdateReleaseDataFiles &&
+              'This release has been approved, and can no longer be updated.'}
+
+            {typeof canUpdateRelease !== 'undefined' &&
+              canUpdateRelease &&
+              !canUpdateReleaseDataFiles &&
+              'This release is an amendment to a live release and so cannot change any data files.'}
 
             {dataFiles.length > 0 && (
               <>

@@ -14,8 +14,6 @@ import {
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import parseNumber from '@common/lib/utils/number/parseNumber';
-import Yup from '@common/lib/validation/yup';
 import {
   AxisConfiguration,
   AxisGroupBy,
@@ -31,6 +29,8 @@ import {
 } from '@common/modules/charts/util/chartUtils';
 import { DataBlockData } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
+import parseNumber from '@common/utils/number/parseNumber';
+import Yup from '@common/validation/yup';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Schema } from 'yup';
 

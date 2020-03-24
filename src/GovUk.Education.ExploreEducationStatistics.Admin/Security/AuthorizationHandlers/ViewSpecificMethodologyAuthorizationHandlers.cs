@@ -10,19 +10,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ViewSpecificMethodologyAuthorizationHandler : CompoundAuthorizationHandler<ViewSpecificMethodologyRequirement, Methodology>
     {
         public ViewSpecificMethodologyAuthorizationHandler() : base(
-            new ViewSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler())
+            new CanViewAllMethodologiesAuthorizationHandler())
         {
             
         }
-    }
     
-    public class ViewSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler 
-        : HasClaimAuthorizationHandler<ViewSpecificMethodologyRequirement>
-    {
-        public ViewSpecificMethodologyCanUpdateAllMethodologiesAuthorizationHandler()
-            : base(SecurityClaimTypes.AccessAllMethodologies)
+        public class CanViewAllMethodologiesAuthorizationHandler 
+            : HasClaimAuthorizationHandler<ViewSpecificMethodologyRequirement>
         {
+            public CanViewAllMethodologiesAuthorizationHandler()
+                : base(SecurityClaimTypes.AccessAllMethodologies)
+            {
             
+            }
         }
     }
 }

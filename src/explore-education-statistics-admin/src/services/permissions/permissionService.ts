@@ -21,6 +21,11 @@ const permissionService = {
   canUpdateRelease: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/update`);
   },
+  // BAU-324 - temporary stopgap to stop the updating of Release Amendment data files until Phase 2 of
+  // Release Versioning is tackled
+  canUpdateReleaseDataFiles: (releaseId: string): Promise<boolean> => {
+    return client.get(`/permissions/release/${releaseId}/update-data-files`);
+  },
   canMarkReleaseAsDraft: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/status/draft`);
   },
@@ -31,6 +36,9 @@ const permissionService = {
   },
   canApproveRelease: (releaseId: string): Promise<boolean> => {
     return client.get(`/permissions/release/${releaseId}/status/approve`);
+  },
+  canMakeAmendmentOfRelease: (releaseId: string): Promise<boolean> => {
+    return client.get(`/permissions/release/${releaseId}/amend`);
   },
   canCreatePublicationForTopic: (topicId: string): Promise<boolean> => {
     return client.get(`/permissions/topic/${topicId}/publication/create`);

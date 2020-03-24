@@ -204,5 +204,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
         
         public List<BasicLink> RelatedInformation { get; set; }
+
+        public Release CreateReleaseAmendment(DateTime createdDate, Guid createdByUserId)
+        {
+            var amendment = MemberwiseClone() as Release;
+            amendment.Id = Guid.NewGuid();
+            var ctx = new CreateAmendmentContext(this, amendment);
+
+            amendment.Published = null;
+            amendment.Status = ReleaseStatus.Draft;
+            amendment.Created = createdDate;
+            amendment.CreatedBy = null;
+            amendment.CreatedById = createdByUserId;
+            amendment.Version = Version + 1;
+            
+            amendment.Content = amendment
+                .Content
+                .Select(content => content.CreateReleaseAmendment(ctx))
+                .ToList();
+            
+            amendment.Updates = amendment
+                .Updates
+                .Select(update => update.CreateReleaseAmendment(ctx))
+                .ToList();
+            
+            amendment.ContentBlocks = amendment
+                .ContentBlocks
+                .Select(releaseContentBlock => releaseContentBlock.CreateReleaseAmendment(ctx))
+                .ToList();
+            
+            return amendment;
+        }
+    }
+
+    public class CreateAmendmentContext
+    {
+        public CreateAmendmentContext(Release original, Release amendment)
+        {
+            Original = original;
+            Amendment = amendment;
+        }
+
+        public Release Original { get; set; }
+
+        public Release Amendment { get; set; }
+        
+        public Dictionary<ContentSection, ContentSection> OldToNewIdContentSectionMappings { get; set; } = new Dictionary<ContentSection, ContentSection>();
+        
+        public Dictionary<IContentBlock, IContentBlock> OldToNewIdContentBlockMappings { get; set; } = new Dictionary<IContentBlock, IContentBlock>();
+        
+        public Dictionary<Update, Update> OldToNewIdUpdateMappings { get; set; } = new Dictionary<Update, Update>();
     }
 }

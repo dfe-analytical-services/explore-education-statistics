@@ -47,6 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public class PermissionsSet
         {
             public bool CanUpdateRelease { get; set; }
+            
+            public bool CanMakeAmendmentOfRelease { get; set; }
         }
 
         public class Comment

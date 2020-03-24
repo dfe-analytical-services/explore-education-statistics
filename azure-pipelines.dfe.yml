@@ -254,9 +254,10 @@ jobs:
         displayName: 'Publish frontend test results'
         inputs:
           testResultsFormat: 'JUnit'
-          testResultsFiles: '**/junit.xml'
+          testResultsFiles: 'explore-education-statistics-*/junit-*.xml'
           searchFolder: './src'
-          testRunTitle: 'Frontend Jest tests'
+          testRunTitle: 'Release Jest tests'
+          mergeTestResults: true
 
   - job: 'FrontendArtifactDev01'
     dependsOn: 'Frontend'

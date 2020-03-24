@@ -16,13 +16,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 - secondary schools
 - special schools
 
-They also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.
+They also include information for [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.
 
 We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).
 
 The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.
 
-They're also used for policy development as key indicators in behaviour and school attendance policy."
+They're also used for policy development as key indicators in behaviour and school attendance policy.
+
+Within this release, absence by reason is broken down in three different ways:
+
+* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences
+
+* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions
+
+* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
             },
             {
                 new Guid("2c369594-3bbc-40b4-ad19-196c923f5c7f"),
@@ -58,11 +66,11 @@ In 2016/17, 91.8% of primary, secondary and special school pupils missed at leas
             },
             {
                 new Guid("8a8add13-368c-4067-9210-166bb19a00c1"),
-                @"The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015 to 16 but still down from 43.3% in 2011 to 12.
+                @"The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015/16 but still down from 43.3% in 2011/12.
 
 It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).
 
-Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
+Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015/16."
             },
             {
                 new Guid("4aa06200-406b-4f5a-bee4-19e3b83eb1d2"),
@@ -73,16 +81,6 @@ The [overall absence](../glossary#overall-absence) rate for persistent absentees
 **Illness absence rate**
 
 The illness absence rate is almost 4 times higher for persistent absentees at 7.6% compared to 2% for other pupils."
-            },
-            {
-                new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
-                @"These have been broken down into the following:
-
-* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences
-
-* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions
-
-* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
             },
             {
                 new Guid("2ef5f84f-e151-425d-8906-2921712f9157"),
@@ -191,7 +189,7 @@ Persistent absence rate:
             },
             {
                 new Guid("97c54e5f-2406-4333-851d-b6c9cc4bf612"),
-                @"The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous 2 years.
+                @"The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous two years.
 
 Absence recorded for 4-year-olds is not treated as authorised or unauthorised and only reported as overall absence."
             },
@@ -207,7 +205,7 @@ The [persistent absence](../glossary#persistent-absence) rate increased to 73.9%
 
 **Overall absence**
 
-Similar to 2015/16, the 3 regions with the highest rates across all school types were:
+Similar to 2015/16, the three regions with the highest rates across all school types were:
 
 * North East - 4.9%
 
@@ -241,17 +239,17 @@ All figures are based on unrounded data so constituent parts may not add up due 
                 new Guid("70546a7d-5edd-4b8f-b096-cfd50153f4cb"),
                 @"The number of [permanent exclusions](../glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.
 
-This works out to an average 40.6 permanent exclusions per day - up from an 35.2 per day in 2015/16.
+This works out to an average 40.6 permanent exclusions per day - up from 35.2 per day in 2015/16.
 
-The permanent exclusion rate has also increased to 0.10% of pupils - up from from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000."
+The permanent exclusion rate has also increased to 0.10% of pupils - up from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000."
             },
             {
                 new Guid("81d8eba2-9cba-4b04-bb02-e00ace5c4418"),
                 @"Most occurred in secondary schools which accounted for 83% of all permanent exclusions.
 
-The [permanent exclusion](../glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
+The [permanent exclusion](../glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
 
-The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from from 0.08% in 2015/16.
+The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from 0.08% in 2015/16.
 
 The rate generally followed a downward trend after 2006/07 - when it stood at 0.12%.
 
@@ -261,7 +259,7 @@ However, since 2012/13 it has been on the rise although rates are still lower no
                 new Guid("7971329a-9e16-468b-9eb3-62bfc384b5a3"),
                 @"The number of fixed-period exclusionshas increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.
 
-This works out to around 2,010 fixed-period exclusions per day - up from an 1,786 per day in 2015/16."
+This works out to around 2,010 fixed-period exclusions per day - up from 1,786 per day in 2015/16."
             },
             {
                 new Guid("e9462ed0-10dc-4ff5-8cda-f8c3b66f2714"),
@@ -317,7 +315,7 @@ Remained the most common reason for permanent exclusions accounting for 2,755 (3
 
 However, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](../glossary#fixed-period-exclusion).
 
-Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 %) of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
+Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
 
 All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent disruptive behaviour and other reasons saw the largest increases."
             },

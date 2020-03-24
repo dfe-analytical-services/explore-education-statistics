@@ -21,6 +21,9 @@ const service = {
       createRequest,
     );
   },
+  createReleaseAmendment(releaseId: string): Promise<ReleaseSummaryDetails> {
+    return client.post(`/release/${releaseId}/amendment`);
+  },
 };
 
 export default service;

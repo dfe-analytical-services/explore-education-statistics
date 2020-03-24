@@ -1,7 +1,9 @@
 import ErrorBoundary from '@common/components/ErrorBoundary';
 import WarningMessage from '@common/components/WarningMessage';
-import cartesian from '@common/lib/utils/cartesian';
-import formatPretty from '@common/lib/utils/number/formatPretty';
+import {
+  HeaderGroup,
+  HeaderSubGroup,
+} from '@common/modules/table-tool/components/MultiHeaderTable';
 import {
   CategoryFilter,
   Filter,
@@ -11,10 +13,8 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
-import {
-  HeaderGroup,
-  HeaderSubGroup,
-} from '@common/modules/table-tool/components/MultiHeaderTable';
+import cartesian from '@common/utils/cartesian';
+import formatPretty from '@common/utils/number/formatPretty';
 import camelCase from 'lodash/camelCase';
 import last from 'lodash/last';
 import React, { forwardRef, memo } from 'react';
