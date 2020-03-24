@@ -99,7 +99,8 @@ function generateAxesMetaData(
   );
 }
 
-const emptyMetadata = {
+const emptyMetadata: ChartMetaData = {
+  footnotes: [],
   timePeriod: {},
   filters: {},
   indicators: {},
@@ -112,8 +113,8 @@ const ChartBuilder = ({
   initialConfiguration,
   onRequiresDataUpdate,
 }: Props) => {
-  const metaData = useMemo(
-    () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
+  const metaData: ChartMetaData = useMemo(
+    () => parseMetaData(data.metaData) ?? emptyMetadata,
     [data.metaData],
   );
 

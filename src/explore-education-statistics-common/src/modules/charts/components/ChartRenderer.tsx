@@ -1,3 +1,4 @@
+import FigureFootnotes from '@common/components/FigureFootnotes';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
@@ -83,7 +84,7 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
 
   if (data && meta && data.result.length > 0) {
     return (
-      <figure>
+      <figure className="govuk-!-margin-0">
         {title && <figcaption className="govuk-heading-s">{title}</figcaption>}
 
         {props.type !== 'infographic' && props.legend === 'top' && legendProps && (
@@ -101,6 +102,8 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
               <DefaultLegendContent {...legendProps} />
             </div>
           )}
+
+        <FigureFootnotes footnotes={meta.footnotes} />
       </figure>
     );
   }
