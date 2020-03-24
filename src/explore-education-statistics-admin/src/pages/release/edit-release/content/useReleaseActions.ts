@@ -1,91 +1,26 @@
 import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
-import permissionService from '@admin/services/permissions/permissionService';
-import {
-  EditableBlock,
-  EditableRelease,
-  ExtendedComment,
-} from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
 import {
   ContentBlockAttachRequest,
   ContentBlockPostModel,
 } from '@admin/services/release/edit-release/content/types';
 import { Dictionary } from '@admin/types';
-import { ContentSection } from '@common/services/publicationService';
 import { useCallback } from 'react';
 import { useReleaseDispatch } from './ReleaseContext';
 import { ContentSectionKeys } from './ReleaseContextActionTypes';
 
-const contentSectionComments = (
-  contentSection: ContentSection<EditableBlock>,
-): ExtendedComment[] => {
-  if (contentSection.content?.length) {
-    return contentSection.content.reduce<ExtendedComment[]>(
-      (allCommentsForSection, content) => {
-        content.comments.forEach(comment =>
-          allCommentsForSection.push(comment),
-        );
-        return allCommentsForSection;
-      },
-      [],
-    );
-  }
-
-  return [];
-};
-
-const getUnresolvedComments = (release: EditableRelease) =>
-  [
-    ...contentSectionComments(release.summarySection),
-    ...contentSectionComments(release.keyStatisticsSection),
-    ...release.content
-      .filter(_ => _.content !== undefined)
-      .reduce<ExtendedComment[]>(
-        (allComments, contentSection) => [
-          ...allComments,
-          ...contentSectionComments(contentSection),
-        ],
-        [],
-      ),
-  ].filter(comment => comment !== undefined && comment.state === 'open');
-
 export default function useReleaseActions() {
   const dispatch = useReleaseDispatch();
-
-  const getReleaseContent = useCallback(
-    async ({ releaseId }: { releaseId: string }) => {
-      dispatch({ type: 'CLEAR_STATE' });
-
-      const {
-        release,
-        availableDataBlocks,
-      } = await releaseContentService.getContent(releaseId);
-
-      const canUpdateRelease = await permissionService.canUpdateRelease(
-        releaseId,
-      );
-
-      dispatch({
-        type: 'SET_STATE',
-        payload: {
-          unresolvedComments: getUnresolvedComments(release),
-          release,
-          availableDataBlocks,
-          canUpdateRelease,
-        },
-      });
-    },
-    [dispatch],
-  );
 
   const updateAvailableDataBlocks = useCallback(
     async ({ releaseId }: { releaseId: string }) => {
       const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
         releaseId,
       );
+
       dispatch({
         type: 'SET_AVAILABLE_DATABLOCKS',
-        payload: { availableDataBlocks },
+        payload: availableDataBlocks,
       });
     },
     [dispatch],
@@ -350,7 +285,6 @@ export default function useReleaseActions() {
   );
 
   return {
-    getReleaseContent,
     updateAvailableDataBlocks,
     deleteContentSectionBlock,
     updateContentSectionDataBlock,

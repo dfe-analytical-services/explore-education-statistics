@@ -305,70 +305,22 @@ const releaseReducer = (
 ) => produce(initial, draft => originalReleaseReducer(draft, action));
 
 describe('ReleaseContext', () => {
-  test('CLEAR_STATE clears state', () => {
-    expect(
-      releaseReducer(
-        {
-          release: basicRelease,
-          canUpdateRelease: true,
-          availableDataBlocks: [basicDataBlock],
-          unresolvedComments: [],
-        },
-        { type: 'CLEAR_STATE' },
-      ),
-    ).toEqual({
-      release: undefined,
-      canUpdateRelease: false,
-      availableDataBlocks: [],
-      unresolvedComments: [],
-    });
-  });
-
-  test('SET_STATE sets the state', () => {
-    expect(
-      releaseReducer(
-        {
-          release: undefined,
-          canUpdateRelease: false,
-          availableDataBlocks: [],
-          unresolvedComments: [],
-        },
-        {
-          type: 'SET_STATE',
-          payload: {
-            release: basicRelease,
-            canUpdateRelease: true,
-            availableDataBlocks: [basicDataBlock],
-            unresolvedComments: [],
-          },
-        },
-      ),
-    ).toEqual({
-      release: basicRelease,
-      canUpdateRelease: true,
-      availableDataBlocks: [basicDataBlock],
-      unresolvedComments: [],
-    });
-  });
-
   test('SET_AVAILABLE_DATABLOCKS sets datablocks', () => {
     expect(
       releaseReducer(
         {
-          release: undefined,
+          release: basicRelease,
           canUpdateRelease: false,
           availableDataBlocks: [],
           unresolvedComments: [],
         },
         {
           type: 'SET_AVAILABLE_DATABLOCKS',
-          payload: {
-            availableDataBlocks: [basicDataBlock],
-          },
+          payload: [basicDataBlock],
         },
       ),
     ).toEqual({
-      release: undefined,
+      release: basicRelease,
       canUpdateRelease: false,
       availableDataBlocks: [basicDataBlock],
       unresolvedComments: [],

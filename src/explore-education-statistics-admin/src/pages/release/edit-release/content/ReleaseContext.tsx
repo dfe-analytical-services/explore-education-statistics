@@ -13,14 +13,11 @@ import { ReleaseDispatchAction } from './ReleaseContextActionTypes';
 export type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
 
 export type ReleaseContextState = {
-  release: EditableRelease | undefined;
+  release: EditableRelease;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
   unresolvedComments: ExtendedComment[];
 };
-
-type ReleaseProviderProps = { children: ReactNode };
-
 const ReleaseStateContext = createContext<ReleaseContextState | undefined>(
   undefined,
 );
@@ -33,22 +30,13 @@ export const releaseReducer: Reducer<
   ReleaseDispatchAction
 > = (draft, action) => {
   switch (action.type) {
-    case 'CLEAR_STATE': {
-      return {
-        release: undefined,
-        canUpdateRelease: false,
-        availableDataBlocks: [],
-        unresolvedComments: [],
-      };
-    }
-    case 'SET_STATE':
     case 'SET_AVAILABLE_DATABLOCKS': {
-      return { ...draft, ...action.payload };
+      draft.availableDataBlocks = action.payload;
+      return draft;
     }
     case 'REMOVE_BLOCK_FROM_SECTION': {
       const { sectionId, blockId, sectionKey } = action.payload.meta;
-
-      const matchingSection = draft.release?.[sectionKey] as
+      const matchingSection = draft.release[sectionKey] as
         | ContentSection<BaseBlock>
         | ContentSection<BaseBlock>[]
         | undefined;
@@ -80,7 +68,7 @@ export const releaseReducer: Reducer<
       const { block, meta } = action.payload;
       const { sectionId, blockId, sectionKey } = meta;
 
-      const matchingSection = draft.release?.[sectionKey] as
+      const matchingSection = draft.release[sectionKey] as
         | ContentSection<BaseBlock>
         | ContentSection<BaseBlock>[]
         | undefined;
@@ -119,7 +107,7 @@ export const releaseReducer: Reducer<
       const { block, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
 
-      const matchingSection = draft.release?.[sectionKey] as
+      const matchingSection = draft.release[sectionKey] as
         | ContentSection<BaseBlock>
         | ContentSection<BaseBlock>[]
         | undefined;
@@ -154,7 +142,7 @@ export const releaseReducer: Reducer<
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
 
-      const matchingSection = draft.release?.[sectionKey] as
+      const matchingSection = draft.release[sectionKey] as
         | ContentSection<BaseBlock>
         | ContentSection<BaseBlock>[]
         | undefined;
@@ -220,13 +208,14 @@ export const releaseReducer: Reducer<
   }
 };
 
-function ReleaseProvider({ children }: ReleaseProviderProps) {
-  const [state, dispatch] = useImmerReducer(releaseReducer, {
-    release: undefined,
-    canUpdateRelease: false,
-    availableDataBlocks: [],
-    unresolvedComments: [],
-  });
+interface ReleaseProviderProps {
+  children: ReactNode;
+  value: ReleaseContextState;
+}
+
+function ReleaseProvider({ children, value }: ReleaseProviderProps) {
+  const [state, dispatch] = useImmerReducer(releaseReducer, value);
+
   return (
     <ReleaseStateContext.Provider value={state}>
       <ReleaseDispatchContext.Provider value={dispatch}>

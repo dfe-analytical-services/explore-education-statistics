@@ -3,7 +3,7 @@ import {
   EditableContentBlock,
 } from '@admin/services/publicationService';
 import { ContentSection, Release } from '@common/services/publicationService';
-import { ReleaseContextState } from './ReleaseContext';
+import { DataBlock } from '@common/services/types/blocks';
 
 export type ContentSectionKeys = keyof Pick<
   Release<EditableContentBlock>,
@@ -22,13 +22,9 @@ type BlockMeta = {
 
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
 
-type ClearState = { type: 'CLEAR_STATE' };
-
-type SetState = { type: 'SET_STATE'; payload: ReleaseContextState };
-
 type SetAvailableDatablocks = {
   type: 'SET_AVAILABLE_DATABLOCKS';
-  payload: Pick<ReleaseContextState, 'availableDataBlocks'>;
+  payload: DataBlock[];
 };
 
 export type RemoveBlockFromSection = {
@@ -85,8 +81,6 @@ export type UpdateContentSection = {
 };
 
 export type ReleaseDispatchAction =
-  | ClearState
-  | SetState
   | SetAvailableDatablocks
   | RemoveBlockFromSection
   | UpdateBlockFromSection
