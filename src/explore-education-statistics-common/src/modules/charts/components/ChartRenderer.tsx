@@ -83,8 +83,8 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
 
   if (data && meta && data.result.length > 0) {
     return (
-      <>
-        {title && <h3 className="govuk-heading-s">{title}</h3>}
+      <figure>
+        {title && <figcaption className="govuk-heading-s">{title}</figcaption>}
 
         {props.type !== 'infographic' && props.legend === 'top' && legendProps && (
           <div className="govuk-!-margin-bottom-6">
@@ -101,7 +101,7 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
               <DefaultLegendContent {...legendProps} />
             </div>
           )}
-      </>
+      </figure>
     );
   }
 
