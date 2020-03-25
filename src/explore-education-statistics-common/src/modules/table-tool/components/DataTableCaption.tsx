@@ -73,15 +73,6 @@ const DataTableCaption = ({
           {`${expanded ? 'Hide' : 'View'} full table title`}
         </ButtonText>
       )}
-      <ul>
-        <li>
-          <strong>n/a</strong> - value matching this criteria could not be
-          found.
-        </li>
-        <li>
-          <strong>x</strong> - value matching this criteria is suppressed.
-        </li>
-      </ul>
     </>
   );
 };
