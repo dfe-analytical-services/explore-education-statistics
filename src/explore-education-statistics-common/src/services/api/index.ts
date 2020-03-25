@@ -10,21 +10,21 @@ export const baseUrl = {
 
 export const contentApi = new Client(
   axios.create({
-    baseURL: `${baseUrl.content}/`,
+    baseURL: baseUrl.content,
     paramsSerializer: commaSeparated,
   }),
 );
 
 export const dataApi = new Client(
   axios.create({
-    baseURL: `${baseUrl.data}/`,
+    baseURL: baseUrl.data,
     paramsSerializer: commaSeparated,
   }),
 );
 
 export const functionApi = new Client(
   axios.create({
-    baseURL: `${baseUrl.function}/`,
+    baseURL: baseUrl.function,
     paramsSerializer: commaSeparated,
   }),
 );

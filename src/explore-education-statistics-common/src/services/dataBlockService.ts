@@ -1,6 +1,3 @@
-import { dataApi } from '@common/services/api';
-import { Dictionary, PartialRecord } from '@common/types/util';
-import { Feature, Geometry } from 'geojson';
 import {
   FilterOption,
   IndicatorOption,
@@ -9,7 +6,11 @@ import {
   TableDataQuery,
   TimePeriodOption,
 } from '@common/modules/table-tool/services/tableBuilderService';
-import { Table, Chart, Summary } from '@common/services/publicationService';
+import { dataApi } from '@common/services/api';
+import { Chart, Summary, Table } from '@common/services/publicationService';
+import { Footnote } from '@common/services/types/footnotes';
+import { Dictionary, PartialRecord } from '@common/types/util';
+import { Feature, Geometry } from 'geojson';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -107,11 +108,6 @@ export interface BoundaryLevel {
   label: string;
 }
 
-export interface FootnoteMetadata {
-  id: string;
-  label: string;
-}
-
 export interface DataBlockMetadata {
   filters: PublicationSubjectMeta['filters'];
   indicators: Dictionary<LabelValueUnitMetadata>;
@@ -120,7 +116,7 @@ export interface DataBlockMetadata {
   timePeriod: Dictionary<TimePeriodOptionMetadata>;
   publicationName: string;
   subjectName: string;
-  footnotes: FootnoteMetadata[];
+  footnotes: Footnote[];
   geoJsonAvailable: boolean;
 }
 

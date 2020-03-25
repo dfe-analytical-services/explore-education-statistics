@@ -44,7 +44,9 @@ export const releaseReducer: Reducer<
     case 'REMOVE_BLOCK_FROM_SECTION': {
       const { sectionId, blockId, sectionKey } = action.payload.meta;
       if (!draft.release?.[sectionKey]) {
-        throw new Error('REMOVE_BLOCK_FROM_SECTION: failed');
+        throw new Error(
+          `REMOVE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+        );
       }
 
       if (sectionKey === 'content') {
@@ -66,7 +68,9 @@ export const releaseReducer: Reducer<
       const { block, meta } = action.payload;
       const { sectionId, blockId, sectionKey } = meta;
       if (!draft.release?.[sectionKey]) {
-        throw new Error('UPDATE_BLOCK_FROM_SECTION: failed');
+        throw new Error(
+          `UPDATE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+        );
       }
       if (sectionKey === 'content') {
         const matchingSection = draft.release[sectionKey].find(
@@ -95,7 +99,9 @@ export const releaseReducer: Reducer<
       const { block, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
       if (!draft.release?.[sectionKey]) {
-        throw new Error('ADD_BLOCK_TO_SECTION: failed');
+        throw new Error(
+          `ADD_BLOCK_TO_SECTION: Error - Section "${sectionKey}" could not be found.`,
+        );
       }
 
       if (sectionKey === 'content') {
@@ -126,7 +132,9 @@ export const releaseReducer: Reducer<
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
       if (!draft.release?.[sectionKey]) {
-        throw new Error('ADD_BLOCK_TO_SECTION: failed');
+        throw new Error(
+          `UPDATE_SECTION_CONTENT: Error - Section "${sectionKey}" could not be found.`,
+        );
       }
 
       if (sectionKey === 'content') {

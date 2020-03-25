@@ -30,12 +30,7 @@ export interface MethodologyContent {
   published?: string;
   lastUpdated?: string;
   content: ContentSection<EditableContentBlock>[];
-  annexes: {
-    order: number;
-    heading: string;
-    caption: string;
-    content: ContentBlock[];
-  }[];
+  annexes: ContentSection<EditableContentBlock>[];
 }
 
 export interface UpdateMethodologyStatusRequest {

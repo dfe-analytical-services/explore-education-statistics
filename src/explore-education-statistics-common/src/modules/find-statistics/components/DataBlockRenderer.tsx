@@ -1,3 +1,4 @@
+import CollapsibleList from '@common/components/CollapsibleList';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { ChartMetaData } from '@common/modules/charts/types/chart';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
@@ -44,14 +45,15 @@ const DataBlockRenderer = ({ datablock, renderType }: Props) => {
         });
     }
   }, [datablock, dataBlockResponse]);
-
   if (!dataBlockResponse && !!error) {
     return <>{error}</>;
   }
+
   if (!dataBlockResponse) {
     return <LoadingSpinner text="Loading data" />;
   }
-  if (renderType === 'table')
+
+  if (renderType === 'table') {
     return (
       <>
         <TimePeriodDataTableRenderer
@@ -65,23 +67,22 @@ const DataBlockRenderer = ({ datablock, renderType }: Props) => {
         />
       </>
     );
+  }
+
   if (renderType === 'chart') {
     // There is a presumption that the configuration from the API is valid.
     // The data coming from the API is required to be optional for the ChartRenderer
     // But the data for the charts is required. The charts have validation that
     // prevent them from attempting to render.
-    // @ts-ignore
-    const chartRendererProps: ChartRendererProps = {
+    const chartRendererProps = {
       data: dataBlockResponse,
       meta: parseMetaData(dataBlockResponse.metaData) as ChartMetaData,
       ...(datablock.charts && datablock.charts[0]),
-    };
-    return (
-      <>
-        <ChartRenderer {...chartRendererProps} />
-      </>
-    );
+    } as ChartRendererProps;
+
+    return <ChartRenderer {...chartRendererProps} />;
   }
+
   return null;
 };
 
