@@ -38,8 +38,7 @@ export const releaseReducer: Reducer<
       const { sectionId, blockId, sectionKey } = action.payload.meta;
       const matchingSection = draft.release[sectionKey] as
         | ContentSection<BaseBlock>
-        | ContentSection<BaseBlock>[]
-        | undefined;
+        | ContentSection<BaseBlock>[];
 
       if (!matchingSection) {
         throw new Error(
@@ -70,8 +69,7 @@ export const releaseReducer: Reducer<
 
       const matchingSection = draft.release[sectionKey] as
         | ContentSection<BaseBlock>
-        | ContentSection<BaseBlock>[]
-        | undefined;
+        | ContentSection<BaseBlock>[];
 
       if (!matchingSection) {
         throw new Error(
@@ -109,8 +107,7 @@ export const releaseReducer: Reducer<
 
       const matchingSection = draft.release[sectionKey] as
         | ContentSection<BaseBlock>
-        | ContentSection<BaseBlock>[]
-        | undefined;
+        | ContentSection<BaseBlock>[];
 
       if (!matchingSection) {
         throw new Error(
@@ -144,8 +141,7 @@ export const releaseReducer: Reducer<
 
       const matchingSection = draft.release[sectionKey] as
         | ContentSection<BaseBlock>
-        | ContentSection<BaseBlock>[]
-        | undefined;
+        | ContentSection<BaseBlock>[];
 
       if (!matchingSection) {
         throw new Error(

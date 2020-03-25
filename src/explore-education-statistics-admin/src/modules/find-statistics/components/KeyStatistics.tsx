@@ -6,7 +6,7 @@ import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
 import { Release } from '@common/services/publicationService';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import KeyStatSelectForm from './KeyStatSelectForm';
 
 export interface KeyStatisticsProps {
@@ -21,19 +21,6 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
     updateContentSectionDataBlock,
   } = useReleaseActions();
 
-  const [keyStats, setKeyStats] = useState<
-    Release<EditableContentBlock>['keyStatisticsSection']
-  >();
-
-  useEffect(() => {
-    if (release.keyStatisticsSection) {
-      setKeyStats(release.keyStatisticsSection);
-    } else {
-      setKeyStats(undefined);
-    }
-  }, [release]);
-
-  if (!keyStats) return null;
   return (
     <>
       {isEditing && (
@@ -49,7 +36,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         </>
       )}
       <div className={styles.keyStatsContainer}>
-        {keyStats.content?.map(stat => {
+        {release.keyStatisticsSection.content.map(stat => {
           return stat.type === 'DataBlock' ? (
             <EditableKeyStatTile
               key={stat.id}
@@ -58,7 +45,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
               onRemove={() => {
                 deleteContentSectionBlock({
                   releaseId,
-                  sectionId: release.keyStatisticsSection.id as string,
+                  sectionId: release.keyStatisticsSection.id,
                   blockId: stat.id,
                   sectionKey: 'keyStatisticsSection',
                 });
@@ -66,7 +53,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
               onSubmit={values =>
                 updateContentSectionDataBlock({
                   releaseId,
-                  sectionId: release.keyStatisticsSection.id as string,
+                  sectionId: release.keyStatisticsSection.id,
                   blockId: stat.id,
                   sectionKey: 'keyStatisticsSection',
                   values,
@@ -84,10 +71,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const { attachContentSectionBlock } = useReleaseActions();
 
-  const another =
-    release.keyStatisticsSection.content &&
-    release.keyStatisticsSection.content.length > 0 &&
-    ' another ';
+  const { keyStatisticsSection } = release;
 
   const addKeyStatToSection = useCallback(
     (datablockId: string) => {
@@ -118,7 +102,9 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
             setIsFormOpen(true);
           }}
         >
-          Add {another} key statistic
+          {`Add ${
+            keyStatisticsSection.content.length > 0 ? ' another ' : ''
+          } key statistic`}
         </Button>
       )}
     </>

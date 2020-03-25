@@ -93,7 +93,7 @@ export interface Release<
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
   keyStatisticsSection: ContentSection<DataBlockType>;
-  keyStatisticsSecondarySection?: ContentSection<DataBlockType>;
+  keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
   publication: PublicationType;
   latestRelease: boolean;

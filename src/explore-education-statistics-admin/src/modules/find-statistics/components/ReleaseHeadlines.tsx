@@ -127,9 +127,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
       <Tabs id="releaseHeadlingsTabs">
         <TabsSection id="headline-headlines" title="Headlines">
           <section id="keystats">
-            {release.keyStatisticsSection && (
-              <KeyStatistics release={release} isEditing={isEditing} />
-            )}
+            <KeyStatistics release={release} isEditing={isEditing} />
           </section>
           <section id="headlines">
             <EditableSectionBlocks

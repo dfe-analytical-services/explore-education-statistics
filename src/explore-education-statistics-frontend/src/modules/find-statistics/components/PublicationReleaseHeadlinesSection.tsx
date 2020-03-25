@@ -28,12 +28,11 @@ const HeadlinesSection = ({
     <Tabs id="headlines-section">
       <TabsSection title="Summary">
         <div className={styles.keyStatsContainer}>
-          {keyStatisticsSection.content &&
-            keyStatisticsSection.content.map(keyStat => {
-              if (keyStat.type !== 'DataBlock') return null;
-              const block = keyStat as DataBlock;
-              return <KeyStatTile key={block.id} {...block} />;
-            })}
+          {keyStatisticsSection.content.map(keyStat => {
+            if (keyStat.type !== 'DataBlock') return null;
+            const block = keyStat as DataBlock;
+            return <KeyStatTile key={block.id} {...block} />;
+          })}
         </div>
 
         {(headlinesSection.content || [])
@@ -53,7 +52,7 @@ const HeadlinesSection = ({
           ))}
       </TabsSection>
 
-      {keyStatisticsSecondarySection?.content?.[0] && (
+      {keyStatisticsSecondarySection.content?.[0] && (
         <TabsSection title="Table">
           <DataBlockRenderer
             dataBlock={keyStatisticsSecondarySection.content[0]}
@@ -62,7 +61,7 @@ const HeadlinesSection = ({
         </TabsSection>
       )}
 
-      {keyStatisticsSecondarySection?.content?.[0]?.charts?.[0] && (
+      {keyStatisticsSecondarySection.content?.[0]?.charts?.[0] && (
         <TabsSection title="Chart">
           <DataBlockRenderer
             dataBlock={keyStatisticsSecondarySection.content[0]}

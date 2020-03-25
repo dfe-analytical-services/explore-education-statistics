@@ -22,8 +22,11 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
     deleteContentSectionBlock,
   } = useReleaseActions();
 
-  if (!isEditing) return null;
-  if (!isFormOpen)
+  if (!isEditing) {
+    return null;
+  }
+
+  if (!isFormOpen) {
     return (
       <>
         <Button
@@ -47,22 +50,20 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
 
         <ModalConfirm
           onConfirm={() => {
-            if (release.keyStatisticsSecondarySection?.content) {
-              Promise.all(
-                release.keyStatisticsSecondarySection.content.map(
-                  async content => {
-                    if (release.keyStatisticsSecondarySection?.content) {
-                      await deleteContentSectionBlock({
-                        releaseId: release.id,
-                        sectionId: release.keyStatisticsSecondarySection.id,
-                        blockId: content.id,
-                        sectionKey: 'keyStatisticsSecondarySection',
-                      });
-                    }
-                  },
-                ),
-              );
-            }
+            Promise.all(
+              release.keyStatisticsSecondarySection.content.map(
+                async content => {
+                  if (release.keyStatisticsSecondarySection?.content) {
+                    await deleteContentSectionBlock({
+                      releaseId: release.id,
+                      sectionId: release.keyStatisticsSecondarySection.id,
+                      blockId: content.id,
+                      sectionKey: 'keyStatisticsSecondarySection',
+                    });
+                  }
+                },
+              ),
+            );
             setShowConfirmation(false);
           }}
           onExit={() => {
@@ -80,43 +81,35 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
         </ModalConfirm>
       </>
     );
+  }
 
   return (
     <>
       <DataBlockSelectForm
         label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
         onSelect={async selectedDataBlockId => {
-          if (
-            release.keyStatisticsSecondarySection &&
-            release.keyStatisticsSecondarySection.id
-          ) {
-            if (release.keyStatisticsSecondarySection?.content) {
-              await Promise.all(
-                release.keyStatisticsSecondarySection.content.map(
-                  async content => {
-                    if (release.keyStatisticsSecondarySection?.content) {
-                      await deleteContentSectionBlock({
-                        releaseId: release.id,
-                        sectionId: release.keyStatisticsSecondarySection.id,
-                        blockId: content.id,
-                        sectionKey: 'keyStatisticsSecondarySection',
-                      });
-                    }
-                  },
-                ),
-              );
-            }
-            await attachContentSectionBlock({
-              releaseId: release.id,
-              sectionId: release.keyStatisticsSecondarySection.id,
-              sectionKey: 'keyStatisticsSecondarySection',
-              block: {
-                contentBlockId: selectedDataBlockId,
-                order: 0,
-              },
-            });
-            setIsFormOpen(false);
-          }
+          await Promise.all(
+            release.keyStatisticsSecondarySection.content.map(async content => {
+              await deleteContentSectionBlock({
+                releaseId: release.id,
+                sectionId: release.keyStatisticsSecondarySection.id,
+                blockId: content.id,
+                sectionKey: 'keyStatisticsSecondarySection',
+              });
+            }),
+          );
+
+          await attachContentSectionBlock({
+            releaseId: release.id,
+            sectionId: release.keyStatisticsSecondarySection.id,
+            sectionKey: 'keyStatisticsSecondarySection',
+            block: {
+              contentBlockId: selectedDataBlockId,
+              order: 0,
+            },
+          });
+
+          setIsFormOpen(false);
         }}
         onCancel={() => {
           setIsFormOpen(false);
