@@ -6,6 +6,7 @@ import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile'
 import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
 import { Publication, Release } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
+import orderBy from 'lodash/orderBy';
 import React from 'react';
 
 interface Props
@@ -18,7 +19,7 @@ interface Props
   publication: Publication;
 }
 
-const HeadlinesSection = ({
+const PublicationReleaseHeadlinesSection = ({
   publication,
   keyStatisticsSection,
   headlinesSection,
@@ -35,21 +36,14 @@ const HeadlinesSection = ({
           })}
         </div>
 
-        {(headlinesSection.content || [])
-          .sort((a, b) => {
-            if (a.order === undefined || b.order === undefined) {
-              return 0;
-            }
-            return a.order - b.order;
-          })
-          .map((block, i) => (
-            <BlockRenderer
-              key={block.id}
-              id={`headlines-section-${i}`}
-              publication={publication}
-              block={block}
-            />
-          ))}
+        {orderBy(headlinesSection.content, 'order').map((block, i) => (
+          <BlockRenderer
+            key={block.id}
+            id={`headlines-section-${i}`}
+            publication={publication}
+            block={block}
+          />
+        ))}
       </TabsSection>
 
       {keyStatisticsSecondarySection.content?.[0] && (
@@ -73,4 +67,4 @@ const HeadlinesSection = ({
   );
 };
 
-export default HeadlinesSection;
+export default PublicationReleaseHeadlinesSection;

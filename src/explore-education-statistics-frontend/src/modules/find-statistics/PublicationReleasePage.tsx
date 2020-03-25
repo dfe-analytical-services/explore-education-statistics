@@ -24,7 +24,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { NextPageContext } from 'next';
 import React, { Component } from 'react';
-import HeadlinesSection from './components/PublicationReleaseHeadlinesSection';
+import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
 interface Props {
@@ -327,7 +327,7 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        <HeadlinesSection
+        <PublicationReleaseHeadlinesSection
           publication={data.publication}
           keyStatisticsSection={data.keyStatisticsSection}
           headlinesSection={data.headlinesSection}
