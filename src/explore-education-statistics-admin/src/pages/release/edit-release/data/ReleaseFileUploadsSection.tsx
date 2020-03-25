@@ -97,8 +97,8 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
     ancillaryFileToDelete: string,
     form: FormikActions<{}>,
   ) => {
-    const ancilliaryFiles = [...files];
-    const fileToDelete = ancilliaryFiles.find(
+    const ancillaryFiles = [...files];
+    const fileToDelete = ancillaryFiles.find(
       file => file.filename === ancillaryFileToDelete,
     );
 
