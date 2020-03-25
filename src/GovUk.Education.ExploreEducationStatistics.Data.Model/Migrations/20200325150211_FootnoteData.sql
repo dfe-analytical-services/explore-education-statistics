@@ -14,7 +14,7 @@ BEGIN CATCH
     DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
     RAISERROR (N'Error executing %s(SUBJECT: %s, FOOTNOTE: %uniq) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @KEY, @errorMessage);
 END CATCH
-GO;
+GO
 
 CREATE OR ALTER PROCEDURE InsertIndicatorFootnote
     @subjectName NVARCHAR(max),
@@ -34,7 +34,7 @@ BEGIN CATCH
     DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
     RAISERROR (N'Error executing %s(SUBJECT: %s, INDICATOR: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @indicatorName, @KEY, @errorMessage);
 END CATCH
-GO;
+GO
 
 CREATE OR ALTER PROCEDURE InsertFilterFootnote
     @subjectName NVARCHAR(max),
@@ -54,7 +54,7 @@ BEGIN CATCH
     DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
     RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterName, @KEY, @errorMessage);
 END CATCH
-GO;
+GO
 
 CREATE OR ALTER PROCEDURE InsertFilterGroupFootnote
     @subjectName NVARCHAR(max),
@@ -74,7 +74,7 @@ BEGIN CATCH
     DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
     RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER GROUP: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterGroupName, @KEY, @errorMessage);
 END CATCH
-GO;
+GO
 
 CREATE OR ALTER PROCEDURE InsertFilterItemFootnote
     @subjectName NVARCHAR(max),
@@ -94,7 +94,7 @@ BEGIN CATCH
     DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
     RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER ITEM: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterItemName, @KEY, @errorMessage);
 END CATCH
-GO;
+GO
 
 
 -- Pupil absence in schools in England 2016/17
