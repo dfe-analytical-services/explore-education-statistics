@@ -10,6 +10,7 @@ import imageReleaseDraft from './images/guidance/guidance-edit-release-draft.png
 import imageReleaseHighReview from './images/guidance/guidance-edit-release-high-review.png';
 import imageReleaseContent from './images/guidance/guidance-edit-release-content.png';
 import imageReleaseUpdateReleaseStatus from './images/guidance/guidance-edit-release-update-release-status.png';
+import imageReleaseUpdateReleaseStatusBtn from './images/guidance/guidance-edit-release-update-release-status-btn.png';
 import imageReleaseNotes from './images/guidance/guidance-edit-release-notes.png';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
@@ -321,8 +322,18 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   <h4>
                     To update release status and approve your release for
                     sign-off - use the main ‘Update release status’ tab across
-                    the top of the page, select the ‘Ready for sign-off’ radio
-                    button and then the green ‘Update’ button.
+                    the top of the page,
+                  </h4>
+                  <img
+                    src={imageReleaseUpdateReleaseStatusBtn}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4>
+                    Select the ‘Ready for sign-off’ radio button and then the
+                    green ‘Update’ button.
                   </h4>
                   <div className="govuk-warning-text">
                     <span
