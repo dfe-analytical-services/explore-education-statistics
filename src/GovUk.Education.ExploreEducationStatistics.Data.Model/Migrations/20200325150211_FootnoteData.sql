@@ -97,20 +97,23 @@ END CATCH
 GO;
 
 
--- DELETE FROM SubjectFootnote WHERE 1=1;
--- DELETE FROM IndicatorFootnote WHERE 1=1;
--- DELETE FROM FilterItemFootnote WHERE 1=1;
--- DELETE FROM FilterGroupFootnote WHERE 1=1;
--- DELETE FROM FilterFootnote WHERE 1=1;
--- DELETE FROM Footnote WHERE 1=1;
+-- Pupil absence in schools in England 2016/17
+DECLARE @absence_release uniqueidentifier = '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5';
+-- Permanent and fixed-period exclusions in England 2016/17
+DECLARE @exclusions_release uniqueidentifier = 'e7774a74-1f62-4b76-b9b5-84f14dac7278';
+
+-- Delete any existing data for the declared releases
+DELETE FROM SubjectFootnote WHERE FootnoteId IN (SELECT Id FROM Footnote F WHERE F.ReleaseId IN (@absence_release, @exclusions_release));
+DELETE FROM IndicatorFootnote WHERE FootnoteId IN (SELECT Id FROM Footnote F WHERE F.ReleaseId IN (@absence_release, @exclusions_release));
+DELETE FROM FilterItemFootnote WHERE FootnoteId IN (SELECT Id FROM Footnote F WHERE F.ReleaseId IN (@absence_release, @exclusions_release));
+DELETE FROM FilterGroupFootnote WHERE FootnoteId IN (SELECT Id FROM Footnote F WHERE F.ReleaseId IN (@absence_release, @exclusions_release));
+DELETE FROM FilterFootnote WHERE FootnoteId IN (SELECT Id FROM Footnote F WHERE F.ReleaseId IN (@absence_release, @exclusions_release));
+DELETE FROM Footnote WHERE ReleaseId IN (@absence_release, @exclusions_release);
 
 
 --
 -- Footnotes
 --
-
-DECLARE @absence_release uniqueidentifier = '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5';
-DECLARE @exclusions_release uniqueidentifier = 'e7774a74-1f62-4b76-b9b5-84f14dac7278';
 
 
 -- Absence footnotes
@@ -318,6 +321,7 @@ VALUES (@footnote_id_40,
 -- Subjects
 --
 
+
 -- Absence subjects
 DECLARE @subject_absence_by_characteristic   NVARCHAR(max) = 'Absence by characteristic';
 DECLARE @subject_absence_by_geographic_level NVARCHAR(max) = 'Absence by geographic level';
@@ -364,6 +368,7 @@ EXEC InsertSubjectFootnote @subject_total_days_missed_due_to_fixed_period_exclus
 --
 -- Indicators
 --
+
 
 -- Absence indicators
 DECLARE @indicator_sess_overall_percent NVARCHAR(max) = 'sess_overall_percent';
@@ -540,7 +545,6 @@ EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_p
 EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_number_of_schools, @footnote_id_36;
 
 
-
 --
 -- Filter Items
 --
@@ -620,6 +624,7 @@ EXEC InsertFilterItemFootnote @subject_total_days_missed_due_to_fixed_period_exc
 --
 -- Filter Groups
 --
+
 
 DECLARE @filterGroup_gender NVARCHAR(max) = 'Gender';
 DECLARE @filterGroup_ethnic_group_major NVARCHAR(max) = 'Ethnic group major';
