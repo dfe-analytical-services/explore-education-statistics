@@ -1,6 +1,6 @@
 import Modal from '@common/components/Modal';
 import React from 'react';
-import { fireEvent, render, wait } from 'react-testing-library';
+import { fireEvent, render, wait } from '@testing-library/react';
 
 describe('Modal', () => {
   const originalAppRootId = process.env.APP_ROOT_ID;

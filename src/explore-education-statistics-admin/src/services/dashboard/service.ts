@@ -25,9 +25,6 @@ const service = {
   getScheduledReleases(): Promise<AdminDashboardRelease[]> {
     return client.get<AdminDashboardRelease[]>('/releases/scheduled');
   },
-  getAvailablePreReleaseContacts(): Promise<PrereleaseContactDetails[]> {
-    return client.get<PrereleaseContactDetails[]>('/prerelease/contacts');
-  },
   getPreReleaseContactsForRelease(
     releaseId: string,
   ): Promise<PrereleaseContactDetails[]> {

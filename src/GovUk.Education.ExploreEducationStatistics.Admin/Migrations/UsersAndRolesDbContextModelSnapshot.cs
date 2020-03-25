@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.0.0")
+                .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -530,6 +530,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             ClaimType = "CanViewPrereleaseContacts",
                             ClaimValue = "",
                             RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -22,
+                            ClaimType = "CreateAnyMethodology",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -23,
+                            ClaimType = "UpdateAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -24,
+                            ClaimType = "AccessAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -25,
+                            ClaimType = "CreateAnyMethodology",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -26,
+                            ClaimType = "UpdateAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -27,
+                            ClaimType = "AccessAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -28,
+                            ClaimType = "ApproveAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -29,
+                            ClaimType = "ApproveAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         });
                 });
 

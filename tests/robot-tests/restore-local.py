@@ -21,16 +21,16 @@ for cmd in copy_to_container_cmds:
     print(subprocess.run(cmd.split()))
 
 restore_cmds = [
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''', # To drop the db
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "DROP DATABASE [content]"''',
+    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''', # To drop the db
+    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "DROP DATABASE [content]"''',
     #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE FILELISTONLY FROM DISK = N'/tmp/content.bak'"''',  # Use to verify "MOVE N'<name>' TO N'<location>'" of next statement
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE DATABASE [content] FROM DISK = N'/tmp/content.bak' WITH FILE = 1, MOVE N'content' TO N'/var/opt/mssql/data/content.mdf',  MOVE N'content_log' TO N'/var/opt/mssql/data/content_log.ldf',  NOUNLOAD,  STATS = 5"''',
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''', # Because backup is saved in single_user mode
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''', # To drop the db
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "DROP DATABASE [statistics]"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE DATABASE [content] FROM DISK = N'/tmp/content.bak' WITH REPLACE, FILE = 1, MOVE N'content' TO N'/var/opt/mssql/data/content.mdf', MOVE N'content_log' TO N'/var/opt/mssql/data/content_log.ldf',  NOUNLOAD,  STATS = 5"''',
+    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''', # Because backup is saved in single_user mode
+    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''', # To drop the db
+    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "DROP DATABASE [statistics]"''',
     #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE FILELISTONLY FROM DISK = N'/tmp/statistics.bak'"''',  # Use to verify "MOVE N'<name>' TO N'<location>'" of next statement
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE DATABASE [statistics] FROM DISK = N'/tmp/statistics.bak' WITH FILE = 1,MOVE N'statistics' TO N'/var/opt/mssql/data/statistics.mdf',  MOVE N'statistics_log' TO N'/var/opt/mssql/data/statistics_log.ldf',  NOUNLOAD,  STATS = 5"''',
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''', # Because backup is saved in single_user mode
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE DATABASE [statistics] FROM DISK = N'/tmp/statistics.bak' WITH REPLACE, FILE = 1, MOVE N'statistics' TO N'/var/opt/mssql/data/statistics.mdf', MOVE N'statistics_log' TO N'/var/opt/mssql/data/statistics_log.ldf',  NOUNLOAD,  STATS = 5"''',
+    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''', # Because backup is saved in single_user mode
     '''rm -rf tmp/*''',
 ]
 for cmd in restore_cmds:

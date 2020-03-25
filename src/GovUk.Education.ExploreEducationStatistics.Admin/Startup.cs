@@ -1,21 +1,23 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -28,7 +30,6 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -168,90 +169,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             });
+            
+            services.Configure<PreReleaseOptions>(Configuration);
 
-            services.AddAuthorization(options =>
-            {
-                // does this user have minimal permissions to access any admin APIs?
-                options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
-                
-                // does this user have permissions to access analyst pages?
-                options.AddPolicy(SecurityPolicies.CanAccessAnalystPages.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.AnalystPagesAccessGranted.ToString()));
-
-                // does this user have permissions to access prerelease pages?
-                options.AddPolicy(SecurityPolicies.CanAccessPrereleasePages.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString()));
-
-                // does this user have permissions to view the prerelease contacts list?
-                options.AddPolicy(SecurityPolicies.CanViewPrereleaseContacts.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.CanViewPrereleaseContacts.ToString()));
-
-                // does this user have permissions to invite and manage all users on the system?
-                options.AddPolicy(SecurityPolicies.CanManageUsersOnSystem.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.ManageAnyUser.ToString()));
-                
-                // does this user have permissions to manage all methodologies on the system?
-                options.AddPolicy(SecurityPolicies.CanManageMethodologiesOnSystem.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.ManageAnyMethodology.ToString()));
-                
-                // does this user have permission to view all Topics across the application?
-                options.AddPolicy(SecurityPolicies.CanViewAllTopics.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.AccessAllTopics.ToString()));
-                
-                // does this user have permission to view a specific Theme?
-                options.AddPolicy(SecurityPolicies.CanViewSpecificTheme.ToString(), policy =>
-                    policy.Requirements.Add(new ViewSpecificThemeRequirement()));
-                
-                // does this user have permission to view all Releases across the application?
-                options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy => 
-                    policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
-                
-                // does this user have permission to create a publication under a specific topic?
-                options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy => 
-                    policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
-                
-                // does this user have permission to create a release under a specific publication?
-                options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy => 
-                    policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement()));
-                
-                // does this user have permission to view a specific Publication?
-                options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
-                    policy.Requirements.Add(new ViewSpecificPublicationRequirement()));
-
-                // does this user have permission to view a specific Release?
-                options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
-                    policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
-
-                // does this user have permission to update a specific Release?
-                options.AddPolicy(SecurityPolicies.CanUpdateSpecificRelease.ToString(), policy =>
-                    policy.Requirements.Add(new UpdateSpecificReleaseRequirement()));
-
-                // does this user have permission to mark a specific Release as a Draft?
-                options.AddPolicy(SecurityPolicies.CanMarkSpecificReleaseAsDraft.ToString(), policy =>
-                    policy.Requirements.Add(new MarkSpecificReleaseAsDraftRequirement()));
-
-                // does this user have permission to submit a specific Release to Higher Review?
-                options.AddPolicy(SecurityPolicies.CanSubmitSpecificReleaseToHigherReview.ToString(), policy =>
-                    policy.Requirements.Add(new SubmitSpecificReleaseToHigherReviewRequirement()));
-
-                // does this user have permission to approve a specific Release?
-                options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
-                    policy.Requirements.Add(new ApproveSpecificReleaseRequirement()));
-
-                // does this user have permission to assign prerelease contacts to a specific Release?
-                options.AddPolicy(SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease.ToString(), policy =>
-                    policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement()));
-            });
+            // here we configure our security policies
+            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-
-            services.AddAutoMapper(typeof(Startup).Assembly);
+            
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient<IMyReleasePermissionSetPropertyResolver, MyReleasePermissionSetPropertyResolver>();
             services.AddTransient<IMyPublicationPermissionSetPropertyResolver, MyPublicationPermissionSetPropertyResolver>();
 
-            services.AddAutoMapper(typeof(Startup).Assembly);
-            
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
@@ -277,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     s.GetService<IMapper>(),
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    new TableStorageService(Configuration.GetConnectionString("PublisherStorage"))));
+                    new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))));
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IThemeRepository, ThemeRepository>();
             services.AddTransient<ITopicService, TopicService>();
@@ -288,7 +217,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
+            services.AddTransient<IMethodologyContentService, MethodologyContentService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
+            services.AddTransient<IPreReleaseContactsService, PreReleaseContactsService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
@@ -341,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
-                new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+                new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
 
@@ -349,28 +280,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
             
             // These services allow us to check our Policies within Controllers and Services
-            services.AddTransient<IAuthorizationService, DefaultAuthorizationService>();
-            services.AddTransient<IUserService, UserService>();
-            
-            // These handlers enforce Resource-based access control
-            services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ViewSpecificThemeAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
+            StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
+
+            services.AddTransient<IFileTypeService, FileTypeService>();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
                     new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
-                // c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
                 c.CustomSchemaIds((type) => type.FullName);
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
                     Name = "Authorization",
@@ -415,7 +334,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+                app.UseHsts(options =>
+                {
+                    options.MaxAge(365);
+                    options.IncludeSubdomains();
+                    options.Preload();
+                });
             }
 
             // Security Headers
@@ -440,12 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ScriptSources(s => s.Self())
                 .ScriptSources(s => s.UnsafeInline())
             );
-            app.UseHsts(options =>
-            {
-                options.MaxAge(365);
-                options.IncludeSubdomains();
-                options.Preload();
-            });
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -501,13 +420,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.Migrate();
                 }
 
-                using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
 
-                using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();

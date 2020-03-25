@@ -15,6 +15,10 @@ function GlossaryIndexPage() {
             Browse our A to Z list of definitions for terms used across
             education statistics and data.
           </p>
+          <p className="govuk-body">
+            The glossary is intended to grow over time as the service is
+            populated.
+          </p>
 
           <PageSearchFormWithAnalytics
             inputLabel="Search our A to Z list of definitions for terms used across
@@ -77,10 +81,14 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="B">
-          <h3 id="bbb-bbb">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="C">
-          <h3 id="ccc-ccc">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="D">
           <h3 id="dual-main-registered-pupils">Dual main registered pupils</h3>
@@ -155,10 +163,14 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="G">
-          <h3 id="ggg-ggg">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="H">
-          <h3 id="hhh-hhh">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="I">
           <h3 id="independent-review-panel">Independent review panel</h3>
@@ -178,10 +190,14 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="J">
-          <h3 id="jjj-jjj">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="K">
-          <h3 id="key-stage">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="L">
           <h3 id="lunchtime-exclusion">Lunchtime exclusion</h3>
@@ -195,7 +211,9 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="M">
-          <h3 id="mmm-mmm">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="N">
           <h3 id="national-offer-day">National Offer Day</h3>
@@ -323,10 +341,14 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="Q">
-          <h3 id="qqq-qqq">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="R">
-          <h3 id="rrr-rrr">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="S">
           <h3 id="school-census">School census</h3>
@@ -364,7 +386,9 @@ function GlossaryIndexPage() {
           <p>Pupils who are on the roll of only 1 school.</p>
         </AccordionSection>
         <AccordionSection heading="T">
-          <h3 id="ttt-ttt">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="U">
           <h3 id="unauthorised-absence">Unauthorised absence</h3>
@@ -380,21 +404,29 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="V">
-          <h3 id="vvv-vvv">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="W">
-          <h3 id="www-wwww">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="X">
-          <h3 id="xxx-xxx">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="Y">
-          <h3 id="yyy-yyy">TBC</h3>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
         <AccordionSection heading="Z">
-          <div>
-            <h3 id="zzz-zzz">TBC</h3>
-          </div>
+          <p className="govuk-inset-text">
+            There are currently no entries under this section
+          </p>
         </AccordionSection>
       </Accordion>
     </Page>

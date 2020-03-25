@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -38,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             TRequirement requirement,
             Release release)
         {
-            var userId = SecurityUtils.GetUserId(authContext.User);
+            var userId = authContext.User.GetUserId();
 
             var releaseRoles = await _context
                 .UserReleaseRoles

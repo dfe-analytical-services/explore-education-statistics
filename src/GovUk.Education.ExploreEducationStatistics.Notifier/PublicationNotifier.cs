@@ -343,7 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         private static CloudTable GetCloudTable(IStorageTableService storageTableService, IConfiguration config,
             string tableName)
         {
-            var connectionStr = config.GetConnectionString(StorageConnectionName);
+            var connectionStr = config.GetValue<string>(StorageConnectionName);
             return storageTableService.GetTable(connectionStr, tableName).Result;
         }
 

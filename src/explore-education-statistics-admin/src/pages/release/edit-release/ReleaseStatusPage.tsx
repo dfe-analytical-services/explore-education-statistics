@@ -1,23 +1,27 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
-import appRouteList from '@admin/routes/dashboard/routes';
-import permissionService from '@admin/services/permissions/service';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import permissionService from '@admin/services/permissions/permissionService';
 import service from '@admin/services/release/edit-release/status/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import Yup from '@common/lib/validation/yup';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import { ReleaseStatus } from '@common/services/publicationService';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
-import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import React, { useEffect, useState } from 'react';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE',
+    'releaseStatus',
+    'Enter a publish scheduled date before approving',
+  ),
+];
 
 interface FormValues {
   releaseStatus: ReleaseStatus;
@@ -27,6 +31,7 @@ interface FormValues {
 interface Model {
   releaseStatus: ReleaseStatus;
   statusOptions: RadioOption[];
+  editable: boolean;
 }
 
 const statusMap: {
@@ -34,59 +39,72 @@ const statusMap: {
 } = {
   Draft: 'In Draft',
   HigherLevelReview: 'Awaiting higher review',
-  Approved: 'Approved for publication',
+  Approved: 'Approved',
 };
 
-const ReleaseStatusPage = ({
-  history,
-  handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+const ReleaseStatusPage = () => {
   const [model, setModel] = useState<Model>();
-  const [showForm, setShowForm] = useState<boolean>(false);
+  const [showForm, setShowForm] = useState(false);
 
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useManageReleaseContext();
 
   useEffect(() => {
     Promise.all([
       service.getReleaseStatus(releaseId),
+      permissionService.canMarkReleaseAsDraft(releaseId),
       permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
       permissionService.canApproveRelease(releaseId),
-    ])
-      .then(([releaseStatus, canSubmit, canApprove]) => {
-        const statusOptions: RadioOption[] = [
-          {
-            label: 'In draft',
-            value: 'Draft',
-          },
-          {
-            label: 'Ready for higher review',
-            value: 'HigherLevelReview',
-            disabled: !canSubmit,
-          },
-          {
-            label: 'Approved for publication',
-            value: 'Approved',
-            disabled: !canApprove,
-          },
-        ];
+    ]).then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
+      const statusOptions: RadioOption[] = [
+        {
+          label: 'In draft',
+          value: 'Draft',
+          disabled: !canMarkAsDraft,
+        },
+        {
+          label: 'Ready for higher review',
+          value: 'HigherLevelReview',
+          disabled: !canSubmit,
+        },
+        {
+          label: 'Approved for publication',
+          value: 'Approved',
+          disabled: !canApprove,
+        },
+      ];
 
+      setModel({
+        releaseStatus,
+        statusOptions,
+        editable: statusOptions.some(option => !option.disabled),
+      });
+    });
+  }, [releaseId, showForm]);
+
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    await service.updateReleaseStatus(releaseId, values).then(() => {
+      if (model) {
         setModel({
-          releaseStatus,
-          statusOptions,
+          ...model,
+          releaseStatus: values.releaseStatus,
+          statusOptions: model.statusOptions,
         });
-      })
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+      }
+
+      setShowForm(false);
+    });
+  }, errorCodeMappings);
+
+  if (!model) return null;
 
   const formId = 'releaseStatusForm';
 
-  if (!model) return null;
   return (
     <>
       <h2 className="govuk-heading-m">Release Status</h2>
       {!showForm ? (
-        <div>
-          <p>
+        <>
+          <div className="govuk-!-margin-bottom-6">
             The current release status is:{' '}
             <StatusBlock text={statusMap[model.releaseStatus]} />
             {model.releaseStatus === 'Approved' && (
@@ -95,11 +113,17 @@ const ReleaseStatusPage = ({
                 <ReleaseServiceStatus releaseId={releaseId} />
               </div>
             )}
-          </p>
-          <Button onClick={() => setShowForm(true)}>
-            Update release status
-          </Button>
-        </div>
+          </div>
+
+          {model.editable && (
+            <Button
+              className="govuk-!-margin-top-2"
+              onClick={() => setShowForm(true)}
+            >
+              Update release status
+            </Button>
+          )}
+        </>
       ) : (
         <Formik<FormValues>
           enableReinitialize
@@ -107,20 +131,7 @@ const ReleaseStatusPage = ({
             releaseStatus: model.releaseStatus,
             internalReleaseNote: '',
           }}
-          onSubmit={async (values: FormValues) => {
-            await service
-              .updateReleaseStatus(releaseId, values)
-              .then(() => {
-                setModel({
-                  releaseStatus: values.releaseStatus,
-                  statusOptions: model.statusOptions,
-                });
-              })
-              .then(() => {
-                history.push(appRouteList.adminDashboard.path as string);
-              })
-              .catch(handleApiErrors);
-          }}
+          onSubmit={handleSubmit}
           validationSchema={Yup.object<FormValues>({
             releaseStatus: Yup.mixed().required('Choose a status'),
             internalReleaseNote: Yup.string().required(
@@ -146,16 +157,18 @@ const ReleaseStatusPage = ({
                   additionalClass="govuk-!-width-one-half"
                 />
                 <div className="govuk-!-margin-top-6">
-                  <Button
+                  <Button type="submit" className="govuk-!-margin-right-6">
+                    Update
+                  </Button>
+                  <ButtonText
                     onClick={() => {
                       form.resetForm();
                       setShowForm(false);
                     }}
-                    className="govuk-!-margin-left-1 govuk-button--secondary"
+                    className="govuk-button govuk-button--secondary"
                   >
                     Cancel
-                  </Button>
-                  <Button type="submit">Update</Button>
+                  </ButtonText>
                 </div>
               </Form>
             );
@@ -166,4 +179,4 @@ const ReleaseStatusPage = ({
   );
 };
 
-export default withErrorControl(ReleaseStatusPage);
+export default ReleaseStatusPage;

@@ -4,6 +4,25 @@ import React from 'react';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 
+import imageContentEdit from './images/guidance/guidance-content-edit.png';
+import imageCommentAdd from './images/guidance/guidance-content-comments-add.png';
+import imageCommentSave from './images/guidance/guidance-content-comment-save.png';
+import imageContentEditButton from './images/guidance/guidance-content-edit-button.png';
+import imageContentSave from './images/guidance/guidance-content-save.png';
+import imageAddDatablock from './images/guidance/guidance-content-add-datablock.png';
+import imageEmbedDatablock from './images/guidance/guidance-content-add-embed-data.png';
+import imageKeyStatBtn from './images/guidance/guidance-content-keystat-btn.png';
+import imageKeyStatSelect from './images/guidance/guidance-content-embed-keystat.png';
+import imageKeyStatGuidance from './images/guidance/guidance-content-add-guidance.png';
+import imageKeyStatMultiple from './images/guidance/guidance-content-add-multiple-stats.png';
+import imageRelatedBtn from './images/guidance/guidance-content-add-related.png';
+import imageRelatedAdd from './images/guidance/guidance-content-create-related.png';
+import imageSectionAdd from './images/guidance/guidance-content-add-section.png';
+import imageReorderBtn from './images/guidance/guidance-content-reorder-sections.png';
+import imageReorderSection from './images/guidance/guidance-content-reorder-sections-move.png';
+import imageContentPreview from './images/guidance/guidance-content-preview.png';
+import imageReleaseNote from './images/guidance/guidance-content-release-note.png';
+
 const DocumentationManageContent = () => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
@@ -62,12 +81,21 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1jqjgpGFMDmUrmk-pePOrjGneQ_3ZNLht">
+                  <h4>
                     Select the 'Add / view comments and edit content' radio
-                    button
-                  </a>
+                    button.
+                  </h4>{' '}
+                  <p>
+                    This will be selected by default when you enter this page.
+                  </p>
                 </li>
               </ul>
+              <img
+                src={imageContentEdit}
+                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                alt=""
+              />
+
               <h3>Don't</h3>
               <p>
                 Don’t worry if you haven't got all the content to complete your
@@ -119,22 +147,28 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1USwHwp1YMTHXwdp4S6hWGqFkFBaRle7S">
-                    Select 'Add / view comments to section' link
-                  </a>
+                  <h4>Select 'Add / view comments' link</h4>
                 </li>
               </ul>
+              <img
+                src={imageCommentAdd}
+                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                alt=""
+              />
               <p>
                 2. To add comments - add them into the text box and select the
                 green 'Submit' button.
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1-oKvKHOrGABKEWw1axnMQJ6-dfVcKe33">
-                    Add comments and select green 'Submit' button.
-                  </a>
+                  <h4>Add comments and select green 'Submit' button.</h4>
                 </li>
               </ul>
+              <img
+                src={imageCommentSave}
+                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                alt=""
+              />
               <p>
                 3. To resolve comments - select the grey 'Resolve' button if
                 you’ve dealt with them or select 'Remove' if they're no longer
@@ -142,9 +176,7 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1iB7oeQiBZdoOf-qtit71COcjUbnWIhUR">
-                    Select grey 'Resolve' button or select 'Remove'
-                  </a>
+                  <h4>Select grey 'Resolve' button or select 'Remove'</h4>
                 </li>
               </ul>
               <h3>Help and support</h3>
@@ -204,11 +236,16 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1USwHwp1YMTHXwdp4S6hWGqFkFBaRle7S">
-                    Select green 'Edit this section' button
-                  </a>
+                  <h4>
+                    Select 'Edit' button on the grey editable content blocks
+                  </h4>
                 </li>
               </ul>
+              <img
+                src={imageContentEditButton}
+                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                alt=""
+              />
               <p>
                 Add and edit content in the same way you would using Word or in
                 an email and then select the green 'Save' button when you've
@@ -216,11 +253,14 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1aKxT6XYJ3UnlseMWfhJNqM1LuGWlxaI6">
-                    Add and edit content and select green 'Save' button
-                  </a>
+                  <h4>Add and edit content and select green 'Save' button</h4>
                 </li>
               </ul>
+              <img
+                src={imageContentSave}
+                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                alt=""
+              />
               <p>
                 If you're adding or editing content to 'Latest headline facts
                 and figures' section read and refer to the guidance and tips
@@ -231,32 +271,40 @@ const DocumentationManageContent = () => {
                 .
               </p>
               <p>
-                2. To add tables and charts to a section - select the green 'Add
-                data black to this section' button.
+                2. To add tables and charts to a section - select the 'Add data
+                block' button.
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1Cm71wi4nX6tffWGdMr_14dMQkN7s175h">
-                    Select green 'Add data black to this section' button
-                  </a>
+                  <h4>Select 'Add data block' button</h4>
                 </li>
               </ul>
+              <img
+                src={imageAddDatablock}
+                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                alt=""
+              />
               <p>
                 Select the related data block you're looking for using the
-                'Select a data block' dropdown and the tables and charts will be
-                added to the section.
+                'Select a data block' dropdown and the tables will appear.
+                Select the 'Embed' button and the charts will be added to the
+                section.
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1T7LAHc7qtLgJX085hyPr5LQq1iTaVP5B">
+                  <h4>
                     Select data block using 'Select a data block' dropdown
-                  </a>
+                  </h4>
                 </li>
               </ul>
+              <img
+                src={imageEmbedDatablock}
+                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                alt=""
+              />
               <p>
-                3. To add key indicators to the 'Latest headline facts and
-                figures' section - select the green 'Add another key indicator'
-                button.
+                3. To add key indicators to the 'Headline facts and figures'
+                section - select the green 'Add key statistic' button.
               </p>
               <p>
                 Our research has shown you should aim to add up to a maximum of
@@ -276,10 +324,41 @@ const DocumentationManageContent = () => {
               <p>Select the green 'Save' button when you've finished.</p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1IAqyiKwP1EdvPR5GI7tU9Z4i_3qKwvKy">
-                    Select green 'Add another key indicator' button, add
-                    guidance text and select green 'Save' button
-                  </a>
+                  <h4>Select green 'Add key statistic' button</h4>
+                  <img
+                    src={imageKeyStatBtn}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4>
+                    Choose key statistic from drop down list and select green
+                    'Embed' button
+                  </h4>
+                  <img
+                    src={imageKeyStatSelect}
+                    className=" govuk-!-margin-bottom-9"
+                    alt=""
+                    width="300"
+                  />
+                </li>
+                <li>
+                  <h4>Add guidance text</h4>
+                  <img
+                    src={imageKeyStatGuidance}
+                    className="govuk-!-margin-bottom-9"
+                    alt=""
+                    width="300"
+                  />
+                </li>
+                <li>
+                  <h4>Add up to a maximum of 6 key indicators</h4>
+                  <img
+                    src={imageKeyStatMultiple}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
                 </li>
               </ul>
               <p>
@@ -289,10 +368,24 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1QcUTnCzYstAOKk5mIcWXrSVYGWSEKmBM">
+                  <h4>Select 'Add related information button'</h4>
+                  <img
+                    src={imageRelatedBtn}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4>
                     Add title and link and select green 'Add related
                     information'
-                  </a>
+                  </h4>
+                  <img
+                    src={imageRelatedAdd}
+                    className="govuk-!-margin-bottom-9"
+                    alt=""
+                    width="300"
+                  />
                 </li>
               </ul>
               <p>
@@ -369,16 +462,12 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1XhzngKyxuFyTRygMW7wFAKvCZePkTgvd">
-                    Select green 'Add new section' button
-                  </a>
-                </li>
-              </ul>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <a href="https://drive.google.com/open?id=1fgU-Nke0f1YrPGUOQkzE9BNu7KS7olh8">
-                    View added sections
-                  </a>
+                  <h4>Select green 'Add new section' button</h4>
+                  <img
+                    src={imageSectionAdd}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
                 </li>
               </ul>
               <p>2. To reorder your sections:</p>
@@ -392,17 +481,23 @@ const DocumentationManageContent = () => {
               </ul>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=121HgJh3OjoMf98R2g5IA6NSOz9TC8vOw">
-                    Select grey 'Reorder sections' button
-                  </a>
+                  <h4>Select 'Reorder sections' button</h4>
+                  <img
+                    src={imageReorderBtn}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
                 </li>
-              </ul>
-              <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1xi-kjUYRLOoOVID0nCU9YIjg2-Kkcinm">
+                  <h4>
                     Reorder using 3 grey lines and select green 'Save
                     reordering' button
-                  </a>
+                  </h4>
+                  <img
+                    src={imageReorderSection}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
                 </li>
               </ul>
               <h3>Don't</h3>
@@ -442,9 +537,12 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1oLJsUiG8tHxSq_g5u-t1oWUl6woTsv9r">
-                    Select 'Preview content' radio button
-                  </a>
+                  <h4>Select 'Preview content' radio button</h4>
+                  <img
+                    src={imageContentPreview}
+                    className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
+                    alt=""
+                  />
                 </li>
               </ul>
               <h3>Help and support</h3>
@@ -486,9 +584,13 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a href="https://drive.google.com/open?id=1kF4Uvu4Yuln0d2v-_Fkyvt5JyvjEYXvg">
-                    Add notes and select green 'Add note' button
-                  </a>
+                  <h4>Add notes and select green 'Add note' button</h4>
+                  <img
+                    src={imageReleaseNote}
+                    className="govuk-!-margin-bottom-9"
+                    alt=""
+                    width="300"
+                  />
                 </li>
               </ul>
               <h3>Help and support</h3>

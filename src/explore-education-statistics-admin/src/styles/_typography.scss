@@ -53,3 +53,10 @@ hr {
     %govuk-section-break--m,
     %govuk-section-break--visible;
 }
+
+/* stylelint-disable scss/at-extend-no-missing-placeholder */
+
+blockquote {
+  @extend .govuk-inset-text;
+  margin-left: 0;
+}

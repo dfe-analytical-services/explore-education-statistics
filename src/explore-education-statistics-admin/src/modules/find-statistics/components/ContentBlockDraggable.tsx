@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import styles from '@admin/modules/find-statistics/components/EditableContentBlock.module.scss';
+import styles from '@admin/components/editable/EditableContentBlock.module.scss';
 
 const ContentBlockDraggable = ({
   draggable,
@@ -15,7 +15,7 @@ const ContentBlockDraggable = ({
 }) => (
   <>
     {draggable ? (
-      <Draggable draggableId={draggableId} index={index} type="contentBlock">
+      <Draggable draggableId={draggableId} index={index}>
         {draggableProvided => (
           <div
             {...draggableProvided.draggableProps}

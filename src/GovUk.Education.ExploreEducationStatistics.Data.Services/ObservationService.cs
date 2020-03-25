@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
@@ -59,6 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var sponsorListParam = CreateIdListType("sponsorList", query.Sponsor);
             var wardListParam =
                 CreateIdListType("wardList", query.Ward);
+            var planningAreaListParam =
+                CreateIdListType("planningAreaList", query.PlanningArea);
             var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
             // EES-745 It's ok to use Observation as the return type here, as long as only the Id field is selected
@@ -83,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             "@rscRegionsList," +
                             "@sponsorList," +
                             "@wardList," +
+                            "@planningAreaList," +
                             "@filterItemList",
                     subjectIdParam,
                     geographicLevelParam,
@@ -101,6 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     rscRegionListParam,
                     sponsorListParam,
                     wardListParam,
+                    planningAreaListParam,
                     filterItemListParam);
 
             _logger.LogTrace("Executed inner stored procedure in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);

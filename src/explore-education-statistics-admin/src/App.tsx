@@ -1,14 +1,14 @@
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
+import ErrorBoundary from '@admin/components/ErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
-import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
+import { AuthContextProvider } from '@admin/contexts/AuthContext';
 import React from 'react';
 import { Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import './App.scss';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import appRouteList from './routes/dashboard/routes';
-import prototypeRouteList from './routes/prototypeRoutes';
 
 function App() {
   const authRoutes = Object.entries(apiAuthorizationRouteList).map(
@@ -27,25 +27,23 @@ function App() {
     );
   });
 
-  const prototypeRoutes = Object.entries(prototypeRouteList).map(
-    ([key, prototypeRoute]) => {
-      return <Route key={`authRoute-${key}`} {...prototypeRoute} />;
-    },
-  );
-
   return (
-    <AriaLiveAnnouncer>
-      <ThemeAndTopic>
-        <BrowserRouter>
-          <Switch>
-            {authRoutes}
-            {appRoutes}
-            {prototypeRoutes}
-            <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
-          </Switch>
-        </BrowserRouter>
-      </ThemeAndTopic>
-    </AriaLiveAnnouncer>
+    <ThemeAndTopic>
+      <BrowserRouter>
+        <AuthContextProvider>
+          <ErrorBoundary>
+            <Switch>
+              {authRoutes}
+              {appRoutes}
+              <ProtectedRoute
+                allowAnonymousUsers
+                component={PageNotFoundPage}
+              />
+            </Switch>
+          </ErrorBoundary>
+        </AuthContextProvider>
+      </BrowserRouter>
+    </ThemeAndTopic>
   );
 }
 

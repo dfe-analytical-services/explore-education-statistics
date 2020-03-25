@@ -1,3 +1,5 @@
+import { ExternalMethodology } from '../dashboard/types';
+
 export interface IdTitlePair {
   id: string;
   title: string;
@@ -40,10 +42,18 @@ export interface TimePeriodCoverageGroup {
   }[];
 }
 
+export type MethodologyStatus = 'Draft' | 'Approved';
+
+export interface BasicMethodology {
+  id: string;
+  title: string;
+  status: MethodologyStatus;
+}
 export interface BasicPublicationDetails {
   id: string;
   title: string;
   contact?: ContactDetails;
-  methodologyId?: string;
+  methodology?: BasicMethodology;
+  externalMethodology?: ExternalMethodology;
   themeId: string;
 }

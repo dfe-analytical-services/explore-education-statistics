@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -10,34 +11,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement
     {}
 
-    public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
+    public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler : 
+        CompoundAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
     {
         public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler(),
-            new AssignPrereleaseContactsToSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(context))
+            new CanUpdateAllReleasesAuthorizationHandler(),
+            new HasEditorRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
-    }
     
-    public class AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler : ReleaseAuthorizationHandler<
-        AssignPrereleaseContactsToSpecificReleaseRequirement>
-    {
-        public AssignPrereleaseContactsToSpecificReleaseCanUpdateAllReleasesAuthorizationHandler()
-            : base(ctx =>
-                ctx.Release.Status == ReleaseStatus.Approved && 
-                SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
-            )
+        public class CanUpdateAllReleasesAuthorizationHandler : 
+            EntityAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
         {
+            public CanUpdateAllReleasesAuthorizationHandler()
+                : base(ctx =>
+                    ctx.Entity.Status == ReleaseStatus.Approved && 
+                    SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
+                )
+            {
             
+            }
         }
-    }
 
-    public class AssignPrereleaseContactsToSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler
-        : HasRoleOnReleaseAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement>
-    {
-        public AssignPrereleaseContactsToSpecificReleaseHasUpdaterRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, ctx => ctx.Release.Status == ReleaseStatus.Approved && ContainsEditorRole(ctx.Roles))
-        {}
+        public class HasEditorRoleOnReleaseAuthorizationHandler
+            : HasRoleOnReleaseAuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement>
+        {
+            public HasEditorRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
+                : base(context, ctx => ctx.Release.Status == ReleaseStatus.Approved && ContainsEditorRole(ctx.Roles))
+            {}
+        }
     }
 }

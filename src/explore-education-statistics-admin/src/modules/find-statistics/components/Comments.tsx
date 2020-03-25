@@ -1,16 +1,18 @@
-import LoginContext from '@admin/components/Login';
-import { User } from '@admin/services/sign-in/types';
+import { useAuthContext } from '@admin/contexts/AuthContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { ExtendedComment } from '@admin/services/publicationService';
-import Details from '@common/components/Details';
-import classNames from 'classnames';
-import React, { useState } from 'react';
 import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
-import { EditingContentBlockContext } from '@admin/modules/find-statistics/components/EditableContentBlocks';
+import { User } from '@admin/services/sign-in/types';
+import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
+import classNames from 'classnames';
+import React, { createRef, useState } from 'react';
+
 import styles from './Comments.module.scss';
 
 interface Props {
   contentBlockId: string;
+  sectionId: string;
   initialComments: ExtendedComment[];
   onCommentsChange?: (comments: ExtendedComment[]) => Promise<void>;
   canResolve?: boolean;
@@ -19,6 +21,7 @@ interface Props {
 
 const Comments = ({
   contentBlockId,
+  sectionId,
   initialComments,
   onCommentsChange = () => Promise.resolve(),
   canResolve = false,
@@ -27,12 +30,10 @@ const Comments = ({
   const [newComment, setNewComment] = React.useState<string>('');
   const [editableComment, setEditableComment] = useState<string>('');
   const [editableCommentText, setEditableCommentText] = useState<string>('');
-  const [comments, setComments] = React.useState<ExtendedComment[]>(
-    initialComments,
-  );
+  const [comments, setComments] = useState<ExtendedComment[]>(initialComments);
 
-  const context = React.useContext(LoginContext);
-  const editingContext = React.useContext(EditingContentBlockContext);
+  const { releaseId } = useManageReleaseContext();
+  const context = useAuthContext();
 
   const addComment = (comment: string) => {
     const user = context.user as User;
@@ -45,11 +46,11 @@ const Comments = ({
       state: 'open',
     };
 
-    if (editingContext.releaseId && editingContext.sectionId) {
+    if (releaseId && sectionId) {
       service
         .addContentSectionComment(
-          editingContext.releaseId,
-          editingContext.sectionId,
+          releaseId,
+          sectionId,
           contentBlockId,
           additionalComment,
         )
@@ -71,11 +72,11 @@ const Comments = ({
   const removeComment = (index: number) => {
     const commentId = comments[index].id;
 
-    if (editingContext.releaseId && editingContext.sectionId) {
+    if (releaseId && sectionId) {
       service
         .deleteContentSectionComment(
-          editingContext.releaseId,
-          editingContext.sectionId,
+          releaseId,
+          sectionId,
           contentBlockId,
           commentId,
         )
@@ -98,11 +99,11 @@ const Comments = ({
     resolvedComment.resolvedOn = new Date();
     resolvedComment.resolvedBy = context.user && context.user.name;
 
-    if (editingContext.releaseId && editingContext.sectionId) {
+    if (releaseId && sectionId) {
       service
         .updateContentSectionComment(
-          editingContext.releaseId,
-          editingContext.sectionId,
+          releaseId,
+          sectionId,
           contentBlockId,
           resolvedComment,
         )
@@ -121,11 +122,11 @@ const Comments = ({
   const updateComment = (index: number, newContent: string) => {
     const editedComment = { ...comments[index] };
     editedComment.commentText = newContent;
-    if (editingContext.releaseId && editingContext.sectionId) {
+    if (releaseId && sectionId) {
       service
         .updateContentSectionComment(
-          editingContext.releaseId,
-          editingContext.sectionId,
+          releaseId,
+          sectionId,
           contentBlockId,
           editedComment,
         )
@@ -143,7 +144,8 @@ const Comments = ({
     }
   };
 
-  const ref = React.createRef<HTMLDivElement>();
+  const ref = createRef<HTMLDivElement>();
+
   return (
     <>
       <div
@@ -152,7 +154,9 @@ const Comments = ({
         className={classNames('dfe-comment-block', [styles.addComment])}
       >
         <Details
-          summary={`${canComment ? `Add / ` : ''}View comments for section`}
+          summary={`${canComment ? `Add / ` : ''}View comments (${
+            comments.length
+          })`}
           className="govuk-!-margin-bottom-1 govuk-body-s"
           onToggle={isOpen => {
             if (ref.current) {

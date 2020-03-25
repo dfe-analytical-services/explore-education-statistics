@@ -33,7 +33,7 @@ exports[`Tabs renders multiple tabs correctly with titles 1`] = `
       </a>
     </li>
   </ul>
-  <section class="govuk-tabs__panel dfe-content-overflow panel"
+  <section class="govuk-tabs__panel panel"
            id="test-tabs-1"
            aria-labelledby="test-tabs-1-tab"
            role="tabpanel"
@@ -46,7 +46,7 @@ exports[`Tabs renders multiple tabs correctly with titles 1`] = `
       Test section 1 content
     </p>
   </section>
-  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-visually-hidden forceFullWidth"
+  <section class="govuk-tabs__panel panel govuk-visually-hidden forceFullWidth"
            id="test-tabs-2"
            aria-labelledby="test-tabs-2-tab"
            role="tabpanel"
@@ -95,7 +95,7 @@ exports[`Tabs renders multiple tabs correctly without titles 1`] = `
       </a>
     </li>
   </ul>
-  <section class="govuk-tabs__panel dfe-content-overflow panel"
+  <section class="govuk-tabs__panel panel"
            id="test-tabs-1"
            aria-labelledby="test-tabs-1-tab"
            role="tabpanel"
@@ -105,7 +105,7 @@ exports[`Tabs renders multiple tabs correctly without titles 1`] = `
       Test section 1 content
     </p>
   </section>
-  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-visually-hidden forceFullWidth"
+  <section class="govuk-tabs__panel panel govuk-visually-hidden forceFullWidth"
            id="test-tabs-2"
            aria-labelledby="test-tabs-2-tab"
            role="tabpanel"
@@ -137,7 +137,7 @@ exports[`Tabs renders single tab correctly 1`] = `
       </a>
     </li>
   </ul>
-  <section class="govuk-tabs__panel dfe-content-overflow panel"
+  <section class="govuk-tabs__panel panel"
            id="test-tabs-1"
            aria-labelledby="test-tabs-1-tab"
            role="tabpanel"

@@ -1,4 +1,4 @@
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/createErrorHelper';
 import classNames from 'classnames';
 import { FormikProps } from 'formik';
 import React, { ChangeEvent, ReactNode } from 'react';

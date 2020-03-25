@@ -1,7 +1,5 @@
 import Link from '@admin/components/Link';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import {
   getSelectedTimePeriodCoverageLabel,
   getTimePeriodCoverageDateRangeStringLong,
@@ -12,20 +10,17 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
+import permissionService from '@admin/services/permissions/permissionService';
 import service from '@admin/services/release/edit-release/summary/service';
-import permissionService from '@admin/services/permissions/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-} from '@common/services/publicationService';
-import React, { useContext, useEffect, useState } from 'react';
+} from '@common/utils/date/dayMonthYear';
+import React, { useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {
   releaseSummaryDetails: ReleaseSummaryDetails;
@@ -34,12 +29,10 @@ interface ReleaseSummaryModel {
   canEditRelease: boolean;
 }
 
-const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
+const ReleaseSummaryPage = () => {
   const [model, setModel] = useState<ReleaseSummaryModel>();
 
-  const { publication, releaseId } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { publication, releaseId } = useManageReleaseContext();
 
   useEffect(() => {
     Promise.all([
@@ -47,24 +40,22 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
       commonService.getReleaseTypes(),
       commonService.getTimePeriodCoverageGroups(),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(
-        ([
+    ]).then(
+      ([
+        releaseSummaryDetails,
+        releaseTypes,
+        timePeriodCoverageGroups,
+        canEditRelease,
+      ]) => {
+        setModel({
           releaseSummaryDetails,
-          releaseTypes,
           timePeriodCoverageGroups,
+          releaseTypes,
           canEditRelease,
-        ]) => {
-          setModel({
-            releaseSummaryDetails,
-            timePeriodCoverageGroups,
-            releaseTypes,
-            canEditRelease,
-          });
-        },
-      )
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors]);
+        });
+      },
+    );
+  }, [releaseId]);
 
   return (
     <>
@@ -115,7 +106,10 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
           {model.canEditRelease && (
             <div className="dfe-align--right">
               <Link
-                to={summaryEditRoute.generateLink(publication.id, releaseId)}
+                to={summaryEditRoute.generateLink({
+                  publicationId: publication.id,
+                  releaseId,
+                })}
               >
                 Edit release summary
               </Link>
@@ -127,4 +121,4 @@ const ReleaseSummaryPage = ({ handleApiErrors }: ErrorControlProps) => {
   );
 };
 
-export default withErrorControl(ReleaseSummaryPage);
+export default ReleaseSummaryPage;

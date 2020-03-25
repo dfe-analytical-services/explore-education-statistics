@@ -1,11 +1,9 @@
 import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import dashboardService from '@admin/services/dashboard/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Details from '@common/components/Details';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { forceCheck } from 'react-lazyload';
 
 interface Props {
   releaseId: string;
@@ -21,8 +19,7 @@ const ReleaseServiceStatus = ({
   releaseId,
   refreshPeriod = 10000,
   exclude,
-  handleApiErrors,
-}: Props & ErrorControlProps) => {
+}: Props) => {
   const [currentStatus, setCurrentStatus] = useState<ReleaseStatus>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
     'blue',
@@ -33,20 +30,29 @@ const ReleaseServiceStatus = ({
     return dashboardService
       .getReleaseStatus(releaseId)
       .then(status => {
-        setCurrentStatus(status);
-        if (
-          status &&
-          (status.overallStage === 'Started' ||
-            status.overallStage === 'Queued')
-        ) {
+        if (!status) {
+          // 204 response waiting for status
+          setCurrentStatus({ overallStage: 'Validating' });
           timeoutRef.current = setTimeout(
             fetchReleaseServiceStatus,
             refreshPeriod,
           );
+        } else {
+          setCurrentStatus(status);
+          if (
+            status &&
+            (status.overallStage === 'Started' ||
+              status.overallStage === 'Queued')
+          ) {
+            timeoutRef.current = setTimeout(
+              fetchReleaseServiceStatus,
+              refreshPeriod,
+            );
+          }
         }
       })
-      .catch(handleApiErrors);
-  }, [releaseId, handleApiErrors, refreshPeriod]);
+      .then(forceCheck);
+  }, [releaseId, refreshPeriod]);
 
   function cancelTimer() {
     if (timeoutRef.current) clearInterval(timeoutRef.current);
@@ -60,30 +66,32 @@ const ReleaseServiceStatus = ({
     };
   }, [fetchReleaseServiceStatus]);
 
-  const statusDetailColor = (
-    status: string,
-  ): { color: StatusBlockProps['color']; text: string } => {
-    if (currentStatus) {
-      switch (status) {
-        case 'Scheduled':
-          return { color: 'blue', text: status };
-        case 'NotStarted':
-          return { color: 'blue', text: 'Not Started' };
-        case 'Invalid':
-        case 'Failed':
-        case 'Cancelled':
-          return { color: 'red', text: status };
-        case 'Queued':
-        case 'Started':
-          return { color: 'orange', text: status };
-        case 'Complete':
-          return { color: 'green', text: status };
-        default:
-          return { color: undefined, text: '' };
+  const statusDetailColor = useCallback(
+    (status: string): { color: StatusBlockProps['color']; text: string } => {
+      if (currentStatus) {
+        switch (status) {
+          case 'Scheduled':
+            return { color: 'blue', text: status };
+          case 'NotStarted':
+            return { color: 'blue', text: 'Not Started' };
+          case 'Invalid':
+          case 'Failed':
+          case 'Cancelled':
+            return { color: 'red', text: status };
+          case 'Validating':
+          case 'Queued':
+          case 'Started':
+            return { color: 'orange', text: status };
+          case 'Complete':
+            return { color: 'green', text: status };
+          default:
+            return { color: 'red', text: 'Error' };
+        }
       }
-    }
-    return { color: undefined, text: '' };
-  };
+      return { color: 'orange', text: 'Requesting status' };
+    },
+    [currentStatus],
+  );
 
   useEffect(() => {
     if (currentStatus && currentStatus.overallStage) {
@@ -101,7 +109,11 @@ const ReleaseServiceStatus = ({
       {exclude !== 'status' && (
         <StatusBlock
           color={statusColor}
-          text={`Release Process - ${currentStatus.overallStage}`}
+          text={
+            currentStatus
+              ? currentStatus.overallStage
+              : 'Waiting to be scheduled...'
+          }
         />
       )}
 
@@ -112,7 +124,8 @@ const ReleaseServiceStatus = ({
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
               {Object.entries(currentStatus).map(([key, val]) => {
-                if (key === 'overallStage') return null;
+                if (['overallStage', 'releaseId', 'lastUpdated'].includes(key))
+                  return null;
                 const { color, text } = statusDetailColor(val);
 
                 if (!color) {
@@ -135,4 +148,4 @@ const ReleaseServiceStatus = ({
   );
 };
 
-export default withErrorControl(ReleaseServiceStatus);
+export default ReleaseServiceStatus;

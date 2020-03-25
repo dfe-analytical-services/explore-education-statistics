@@ -1,7 +1,7 @@
-import appRouteList from '@admin/routes/dashboard/routes';
-import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import appRouteList from '@admin/routes/dashboard/routes';
+import React from 'react';
 
 function IndexPage() {
   return (

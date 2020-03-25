@@ -1,10 +1,10 @@
 using System;
-using System.Net;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -20,25 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<ActionResult<PermalinkViewModel>> GetAsync(Guid id)
         {
-            try
-            {
-                var permalink = await _permalinkService.GetAsync(id);
-                return Ok(permalink);
-            }
-            catch (StorageException e)
-                when ((HttpStatusCode) e.RequestInformation.HttpStatusCode == HttpStatusCode.NotFound)
-            {
-                return NotFound();
-            }
+            return await _permalinkService.GetAsync(id).HandleFailuresOrOk();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TableBuilderQueryContext query)
+        public async Task<ActionResult<PermalinkViewModel>> CreateAsync([FromBody] TableBuilderQueryContext query)
         {
-            var permalink = await _permalinkService.CreateAsync(query);
-            return Ok(permalink);
+            return await _permalinkService.CreateAsync(query).HandleFailuresOrOk();
         }
     }
 }

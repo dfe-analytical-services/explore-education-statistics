@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -5,10 +6,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class CreatePublicationForSpecificTopicRequirement : IAuthorizationRequirement
     {}
     
-    public class CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler : HasClaimAuthorizationHandler<
-        CreatePublicationForSpecificTopicRequirement>
+    public class CreatePublicationForSpecificTopicAuthorizationHandler : CompoundAuthorizationHandler<
+        CreatePublicationForSpecificTopicRequirement, Topic>
     {
-        public CreatePublicationForSpecificTopicCanCreateForAnyTopicAuthorizationHandler() 
-            : base(SecurityClaimTypes.CreateAnyPublication) {}
+        public CreatePublicationForSpecificTopicAuthorizationHandler() 
+            : base(new CanCreateForAnyTopicAuthorizationHandler()) {}
+        
+        public class CanCreateForAnyTopicAuthorizationHandler : HasClaimAuthorizationHandler<
+            CreatePublicationForSpecificTopicRequirement>
+        {
+            public CanCreateForAnyTopicAuthorizationHandler() 
+                : base(SecurityClaimTypes.CreateAnyPublication) {}
+        }
     }
 }

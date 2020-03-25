@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -71,6 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     return location.Sponsor;
                 case GeographicLevel.Ward:
                     return location.Ward;
+                case GeographicLevel.PlanningArea:
+                    return location.PlanningArea;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

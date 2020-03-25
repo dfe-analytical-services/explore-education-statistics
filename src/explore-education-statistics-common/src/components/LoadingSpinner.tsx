@@ -1,44 +1,57 @@
 import classNames from 'classnames';
-import React from 'react';
-import AriaLiveMessage from './AriaLiveMessage';
+import React, { ReactNode } from 'react';
 import styles from './LoadingSpinner.module.scss';
 
 interface Props {
+  alert?: boolean;
   className?: string;
+  children?: ReactNode;
+  hideText?: boolean;
   text?: string;
-  size?: number;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   inline?: boolean;
+  loading?: boolean;
   overlay?: boolean;
-  screenReaderMessage?: string;
 }
 
 const LoadingSpinner = ({
+  alert = false,
   className,
-  text,
-  size = 80,
+  children,
+  hideText = false,
   inline = false,
+  loading = true,
   overlay = false,
-  screenReaderMessage = 'The page is loading. Please wait.',
+  size = 'xl',
+  text,
 }: Props) => {
   return (
     <>
-      <div
-        className={classNames({
-          [styles.noInlineFlex]: size >= 80 || !inline,
-          [styles.container]: true,
-          [styles.overlay]: overlay,
-        })}
-      >
+      {loading ? (
         <div
-          className={classNames(styles.spinner, className)}
-          style={{
-            height: `${size}px`,
-            width: `${size}px`,
-            borderWidth: `${size * 0.15}px`,
-          }}
-        />
-        {text || <AriaLiveMessage message={screenReaderMessage} />}
-      </div>
+          className={classNames(
+            styles.container,
+            {
+              [styles.noInlineFlex]: !inline,
+              [styles.overlay]: overlay,
+            },
+            className,
+          )}
+        >
+          <div
+            className={classNames(styles.spinner, styles[`spinner--${size}`])}
+          />
+
+          <span
+            role={alert ? 'alert' : undefined}
+            className={classNames({ 'govuk-visually-hidden': hideText })}
+          >
+            {text}
+          </span>
+        </div>
+      ) : (
+        children
+      )}
     </>
   );
 };

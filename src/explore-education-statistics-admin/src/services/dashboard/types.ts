@@ -4,10 +4,8 @@ import {
   IdTitlePair,
   UserDetails,
 } from '@admin/services/common/types';
-import {
-  DayMonthYearValues,
-  ReleaseStatus,
-} from '@common/services/publicationService';
+import { ReleaseStatus } from '@common/services/publicationService';
+import { DayMonthYearValues } from '@common/utils/date/dayMonthYear';
 
 export interface ThemeAndTopics {
   title: string;
@@ -22,6 +20,11 @@ export interface Comment {
   message: string;
   authorName: string;
   createdDate: string;
+}
+
+export interface ExternalMethodology {
+  title: string;
+  url: string;
 }
 
 export interface AdminDashboardRelease {
@@ -44,6 +47,7 @@ export interface AdminDashboardRelease {
   higherReviewComments: Comment[];
   permissions: {
     canUpdateRelease: boolean;
+    canMakeAmendmentOfRelease: boolean;
   };
 }
 
@@ -51,6 +55,7 @@ export interface AdminDashboardPublication {
   id: string;
   title: string;
   methodology?: IdTitlePair;
+  externalMethodology: ExternalMethodology;
   releases: AdminDashboardRelease[];
   contact: ContactDetails;
   permissions: {

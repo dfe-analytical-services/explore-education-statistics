@@ -52,6 +52,7 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
   return (
     <DetailsMenu
       open={open}
+      jsRequired
       onToggle={(isOpen, event) => {
         if (error) {
           event.preventDefault();

@@ -1,22 +1,23 @@
-import commaList from '@common/lib/utils/string/commaList';
-import {
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
+import ButtonText from '@common/components/ButtonText';
+import useToggle from '@common/hooks/useToggle';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import commaList from '@common/utils/string/commaList';
+import classNames from 'classnames';
 import React from 'react';
-import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 
 export function generateTableTitle({
+  indicators,
   timePeriodRange,
   locations,
   subjectName,
   publicationName,
-}: {
-  timePeriodRange: FullTableMeta['timePeriodRange'];
-  locations: FullTableMeta['locations'];
-  subjectName: FullTableMeta['subjectName'];
-  publicationName: FullTableMeta['publicationName'];
+  expanded,
+}: FullTableMeta & {
+  expanded?: boolean;
 }) {
+  const indicatorString =
+    indicators.length === 1 ? `${indicators[0].label} for ` : '';
+
   let timePeriodString = '';
 
   if (timePeriodRange.length > 0) {
@@ -30,47 +31,48 @@ export function generateTableTitle({
   }
 
   const locationsString = ` in ${commaList(
-    locations.map(location => location.label),
+    locations.length > 10 && !expanded
+      ? locations
+          .map(location => location.label)
+          .sort()
+          .slice(0, 10)
+          .concat(`${locations.length - 10} other locations...`)
+      : locations.map(location => location.label).sort(),
   )}`;
 
-  return `Table showing '${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
+  return `Table showing ${indicatorString}'${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
 }
 
-interface Props {
+interface Props extends FullTableMeta {
   id: string;
-  timePeriodRange: TimePeriodFilter[];
-  locations: LocationFilter[];
-  subjectName: string;
-  publicationName: string;
+  title?: string;
 }
 
 const DataTableCaption = ({
   id = 'dataTableCaption',
-  timePeriodRange,
-  locations,
-  subjectName,
-  publicationName,
+  title,
+  ...props
 }: Props) => {
+  const { locations } = props;
+
+  const [expanded, toggleExpanded] = useToggle(false);
+
   const caption = generateTableTitle({
-    timePeriodRange,
-    locations,
-    subjectName,
-    publicationName,
+    ...props,
+    expanded,
   });
 
   return (
     <>
-      <strong id={id}>{caption}</strong>
-
-      <ul>
-        <li>
-          <strong>n/a</strong> - value matching this criteria could not be
-          found.
-        </li>
-        <li>
-          <strong>x</strong> - value matching this criteria is suppressed.
-        </li>
-      </ul>
+      <strong id={id}>{title || caption}</strong>
+      {locations.length > 10 && (
+        <ButtonText
+          className={classNames('govuk-!-display-block govuk-!-margin-top-2')}
+          onClick={toggleExpanded}
+        >
+          {`${expanded ? 'Hide' : 'View'} full table title`}
+        </ButtonText>
+      )}
     </>
   );
 };

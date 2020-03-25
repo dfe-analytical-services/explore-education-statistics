@@ -79,38 +79,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
+        public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.State.Content = stage;
+                row.AppendLogMessage(logMessage);
                 return row;
             });
         }
 
-        public async Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
+        public async Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.State.Data = stage;
+                row.AppendLogMessage(logMessage);
                 return row;
             });
         }
 
-        public async Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
+        public async Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.State.Files = stage;
+                row.AppendLogMessage(logMessage);
                 return row;
             });
         }
 
-        public async Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage)
+        public async Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.State.Publishing = stage;
+                row.AppendLogMessage(logMessage);
                 return row;
             });
         }

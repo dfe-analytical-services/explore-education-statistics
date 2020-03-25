@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage.Queue;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.QueueUtils;
@@ -15,13 +15,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class QueueService : IQueueService
     {
-        private readonly string _storageConnectionString =
-            ConnectionUtils.GetAzureStorageConnectionString("PublisherStorage");
+        private readonly string _storageConnectionString;
 
         private readonly ILogger<QueueService> _logger;
 
-        public QueueService(ILogger<QueueService> logger)
+        public QueueService(IConfiguration configuration, ILogger<QueueService> logger)
         {
+            _storageConnectionString = configuration.GetValue<string>("PublisherStorage");
             _logger = logger;
         }
 

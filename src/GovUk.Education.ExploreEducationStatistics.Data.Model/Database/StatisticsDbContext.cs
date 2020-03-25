@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -44,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Publication> Publication { get; set; }
         public DbSet<Release> Release { get; set; }
         public DbSet<School> School { get; set; }
-        public virtual DbSet<Subject> Subject { get; set; }
+        public DbSet<Subject> Subject { get; set; }
         public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
         public DbSet<Theme> Theme { get; set; }
         public DbSet<Topic> Topic { get; set; }
@@ -64,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureMeasures(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
             ConfigurePublication(modelBuilder);
+            ConfigureRelease(modelBuilder);
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
@@ -93,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureRscRegion(modelBuilder);
             ConfigureSponsor(modelBuilder);
             ConfigureWard(modelBuilder);
+            ConfigurePlanningArea(modelBuilder);
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
@@ -125,6 +128,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Release>()
                 .HasIndex(data => data.PublicationId);
+        }
+
+        private static void ConfigureRelease(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Release>()
+                .Property(r => r.TimeIdentifier)
+                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
+                .HasMaxLength(6);
         }
 
         private static void ConfigureMeasures(ModelBuilder modelBuilder)
@@ -354,7 +365,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .OwnsOne(level => level.Ward,
                     builder => builder.HasIndex(ward => ward.Code));
         }
-
+        
+        private static void ConfigurePlanningArea(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Location>()
+                .OwnsOne(level => level.PlanningArea,
+                    builder => builder.HasIndex(planningArea => planningArea.Code));
+        }
+        
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeoJson>().HasNoKey().ToView("geojson");

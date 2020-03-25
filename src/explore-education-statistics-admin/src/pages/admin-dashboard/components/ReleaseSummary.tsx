@@ -6,13 +6,15 @@ import {
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
 import React, { ReactNode } from 'react';
+import LazyLoad from 'react-lazyload';
 
 interface Props {
   release: AdminDashboardRelease;
@@ -28,7 +30,17 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
       tag={[
         getReleaseStatusLabel(release.status),
         // eslint-disable-next-line react/jsx-key
-        <ReleaseServiceStatus exclude="details" releaseId={release.id} />,
+        release.status !== 'Draft' && release.status !== 'HigherLevelReview' && (
+          <LazyLoad
+            scroll={false}
+            placeholder={
+              <LoadingSpinner className="govuk-!-margin-0" inline size="sm" />
+            }
+            once
+          >
+            <ReleaseServiceStatus exclude="details" releaseId={release.id} />
+          </LazyLoad>
+        ),
       ]}
     >
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">

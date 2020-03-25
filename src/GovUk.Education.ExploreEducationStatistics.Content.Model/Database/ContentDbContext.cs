@@ -4,8 +4,10 @@ using System.IO;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -213,21 +215,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<ReleaseFile> ReleaseFiles { get; set; }
+        public DbSet<ReleaseFileReference> ReleaseFileReferences { get; set; }
         public DbSet<ContentSection> ContentSections { get; set; }
         public DbSet<IContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
-        public DbSet<InsetTextBlock> InsetTextBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
-        public DbSet<ReleaseSummary> ReleaseSummaries { get; set; }
-        public DbSet<ReleaseSummaryVersion> ReleaseSummaryVersions { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
-        public virtual DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
+        public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public DbSet<Update> Update { get; set; }
         public DbSet<User> Users { get; set; }
-        public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+        public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
 
         public DbSet<Comment> Comment { get; set; }
         public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
@@ -239,17 +240,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+            
             modelBuilder.Entity<Methodology>()
                 .Property(b => b.Annexes)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
+            modelBuilder.Entity<Methodology>()
+                .Property(b => b.Status)
+                .HasConversion(new EnumToStringConverter<MethodologyStatus>())
+                .HasDefaultValue(MethodologyStatus.Draft);
+
             modelBuilder.Entity<Publication>()
                 .Property(p => p.LegacyPublicationUrl)
                 .HasConversion(
                     p => p.ToString(),
                     p => new Uri(p));
+
+            modelBuilder.Entity<Publication>()
+                .OwnsOne(p => p.ExternalMethodology).ToTable("ExternalMethodology");
 
             modelBuilder.Entity<Release>()
                 .Property(r => r.TimePeriodCoverage)
@@ -261,6 +271,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<BasicLink>>(v));
+
+            modelBuilder.Entity<Release>()
+                .HasIndex(r => new {r.OriginalId, r.Version});
+
+            modelBuilder.Entity<Release>()
+                .HasOne(r => r.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFile>()
+                .HasOne(r => r.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFileReference>()
+                .HasOne(r => r.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Release>()
+                .HasOne(r => r.Original)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<IContentBlock>()
                 .ToTable("ContentBlock")
@@ -280,26 +313,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(b => b.Status)
                 .HasConversion(new EnumToStringConverter<ReleaseStatus>());
 
-            modelBuilder.Entity<ReleaseSummary>()
-                .HasOne(rs => rs.Release).WithOne(r => r.ReleaseSummary)
-                .HasForeignKey<ReleaseSummary>(rs => rs.ReleaseId);
-
-            modelBuilder.Entity<ReleaseSummaryVersion>()
-                .HasOne(rsv => rsv.ReleaseSummary)
-                .WithMany(rs => rs.Versions)
-                .HasForeignKey(rsv => rsv.ReleaseSummaryId);
-
-            modelBuilder.Entity<ReleaseSummaryVersion>()
-                .Property(b => b.NextReleaseDate)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<PartialDate>(v));
-
-            modelBuilder.Entity<ReleaseSummaryVersion>()
-                .Property(r => r.TimePeriodCoverage)
-                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
-                .HasMaxLength(6);
-
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Heading)
                 .HasColumnName("DataBlock_Heading");
@@ -309,7 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasColumnName("DataBlock_Request")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<DataBlockRequest>(v));
+                    v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Charts)
@@ -335,14 +348,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("HtmlBlock_Body");
-
-            modelBuilder.Entity<InsetTextBlock>()
-                .Property(block => block.Body)
-                .HasColumnName("InsetTextBlock_Body");
-
-            modelBuilder.Entity<InsetTextBlock>()
-                .Property(block => block.Heading)
-                .HasColumnName("InsetTextBlock_Heading");
 
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
@@ -792,6 +797,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContactName = "Cameron Race",
                     ContactTelNo = "07780991976"
                 },
+                
                 new Contact
                 {
                     Id = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
@@ -806,7 +812,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TeamName = "School preference statistics team",
                     TeamEmail = "school.preference@education.gov.uk",
                     ContactName = "Helen Bray",
-                    ContactTelNo = "02077838553"
+                    ContactTelNo = "020 7783 8553"
+
                 },
                 new Contact
                 {
@@ -818,7 +825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Contact
                 {
-                    Id = new Guid("0d2ead36-3ebc-482f-a9c9-e17d746a0dd9"),
+                    Id = new Guid("9f67f7ec-e6e6-439e-829e-fb52e634c5f5"),
                     TeamName = "Looked-after children statistics team",
                     TeamEmail = "cla.stats@education.gov.uk",
                     ContactName = "Justin Ushie",
@@ -831,6 +838,280 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TeamEmail = "Attainment.STATISTICS@education.gov.uk",
                     ContactName = "Raffaele Sasso",
                     ContactTelNo = "07469413581"
+                },
+                new Contact
+                {
+                    Id = new Guid("e4c2f394-4cb8-4d3b-969b-60f1e3550abf"),
+                    TeamName = "Attainment statistics team",
+                    TeamEmail = "Attainment.STATISTICS@education.gov.uk",
+                    ContactName = "Allan Burrage",
+                    ContactTelNo = "01325340986"
+                },
+                new Contact
+                {
+                    Id = new Guid("102497b9-ebd6-442a-b422-942ac391aaae"),
+                    TeamName = "Attainment statistics team",
+                    TeamEmail = "Attainment.STATISTICS@education.gov.uk",
+                    ContactName = "Tingting Shu",
+                    ContactTelNo = "0370 000 2288"
+                },
+                new Contact
+                {
+                    Id = new Guid("fb9030a8-8e5b-42a3-b621-1267f1ddf6f2"),
+                    TeamName = "Attainment statistics team",
+                    TeamEmail = "Attainment.STATISTICS@education.gov.uk",
+                    ContactName = "Glenn Goodman",
+                    ContactTelNo = "020 7654 6408"
+                },
+                    
+                new Contact
+                {
+                    Id = new Guid("2ed7e605-b7e5-4c02-ae8f-f01fe9261c37"),
+                    TeamName = "Early years statistics team",
+                    TeamEmail = "EarlyYears.STATISTICS@education.gov.uk",
+                    ContactName = "Chris Noble",
+                    ContactTelNo = "01325 340 688"
+                },
+                new Contact
+                {
+                    Id = new Guid("6a0e8cba-dbb6-4d79-a672-7114b82f8347"),
+                    TeamName = "Initial Teacher Training Statistics Publications",
+                    TeamEmail = "ittstatistics.publications@education.gov.uk",
+                    ContactName = "Jeanette D'Costa",
+                    ContactTelNo = "020 7783 8699"
+                },
+                new Contact
+                {
+                    Id = new Guid("7536aef1-03c6-44cc-971f-9e0d4deebb82"),
+                    TeamName = "Teachers and teaching statistics team",
+                    TeamEmail = "schoolworkforce.statistics@education.gov.uk",
+                    ContactName = "Heather Brown",
+                    ContactTelNo = "0114 274 2755"
+                },
+                new Contact
+                {
+                    Id = new Guid("f65786b2-fb7e-4ee9-84dc-78fddd057252"),
+                    TeamName = "Primary attainment statistics team",
+                    TeamEmail = "primary.attainment@education.gov.uk",
+                    ContactName = "Gemma Coleman",
+                    ContactTelNo = "020 7783 8239"
+                },
+                new Contact
+                {
+                    Id = new Guid("94b3f9c3-6169-4e85-bf26-08d69bcb1a4a"),
+                    TeamName = "Infrastructure statistics team",
+                    TeamEmail = "Schools.STATISTICS@education.gov.uk",
+                    ContactName = "Anastasia Ioannou",
+                    ContactTelNo = "0370 000 2288"
+                },
+                new Contact
+                {
+                    Id = new Guid("ee490e40-201a-4b25-bc52-76c15de72344"),
+                    TeamName = "Post-16 statistics team",
+                    TeamEmail = "post16.statistics@education.gov.uk",
+                    ContactName = "Sally Marshall",
+                    ContactTelNo = "0114 274 2317"
+                },
+                new Contact
+                {
+                    Id = new Guid("f47cb404-6bf1-4f69-b223-c9a6a2c15082"),
+                    TeamName = "Post-16 statistics team",
+                    TeamEmail = "post16.statistics@education.gov.uk",
+                    ContactName = "Suzanne Wallace",
+                    ContactTelNo = "020 7654 6191"
+                },
+                new Contact
+                {
+                    Id = new Guid("6a95bda0-a823-4faa-9a13-7e65f5b6c121"),
+                    TeamName = "Post-16 statistics team",
+                    TeamEmail = "post16.statistics@education.gov.uk",
+                    ContactName = "Ann Claytor",
+                    ContactTelNo = "0114 274 2515"
+                },
+                new Contact
+                {
+                    Id = new Guid("8d1469b6-f029-4dcc-92fa-bda8ab2c69cd"),
+                    TeamName = "Further education outcomes statistics",
+                    TeamEmail = "FE.OUTCOMESDATA@education.gov.uk",
+                    ContactName = "Nick Treece",
+                    ContactTelNo = "0114 2742728"
+                },
+                new Contact
+                {
+                    Id = new Guid("367a6e6f-48c5-4f1a-9580-f44852bc8e7a"),
+                    TeamName = "Standards and Testing Agency",
+                    TeamEmail = "Marking.STA@education.gov.uk",
+                    ContactName = "Alana Afflick",
+                    ContactTelNo = "07469 413 560"
+                },
+                new Contact
+                {
+                    Id = new Guid("0e7d435f-2177-4063-bad2-4b3dcdb17ea8"),
+                    TeamName = "Academies and school organisation team",
+                    TeamEmail = "Academies.DATA@education.gov.uk",
+                    ContactName = "Adam Hatton",
+                    ContactTelNo = "020 7340 8364"
+                },
+                new Contact
+                {
+                    Id = new Guid("2e38c23a-564b-4228-bffe-fa6f88b7bec4"),
+                    TeamName = "International evidence and statistics team",
+                    TeamEmail = "InternationalEvidence.STATISTICS@education.gov.uk",
+                    ContactName = "",
+                    ContactTelNo = ""
+                },
+                new Contact
+                {
+                    Id = new Guid("308accc8-6b2e-4e26-b3e9-2437d5d1da23"),
+                    TeamName = "Admission appeals statistics team",
+                    TeamEmail = "admissions.appeals@education.gov.uk",
+                    ContactName = "Helen Bray",
+                    ContactTelNo = "0370 000 2288"
+                },
+                new Contact
+                {
+                    Id = new Guid("667f03a6-fd2f-41a2-a28d-3721662633c3"),
+                    TeamName = "Widening participation statistics",
+                    TeamEmail = "HE.statistics@education.gov.uk",
+                    ContactName = "John Simes",
+                    ContactTelNo = "0370 000 2288"
+                },
+                new Contact
+                {
+                    Id = new Guid("71f624fd-d8b8-4dc5-924c-4d768c9aa8fa"),
+                    TeamName = "Pupils and School Finance team",
+                    TeamEmail = "PupilPopulation.PROJECTIONS@education.gov.uk",
+                    ContactName = "Helen Bray",
+                    ContactTelNo = "0370 000 2288"
+                },
+                new Contact
+                {
+                    Id = new Guid("922ceecb-d0bf-4c2a-a166-928afecd4892"),
+                    TeamName = "Pupil Place Planning team",
+                    TeamEmail = "SCAP.PPP@education.gov.uk",
+                    ContactName = "Selena Jackson",
+                    ContactTelNo = "020 7783 8599"
+                },
+                new Contact
+                {
+                    Id = new Guid("070f2584-c2a0-4fce-899d-bddfee7a803e"),
+                    TeamName = "Further education statistical dissemination team",
+                    TeamEmail = "FE.OFFICIALSTATISTICS@education.gov.uk",
+                    ContactName = "Matthew Rolfe",
+                    ContactTelNo = ""
+                },
+                new Contact
+                {
+                    Id = new Guid("d718aebb-bda6-4c3a-802d-8e9945b80997"),
+                    TeamName = "Further education statistical dissemination team",
+                    TeamEmail = "FE.OFFICIALSTATISTICS@education.gov.uk",
+                    ContactName = "Dave Bartholomew",
+                    ContactTelNo = ""
+                },
+                new Contact
+                {
+                    Id = new Guid("d5ed9ccc-5f7c-4c60-acbd-500461dbd680"),
+                    TeamName = "Destination measures statistics team",
+                    TeamEmail = "destination.measures@education.gov.uk",
+                    ContactName = " Stephen Harris",
+                    ContactTelNo = "0161 600 1595"
+                },
+                new Contact
+                {
+                    Id = new Guid("4de616ac-5124-4c28-b111-7d4bf63ee7b7"),
+                    TeamName = "FE & Skills production team",
+                    TeamEmail = "andy.cooke@education.gov.uk",
+                    ContactName = "Andy Cooke",
+                    ContactTelNo = "07917 266106"
+                },
+                new Contact
+                {
+                    Id = new Guid("1c696dea-8db7-4347-a12c-c9d081c34748"),
+                    TeamName = "Teachers and teaching analysis unit",
+                    TeamEmail = "TeachersAnalysisUnit.MAILBOX@education.gov.uk",
+                    ContactName = "Emma Ibberson",
+                    ContactTelNo = "07824 082838"
+                },
+                new Contact
+                {
+                    Id = new Guid("b40b586f-818f-4ef0-90d3-7ca4e65b0b00"),
+                    TeamName = "Academies financial benchmarking team",
+                    TeamEmail = "AFB.BENCHMARKING@education.gov.uk",
+                    ContactName = "",
+                    ContactTelNo = "01325 340 593"
+                },
+                new Contact
+                {
+                    Id = new Guid("2dc3af2d-574f-4ce5-8d37-0aa723b24d8d"),
+                    TeamName = "Pupil and school finance data team",
+                    TeamEmail = "finance.statistics@education.gov.uk",
+                    ContactName = "Tony Clarke",
+                    ContactTelNo = "01325 340593"
+                },
+                new Contact
+                {
+                    Id = new Guid("4adb1382-faa1-4057-b9f5-6960d7f1465b"),
+                    TeamName = "Data expert team",
+                    TeamEmail = "finance.statistics@education.gov.uk",
+                    ContactName = "Anthony Clarke",
+                    ContactTelNo = "01325 340 593"
+                },
+                new Contact
+                {
+                    Id = new Guid("cd56905b-bbf0-42ed-8b07-4b750e2c0fae"),
+                    TeamName = "Children looked-after statistics team",
+                    TeamEmail = "",
+                    ContactName = "David Collinge",
+                    ContactTelNo = "01325 340886"
+                },
+                new Contact
+                {
+                    Id = new Guid("e4a5c74c-107a-4b56-965e-d8f0f68fe5cf"),
+                    TeamName = "Children’s services statistics team - CIN",
+                    TeamEmail = "CIN.Stats@education.gov.uk",
+                    ContactName = "Chris Gray",
+                    ContactTelNo = "01325 340854"
+                },
+                new Contact
+                {
+                    Id = new Guid("3653736f-3f11-4541-869f-0978c3bd026c"),
+                    TeamName = "Children’s services statistics team",
+                    TeamEmail = "CSWW.STATS@education.gov.uk",
+                    ContactName = "Dan Brown",
+                    ContactTelNo = "0114 274 2599"
+                },
+            
+                new Contact
+                {
+                    Id = new Guid("c2ecb6e3-c539-4bf4-9376-51b9812a8447"),
+                    TeamName = "Early years and childcare research and analysis",
+                    TeamEmail = "EY.AnalysisANDResearch@education.gov.uk",
+                    ContactName = "Adina Huma",
+                    ContactTelNo = "0114 274 2313"
+                },
+                new Contact
+                {
+                    Id = new Guid("004ab2f0-606a-4ec2-8ab2-74bd5b931766"),
+                    TeamName = "Early Years Analysis and Research",
+                    TeamEmail = "EarlyYears.STATISTICS@education.gov.uk",
+                    ContactName = "Jonathon Blackburn",
+                    ContactTelNo = "0161 600 1725"
+                },
+                new Contact
+                {
+                    Id = new Guid("f4dd2a45-3538-47da-b40c-0cd270c185c6"),
+                    TeamName = "Further education statistical production team",
+                    TeamEmail = "andy.cooke@education.gov.uk",
+                    ContactName = "Andy Cooke",
+                    ContactTelNo = ""
+                },
+                new Contact
+                {
+                    Id = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e"),
+                    TeamName = "Higher education statistics team (LEO)",
+                    TeamEmail = "he.leo@education.gov.uk",
+                    ContactName = "Matthew Bridge",
+                    ContactTelNo = "07384 456648"
                 }
             );
 
@@ -855,7 +1136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "childcare-and-early-years-provider-survey",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey")
+                            "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey"),
+                    ContactId = new Guid("c2ecb6e3-c539-4bf4-9376-51b9812a8447")
                 },
                 new Publication
                 {
@@ -866,7 +1148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "childcare-and-early-years-survey-of-parents",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey")
+                            "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey"),
+                    ContactId = new Guid("004ab2f0-606a-4ec2-8ab2-74bd5b931766")
                 },
                 new Publication
                 {
@@ -877,7 +1160,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "education-provision-children-under-5",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#provision-for-children-under-5-years-of-age-in-england")
+                            "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#provision-for-children-under-5-years-of-age-in-england"),
+                    ContactId = new Guid("2ed7e605-b7e5-4c02-ae8f-f01fe9261c37")
                 },
                 new Publication
                 {
@@ -888,7 +1172,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "characteristics-of-children-in-need",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-children-in-need#characteristics-of-children-in-need")
+                            "https://www.gov.uk/government/collections/statistics-children-in-need#characteristics-of-children-in-need"),
+                    ContactId = new Guid("e4a5c74c-107a-4b56-965e-d8f0f68fe5cf")
                 },
                 new Publication
                 {
@@ -899,7 +1184,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "childrens-social-work-workforce",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-childrens-social-care-workforce#statutory-collection")
+                            "https://www.gov.uk/government/collections/statistics-childrens-social-care-workforce#statutory-collection"),
+                    ContactId = new Guid("3653736f-3f11-4541-869f-0978c3bd026c")
                 },
                 new Publication
                 {
@@ -910,7 +1196,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "early-years-foundation-stage-profile-results",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-early-years-foundation-stage-profile#results-at-national-and-local-authority-level")
+                            "https://www.gov.uk/government/collections/statistics-early-years-foundation-stage-profile#results-at-national-and-local-authority-level"),
+                    ContactId = new Guid("2ed7e605-b7e5-4c02-ae8f-f01fe9261c37")
                 },
                 new Publication
                 {
@@ -921,7 +1208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "children-looked-after-in-england-including-adoptions",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-looked-after-children#looked-after-children")
+                            "https://www.gov.uk/government/collections/statistics-looked-after-children#looked-after-children"),
+                    ContactId = new Guid("9f67f7ec-e6e6-439e-829e-fb52e634c5f5")
                 },
                 new Publication
                 {
@@ -932,7 +1220,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "outcomes-for-children-looked-after-by-las",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-looked-after-children#outcomes-for-looked-after-children")
+                            "https://www.gov.uk/government/collections/statistics-looked-after-children#outcomes-for-looked-after-children"),
+                    ContactId = new Guid("cd56905b-bbf0-42ed-8b07-4b750e2c0fae")
                 },
                 new Publication
                 {
@@ -942,7 +1231,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"),
                     Slug = "children-accommodated-in-secure-childrens-homes",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-secure-children-s-homes")
+                        new Uri("https://www.gov.uk/government/collections/statistics-secure-children-s-homes"),
+                    ContactId = new Guid("9f67f7ec-e6e6-439e-829e-fb52e634c5f5")
                 },
                 new Publication
                 {
@@ -953,7 +1243,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "destinations-of-ks4-and-ks5-pupils",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-destinations#destinations-after-key-stage-4-and-5")
+                            "https://www.gov.uk/government/collections/statistics-destinations#destinations-after-key-stage-4-and-5"),
+                    ContactId = new Guid("d5ed9ccc-5f7c-4c60-acbd-500461dbd680")
                 },
                 new Publication
                 {
@@ -974,7 +1265,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
                     Slug = "participation-in-education-training-and-employement",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-neet#participation-in-education")
+                        new Uri("https://www.gov.uk/government/collections/statistics-neet#participation-in-education"),
+                    ContactId = new Guid("ee490e40-201a-4b25-bc52-76c15de72344")
                 },
                 new Publication
                 {
@@ -984,7 +1276,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
                     Slug = "neet-statistics-quarterly-brief",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-")
+                        new Uri("https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-"),
+                    ContactId = new Guid("ee490e40-201a-4b25-bc52-76c15de72344")
                 },
                 new Publication
                 {
@@ -995,7 +1288,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "income-and-expenditure-in-academies-in-england",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#academy-spending")
+                            "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#academy-spending"),
+                    ContactId = new Guid("b40b586f-818f-4ef0-90d3-7ca4e65b0b00")
                 },
                 new Publication
                 {
@@ -1006,7 +1300,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "la-and-school-expenditure",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#local-authority-and-school-finance")
+                            "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#local-authority-and-school-finance"),
+                    ContactId = new Guid("2dc3af2d-574f-4ce5-8d37-0aa723b24d8d")
                 },
                 new Publication
                 {
@@ -1017,7 +1312,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "planned-la-and-school-expenditure",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#planned-local-authority-and-school-spending-")
+                            "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#planned-local-authority-and-school-spending-"),
+                    ContactId = new Guid("4adb1382-faa1-4057-b9f5-6960d7f1465b")
                 },
                 new Publication
                 {
@@ -1038,18 +1334,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "advanced-learner-loans-applications",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/further-education#advanced-learner-loans-applications-2017-to-2018")
+                            "https://www.gov.uk/government/collections/further-education#advanced-learner-loans-applications-2017-to-2018"),
+                    ContactId = new Guid("4de616ac-5124-4c28-b111-7d4bf63ee7b7")
                 },
                 new Publication
                 {
                     Id = new Guid("f00a784b-52e8-475b-b8ee-dbe730382ba8"),
-                    Title = "FE chioces employer satisfaction survey",
+                    Title = "FE choices employer satisfaction survey",
                     Summary = "",
                     TopicId = new Guid("dd4a5d02-fcc9-4b7f-8c20-c153754ba1e4"),
                     Slug = "fe-choices-employer-satisfaction-survey",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/fe-choices#employer-satisfaction-survey-data")
+                            "https://www.gov.uk/government/collections/fe-choices#employer-satisfaction-survey-data"),
+                    ContactId = new Guid("4de616ac-5124-4c28-b111-7d4bf63ee7b7")
                 },
                 new Publication
                 {
@@ -1059,7 +1357,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("dd4a5d02-fcc9-4b7f-8c20-c153754ba1e4"),
                     Slug = "fe-choices-learner-satisfaction-survey",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/fe-choices#learner-satisfaction-survey-data")
+                        new Uri("https://www.gov.uk/government/collections/fe-choices#learner-satisfaction-survey-data"),
+                    ContactId = new Guid("4de616ac-5124-4c28-b111-7d4bf63ee7b7")
                 },
                 new Publication
                 {
@@ -1070,7 +1369,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "apprenticeship-and-levy-statistics",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-levy---older-data")
+                            "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-levy---older-data"),
+                    ContactId = new Guid("070f2584-c2a0-4fce-899d-bddfee7a803e")
                 },
                 new Publication
                 {
@@ -1081,7 +1381,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "apprenticeships-and-traineeships",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-traineeships---older-data")
+                            "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-traineeships---older-data"),
+                    ContactId = new Guid("070f2584-c2a0-4fce-899d-bddfee7a803e")
                 },
                 new Publication
                 {
@@ -1114,7 +1415,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "national-achievement-rates-tables",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/sfa-national-success-rates-tables#national-achievement-rates-tables")
+                            "https://www.gov.uk/government/collections/sfa-national-success-rates-tables#national-achievement-rates-tables"),
+                    ContactId = new Guid("f4dd2a45-3538-47da-b40c-0cd270c185c6")
                 },
                 new Publication
                 {
@@ -1125,7 +1427,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "graduate-outcomes",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents")
+                            "https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents"),
+                    ContactId = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e")
                 },
                 new Publication
                 {
@@ -1191,7 +1494,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "widening-participation-in-higher-education",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/widening-participation-in-higher-education#documents")
+                            "https://www.gov.uk/government/collections/widening-participation-in-higher-education#documents"),
+                    ContactId = new Guid("667f03a6-fd2f-41a2-a28d-3721662633c3")
                 },
                 new Publication
                 {
@@ -1201,7 +1505,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("c9f0b897-d58a-42b0-9d12-ca874cc7c810"),
                     Slug = "admission-appeals-in-england",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-admission-appeals#documents")
+                        new Uri("https://www.gov.uk/government/collections/statistics-admission-appeals#documents"),
+                    ContactId = new Guid("308accc8-6b2e-4e26-b3e9-2437d5d1da23")
                 },
                 new Publication
                 {
@@ -1211,7 +1516,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
                     Slug = "permanent-and-fixed-period-exclusions-in-england",
-                    NextUpdate = new DateTime(2019, 7, 19),
                     ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
@@ -1222,7 +1526,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
                     Slug = "pupil-absence-in-schools-in-england",
-                    NextUpdate = new DateTime(2019, 3, 22),
                     DataSource =
                         "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
                     ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
@@ -1236,7 +1539,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "pupil-absence-in-schools-in-england-autumn-term",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-pupil-absence#autumn-term-release")
+                            "https://www.gov.uk/government/collections/statistics-pupil-absence#autumn-term-release"),
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
@@ -1247,7 +1551,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "pupil-absence-in-schools-in-england-autumn-and-spring",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-pupil-absence#combined-autumn--and-spring-term-release")
+                            "https://www.gov.uk/government/collections/statistics-pupil-absence#combined-autumn--and-spring-term-release"),
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
@@ -1258,7 +1563,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "parental-responsibility-measures",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics")
+                            "https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics"),
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
@@ -1268,7 +1574,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("5e196d11-8ac4-4c82-8c46-a10a67c1118e"),
                     Slug = "national-pupil-projections",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-pupil-projections#documents")
+                        new Uri("https://www.gov.uk/government/collections/statistics-pupil-projections#documents"),
+                    ContactId = new Guid("71f624fd-d8b8-4dc5-924c-4d768c9aa8fa")
                 },
                 new Publication
                 {
@@ -1278,7 +1585,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba"),
                     Slug = "school-pupils-and-their-characteristics",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers")
+                        new Uri("https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers"),
+                    ContactId = new Guid("94b3f9c3-6169-4e85-bf26-08d69bcb1a4a")
                 },
                 new Publication
                 {
@@ -1289,7 +1597,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                     Slug = "secondary-and-primary-schools-applications-and-offers",
-                    NextUpdate = new DateTime(2019, 6, 14),
                     ContactId = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191")
                 },
                 new Publication
@@ -1301,7 +1608,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "school-capacity",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-school-capacity#school-capacity-data:-by-academic-year")
+                            "https://www.gov.uk/government/collections/statistics-school-capacity#school-capacity-data:-by-academic-year"),
+                    ContactId = new Guid("922ceecb-d0bf-4c2a-a166-928afecd4892")
                 },
                 new Publication
                 {
@@ -1312,7 +1620,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "special-educational-needs-in-england",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england")
+                            "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england"),
+                    ContactId = new Guid("0b63e6c7-5a9d-4c48-b30f-f0729e0644c0")
                 },
                 new Publication
                 {
@@ -1334,7 +1643,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "statements-on-sen-and-ehc-plans",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans")
+                            "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans"),
+                    ContactId = new Guid("0b63e6c7-5a9d-4c48-b30f-f0729e0644c0")
                 },
                 new Publication
                 {
@@ -1345,7 +1655,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "16-to-18-school-and-college-performance-tables",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables")
+                            "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables"),
+                    ContactId = new Guid("102497b9-ebd6-442a-b422-942ac391aaae")
                 },
                 new Publication
                 {
@@ -1356,7 +1667,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "a-level-and-other-16-to-18-results",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results")
+                            "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results"),
+                    ContactId = new Guid("102497b9-ebd6-442a-b422-942ac391aaae")
                 },
                 new Publication
                 {
@@ -1367,7 +1679,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "level-2-and-3-attainment-by-young-people-aged-19",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment")
+                            "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment"),
+                    ContactId = new Guid("f47cb404-6bf1-4f69-b223-c9a6a2c15082")
                 },
                 new Publication
                 {
@@ -1378,7 +1691,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "gcse-and-equivalent-results",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results")
+                            "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results"),
+                    ContactId = new Guid("fb9030a8-8e5b-42a3-b621-1267f1ddf6f2")
                 },
                 new Publication
                 {
@@ -1389,7 +1703,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "multi-academy-trust-performance-measures",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures")
+                            "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures"),
+                    ContactId = new Guid("e4c2f394-4cb8-4d3b-969b-60f1e3550abf")
                 },
                 new Publication
                 {
@@ -1400,7 +1715,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "revised-gcse-and-equivalent-results-in-england",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results,-including-pupil-characteristics")
+                            "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results,-including-pupil-characteristics"),
+                    ContactId = new Guid("18c9a473-465d-4b8a-b2cf-b24fd3b9c094")
                 },
                 new Publication
                 {
@@ -1411,7 +1727,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "secondary-school-performance-tables",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#secondary-school-performance-tables")
+                            "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#secondary-school-performance-tables"),
+                    ContactId = new Guid("e4c2f394-4cb8-4d3b-969b-60f1e3550abf")
                 },
                 new Publication
                 {
@@ -1422,7 +1739,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "phonics-screening-check-and-ks1-assessments",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-key-stage-1#phonics-screening-check-and-key-stage-1-assessment")
+                            "https://www.gov.uk/government/collections/statistics-key-stage-1#phonics-screening-check-and-key-stage-1-assessment"),
+                    ContactId = new Guid("f65786b2-fb7e-4ee9-84dc-78fddd057252")
                 },
                 new Publication
                 {
@@ -1433,7 +1751,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "ks2-national-curriculum-test-review-outcomes",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-key-stage-2#key-stage-2-national-curriculum-tests:-review-outcomes")
+                            "https://www.gov.uk/government/collections/statistics-key-stage-2#key-stage-2-national-curriculum-tests:-review-outcomes"),
+                    ContactId = new Guid("367a6e6f-48c5-4f1a-9580-f44852bc8e7a")
                 },
                 new Publication
                 {
@@ -1444,7 +1763,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "multi-academy-trust-performance-measures",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2")
+                            "https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2"),
+                    ContactId = new Guid("0e7d435f-2177-4063-bad2-4b3dcdb17ea8")
                 },
                 new Publication
                 {
@@ -1466,7 +1786,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "primary-school-performance-tables",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-key-stage-2#primary-school-performance-tables")
+                            "https://www.gov.uk/government/collections/statistics-key-stage-2#primary-school-performance-tables"),
+                    ContactId = new Guid("f65786b2-fb7e-4ee9-84dc-78fddd057252")
                 },
                 new Publication
                 {
@@ -1477,7 +1798,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "further-education-outcome-based-success-measures",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics")
+                            "https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics"),
+                    ContactId = new Guid("8d1469b6-f029-4dcc-92fa-bda8ab2c69cd")
                 },
                 new Publication
                 {
@@ -1488,7 +1810,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "primary-school-performance-tables-2",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-performance-tables#primary-school-(key-stage-2)")
+                            "https://www.gov.uk/government/collections/statistics-performance-tables#primary-school-(key-stage-2)"),
+                    ContactId = new Guid("f65786b2-fb7e-4ee9-84dc-78fddd057252")
                 },
                 new Publication
                 {
@@ -1499,7 +1822,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "school-and-college-performance-tables",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-performance-tables#school-and-college:-post-16-(key-stage-5)")
+                            "https://www.gov.uk/government/collections/statistics-performance-tables#school-and-college:-post-16-(key-stage-5)"),
+                    ContactId = new Guid("102497b9-ebd6-442a-b422-942ac391aaae")
                 },
                 new Publication
                 {
@@ -1510,7 +1834,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "secondary-school-performance-tables",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-performance-tables#secondary-school-(key-stage-4)")
+                            "https://www.gov.uk/government/collections/statistics-performance-tables#secondary-school-(key-stage-4)"),
+                    ContactId = new Guid("fb9030a8-8e5b-42a3-b621-1267f1ddf6f2")
                 },
                 new Publication
                 {
@@ -1521,7 +1846,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "initial-teacher-training-performance-profiles",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/statistics-teacher-training#performance-data")
+                            "https://www.gov.uk/government/collections/statistics-teacher-training#performance-data"),
+                    ContactId = new Guid("6a0e8cba-dbb6-4d79-a672-7114b82f8347")
                 },
                 new Publication
                 {
@@ -1531,7 +1857,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("0f8792d2-28b1-4537-a1b4-3e139fcf0ca7"),
                     Slug = "initial-teacher-training-trainee-number-census",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-teacher-training#census-data")
+                        new Uri("https://www.gov.uk/government/collections/statistics-teacher-training#census-data"),
+                    ContactId = new Guid("6a0e8cba-dbb6-4d79-a672-7114b82f8347")
                 },
                 new Publication
                 {
@@ -1552,7 +1879,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("28cfa002-83cb-4011-9ddd-859ec99e0aa0"),
                     Slug = "school-workforce-in-england",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-school-workforce#documents")
+                        new Uri("https://www.gov.uk/government/collections/statistics-school-workforce#documents"),
+                    ContactId = new Guid("7536aef1-03c6-44cc-971f-9e0d4deebb82")
                 },
                 new Publication
                 {
@@ -1563,7 +1891,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "teacher-analysis-compendium",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/teacher-workforce-statistics-and-analysis#documents")
+                            "https://www.gov.uk/government/collections/teacher-workforce-statistics-and-analysis#documents"),
+                    ContactId = new Guid("1c696dea-8db7-4347-a12c-c9d081c34748")
                 },
                 new Publication
                 {
@@ -1573,7 +1902,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("692050da-9ac9-435a-80d5-a6be4915f0f7"),
                     Slug = "education-and-training-statistics-for-the-uk",
                     LegacyPublicationUrl =
-                        new Uri("https://www.gov.uk/government/collections/statistics-education-and-training#documents")
+                        new Uri("https://www.gov.uk/government/collections/statistics-education-and-training#documents"),
+                    ContactId = new Guid("2e38c23a-564b-4228-bffe-fa6f88b7bec4")
                 }
             );
 
@@ -1581,69 +1911,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             var exclusionsReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278");
             var applicationOffersReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717");
 
-            modelBuilder.Entity<ReleaseSummary>().HasData(
-                new ReleaseSummary
-                {
-                    ReleaseId = absenceReleaseId,
-                    Id = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
-                },
-                new ReleaseSummary
-                {
-                    ReleaseId = exclusionsReleaseId,
-                    Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
-                },
-                new ReleaseSummary
-                {
-                    ReleaseId = applicationOffersReleaseId,
-                    Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
-                }
-            );
-
-
-            modelBuilder.Entity<ReleaseSummaryVersion>().HasData(
-                new ReleaseSummaryVersion
-                {
-                    Created = new DateTime(2018, 1, 1),
-                    Id = new Guid("420ca58e-278b-456b-9031-fe74a6966159"),
-                    Slug = "2016-17",
-                    ReleaseName = "2016",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    ReleaseSummaryId = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7")
-                },
-                new ReleaseSummaryVersion
-                {
-                    Id = new Guid("04adfe47-9057-4abd-a0e8-5a6ac56e1560"),
-                    Created = new DateTime(2018, 1, 1),
-                    ReleaseName = "2016",
-                    Slug = "2016-17",
-                    TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseSummaryId = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
-                },
-                new ReleaseSummaryVersion
-                {
-                    Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
-                    Created = new DateTime(2018, 1, 1),
-                    ReleaseName = "2018",
-                    Slug = "2018",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    ReleaseSummaryId = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
-                });
-
-
             modelBuilder.Entity<Release>().HasData(
                 //absence
                 new Release
                 {
                     Id = absenceReleaseId,
                     ReleaseName = "2016",
+                    NextReleaseDate = new PartialDate
+                    {
+                        Day = "22",
+                        Month = "3",
+                        Year = "2019"
+                    },
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2018, 3, 22),
+                    Published = new DateTime(2018, 4, 25, 9, 30, 0),
+                    PublishScheduled = new DateTime(2018, 4, 25),
+                    Status = ReleaseStatus.Approved,
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    Created = new DateTime(2017, 8, 1, 23, 59, 54, DateTimeKind.Utc),
+                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    OriginalId = absenceReleaseId
                 },
 
                 // exclusions
@@ -1651,8 +1940,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = exclusionsReleaseId,
                     ReleaseName = "2016",
+                    NextReleaseDate = new PartialDate
+                    {
+                        Day = "19",
+                        Month = "7",
+                        Year = "2019"
+                    },
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Published = new DateTime(2018, 7, 19),
+                    Published = new DateTime(2018, 7, 19, 9, 30, 0),
+                    PublishScheduled = new DateTime(2018, 7, 19),
+                    Status = ReleaseStatus.Approved,
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     RelatedInformation = new List<BasicLink>
@@ -1671,6 +1968,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     },
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    Created = new DateTime(2017, 8, 1, 11, 13, 22, DateTimeKind.Utc),
+                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    OriginalId = exclusionsReleaseId
                 },
 
                 // Secondary and primary schools applications offers
@@ -1679,10 +1979,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = applicationOffersReleaseId,
                     ReleaseName = "2018",
                     PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
-                    Published = new DateTime(2018, 6, 14),
+                    NextReleaseDate = new PartialDate
+                    {
+                        Day = "14",
+                        Month = "6",
+                        Year = "2019"
+                    },
+                    Published = null,
+                    PublishScheduled = new DateTime(2018, 6, 14),
+                    Status = ReleaseStatus.Draft,
                     Slug = "2018",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    Created = new DateTime(2019, 8, 1, 9, 30, 33, DateTimeKind.Utc),
+                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    OriginalId = applicationOffersReleaseId
                 }
             );
 
@@ -2276,12 +2587,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new MarkDownBlock
                 {
-                    Id = new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
-                    ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
-                    Body = SampleMarkDownContent.Content[new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d")]
-                },
-                new MarkDownBlock
-                {
                     Id = new Guid("2ef5f84f-e151-425d-8906-2921712f9157"),
                     ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
                     Body = SampleMarkDownContent.Content[new Guid("2ef5f84f-e151-425d-8906-2921712f9157")]
@@ -2437,7 +2742,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     Body =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england)."
+                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).\n\n" + 
+                        "This release was created as example content during the platform’s Private Beta phase, " +
+                        "whilst it provides access to real data, the below release should be used with some caution. " +
+                        "To access the original, release please see [Pupil absence in schools in England: 2016 to 2017](https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2016-to-2017)"
                 },
                 new MarkDownBlock
                 {
@@ -2447,7 +2755,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Body = "Read national statistical summaries, view charts and tables and download " +
                            "data files.\n\nFind out how and why these statistics are collected and " +
                            "published - [Permanent and fixed-period exclusion statistics: methodology]" +
-                           "(../methodology/permanent-and-fixed-period-exclusions-in-england)",
+                           "(../methodology/permanent-and-fixed-period-exclusions-in-england)\n\n" + 
+                           "This release was created as example content during the platform’s Private Beta phase, " + 
+                           "whilst it provides access to real data, the below release should be used with some caution. " +
+                           "To access the original release, please see [Permanent and fixed-period exclusions in England: 2016 to 2017](https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2016-to-2017)"
                 },
                 new MarkDownBlock
                 {
@@ -2464,12 +2775,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new MarkDownBlock
                 {
                     Id = new Guid("b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9"),
-                    ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                    ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
                     Order = 1,
-                    Body = " * pupils missed on average 8.2 school days\n" +
-                           " * overall and unauthorised absence rates up on 2015/16\n" +
-                           " * unauthorised absence rise due to higher rates of unauthorised holidays\n" +
-                           " * 10% of pupils persistently absent during 2016/17"
+                    Body = "* pupils missed on average 8.2 school days\n" +
+                           "* overall and unauthorised absence rates up on 2015/16\n" +
+                           "* unauthorised absence rise due to higher rates of unauthorised holidays\n" +
+                           "* 10% of pupils persistently absent during 2016/17\n"
                 },
                 new MarkDownBlock
                 {
@@ -2477,9 +2788,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
                     Order = 1,
                     Body =
-                        "* majority of applicants received a preferred offer\n" +
-                        "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
-                        "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
+                        "* The rate of permanent exclusions has increased since last year from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17. The number of exclusions has also increased, from 6,685 to 7,720.\n" +
+                        "* The rate of fixed period exclusions have also increased since last year from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17. The number of exclusions has also increased, from 339,360 to 381,865.\n" +
+                        "* There were 183,475 pupil enrolments, 2.29 per cent, with at least one fixed term exclusion in 2016/17, up from 167,125 pupil enrolments, 2.11 per cent, in 2015/16.\n"
                 },
                 new MarkDownBlock
                 {
@@ -2501,18 +2812,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Order = 1,
                     Name = "Key Stat 1",
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
                         Filters = new List<Guid>
@@ -2545,7 +2856,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=""/glossary#overall-absence"">More >>></a>",
+                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils.",
                         }
                     },
                     Tables = new List<Table>
@@ -2557,10 +2868,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -2581,9 +2888,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -2627,7 +2934,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -2655,18 +2962,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
                         Filters = new List<Guid>
@@ -2699,7 +3006,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of authorised absences as a percentage of the overall school population. <a href=""/glossary#authorised-absence"">More >>></a>",
+                            @"Number of authorised absences as a percentage of the overall school population.",
                         }
                     },
                     Tables = new List<Table>
@@ -2711,10 +3018,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -2735,9 +3038,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -2757,7 +3060,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -2785,18 +3088,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
                         Filters = new List<Guid>
@@ -2829,7 +3132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of unauthorised absences as a percentage of the overall school population. <a href=""/glossary#unauthorised-absence"">More >>></a>"
+                            @"Number of unauthorised absences as a percentage of the overall school population."
                         }
                     },
                     Tables = new List<Table>
@@ -2841,10 +3144,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -2865,9 +3164,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -2911,7 +3210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -2939,18 +3238,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2012,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
                         Filters = new List<Guid>
@@ -2995,9 +3294,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=""/glossary#overall-absence"">More >>></a>",
-                            @"Number of authorised absences as a percentage of the overall school population. <a href=""/glossary#authorised-absence"">More >>></a>",
-                            @"Number of unauthorised absences as a percentage of the overall school population. <a href=""/glossary#unauthorised-absence"">More >>></a>"
+                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils.",
+                            @"Number of authorised absences as a percentage of the overall school population.",
+                            @"Number of unauthorised absences as a percentage of the overall school population."
                         }
                     },
                     Tables = new List<Table>
@@ -3035,9 +3334,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -3081,7 +3380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -3124,18 +3423,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                     Name = "Generic data block - National",
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2012,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
                         Filters = new List<Guid>
@@ -3189,9 +3488,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -3235,7 +3534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -3277,15 +3576,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
                     ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
                     Name = "Generic data block - LA",
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2016",
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2017",
+                            EndYear = 2017,
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
@@ -3309,9 +3608,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new MapChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -3355,7 +3654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Title = "Absence Rate"
                                 }
@@ -3398,18 +3697,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 1",
                     Order = 1,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
@@ -3441,7 +3740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of permanent exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                            @"Number of permanent exclusions as a percentage of the overall school population.",
                         },
                     },
                     Tables = new List<Table>
@@ -3453,10 +3752,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -3478,9 +3773,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -3508,7 +3803,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -3538,18 +3833,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
@@ -3581,7 +3876,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                            @"Number of fixed-period exclusions as a percentage of the overall school population.",
                         }
                     },
                     Tables = new List<Table>
@@ -3593,10 +3888,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -3617,9 +3908,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -3637,7 +3928,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -3667,18 +3958,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
@@ -3710,7 +4001,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                            @"Total number of permanent exclusions within a school year."
                         },
                     },
                     Tables = new List<Table>
@@ -3722,10 +4013,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -3747,9 +4034,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -3767,7 +4054,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -3797,18 +4084,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2012,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
@@ -3860,9 +4147,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of permanent exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
-                            @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
-                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                            @"Number of permanent exclusions as a percentage of the overall school population.",
+                            @"Number of fixed-period exclusions as a percentage of the overall school population.",
+                            @"Total number of permanent exclusions within a school year."
                         },
                     },
                     Tables = new List<Table>
@@ -3901,9 +4188,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -3931,7 +4218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -3969,18 +4256,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
                     Heading = "Chart showing permanent exclusions in England",
                     Name = "Generic data block 1",
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2012,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
                         Filters = new List<Guid>
@@ -4033,9 +4320,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -4053,7 +4340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Exclusion Rate"
@@ -4081,18 +4368,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
                     Heading = "Chart showing fixed-period exclusions in England",
                     Name = "Generic data block 2",
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2012,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
@@ -4146,9 +4433,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -4166,9 +4453,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
+                                    Max = 5,
+                                    TickConfig = TickConfig.custom,
+                                    TickSpacing = 1,
                                     Title = "Absence Rate"
                                 }
                             },
@@ -4196,18 +4486,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = null, // not yet used in any Content
                     Name = "Available Data Block",
                     Order = 0,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2012,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
@@ -4239,7 +4529,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                            @"Total number of permanent exclusions within a school year."
                         },
                     },
                     Tables = new List<Table>
@@ -4276,9 +4566,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -4296,7 +4586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -4326,18 +4616,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = null, // not yet used in any Content
                     Name = "Available Data Block 2",
                     Order = 0,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2012",
+                            StartYear = 2012,
                             StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
+                            EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
                         },
 
@@ -4369,7 +4659,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                            @"Total number of permanent exclusions within a school year."
                         },
                     },
                     Tables = new List<Table>
@@ -4406,9 +4696,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, AxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
                             {
-                                ["major"] = new AxisConfigurationItem
+                                ["major"] = new ChartAxisConfigurationItem
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -4426,7 +4716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new AxisConfigurationItem
+                                ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
@@ -4456,18 +4746,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 1",
                     Order = 1,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2014",
+                            StartYear = 2014,
                             StartCode = TimeIdentifier.CalendarYear,
-                            EndYear = "2018",
+                            EndYear = 2018,
                             EndCode = TimeIdentifier.CalendarYear
                         },
                         Filters = new List<Guid>
@@ -4545,18 +4835,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2014",
+                            StartYear = 2014,
                             StartCode = TimeIdentifier.CalendarYear,
-                            EndYear = "2018",
+                            EndYear = 2018,
                             EndCode = TimeIdentifier.CalendarYear
                         },
                         Filters = new List<Guid>
@@ -4634,18 +4924,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2014",
+                            StartYear = 2014,
                             StartCode = TimeIdentifier.CalendarYear,
-                            EndYear = "2018",
+                            EndYear = 2018,
                             EndCode = TimeIdentifier.CalendarYear
                         },
                         Filters = new List<Guid>
@@ -4723,18 +5013,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2014",
+                            StartYear = 2014,
                             StartCode = TimeIdentifier.CalendarYear,
-                            EndYear = "2018",
+                            EndYear = 2018,
                             EndCode = TimeIdentifier.CalendarYear
                         },
                         Filters = new List<Guid>
@@ -4844,18 +5134,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading =
                         "Table of Timeseries of key secondary preference rates, England",
                     Name = "Generic data block 1",
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2014",
+                            StartYear = 2014,
                             StartCode = TimeIdentifier.CalendarYear,
-                            EndYear = "2018",
+                            EndYear = 2018,
                             EndCode = TimeIdentifier.CalendarYear
                         },
 
@@ -4921,18 +5211,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading =
                         "Table showing Timeseries of key primary preference rates, England Entry into academic year",
                     Name = "Generic data block 2",
-                    DataBlockRequest = new DataBlockRequest
+                    DataBlockRequest = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Country = new List<string>
                         {
                             CountryCodeEngland
                         },
-                        TimePeriod = new TimePeriod
+                        TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = "2014",
+                            StartYear = 2014,
                             StartCode = TimeIdentifier.CalendarYear,
-                            EndYear = "2018",
+                            EndYear = 2018,
                             EndCode = TimeIdentifier.CalendarYear
                         },
 

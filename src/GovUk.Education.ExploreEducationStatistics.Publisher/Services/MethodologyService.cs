@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return _mapper.Map<MethodologyViewModel>(methodology);
         }
 
-        public List<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
+        public List<ThemeTree<MethodologyTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
             return _context.Themes
                 .Include(theme => theme.Topics)
@@ -47,9 +47,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        private static ThemeTree BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
+        private static ThemeTree<MethodologyTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
-            return new ThemeTree
+            return new ThemeTree<MethodologyTreeNode>
             {
                 Id = theme.Id,
                 Title = theme.Title,
@@ -61,29 +61,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private static TopicTree BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
+        private static TopicTree<MethodologyTreeNode> BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
         {
-            return new TopicTree
+            return new TopicTree<MethodologyTreeNode>
             {
                 Id = topic.Id,
                 Title = topic.Title,
                 Summary = topic.Summary,
                 Publications = topic.Publications
                     .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
-                    .Select(BuildPublicationTree)
+                    .Select(BuildPublicationNode)
                     .OrderBy(publication => publication.Title)
                     .ToList()
             };
         }
 
-        private static PublicationTree BuildPublicationTree(Publication publication)
+        private static MethodologyTreeNode BuildPublicationNode(Publication publication)
         {
-            return new PublicationTree
+            return new MethodologyTreeNode
             {
-                Id = publication.Methodology.Id,
-                Title = publication.Methodology.Title,
-                Summary = publication.Methodology.Summary,
-                Slug = publication.Methodology.Slug
+                Id = publication.Id,
+                Title = publication.Title,
+                Summary = publication.Summary,
+                Slug = publication.Slug,
+                Methodology = BuildMethodology(publication.Methodology)
+            };
+        }
+
+        private static MethodologySummaryViewModel BuildMethodology(Methodology methodology)
+        {
+            return new MethodologySummaryViewModel
+            {
+                Id = methodology.Id,
+                Slug = methodology.Slug,
+                Summary = methodology.Summary,
+                Title = methodology.Title
             };
         }
 

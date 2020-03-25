@@ -1,9 +1,9 @@
 import useMounted from '@common/hooks/useMounted';
-import findAllParents from '@common/lib/dom/findAllParents';
+import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
 import React, { createElement, ReactNode } from 'react';
-import GoToTopLink from './GoToTopLink';
 import styles from './Accordion.module.scss';
+import GoToTopLink from './GoToTopLink';
 
 export type ToggleHandler = (open: boolean) => void;
 

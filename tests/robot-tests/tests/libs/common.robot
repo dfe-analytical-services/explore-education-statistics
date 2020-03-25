@@ -11,7 +11,7 @@ Library    utilities.py
 ${browser}    chrome
 ${headless}   1
 
-${timeout}          20
+${timeout}          30
 ${implicit_wait}    3
 
 *** Keywords ***
@@ -24,20 +24,40 @@ set to local storage
   execute javascript  localStorage.setItem('${key}', '${value}');
 
 user signs in
+
+user signs in as bau1
   user opens the browser
 
   environment variable should be set   ADMIN_URL
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading     Sign-in
 
-  environment variable should be set   IDENTITY_LOCAL_STORAGE
-  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE}
-  environment variable should be set   IDENTITY_COOKIE
-  set cookie from json   %{IDENTITY_COOKIE}
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
+  environment variable should be set   IDENTITY_COOKIE_BAU
+  set cookie from json   %{IDENTITY_COOKIE_BAU}
 
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading   Bau1
-  user waits until page contains element   css:#selectTheme
+  user waits until page contains element   css:#selectTheme   180
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
+
+user signs in as analyst1
+  user opens the browser
+
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading     Sign-in
+
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}
+  environment variable should be set   IDENTITY_COOKIE_ANALYST
+  set cookie from json   %{IDENTITY_COOKIE_ANALYST}
+
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading   Analyst1
+  user waits until page contains element   css:#selectTheme   180
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
@@ -138,8 +158,12 @@ user waits until page contains link
   page should contain link   ${link_text}
 
 user waits until page contains heading
-  [Arguments]   ${text}
-  wait until page contains element   xpath://h1[contains(.,"${text}")]
+  [Arguments]   ${text}    ${wait}=${timeout}
+  wait until page contains element   xpath://h1[contains(.,"${text}")]   timeout=${wait}
+
+user waits until page contains accordion section
+  [Arguments]   ${section_title}     ${wait}=${timeout}
+  user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
 
 user checks element contains
   [Arguments]   ${element}    ${text}
@@ -249,7 +273,6 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
 user checks summary list item "${dtText}" should be "${ddText}"
   user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
-user checks summary list item "${}" should contain link "${link}"
 user selects from list by label
   [Arguments]   ${locator}   ${label}
   select from list by label   ${locator}   ${label}
@@ -323,3 +346,8 @@ user checks publication bullet contains link
 user checks publication bullet does not contain link
   [Arguments]   ${publication}   ${link}
   user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
+
+user waits until page contains key stat tile
+  [Arguments]  ${title}   ${value}   ${wait}=${timeout}
+  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]    ${wait}
+

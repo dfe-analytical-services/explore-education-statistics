@@ -10,6 +10,10 @@ import publicationService, {
   Release,
   ReleaseType,
 } from '@common/services/publicationService';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@common/utils/date/dayMonthYear';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -18,7 +22,7 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
-import { NextContext } from 'next';
+import { NextPageContext } from 'next';
 import React, { Component } from 'react';
 import HeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
@@ -32,13 +36,11 @@ interface Props {
 class PublicationReleasePage extends Component<Props> {
   private accId: string[] = generateIdList(2);
 
-  public static async getInitialProps({
-    query,
-  }: NextContext<{
-    publication: string;
-    release: string;
-  }>) {
-    const { publication, release } = query;
+  public static async getInitialProps({ query }: NextPageContext) {
+    const { publication, release } = query as {
+      publication: string;
+      release: string;
+    };
 
     const request = release
       ? publicationService.getPublicationRelease(publication, release)
@@ -57,7 +59,8 @@ class PublicationReleasePage extends Component<Props> {
     const { data } = this.props;
 
     const releaseCount =
-      data.publication.releases.length + data.publication.legacyReleases.length;
+      data.publication.otherReleases.length +
+      data.publication.legacyReleases.length;
 
     return (
       <Page
@@ -88,7 +91,7 @@ class PublicationReleasePage extends Component<Props> {
                   >
                     View latest data:{' '}
                     <span className="govuk-!-font-weight-bold">
-                      {data.publication.releases.slice(-1)[0].title}
+                      {data.publication.otherReleases.slice(-1)[0].title}
                     </span>
                   </Link>
                 )}
@@ -99,16 +102,18 @@ class PublicationReleasePage extends Component<Props> {
                       <FormattedDate>{data.published}</FormattedDate>
                     </strong>
                   </dd>
-                  <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
-                    <dd data-testid="next-update">
-                      <strong>
-                        <FormattedDate format="MMMM yyyy">
-                          {data.publication.nextUpdate}
-                        </FormattedDate>
-                      </strong>
-                    </dd>
-                  </div>
+                  {dayMonthYearIsComplete(data.nextReleaseDate) && (
+                    <div>
+                      <dt className="govuk-caption-m">Next update: </dt>
+                      <dd data-testid="next-update">
+                        <strong>
+                          <FormattedDate>
+                            {dayMonthYearToDate(data.nextReleaseDate)}
+                          </FormattedDate>
+                        </strong>
+                      </dd>
+                    </div>
+                  )}
                 </dl>
                 <Link
                   className="dfe-print-hidden"
@@ -200,43 +205,37 @@ class PublicationReleasePage extends Component<Props> {
                 {!!releaseCount && (
                   <dd>
                     <Details
-                      summary={`See previous ${releaseCount} releases`}
+                      summary={`See ${releaseCount} other releases`}
                       onToggle={(open: boolean) =>
                         open &&
                         logEvent(
-                          'Previous Releases',
-                          'Release page previous releases dropdown opened',
+                          'Other Releases',
+                          'Release page other releases dropdown opened',
                           window.location.pathname,
                         )
                       }
                     >
                       <ul className="govuk-list">
                         {[
-                          ...data.publication.releases.map(
-                            ({ id, slug, releaseName }) => [
-                              releaseName,
-                              <li key={id} data-testid="previous-release-item">
+                          ...data.publication.otherReleases.map(
+                            ({ id, slug, title }) => (
+                              <li key={id} data-testid="other-release-item">
                                 <Link
                                   to={`/find-statistics/${data.publication.slug}/${slug}`}
                                 >
-                                  {releaseName}
+                                  {title}
                                 </Link>
-                              </li>,
-                            ],
+                              </li>
+                            ),
                           ),
                           ...data.publication.legacyReleases.map(
-                            ({ id, description, url }) => [
-                              description,
-                              <li key={id} data-testid="previous-release-item">
+                            ({ id, description, url }) => (
+                              <li key={id} data-testid="other-release-item">
                                 <a href={url}>{description}</a>
-                              </li>,
-                            ],
+                              </li>
+                            ),
                           ),
-                        ]
-                          .sort((a, b) =>
-                            b[0].toString().localeCompare(a[0].toString()),
-                          )
-                          .map(items => items[1])}
+                        ]}
                       </ul>
                     </Details>
                   </dd>
@@ -363,7 +362,6 @@ class PublicationReleasePage extends Component<Props> {
           data.
         </p>
         <ButtonLink
-          prefetch
           as={`/data-tables/${data.publication.slug}`}
           href={`/data-tables?publicationSlug=${data.publication.slug}`}
         >

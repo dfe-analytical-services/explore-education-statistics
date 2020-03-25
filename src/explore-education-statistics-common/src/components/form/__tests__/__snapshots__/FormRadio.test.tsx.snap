@@ -2,13 +2,13 @@
 
 exports[`FormRadio does not render conditional content when not checked 1`] = `
 <div class="govuk-radios__item">
-  <input data-aria-controls="test-radio-conditional"
-         class="govuk-radios__input"
+  <input class="govuk-radios__input"
          id="test-radio"
          name="test"
          type="radio"
          data-testid="Test radio"
          value="true"
+         aria-controls="test-radio-conditional"
   >
   <label class="govuk-label govuk-radios__label"
          for="test-radio"
@@ -27,14 +27,15 @@ exports[`FormRadio does not render conditional content when not checked 1`] = `
 
 exports[`FormRadio renders conditional content when checked 1`] = `
 <div class="govuk-radios__item">
-  <input data-aria-controls="test-radio-conditional"
-         class="govuk-radios__input"
+  <input class="govuk-radios__input"
          id="test-radio"
          name="test"
          type="radio"
          data-testid="Test radio"
          value="true"
          checked
+         aria-controls="test-radio-conditional"
+         aria-expanded="true"
   >
   <label class="govuk-label govuk-radios__label"
          for="test-radio"

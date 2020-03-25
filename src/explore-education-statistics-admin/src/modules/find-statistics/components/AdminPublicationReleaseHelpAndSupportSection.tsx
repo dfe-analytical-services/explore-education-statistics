@@ -1,19 +1,20 @@
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import Accordion from '@admin/components/EditableAccordion';
-import AccordionSection from '@admin/components/EditableAccordionSection';
 import Link from '@admin/components/Link';
-import React from 'react';
-import { ReleaseType } from '@common/services/publicationService';
-import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
+import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { ReleaseType } from '@common/services/publicationService';
+import React, { useContext } from 'react';
 
 const AdminPublicationReleaseHelpAndSupportSection = ({
   release,
-  publication,
 }: {
-  publication: ManageContentPageViewModel['release']['publication'];
   release: ManageContentPageViewModel['release'];
 }) => {
+  const { isEditing } = useContext(EditingContext);
+  const { publication } = release;
   return (
     <>
       <h2
@@ -23,25 +24,42 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
         Help and support
       </h2>
 
-      <Accordion id="static-content-section" canReorder={false}>
+      <Accordion id="static-content-section">
         <AccordionSection
-          heading={`${publication.title}: methodology`}
+          heading="Methodology"
           caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          <p>
-            Read our{' '}
-            <Link
-              to={`/methodology/${
-                release.publication.methodology
-                  ? release.publication.methodology.id
-                  : 'no-methodology'
-              }`}
-            >
-              {`${publication.title}: methodology`}
-            </Link>{' '}
-            guidance.
-          </p>
+          {publication.methodology || publication.externalMethodology ? (
+            <p>
+              Read our{' '}
+              {publication.methodology &&
+                (isEditing ? (
+                  <a>{`${publication.title}: methodology`}</a>
+                ) : (
+                  <Link to={`/methodologies/${publication.methodology.id}`}>
+                    {`${publication.title}: methodology`}
+                  </Link>
+                ))}
+              {!publication.methodology &&
+                publication.externalMethodology &&
+                (isEditing ? (
+                  <a>{`${publication.title}: methodology`}</a>
+                ) : (
+                  <Link
+                    to=""
+                    rel="external"
+                    target="_blank"
+                    href={publication.externalMethodology.url}
+                  >
+                    {`${publication.title}: methodology`}
+                  </Link>
+                ))}{' '}
+              guidance.
+            </p>
+          ) : (
+            <p>No methodology added.</p>
+          )}
         </AccordionSection>
         {release.type && release.type.title === ReleaseType.NationalStatistics && (
           <AccordionSection heading="National Statistics" headingTag="h3">

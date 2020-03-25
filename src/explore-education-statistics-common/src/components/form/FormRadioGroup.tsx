@@ -15,6 +15,7 @@ export type RadioOption = PartialBy<
 >;
 
 export type FormRadioGroupProps = {
+  disabled?: boolean;
   inline?: boolean;
   name: string;
   onChange?: RadioChangeEventHandler;
@@ -39,22 +40,6 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
 
   private ref = createRef<HTMLInputElement>();
 
-  public componentDidMount(): void {
-    if (this.ref.current) {
-      try {
-        import('govuk-frontend/govuk/components/radios/radios').then(
-          ({ default: GovUkRadios }) => {
-            new GovUkRadios(this.ref.current).init();
-          },
-        );
-      } catch (e) {
-        // if an error occurs during the import it breaks the entire page
-        // eslint-disable-next-line no-console
-        console.error('An error occured importing radios', e);
-      }
-    }
-  }
-
   private handleChange: RadioChangeEventHandler = (event, option) => {
     const { onChange } = this.props;
 
@@ -65,6 +50,7 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
 
   public render() {
     const {
+      disabled,
       id,
       inline,
       name,
@@ -91,6 +77,7 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
         >
           {orderedOptions.map(option => (
             <FormRadio
+              disabled={disabled}
               {...option}
               id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
               checked={value === option.value}

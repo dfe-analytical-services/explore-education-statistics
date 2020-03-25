@@ -1,18 +1,18 @@
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import formatPretty from '@common/lib/utils/number/formatPretty';
+import { AxiosErrorHandler } from '@common/services/api/Client';
 import DataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { AxiosResponse } from 'axios';
-import React, { ReactNode, useEffect, useState } from 'react';
+import formatPretty from '@common/utils/number/formatPretty';
+import React, { ReactNode, useEffect, useState, useMemo } from 'react';
+import ReactMarkdown from 'react-markdown';
 import styles from './SummaryRenderer.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
-  dataBlockResponse?: DataBlockResponse;
   children?: ReactNode;
-  handleApiErrors?: (error: AxiosResponse) => void;
+  handleApiErrors?: AxiosErrorHandler;
 }
 
 export interface KeyStatConfig {
@@ -20,42 +20,41 @@ export interface KeyStatConfig {
   value: string;
 }
 
-const KeyStatTile = ({
-  dataBlockRequest,
-  summary,
-  dataBlockResponse: response,
-  children,
-  handleApiErrors,
-}: KeyStatProps) => {
+const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     DataBlockResponse | undefined
-  >(response);
-
-  const [config, setConfig] = useState<KeyStatConfig | undefined>();
+  >();
 
   useEffect(() => {
-    if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject(dataBlockRequest)
-        .then(setDataBlockResponse)
-        .catch(handleApiErrors);
-    } else {
+    DataBlockService.getDataBlockForSubject({
+      ...dataBlockRequest,
+      includeGeoJson: false,
+    }).then(setDataBlockResponse);
+  }, [dataBlockRequest]);
+
+  const config: KeyStatConfig = useMemo(() => {
+    if (dataBlockResponse) {
       const [indicatorKey, theIndicator] = Object.entries(
         dataBlockResponse.metaData.indicators,
       )[0];
-      setConfig({
+      return {
         indicatorLabel: theIndicator.label,
         value: `${formatPretty(
           dataBlockResponse.result[0].measures[indicatorKey],
         )}${theIndicator.unit}`,
-      });
+      };
     }
-  }, [dataBlockResponse, dataBlockRequest, handleApiErrors]);
+    return {
+      indicatorLabel: '',
+      value: '',
+    };
+  }, [dataBlockResponse]);
 
   return (
     <div className={styles.keyStatTile}>
       {dataBlockResponse && config ? (
         <>
-          <div className={styles.keyStat}>
+          <div className={styles.keyStat} data-testid="key-stat-tile">
             <h3 className="govuk-heading-s" data-testid="key-stat-tile-title">
               {config.indicatorLabel}
             </h3>
@@ -66,14 +65,13 @@ const KeyStatTile = ({
               <p className="govuk-body-s">{summary.dataSummary}</p>
             )}
           </div>
-          {summary && summary.dataDefinition && (
+          {summary && summary?.dataDefinition?.[0] !== '' && (
             <Details
-              summary={
-                (summary && summary.dataDefinitionTitle) ||
-                `Define '${config.indicatorLabel}'`
-              }
+              summary={(summary && summary.dataDefinitionTitle) || 'Help'}
             >
-              <div>{summary.dataDefinition}</div>
+              {summary.dataDefinition.map(data => (
+                <ReactMarkdown key={data}>{data}</ReactMarkdown>
+              ))}
             </Details>
           )}
           {children}

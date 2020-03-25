@@ -1,10 +1,10 @@
-import permissionService from '@admin/services/permissions/service';
-import service from '@admin/services/release/edit-release/data/service';
-import { AncillaryFile } from '@admin/services/release/edit-release/data/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
+import permissionService from '@admin/services/permissions/permissionService';
+import editReleaseDataService, {
+  AncillaryFile,
+} from '@admin/services/release/edit-release/data/editReleaseDataService';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
@@ -14,9 +14,28 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
+import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'CANNOT_OVERWRITE_FILE',
+    'file',
+    'Choose a unique file name',
+  ),
+  errorCodeToFieldError(
+    'FILE_CANNOT_BE_EMPTY',
+    'file',
+    'Choose a file that is not empty',
+  ),
+  errorCodeToFieldError(
+    'FILE_TYPE_INVALID',
+    'file',
+    'Choose a file of an allowed format',
+  ),
+];
 
 interface FormValues {
   name: string;
@@ -30,26 +49,21 @@ interface Props {
 
 const formId = 'fileUploadForm';
 
-const ReleaseFileUploadsSection = ({
-  publicationId,
-  releaseId,
-  handleApiErrors,
-}: Props & ErrorControlProps) => {
+const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [files, setFiles] = useState<AncillaryFile[]>();
   const [deleteFileName, setDeleteFileName] = useState('');
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);
+  const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
 
   useEffect(() => {
     Promise.all([
-      service.getAncillaryFiles(releaseId),
+      editReleaseDataService.getAncillaryFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([filesResult, canUpdateReleaseResult]) => {
-        setFiles(filesResult);
-        setCanUpdateRelease(canUpdateReleaseResult);
-      })
-      .catch(handleApiErrors);
-  }, [publicationId, releaseId, handleApiErrors]);
+    ]).then(([filesResult, canUpdateReleaseResult]) => {
+      setFiles(filesResult);
+      setCanUpdateRelease(canUpdateReleaseResult);
+    });
+  }, [publicationId, releaseId]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
@@ -60,35 +74,20 @@ const ReleaseFileUploadsSection = ({
         fileInput.value = '';
       });
 
-    const latestFiles = await service.getAncillaryFiles(releaseId);
+    const latestFiles = await editReleaseDataService.getAncillaryFiles(
+      releaseId,
+    );
     setFiles(latestFiles);
   };
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'CANNOT_OVERWRITE_FILE',
-      'file',
-      'Choose a unique file name',
-    ),
-    errorCodeToFieldError(
-      'FILE_CANNOT_BE_EMPTY',
-      'file',
-      'Choose a file that is not empty',
-    ),
-  ];
+  const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+    await editReleaseDataService.uploadAncillaryFile(releaseId, {
+      name: values.name,
+      file: values.file as File,
+    });
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async (values, actions) => {
-      await service.uploadAncillaryFile(releaseId, {
-        name: values.name,
-        file: values.file as File,
-      });
-
-      await resetPage(actions);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+    await resetPage(actions);
+  }, errorCodeMappings);
 
   return (
     <Formik<FormValues>
@@ -97,7 +96,7 @@ const ReleaseFileUploadsSection = ({
         name: '',
         file: null,
       }}
-      onSubmit={submitFormHandler}
+      onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({
         name: Yup.string().required('Enter a name'),
         file: Yup.mixed().required('Choose a file'),
@@ -129,6 +128,7 @@ const ReleaseFileUploadsSection = ({
 
                 <Button
                   type="submit"
+                  id="upload-file-button"
                   className="govuk-button govuk-!-margin-right-6"
                 >
                   Upload file
@@ -147,43 +147,69 @@ const ReleaseFileUploadsSection = ({
               <>
                 <hr />
                 <h2 className="govuk-heading-m">Uploaded files</h2>
+                <Accordion id="uploaded-files">
+                  {files.map((file, index) => {
+                    const accId = `${file.title}-${index}`;
+                    return (
+                      <AccordionSection
+                        /* eslint-disable-next-line react/no-array-index-key */
+                        key={accId}
+                        headingId={accId}
+                        heading={file.title}
+                        onToggle={() => {
+                          if (openedAccordions.includes(accId)) {
+                            setOpenedAccordions(
+                              remove(openedAccordions, (item: string) => {
+                                return item !== accId;
+                              }),
+                            );
+                          } else {
+                            setOpenedAccordions([...openedAccordions, accId]);
+                          }
+                        }}
+                        open={openedAccordions.includes(accId)}
+                      >
+                        <SummaryList key={file.filename}>
+                          <SummaryListItem term="Name">
+                            <h4 className="govuk-heading-m">{file.title}</h4>
+                          </SummaryListItem>
+                          <SummaryListItem term="File">
+                            <ButtonText
+                              onClick={() =>
+                                editReleaseDataService.downloadAncillaryFile(
+                                  releaseId,
+                                  file.filename,
+                                )
+                              }
+                            >
+                              {file.filename}
+                            </ButtonText>
+                          </SummaryListItem>
+                          <SummaryListItem term="Filesize">
+                            {file.fileSize.size.toLocaleString()}{' '}
+                            {file.fileSize.unit}
+                          </SummaryListItem>
+                          {canUpdateRelease && (
+                            <SummaryListItem
+                              term="Actions"
+                              actions={
+                                <ButtonText
+                                  onClick={() =>
+                                    setDeleteFileName(file.filename)
+                                  }
+                                >
+                                  Delete file
+                                </ButtonText>
+                              }
+                            />
+                          )}
+                        </SummaryList>
+                      </AccordionSection>
+                    );
+                  })}
+                </Accordion>
               </>
             )}
-
-            {files &&
-              files.map(file => (
-                <SummaryList key={file.filename}>
-                  <SummaryListItem term="Name">
-                    <h4 className="govuk-heading-m">{file.title}</h4>
-                  </SummaryListItem>
-                  <SummaryListItem term="File">
-                    <ButtonText
-                      onClick={() =>
-                        service
-                          .downloadAncillaryFile(releaseId, file.filename)
-                          .catch(handleApiErrors)
-                      }
-                    >
-                      {file.filename}
-                    </ButtonText>
-                  </SummaryListItem>
-                  <SummaryListItem term="Filesize">
-                    {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
-                  </SummaryListItem>
-                  {canUpdateRelease && (
-                    <SummaryListItem
-                      term="Actions"
-                      actions={
-                        <ButtonText
-                          onClick={() => setDeleteFileName(file.filename)}
-                        >
-                          Delete file
-                        </ButtonText>
-                      }
-                    />
-                  )}
-                </SummaryList>
-              ))}
 
             <ModalConfirm
               mounted={deleteFileName !== null && deleteFileName.length > 0}
@@ -191,9 +217,10 @@ const ReleaseFileUploadsSection = ({
               onExit={() => setDeleteFileName('')}
               onCancel={() => setDeleteFileName('')}
               onConfirm={async () => {
-                await service
-                  .deleteAncillaryFile(releaseId, deleteFileName)
-                  .catch(handleApiErrors);
+                await editReleaseDataService.deleteAncillaryFile(
+                  releaseId,
+                  deleteFileName,
+                );
                 setDeleteFileName('');
                 resetPage(form);
               }}
@@ -209,4 +236,4 @@ const ReleaseFileUploadsSection = ({
   );
 };
 
-export default withErrorControl(ReleaseFileUploadsSection);
+export default ReleaseFileUploadsSection;

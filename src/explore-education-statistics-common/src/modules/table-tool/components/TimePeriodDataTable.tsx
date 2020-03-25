@@ -1,103 +1,126 @@
+import ErrorBoundary from '@common/components/ErrorBoundary';
 import WarningMessage from '@common/components/WarningMessage';
-import cartesian from '@common/lib/utils/cartesian';
-import formatPretty from '@common/lib/utils/number/formatPretty';
+import {
+  HeaderGroup,
+  HeaderSubGroup,
+} from '@common/modules/table-tool/components/MultiHeaderTable';
 import {
   CategoryFilter,
+  Filter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { RowHeaderType } from '@common/modules/table-tool/components/MultiHeaderTable';
+} from '@common/modules/table-tool/types/filters';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import cartesian from '@common/utils/cartesian';
+import formatPretty from '@common/utils/number/formatPretty';
 import camelCase from 'lodash/camelCase';
 import last from 'lodash/last';
 import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import {
-  SortableOptionWithGroup,
-  TableHeadersFormValues,
-} from './TableHeadersForm';
-import { reverseMapTableHeadersConfig } from './utils/tableToolHelpers';
 
 interface Props {
+  captionTitle?: string;
   fullTable: FullTable;
-  tableHeadersConfig: TableHeadersFormValues;
+  tableHeadersConfig: TableHeadersConfig;
 }
 
-const selectFilterGroup = (
-  group?: string,
-  previousGroup?: string,
-): RowHeaderType => {
-  if (group) {
-    if (group === previousGroup) return undefined;
-    if (group !== 'Default') return group;
+const createFilterGroupHeaders = (group: Filter[]): HeaderSubGroup[] =>
+  group.reduce<HeaderSubGroup[]>((acc, filter) => {
+    if (!filter.filterGroup) {
+      return acc;
+    }
+
+    const lastFilterGroupHeader = last(acc);
+
+    if (!lastFilterGroupHeader) {
+      acc.push({
+        text: filter.filterGroup,
+      });
+
+      return acc;
+    }
+
+    if (lastFilterGroupHeader.text === filter.filterGroup) {
+      lastFilterGroupHeader.span =
+        typeof lastFilterGroupHeader.span !== 'undefined'
+          ? lastFilterGroupHeader.span + 1
+          : 2;
+    } else {
+      acc.push({
+        text: filter.filterGroup,
+      });
+    }
+
+    return acc;
+  }, []);
+
+export const createGroupHeaders = (groups: Filter[][]): HeaderGroup[] => {
+  return groups.reduce((acc, group) => {
+    const filterGroupHeaders = createFilterGroupHeaders(group);
+
+    const groupHeaders = group.map(filter => {
+      return {
+        text: filter.label,
+      };
+    });
+
+    const hasHeaderFilterGroup =
+      filterGroupHeaders.length > 1 &&
+      filterGroupHeaders.some(header => header.text !== 'Default');
+
+    acc.push(
+      hasHeaderFilterGroup
+        ? {
+            groups: filterGroupHeaders,
+            headers: groupHeaders,
+          }
+        : {
+            headers: groupHeaders,
+          },
+    );
+
+    return acc;
+  }, [] as HeaderGroup[]);
+};
+
+/**
+ * Create table headers in either the row or column direction.
+ * This function will join together the configurations for
+ * the row/cols and the row/colgroups if possible, but will
+ * aim to optimise the viewing experience for the user.
+ */
+const createHeaders = (
+  rowColGroups: Filter[][],
+  rowCols: Filter[],
+): HeaderGroup[] => {
+  const groupHeaders = createGroupHeaders(rowColGroups);
+  const headers = {
+    headers: rowCols.map(rowCol => ({
+      text: rowCol.label,
+    })),
+  };
+
+  // If we have multiple row/col headers, we can just
+  // create a combination of the groups and the headers.
+  // This is a typical combination of headers.
+  if (rowCols.length > 1) {
+    return [...groupHeaders, headers];
   }
-  return '';
-};
 
-export const createHeadersFromGroups = (
-  groups: SortableOptionWithGroup[][],
-): RowHeaderType[][] => {
-  return groups.flatMap(rowGroup =>
-    rowGroup
-      .reduce<[RowHeaderType[], RowHeaderType[]]>(
-        ([b, c], group, index) => [
-          (group.filterGroup && [
-            ...b,
-            selectFilterGroup(
-              group.filterGroup,
-              (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
-            ),
-          ]) ||
-            b,
-          [
-            ...c,
-            group instanceof LocationFilter && rowGroup.length === 1
-              ? ''
-              : group.label,
-          ],
-        ],
-        [[], []],
-      )
-      .filter(
-        ary => ary.length > 0 && ary.filter(cell => !!cell).join('').length > 0,
-      ),
-  );
-};
-
-export const createHeaderIgnoreFromGroups = (
-  groups: SortableOptionWithGroup[][],
-): boolean[] => {
-  return groups
-    .flatMap(rowGroup =>
-      rowGroup
-        .reduce<[boolean[], boolean[]]>(
-          ([b, c], group, index) => [
-            (selectFilterGroup(
-              group.filterGroup,
-              (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
-            ) && [...b, true]) ||
-              b,
-            [...c, false],
-          ],
-          [[], []],
-        )
-
-        .filter(ary => ary.length > 0),
-    )
-    .map(group => group.includes(true));
+  // We only have one or zero row/col headers, so we want
+  // to show the group headers instead if possible.
+  // If there are no groups headers, we fallback to
+  // showing the row/col headers so that there are
+  // at least some headers in that direction.
+  return groupHeaders.length ? groupHeaders : [headers];
 };
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
-  (props: Props, dataTableRef) => {
-    const { fullTable, tableHeadersConfig: unmappedHeaderConfig } = props;
+  ({ fullTable, tableHeadersConfig, captionTitle }: Props, dataTableRef) => {
     const { subjectMeta, results } = fullTable;
-
-    const tableHeadersConfig = reverseMapTableHeadersConfig(
-      unmappedHeaderConfig,
-      fullTable.subjectMeta,
-    ) as TableHeadersFormValues;
 
     if (results.length === 0) {
       return (
@@ -108,34 +131,23 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       );
     }
 
-    const columnHeaders: RowHeaderType[][] = [
-      ...createHeadersFromGroups(tableHeadersConfig.columnGroups),
-      tableHeadersConfig.columns.map(column => column.label),
-    ];
-
-    const columnHeaderIsGroup: boolean[] = [
-      ...createHeaderIgnoreFromGroups(tableHeadersConfig.columnGroups),
-      false,
-    ];
-
-    const rowHeaders: RowHeaderType[][] = [
-      ...createHeadersFromGroups(tableHeadersConfig.rowGroups),
-      tableHeadersConfig.rows.map(row => row.label),
-    ];
-
-    const rowHeaderIsGroup: boolean[] = [
-      ...createHeaderIgnoreFromGroups(tableHeadersConfig.rowGroups),
-      false,
-    ];
+    const columnHeaders = createHeaders(
+      tableHeadersConfig.columnGroups,
+      tableHeadersConfig.columns,
+    );
+    const rowHeaders = createHeaders(
+      tableHeadersConfig.rowGroups,
+      tableHeadersConfig.rows,
+    );
 
     const rowHeadersCartesian = cartesian(
       ...tableHeadersConfig.rowGroups,
-      tableHeadersConfig.rows,
+      tableHeadersConfig.rows as Filter[],
     );
 
     const columnHeadersCartesian = cartesian(
       ...tableHeadersConfig.columnGroups,
-      tableHeadersConfig.columns,
+      tableHeadersConfig.columns as Filter[],
     );
 
     const rows = rowHeadersCartesian.map(rowFilterCombination => {
@@ -200,16 +212,28 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
     });
 
     return (
-      <FixedMultiHeaderDataTable
-        caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
-        columnHeaders={columnHeaders}
-        columnHeaderIsGroup={columnHeaderIsGroup}
-        rowHeaders={rowHeaders}
-        rowHeaderIsGroup={rowHeaderIsGroup}
-        rows={rows}
-        ref={dataTableRef}
-        footnotes={subjectMeta.footnotes}
-      />
+      <ErrorBoundary
+        fallback={
+          <WarningMessage>
+            There was a problem rendering your table.
+          </WarningMessage>
+        }
+      >
+        <FixedMultiHeaderDataTable
+          caption={
+            <DataTableCaption
+              {...subjectMeta}
+              title={captionTitle}
+              id="dataTableCaption"
+            />
+          }
+          columnHeaders={columnHeaders}
+          rowHeaders={rowHeaders}
+          rows={rows}
+          ref={dataTableRef}
+          footnotes={subjectMeta.footnotes}
+        />
+      </ErrorBoundary>
     );
   },
 );

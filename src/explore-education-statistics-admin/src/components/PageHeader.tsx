@@ -1,17 +1,17 @@
 import Link from '@admin/components/Link';
-import LoginContext from '@admin/components/Login';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import loginService from '@admin/services/sign-in/service';
 import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
-import React, { useContext } from 'react';
+import React from 'react';
 
 interface Props {
   wide?: boolean;
 }
 
 const PageHeader = ({ wide }: Props) => {
-  const { user } = useContext(LoginContext);
+  const { user } = useAuthContext();
 
   return (
     <>
@@ -46,7 +46,7 @@ const PageHeader = ({ wide }: Props) => {
           </div>
           <div className="govuk-header__content">
             <a
-              href="/"
+              href={user && user.permissions.canAccessAnalystPages ? '/' : '#'}
               className="govuk-header__link govuk-header__link--service-name"
             >
               Explore education statistics

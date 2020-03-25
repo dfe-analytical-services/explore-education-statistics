@@ -1,14 +1,11 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { ContactDetails } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
-import methodologyService from '@admin/services/methodology/service';
+import methodologyService from '@admin/services/methodology/methodologyService';
 import { CreateMethodologyRequest } from '@admin/services/methodology/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
@@ -20,17 +17,26 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup';
+import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import {
   dateToDayMonthYear,
   DayMonthYearInputs,
   dayMonthYearInputsToDate,
   dayMonthYearValuesToInputs,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'SLUG_NOT_UNIQUE',
+    'methodologyTitle',
+    'Choose a unique title',
+  ),
+];
 
 interface FormValues {
   methodologyTitle: string;
@@ -44,22 +50,18 @@ interface CreateMethodologyModel {
 
 const CreateMethodologyPage = ({
   history,
-  handleApiErrors,
-}: RouteComponentProps & ErrorControlProps) => {
+}: RouteComponentProps & ErrorControlState) => {
   const [model, setModel] = useState<CreateMethodologyModel>();
 
   useEffect(() => {
-    service
-      .getPublicationAndReleaseContacts()
-      .then(contacts => {
-        setModel({
-          contacts,
-        });
-      })
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+    service.getPublicationAndReleaseContacts().then(contacts => {
+      setModel({
+        contacts,
+      });
+    });
+  }, []);
 
-  const cancelHandler = () => history.push('/methodology');
+  const cancelHandler = () => history.push('/methodologies');
 
   const getSelectedContact = (
     contactId: string,
@@ -68,31 +70,19 @@ const CreateMethodologyPage = ({
     availableContacts.find(contact => contact.id === contactId) ||
     availableContacts[0];
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'SLUG_NOT_UNIQUE',
-      'methodologyTitle',
-      'Choose a unique title',
-    ),
-  ];
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    const submission: CreateMethodologyRequest = {
+      title: values.methodologyTitle,
+      publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
+      contactId: values.selectedContactId,
+    };
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async values => {
-      const submission: CreateMethodologyRequest = {
-        title: values.methodologyTitle,
-        publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
-        contactId: values.selectedContactId,
-      };
+    const createdMethodology = await methodologyService.createMethodology(
+      submission,
+    );
 
-      const createdMethodology = await methodologyService.createMethodology(
-        submission,
-      );
-
-      history.push(`/methodology/${createdMethodology.id}`);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+    history.push(`/methodologies/${createdMethodology.id}`);
+  }, errorCodeMappings);
 
   const formId = 'createMethodologyForm';
 
@@ -101,8 +91,8 @@ const CreateMethodologyPage = ({
       wide
       breadcrumbs={[
         {
-          name: 'Manage methodology',
-          link: '/methodology',
+          name: 'Manage methodologies',
+          link: '/methodologies',
         },
         {
           name: 'Create new methodology',
@@ -147,7 +137,7 @@ const CreateMethodologyPage = ({
             ),
             scheduledPublishDate: validateMandatoryDayMonthYearField,
           })}
-          onSubmit={submitFormHandler}
+          onSubmit={handleSubmit}
           render={(form: FormikProps<FormValues>) => {
             return (
               <Form id={formId}>
@@ -217,4 +207,4 @@ const CreateMethodologyPage = ({
   );
 };
 
-export default withErrorControl(CreateMethodologyPage);
+export default CreateMethodologyPage;

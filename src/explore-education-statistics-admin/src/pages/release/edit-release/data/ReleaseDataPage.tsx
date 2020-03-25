@@ -1,21 +1,60 @@
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import ReleaseFootnotesSection from '@admin/pages/release/edit-release/data/ReleaseFootnotesSection';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import permissionService from '@admin/services/permissions/permissionService';
+import footnotesService from '@admin/services/release/edit-release/footnotes/service';
+import {
+  Footnote,
+  FootnoteMeta,
+  FootnoteMetaGetters,
+} from '@admin/services/release/edit-release/footnotes/types';
+import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, { useContext } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';
-import ReleaseFootnotesSection from './ReleaseFootnotesSection';
+
+export interface FootnotesData {
+  footnoteMeta: FootnoteMeta;
+  footnotes: Footnote[];
+  footnoteMetaGetters: FootnoteMetaGetters;
+  canUpdateRelease: boolean;
+}
 
 const ReleaseDataPage = () => {
-  const { publication, releaseId } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { publication, releaseId } = useManageReleaseContext();
+
+  const [footnotesData, setFootnotesData] = useState<FootnotesData>();
+  const [activeTab, setActiveTab] = useState<string>('');
+
+  const getFootnoteData = useCallback(() => {
+    Promise.all([
+      footnotesService.getReleaseFootnoteData(releaseId),
+      permissionService.canUpdateRelease(releaseId),
+    ]).then(([{ meta, footnotes: footnotesList }, canUpdateRelease]) => {
+      setFootnotesData({
+        footnoteMeta: meta,
+        footnotes: footnotesList,
+        footnoteMetaGetters: generateFootnoteMetaMap(meta),
+        canUpdateRelease,
+      });
+    });
+  }, [releaseId]);
+
+  useEffect(() => {
+    if (activeTab === 'footnotes') {
+      getFootnoteData();
+    }
+  }, [activeTab, getFootnoteData]);
 
   return (
     <>
-      <Tabs id="dataUploadTab">
+      <Tabs
+        onToggle={tab => {
+          setActiveTab(tab.id);
+        }}
+        id="dataUploadTab"
+      >
         <TabsSection id="data-upload" title="Data uploads">
           <ReleaseDataUploadsSection
             publicationId={publication.id}
@@ -24,8 +63,13 @@ const ReleaseDataPage = () => {
         </TabsSection>
         <TabsSection id="footnotes" title="Footnotes">
           <ReleaseFootnotesSection
+            onDelete={getFootnoteData}
             publicationId={publication.id}
             releaseId={releaseId}
+            footnotesData={footnotesData}
+            onSubmit={(footnotesDataCallback: FootnotesData) => {
+              setFootnotesData(footnotesDataCallback);
+            }}
           />
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">

@@ -15,5 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             CreatePublicationViewModel publication);
 
         Task<Either<ActionResult, PublicationViewModel>> GetViewModelAsync(Guid publicationId);
+        
+        Task<Either<ActionResult, bool>> UpdatePublicationMethodologyAsync(Guid publicationId, UpdatePublicationMethodologyViewModel methodology);
+
     }
 }

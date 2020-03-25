@@ -1,10 +1,10 @@
 import FormTextArea, {
   FormTextAreaProps,
 } from '@common/components/form/FormTextArea';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import classNames from 'classnames';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
-import classNames from 'classnames';
 import FormGroup from './FormGroup';
 
 type Props<FormValues> = {
@@ -36,7 +36,19 @@ const FormFieldTextArea = <T extends {}>(props: Props<T>) => {
               [formGroupClass || '']: formGroupClass,
             })}
           >
-            <FormTextArea {...childProps} {...field} error={errorMessage} />
+            <FormTextArea
+              {...childProps}
+              {...field}
+              onChange={e => {
+                if (childProps.onChange) {
+                  childProps.onChange(e);
+                }
+                if (!e.isDefaultPrevented()) {
+                  field.onChange(e);
+                }
+              }}
+              error={errorMessage}
+            />
           </FormGroup>
         );
       }}

@@ -1,9 +1,6 @@
 import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
@@ -12,14 +9,14 @@ import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
-import Yup from '@common/lib/validation/yup';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { ReleaseNote } from '@common/services/publicationService';
 import {
   dateToDayMonthYear,
   DayMonthYearInputs,
   dayMonthYearInputsToDate,
-  ReleaseNote,
-} from '@common/services/publicationService';
+} from '@common/utils/date/dayMonthYear';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import merge from 'lodash/merge';
 import React, { useContext, useState } from 'react';
@@ -47,11 +44,7 @@ const emptyReleaseNote: ReleaseNote = {
   reason: '',
 };
 
-const ReleaseNotesSection = ({
-  release,
-  logEvent = nullLogEvent,
-  handleApiErrors,
-}: Props & ErrorControlProps) => {
+const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
   const [deletedReleaseNote, setDeletedReleaseNote] = useState<ReleaseNote>(
@@ -72,8 +65,7 @@ const ReleaseNotesSection = ({
         .then(newReleaseNotes => {
           setReleaseNotes(newReleaseNotes);
           resolve();
-        })
-        .catch(handleApiErrors);
+        });
     });
   };
 
@@ -87,8 +79,7 @@ const ReleaseNotesSection = ({
         .then(newReleaseNotes => {
           setReleaseNotes(newReleaseNotes);
           resolve();
-        })
-        .catch(handleApiErrors);
+        });
     });
   };
 
@@ -232,80 +223,80 @@ const ReleaseNotesSection = ({
   };
 
   return (
-    <>
-      <dl className="dfe-meta-content">
-        <dt className="govuk-caption-m">Last updated:</dt>
-        <dd data-testid="last-updated">
-          <strong>
-            <FormattedDate>{releaseNotes[0].on}</FormattedDate>
-          </strong>
-          <Details
-            onToggle={(open: boolean) =>
-              open &&
-              logEvent(
-                'Last Updates',
-                'Release page last updates dropdown opened',
-                window.location.pathname,
-              )
-            }
-            summary={`See all ${releaseNotes.length} updates`}
-          >
-            {releaseNotes.map((elem, index) => (
-              <React.Fragment key={elem.id}>
-                {isEditing &&
-                editFormOpen &&
-                selectedReleaseNote.id === elem.id ? (
-                  renderEditForm()
-                ) : (
-                  <div data-testid="last-updated-element" key={elem.id}>
-                    <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                      {elem.on}
-                    </FormattedDate>
-                    <p>{elem.reason}</p>
+    releaseNotes && (
+      <>
+        <dl className="dfe-meta-content">
+          <dt className="govuk-caption-m">Last updated:</dt>
+          <dd data-testid="last-updated">
+            <strong>
+              <FormattedDate>{releaseNotes[0]?.on}</FormattedDate>
+            </strong>
+            <Details
+              onToggle={(open: boolean) =>
+                open &&
+                logEvent(
+                  'Last Updates',
+                  'Release page last updates dropdown opened',
+                  window.location.pathname,
+                )
+              }
+              summary={`See all ${releaseNotes.length} updates`}
+            >
+              {releaseNotes.map((elem, index) => (
+                <React.Fragment key={elem.id}>
+                  {isEditing &&
+                  editFormOpen &&
+                  selectedReleaseNote.id === elem.id ? (
+                    renderEditForm()
+                  ) : (
+                    <div data-testid="last-updated-element" key={elem.id}>
+                      <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                        {elem.on}
+                      </FormattedDate>
+                      <p>{elem.reason}</p>
 
-                    {isEditing && (
-                      <>
-                        <ButtonText
-                          className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
-                          onClick={() => openEditForm(elem)}
-                        >
-                          Edit
-                        </ButtonText>
-                        <ButtonText
-                          className="govuk-button govuk-button--warning"
-                          onClick={() => setDeletedReleaseNote(elem)}
-                        >
-                          Remove
-                        </ButtonText>
-                      </>
-                    )}
-                  </div>
-                )}
-                {index < releaseNotes.length - 1 && <hr />}
-              </React.Fragment>
-            ))}
-          </Details>
-        </dd>
-        {isEditing && renderAddForm()}
-      </dl>
-
-      <ModalConfirm
-        mounted={deletedReleaseNote.id.length > 0}
-        title="Confirm deletion of release note"
-        onExit={() => setDeletedReleaseNote(emptyReleaseNote)}
-        onCancel={() => setDeletedReleaseNote(emptyReleaseNote)}
-        onConfirm={async () => {
-          await releaseNoteService
-            .delete(deletedReleaseNote.id, release.id)
-            .then(setReleaseNotes)
-            .catch(handleApiErrors)
-            .finally(() => setDeletedReleaseNote(emptyReleaseNote));
-        }}
-      >
-        <p>This release note will be removed from this release</p>
-      </ModalConfirm>
-    </>
+                      {isEditing && (
+                        <>
+                          <Button
+                            className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 govuk-!-margin-right-6"
+                            onClick={() => openEditForm(elem)}
+                          >
+                            Edit
+                          </Button>
+                          <ButtonText
+                            className="govuk-button govuk-button--warning"
+                            onClick={() => setDeletedReleaseNote(elem)}
+                          >
+                            Remove
+                          </ButtonText>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {index < releaseNotes.length - 1 && <hr />}
+                </React.Fragment>
+              ))}
+            </Details>
+          </dd>
+          {isEditing && renderAddForm()}
+        </dl>
+        <ModalConfirm
+          mounted={deletedReleaseNote.id.length > 0}
+          title="Confirm deletion of release note"
+          onExit={() => setDeletedReleaseNote(emptyReleaseNote)}
+          onCancel={() => setDeletedReleaseNote(emptyReleaseNote)}
+          onConfirm={async () => {
+            await releaseNoteService
+              .delete(deletedReleaseNote.id, release.id)
+              .then(setReleaseNotes)
+              .finally(() => setDeletedReleaseNote(emptyReleaseNote));
+          }}
+        >
+          <p>This release note will be removed from this release</p>
+        </ModalConfirm>
+      </>
+    )
   );
 };
 
-export default withErrorControl(ReleaseNotesSection);
+export default ReleaseNotesSection;

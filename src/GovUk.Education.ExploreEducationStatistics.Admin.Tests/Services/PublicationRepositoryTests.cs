@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -36,15 +37,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 new Release
                                 {
                                     Id = notLatestReleaseId,
-                                    Order = 0,
-                                    Published = DateTime.Now.AddDays(-2) // Is published but not the latest by order
+                                    ReleaseName = "2019",
+                                    TimePeriodCoverage = TimeIdentifier.December,
+                                    Published = DateTime.UtcNow
 
                                 },
                                 new Release
                                 {
                                     Id = latestReleaseId,
-                                    Order = 1,
-                                    Published = DateTime.Now.AddDays(-1) // Is published and the the latest by order
+                                    ReleaseName = "2020",
+                                    TimePeriodCoverage = TimeIdentifier.June,
+                                    Published = DateTime.UtcNow
                                 }
                             }
                         }

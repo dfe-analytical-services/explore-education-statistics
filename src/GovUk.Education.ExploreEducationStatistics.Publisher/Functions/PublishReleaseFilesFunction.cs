@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            
+
             var published = new List<(Guid ReleaseId, Guid ReleaseStatusId)>();
             foreach (var (releaseId, releaseStatusId) in message.Releases)
             {
@@ -46,12 +46,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 catch (Exception e)
                 {
                     logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                    await UpdateFilesStage(releaseId, releaseStatusId, Failed);
+                    await UpdateFilesStage(releaseId, releaseStatusId, Failed,
+                        new ReleaseStatusLogMessage($"Exception in files stage: {e.Message}"));
                 }
             }
-            
+
             await _queueService.QueueGenerateReleaseContentMessageAsync(published);
-            
+
             foreach (var (releaseId, releaseStatusId) in published)
             {
                 await UpdateFilesStage(releaseId, releaseStatusId, Complete);
@@ -61,9 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateFilesStage(Guid releaseId, Guid releaseStatusId, Stage stage)
+        private async Task UpdateFilesStage(Guid releaseId, Guid releaseStatusId, Stage stage,
+            ReleaseStatusLogMessage logMessage = null)
         {
-            await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage);
+            await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage, logMessage);
         }
 
         private async Task UpdateContentStage(Guid releaseId, Guid releaseStatusId, Stage stage)

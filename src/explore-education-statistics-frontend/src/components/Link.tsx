@@ -1,7 +1,5 @@
 import classNames from 'classnames';
-// eslint-disable-next-line import/no-unresolved
-import { UrlLike } from 'next-server/router';
-import RouterLink from 'next/link';
+import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 import {
   AnalyticProps,
@@ -9,11 +7,11 @@ import {
 } from '@frontend/services/googleAnalyticsService';
 
 export type LinkProps = {
-  as?: string | UrlLike;
+  as?: RouterLinkProps['as'];
   children: ReactNode;
   className?: string;
   prefetch?: boolean;
-  to?: string | UrlLike;
+  to?: RouterLinkProps['href'];
   unvisited?: boolean;
 } & AnchorHTMLAttributes<HTMLAnchorElement> &
   AnalyticProps;
@@ -41,7 +39,7 @@ const Link = ({
 
   /* eslint-disable jsx-a11y/no-static-element-interactions */
   return (
-    <RouterLink href={href || to} as={as} prefetch={prefetch}>
+    <RouterLink href={href ?? to ?? ''} as={as} prefetch={prefetch}>
       <a
         {...props}
         className={classNames(

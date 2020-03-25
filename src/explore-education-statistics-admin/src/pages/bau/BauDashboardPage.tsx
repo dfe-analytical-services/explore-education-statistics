@@ -1,10 +1,10 @@
 import Link from '@admin/components/Link';
-import LoginContext from '@admin/components/Login';
 import Page from '@admin/components/Page';
-import React, { useContext } from 'react';
+import { useAuthContext } from '@admin/contexts/AuthContext';
+import React from 'react';
 
 const BauDashboardPage = () => {
-  const { user } = useContext(LoginContext);
+  const { user } = useAuthContext();
 
   const canManageUsers = user
     ? user.permissions.canAccessUserAdministrationPages

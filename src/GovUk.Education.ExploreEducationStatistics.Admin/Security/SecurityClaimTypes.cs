@@ -2,25 +2,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {
     public enum SecurityClaimTypes
     {
+        /**
+         * General role-based page access
+         */
         ApplicationAccessGranted,
         AnalystPagesAccessGranted,
         PrereleasePagesAccessGranted,
-
         ManageAnyUser,
         ManageAnyMethodology,
-        
-        CreateAnyPublication,
-        CreateAnyRelease,
 
+        /**
+         * Publication management
+         */
+        CreateAnyPublication,
+        
+        /**
+         * Release management
+         */
+        CreateAnyRelease,
         AccessAllReleases,
-        AccessAllTopics,
-        
         UpdateAllReleases,
-        
         MarkAllReleasesAsDraft,
         SubmitAllReleasesToHigherReview,
         ApproveAllReleases,
+        MakeAmendmentsOfAllReleases,
         
-        CanViewPrereleaseContacts
+        /**
+         * Pre Release management
+         */
+        CanViewPrereleaseContacts,
+
+        /**
+         * Topic / Theme management
+         */
+        AccessAllTopics,
+        
+        /**
+         * Methodology management
+         */
+        CreateAnyMethodology,
+        AccessAllMethodologies,
+        UpdateAllMethodologies,
+        ApproveAllMethodologies
     }
 }

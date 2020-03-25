@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
@@ -119,7 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 predicate = predicate.Or(WardPredicate(query));
             }
-
+            
+            if (query.PlanningArea != null)
+            {
+                predicate = predicate.Or(PlanningAreaPredicate(query));
+            }
             return predicate;
         }
 
@@ -137,7 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                      query.Region == null &&
                      query.RscRegion == null &&
                      query.Sponsor == null &&
-                     query.Ward == null);
+                     query.Ward == null &&
+                     query.PlanningArea == null);
         }
 
         private static Expression<Func<Observation, bool>> CountryPredicate(SubjectMetaQueryContext query)
@@ -227,6 +234,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return ObservationalUnitPredicate(query, GeographicLevel.Ward,
                 observation => query.Ward.Contains(observation.Location.Ward.Code));
+        }
+        
+        private static Expression<Func<Observation, bool>> PlanningAreaPredicate(SubjectMetaQueryContext query)
+        {
+            return ObservationalUnitPredicate(query, GeographicLevel.PlanningArea,
+                observation => query.PlanningArea.Contains(observation.Location.PlanningArea.Code));
         }
 
         private static Expression<Func<Observation, bool>> ObservationalUnitPredicate(SubjectMetaQueryContext query,

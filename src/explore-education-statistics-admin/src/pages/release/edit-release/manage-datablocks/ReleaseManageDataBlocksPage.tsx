@@ -1,68 +1,60 @@
-/* eslint-disable no-shadow */
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+import DataBlockContentTabs from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
+import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
+import { manageDataBlocksRoute } from '@admin/routes/edit-release/routes';
 import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
-import permissionService from '@admin/services/permissions/service';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import dataBlockService, {
   DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { useContext } from 'react';
-import CreateDataBlocks from './CreateDataBlocks';
-import ViewDataBlocks from './ViewDataBlocks';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
-interface DataBlockData {
-  dataBlock: DataBlock;
-  dataBlockResponse: DataBlockResponse;
+export interface ReleaseManageDataBlocksPageParams {
+  publicationId: string;
+  releaseId: string;
+  dataBlockId?: string;
 }
 
+interface SelectedDataBlock {
+  dataBlock: DataBlock;
+  response: DataBlockResponse;
+}
+
+const emptyDataBlocks: DataBlock[] = [];
+
 const ReleaseManageDataBlocksPage = ({
-  handleApiErrors,
-}: ErrorControlProps) => {
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  match,
+  history,
+}: RouteComponentProps<ReleaseManageDataBlocksPageParams>) => {
+  const { publicationId, releaseId, dataBlockId } = match.params;
 
-  const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
-  const [selectedDataBlock, setSelectedDataBlock] = React.useState<
-    DataBlock['id']
-  >('');
+  const [activeTab, setActiveTab] = useState<string>('');
 
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [isSaving, setIsSaving] = React.useState<boolean>(false);
+  const [isLoading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const [canUpdateRelease, setCanUpdateRelease] = React.useState(false);
+  const [selectedDataBlock, setSelectedDataBlock] = useState<
+    SelectedDataBlock
+  >();
+  const [deleteDataBlock, setDeleteDataBlock] = useState<DataBlock>();
 
-  const [dataBlockData, setDataBlockData] = React.useState<DataBlockData>();
+  const {
+    value: dataBlocks = emptyDataBlocks,
+    isLoading: isDataBlocksLoading,
+    retry: fetchDataBlocks,
+    setValue: setDataBlocks,
+  } = useAsyncRetry(() => dataBlocksService.getDataBlocks(releaseId), [
+    releaseId,
+  ]);
 
-  const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
-
-  const updateDataBlocks = (rId: string) => {
-    return dataBlocksService
-      .getDataBlocks(rId)
-      .then(setDataBlocks)
-      .catch(handleApiErrors);
-  };
-
-  React.useEffect(() => {
-    updateDataBlocks(releaseId);
-  }, [releaseId]);
-
-  React.useEffect(() => {
-    permissionService
-      .canUpdateRelease(releaseId)
-      .then(canUpdateRelease => setCanUpdateRelease(canUpdateRelease));
-  }, [releaseId]);
-
-  const dataBlockOptions = React.useMemo(
+  const dataBlockOptions = useMemo(
     () =>
       dataBlocks.map(({ name, id }, index) => ({
         label: `${name || index}`,
@@ -71,153 +63,150 @@ const ReleaseManageDataBlocksPage = ({
     [dataBlocks],
   );
 
-  const onDeleteDataBlock = (db: DataBlock) => {
-    setDeleteDataBlock(undefined);
-    if (db.id) {
-      dataBlocksService
-        .deleteDataBlock(db.id)
-        .then(() => updateDataBlocks(releaseId))
-        .then(() => setSelectedDataBlock(''))
-        .catch(handleApiErrors);
+  useEffect(() => {
+    setLoading(true);
+
+    if (!dataBlockId) {
+      setSelectedDataBlock(undefined);
+      setLoading(false);
+      return;
     }
-  };
 
-  const load = async (
-    dataBlocks: DataBlock[],
-    releaseId: string,
-    selectedDataBlockId: string,
-  ) => {
-    // Load's the datablock of 'selectedDataBlockId' in datablock form
+    if (isDataBlocksLoading) {
+      return;
+    }
 
-    setIsLoading(true);
+    const dataBlock = dataBlocks.find(({ id }) => dataBlockId === id);
 
-    if (!selectedDataBlockId) return {};
+    if (!dataBlock) {
+      history.push(
+        manageDataBlocksRoute.generateLink({ publicationId, releaseId }),
+      );
+      return;
+    }
 
-    const db = dataBlocks.find(({ id }) => selectedDataBlockId === id);
+    if (!dataBlock.dataBlockRequest) {
+      return;
+    }
 
-    if (db === undefined) return {};
+    dataBlockService
+      .getDataBlockForSubject(dataBlock.dataBlockRequest)
+      .then(response => {
+        if (response) {
+          setSelectedDataBlock({
+            dataBlock,
+            response: {
+              ...response,
+              releaseId,
+            },
+          });
+        }
+      });
+  }, [
+    dataBlockId,
+    dataBlocks,
+    history,
+    isDataBlocksLoading,
+    publicationId,
+    releaseId,
+  ]);
 
-    const request = db.dataBlockRequest;
-    if (request === undefined) return {};
+  const onDeleteDataBlock = useCallback(
+    (dataBlock: DataBlock) => {
+      setDeleteDataBlock(undefined);
 
-    const response = await dataBlockService
-      .getDataBlockForSubject(request)
-      .catch(handleApiErrors);
-
-    if (response === undefined) return {};
-
-    return {
-      dataBlock: db,
-      request,
-      response: {
-        ...response,
-        releaseId,
-      },
-    };
-  };
-
-  const currentlyLoadingDataBlockId = React.useRef<string>();
-
-  const unsetIsLoading = React.useCallback(() => {
-    setIsLoading(false);
-    currentlyLoadingDataBlockId.current = undefined;
-  }, []);
-
-  const doLoad = React.useCallback(
-    (
-      releaseId: string,
-      selectedDataBlockId: string | undefined,
-      dataBlocks: DataBlock[],
-    ) => {
-      if (!selectedDataBlockId) {
-        setDataBlockData(undefined);
-        setIsLoading(false);
-        currentlyLoadingDataBlockId.current = undefined;
-        return;
+      if (dataBlock.id) {
+        dataBlocksService
+          .deleteDataBlock(dataBlock.id)
+          .then(fetchDataBlocks)
+          .then(() =>
+            history.push(
+              manageDataBlocksRoute.generateLink({ publicationId, releaseId }),
+            ),
+          );
       }
+    },
+    [fetchDataBlocks, history, publicationId, releaseId],
+  );
 
-      if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
-        currentlyLoadingDataBlockId.current = selectedDataBlockId;
+  const onDataBlockSave = useMemo(
+    () => async (dataBlock: DataBlock) => {
+      setIsSaving(true);
 
-        load(dataBlocks, releaseId, selectedDataBlockId).then(
-          ({ dataBlock, response: dataBlockResponse }) => {
-            if (dataBlock && dataBlockResponse) {
-              if (dataBlock.id === selectedDataBlockId) {
-                setDataBlockData({
-                  dataBlock,
-                  dataBlockResponse,
-                });
-              } else {
-                setDataBlockData(undefined);
-                setIsLoading(false);
-                currentlyLoadingDataBlockId.current = undefined;
-              }
-            }
-          },
+      let newDataBlock: DataBlock;
+      let newDataBlocks: DataBlock[];
+
+      if (dataBlock.id) {
+        newDataBlock = await dataBlocksService.putDataBlock(
+          dataBlock.id,
+          dataBlock,
+        );
+
+        newDataBlocks = [...dataBlocks];
+
+        const currentBlockIndex = newDataBlocks.findIndex(
+          db => db.id === newDataBlock.id,
+        );
+
+        if (currentBlockIndex > -1) {
+          newDataBlocks[currentBlockIndex] = newDataBlock;
+        }
+
+        setDataBlocks(newDataBlocks);
+        setIsSaving(false);
+      } else {
+        newDataBlock = await dataBlocksService.postDataBlock(
+          releaseId,
+          dataBlock,
+        );
+
+        setDataBlocks([...dataBlocks, newDataBlock]);
+        setIsSaving(false);
+
+        history.push(
+          manageDataBlocksRoute.generateLink({
+            publicationId,
+            releaseId,
+            dataBlockId: newDataBlock.id,
+          }),
         );
       }
     },
-    [],
+    [dataBlocks, setDataBlocks, releaseId, history, publicationId],
   );
 
-  const onDataBlockSave = React.useMemo(
-    () => async (db: DataBlock) => {
-      setIsSaving(true);
+  const handleTableToolLoaded = useCallback(() => setLoading(false), []);
 
-      let newDataBlock;
-      let newDataBlocksList;
-
-      if (db.id) {
-        newDataBlock = await dataBlocksService
-          .putDataBlock(db.id, db)
-          .catch(handleApiErrors);
-        newDataBlocksList = [
-          ...dataBlocks.filter(db => db.id !== selectedDataBlock),
-          newDataBlock,
-        ];
-      } else {
-        newDataBlock = await dataBlocksService
-          .postDataBlock(releaseId, db)
-          .catch(handleApiErrors);
-        newDataBlocksList = [...dataBlocks, newDataBlock];
-      }
-      setDataBlocks(newDataBlocksList);
-
-      setSelectedDataBlock(newDataBlock.id || '');
-      doLoad(releaseId, selectedDataBlock, newDataBlocksList);
-
-      setIsSaving(false);
-
-      return newDataBlock;
-    },
-    [dataBlocks, doLoad, releaseId, selectedDataBlock, handleApiErrors],
-  );
-
-  React.useEffect(() => {
-    doLoad(releaseId, selectedDataBlock, dataBlocks);
-  }, [releaseId, dataBlocks, doLoad, selectedDataBlock]);
-
-  return canUpdateRelease ? (
+  return (
     <>
-      <FormSelect
-        id="selectDataBlock"
-        name="selectDataBlock"
-        label="Select an existing data block to edit or create a new one"
-        onChange={e => {
-          setSelectedDataBlock(e.target.value);
-        }}
-        order={[]}
-        optGroups={{
-          'Create data block': [
-            {
-              label: 'Create new data block',
-              value: '',
-            },
-          ],
-          'Edit existing': dataBlockOptions,
-        }}
-        value={selectedDataBlock}
-      />
+      {dataBlockOptions.length > 0 && (
+        <FormSelect
+          id="selectDataBlock"
+          name="selectDataBlock"
+          label="Select an existing data block to edit or create a new one"
+          disabled={isLoading}
+          order={[]}
+          value={dataBlockId}
+          optGroups={{
+            'Create data block': [
+              {
+                label: 'Create new data block',
+                value: '',
+              },
+            ],
+            'Edit existing': dataBlockOptions,
+          }}
+          onChange={e => {
+            history.push(
+              manageDataBlocksRoute.generateLink({
+                publicationId,
+                releaseId,
+                dataBlockId: e.target.value ? e.target.value : undefined,
+              }),
+            );
+          }}
+        />
+      )}
 
       <hr />
 
@@ -231,28 +220,34 @@ const ReleaseManageDataBlocksPage = ({
 
         <div>
           <h2>
-            {dataBlockData && dataBlockData.dataBlock
-              ? dataBlockData.dataBlock.name || 'title not set'
+            {selectedDataBlock && selectedDataBlock.dataBlock
+              ? selectedDataBlock.dataBlock.name || 'title not set'
               : 'Create new data block'}
           </h2>
 
-          <Tabs id="manageDataBlocks">
+          <Tabs
+            openId={activeTab}
+            onToggle={tab => {
+              setActiveTab(tab.id);
+            }}
+            id="manageDataBlocks"
+          >
             <TabsSection
               title={
-                dataBlockData && dataBlockData.dataBlock
+                selectedDataBlock && selectedDataBlock.dataBlock
                   ? 'Update data source'
                   : 'Create data source'
               }
             >
               <p>Configure the data source for the data block</p>
 
-              {dataBlockData && dataBlockData.dataBlock && (
+              {selectedDataBlock && selectedDataBlock.dataBlock && (
                 <>
                   <div className="govuk-!-margin-top-4">
                     <Button
                       type="button"
                       onClick={() =>
-                        setDeleteDataBlock(dataBlockData.dataBlock)
+                        setDeleteDataBlock(selectedDataBlock.dataBlock)
                       }
                     >
                       Delete this data block
@@ -261,31 +256,33 @@ const ReleaseManageDataBlocksPage = ({
                 </>
               )}
 
-              {deleteDataBlock && (
-                <ModalConfirm
-                  title="Delete data block"
-                  mounted={deleteDataBlock !== undefined}
-                  onConfirm={() => onDeleteDataBlock(deleteDataBlock)}
-                  onExit={() => setDeleteDataBlock(undefined)}
-                  onCancel={() => setDeleteDataBlock(undefined)}
-                >
-                  <p>Are you sure you wish to delete this data block?</p>
-                </ModalConfirm>
-              )}
+              <ModalConfirm
+                title="Delete data block"
+                mounted={deleteDataBlock !== undefined}
+                onConfirm={() =>
+                  deleteDataBlock && onDeleteDataBlock(deleteDataBlock)
+                }
+                onExit={() => setDeleteDataBlock(undefined)}
+                onCancel={() => setDeleteDataBlock(undefined)}
+              >
+                <p>Are you sure you wish to delete this data block?</p>
+              </ModalConfirm>
 
               <div style={{ overflow: 'hidden' }}>
-                <CreateDataBlocks
+                <DataBlockSourceWizard
+                  dataBlock={selectedDataBlock?.dataBlock}
+                  dataBlockResponse={selectedDataBlock?.response}
                   releaseId={releaseId}
-                  {...dataBlockData}
                   onDataBlockSave={onDataBlockSave}
-                  onTableToolLoaded={unsetIsLoading}
+                  onTableToolLoaded={handleTableToolLoaded}
                 />
               </div>
             </TabsSection>
-            {!isLoading && dataBlockData && (
+            {!isLoading && selectedDataBlock && (
               <TabsSection title="Configure content">
-                <ViewDataBlocks
-                  {...dataBlockData}
+                <DataBlockContentTabs
+                  dataBlock={selectedDataBlock?.dataBlock}
+                  dataBlockResponse={selectedDataBlock?.response}
                   onDataBlockSave={onDataBlockSave}
                 />
               </TabsSection>
@@ -294,9 +291,7 @@ const ReleaseManageDataBlocksPage = ({
         </div>
       </div>
     </>
-  ) : (
-    <div>This release is currently not editable.</div>
   );
 };
 
-export default withErrorControl(ReleaseManageDataBlocksPage);
+export default ReleaseManageDataBlocksPage;

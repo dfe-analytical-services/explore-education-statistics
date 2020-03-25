@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,13 +33,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var response = JsonConvert.DeserializeObject<PipelineResponse>(requestBody);
 
-            if (response.Status != "Complete")
+            if (response.Status == "Complete")
             {
-                logger.LogError($"Data factory pipeline failed: {response}");
+                await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
+                    Complete);
             }
-
-            await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
-                response.Status == "Complete" ? Complete : Failed);
+            else
+            {
+                logger.LogError($"ADF pipeline failed: {response}");
+                await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId, Failed,
+                    new ReleaseStatusLogMessage(
+                        $"Exception in data stage (ADF pipeline triggered: {response.PipelineTriggerTime}): {response.ErrorMessage}"));
+            }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
 

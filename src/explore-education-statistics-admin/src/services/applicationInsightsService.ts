@@ -19,6 +19,7 @@ const initApplicationInsights = async () => {
     });
     appInsights.loadAppInsights();
 
+    // eslint-disable-next-line no-console
     console.log('Application Insights initialised');
   }
 };

@@ -19,14 +19,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Summary { get; set; }
 
-        public DateTime? NextUpdate { get; set; }
-
         public List<Release> Releases { get; set; }
 
         public Guid? MethodologyId { get; set; }
-        
+
         public Methodology Methodology { get; set; }
-        
+
+        public ExternalMethodology ExternalMethodology { get; set; }
+
         public Uri LegacyPublicationUrl { get; set; }
 
         public List<Link> LegacyReleases { get; set; }
@@ -34,18 +34,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid TopicId { get; set; }
 
         public Topic Topic { get; set; }
-        
+
         public Guid? ContactId { get; set; }
 
         public Contact Contact { get; set; }
-        
+
         public Release LatestRelease()
         {
-            var latest = Releases?.Where(r => r.Published != null)
-                .OrderBy(r => r.Order)
-                .ThenBy(r => r.Published)
+            return Releases?.Where(r => r.Live)
+                .OrderBy(r => r.Year)
+                .ThenBy(r => r.TimePeriodCoverage)
                 .LastOrDefault();
-            return latest;
         }
     }
 }

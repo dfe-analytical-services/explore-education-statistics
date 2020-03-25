@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -11,26 +12,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ApproveSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<ApproveSpecificReleaseRequirement, Release>
     {
         public ApproveSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler(),
-            new ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(context))
+            new CanApproveAllReleasesAuthorizationHandler(),
+            new HasApproverRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
-    }
-    
-    public class ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
-        ApproveSpecificReleaseRequirement>
-    {
-        public ApproveSpecificReleaseCanApproveAllReleasesAuthorizationHandler() 
-            : base(SecurityClaimTypes.ApproveAllReleases) {}
-    }
+        
+        public class CanApproveAllReleasesAuthorizationHandler : 
+            EntityAuthorizationHandler<ApproveSpecificReleaseRequirement, Release>
+        {
+            public CanApproveAllReleasesAuthorizationHandler() 
+                : base(ctx => 
+                    ctx.Entity.Status != ReleaseStatus.Approved 
+                    && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.ApproveAllReleases)) {}
+        }
 
-    public class ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler
-        : HasRoleOnReleaseAuthorizationHandler<ApproveSpecificReleaseRequirement>
-    {
-        public ApproveSpecificReleaseHasApproverRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
-            : base(context, ctx => ContainsApproverRole(ctx.Roles))
-        {}
+        public class HasApproverRoleOnReleaseAuthorizationHandler
+            : HasRoleOnReleaseAuthorizationHandler<ApproveSpecificReleaseRequirement>
+        {
+            public HasApproverRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
+                : base(context, ctx => ctx.Release.Status != ReleaseStatus.Approved && ContainsApproverRole(ctx.Roles))
+            {}
+        }
     }
-    
 }

@@ -1,15 +1,17 @@
 import FormattedDate from '@common/components/FormattedDate';
-import permalinkService, {
-  Permalink,
-} from '@common/modules/full-table/services/permalinkService';
-import { mapPermalink } from '@common/modules/full-table/utils/mapPermalinks';
+import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import permalinkService from '@common/modules/table-tool/services/permalinkService';
+import { Permalink } from '@common/modules/table-tool/types/permalink';
+import mapPermalink from '@common/modules/table-tool/utils/mapPermalink';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
-import { NextContext } from 'next';
+import PrintThisPage from '@frontend/components/PrintThisPage';
+import { NextPageContext } from 'next';
 import React, { Component } from 'react';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import styles from './PermalinkPage.module.scss';
 
 interface Props {
   permalink: string;
@@ -17,14 +19,10 @@ interface Props {
 }
 
 class PermalinkPage extends Component<Props> {
-  public static async getInitialProps({
-    query,
-  }: NextContext<{
-    permalink: string;
-  }>) {
+  public static async getInitialProps({ query }: NextPageContext) {
     const { permalink } = query;
 
-    const request = permalinkService.getPermalink(permalink);
+    const request = permalinkService.getPermalink(permalink as string);
 
     const data = await request;
 
@@ -43,6 +41,7 @@ class PermalinkPage extends Component<Props> {
       <Page
         title={`'${fullTable.subjectMeta.subjectName}' from '${fullTable.subjectMeta.publicationName}'`}
         caption="Permanent data table"
+        wide
         breadcrumbs={[
           { name: 'Data tables', link: '/data-tables' },
           { name: 'Permanent link', link: '/data-tables' },
@@ -61,6 +60,13 @@ class PermalinkPage extends Component<Props> {
             </dl>
           </div>
           <div className="govuk-grid-column-one-third">
+            <PrintThisPage
+              className="dfe-align--centre govuk-!-margin-top-0"
+              analytics={{
+                category: 'Page print',
+                action: 'Print this page link selected',
+              }}
+            />
             {/* <RelatedAside>
               <h3>Related content</h3>
             </RelatedAside> */}
@@ -70,25 +76,32 @@ class PermalinkPage extends Component<Props> {
           fullTable={fullTable}
           tableHeadersConfig={
             configuration.tableHeadersConfig
-              ? configuration.tableHeadersConfig
+              ? mapTableHeadersConfig(
+                  configuration.tableHeadersConfig,
+                  fullTable.subjectMeta,
+                )
               : getDefaultTableHeaderConfig(fullTable.subjectMeta)
           }
         />
-        <DownloadCsvButton
-          publicationSlug={`permalink-${data.created}-${data.title}`}
-          fullTable={fullTable}
-        />
-        <p className="govuk-body-s">Source: DfE prototype example statistics</p>
-        <h2 className="govuk-heading-m govuk-!-margin-top-9">
-          Create your own tables online
-        </h2>
-        <p>
-          Use our tool to build tables using our range of national and regional
-          data.
-        </p>
-        <ButtonLink prefetch as="/data-tables/" href="/data-tables">
-          Create tables
-        </ButtonLink>
+        <div className={styles.hidePrint}>
+          <DownloadCsvButton
+            publicationSlug={`permalink-${data.created}-${data.title}`}
+            fullTable={fullTable}
+          />
+          <p className="govuk-body-s">
+            Source: DfE prototype example statistics
+          </p>
+          <h2 className="govuk-heading-m govuk-!-margin-top-9">
+            Create your own tables online
+          </h2>
+          <p>
+            Use our tool to build tables using our range of national and
+            regional data.
+          </p>
+          <ButtonLink as="/data-tables/" href="/data-tables">
+            Create tables
+          </ButtonLink>
+        </div>
       </Page>
     );
   }

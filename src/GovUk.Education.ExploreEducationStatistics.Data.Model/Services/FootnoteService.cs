@@ -13,9 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
     {
         public FootnoteService(StatisticsDbContext context,
             ILogger<FootnoteService> logger) : base(context, logger)
-        {
-            
-        }
+        {}
 
         public IEnumerable<Footnote> GetFootnotes(Guid subjectId,
             IQueryable<Observation> observations,

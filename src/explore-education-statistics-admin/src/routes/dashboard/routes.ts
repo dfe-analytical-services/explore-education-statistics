@@ -3,7 +3,6 @@ import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
-import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import AdminDocumentationCreateNewPublication from '@admin/pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationCreateNewRelease from '@admin/pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationContentDesignStandards from '@admin/pages/documentation/DocumentationDesignStandards';
@@ -16,17 +15,19 @@ import AdminDocumentationManageDataBlocks from '@admin/pages/documentation/Docum
 import AdminDocumentationStyle from '@admin/pages/documentation/DocumentationStyle';
 import AdminDocumentationUsingDashboard from '@admin/pages/documentation/DocumentationUsingDashboard';
 import CreateMethodologyPage from '@admin/pages/methodology/CreateMethodologyPage';
-import EditMethodologyPage from '@admin/pages/methodology/EditMethodologyPage';
-import ListMethodologyPages from '@admin/pages/methodology/ListMethodologyPages';
+import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
+import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
-import PrereleasePage from '@admin/pages/release/prerelease/PrereleasePage';
+import PreReleasePage from '@admin/pages/release/prerelease/PreReleasePage';
+import ThemeTopicWrapper, {
+  themeTopicPath,
+} from '@admin/pages/theme/ThemeTopicWrapper';
 import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
-import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { User } from '@admin/services/sign-in/types';
 import { Dictionary } from '@admin/types';
-import { RouteProps } from 'react-router';
+import { generatePath, RouteProps } from 'react-router';
 
 interface ProtectedRouteProps extends RouteProps {
   protectedAction?: (user: User) => boolean;
@@ -35,7 +36,11 @@ interface ProtectedRouteProps extends RouteProps {
 export const generateAdminDashboardThemeTopicLink: (
   themeId: string,
   topicId: string,
-) => string = (themeId, topicId) => `/dashboard/${themeId}/${topicId}`;
+) => string = (themeId, topicId) =>
+  generatePath('/dashboard/:themeId/:topicId', {
+    themeId,
+    topicId,
+  });
 
 const appRouteList: Dictionary<ProtectedRouteProps> = {
   home: {
@@ -54,6 +59,10 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     path: '/dashboard/:themeId/:topicId',
     component: AdminDashboardPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
+  },
+  themeTopicWrapper: {
+    path: themeTopicPath,
+    component: ThemeTopicWrapper,
   },
   administration: {
     path: '/administration',
@@ -88,29 +97,22 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
   },
-  methodology: {
-    path: '/methodology',
-    component: ListMethodologyPages,
+  methodologies: {
+    path: '/methodologies',
+    component: MethodologiesPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
   methodologyCreate: {
-    path: '/methodology/create',
+    path: '/methodologies/create',
     component: CreateMethodologyPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
-  editMethodology: {
-    path: '/methodology/:methodologyId',
-    component: EditMethodologyPage,
+  methodology: {
+    path: '/methodologies/:methodologyId',
+    component: MethodologyPage,
     protectedAction: user => user.permissions.canAccessAnalystPages,
-    exact: true,
-  },
-  createPublication: {
-    path: publicationRoutes.createPublication.route,
-    component: CreatePublicationPage,
-    protectedAction: user => user.permissions.canAccessAnalystPages,
-    exact: true,
   },
   createRelease: {
     path: '/publication/:publicationId/create-release',
@@ -120,7 +122,7 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   },
   prereleaseView: {
     path: '/publication/:publicationId/release/:releaseId/prerelease',
-    component: PrereleasePage,
+    component: PreReleasePage,
     protectedAction: user => user.permissions.canAccessPrereleasePages,
     exact: true,
   },

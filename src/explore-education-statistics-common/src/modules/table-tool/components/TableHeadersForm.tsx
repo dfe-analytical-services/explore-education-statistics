@@ -1,36 +1,28 @@
-import React from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Form, FormikProps } from 'formik';
-import classNames from 'classnames';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormGroup, Formik } from '@common/components/form';
-import reorder from '@common/lib/utils/reorder';
-import Yup from '@common/lib/validation/yup';
+import { Filter } from '@common/modules/table-tool/types/filters';
+import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { PickByType } from '@common/types';
+import reorder from '@common/utils/reorder';
+import Yup from '@common/validation/yup';
+import classNames from 'classnames';
+import { Form, FormikProps } from 'formik';
+import React, { useMemo } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
 import FormFieldSortableListGroup from './FormFieldSortableListGroup';
-import { SortableOption } from './FormSortableList';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props {
-  initialValues?: TableHeadersFormValues;
-  onSubmit: (values: TableHeadersFormValues) => void;
-}
-
-export interface SortableOptionWithGroup extends SortableOption {
-  filterGroup?: string;
-}
-
-export interface TableHeadersFormValues {
-  columnGroups: SortableOptionWithGroup[][];
-  columns: SortableOptionWithGroup[];
-  rowGroups: SortableOptionWithGroup[][];
-  rows: SortableOptionWithGroup[];
+  id?: string;
+  initialValues?: TableHeadersConfig;
+  onSubmit: (values: TableHeadersConfig) => void;
 }
 
 const TableHeadersForm = ({
   onSubmit,
+  id = 'tableHeadersForm',
   initialValues = {
     columnGroups: [],
     columns: [],
@@ -38,7 +30,7 @@ const TableHeadersForm = ({
     rows: [],
   },
 }: Props) => {
-  const formInitialValues = React.useMemo(() => ({ ...initialValues }), [
+  const formInitialValues = useMemo(() => ({ ...initialValues }), [
     initialValues,
   ]);
 
@@ -54,14 +46,14 @@ const TableHeadersForm = ({
         use the arrow keys to move a selected item. If you are using a screen
         reader disable scan mode.
       </div>
-      <Formik<TableHeadersFormValues>
+      <Formik<TableHeadersConfig>
         enableReinitialize
         initialValues={formInitialValues}
-        validationSchema={Yup.object<TableHeadersFormValues>({
+        validationSchema={Yup.object<TableHeadersConfig>({
           rowGroups: Yup.array()
             .of(
               Yup.array()
-                .of<SortableOptionWithGroup>(Yup.object())
+                .of<Filter>(Yup.object())
                 .ensure(),
             )
             .min(
@@ -75,7 +67,7 @@ const TableHeadersForm = ({
           columnGroups: Yup.array()
             .of(
               Yup.array()
-                .of<SortableOptionWithGroup>(Yup.object())
+                .of<Filter>(Yup.object())
                 .ensure(),
             )
             .min(
@@ -87,14 +79,14 @@ const TableHeadersForm = ({
               'Must have at least one column group',
             ),
           columns: Yup.array()
-            .of<SortableOptionWithGroup>(Yup.object())
+            .of<Filter>(Yup.object())
             .ensure(),
           rows: Yup.array()
-            .of<SortableOptionWithGroup>(Yup.object())
+            .of<Filter>(Yup.object())
             .ensure(),
         })}
         onSubmit={onSubmit}
-        render={(form: FormikProps<TableHeadersFormValues>) => {
+        render={(form: FormikProps<TableHeadersConfig>) => {
           return (
             <Form>
               <FormGroup>
@@ -152,8 +144,9 @@ const TableHeadersForm = ({
                     >
                       <div className={styles.axisContainer}>
                         <FormFieldSortableListGroup<
-                          PickByType<TableHeadersFormValues, SortableOption[][]>
+                          PickByType<TableHeadersConfig, Filter[][]>
                         >
+                          id={`${id}-rowGroups`}
                           name="rowGroups"
                           legend="Row groups"
                           groupLegend="Row group"
@@ -162,8 +155,9 @@ const TableHeadersForm = ({
 
                       <div className={styles.axisContainer}>
                         <FormFieldSortableListGroup<
-                          PickByType<TableHeadersFormValues, SortableOption[][]>
+                          PickByType<TableHeadersConfig, Filter[][]>
                         >
+                          id={`${id}-columnGroups`}
                           name="columnGroups"
                           legend="Column groups"
                           groupLegend="Column group"
@@ -215,9 +209,9 @@ const TableHeadersForm = ({
                                       draggableSnapshot.isDragging,
                                   })}
                                 >
-                                  <FormFieldSortableList<TableHeadersFormValues>
+                                  <FormFieldSortableList<TableHeadersConfig>
                                     name="rows"
-                                    id="sort-rows"
+                                    id={`${id}-rows`}
                                     legend="Rows"
                                     legendSize="s"
                                   />
@@ -235,9 +229,9 @@ const TableHeadersForm = ({
                                       draggableSnapshot.isDragging,
                                   })}
                                 >
-                                  <FormFieldSortableList<TableHeadersFormValues>
+                                  <FormFieldSortableList<TableHeadersConfig>
                                     name="columns"
-                                    id="sort-columns"
+                                    id={`${id}-columns`}
                                     legend="Columns"
                                     legendSize="s"
                                   />

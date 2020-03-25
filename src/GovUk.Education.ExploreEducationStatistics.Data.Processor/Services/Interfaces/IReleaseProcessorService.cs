@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -7,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IReleaseProcessorService
     {
-        Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message, StatisticsDbContext context);
+        Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message, StatisticsDbContext context,
+            ContentDbContext contentDbContext);
     }
 }

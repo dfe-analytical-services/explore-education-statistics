@@ -1,24 +1,10 @@
 import tableBuilderService, {
   ThemeMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
+} from '@common/modules/table-tool/services/tableBuilderService';
 import Page from '@frontend/components/Page';
-import TableTool from '@frontend/components/TableTool';
-import { NextContext } from 'next';
+import TableTool from '@frontend/modules/table-tool/components/TableTool';
+import { NextPageContext } from 'next';
 import React, { Component } from 'react';
-
-export interface PublicationOptions {
-  id: string;
-  title: string;
-  topics: {
-    id: string;
-    title: string;
-    publications: {
-      id: string;
-      title: string;
-      slug: string;
-    }[];
-  }[];
-}
 
 interface Props {
   themeMeta: ThemeMeta[];
@@ -26,7 +12,7 @@ interface Props {
 }
 
 class TableToolPage extends Component<Props> {
-  public static async getInitialProps({ query }: NextContext) {
+  public static async getInitialProps({ query }: NextPageContext) {
     const themeMeta = await tableBuilderService.getThemes();
 
     const publication = themeMeta

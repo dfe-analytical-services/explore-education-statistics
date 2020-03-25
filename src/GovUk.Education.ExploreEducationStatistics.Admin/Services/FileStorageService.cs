@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -15,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -27,23 +29,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileStorageService : IFileStorageService
     {
+        public static readonly Regex[] AllowedCsvMimeTypes = {
+            new Regex(@"^(application|text)/csv$"),
+            new Regex(@"text/plain$")
+        };
+        
+        private static readonly string[] CsvEncodingTypes = {
+            "us-ascii",
+            "utf-8"
+        };
+        
+        public static readonly Regex[] AllowedChartFileTypes = {
+            new Regex(@"^image/.*") 
+        };
+        
+        public static readonly Regex[] AllowedAncillaryFileTypes = {
+            new Regex(@"^image/.*"),
+            new Regex(@"^(application|text)/csv$"),
+            new Regex(@"^text/plain$"),
+            new Regex(@"^application/pdf$"),
+            new Regex(@"^application/msword$"),
+            new Regex(@"^application/vnd.ms-excel$"),
+            new Regex(@"^application/vnd.openxmlformats(.*)$"),
+            new Regex(@"^application/vnd.oasis.opendocument(.*)$"),
+            new Regex(@"^application/CDFV2$"), 
+        };
+        
+        private static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
+            new Dictionary<ReleaseFileTypes, IEnumerable<Regex>>
+        {
+            { ReleaseFileTypes.Ancillary, AllowedAncillaryFileTypes },
+            { ReleaseFileTypes.Chart, AllowedChartFileTypes },
+            { ReleaseFileTypes.Data, AllowedCsvMimeTypes }
+        };
+        
         private readonly string _storageConnectionString;
 
         private readonly ISubjectService _subjectService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
+        private readonly IFileTypeService _fileTypeService;
+        private readonly ContentDbContext _context;
 
         private const string ContainerName = "releases";
 
         private const string NameKey = "name";
 
         public FileStorageService(IConfiguration config, ISubjectService subjectService, IUserService userService, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService, ContentDbContext context)
         {
-            _storageConnectionString = config.GetConnectionString("CoreStorage");
+            _storageConnectionString = config.GetValue<string>("CoreStorage");
             _subjectService = subjectService;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
+            _fileTypeService = fileTypeService;
+            _context = context;
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId)
@@ -72,6 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
                         .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data,
                             metaDataInfo, overwrite))
+                        .OnSuccess(() => CreateBasicFileLink(dataFile.FileName, releaseId))
                         .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });
         }
@@ -82,21 +123,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
-                {
-                    var blobContainer = await GetCloudBlobContainer();
-                    // Get the paths of the files to delete
-                    return await DataPathsForDeletion(blobContainer, releaseId, fileName)
-                        .OnSuccess((path) =>
-                        {
-                            // Delete the data file
-                            return DeleteFileAsync(blobContainer, path.dataFilePath)
-                                // and the metadata file
-                                .OnSuccess(() => DeleteFileAsync(blobContainer, path.metadataFilePath))
-                                // and return the remaining files
-                                .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
-                        });
-                });
+                .OnSuccess(GetCloudBlobContainer)
+                .OnSuccess(blobContainer => 
+                    DataPathsForDeletion(blobContainer, releaseId, fileName)
+                    .OnSuccess(paths => DeleteDataFilesAsync(blobContainer, paths)))
+                .OnSuccess(() => DeleteFileLink(fileName, releaseId))
+                .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadFilesAsync(Guid releaseId,
@@ -105,6 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccessDo(() => ValidateUploadFileType(file, AllowedMimeTypesByFileType[type]))
                 .OnSuccess(async release =>
                 {
                     if (type == ReleaseFileTypes.Data)
@@ -149,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     IEnumerable<Models.FileInfo> files = blobContainer
                         .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
-                        .Where(blob => !IsBatchedFile(blob, releaseId))
+                        .Where(blob => !IsBatchedDataFile(blob, releaseId))
                         .OfType<CloudBlockBlob>()
                         .Select(file => new Models.FileInfo
                         {
@@ -165,6 +198,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OrderBy(info => info.Name);
 
                     return files;
+                });
+        }
+
+        public Task<Either<ActionResult, Release>> CopyReleaseFilesAsync(Guid originalReleaseId, Guid newReleaseId, ReleaseFileTypes type)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(originalReleaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async newRelease =>
+                {
+                    var blobContainer = await GetCloudBlobContainer();
+
+                    var originalBlobs = blobContainer
+                        .ListBlobs(AdminReleaseDirectoryPath(originalReleaseId, type), true, BlobListingDetails.Metadata)
+                        .Where(blob => !IsBatchedDataFile(blob, originalReleaseId))
+                        .OfType<CloudBlockBlob>()
+                        .ToList();
+
+                    var copyJobs = originalBlobs
+                        .Select(blob =>
+                        {
+                            var originalFilename = blob.Name.Substring(blob.Name.LastIndexOf('/') + 1);
+                            var blobCopy = blobContainer
+                                .GetBlockBlobReference(AdminReleasePath(newReleaseId, type, originalFilename));
+                            return blobCopy.StartCopyAsync(blob);
+                        });
+
+                    await Task.WhenAll(copyJobs);
+                    
+                    return newRelease;
                 });
         }
 
@@ -219,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(UnableToFindMetadataFileToDelete);
             }
 
-            return (dataFilePath: dataFilePath, metadataFilePath: metadataFilePath);
+            return (dataFilePath, metadataFilePath);
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
@@ -244,12 +307,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
 
-            if (!IsCsvFile(dataFilePath, dataFile.OpenReadStream()))
+            if (!IsCsvFile(dataFilePath, dataFile))
             {
                 return ValidationActionResult(DataFileMustBeCsvFile);
             }
 
-            if (!IsCsvFile(metadataFilePath, metaFile.OpenReadStream()))
+            if (!IsCsvFile(metadataFilePath, metaFile))
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
@@ -269,6 +332,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(SubjectTitleMustBeUnique);
             }
 
+            return true;
+        }
+        
+        // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
+        private async Task<Either<ActionResult, bool>> ValidateUploadFileType(
+            IFormFile file, IEnumerable<Regex> allowedMimeTypes)
+        {
+            if (!_fileTypeService.HasMatchingMimeType(file, allowedMimeTypes))
+            {
+                return ValidationActionResult(FileTypeInvalid);
+            }
+
+            return true;
+        }
+
+        private async Task<Either<ActionResult, bool>> CreateBasicFileLink(string filename, Guid releaseId)
+        {
+            var fileLink = new ReleaseFile
+            {
+                Id = Guid.NewGuid(),
+                ReleaseId = releaseId,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Id = Guid.NewGuid(),
+                    ReleaseId = releaseId,
+                    Filename = filename
+                }
+            };
+
+            _context.ReleaseFiles.Add(fileLink);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task<Either<ActionResult, bool>> DeleteFileLink(string filename, Guid releaseId)
+        {
+            var fileLink = await _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Where(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == filename)
+                .FirstOrDefaultAsync();
+
+            _context.ReleaseFiles.Remove(fileLink);
+            await _context.SaveChangesAsync();
             return true;
         }
 
@@ -311,6 +418,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
+        private static async Task<Either<ActionResult, bool>> DeleteDataFilesAsync(CloudBlobContainer blobContainer,
+            (string, string) paths)
+        {
+            await DeleteFileAsync(blobContainer, paths.Item1);
+            await DeleteFileAsync(blobContainer, paths.Item2);
+            return true;
+        }
+        
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
             return await GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
@@ -349,11 +464,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
         }
 
-        private static bool IsBatchedFile(IListBlobItem blobItem, Guid releaseId)
-        {
-            return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
-        }
-
         private static async Task AddMetaValuesAsync(CloudBlob blob, IDictionary<string, string> values)
         {
             foreach (var (key, value) in values)
@@ -369,29 +479,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await blob.SetMetadataAsync();
         }
 
-        private static bool IsCsvFile(string filePath, Stream fileStream)
+        private bool IsCsvFile(string filePath, IFormFile file)
         {
             if (!filePath.EndsWith(".csv"))
             {
                 return false;
             }
-
-            using var reader = new StreamReader(fileStream);
-            return reader.BaseStream.IsTextFile();
-        }
-
-        private static int CalculateNumberOfRows(Stream fileStream)
-        {
-            using (var reader = new StreamReader(fileStream))
-            {
-                var numberOfLines = 0;
-                while (reader.ReadLine() != null)
-                {
-                    ++numberOfLines;
-                }
-
-                return numberOfLines;
-            }
+            
+            return _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data]) 
+                   && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
     }
 }

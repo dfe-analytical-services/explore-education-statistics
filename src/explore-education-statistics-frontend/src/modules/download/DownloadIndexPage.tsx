@@ -21,8 +21,6 @@ interface Props {
 }
 
 class DownloadIndexPage extends Component<Props> {
-  private accId: string[] = generateIdList(1);
-
   public static defaultProps = {
     themes: [],
   };
@@ -31,6 +29,8 @@ class DownloadIndexPage extends Component<Props> {
     const themes = await contentApi.get('/Download/tree');
     return { themes };
   }
+
+  private accId: string[] = generateIdList(1);
 
   public render() {
     const { themes } = this.props;

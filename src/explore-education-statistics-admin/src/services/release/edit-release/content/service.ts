@@ -1,4 +1,4 @@
-import { KeyStatsFormValues } from '@admin/modules/find-statistics/components/EditableKeyStatTile';
+import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
 import {
   EditableContentBlock,
   ExtendedComment,
@@ -13,10 +13,8 @@ import {
 import { Dictionary } from '@common/types/util';
 import {
   ContentBlockAttachRequest,
-  ContentBlockAttachResponse,
   ContentBlockPostModel,
   ContentBlockPutModel,
-  ContentBlockViewModel,
   ContentSectionViewModel,
   ManageContentPageViewModel,
 } from './types';
@@ -50,6 +48,14 @@ export const releaseContentService = {
       order,
     );
   },
+  removeContentSection(
+    releaseId: string,
+    sectionId: string,
+  ): Promise<ContentSectionViewModel[]> {
+    return client.delete<ContentSectionViewModel[]>(
+      `/release/${releaseId}/content/section/${sectionId}`,
+    );
+  },
 
   getContentSection(
     releaseId: string,
@@ -64,8 +70,8 @@ export const releaseContentService = {
     releaseId: string,
     sectionId: string,
     block: ContentBlockPostModel,
-  ): Promise<ContentBlockViewModel> {
-    return client.post<ContentBlockViewModel>(
+  ): Promise<EditableContentBlock> {
+    return client.post<EditableContentBlock>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/add`,
       block,
     );
@@ -87,8 +93,8 @@ export const releaseContentService = {
     sectionId: string,
     blockId: string,
     block: ContentBlockPutModel,
-  ): Promise<ContentBlockViewModel> {
-    return client.put<ContentBlockViewModel>(
+  ): Promise<EditableContentBlock> {
+    return client.put<EditableContentBlock>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
     );
@@ -110,8 +116,8 @@ export const releaseContentService = {
     releaseId: string,
     sectionId: string,
     order: Dictionary<number>,
-  ): Promise<ContentBlockViewModel[]> {
-    return client.put<ContentBlockViewModel[]>(
+  ): Promise<EditableContentBlock[]> {
+    return client.put<EditableContentBlock[]>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/order`,
       order,
     );
@@ -180,8 +186,8 @@ export const releaseContentService = {
     releaseId: string,
     sectionId: string,
     block: ContentBlockAttachRequest,
-  ): Promise<ContentBlockAttachResponse> {
-    return client.post<ContentBlockViewModel>(
+  ): Promise<EditableContentBlock> {
+    return client.post<EditableContentBlock>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/attach`,
       block,
     );

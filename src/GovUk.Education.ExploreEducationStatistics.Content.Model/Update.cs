@@ -14,5 +14,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [Required] public DateTime On { get; set; }
 
         [Required] public string Reason { get; set; }
+
+        public Update CreateReleaseAmendment(CreateAmendmentContext ctx)
+        {
+            var copy = MemberwiseClone() as Update;
+            copy.Id = Guid.NewGuid();
+            ctx.OldToNewIdUpdateMappings.Add(this, copy);
+            
+            copy.Release = ctx.Amendment;
+            copy.ReleaseId = ctx.Amendment.Id;
+            return copy;
+        }
     }
 }

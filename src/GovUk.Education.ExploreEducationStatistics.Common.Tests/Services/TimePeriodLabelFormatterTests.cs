@@ -155,6 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             _testOutputHelper.WriteLine($"Format({Year}, FinancialYearQ2Q3) {Format(Year, FinancialYearQ2Q3)}");
             _testOutputHelper.WriteLine($"Format({Year}, FinancialYearQ2Q4) {Format(Year, FinancialYearQ2Q4)}");
             _testOutputHelper.WriteLine($"Format({Year}, FinancialYearQ3Q4) {Format(Year, FinancialYearQ3Q4)}");
+            _testOutputHelper.WriteLine($"Format({Year}, ReportingYear)     {Format(Year, ReportingYear)}");
             _testOutputHelper.WriteLine($"Format({Year}, TaxYear)           {Format(Year, TaxYear)}");
             _testOutputHelper.WriteLine($"Format({Year}, TaxYearQ1)         {Format(Year, TaxYearQ1)}");
             _testOutputHelper.WriteLine($"Format({Year}, TaxYearQ2)         {Format(Year, TaxYearQ2)}");

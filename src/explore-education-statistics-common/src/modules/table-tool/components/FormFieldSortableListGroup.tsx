@@ -1,21 +1,23 @@
 import { FormFieldset } from '@common/components/form';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import { Filter } from '@common/modules/table-tool/types/filters';
 import { Dictionary } from '@common/types';
+import createErrorHelper from '@common/validation/createErrorHelper';
 import classNames from 'classnames';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
 import styles from './FormFieldSortableListGroup.module.scss';
-import { SortableOption } from './FormSortableList';
 
 interface Props<FormValues> {
+  id: string;
   name: keyof FormValues & string;
   legend: string;
   groupLegend: string;
 }
 
-const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
+const FormFieldSortableListGroup = <T extends Dictionary<Filter[][]>>({
+  id,
   name,
   legend,
   groupLegend,
@@ -36,7 +38,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                 })}
               >
                 <FormFieldset
-                  id={`sortableListGroup-${name}`}
+                  id={id}
                   legend={legend}
                   error={getError(name)}
                   legendSize="m"
@@ -71,7 +73,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                           >
                             <FormFieldSortableList<T>
                               name={`${name}[${index}]`}
-                              id={`sortableList-${name}-${index}`}
+                              id={`${id}-${index}`}
                               legend={`${groupLegend} ${index + 1}`}
                               legendSize="s"
                             />

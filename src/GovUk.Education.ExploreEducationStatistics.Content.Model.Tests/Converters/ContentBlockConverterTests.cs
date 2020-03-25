@@ -22,25 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Convert
             
             Assert.Equal("Markdown text", result.Body);
         }
-        
-        [Fact]
-        public void ContentBlockConverterReturnsInsetTextBlock()
-        {
-            const string testString = "{\"Type\":\"InsetTextBlock\", \"Heading\": \"Heading text\",\"Body\":\"heading body text\"}";
-            
-            var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.Converters.Add(new ContentBlockConverter());
 
-            var serializer = JsonSerializer.Create(serializerSettings);
-
-            var jObject = JObject.Parse(testString);
-            
-            var result = jObject.ToObject<InsetTextBlock>(serializer);
-            
-            Assert.Equal("Heading text", result.Heading);
-            Assert.Equal("heading body text", result.Body);
-        }
-        
         [Fact]
         public void ContentBlockConverterReturnsHtmlBlock()
         {

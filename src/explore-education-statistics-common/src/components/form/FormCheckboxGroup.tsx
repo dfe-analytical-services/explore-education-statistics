@@ -29,6 +29,7 @@ export type CheckboxGroupAllChangeEventHandler = (
 ) => void;
 
 interface BaseFormCheckboxGroupProps {
+  disabled?: boolean;
   id: string;
   name: string;
   onAllChange?: CheckboxGroupAllChangeEventHandler;
@@ -98,6 +99,7 @@ export class BaseFormCheckboxGroup extends PureComponent<
 
   public render() {
     const {
+      disabled,
       value,
       name,
       id,
@@ -130,6 +132,7 @@ export class BaseFormCheckboxGroup extends PureComponent<
 
         {orderBy(options, order, orderDirection).map(option => (
           <FormCheckbox
+            disabled={disabled}
             {...option}
             id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
             name={name}

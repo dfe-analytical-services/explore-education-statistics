@@ -1,189 +1,195 @@
 import classNames from 'classnames';
-import React, { forwardRef, ReactElement } from 'react';
-import { times } from 'lodash';
+import last from 'lodash/last';
+import sumBy from 'lodash/sumBy';
+import times from 'lodash/times';
+import React, { forwardRef, ReactNode } from 'react';
 import styles from './MultiHeaderTable.module.scss';
 
-export type RowHeaderType = string | undefined;
+/**
+ * Header groups can have subgroups. This is intended
+ * for use with 'filter groups' in table tool to make it
+ * more obvious which filters are grouped together.
+ * e.g.
+ * 'Ethnic group major' is the filter group for
+ * 'Ethnicity Major Asian Total' and 'Ethnicity Major Black Total'.
+ */
+export interface HeaderSubGroup {
+  text: string;
+  span?: number;
+}
+
+/**
+ * A header group describes a row/column of table headers.
+ * We can have multiple header groups in the row or
+ * column directions.
+ * Header groups can have additional subgroups which
+ * introduce additional rows/columns into the rendered headers.
+ */
+export interface HeaderGroup {
+  headers: {
+    text: string;
+  }[];
+  groups?: HeaderSubGroup[];
+}
+
+interface ExpandedHeader {
+  text: string;
+  span: number;
+  crossSpan: number;
+  start: number;
+  isGroup: boolean;
+  isHidden?: boolean;
+}
+
+/**
+ * Create {@see ExpandedHeader}s that provide a more
+ * detailed model for rendering the table headers.
+ */
+const createExpandedHeaders = (
+  headerGroups: HeaderGroup[],
+): ExpandedHeader[][] => {
+  // The max number of rows/column spans that any
+  // header group can be for this table.
+  const maxSpan = headerGroups.reduce(
+    (acc, headerGroup) => acc * headerGroup?.headers?.length,
+    1,
+  );
+
+  return headerGroups.reduce<ExpandedHeader[][]>(
+    (acc, headerGroup, headerGroupIndex) => {
+      const previousGroupLength = last(acc)?.length ?? 1;
+      const span = maxSpan / (headerGroup.headers.length * previousGroupLength);
+
+      let expandedHeaderGroups: ExpandedHeader[] = [];
+
+      if (headerGroup.groups && headerGroup.groups.length) {
+        const hasMultipleGroups = headerGroup.groups.length > 1;
+
+        // Header subgroups can have different sizes depending
+        // on the `span` that is specified.
+        // It should not be bigger or smaller than it's parent
+        // header group's span as this will break the table.
+        // If we have a single header subgroup, then we just
+        // make it span the entire header group.
+        const groupSpan = hasMultipleGroups
+          ? sumBy(headerGroup.groups, header => (header.span ?? 1) * span)
+          : maxSpan;
+
+        expandedHeaderGroups = times(
+          maxSpan / groupSpan,
+          repeat =>
+            headerGroup.groups?.reduce((headerSubGroups, header) => {
+              const previous = last(headerSubGroups);
+
+              headerSubGroups.push({
+                text: header.text,
+                span: hasMultipleGroups ? (header.span ?? 1) * span : groupSpan,
+                crossSpan: 1,
+                start: previous
+                  ? previous.start + previous.span
+                  : repeat * groupSpan,
+                isGroup: true,
+              });
+
+              return headerSubGroups;
+            }, [] as ExpandedHeader[]) ?? [],
+        ).flat();
+
+        acc.push(expandedHeaderGroups);
+      }
+
+      const expandedHeaders: ExpandedHeader[] = times(
+        previousGroupLength,
+        repeat =>
+          headerGroup.headers.map((header, headerIndex) => {
+            return {
+              text: header.text,
+              // Headers are expected to have equal sizes
+              // within their group (unlike header subgroups)
+              span,
+              crossSpan: 1,
+              start:
+                repeat * headerGroup.headers.length * span + headerIndex * span,
+              isGroup: headerGroupIndex !== headerGroups.length - 1,
+            };
+          }),
+      )
+        .flat()
+        .map(expandedHeader => {
+          // We want to find any headers that duplicate their
+          // corresponding header group to clean up the headers.
+          const matchingHeaderGroup = expandedHeaderGroups.find(
+            expandedHeaderGroup =>
+              expandedHeaderGroup.start === expandedHeader.start &&
+              expandedHeaderGroup.text === expandedHeader.text &&
+              expandedHeaderGroup.span === expandedHeader.span,
+          );
+
+          // We simply make the header group take up the space
+          // that the header would normally have taken in the table.
+          // We then prevent the header itself from being rendered.
+          if (matchingHeaderGroup) {
+            // A bit naughty, but we mutate the header group
+            // to re-use the current context and avoid
+            // having to perform any further complex loops.
+            matchingHeaderGroup.isGroup = false;
+            matchingHeaderGroup.crossSpan = 2;
+
+            // eslint-disable-next-line no-param-reassign
+            return {
+              ...expandedHeader,
+              isHidden: true,
+            };
+          }
+
+          return expandedHeader;
+        });
+
+      acc.push(expandedHeaders);
+
+      return acc;
+    },
+    [],
+  );
+};
 
 interface Props {
   ariaLabelledBy?: string;
   className?: string;
-  columnHeaders: RowHeaderType[][];
-  columnHeaderIsGroup?: boolean[];
-  rowHeaders: RowHeaderType[][];
-  rowHeaderIsGroup?: boolean[];
+  columnHeaders: HeaderGroup[];
+  rowHeaders: HeaderGroup[];
   rows: string[][];
 }
 
-export interface SpanInfo {
-  heading: string;
-  count: number;
-  start: number;
-  isGroup: boolean;
-}
+const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
+  ({ ariaLabelledBy, className, columnHeaders, rowHeaders, rows }, ref) => {
+    const expandedColumnHeaders = createExpandedHeaders(columnHeaders);
+    const expandedRowHeaders = createExpandedHeaders(rowHeaders);
+    const firstRowHeaderLength = expandedRowHeaders[0].length;
 
-const grow2DArray = <T, R>(
-  finalGroups: T[][],
-  numberOfTimesToRepeat: number,
-  emptySpace: R,
-): (T | R)[][] =>
-  finalGroups.map(finalRow =>
-    ([] as (T | R)[]).concat(
-      ...finalRow.map(cell =>
-        [...Array(numberOfTimesToRepeat)].map((_, idx) =>
-          idx === 0 ? cell : emptySpace,
-        ),
-      ),
-    ),
-  );
+    // Expanded headers need to be transposed so that
+    // they are compatible with HTML table rows.
+    const transposeToRows = (
+      headerGroups: ExpandedHeader[][],
+    ): ExpandedHeader[][] => {
+      const totalRows = last(headerGroups)?.length ?? 0;
 
-const generateSpanInfoForSingleGroup = (
-  headingsForGroup: RowHeaderType[],
-  overallHeaderLength: number,
-  isRowGroup: boolean,
-) => {
-  return headingsForGroup.reduce<SpanInfo[]>(
-    (spanInfo: SpanInfo[], nextHeading: RowHeaderType, rowIndex: number) => {
-      if (spanInfo.length === 0) {
-        return [
-          {
-            heading: nextHeading || '',
-            count: overallHeaderLength,
-            start: rowIndex,
-            isGroup: isRowGroup,
-          },
-        ];
-      }
-
-      const previousHeading = spanInfo[spanInfo.length - 1];
-
-      if (nextHeading === undefined) {
-        return spanInfo;
-      }
-
-      return [
-        ...spanInfo.slice(0, -1),
-        {
-          ...previousHeading,
-          count: rowIndex - previousHeading.start,
-        },
-        {
-          heading: nextHeading,
-          count: overallHeaderLength - rowIndex,
-          start: rowIndex,
-          isGroup: isRowGroup,
-        },
-      ];
-    },
-    [],
-  );
-};
-
-export const generateHeaderSpanInfo = (headerGroups: RowHeaderType[][]) => {
-  const overallHeaderLength = headerGroups.reduce(
-    (curMaxLength: number, group) =>
-      curMaxLength < group.length ? group.length : curMaxLength,
-    0,
-  );
-
-  return headerGroups.reduce<SpanInfo[][]>(
-    (
-      headerSpanInfo: SpanInfo[][],
-      headingsForGroup: RowHeaderType[],
-      groupIndex: number,
-    ) => [
-      ...headerSpanInfo,
-      generateSpanInfoForSingleGroup(
-        headingsForGroup,
-        overallHeaderLength,
-        groupIndex < headerGroups.length - 1,
-      ),
-    ],
-    [],
-  );
-};
-
-export const transposeSpanColumnsToRows = (
-  headers: SpanInfo[][],
-): SpanInfo[][] => {
-  const lengthOfRow = headers[0].reduce(
-    (length, { count }) => length + count,
-    0,
-  );
-
-  const rowColumnsReversed = headers.map(column => [...column].reverse());
-
-  return [...Array(lengthOfRow)].map((_, currentRow) =>
-    rowColumnsReversed
-      .map(rowColumn => rowColumn.find(({ start }) => start === currentRow))
-      .filter(cell => !!cell),
-  ) as SpanInfo[][];
-};
-
-export const generateAggregatedGroups = (
-  headerGroups: RowHeaderType[][],
-  headerIsGroup: boolean[] = [],
-): (RowHeaderType)[][] => {
-  const aggrigatedDuplication = headerGroups.reduce<{
-    finalGroups: RowHeaderType[][];
-    total: number;
-  }>(
-    ({ finalGroups, total }, groups, index) => {
-      const numberOfTimesToRepeat =
-        index > 0 && headerIsGroup[index - 1] ? 1 : groups.length;
-
-      const expandedPreviousGroups = grow2DArray(
-        finalGroups,
-        numberOfTimesToRepeat,
-        undefined,
+      const reversedHeaderGroups = headerGroups.map(headers =>
+        [...headers].reverse(),
       );
 
-      return {
-        finalGroups: [
-          ...expandedPreviousGroups,
-          ([] as RowHeaderType[]).concat(...times(total).map(() => groups)),
-        ],
-        total: total * (headerIsGroup[index] ? 1 : groups.length),
-      };
-    },
-    { finalGroups: [], total: 1 },
-  );
+      return [...Array(totalRows)].map((_, rowIndex) => {
+        return reversedHeaderGroups
+          .map(headerGroup =>
+            headerGroup.find(header => header.start === rowIndex),
+          )
+          .filter(Boolean);
+      }) as ExpandedHeader[][];
+    };
 
-  return aggrigatedDuplication.finalGroups;
-};
-
-export const generateSpanInfoFromHeaders = (
-  groups: RowHeaderType[][],
-  rowHeaderIsGroup: boolean[],
-): SpanInfo[][] => {
-  return generateHeaderSpanInfo(
-    generateAggregatedGroups(groups, rowHeaderIsGroup),
-  );
-};
-
-const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
-  (
-    {
-      ariaLabelledBy,
-      className,
-      columnHeaders,
-      rowHeaders,
-      rows,
-      rowHeaderIsGroup = [],
-      columnHeaderIsGroup = [],
-    },
-    ref,
-  ) => {
-    const columnSpanInfo = generateSpanInfoFromHeaders(
-      columnHeaders,
-      columnHeaderIsGroup,
-    );
-    const rowSpanInfo = generateSpanInfoFromHeaders(
-      rowHeaders,
-      rowHeaderIsGroup,
-    );
-
-    const firstRowLength = rowSpanInfo[0].length;
+    const transposedRowHeaders = transposeToRows(
+      expandedRowHeaders,
+    ) as ExpandedHeader[][];
 
     return (
       <table
@@ -192,65 +198,73 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
         ref={ref}
       >
         <thead>
-          {columnSpanInfo.map((columns, rowIndex) => {
+          {expandedColumnHeaders.map((columns, rowIndex) => {
             return (
               // eslint-disable-next-line react/no-array-index-key
               <tr key={rowIndex}>
                 {rowIndex === 0 && (
                   <td
-                    colSpan={rowHeaders.length}
-                    rowSpan={columnHeaders.length}
-                    className={classNames(
-                      styles.borderBottom,
-                      styles.borderRight,
-                    )}
+                    colSpan={expandedRowHeaders.length}
+                    rowSpan={expandedColumnHeaders.length}
+                    className={styles.borderBottom}
                   />
                 )}
 
-                {columns.map((column, columnIndex) => {
-                  const key = `${column.heading}_${columnIndex}`;
+                {columns
+                  .filter(column => !column.isHidden)
+                  .map((column, columnIndex) => {
+                    const key = `${column.text}_${columnIndex}`;
 
-                  return (
-                    <th
-                      className={classNames({
-                        'govuk-table__header--numeric': !column.isGroup,
-                        [styles.cellHorizontalMiddle]: column.isGroup,
-                        [styles.borderBottom]: !column.isGroup,
-                      })}
-                      colSpan={column.count}
-                      scope={column.isGroup ? 'colgroup' : 'col'}
-                      key={key}
-                    >
-                      {column.heading}
-                    </th>
-                  );
-                })}
+                    return (
+                      <th
+                        className={classNames({
+                          'govuk-table__header--numeric': !column.isGroup,
+                          [styles.columnHeaderGroup]:
+                            column.isGroup || column.crossSpan > 1,
+                          [styles.borderBottom]: !column.isGroup,
+                          [styles.borderRightNone]:
+                            column.start + column.span === rows[0].length,
+                        })}
+                        colSpan={column.span}
+                        rowSpan={column.crossSpan}
+                        scope={column.isGroup ? 'colgroup' : 'col'}
+                        key={key}
+                      >
+                        {column.text}
+                      </th>
+                    );
+                  })}
               </tr>
             );
           })}
         </thead>
 
         <tbody>
-          {transposeSpanColumnsToRows(rowSpanInfo)
-            .reduce<ReactElement[][]>((agg, group, headerGroupIndex) => {
-              return [
-                ...agg,
-                group.map((column, rowIndex) => (
-                  <th
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={`${rowIndex}_${headerGroupIndex}`}
-                    className={classNames({
-                      'govuk-table__cell--numeric': !column.isGroup,
-                      [styles.borderBottom]: column.isGroup,
-                    })}
-                    rowSpan={column.count}
-                    scope={column.isGroup ? 'rowgroup' : 'row'}
-                  >
-                    {column.heading}
-                  </th>
-                )),
-              ];
-            }, [])
+          {transposedRowHeaders
+            .reduce((acc, rowGroup, headerGroupIndex) => {
+              acc.push(
+                rowGroup
+                  .filter(row => !row.isHidden)
+                  .map((row, rowIndex) => {
+                    return (
+                      <th
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`${rowIndex}_${headerGroupIndex}`}
+                        className={classNames({
+                          [styles.borderBottom]: row.isGroup,
+                        })}
+                        rowSpan={row.span}
+                        colSpan={row.crossSpan}
+                        scope={row.isGroup ? 'rowgroup' : 'row'}
+                      >
+                        {row.text}
+                      </th>
+                    );
+                  }),
+              );
+
+              return acc;
+            }, [] as ReactNode[][])
             .map((headerCells, rowIndex) => {
               return (
                 // eslint-disable-next-line react/no-array-index-key
@@ -263,7 +277,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                         key={cellIndex}
                         className={classNames('govuk-table__cell--numeric', {
                           [styles.borderBottom]:
-                            (rowIndex + 1) % firstRowLength === 0,
+                            (rowIndex + 1) % firstRowHeaderLength === 0,
                         })}
                       >
                         {cell}

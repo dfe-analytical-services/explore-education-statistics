@@ -27,6 +27,7 @@ Object {
       },
     },
     "footnotes": Array [],
+    "geoJsonAvailable": true,
     "indicators": Object {
       "23": Object {
         "label": "Unauthorised absence rate",

@@ -1,59 +1,64 @@
 begin
-	declare @subjectId uniqueidentifier = '568576e5-d386-450e-a8db-307b7061d0d8'
+    declare @subjectId uniqueidentifier = '568576e5-d386-450e-a8db-307b7061d0d8'
 
-	declare @geographicLevel nvarchar(6) = 'SCH'
+    declare @geographicLevel nvarchar(6) = 'SCH'
 
-	declare @timePeriodList TimePeriodListType
-	insert @timePeriodList values (2016, 'AY')
+    declare @timePeriodList TimePeriodListType
+    insert @timePeriodList values (2016, 'AY')
 
-	declare @countriesList IdListVarcharType
+    declare @countriesList IdListVarcharType
 
-	declare @institutionsList IdListVarcharType
+    declare @institutionsList IdListVarcharType
 
-	declare @localAuthorityList IdListVarcharType
+    declare @localAuthorityList IdListVarcharType
 
-	declare @localAuthorityDistrictList IdListVarcharType
+    declare @localAuthorityDistrictList IdListVarcharType
 
-	declare @localEnterprisePartnershipsList IdListVarcharType
+    declare @localAuthorityOldCodeList IdListVarcharType
 
-	declare @mayoralCombinedAuthoritiesList IdListVarcharType
+    declare @localEnterprisePartnershipsList IdListVarcharType
 
-	declare @multiAcademyTrustList IdListVarcharType
+    declare @mayoralCombinedAuthoritiesList IdListVarcharType
 
-	declare @opportunityAreasList IdListVarcharType
+    declare @multiAcademyTrustList IdListVarcharType
 
-	declare @parliamentaryConstituenciesList IdListVarcharType
+    declare @opportunityAreasList IdListVarcharType
 
-	declare @regionsList IdListVarcharType
-	insert @regionsList values ('E13000001')
+    declare @parliamentaryConstituenciesList IdListVarcharType
 
-	declare @rscRegionsList IdListVarcharType
+    declare @regionsList IdListVarcharType
+    insert @regionsList values ('E13000001')
 
-	declare @sponsorList IdListVarcharType
+    declare @rscRegionsList IdListVarcharType
 
-	declare @wardsList IdListVarcharType
+    declare @sponsorList IdListVarcharType
 
-	declare @filterItemList IdListGuidType
-	insert @filterItemList values (83), (86)
+    declare @wardsList IdListVarcharType
 
-	declare @result int
-	exec
-		@result = FilteredObservations
-			@subjectId,
-			@geographicLevel,
-			@timePeriodList,
-			@countriesList,
-			@institutionsList,
-			@localAuthorityList,
-			@localAuthorityDistrictList,
-			@localEnterprisePartnershipsList,
-			@mayoralCombinedAuthoritiesList,
-			@multiAcademyTrustList,
-			@opportunityAreasList,
-			@parliamentaryConstituenciesList,
-			@regionsList,
-			@rscRegionsList,
-			@sponsorList,
-			@wardsList,
-			@filterItemList
+    declare @planningAreasList IdListVarcharType
+
+    declare @filterItemList IdListGuidType
+
+    declare @result int
+    exec
+        @result = FilteredObservations
+                  @subjectId,
+                  @geographicLevel,
+                  @timePeriodList,
+                  @countriesList,
+                  @institutionsList,
+                  @localAuthorityList,
+                  @localAuthorityDistrictList,
+                  @localAuthorityOldCodeList,
+                  @localEnterprisePartnershipsList,
+                  @mayoralCombinedAuthoritiesList,
+                  @multiAcademyTrustList,
+                  @opportunityAreasList,
+                  @parliamentaryConstituenciesList,
+                  @regionsList,
+                  @rscRegionsList,
+                  @sponsorList,
+                  @wardsList,
+                  @planningAreasList,
+                  @filterItemList
 end

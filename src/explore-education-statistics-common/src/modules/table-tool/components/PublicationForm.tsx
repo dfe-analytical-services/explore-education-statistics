@@ -9,9 +9,9 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import Yup from '@common/lib/validation/yup';
-import { ThemeMeta } from '@common/modules/full-table/services/tableBuilderService';
+import { ThemeMeta } from '@common/modules/table-tool/services/tableBuilderService';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';
@@ -43,6 +43,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
   } = props;
 
   const [searchTerm, setSearchTerm] = useState('');
+  const lowercaseSearchTerm = searchTerm.toLowerCase();
 
   const formId = 'publicationForm';
 
@@ -58,21 +59,57 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
       initialValues={{
         publicationId,
       }}
+      validateOnBlur={false}
+      validateOnChange={false}
+      validationSchema={Yup.object<FormValues>({
+        publicationId: Yup.string().required('Choose publication'),
+      })}
       onSubmit={async values => {
         await onSubmit(values);
         goToNextStep();
       }}
-      validationSchema={Yup.object<FormValues>({
-        publicationId: Yup.string().required('Choose publication'),
-      })}
       render={(form: FormikProps<FormValues>) => {
         const { values } = form;
         const { getError } = createErrorHelper(form);
 
+        const filteredOptions: ThemeMeta[] = options
+          .filter(theme =>
+            theme.topics.some(topic =>
+              topic.publications.some(
+                publication =>
+                  publication.id === values.publicationId ||
+                  publication.title.toLowerCase().includes(lowercaseSearchTerm),
+              ),
+            ),
+          )
+          .map(group => ({
+            ...group,
+            topics: group.topics
+              .filter(topic =>
+                topic.publications.some(
+                  publication =>
+                    publication.id === values.publicationId ||
+                    publication.title
+                      .toLowerCase()
+                      .includes(lowercaseSearchTerm),
+                ),
+              )
+              .map(topic => ({
+                ...topic,
+                publications: topic.publications.filter(
+                  publication =>
+                    publication.id === values.publicationId ||
+                    publication.title
+                      .toLowerCase()
+                      .includes(lowercaseSearchTerm),
+                ),
+              })),
+          }));
+
         return (
           <>
             {isActive ? (
-              <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
+              <Form {...form} id={formId} showSubmitError>
                 <FormFieldset
                   error={getError('publicationId')}
                   id={`${formId}-publicationId`}
@@ -95,85 +132,61 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
 
                   <FormGroup>
                     <div aria-live="assertive">
-                      {options
-                        .filter(group => {
-                          return group.topics.some(topic =>
-                            topic.publications.some(
-                              publication =>
-                                publication.id === values.publicationId ||
-                                publication.title.search(
-                                  new RegExp(searchTerm, 'i'),
-                                ) > -1,
-                            ),
-                          );
-                        })
-                        .map(group => {
-                          return (
-                            <DetailsMenu
-                              summary={group.title}
-                              key={group.id}
-                              open={
-                                searchTerm !== '' ||
-                                group.topics.some(topic =>
+                      {filteredOptions.length > 0 ? (
+                        filteredOptions.map(theme => (
+                          <DetailsMenu
+                            jsRequired
+                            summary={theme.title}
+                            key={theme.id}
+                            id={`${formId}-theme-${theme.id}`}
+                            open={
+                              searchTerm !== '' ||
+                              theme.topics.some(topic =>
+                                topic.publications.some(
+                                  publication =>
+                                    publication.id === values.publicationId,
+                                ),
+                              )
+                            }
+                          >
+                            {theme.topics.map(topic => (
+                              <DetailsMenu
+                                summary={topic.title}
+                                key={topic.id}
+                                id={`${formId}-topic-${topic.id}`}
+                                open={
+                                  searchTerm !== '' ||
                                   topic.publications.some(
                                     publication =>
                                       publication.id === values.publicationId,
-                                  ),
-                                )
-                              }
-                            >
-                              {group.topics
-                                .filter(topic => {
-                                  return topic.publications.find(
-                                    publication =>
-                                      publication.id === values.publicationId ||
-                                      publication.title.search(
-                                        new RegExp(searchTerm, 'i'),
-                                      ) > -1,
-                                  );
-                                })
-                                .map(topic => (
-                                  <DetailsMenu
-                                    summary={topic.title}
-                                    key={topic.id}
-                                    open={
-                                      searchTerm !== '' ||
-                                      topic.publications.some(
-                                        publication =>
-                                          publication.id ===
-                                          values.publicationId,
-                                      )
-                                    }
-                                  >
-                                    <FormFieldRadioGroup
-                                      legend={`Choose option from ${topic.title}`}
-                                      legendHidden
-                                      small
-                                      showError={false}
-                                      name="publicationId"
-                                      id={`${formId}-publicationId-${camelCase(
-                                        topic.title,
-                                      )}`}
-                                      options={topic.publications
-                                        .filter(
-                                          publication =>
-                                            publication.id ===
-                                              values.publicationId ||
-                                            publication.title.search(
-                                              new RegExp(searchTerm, 'i'),
-                                            ) > -1,
-                                        )
-                                        .map(publication => ({
-                                          id: publication.id,
-                                          label: publication.title,
-                                          value: publication.id,
-                                        }))}
-                                    />
-                                  </DetailsMenu>
-                                ))}
-                            </DetailsMenu>
-                          );
-                        })}
+                                  )
+                                }
+                              >
+                                <FormFieldRadioGroup
+                                  legend={`Choose option from ${topic.title}`}
+                                  legendHidden
+                                  small
+                                  showError={false}
+                                  name="publicationId"
+                                  id={`${formId}-publicationId-${camelCase(
+                                    topic.title,
+                                  )}`}
+                                  disabled={form.isSubmitting}
+                                  options={topic.publications.map(
+                                    publication => ({
+                                      id: publication.id,
+                                      label: publication.title,
+                                      value: publication.id,
+                                    }),
+                                  )}
+                                />
+                              </DetailsMenu>
+                            ))}
+                          </DetailsMenu>
+                        ))
+                      ) : (
+                        <p>No publications found</p>
+                      )}
                     </div>
                   </FormGroup>
                 </FormFieldset>

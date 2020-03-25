@@ -1,12 +1,13 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
-import permissionService from '@admin/services/permissions/service';
-import service from '@admin/services/release/edit-release/data/service';
-import { DataFile } from '@admin/services/release/edit-release/data/types';
+import useFormSubmit from '@admin/hooks/useFormSubmit';
+import permissionService from '@admin/services/permissions/permissionService';
+import editReleaseDataService, {
+  DataFile,
+  DeleteDataFilePlan,
+} from '@admin/services/release/edit-release/data/editReleaseDataService';
 import { ImportStatusCode } from '@admin/services/release/imports/types';
-import submitWithFormikValidation from '@admin/validation/formikSubmitHandler';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
@@ -16,10 +17,54 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
+import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
+
+const errorCodeMappings = [
+  errorCodeToFieldError(
+    'CANNOT_OVERWRITE_DATA_FILE',
+    'dataFile',
+    'Choose a unique data file name',
+  ),
+  errorCodeToFieldError(
+    'CANNOT_OVERWRITE_METADATA_FILE',
+    'metadataFile',
+    'Choose a unique metadata file name',
+  ),
+  errorCodeToFieldError(
+    'DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME',
+    'dataFile',
+    'Choose a different file name for data and metadata files',
+  ),
+  errorCodeToFieldError(
+    'DATA_FILE_CANNOT_BE_EMPTY',
+    'dataFile',
+    'Choose a data file that is not empty',
+  ),
+  errorCodeToFieldError(
+    'METADATA_FILE_CANNOT_BE_EMPTY',
+    'metadataFile',
+    'Choose a metadata file that is not empty',
+  ),
+  errorCodeToFieldError(
+    'DATA_FILE_MUST_BE_CSV_FILE',
+    'dataFile',
+    'Data file must be a csv file',
+  ),
+  errorCodeToFieldError(
+    'META_FILE_MUST_BE_CSV_FILE',
+    'metadataFile',
+    'Meta file must be a csv file',
+  ),
+  errorCodeToFieldError(
+    'SUBJECT_TITLE_MUST_BE_UNIQUE',
+    'subjectTitle',
+    'Subject title must be unique',
+  ),
+];
 
 interface FormValues {
   subjectTitle: string;
@@ -32,39 +77,41 @@ interface Props {
   releaseId: string;
 }
 
+interface DeleteDataFile {
+  plan: DeleteDataFilePlan;
+  file: DataFile;
+}
+
 const formId = 'dataFileUploadForm';
 
-const emptyDataFile: DataFile = {
-  canDelete: false,
-  fileSize: { size: 0, unit: '' },
-  filename: '',
-  metadataFilename: '',
-  rows: 0,
-  title: '',
-  userName: '',
-  created: new Date(),
-};
-
-const ReleaseDataUploadsSection = ({
-  publicationId,
-  releaseId,
-  handleApiErrors,
-}: Props & ErrorControlProps) => {
+const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
-  const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
-  const [canUpdateRelease, setCanUpdateRelease] = useState(false);
+  const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
+  const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
+  // BAU-324 - temporary stopgap until Release Versioning phase 2 is tackled, to prevent data files being changed on a
+  // Release amendment
+  const [canUpdateReleaseDataFiles, setCanUpdateReleaseDataFiles] = useState<
+    boolean
+  >();
+  const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
 
   useEffect(() => {
     Promise.all([
-      service.getReleaseDataFiles(releaseId),
+      editReleaseDataService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ])
-      .then(([releaseDataFiles, canUpdateReleaseResponse]) => {
+      permissionService.canUpdateReleaseDataFiles(releaseId),
+    ]).then(
+      ([
+        releaseDataFiles,
+        canUpdateReleaseResponse,
+        canUpdateReleaseDataFilesResponse,
+      ]) => {
         setDataFiles(releaseDataFiles);
         setCanUpdateRelease(canUpdateReleaseResponse);
-      })
-      .catch(handleApiErrors);
-  }, [publicationId, releaseId, handleApiErrors]);
+        setCanUpdateReleaseDataFiles(canUpdateReleaseDataFilesResponse);
+      },
+    );
+  }, [publicationId, releaseId]);
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
@@ -76,10 +123,7 @@ const ReleaseDataUploadsSection = ({
         fileInput.value = '';
       });
 
-    const files = await service
-      .getReleaseDataFiles(releaseId)
-      .catch(handleApiErrors);
-
+    const files = await editReleaseDataService.getReleaseDataFiles(releaseId);
     setDataFiles(files);
   };
 
@@ -101,62 +145,15 @@ const ReleaseDataUploadsSection = ({
     setDataFiles(updatedDataFiles);
   };
 
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'CANNOT_OVERWRITE_DATA_FILE',
-      'dataFile',
-      'Choose a unique data file name',
-    ),
-    errorCodeToFieldError(
-      'CANNOT_OVERWRITE_METADATA_FILE',
-      'metadataFile',
-      'Choose a unique metadata file name',
-    ),
-    errorCodeToFieldError(
-      'DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME',
-      'dataFile',
-      'Choose a different file name for data and metadata files',
-    ),
-    errorCodeToFieldError(
-      'DATA_FILE_CANNOT_BE_EMPTY',
-      'dataFile',
-      'Choose a data file that is not empty',
-    ),
-    errorCodeToFieldError(
-      'METADATA_FILE_CANNOT_BE_EMPTY',
-      'metadataFile',
-      'Choose a metadata file that is not empty',
-    ),
-    errorCodeToFieldError(
-      'DATA_FILE_MUST_BE_CSV_FILE',
-      'dataFile',
-      'Data file must be a csv file',
-    ),
-    errorCodeToFieldError(
-      'META_FILE_MUST_BE_CSV_FILE',
-      'metadataFile',
-      'Meta file must be a csv file',
-    ),
-    errorCodeToFieldError(
-      'SUBJECT_TITLE_MUST_BE_UNIQUE',
-      'subjectTitle',
-      'Subject title must be unique',
-    ),
-  ];
+  const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
+    await editReleaseDataService.uploadDataFiles(releaseId, {
+      subjectTitle: values.subjectTitle,
+      dataFile: values.dataFile as File,
+      metadataFile: values.metadataFile as File,
+    });
 
-  const submitFormHandler = submitWithFormikValidation<FormValues>(
-    async (values, actions) => {
-      await service.uploadDataFiles(releaseId, {
-        subjectTitle: values.subjectTitle,
-        dataFile: values.dataFile as File,
-        metadataFile: values.metadataFile as File,
-      });
-
-      await resetPage(actions);
-    },
-    handleApiErrors,
-    ...errorCodeMappings,
-  );
+    await resetPage(actions);
+  }, errorCodeMappings);
 
   return (
     <Formik<FormValues>
@@ -166,7 +163,7 @@ const ReleaseDataUploadsSection = ({
         dataFile: null,
         metadataFile: null,
       }}
-      onSubmit={submitFormHandler}
+      onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({
         subjectTitle: Yup.string()
           .required('Enter a subject title')
@@ -188,7 +185,7 @@ const ReleaseDataUploadsSection = ({
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {canUpdateRelease ? (
+            {canUpdateRelease && (
               <>
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
@@ -243,6 +240,7 @@ const ReleaseDataUploadsSection = ({
 
                 <Button
                   type="submit"
+                  id="upload-data-files-button"
                   className="govuk-button govuk-!-margin-right-6"
                 >
                   Upload data files
@@ -254,103 +252,192 @@ const ReleaseDataUploadsSection = ({
                   Cancel
                 </ButtonText>
               </>
-            ) : (
-              'Release has been approved, and can no longer be updated.'
             )}
+
+            {typeof canUpdateRelease !== 'undefined' &&
+              !canUpdateRelease &&
+              !canUpdateReleaseDataFiles &&
+              'This release has been approved, and can no longer be updated.'}
+
+            {typeof canUpdateRelease !== 'undefined' &&
+              canUpdateRelease &&
+              !canUpdateReleaseDataFiles &&
+              'This release is an amendment to a live release and so cannot change any data files.'}
 
             {dataFiles.length > 0 && (
               <>
                 <hr />
                 <h2 className="govuk-heading-m">Uploaded data files</h2>
+                <Accordion id="uploaded-files">
+                  {dataFiles.map((dataFile, index) => {
+                    const accId = `${dataFile.title}-${index}`;
+                    return (
+                      <AccordionSection
+                        /* eslint-disable-next-line react/no-array-index-key */
+                        key={accId}
+                        headingId={accId}
+                        heading={dataFile.title}
+                        onToggle={() => {
+                          if (openedAccordions.includes(accId)) {
+                            setOpenedAccordions(
+                              remove(openedAccordions, (item: string) => {
+                                return item !== accId;
+                              }),
+                            );
+                          } else {
+                            setOpenedAccordions([...openedAccordions, accId]);
+                          }
+                        }}
+                        open={openedAccordions.includes(accId)}
+                      >
+                        <SummaryList
+                          key={dataFile.filename}
+                          additionalClassName="govuk-!-margin-bottom-9"
+                        >
+                          <SummaryListItem term="Subject title">
+                            <h4 className="govuk-heading-m">
+                              {dataFile.title}
+                            </h4>
+                          </SummaryListItem>
+                          <SummaryListItem term="Data file">
+                            <ButtonText
+                              onClick={() =>
+                                editReleaseDataService.downloadDataFile(
+                                  releaseId,
+                                  dataFile.filename,
+                                )
+                              }
+                            >
+                              {dataFile.filename}
+                            </ButtonText>
+                          </SummaryListItem>
+                          <SummaryListItem term="Metadata file">
+                            <ButtonText
+                              onClick={() =>
+                                editReleaseDataService.downloadDataMetadataFile(
+                                  releaseId,
+                                  dataFile.metadataFilename,
+                                )
+                              }
+                            >
+                              {dataFile.metadataFilename}
+                            </ButtonText>
+                          </SummaryListItem>
+                          <SummaryListItem term="Data file size">
+                            {dataFile.fileSize.size.toLocaleString()}{' '}
+                            {dataFile.fileSize.unit}
+                          </SummaryListItem>
+                          <SummaryListItem term="Number of rows">
+                            {dataFile.rows.toLocaleString()}
+                          </SummaryListItem>
+
+                          <ImporterStatus
+                            releaseId={releaseId}
+                            dataFile={dataFile}
+                            onStatusChangeHandler={statusChangeHandler}
+                          />
+                          <SummaryListItem term="Uploaded by">
+                            <a href={`mailto:${dataFile.userName}`}>
+                              {dataFile.userName}
+                            </a>
+                          </SummaryListItem>
+                          <SummaryListItem term="Date uploaded">
+                            {format(dataFile.created, 'd/M/yyyy HH:mm')}
+                          </SummaryListItem>
+                          {canUpdateRelease && dataFile.canDelete && (
+                            <SummaryListItem
+                              term="Actions"
+                              actions={
+                                <ButtonText
+                                  onClick={() =>
+                                    editReleaseDataService
+                                      .getDeleteDataFilePlan(
+                                        releaseId,
+                                        dataFile,
+                                      )
+                                      .then(plan => {
+                                        setDeleteDataFile({
+                                          plan,
+                                          file: dataFile,
+                                        });
+                                      })
+                                  }
+                                >
+                                  Delete files
+                                </ButtonText>
+                              }
+                            />
+                          )}
+                        </SummaryList>
+                      </AccordionSection>
+                    );
+                  })}
+                </Accordion>
               </>
             )}
 
-            {dataFiles.map(dataFile => (
-              <SummaryList
-                key={dataFile.filename}
-                additionalClassName="govuk-!-margin-bottom-9"
+            {deleteDataFile && (
+              <ModalConfirm
+                mounted
+                title="Confirm deletion of selected data files"
+                onExit={() => setDeleteDataFile(undefined)}
+                onCancel={() => setDeleteDataFile(undefined)}
+                onConfirm={async () => {
+                  await editReleaseDataService
+                    .deleteDataFiles(
+                      releaseId,
+                      (deleteDataFile as DeleteDataFile).file,
+                    )
+                    .finally(() => {
+                      setDeleteDataFile(undefined);
+                      resetPage(form);
+                    });
+                }}
               >
-                <SummaryListItem term="Subject title">
-                  <h4 className="govuk-heading-m">{dataFile.title}</h4>
-                </SummaryListItem>
-                <SummaryListItem term="Data file">
-                  <ButtonText
-                    onClick={() =>
-                      service
-                        .downloadDataFile(releaseId, dataFile.filename)
-                        .catch(handleApiErrors)
-                    }
-                  >
-                    {dataFile.filename}
-                  </ButtonText>
-                </SummaryListItem>
-                <SummaryListItem term="Metadata file">
-                  <ButtonText
-                    onClick={() =>
-                      service
-                        .downloadDataMetadataFile(
-                          releaseId,
-                          dataFile.metadataFilename,
-                        )
-                        .catch(handleApiErrors)
-                    }
-                  >
-                    {dataFile.metadataFilename}
-                  </ButtonText>
-                </SummaryListItem>
-                <SummaryListItem term="Data file size">
-                  {dataFile.fileSize.size.toLocaleString()}{' '}
-                  {dataFile.fileSize.unit}
-                </SummaryListItem>
-                <SummaryListItem term="Number of rows">
-                  {dataFile.rows.toLocaleString()}
-                </SummaryListItem>
-
-                <ImporterStatus
-                  releaseId={releaseId}
-                  dataFile={dataFile}
-                  onStatusChangeHandler={statusChangeHandler}
-                />
-                <SummaryListItem term="Uploaded by">
-                  <a href={`mailto:${dataFile.userName}`}>
-                    {dataFile.userName}
-                  </a>
-                </SummaryListItem>
-                <SummaryListItem term="Date uploaded">
-                  {format(dataFile.created, 'd/M/yyyy HH:mm')}
-                </SummaryListItem>
-                {canUpdateRelease && dataFile.canDelete && (
-                  <SummaryListItem
-                    term="Actions"
-                    actions={
-                      <ButtonText onClick={() => setDeleteDataFile(dataFile)}>
-                        Delete files
-                      </ButtonText>
-                    }
-                  />
+                <p>
+                  This data will no longer be available for use in this release.
+                </p>
+                {deleteDataFile.plan.dependentDataBlocks.length > 0 && (
+                  <p>
+                    The following data blocks will also be deleted:
+                    <ul>
+                      {deleteDataFile.plan.dependentDataBlocks.map(block => (
+                        <li key={block.name}>
+                          <p>{block.name}</p>
+                          {block.contentSectionHeading && (
+                            <p>
+                              {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
+                            </p>
+                          )}
+                          {block.infographicFilenames.length > 0 && (
+                            <p>
+                              The following infographic files will also be
+                              removed:
+                              <ul>
+                                {block.infographicFilenames.map(filename => (
+                                  <li key={filename}>
+                                    <p>{filename}</p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </p>
                 )}
-              </SummaryList>
-            ))}
-
-            <ModalConfirm
-              mounted={deleteDataFile && deleteDataFile.title.length > 0}
-              title="Confirm deletion of selected data files"
-              onExit={() => setDeleteDataFile(emptyDataFile)}
-              onCancel={() => setDeleteDataFile(emptyDataFile)}
-              onConfirm={async () => {
-                await service
-                  .deleteDataFiles(releaseId, deleteDataFile)
-                  .catch(handleApiErrors)
-                  .finally(() => {
-                    setDeleteDataFile(emptyDataFile);
-                    resetPage(form);
-                  });
-              }}
-            >
-              <p>
-                This data will no longer be available for use in this release
-              </p>
-            </ModalConfirm>
+                {deleteDataFile.plan.footnoteIds.length > 0 && (
+                  <p>
+                    {deleteDataFile.plan.footnoteIds.length}{' '}
+                    {deleteDataFile.plan.footnoteIds.length > 1
+                      ? 'footnotes'
+                      : 'footnote'}{' '}
+                    will be removed.
+                  </p>
+                )}
+              </ModalConfirm>
+            )}
           </Form>
         );
       }}
@@ -358,4 +445,4 @@ const ReleaseDataUploadsSection = ({
   );
 };
 
-export default withErrorControl(ReleaseDataUploadsSection);
+export default ReleaseDataUploadsSection;

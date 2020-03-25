@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -5,10 +7,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class CreateReleaseForSpecificPublicationRequirement : IAuthorizationRequirement
     {}
     
-    public class CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler : 
-        HasClaimAuthorizationHandler<CreateReleaseForSpecificPublicationRequirement>
+    public class CreateReleaseForSpecificPublicationAuthorizationHandler 
+        : CompoundAuthorizationHandler<CreateReleaseForSpecificPublicationRequirement, Publication>
     {
-        public CreateReleaseForSpecificPublicationCanCreateForAnyPublicationAuthorizationHandler() 
-            : base(SecurityClaimTypes.CreateAnyRelease) {}
+        public CreateReleaseForSpecificPublicationAuthorizationHandler() : base(
+            new CanCreateReleaseForAnyPublicationAuthorizationHandler())
+        {}
+    
+        public class CanCreateReleaseForAnyPublicationAuthorizationHandler : 
+            HasClaimAuthorizationHandler<CreateReleaseForSpecificPublicationRequirement>
+        {
+            public CanCreateReleaseForAnyPublicationAuthorizationHandler() 
+                : base(SecurityClaimTypes.CreateAnyRelease) {}
+        }
     }
 }

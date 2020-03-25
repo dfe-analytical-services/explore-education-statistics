@@ -4,6 +4,7 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -22,9 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
-                opts => opts.MapFrom(release => release.ReleaseName));
-            
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.LatestRelease,
@@ -83,14 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
             
-            CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
-            CreateMap<ReleaseSummaryViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
-
-            CreateMap<ReleaseSummary, ReleaseSummaryViewModel>()
-                .ForMember(model => model.InternalReleaseNote,
-                    m => m.MapFrom(summary => summary.Release.InternalReleaseNote))
-                .ForMember(model => model.Status,
-                    m => m.MapFrom(summary => summary.Release.Status));
+            CreateMap<Release, ReleaseSummaryViewModel>();
 
             CreateMap<Methodology, MethodologyViewModel>();
             CreateMap<Methodology, MethodologyStatusViewModel>();
@@ -146,7 +137,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         Summary = r.Publication.Summary,
                         DataSource = r.Publication.DataSource,
                         Contact = r.Publication.Contact,
-                        NextUpdate = r.Publication.NextUpdate,
                         Topic = new ManageContentTopicViewModel
                         {
                             Theme = new ThemeViewModel
@@ -154,14 +144,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Title = r.Publication.Topic.Theme.Title
                             } 
                         },
-                        Releases = r.Publication.Releases
+                        OtherReleases = r.Publication.Releases
                             .FindAll(otherRelease => otherRelease.Id != r.Id)    
                             .Select(otherRelease => new PreviousReleaseViewModel
                             {
                                 Id = otherRelease.Id,
                                 Slug = otherRelease.Slug,
                                 Title = otherRelease.Title,
-                                ReleaseName = otherRelease.ReleaseName
                             })
                             .ToList(),
                         LegacyReleases = r.Publication.LegacyReleases
@@ -192,6 +181,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(c => c.State.GetEnumValue())
                 );
             
+            CreateMap<ContentSection, ContentSectionViewModel>();
+
+            CreateMap<Methodology, ManageMethodologyContentViewModel>();
         }
     }
 }

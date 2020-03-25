@@ -19,6 +19,7 @@ export interface SelectOption {
 }
 
 export interface FormSelectProps {
+  disabled?: boolean;
   error?: string;
   id: string;
   label: ReactNode | string;
@@ -33,10 +34,10 @@ export interface FormSelectProps {
   orderDirection?: ('asc' | 'desc')[];
   value?: string | number;
   className?: string;
-  disabled?: boolean;
 }
 
 const FormSelect = ({
+  disabled,
   error,
   id,
   label,
@@ -49,7 +50,6 @@ const FormSelect = ({
   orderDirection = ['asc'],
   value,
   className,
-  disabled = false,
 }: FormSelectProps) => {
   return (
     <>
@@ -63,10 +63,10 @@ const FormSelect = ({
         })}
         id={id}
         name={name}
+        disabled={disabled}
         onBlur={onBlur}
         onChange={onChange}
         value={value}
-        disabled={disabled}
       >
         {options &&
           (order === undefined || order.length === 0

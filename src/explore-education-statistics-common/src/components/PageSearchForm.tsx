@@ -5,9 +5,9 @@ import {
 import { openAllParentDetails } from '@common/components/Details';
 import FormComboBox from '@common/components/form/FormComboBox';
 import { openAllParentTabSections } from '@common/components/TabsSection';
-import findAllByText from '@common/lib/dom/findAllByText';
-import findAllParents from '@common/lib/dom/findAllParents';
-import findPreviousSibling from '@common/lib/dom/findPreviousSibling';
+import findAllByText from '@common/utils/dom/findAllByText';
+import findAllParents from '@common/utils/dom/findAllParents';
+import findPreviousSibling from '@common/utils/dom/findPreviousSibling';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 import React, { Component, ReactNode } from 'react';
@@ -36,15 +36,15 @@ interface State {
 }
 
 class PageSearchForm extends Component<PageSearchFormProps, State> {
-  public state: State = {
-    searchResults: [],
-    searchComplete: false,
-  };
-
   public static defaultProps = {
     elementSelectors: ['p', 'li > strong', 'h2', 'h3', 'h4'],
     id: 'pageSearchForm',
     minInput: 3,
+  };
+
+  public state: State = {
+    searchResults: [],
+    searchComplete: false,
   };
 
   private static getLocationText(element: HTMLElement): string {
@@ -86,6 +86,7 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
     return location.join(' > ');
   }
 
+  // eslint-disable-next-line react/sort-comp
   private search = (value: string) => {
     const { elementSelectors, minInput, onSearch } = this.props;
 

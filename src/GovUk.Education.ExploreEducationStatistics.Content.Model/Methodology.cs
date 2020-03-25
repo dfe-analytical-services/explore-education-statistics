@@ -6,6 +6,12 @@ using Microsoft.Azure.Documents.SystemFunctions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
+    public enum MethodologyStatus
+    {
+        Draft,
+        Approved
+    }
+    
     public class Methodology
     {
         [Key] 
@@ -19,8 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Summary { get; set; }
 
-        [NotMapped]
-        public string Status => Published == null ?  "Draft" : "Live" ;
+        public MethodologyStatus Status { get; set; }
 
         public DateTime? Published { get; set; }
         
@@ -33,5 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<ContentSection> Annexes { get; set; }
 
         public List<Publication> Publications { get; set; }
+        
+        public string InternalReleaseNote { get; set; }
     }
 }

@@ -1,32 +1,26 @@
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
-import ButtonText from '@common/components/ButtonText';
-import { BasicLink } from '@common/services/publicationService';
-import React, { useState, useContext } from 'react';
-import { FormikProps } from 'formik';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import EditableLink from '@admin/components/editable/EditableLink';
 import Link from '@admin/components/Link';
 import { relatedInformationService } from '@admin/services/release/edit-release/content/service';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import {
-  Formik,
-  FormFieldset,
   Form,
+  FormFieldset,
   FormFieldTextInput,
+  Formik,
 } from '@common/components/form';
-import Yup from '@common/lib/validation/yup';
-import EditableLink from './EditableLink';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { BasicLink } from '@common/services/publicationService';
+import Yup from '@common/validation/yup';
+import { FormikProps } from 'formik';
+import React, { useContext, useState } from 'react';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
 }
 
-const RelatedInformationSection = ({
-  release,
-  handleApiErrors,
-}: Props & ErrorControlProps) => {
+const RelatedInformationSection = ({ release }: Props) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 
@@ -34,21 +28,15 @@ const RelatedInformationSection = ({
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
     return new Promise(resolve => {
-      relatedInformationService
-        .create(release.id, link)
-        .then(newLinks => {
-          setLinks(newLinks);
-          resolve();
-        })
-        .catch(handleApiErrors);
+      relatedInformationService.create(release.id, link).then(newLinks => {
+        setLinks(newLinks);
+        resolve();
+      });
     });
   };
 
   const removeLink = (linkId: string) => {
-    relatedInformationService
-      .delete(release.id, linkId)
-      .then(setLinks)
-      .catch(handleApiErrors);
+    relatedInformationService.delete(release.id, linkId).then(setLinks);
   };
 
   const renderLinkForm = () => {
@@ -113,18 +101,32 @@ const RelatedInformationSection = ({
       <nav role="navigation" aria-labelledby="related-content">
         <ul className="govuk-list">
           <li>
-            <Link
-              to={`/methodology/${
-                release.publication.methodology
-                  ? release.publication.methodology.id
-                  : 'no-methodology'
-              }`}
-              target="_blank"
-            >
-              {release.publication.methodology
-                ? release.publication.methodology.title
-                : 'Methodology title'}
-            </Link>
+            {release.publication.methodology &&
+              (isEditing ? (
+                <a>{release.publication.methodology.title}</a>
+              ) : (
+                <Link
+                  to={`/methodologies/${release.publication.methodology.id}`}
+                >
+                  {release.publication.methodology.title}
+                </Link>
+              ))}
+            {release.publication.externalMethodology &&
+              (isEditing ? (
+                <a>{release.publication.externalMethodology.title}</a>
+              ) : (
+                <Link
+                  to=""
+                  href={release.publication.externalMethodology.url}
+                  target="_blank"
+                  rel="external"
+                >
+                  {release.publication.externalMethodology.title}
+                </Link>
+              ))}
+            {!release.publication.externalMethodology &&
+              !release.publication.methodology &&
+              'No methodology added.'}
           </li>
           {isEditing && <hr />}
 
@@ -142,4 +144,4 @@ const RelatedInformationSection = ({
   );
 };
 
-export default withErrorControl(RelatedInformationSection);
+export default RelatedInformationSection;

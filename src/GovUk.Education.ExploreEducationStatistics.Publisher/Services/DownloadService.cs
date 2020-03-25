@@ -4,8 +4,8 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseService = releaseService;
         }
 
-        public IEnumerable<ThemeTree> GetTree(IEnumerable<Guid> includedReleaseIds)
+        public IEnumerable<ThemeTree<PublicationDownloadTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
         { 
             return _context.Themes
                 .Include(theme => theme.Topics)
@@ -38,9 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        private ThemeTree BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
+        private ThemeTree<PublicationDownloadTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
-            return new ThemeTree
+            return new ThemeTree<PublicationDownloadTreeNode>
             {
                 Id = theme.Id,
                 Title = theme.Title,
@@ -53,25 +53,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private TopicTree BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
+        private TopicTree<PublicationDownloadTreeNode> BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
         {
-            return new TopicTree
+            return new TopicTree<PublicationDownloadTreeNode>
             {
                 Id = topic.Id,
                 Title = topic.Title,
                 Summary = topic.Summary,
                 Publications = topic.Publications
                     .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
-                    .Select(publication => BuildPublicationTree(publication, includedReleaseIds))
+                    .Select(publication => BuildPublicationNode(publication, includedReleaseIds))
                     .Where(publicationTree => publicationTree.DownloadFiles.Any())
                     .OrderBy(publication => publication.Title)
                     .ToList()
             };
         }
 
-        private PublicationTree BuildPublicationTree(Publication publication, IEnumerable<Guid> includedReleaseIds)
+        private PublicationDownloadTreeNode BuildPublicationNode(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
-            return new PublicationTree
+            return new PublicationDownloadTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,

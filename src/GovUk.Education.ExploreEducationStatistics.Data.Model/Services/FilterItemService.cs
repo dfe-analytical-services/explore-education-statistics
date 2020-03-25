@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private static IEnumerable<FilterItem> GetTotalGroup(IEnumerable<FilterItem> filterItems)
         {
-            var itemsGroupedByFilterGroup = filterItems.GroupBy(item => item.FilterGroup).ToList();
+            var itemsGroupedByFilterGroup = filterItems.GroupBy(item => item.FilterGroup, FilterGroup.IdComparer).ToList();
 
             // Return the group if there is only one, otherwise the 'Total' group if it exists
             return itemsGroupedByFilterGroup.Count == 1

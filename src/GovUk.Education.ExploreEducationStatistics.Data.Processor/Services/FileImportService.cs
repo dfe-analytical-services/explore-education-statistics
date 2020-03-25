@@ -35,44 +35,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var releaseId = message.Release.Id.ToString();
 
-            // Ensure batch processed only once
-            if (!await _batchService.IsBatchProcessed(releaseId, message.OrigDataFileName, message.BatchNo))
+            // Potentially status could already be failed so don't continue
+            if (await _batchService.UpdateStatus(releaseId, message.OrigDataFileName,
+                IStatus.RUNNING_PHASE_3))
             {
-                // Potentially status could already be failed so don't continue
-                if (await _batchService.UpdateStatus(releaseId, message.OrigDataFileName,
-                    IStatus.RUNNING_PHASE_3))
-                {
-                    var subjectData = await _fileStorageService.GetSubjectData(message);
-                    var subject = GetSubject(message, subjectData.Name, context);
-
-                    _importerService.ImportObservations(
-                        subjectData.GetCsvLines().ToList(),
-                        subject,
-                        _importerService.GetMeta(subjectData.GetMetaLines().ToList(), subject, context),
-                        message.BatchNo,
-                        message.RowsPerBatch,
-                        context
-                    );
-
-                    await _batchService.UpdateBatchCount(releaseId, message.OrigDataFileName, message.BatchNo);
-                }
+                var subjectData = await _fileStorageService.GetSubjectData(message);
+                var subject = GetSubject(message, subjectData.Name, context);
+                var csvTable = subjectData.GetCsvTable();
+                var metaTable = subjectData.GetMetaTable();
+                
+                context.Database.BeginTransaction();
+                
+                _importerService.ImportObservations(
+                    csvTable.Columns,
+                    csvTable.Rows,
+                    subject,
+                    _importerService.GetMeta(metaTable, subject, context),
+                    message.BatchNo,
+                    message.RowsPerBatch,
+                    context
+                );
+                
+                context.Database.CommitTransaction();
+                
+                await _batchService.CheckComplete(releaseId, message, context);
             }
             else
             {
-                _logger.LogInformation($"{message.DataFileName} already processed...skipping");
+                _logger.LogInformation($"{message.DataFileName} already failed...skipping");
             }
         }
 
         public void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var batch = subjectData.GetCsvLines().ToList();
-            var metaLines = subjectData.GetMetaLines().ToList();
             var subject = GetSubject(message, subjectData.Name, context);
+            var csvTable = subjectData.GetCsvTable();
+            var metaTable = subjectData.GetMetaTable();
 
             _importerService.ImportFiltersLocationsAndSchools(
-                batch,
-                _importerService.GetMeta(metaLines, subject, context),
+                csvTable.Columns,
+                csvTable.Rows,
+                _importerService.GetMeta(metaTable, subject, context),
                 subject,
                 context);
         }

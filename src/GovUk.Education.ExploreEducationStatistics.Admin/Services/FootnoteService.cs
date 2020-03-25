@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -65,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     filterItemIds,
                     indicatorIds,
                     subjectIds)
-                .OnSuccess(_ =>
+                .OnSuccess(release =>
                 {
                     var footnote = DbSet().Add(new Footnote
                     {
@@ -74,7 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         FilterGroups = new List<FilterGroupFootnote>(),
                         FilterItems = new List<FilterItemFootnote>(),
                         Indicators = new List<IndicatorFootnote>(),
-                        Subjects = new List<SubjectFootnote>()
+                        Subjects = new List<SubjectFootnote>(),
+                        ReleaseId = release.Id
                     }).Entity;
 
                     CreateSubjectLinks(footnote, subjectIds);

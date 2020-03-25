@@ -2,25 +2,15 @@
 
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
-const withTypescript = require('@zeit/next-typescript');
 const DotEnv = require('dotenv');
-const DotEnvPlugin = require('dotenv-webpack');
 const fs = require('fs');
 const compose = require('lodash/fp/compose');
 const withImages = require('next-images');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
-const { BUILD_ENV } = process.env;
-
-if (['local', 'example'].includes(BUILD_ENV)) {
-  throw new Error('Invalid BUILD_ENV provided');
-}
-
-const localEnvFile = fs.existsSync('.env.local') ? '.env.local' : '.env';
-
-const envFilePath = BUILD_ENV ? `.env.${BUILD_ENV}` : localEnvFile;
-const envConfig = DotEnv.parse(fs.readFileSync(envFilePath));
+const envFilePath = fs.existsSync('.env.local') ? '.env.local' : '.env';
+const envConfig = DotEnv.config(fs.readFileSync(envFilePath));
 
 const createPlugin = plugin => {
   return (nextConfig = {}) =>
@@ -124,7 +114,14 @@ const withESLint = createPlugin((config, options) => {
 });
 
 const nextConfig = {
-  transpileModules: ['explore-education-statistics-common', '@common'],
+  publicRuntimeConfig: {
+    CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
+    DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
+    FUNCTION_API_BASE_URL: process.env.FUNCTION_API_BASE_URL,
+    APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
+    GA_TRACKING_ID: process.env.GA_TRACKING_ID,
+    HOTJAR_ID: process.env.HOTJAR_ID,
+  },
   webpack(config, options) {
     const { dev, isServer } = options;
 
@@ -133,9 +130,11 @@ const nextConfig = {
 
       config.plugins.push(
         new ForkTsCheckerPlugin({
-          tsconfig: path.resolve(__dirname, 'tsconfig.json'),
+          tsconfig: path.resolve(__dirname, 'src/tsconfig.json'),
         }),
       );
+
+      config.externals = [...config.externals, 'react', 'react-dom'];
     }
 
     if (dev) {
@@ -155,27 +154,9 @@ const nextConfig = {
       }
     }
 
-    const originalEntry = config.entry;
-
-    config.entry = async () => {
-      const entries = await originalEntry();
-
-      if (entries['main.js'] && !entries['main.js'].includes('./polyfill.js')) {
-        entries['main.js'].unshift('./polyfill.js');
-      }
-
-      return entries;
-    };
-
-    config.plugins.push(
-      new DotEnvPlugin({
-        path: envFilePath,
-        safe: true,
-      }),
-    );
-
     config.resolve.alias = {
       ...config.resolve.alias,
+      './dist/cpexcel.js': '',
       '@frontend': path.resolve(__dirname, 'src'),
       '@common': path.resolve(
         __dirname,
@@ -185,21 +166,20 @@ const nextConfig = {
       formik: path.resolve(__dirname, 'node_modules/formik'),
     };
 
-    options.defaultLoaders.babel.options.configFile = path.resolve(
-      __dirname,
-      'babel.config.js',
-    );
+    config.node = {
+      ...config.node,
+      Buffer: false,
+    };
 
     return config;
   },
 };
 
 module.exports = compose(
-  withTranspileModules,
+  withTranspileModules(['explore-education-statistics-common', '@common']),
   withFonts,
   withImages,
   withCss,
   withSassModules,
-  withTypescript,
   withESLint,
 )(nextConfig);

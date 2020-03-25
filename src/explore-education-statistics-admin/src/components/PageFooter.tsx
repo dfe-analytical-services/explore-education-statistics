@@ -1,6 +1,6 @@
-import LoginContext from '@admin/components/Login';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import classNames from 'classnames';
-import React, { useContext } from 'react';
+import React from 'react';
 import Link from './Link';
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const PageFooter = ({ wide }: Props) => {
-  const { user } = useContext(LoginContext);
+  const { user } = useAuthContext();
 
   return (
     <footer className="govuk-footer" role="contentinfo">
@@ -21,11 +21,6 @@ const PageFooter = ({ wide }: Props) => {
           <div className="govuk-footer__meta-item govuk-footer__meta-item--grow">
             <h2 className="govuk-visually-hidden">Support links</h2>
             <ul className="govuk-footer__inline-list">
-              <li className="govuk-footer__inline-list-item">
-                <Link className="govuk-footer__link" to="/prototypes">
-                  Prototypes
-                </Link>
-              </li>
               {user &&
                 (user.permissions.canAccessUserAdministrationPages ||
                   user.permissions.canAccessMethodologyAdministrationPages) && (

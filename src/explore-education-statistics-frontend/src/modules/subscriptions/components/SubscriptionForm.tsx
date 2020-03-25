@@ -3,7 +3,7 @@ import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
 import { FormFieldTextInput } from '@common/components/form';
-import Yup from '@common/lib/validation/yup';
+import Yup from '@common/validation/yup';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import React, { Component, createRef } from 'react';
 

@@ -140,6 +140,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         [TimeIdentifierMeta("Tax Year Q4", "TYQ4", Category.TaxYear, AcademicOrFiscalShort, "Q4")]
         TaxYearQ4,
+        
+        [TimeIdentifierMeta("Reporting Year", "RY", Category.ReportingYear, NoLabel)]
+        ReportingYear,
 
         [TimeIdentifierMeta("Five Half Terms", "HT5", Category.AcademicYear, AcademicOrFiscalNoLabel)]
         FiveHalfTerms,

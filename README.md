@@ -58,15 +58,23 @@ You will need the following groups of dependencies to run the project successful
    - [NodeJS v12+](https://nodejs.org/)
    - [.NET Core v3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
    - [Azure Functions Core Tools v3+](https://github.com/Azure/azure-functions-core-tools)
+   
+2. To emulate azure storage you will require either:
    - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
+   - [Azurite](https://github.com/Azure/Azurite)
+   - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
+   
+   You will most likely need to use Windows to run the service due to a dependency on Azure Storage Emulator
+for development, specifically the table storage component which is not supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the service.
 
-2. To run the databases, you can use either:
+   Alternatively you could create your own Storage Account on Azure and ammend your storage connection string to point to this.
+
+3. To run the databases, you can use either:
 
    - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
    - [Docker and Docker Compose](https://docs.docker.com/)
 
-Unfortunately you will most likely need to use Windows to run the service due to a dependency on Azure Storage Emulator
-for development.
+
 
 ### Running the backend
 
@@ -112,10 +120,7 @@ Examples:
 
 ##### Using Docker
 
-Parts (but not all) of the backend can be run using Docker. This was previously the preferred way of running backend
-applications as you could avoid needing to install some of the project's hard dependencies (e.g. Azure Storage Emulator).
-
-Unfortunately, is **not maintained** currently.
+Parts (but not all) of the service can be run using Docker. 
 
 Examples:
 
@@ -187,6 +192,8 @@ Required environment variables should be supplied to both the specific `.env.{en
 
 The `.env.example` file is used to validate that the `.env.{env}` file in use is not missing any
 required variables and consequently needs to be in sync with any changes.
+
+No secrets/keys etc. should be added to these environment variables.
 
 ### Dependency management with Lerna
 

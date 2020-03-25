@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
         private static readonly List<DataCsvFile> IgnoredSubjectFiles = new List<DataCsvFile>
         {
             DataCsvFile.clean_data_fe,
-            DataCsvFile.KS2_2016_test_UD
+            DataCsvFile.KS2_2016_test_UD,
 
 //            DataCsvFile.absence_by_characteristic,
 //            DataCsvFile.absence_by_geographic_level,
@@ -60,9 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
 //            DataCsvFile.absence_in_prus,
 //            DataCsvFile.absence_number_missing_at_least_one_session_by_reason,
 //            DataCsvFile.absence_rate_percent_bands,
-//            DataCsvFile.EYFSP_ELG_underlying_data_2013_2018,
-//            DataCsvFile.EYFSP_areas_of_learning_underlying_data_2013_2018,
-//            DataCsvFile.EYFSP_APS_GLD_ELG_underlying_data_2013_2018,
+            DataCsvFile.EYFSP_ELG_underlying_data_2013_2018,
+            DataCsvFile.EYFSP_areas_of_learning_underlying_data_2013_2018,
+            DataCsvFile.EYFSP_APS_GLD_ELG_underlying_data_2013_2018,
 //            DataCsvFile.exclusions_by_characteristic,
 //            DataCsvFile.exclusions_by_geographic_level,
 //            DataCsvFile.exclusions_by_reason,
@@ -70,20 +71,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
 //            DataCsvFile.exclusions_number_of_fixed_exclusions,
 //            DataCsvFile.exclusions_total_days_missed_fixed_exclusions,
 //            DataCsvFile.school_applications_and_offers,
-//            DataCsvFile.SEN2_AGE_NEW,
-//            DataCsvFile.SEN2_AGE_STOCK,
-//            DataCsvFile.SEN2_ESTAB_NEW,
-//            DataCsvFile.SEN2_ESTAB_STOCK,
-//            DataCsvFile.SEN2_MI,
-//            DataCsvFile.skeleton_dashboard_tidy_data_NARTS,
-//            DataCsvFile.skeleton_dashboard_tidy_data_annual_v4,
-//            DataCsvFile.level_2_3_national,
-//            DataCsvFile.level_2_3_sf,
-//            DataCsvFile.level_2_3_sfla,
-//            DataCsvFile.KS4_2018_LA_Char_Testdata,
-//            DataCsvFile.KS4_2018_Nat_Char_Testdata,
-//            DataCsvFile.KS4_2018_Subject_Tables_S1_TestData,
-//            DataCsvFile.KS4_2018_Subject_Tables_S3_TestData
+            DataCsvFile.SEN2_AGE_NEW,
+            DataCsvFile.SEN2_AGE_STOCK,
+            DataCsvFile.SEN2_ESTAB_NEW,
+            DataCsvFile.SEN2_ESTAB_STOCK,
+            DataCsvFile.SEN2_MI,
+            DataCsvFile.skeleton_dashboard_tidy_data_NARTS,
+            DataCsvFile.skeleton_dashboard_tidy_data_annual_v4,
+            DataCsvFile.level_2_3_national,
+            DataCsvFile.level_2_3_sf,
+            DataCsvFile.level_2_3_sfla,
+            DataCsvFile.KS4_2018_LA_Char_Testdata,
+            DataCsvFile.KS4_2018_Nat_Char_Testdata,
+            DataCsvFile.KS4_2018_Subject_Tables_S1_TestData,
+            DataCsvFile.KS4_2018_Subject_Tables_S3_TestData
         };
 
         public static List<Subject> GetSubjects()
@@ -137,8 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                                            Title = "2016 to 2017",
-                                            ReleaseDate = new DateTime(2018, 4, 25),
+                                            Published = new DateTime(2018, 4, 25),
                                             Slug = "2016-17",
                                             Subjects = new List<Subject>
                                             {
@@ -177,7 +177,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(6),
                                                     Name = "Absence rate percent bands"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.AcademicYear,
+                                            Year = 2016
                                         }
                                     }
                                 }
@@ -200,8 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                                            Title = "2016 to 2017",
-                                            ReleaseDate = new DateTime(2018, 7, 19),
+                                            Published = new DateTime(2018, 7, 19),
                                             Slug = "2016-17",
                                             Subjects = new List<Subject>
                                             {
@@ -235,7 +236,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(15),
                                                     Name = "Total days missed due to fixed period exclusions"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.AcademicYear,
+                                            Year = 2016
                                         }
                                     }
                                 }
@@ -258,8 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                                            Title = "2018",
-                                            ReleaseDate = new DateTime(2019, 4, 29),
+                                            Published = new DateTime(2019, 4, 29),
                                             Slug = "2018",
                                             Subjects = new List<Subject>
                                             {
@@ -268,7 +270,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(16),
                                                     Name = "Applications and offers by school phase"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.CalendarYear,
+                                            Year = 2018
                                         }
                                     }
                                 }
@@ -291,8 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5"),
-                                            Title = "2018",
-                                            ReleaseDate = new DateTime(2019, 4, 29),
+                                            Published = new DateTime(2019, 4, 29),
                                             Slug = "2018",
                                             Subjects = new List<Subject>
                                             {
@@ -321,7 +324,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(21),
                                                     Name = "Management information"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.CalendarYear,
+                                            Year = 2018
                                         }
                                     }
                                 }
@@ -353,8 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a"),
-                                            Title = "2017 to 2018",
-                                            ReleaseDate = new DateTime(2019, 5, 20),
+                                            Published = new DateTime(2019, 5, 20),
                                             Slug = "2017-18",
                                             Subjects = new List<Subject>
                                             {
@@ -373,7 +377,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(9),
                                                     Name = "APS GLD ELG underlying data 2013 - 2018"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.AcademicYear,
+                                            Year = 2017
                                         }
                                     }
                                 }
@@ -405,8 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("59258583-b075-47a2-bee4-5969e2d58873"),
-                                            ReleaseDate = new DateTime(2019, 4, 29),
-                                            Title = "2018",
+                                            Published = new DateTime(2019, 4, 29),
                                             Slug = "2018",
                                             Subjects = new[]
                                             {
@@ -415,7 +420,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(22),
                                                     Name = "National achievement rates tables (NARTs)"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.CalendarYear,
+                                            Year = 2018
                                         }
                                     }
                                 }
@@ -438,8 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("463c8521-d9b4-4ccc-aee9-0666e39c8e47"),
-                                            ReleaseDate = new DateTime(2019, 4, 29),
-                                            Title = "2018",
+                                            Published = new DateTime(2019, 4, 29),
                                             Slug = "2018",
                                             Subjects = new[]
                                             {
@@ -448,7 +454,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(23),
                                                     Name = "Apprenticeship annual"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.CalendarYear,
+                                            Year = 2018
                                         }
                                     }
                                 },
@@ -462,8 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60"),
-                                            ReleaseDate = new DateTime(2019, 4, 29),
-                                            Title = "2018",
+                                            Published = new DateTime(2019, 4, 29),
                                             Slug = "2018",
                                             Subjects = new[]
                                             {
@@ -472,7 +479,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(32),
                                                     Name = "Further education and skills"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.CalendarYear,
+                                            Year = 2018
                                         }
                                     }
                                 }
@@ -504,8 +513,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a"),
-                                            ReleaseDate = new DateTime(2019, 4, 29),
-                                            Title = "2018",
+                                            Published = new DateTime(2019, 4, 29),
                                             Slug = "2018",
                                             Subjects = new[]
                                             {
@@ -524,7 +532,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(26),
                                                     Name = "Level 2 and 3 sf by Local authority"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.CalendarYear,
+                                            Year = 2018
                                         }
                                     }
                                 }
@@ -547,8 +557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("dbaeb363-33fa-4928-870f-5054278e0c9a"),
-                                            ReleaseDate = new DateTime(2019, 4, 29),
-                                            Title = "2018",
+                                            Published = new DateTime(2019, 4, 29),
                                             Slug = "2018",
                                             Subjects = new[]
                                             {
@@ -557,7 +566,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(27),
                                                     Name = "2016 test data"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.CalendarYear,
+                                            Year = 2018
                                         }
                                     }
                                 }
@@ -580,8 +591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         new Release
                                         {
                                             Id = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801"),
-                                            ReleaseDate = new DateTime(2019, 4, 29),
-                                            Title = "2018",
+                                            Published = new DateTime(2019, 4, 29),
                                             Slug = "2018",
                                             Subjects = new[]
                                             {
@@ -605,7 +615,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                                     Id = GetSubjectKey(31),
                                                     Name = "Subject tables S3 test data"
                                                 }
-                                            }
+                                            },
+                                            TimeIdentifier = TimeIdentifier.CalendarYear,
+                                            Year = 2018
                                         }
                                     }
                                 }

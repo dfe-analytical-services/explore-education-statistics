@@ -5,20 +5,20 @@ import {
   FormGroup,
   Formik,
 } from '@common/components/form';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import Yup from '@common/lib/validation/yup';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import {
   FilterOption,
   PublicationSubjectMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
-import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
+} from '@common/modules/table-tool/services/tableBuilderService';
+import { Dictionary } from '@common/types';
+import createErrorHelper from '@common/validation/createErrorHelper';
+import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';
-import SummaryListItem from '@common/components/SummaryListItem';
-import SummaryList from '@common/components/SummaryList';
-import { Dictionary } from '@common/types';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -153,6 +153,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       initialValues={initialFormValues}
+      validateOnBlur={false}
+      validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
         indicators: Yup.array()
           .of(Yup.string())
@@ -177,7 +179,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
         return isActive ? (
           <div ref={ref}>
-            <Form {...form} id={formId} displayErrorMessageOnUncaughtErrors>
+            <Form {...form} id={formId} showSubmitError>
               {stepHeading}
 
               <FormGroup>
@@ -191,6 +193,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       hint="Select at least one indicator"
                       error={getError('indicators')}
                       selectAll
+                      disabled={form.isSubmitting}
                       options={Object.entries(subjectMeta.indicators).map(
                         ([_, group]) => {
                           return {
@@ -201,39 +204,42 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       )}
                     />
 
-                    <FormFieldset
-                      id={`${formId}-filters`}
-                      legend="Categories"
-                      legendSize="s"
-                      hint="Select at least one option from all categories"
-                      error={getError('filters')}
-                    >
-                      {Object.entries(subjectMeta.filters).map(
-                        ([filterKey, filterGroup]) => {
-                          const filterName = `filters.${filterKey}`;
+                    {Object.entries(subjectMeta.filters).length > 0 && (
+                      <FormFieldset
+                        id={`${formId}-filters`}
+                        legend="Categories"
+                        legendSize="s"
+                        hint="Select at least one option from all categories"
+                        error={getError('filters')}
+                      >
+                        {Object.entries(subjectMeta.filters).map(
+                          ([filterKey, filterGroup]) => {
+                            const filterName = `filters.${filterKey}`;
 
-                          return (
-                            <FormFieldCheckboxGroupsMenu<FormValues>
-                              key={filterKey}
-                              name={filterName}
-                              id={`${formId}-${camelCase(filterName)}`}
-                              legend={filterGroup.legend}
-                              hint={filterGroup.hint}
-                              error={getError(filterName)}
-                              selectAll
-                              options={Object.entries(filterGroup.options).map(
-                                ([_, group]) => {
+                            return (
+                              <FormFieldCheckboxGroupsMenu<FormValues>
+                                key={filterKey}
+                                name={filterName}
+                                id={`${formId}-${camelCase(filterName)}`}
+                                legend={filterGroup.legend}
+                                hint={filterGroup.hint}
+                                error={getError(filterName)}
+                                disabled={form.isSubmitting}
+                                selectAll
+                                options={Object.entries(
+                                  filterGroup.options,
+                                ).map(([_, group]) => {
                                   return {
                                     legend: group.label,
                                     options: group.options,
                                   };
-                                },
-                              )}
-                            />
-                          );
-                        },
-                      )}
-                    </FormFieldset>
+                                })}
+                              />
+                            );
+                          },
+                        )}
+                      </FormFieldset>
+                    )}
                   </div>
                 </div>
               </FormGroup>
@@ -263,32 +269,28 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             {stepHeading}
-            {
-              <SummaryList noBorder>
-                <SummaryListItem term="Indicators" shouldCollapse>
-                  {form.values.indicators.map(indicator => (
-                    <div key={indicator}>
-                      {parsedMeta.indicators[indicator]}
-                    </div>
-                  ))}
-                </SummaryListItem>
-                {Object.entries(form.values.filters).map(
-                  ([filterGroupId, filterItemIds]) => (
-                    <SummaryListItem
-                      term={parsedMeta.filters[filterGroupId]}
-                      shouldCollapse
-                      key={filterGroupId}
-                    >
-                      {filterItemIds.map(filterItemId => (
-                        <div key={filterItemId}>
-                          {parsedMeta.filters[filterItemId]}
-                        </div>
-                      ))}
-                    </SummaryListItem>
-                  ),
-                )}
-              </SummaryList>
-            }
+            <SummaryList noBorder>
+              <SummaryListItem term="Indicators" shouldCollapse>
+                {form.values.indicators.map(indicator => (
+                  <div key={indicator}>{parsedMeta.indicators[indicator]}</div>
+                ))}
+              </SummaryListItem>
+              {Object.entries(form.values.filters).map(
+                ([filterGroupId, filterItemIds]) => (
+                  <SummaryListItem
+                    term={parsedMeta.filters[filterGroupId]}
+                    shouldCollapse
+                    key={filterGroupId}
+                  >
+                    {filterItemIds.map(filterItemId => (
+                      <div key={filterItemId}>
+                        {parsedMeta.filters[filterItemId]}
+                      </div>
+                    ))}
+                  </SummaryListItem>
+                ),
+              )}
+            </SummaryList>
           </>
         );
       }}

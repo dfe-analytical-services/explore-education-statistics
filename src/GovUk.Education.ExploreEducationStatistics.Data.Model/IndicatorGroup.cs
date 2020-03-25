@@ -17,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public IndicatorGroup(string label, Subject subject)
         {
+            Id = Guid.NewGuid();
             Label = label;
             Subject = subject;
             Indicators = new List<Indicator>();

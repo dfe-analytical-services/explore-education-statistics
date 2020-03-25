@@ -13,13 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public Guid GetLatestRelease(Guid publicationId)
+        public Guid? GetLatestPublishedRelease(Guid publicationId)
         {
             return DbSet()
                 .Where(release => release.PublicationId.Equals(publicationId))
-                .OrderByDescending(release => release.ReleaseDate)
-                .Select(release => release.Id)
-                .FirstOrDefault();
+                .OrderBy(release => release.Year)
+                .ThenBy(release => release.TimeIdentifier)
+                .ToList()
+                .LastOrDefault(release => release.Live)?.Id;
         }
     }
 }

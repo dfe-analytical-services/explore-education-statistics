@@ -4,21 +4,21 @@ import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/ro
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
-import permissionService from '@admin/services/permissions/service';
 import {
   AdminDashboardPublication,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
+import permissionService from '@admin/services/permissions/permissionService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import ErrorSummary, {
+  ErrorSummaryMessage,
+} from '@common/components/ErrorSummary';
 import FormSelect from '@common/components/form/FormSelect';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -45,17 +45,12 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
 
-export interface Props
-  extends RouteComponentProps<{
-      themeId?: string;
-      topicId?: string;
-    }>,
-    ErrorControlProps {}
-
 const ManagePublicationsAndReleasesTab = ({
   match,
-  handleApiErrors,
-}: Props) => {
+}: RouteComponentProps<{
+  themeId?: string;
+  topicId?: string;
+}>) => {
   const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
     ThemeAndTopicContext,
   );
@@ -65,6 +60,8 @@ const ManagePublicationsAndReleasesTab = ({
   >();
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
+
+  const [apiErrors, setApiErrors] = useState<ErrorSummaryMessage[]>([]);
 
   const [canCreatePublication, setCanCreatePublication] = useState(false);
 
@@ -115,9 +112,8 @@ const ManagePublicationsAndReleasesTab = ({
       .getMyThemesAndTopics()
       .then(themeList =>
         setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
-      )
-      .catch(handleApiErrors);
-  }, [handleApiErrors]);
+      );
+  }, []);
 
   useEffect(() => {
     if (themes) {
@@ -150,7 +146,8 @@ const ManagePublicationsAndReleasesTab = ({
           .canCreatePublicationForTopic(selectedThemeAndTopic.topic.id)
           .then(setCanCreatePublication),
       ])
-        .then(_ =>
+        .then(_ => {
+          setApiErrors([]);
           // eslint-disable-next-line
           history.replaceState(
             {},
@@ -159,9 +156,14 @@ const ManagePublicationsAndReleasesTab = ({
               selectedThemeAndTopic.theme.id,
               selectedThemeAndTopic.topic.id,
             ),
-          ),
-        )
-        .catch(handleApiErrors);
+          );
+        })
+        .catch(error => {
+          setApiErrors([
+            ...apiErrors,
+            { id: error.data.traceId, message: error.data.title },
+          ]);
+        });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedThemeAndTopic]);
@@ -251,6 +253,7 @@ const ManagePublicationsAndReleasesTab = ({
             {canCreatePublication && (
               <Link
                 to={publicationRoutes.createPublication.generateLink(
+                  selectedThemeAndTopic.theme.id,
                   selectedThemeAndTopic.topic.id,
                 )}
                 className="govuk-button"
@@ -260,11 +263,17 @@ const ManagePublicationsAndReleasesTab = ({
             )}
           </>
         ) : (
-          <LoadingSpinner />
+          <>
+            {apiErrors.length > 0 ? (
+              <ErrorSummary id="publications-error" errors={apiErrors} />
+            ) : (
+              <LoadingSpinner />
+            )}
+          </>
         )}
       </section>
     </>
   );
 };
 
-export default withErrorControl(withRouter(ManagePublicationsAndReleasesTab));
+export default withRouter(ManagePublicationsAndReleasesTab);

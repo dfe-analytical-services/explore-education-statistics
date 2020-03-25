@@ -15,5 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid ReleaseId { get; set; }
         
         public ReleaseRole Role { get; set; }
+
+        public UserReleaseRole CreateReleaseAmendment(Release amendment)
+        {
+            var copy = MemberwiseClone() as UserReleaseRole;
+            copy.Id = Guid.NewGuid();
+            copy.Release = amendment;
+            copy.ReleaseId = amendment.Id;
+            return copy;
+        }
     }
 }

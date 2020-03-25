@@ -32,15 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var release = await GetReleaseAsync(statusMessage.ReleaseId);
 
             var (approvalValid, approvalMessages) = ValidateApproval(release);
-            var (methodologyValid, methodologyMessages) = ValidateMethodology(release);
             var (scheduledPublishDateValid, scheduledPublishDateMessages) = ValidateScheduledPublishDate(release);
 
             var valid = approvalValid &&
-                        methodologyValid &&
                         scheduledPublishDateValid;
 
             var logMessages = approvalMessages
-                .Concat(methodologyMessages)
                 .Concat(scheduledPublishDateMessages);
 
             return Result(valid, logMessages);
@@ -50,15 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             return release.Status == ReleaseStatus.Approved
                 ? Success()
-                : Failure(ValidationStage.Approval, $"Release status is {release.Status}");
-        }
-
-        private static (bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages) ValidateMethodology(
-            Release release)
-        {
-            return release.Publication.MethodologyId.HasValue
-                ? Success()
-                : Failure(ValidationStage.Methodology, $"Methodology is not set");
+                : Failure(ValidationStage.ReleaseMustBeApproved, $"Release status is {release.Status}");
         }
 
         private static (bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages) ValidateScheduledPublishDate(
@@ -66,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             return release.PublishScheduled.HasValue
                 ? Success()
-                : Failure(ValidationStage.ScheduledPublishDate, $"Scheduled publish date status is not set");
+                : Failure(ValidationStage.ReleaseMustHavePublishScheduledDate, $"Scheduled publish date status is not set");
         }
 
         private Task<Release> GetReleaseAsync(Guid releaseId)
@@ -105,9 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private enum ValidationStage
         {
-            Approval,
-            Methodology,
-            ScheduledPublishDate
+            ReleaseMustBeApproved,
+            ReleaseMustHavePublishScheduledDate
         }
     }
 }

@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -140,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 footnoteService.Object,
                 indicatorGroupService.Object,
                 releaseMetaService.Object,
-                MapperForProfiles(new Profile[] {new MappingProfiles(), new DataMappingProfiles()}));
+                MapperForProfiles(new Profile[] {new MappingProfiles(), new DataServiceMappingProfiles()}));
         }
 
         [Fact]

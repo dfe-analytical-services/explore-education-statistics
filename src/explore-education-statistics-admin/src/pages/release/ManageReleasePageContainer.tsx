@@ -5,13 +5,11 @@ import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import withErrorControl, {
-  ErrorControlProps,
-} from '@admin/validation/withErrorControl';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps } from 'react-router';
 import ManageReleaseContext from './ManageReleaseContext';
+import { ReleaseProvider } from './edit-release/content/ReleaseContext';
 
 interface MatchProps {
   publicationId: string;
@@ -21,23 +19,19 @@ interface MatchProps {
 const ManageReleasePageContainer = ({
   match,
   location,
-  handleApiErrors,
-}: RouteComponentProps<MatchProps> & ErrorControlProps) => {
+}: RouteComponentProps<MatchProps>) => {
   const { publicationId, releaseId } = match.params;
 
   const [publication, setPublication] = useState<BasicPublicationDetails>();
 
   useEffect(() => {
-    service
-      .getBasicPublicationDetails(publicationId)
-      .then(setPublication)
-      .catch(handleApiErrors);
-  }, [publicationId, releaseId, handleApiErrors]);
+    service.getBasicPublicationDetails(publicationId).then(setPublication);
+  }, [publicationId, releaseId]);
 
   const currentRouteIndex =
     viewRoutes.findIndex(
       route =>
-        route.generateLink(publicationId, releaseId) === location.pathname,
+        route.generateLink({ publicationId, releaseId }) === location.pathname,
     ) || 0;
 
   const previousRoute =
@@ -51,14 +45,14 @@ const ManageReleasePageContainer = ({
   const previousSection = previousRoute
     ? {
         label: previousRoute.title,
-        linkTo: previousRoute.generateLink(publicationId, releaseId),
+        linkTo: previousRoute.generateLink({ publicationId, releaseId }),
       }
     : undefined;
 
   const nextSection = nextRoute
     ? {
         label: nextRoute.title,
-        linkTo: nextRoute.generateLink(publicationId, releaseId),
+        linkTo: nextRoute.generateLink({ publicationId, releaseId }),
       }
     : undefined;
 
@@ -82,7 +76,7 @@ const ManageReleasePageContainer = ({
                       to="/documentation/create-new-release"
                       target="_blank"
                     >
-                      Creating a new release{' '}
+                      Creating a new release
                     </Link>
                   </li>
                 </ul>
@@ -96,7 +90,7 @@ const ManageReleasePageContainer = ({
                 <li key={route.path}>
                   <NavLink
                     key={route.path}
-                    to={route.generateLink(publicationId, releaseId)}
+                    to={route.generateLink({ publicationId, releaseId })}
                   >
                     {route.title}
                   </NavLink>
@@ -111,14 +105,11 @@ const ManageReleasePageContainer = ({
               releaseId,
             }}
           >
-            {releaseRoutes.manageReleaseRoutes.map(route => (
-              <Route
-                exact
-                key={route.path}
-                path={route.path}
-                component={route.component}
-              />
-            ))}
+            <ReleaseProvider>
+              {releaseRoutes.manageReleaseRoutes.map(route => (
+                <Route exact key={route.path} {...route} />
+              ))}
+            </ReleaseProvider>
           </ManageReleaseContext.Provider>
 
           <PreviousNextLinks
@@ -131,4 +122,4 @@ const ManageReleasePageContainer = ({
   );
 };
 
-export default withErrorControl(ManageReleasePageContainer);
+export default ManageReleasePageContainer;
