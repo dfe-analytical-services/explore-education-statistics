@@ -60,9 +60,10 @@ const EditableKeyStatTile = ({
           )[0];
           setConfig({
             indicatorLabel: theIndicator.label,
-            value: `${formatPretty(
+            value: formatPretty(
               newResponse.result[0].measures[indicatorKey],
-            )}${theIndicator.unit}`,
+              theIndicator.unit,
+            ),
           });
         }
       });
