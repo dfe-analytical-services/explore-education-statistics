@@ -2736,7 +2736,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     Body =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england)."
+                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).\n\n" + 
+                        "This release was created as example content during the platform’s Private Beta phase, " +
+                        "whilst it provides access to real data, the below release should be used with some caution. " +
+                        "To access the original, release please see [Pupil absence in schools in England: 2016 to 2017](https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2016-to-2017)"
                 },
                 new MarkDownBlock
                 {
@@ -2746,7 +2749,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Body = "Read national statistical summaries, view charts and tables and download " +
                            "data files.\n\nFind out how and why these statistics are collected and " +
                            "published - [Permanent and fixed-period exclusion statistics: methodology]" +
-                           "(../methodology/permanent-and-fixed-period-exclusions-in-england)",
+                           "(../methodology/permanent-and-fixed-period-exclusions-in-england)\n\n" + 
+                           "This release was created as example content during the platform’s Private Beta phase, " + 
+                           "whilst it provides access to real data, the below release should be used with some caution. " +
+                           "To access the original release, please see [Permanent and fixed-period exclusions in England: 2016 to 2017](https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2016-to-2017)"
                 },
                 new MarkDownBlock
                 {
@@ -3282,9 +3288,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=""/glossary#overall-absence"">More >>></a>",
-                            @"Number of authorised absences as a percentage of the overall school population. <a href=""/glossary#authorised-absence"">More >>></a>",
-                            @"Number of unauthorised absences as a percentage of the overall school population. <a href=""/glossary#unauthorised-absence"">More >>></a>"
+                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils.",
+                            @"Number of authorised absences as a percentage of the overall school population.",
+                            @"Number of unauthorised absences as a percentage of the overall school population."
                         }
                     },
                     Tables = new List<Table>
@@ -3694,7 +3700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = 2012,
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
                             EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
@@ -3728,7 +3734,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of permanent exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                            @"Number of permanent exclusions as a percentage of the overall school population.",
                         },
                     },
                     Tables = new List<Table>
@@ -3740,10 +3746,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -3834,7 +3836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = 2012,
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
                             EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
@@ -3868,7 +3870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                            @"Number of fixed-period exclusions as a percentage of the overall school population.",
                         }
                     },
                     Tables = new List<Table>
@@ -3880,10 +3882,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -3963,7 +3961,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         TimePeriod = new TimePeriodQuery
                         {
-                            StartYear = 2012,
+                            StartYear = 2016,
                             StartCode = TimeIdentifier.AcademicYear,
                             EndYear = 2016,
                             EndCode = TimeIdentifier.AcademicYear
@@ -3997,7 +3995,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                            @"Total number of permanent exclusions within a school year."
                         },
                     },
                     Tables = new List<Table>
@@ -4009,10 +4007,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 columnGroups = new List<List<TableOption>>(),
                                 columns = new List<TableOption>
                                 {
-                                    new TableOption("2012/13", "2012_AY"),
-                                    new TableOption("2013/14", "2013_AY"),
-                                    new TableOption("2014/15", "2014_AY"),
-                                    new TableOption("2015/16", "2015_AY"),
                                     new TableOption("2016/17", "2016_AY")
                                 },
                                 rowGroups = new List<List<TableRowGroupOption>>
@@ -4147,9 +4141,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Number of permanent exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
-                            @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
-                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                            @"Number of permanent exclusions as a percentage of the overall school population.",
+                            @"Number of fixed-period exclusions as a percentage of the overall school population.",
+                            @"Total number of permanent exclusions within a school year."
                         },
                     },
                     Tables = new List<Table>
@@ -4456,6 +4450,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 ["minor"] = new ChartAxisConfigurationItem
                                 {
                                     Min = 0,
+                                    Max = 5,
+                                    TickConfig = TickConfig.custom,
+                                    TickSpacing = 1,
                                     Title = "Absence Rate"
                                 }
                             },
@@ -4526,7 +4523,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                            @"Total number of permanent exclusions within a school year."
                         },
                     },
                     Tables = new List<Table>
@@ -4656,7 +4653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         dataDefinition = new List<string>
                         {
-                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                            @"Total number of permanent exclusions within a school year."
                         },
                     },
                     Tables = new List<Table>
