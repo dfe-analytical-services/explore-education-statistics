@@ -74,6 +74,7 @@ class PermalinkPage extends Component<Props> {
         </div>
         <TimePeriodDataTable
           fullTable={fullTable}
+          source="DfE prototype example statistics"
           tableHeadersConfig={
             configuration.tableHeadersConfig
               ? mapTableHeadersConfig(
@@ -88,9 +89,7 @@ class PermalinkPage extends Component<Props> {
             publicationSlug={`permalink-${data.created}-${data.title}`}
             fullTable={fullTable}
           />
-          <p className="govuk-body-s">
-            Source: DfE prototype example statistics
-          </p>
+
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Create your own tables online
           </h2>

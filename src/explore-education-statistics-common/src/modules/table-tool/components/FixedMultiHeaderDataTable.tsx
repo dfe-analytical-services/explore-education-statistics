@@ -14,11 +14,17 @@ interface Props {
   rowHeaders: HeaderGroup[];
   rows: string[][];
   footnotes?: FullTableMeta['footnotes'];
+  source?: string;
 }
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
   (props, ref) => {
-    const { caption, captionId = 'dataTableCaption', footnotes = [] } = props;
+    const {
+      caption,
+      captionId = 'dataTableCaption',
+      footnotes = [],
+      source,
+    } = props;
 
     const containerRef = useRef<HTMLDivElement>(null);
     const mainTableRef = useRef<HTMLTableElement>(null);
@@ -103,6 +109,8 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
         </div>
 
         <FigureFootnotes footnotes={footnotes} />
+
+        {source && <p className="govuk-body-s">Source: {source}</p>}
       </figure>
     );
   },

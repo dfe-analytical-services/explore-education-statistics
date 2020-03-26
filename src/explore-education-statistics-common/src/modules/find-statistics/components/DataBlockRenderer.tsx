@@ -58,19 +58,22 @@ const DataBlockRenderer = ({
               );
 
               return (
-                <TimePeriodDataTable
-                  key={index}
-                  fullTable={fullTable}
-                  captionTitle={dataBlock?.heading}
-                  tableHeadersConfig={
-                    table.tableHeaders
-                      ? mapTableHeadersConfig(
-                          table.tableHeaders,
-                          fullTable.subjectMeta,
-                        )
-                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
-                  }
-                />
+                <>
+                  <TimePeriodDataTable
+                    key={index}
+                    fullTable={fullTable}
+                    captionTitle={dataBlock?.heading}
+                    source={dataBlock?.source}
+                    tableHeadersConfig={
+                      table.tableHeaders
+                        ? mapTableHeadersConfig(
+                            table.tableHeaders,
+                            fullTable.subjectMeta,
+                          )
+                        : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                    }
+                  />
+                </>
               );
             })}
 
