@@ -57,7 +57,7 @@ const generateLegendType = (symbol: LegendType | undefined): LegendType => {
   return symbol;
 };
 
-export interface LineChartProps extends ChartProps, RenderLegend {
+export interface LineChartProps extends ChartProps {
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
@@ -73,7 +73,7 @@ const LineChartBlock = ({
   legend,
   width,
   renderLegend,
-}: LineChartProps) => {
+}: LineChartProps & RenderLegend) => {
   if (
     axes === undefined ||
     axes.major === undefined ||

@@ -27,7 +27,7 @@ import {
   YAxis,
 } from 'recharts';
 
-export interface HorizontalBarProps extends StackedBarProps, RenderLegend {
+export interface HorizontalBarProps extends StackedBarProps {
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
@@ -44,7 +44,7 @@ const HorizontalBarBlock = ({
   axes,
   legend,
   renderLegend,
-}: HorizontalBarProps) => {
+}: HorizontalBarProps & RenderLegend) => {
   if (
     axes === undefined ||
     axes.major === undefined ||

@@ -12,10 +12,7 @@ import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import {
-  chartDefinitions,
-  RenderLegend,
-} from '@common/modules/charts/types/chart';
+import { chartDefinitions } from '@common/modules/charts/types/chart';
 import omit from 'lodash/omit';
 import dynamic from 'next/dynamic';
 import React, { memo, useMemo, useState } from 'react';
@@ -29,9 +26,7 @@ const DynamicMapBlock = dynamic(
   },
 );
 
-function hasLegend(
-  props: ChartRendererProps,
-): props is ChartRendererProps & RenderLegend {
+function hasLegend(props: ChartRendererProps): boolean {
   return Boolean(
     chartDefinitions.find(
       chart => chart.type === props.type && chart.capabilities.hasLegend,
@@ -42,13 +37,13 @@ function hasLegend(
 export type ChartRendererProps =
   | ({
       type: 'line';
-    } & Omit<LineChartProps, keyof RenderLegend>)
+    } & LineChartProps)
   | ({
       type: 'verticalbar';
-    } & Omit<VerticalBarProps, keyof RenderLegend>)
+    } & VerticalBarProps)
   | ({
       type: 'horizontalbar';
-    } & Omit<HorizontalBarProps, keyof RenderLegend>)
+    } & HorizontalBarProps)
   | ({
       type: 'map';
     } & MapBlockProps)
