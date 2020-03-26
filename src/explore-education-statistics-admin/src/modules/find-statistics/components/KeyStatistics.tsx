@@ -3,7 +3,7 @@ import useReleaseActions from '@admin/pages/release/edit-release/content/useRele
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
-import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import { Release } from '@common/services/publicationService';
 import React, { useCallback, useState } from 'react';
 import KeyStatSelectForm from './KeyStatSelectForm';

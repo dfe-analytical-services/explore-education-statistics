@@ -2,7 +2,7 @@ import TabsSection from '@common/components/TabsSection';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRender';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import { Release } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 import orderBy from 'lodash/orderBy';

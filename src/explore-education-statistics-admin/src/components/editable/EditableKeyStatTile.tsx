@@ -7,7 +7,7 @@ import KeyStatTile, {
   KeyStatConfig,
   KeyStatProps,
 } from '@common/modules/find-statistics/components/KeyStatTile';
-import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import dataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';

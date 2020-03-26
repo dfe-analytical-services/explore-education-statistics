@@ -6,9 +6,9 @@ import dataBlockService, {
 } from '@common/services/dataBlockService';
 import { DataBlock } from '@common/services/types/blocks';
 import formatPretty from '@common/utils/number/formatPretty';
-import React, { ReactNode, useEffect, useState, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import styles from './SummaryRenderer.module.scss';
+import styles from './KeyStatTile.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
   children?: ReactNode;
