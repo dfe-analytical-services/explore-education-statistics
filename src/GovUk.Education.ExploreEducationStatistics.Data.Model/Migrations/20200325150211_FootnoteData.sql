@@ -1,8 +1,7 @@
 CREATE OR ALTER PROCEDURE InsertSubjectFootnote
-    @subjectName NVARCHAR(max),
+    @subjectId uniqueidentifier,
     @footnoteId uniqueidentifier
 AS
-DECLARE @subjectId uniqueidentifier = (SELECT S.Id FROM Subject S WHERE S.Name = @subjectName);
 BEGIN TRY
     INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subjectId, @footnoteId);
 END TRY
@@ -11,18 +10,19 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FOOTNOTE: %uniq) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @KEY, @errorMessage);
+    DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
+    DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectIdString, @footnoteIdString, @errorMessage);
 END CATCH
 GO
 
 CREATE OR ALTER PROCEDURE InsertIndicatorFootnote
-    @subjectName NVARCHAR(max),
+    @subjectId uniqueidentifier,
     @indicatorName NVARCHAR(max),
     @footnoteId uniqueidentifier
 AS
 DECLARE
-    @indicatorId uniqueidentifier = (SELECT I.Id FROM Indicator I JOIN IndicatorGroup IG on I.IndicatorGroupId = IG.Id JOIN Subject S on IG.SubjectId = S.Id WHERE S.Name = @subjectName AND I.Name = @indicatorName);
+    @indicatorId uniqueidentifier = (SELECT I.Id FROM Indicator I JOIN IndicatorGroup IG ON I.IndicatorGroupId = IG.Id WHERE IG.SubjectId = @subjectId AND I.Name = @indicatorName);
 BEGIN TRY
     INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (@indicatorId, @footnoteId);
 END TRY
@@ -31,18 +31,19 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
-    RAISERROR (N'Error executing %s(SUBJECT: %s, INDICATOR: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @indicatorName, @KEY, @errorMessage);
+    DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
+    DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, INDICATOR: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectIdString, @indicatorName, @footnoteIdString, @errorMessage);
 END CATCH
 GO
 
 CREATE OR ALTER PROCEDURE InsertFilterFootnote
-    @subjectName NVARCHAR(max),
+    @subjectId uniqueidentifier,
     @filterName NVARCHAR(max),
     @footnoteId uniqueidentifier
 AS
 DECLARE
-    @filterId uniqueidentifier = (SELECT F.Id FROM Filter F JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND F.Name = @filterName);
+    @filterId uniqueidentifier = (SELECT F.Id FROM Filter F WHERE F.SubjectId = @subjectId AND F.Name = @filterName);
 BEGIN TRY
     INSERT INTO FilterFootnote (FilterId, FootnoteId) VALUES (@filterId, @footnoteId);
 END TRY
@@ -51,18 +52,19 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterName, @KEY, @errorMessage);
+    DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
+    DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectIdString, @filterName, @footnoteIdString, @errorMessage);
 END CATCH
 GO
 
 CREATE OR ALTER PROCEDURE InsertFilterGroupFootnote
-    @subjectName NVARCHAR(max),
+    @subjectId uniqueidentifier,
     @filterGroupName NVARCHAR(max),
     @footnoteId uniqueidentifier
 AS
 DECLARE
-    @filterGroupId uniqueidentifier = (SELECT FG.Id FROM FilterGroup FG JOIN Filter F ON FG.FilterId = F.Id JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND FG.Label = @filterGroupName);
+    @filterGroupId uniqueidentifier = (SELECT FG.Id FROM FilterGroup FG JOIN Filter F ON FG.FilterId = F.Id WHERE F.SubjectId = @subjectId AND FG.Label = @filterGroupName);
 BEGIN TRY
     INSERT INTO FilterGroupFootnote (FilterGroupId, FootnoteId) VALUES (@filterGroupId, @footnoteId);
 END TRY
@@ -71,18 +73,19 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER GROUP: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterGroupName, @KEY, @errorMessage);
+    DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
+    DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER GROUP: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectIdString, @filterGroupName, @footnoteIdString, @errorMessage);
 END CATCH
 GO
 
 CREATE OR ALTER PROCEDURE InsertFilterItemFootnote
-    @subjectName NVARCHAR(max),
+    @subjectId uniqueidentifier,
     @filterItemName NVARCHAR(max),
     @footnoteId uniqueidentifier
 AS
 DECLARE
-    @filterItemId uniqueidentifier = (SELECT FI.Id FROM FilterItem FI JOIN FilterGroup FG ON FI.FilterGroupId = FG.Id JOIN Filter F on FG.FilterId = F.Id  JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND FI.Label = @filterItemName);
+    @filterItemId uniqueidentifier = (SELECT FI.Id FROM FilterItem FI JOIN FilterGroup FG ON FI.FilterGroupId = FG.Id JOIN Filter F ON FG.FilterId = F.Id WHERE F.SubjectId = @subjectId AND FI.Label = @filterItemName);
 BEGIN TRY
     INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (@filterItemId, @footnoteId);
 END TRY
@@ -91,8 +94,9 @@ BEGIN CATCH
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
     DECLARE @errorState INT = ERROR_SEVERITY();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
-    DECLARE @KEY NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER ITEM: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterItemName, @KEY, @errorMessage);
+    DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
+    DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER ITEM: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectIdString, @filterItemName, @footnoteIdString, @errorMessage);
 END CATCH
 GO
 
@@ -323,46 +327,46 @@ VALUES (@footnote_id_40,
 
 
 -- Absence subjects
-DECLARE @subject_absence_by_characteristic   NVARCHAR(max) = 'Absence by characteristic';
-DECLARE @subject_absence_by_geographic_level NVARCHAR(max) = 'Absence by geographic level';
-DECLARE @subject_absence_by_term             NVARCHAR(max) = 'Absence by term';
-DECLARE @subject_absence_for_four_year_olds  NVARCHAR(max) = 'Absence for four year olds';
-DECLARE @subject_absence_in_prus             NVARCHAR(max) = 'Absence in prus';
-DECLARE @subject_absence_number_missing      NVARCHAR(max) = 'Absence number missing at least one session by reason';
-DECLARE @subject_absence_rate_percent_bands  NVARCHAR(max) = 'Absence rate percent bands';
+DECLARE @subject_id_absence_by_characteristic   uniqueidentifier = '803fbf56-600f-490f-8409-6413a891720d';
+DECLARE @subject_id_absence_by_geographic_level uniqueidentifier = '568576e5-d386-450e-a8db-307b7061d0d8';
+DECLARE @subject_id_absence_by_term             uniqueidentifier = 'b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a';
+DECLARE @subject_id_absence_for_four_year_olds  uniqueidentifier = '353db5ea-befd-488b-ad16-2ce7963c9bc9';
+DECLARE @subject_id_absence_in_prus             uniqueidentifier = '95c7f584-907e-4756-bbf0-4905ceae57df';
+DECLARE @subject_id_absence_number_missing      uniqueidentifier = 'faf2152e-0a6c-4e97-af02-e9a89d48c47a';
+DECLARE @subject_id_absence_rate_percent_bands  uniqueidentifier = '666cd878-87bb-4f77-9a3f-f5c75078e112';
 
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_by_term, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, @footnote_id_4;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, @footnote_id_4;
+EXEC InsertSubjectFootnote @subject_id_absence_by_characteristic, @footnote_id_4;
+EXEC InsertSubjectFootnote @subject_id_absence_by_geographic_level, @footnote_id_4;
+EXEC InsertSubjectFootnote @subject_id_absence_by_term, @footnote_id_4;
+EXEC InsertSubjectFootnote @subject_id_absence_for_four_year_olds, @footnote_id_4;
+EXEC InsertSubjectFootnote @subject_id_absence_in_prus, @footnote_id_4;
+EXEC InsertSubjectFootnote @subject_id_absence_number_missing, @footnote_id_4;
+EXEC InsertSubjectFootnote @subject_id_absence_rate_percent_bands, @footnote_id_4;
 
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, @footnote_id_5;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, @footnote_id_5;
-EXEC InsertSubjectFootnote @subject_absence_by_term, @footnote_id_5;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, @footnote_id_5;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, @footnote_id_5;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, @footnote_id_5;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, @footnote_id_5;
+EXEC InsertSubjectFootnote @subject_id_absence_by_characteristic, @footnote_id_5;
+EXEC InsertSubjectFootnote @subject_id_absence_by_geographic_level, @footnote_id_5;
+EXEC InsertSubjectFootnote @subject_id_absence_by_term, @footnote_id_5;
+EXEC InsertSubjectFootnote @subject_id_absence_for_four_year_olds, @footnote_id_5;
+EXEC InsertSubjectFootnote @subject_id_absence_in_prus, @footnote_id_5;
+EXEC InsertSubjectFootnote @subject_id_absence_number_missing, @footnote_id_5;
+EXEC InsertSubjectFootnote @subject_id_absence_rate_percent_bands, @footnote_id_5;
 
 -- Exclusion subjects
-DECLARE @subject_duration_of_fixed_exclusions                     NVARCHAR(max) = 'Duration of fixed exclusions';
-DECLARE @subject_exclusions_by_characteristic                     NVARCHAR(max) = 'Exclusions by characteristic';
-DECLARE @subject_exclusions_by_geographic_level                   NVARCHAR(max) = 'Exclusions by geographic level';
-DECLARE @subject_exclusions_by_reason                             NVARCHAR(max) = 'Exclusions by reason';
-DECLARE @subject_number_of_fixed_exclusions                       NVARCHAR(max) = 'Number of fixed exclusions';
-DECLARE @subject_total_days_missed_due_to_fixed_period_exclusions NVARCHAR(max) = 'Total days missed due to fixed period exclusions';
+DECLARE @subject_id_duration_of_fixed_exclusions                     uniqueidentifier = '926e33e4-b3ce-41aa-9ed2-e04106068ffb';
+DECLARE @subject_id_exclusions_by_characteristic                     uniqueidentifier = '92039f68-a894-46a9-bd44-4482728698b0';
+DECLARE @subject_id_exclusions_by_geographic_level                   uniqueidentifier = '3c0fbe56-0a4b-4caa-82f2-ab696cd96090';
+DECLARE @subject_id_exclusions_by_reason                             uniqueidentifier = '8fe88bbe-dce7-4698-a55f-8e1e3e41c5a7';
+DECLARE @subject_id_number_of_fixed_exclusions                       uniqueidentifier = '048a6276-1df1-487a-a501-fbd5e64d4b79';
+DECLARE @subject_id_total_days_missed_due_to_fixed_period_exclusions uniqueidentifier = '28feb263-4bf9-4dd7-9440-48e2685f6954';
 
-EXEC InsertSubjectFootnote @subject_duration_of_fixed_exclusions, @footnote_id_35;
+EXEC InsertSubjectFootnote @subject_id_duration_of_fixed_exclusions, @footnote_id_35;
 
-EXEC InsertSubjectFootnote @subject_duration_of_fixed_exclusions, @footnote_id_40;
-EXEC InsertSubjectFootnote @subject_exclusions_by_characteristic, @footnote_id_40;
-EXEC InsertSubjectFootnote @subject_exclusions_by_geographic_level, @footnote_id_40;
-EXEC InsertSubjectFootnote @subject_exclusions_by_reason, @footnote_id_40;
-EXEC InsertSubjectFootnote @subject_number_of_fixed_exclusions, @footnote_id_40;
-EXEC InsertSubjectFootnote @subject_total_days_missed_due_to_fixed_period_exclusions, @footnote_id_40;
+EXEC InsertSubjectFootnote @subject_id_duration_of_fixed_exclusions, @footnote_id_40;
+EXEC InsertSubjectFootnote @subject_id_exclusions_by_characteristic, @footnote_id_40;
+EXEC InsertSubjectFootnote @subject_id_exclusions_by_geographic_level, @footnote_id_40;
+EXEC InsertSubjectFootnote @subject_id_exclusions_by_reason, @footnote_id_40;
+EXEC InsertSubjectFootnote @subject_id_number_of_fixed_exclusions, @footnote_id_40;
+EXEC InsertSubjectFootnote @subject_id_total_days_missed_due_to_fixed_period_exclusions, @footnote_id_40;
 
 
 --
@@ -406,118 +410,118 @@ DECLARE @indicator_enrolments_unauthorised_percent NVARCHAR(max) = 'enrolments_u
 DECLARE @indicator_num_schools NVARCHAR(max) = 'num_schools';
 DECLARE @indicator_sess_overall NVARCHAR(max) = 'sess_overall';
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_by_term, @indicator_sess_overall_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_sess_overall_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_sess_overall_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_overall_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_overall_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_term, @indicator_sess_overall_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_for_four_year_olds, @indicator_sess_overall_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_sess_overall_percent, @footnote_id_6;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_by_term, @indicator_sess_authorised_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_sess_authorised_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_authorised_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_authorised_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_term, @indicator_sess_authorised_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_sess_authorised_percent, @footnote_id_6;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_by_term, @indicator_sess_unauthorised_percent, @footnote_id_6;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_sess_unauthorised_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_unauthorised_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_unauthorised_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_term, @indicator_sess_unauthorised_percent, @footnote_id_6;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_sess_unauthorised_percent, @footnote_id_6;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_enrolments_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_enrolments_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_enrolments_pa_10_exact, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments_pa_10_exact_percent, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_enrolments_pa_10_exact_percent, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_possible_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_possible_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_possible_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_possible_pa_10_exact, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_overall_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_overall_pa_10_exact, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_authorised_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_authorised_pa_10_exact, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_unauthorised_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_unauthorised_pa_10_exact, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_percent_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_percent_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_overall_percent_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_overall_percent_pa_10_exact, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_percent_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_percent_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_authorised_percent_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_authorised_percent_pa_10_exact, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_percent_pa_10_exact, @footnote_id_7;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_percent_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_unauthorised_percent_pa_10_exact, @footnote_id_7;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_unauthorised_percent_pa_10_exact, @footnote_id_7;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_enrolments_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_enrolments_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_enrolments_pa_10_exact, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments_pa_10_exact_percent, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_enrolments_pa_10_exact_percent, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_possible_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_possible_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_possible_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_possible_pa_10_exact, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_overall_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_overall_pa_10_exact, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_authorised_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_authorised_pa_10_exact, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_unauthorised_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_unauthorised_pa_10_exact, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_percent_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_percent_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_overall_percent_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_overall_percent_pa_10_exact, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_percent_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_percent_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_authorised_percent_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_authorised_percent_pa_10_exact, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_percent_pa_10_exact, @footnote_id_8;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_percent_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_sess_unauthorised_percent_pa_10_exact, @footnote_id_8;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_sess_unauthorised_percent_pa_10_exact, @footnote_id_8;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, @footnote_id_9;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, @footnote_id_9;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments_pa_10_exact_percent, @footnote_id_9;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, @footnote_id_9;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, @footnote_id_9;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_enrolments_pa_10_exact_percent, @footnote_id_9;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments, @footnote_id_10;
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments, @footnote_id_10;
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments, @footnote_id_10;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrolments, @footnote_id_10;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_characteristic, @indicator_enrolments, @footnote_id_10;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_enrolments, @footnote_id_10;
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_enrolments, @footnote_id_10;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrolments, @footnote_id_10;
 
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauth_late, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauth_holiday, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_other, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_excluded, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_ext_holiday, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_holiday, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauth_other, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_traveller, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_religious, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_appointments, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_illness, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauthorised, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_authorised, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_overall, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_study, @footnote_id_11;
-EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauth_noyet, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_unauth_late, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_unauth_holiday, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_other, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_excluded, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_ext_holiday, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_holiday, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_unauth_other, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_traveller, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_religious, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_appointments, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_illness, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_unauthorised, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_authorised, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_overall, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_auth_study, @footnote_id_11;
+EXEC InsertIndicatorFootnote @subject_id_absence_number_missing, @indicator_enrol_unauth_noyet, @footnote_id_11;
 
-EXEC InsertIndicatorFootnote @subject_absence_rate_percent_bands, @indicator_enrolments_overall_percent, @footnote_id_12;
-EXEC InsertIndicatorFootnote @subject_absence_rate_percent_bands, @indicator_enrolments_authorised_percent, @footnote_id_12;
-EXEC InsertIndicatorFootnote @subject_absence_rate_percent_bands, @indicator_enrolments_unauthorised_percent, @footnote_id_12;
+EXEC InsertIndicatorFootnote @subject_id_absence_rate_percent_bands, @indicator_enrolments_overall_percent, @footnote_id_12;
+EXEC InsertIndicatorFootnote @subject_id_absence_rate_percent_bands, @indicator_enrolments_authorised_percent, @footnote_id_12;
+EXEC InsertIndicatorFootnote @subject_id_absence_rate_percent_bands, @indicator_enrolments_unauthorised_percent, @footnote_id_12;
 
-EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_num_schools, @footnote_id_13;
-EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_num_schools, @footnote_id_13
-EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_num_schools, @footnote_id_13;
+EXEC InsertIndicatorFootnote @subject_id_absence_by_geographic_level, @indicator_num_schools, @footnote_id_13;
+EXEC InsertIndicatorFootnote @subject_id_absence_for_four_year_olds, @indicator_num_schools, @footnote_id_13
+EXEC InsertIndicatorFootnote @subject_id_absence_in_prus, @indicator_num_schools, @footnote_id_13;
 
-EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_enrolments, @footnote_id_20;
+EXEC InsertIndicatorFootnote @subject_id_absence_for_four_year_olds, @indicator_enrolments, @footnote_id_20;
 
-EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_sess_overall, @footnote_id_21;
-EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_sess_overall_percent, @footnote_id_21;
+EXEC InsertIndicatorFootnote @subject_id_absence_for_four_year_olds, @indicator_sess_overall, @footnote_id_21;
+EXEC InsertIndicatorFootnote @subject_id_absence_for_four_year_olds, @indicator_sess_overall_percent, @footnote_id_21;
 
 -- Exclusion indicators
 DECLARE @indicator_permanent_exclusion_rate NVARCHAR(max) = 'perm_excl_rate';
@@ -527,22 +531,22 @@ DECLARE @indicator_number_of_schools NVARCHAR(max) = 'num_schools';
 DECLARE @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions NVARCHAR(max) = 'one_plus_fixed_rate';
 DECLARE @indicator_number_of_pupils_with_one_or_more_fixed_period_exclusions NVARCHAR(max) = 'one_plus_fixed';
 
-EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_permanent_exclusion_rate, @footnote_id_22;
-EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_permanent_exclusion_rate, @footnote_id_22;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_characteristic, @indicator_permanent_exclusion_rate, @footnote_id_22;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_geographic_level, @indicator_permanent_exclusion_rate, @footnote_id_22;
 
-EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_23;
-EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_23;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_characteristic, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_23;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_geographic_level, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_23;
 
-EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_fixed_period_exclusion_rate, @footnote_id_24;
-EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_fixed_period_exclusion_rate, @footnote_id_24;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_characteristic, @indicator_fixed_period_exclusion_rate, @footnote_id_24;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_geographic_level, @indicator_fixed_period_exclusion_rate, @footnote_id_24;
 
-EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_number_of_pupils, @footnote_id_25;
-EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_number_of_pupils, @footnote_id_25;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_characteristic, @indicator_number_of_pupils, @footnote_id_25;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_geographic_level, @indicator_number_of_pupils, @footnote_id_25;
 
-EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_number_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_29;
-EXEC InsertIndicatorFootnote @subject_exclusions_by_characteristic, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_29;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_characteristic, @indicator_number_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_29;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_characteristic, @indicator_percentage_of_pupils_with_one_or_more_fixed_period_exclusions, @footnote_id_29;
 
-EXEC InsertIndicatorFootnote @subject_exclusions_by_geographic_level, @indicator_number_of_schools, @footnote_id_36;
+EXEC InsertIndicatorFootnote @subject_id_exclusions_by_geographic_level, @indicator_number_of_schools, @footnote_id_36;
 
 
 --
@@ -564,61 +568,61 @@ DECLARE @filterItem_ethnicity_unclassified NVARCHAR(max) = 'Ethnicity Unclassifi
 DECLARE @filterItem_ethnicity_unclassified_male NVARCHAR(max) = 'Ethnicity Unclassified Male';
 DECLARE @filterItem_ethnicity_unclassified_female NVARCHAR(max) = 'Ethnicity Unclassified Female';
 
-EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_State_funded_primary, @footnote_id_1;
-EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_State_funded_primary, @footnote_id_1;
-EXEC InsertFilterItemFootnote @subject_absence_by_term, @filterItem_State_funded_primary, @footnote_id_1;
-EXEC InsertFilterItemFootnote @subject_absence_for_four_year_olds, @filterItem_State_funded_primary, @footnote_id_1;
-EXEC InsertFilterItemFootnote @subject_absence_number_missing, @filterItem_State_funded_primary, @footnote_id_1;
-EXEC InsertFilterItemFootnote @subject_absence_rate_percent_bands, @filterItem_State_funded_primary, @footnote_id_1;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_characteristic, @filterItem_State_funded_primary, @footnote_id_1;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_geographic_level, @filterItem_State_funded_primary, @footnote_id_1;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_term, @filterItem_State_funded_primary, @footnote_id_1;
+EXEC InsertFilterItemFootnote @subject_id_absence_for_four_year_olds, @filterItem_State_funded_primary, @footnote_id_1;
+EXEC InsertFilterItemFootnote @subject_id_absence_number_missing, @filterItem_State_funded_primary, @footnote_id_1;
+EXEC InsertFilterItemFootnote @subject_id_absence_rate_percent_bands, @filterItem_State_funded_primary, @footnote_id_1;
 
-EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_State_funded_secondary, @footnote_id_2;
-EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_State_funded_secondary, @footnote_id_2;
-EXEC InsertFilterItemFootnote @subject_absence_by_term, @filterItem_State_funded_secondary, @footnote_id_2;
-EXEC InsertFilterItemFootnote @subject_absence_for_four_year_olds, @filterItem_State_funded_secondary, @footnote_id_2;
-EXEC InsertFilterItemFootnote @subject_absence_number_missing, @filterItem_State_funded_secondary, @footnote_id_2;
-EXEC InsertFilterItemFootnote @subject_absence_rate_percent_bands, @filterItem_State_funded_secondary, @footnote_id_2;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_characteristic, @filterItem_State_funded_secondary, @footnote_id_2;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_geographic_level, @filterItem_State_funded_secondary, @footnote_id_2;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_term, @filterItem_State_funded_secondary, @footnote_id_2;
+EXEC InsertFilterItemFootnote @subject_id_absence_for_four_year_olds, @filterItem_State_funded_secondary, @footnote_id_2;
+EXEC InsertFilterItemFootnote @subject_id_absence_number_missing, @filterItem_State_funded_secondary, @footnote_id_2;
+EXEC InsertFilterItemFootnote @subject_id_absence_rate_percent_bands, @filterItem_State_funded_secondary, @footnote_id_2;
 
-EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_Special, @footnote_id_3;
-EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_Special, @footnote_id_3;
-EXEC InsertFilterItemFootnote @subject_absence_by_term, @filterItem_Special, @footnote_id_3;
-EXEC InsertFilterItemFootnote @subject_absence_for_four_year_olds, @filterItem_Special, @footnote_id_3;
-EXEC InsertFilterItemFootnote @subject_absence_number_missing, @filterItem_Special, @footnote_id_3;
-EXEC InsertFilterItemFootnote @subject_absence_rate_percent_bands, @filterItem_Special, @footnote_id_3;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_characteristic, @filterItem_Special, @footnote_id_3;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_geographic_level, @filterItem_Special, @footnote_id_3;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_term, @filterItem_Special, @footnote_id_3;
+EXEC InsertFilterItemFootnote @subject_id_absence_for_four_year_olds, @filterItem_Special, @footnote_id_3;
+EXEC InsertFilterItemFootnote @subject_id_absence_number_missing, @filterItem_Special, @footnote_id_3;
+EXEC InsertFilterItemFootnote @subject_id_absence_rate_percent_bands, @filterItem_Special, @footnote_id_3;
 
-EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_Ethnicity_Minority_Ethnic_Group, @footnote_id_17;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_characteristic, @filterItem_Ethnicity_Minority_Ethnic_Group, @footnote_id_17;
 
-EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_Social_emotional_and_mental_health, @footnote_id_19;
+EXEC InsertFilterItemFootnote @subject_id_absence_by_characteristic, @filterItem_Social_emotional_and_mental_health, @footnote_id_19;
 
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_SEN_provision_SEN_with_statement_EHC, @footnote_id_27;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_SEN_provision_SEN_with_statement_EHC, @footnote_id_27;
 
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil, @footnote_id_31;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil_male, @footnote_id_31;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil_female, @footnote_id_31;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil, @footnote_id_31;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil_male, @footnote_id_31;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_ethnicity_minority_ethnic_pupil_female, @footnote_id_31;
 
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_unclassified, @footnote_id_33;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_unclassified_male, @footnote_id_33;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_ethnicity_unclassified_female, @footnote_id_33;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_ethnicity_unclassified, @footnote_id_33;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_ethnicity_unclassified_male, @footnote_id_33;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_ethnicity_unclassified_female, @footnote_id_33;
 
-EXEC InsertFilterItemFootnote @subject_duration_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_State_funded_primary, @footnote_id_37;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_geographic_level, @filterItem_State_funded_primary, @footnote_id_37;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_State_funded_primary, @footnote_id_37;
-EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
-EXEC InsertFilterItemFootnote @subject_total_days_missed_due_to_fixed_period_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
+EXEC InsertFilterItemFootnote @subject_id_duration_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_State_funded_primary, @footnote_id_37;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_geographic_level, @filterItem_State_funded_primary, @footnote_id_37;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_reason, @filterItem_State_funded_primary, @footnote_id_37;
+EXEC InsertFilterItemFootnote @subject_id_number_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
+EXEC InsertFilterItemFootnote @subject_id_total_days_missed_due_to_fixed_period_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
 
-EXEC InsertFilterItemFootnote @subject_duration_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_State_funded_secondary, @footnote_id_38;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_geographic_level, @filterItem_State_funded_secondary, @footnote_id_38;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_State_funded_secondary, @footnote_id_38;
-EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
-EXEC InsertFilterItemFootnote @subject_total_days_missed_due_to_fixed_period_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_id_duration_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_State_funded_secondary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_geographic_level, @filterItem_State_funded_secondary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_reason, @filterItem_State_funded_secondary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_id_number_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_id_total_days_missed_due_to_fixed_period_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
 
-EXEC InsertFilterItemFootnote @subject_duration_of_fixed_exclusions, @filterItem_Special, @footnote_id_39;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_characteristic, @filterItem_Special, @footnote_id_39;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_geographic_level, @filterItem_Special, @footnote_id_39;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_Special, @footnote_id_39;
-EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_Special, @footnote_id_39;
-EXEC InsertFilterItemFootnote @subject_total_days_missed_due_to_fixed_period_exclusions, @filterItem_Special, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_id_duration_of_fixed_exclusions, @filterItem_Special, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_Special, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_geographic_level, @filterItem_Special, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_reason, @filterItem_Special, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_id_number_of_fixed_exclusions, @filterItem_Special, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_id_total_days_missed_due_to_fixed_period_exclusions, @filterItem_Special, @footnote_id_39;
 
 
 --
@@ -643,41 +647,41 @@ DECLARE @filterGroup_ethnicity NVARCHAR(max) = 'Ethnicity';
 DECLARE @filterGroup_ethnicity_and_gender NVARCHAR(max) = 'Ethnicity and gender';
 DECLARE @filterGroup_IDACI_decile NVARCHAR(max) = 'IDACI decile';
 
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_gender, @footnote_id_14;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_ethnic_group_major, @footnote_id_14;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_ethnic_group_minor, @footnote_id_14;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_NC_year, @footnote_id_14;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_FSM, @footnote_id_14;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_FSM_ever_6, @footnote_id_14;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_14;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_14;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_first_language, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_gender, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_ethnic_group_major, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_ethnic_group_minor, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_NC_year, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_FSM, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_FSM_ever_6, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_14;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_first_language, @footnote_id_14;
 
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_gender, @footnote_id_15;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_ethnic_group_major, @footnote_id_15;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_ethnic_group_minor, @footnote_id_15;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_NC_year, @footnote_id_15;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_FSM, @footnote_id_15;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_FSM_ever_6, @footnote_id_15;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_15;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_15;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_first_language, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_gender, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_ethnic_group_major, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_ethnic_group_minor, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_NC_year, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_FSM, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_FSM_ever_6, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_15;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_first_language, @footnote_id_15;
 
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_16;
-EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_18;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_SEN_provision, @footnote_id_16;
+EXEC InsertFilterGroupFootnote @subject_id_absence_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_18;
 
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_SEN_provision, @footnote_id_26;
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_28;
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_NC_year, @footnote_id_29;
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_NC_year_and_gender, @footnote_id_29;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_SEN_provision, @footnote_id_26;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_SEN_primary_need, @footnote_id_28;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_NC_year, @footnote_id_29;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_NC_year_and_gender, @footnote_id_29;
 
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_FSM_eligible, @footnote_id_30;
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_FSM_eligible_in_last_6_years, @footnote_id_30;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_FSM_eligible, @footnote_id_30;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_FSM_eligible_in_last_6_years, @footnote_id_30;
 
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_ethnicity, @footnote_id_32;
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_ethnicity_and_gender, @footnote_id_32;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_ethnicity, @footnote_id_32;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_ethnicity_and_gender, @footnote_id_32;
 
-EXEC InsertFilterGroupFootnote @subject_exclusions_by_characteristic, @filterGroup_IDACI_decile, @footnote_id_34;
+EXEC InsertFilterGroupFootnote @subject_id_exclusions_by_characteristic, @filterGroup_IDACI_decile, @footnote_id_34;
 
 DROP PROCEDURE InsertSubjectFootnote;
 DROP PROCEDURE InsertIndicatorFootnote;
