@@ -1,5 +1,6 @@
 import FormattedDate from '@common/components/FormattedDate';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import permalinkService, {
   UnmappedPermalink,
@@ -11,7 +12,7 @@ import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import { NextPage, NextPageContext } from 'next';
-import React from 'react';
+import React, { useRef } from 'react';
 import styles from './PermalinkPage.module.scss';
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const PermalinkPage: NextPage<Props> = ({ data }) => {
+  const tableRef = useRef<HTMLDivElement>(null);
   const { fullTable, query } = mapPermalink(data);
   const { configuration } = query;
 
@@ -59,24 +61,34 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
             </RelatedAside> */}
         </div>
       </div>
-      <TimePeriodDataTable
-        fullTable={fullTable}
-        source="DfE prototype example statistics"
-        tableHeadersConfig={
-          configuration.tableHeadersConfig
-            ? mapTableHeadersConfig(
-                configuration.tableHeadersConfig,
-                fullTable.subjectMeta,
-              )
-            : getDefaultTableHeaderConfig(fullTable.subjectMeta)
-        }
-      />
+      <div ref={tableRef}>
+        <TimePeriodDataTable
+          fullTable={fullTable}
+          source="DfE prototype example statistics"
+          tableHeadersConfig={
+            configuration.tableHeadersConfig
+              ? mapTableHeadersConfig(
+                  configuration.tableHeadersConfig,
+                  fullTable.subjectMeta,
+                )
+              : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+          }
+        />
+      </div>
+
       <div className={styles.hidePrint}>
         <ul className="govuk-list">
           <li>
             <DownloadCsvButton
               publicationSlug={publicationSlug}
               fullTable={fullTable}
+            />
+          </li>
+          <li>
+            <DownloadExcelButton
+              tableRef={tableRef}
+              publicationSlug={publicationSlug}
+              subjectMeta={fullTable.subjectMeta}
             />
           </li>
         </ul>

@@ -146,26 +146,24 @@ const DownloadExcelButton = ({
   tableRef,
 }: Props) => {
   const { footnotes } = subjectMeta;
-
-  // Try to find table element within the ref
-  let tableEl: HTMLTableElement | null = null;
-
-  if (tableRef.current) {
-    if (tableRef.current.tagName.toLowerCase() === 'table') {
-      tableEl = tableRef.current as HTMLTableElement;
-    } else {
-      tableEl = tableRef.current.querySelector('table');
-    }
-
-    // Don't render anything if no table could be found
-    if (!tableEl) {
-      return null;
-    }
-  }
-
   return (
     <ButtonText
       onClick={() => {
+        // Try to find table element within the ref
+        let tableEl: HTMLTableElement | null = null;
+
+        if (tableRef.current) {
+          if (tableRef.current.tagName.toLowerCase() === 'table') {
+            tableEl = tableRef.current as HTMLTableElement;
+          } else {
+            tableEl = tableRef.current.querySelector('table');
+          }
+        }
+
+        if (!tableEl) {
+          return;
+        }
+
         const workBook = utils.table_to_book(tableEl, {
           raw: true,
         });
