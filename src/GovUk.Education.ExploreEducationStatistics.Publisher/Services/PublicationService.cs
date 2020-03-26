@@ -87,21 +87,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Summary = topic.Summary,
                 Publications = topic.Publications
                     .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
-                    .Select(BuildPublicationNode)
+                    .Select(publication => BuildPublicationNode(publication, includedReleaseIds))
                     .OrderBy(publication => publication.Title)
                     .ToList()
             };
         }
 
-        private static PublicationTreeNode BuildPublicationNode(Publication publication)
+        private static PublicationTreeNode BuildPublicationNode(Publication publication,
+            IEnumerable<Guid> includedReleaseIds)
         {
+            // Ignore any legacyPublicationUrl once the Publication has releases
+            var legacyPublicationUrlIgnored =
+                publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
+            var legacyPublicationUrl =
+                legacyPublicationUrlIgnored ? null : publication.LegacyPublicationUrl?.ToString();
+
             return new PublicationTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,
                 Summary = publication.Summary,
                 Slug = publication.Slug,
-                LegacyPublicationUrl = publication.LegacyPublicationUrl?.ToString()
+                LegacyPublicationUrl = legacyPublicationUrl
             };
         }
 
