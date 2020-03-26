@@ -78,10 +78,10 @@ const DataBlockContentTabs = ({
     });
   }, [dataBlock.tables, chartBuilderData]);
 
-  const onChartSave = (props: ChartRendererProps) => {
+  const onChartSave = (chart: Chart) => {
     const newDataBlock: ReleaseDataBlock = {
       ...dataBlock,
-      charts: [props],
+      charts: [chart],
     };
 
     onDataBlockSave(newDataBlock);

@@ -43,6 +43,7 @@ import {
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
+import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import React, { useCallback, useMemo } from 'react';
 
@@ -55,9 +56,8 @@ const chartDefinitions: ChartDefinition[] = [
 
 interface Props {
   data: DataBlockResponse;
-  initialConfiguration?: ChartRendererProps;
-  onChartSave?: (props: ChartRendererProps) => void;
-
+  initialConfiguration?: Chart;
+  onChartSave?: (chart: Chart) => void;
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }
 
