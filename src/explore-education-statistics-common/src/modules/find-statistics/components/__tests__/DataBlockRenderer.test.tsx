@@ -4,8 +4,14 @@ import {
   testDataBlockResponse,
 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import _dataBlockService, { GeographicLevel } from '@common/services/dataBlockService';
-import { Chart, DataBlock, DataBlockRequest } from '@common/services/types/blocks';
+import _dataBlockService, {
+  GeographicLevel,
+} from '@common/services/dataBlockService';
+import {
+  Chart,
+  DataBlock,
+  DataBlockRequest,
+} from '@common/services/types/blocks';
 import { render, wait } from '@testing-library/react';
 import React from 'react';
 import DataBlockRenderer from '../DataBlockRenderer';
