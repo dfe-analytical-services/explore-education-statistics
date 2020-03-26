@@ -4,9 +4,11 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
-import TimePeriodDataTableRenderer
-  from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
+import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import useDataBlockQuery from '@common/modules/find-statistics/hooks/useDataBlockQuery';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlock } from '@common/services/types/blocks';
 import React, { MouseEvent, ReactNode } from 'react';
 
@@ -51,12 +53,23 @@ const DataBlockRenderer = ({
         {dataBlock?.tables?.length && dataBlockResponse && (
           <TabsSection id={`${id}-tables`} title="Table">
             {dataBlock?.tables.map((table, index) => {
+              const fullTable = mapDataBlockResponseToFullTable(
+                dataBlockResponse,
+              );
+
               return (
-                <TimePeriodDataTableRenderer
+                <TimePeriodDataTable
                   key={index}
-                  tableHeaders={table.tableHeaders}
-                  heading={dataBlock?.heading}
-                  data={dataBlockResponse}
+                  fullTable={fullTable}
+                  captionTitle={dataBlock?.heading}
+                  tableHeadersConfig={
+                    table.tableHeaders
+                      ? mapTableHeadersConfig(
+                          table.tableHeaders,
+                          fullTable.subjectMeta,
+                        )
+                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                  }
                 />
               );
             })}
