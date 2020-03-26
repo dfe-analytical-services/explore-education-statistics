@@ -107,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             MethodologyId = Methodology.Id,
             Slug = "publication-a",
             Summary = "first publication summary",
+            LegacyPublicationUrl = new Uri("http://legacy.url/")
         };
 
         private static readonly Publication PublicationB = new Publication
@@ -240,6 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("publication-a", publications[0].Slug);
                 Assert.Equal("first publication summary", publications[0].Summary);
                 Assert.Equal("Publication A", publications[0].Title);
+                // The Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(publications[0].LegacyPublicationUrl);
                 Assert.Equal("publication-c", publications[1].Slug);
                 Assert.Equal("third publication summary", publications[1].Summary);
