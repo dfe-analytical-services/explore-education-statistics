@@ -355,8 +355,8 @@ EXEC InsertSubjectFootnote @subject_id_absence_rate_percent_bands, @footnote_id_
 DECLARE @subject_id_duration_of_fixed_exclusions                     uniqueidentifier = '926e33e4-b3ce-41aa-9ed2-e04106068ffb';
 DECLARE @subject_id_exclusions_by_characteristic                     uniqueidentifier = '92039f68-a894-46a9-bd44-4482728698b0';
 DECLARE @subject_id_exclusions_by_geographic_level                   uniqueidentifier = '3c0fbe56-0a4b-4caa-82f2-ab696cd96090';
-DECLARE @subject_exclusions_by_reason                                uniqueidentifier = '8fe88bbe-dce7-4698-a55f-8e1e3e41c5a7';
-DECLARE @subject_number_of_fixed_exclusions                          uniqueidentifier = '048a6276-1df1-487a-a501-fbd5e64d4b79';
+DECLARE @subject_id_exclusions_by_reason                             uniqueidentifier = '8fe88bbe-dce7-4698-a55f-8e1e3e41c5a7';
+DECLARE @subject_id_number_of_fixed_exclusions                       uniqueidentifier = '048a6276-1df1-487a-a501-fbd5e64d4b79';
 DECLARE @subject_id_total_days_missed_due_to_fixed_period_exclusions uniqueidentifier = '28feb263-4bf9-4dd7-9440-48e2685f6954';
 
 EXEC InsertSubjectFootnote @subject_id_duration_of_fixed_exclusions, @footnote_id_35;
@@ -364,8 +364,8 @@ EXEC InsertSubjectFootnote @subject_id_duration_of_fixed_exclusions, @footnote_i
 EXEC InsertSubjectFootnote @subject_id_duration_of_fixed_exclusions, @footnote_id_40;
 EXEC InsertSubjectFootnote @subject_id_exclusions_by_characteristic, @footnote_id_40;
 EXEC InsertSubjectFootnote @subject_id_exclusions_by_geographic_level, @footnote_id_40;
-EXEC InsertSubjectFootnote @subject_exclusions_by_reason, @footnote_id_40;
-EXEC InsertSubjectFootnote @subject_number_of_fixed_exclusions, @footnote_id_40;
+EXEC InsertSubjectFootnote @subject_id_exclusions_by_reason, @footnote_id_40;
+EXEC InsertSubjectFootnote @subject_id_number_of_fixed_exclusions, @footnote_id_40;
 EXEC InsertSubjectFootnote @subject_id_total_days_missed_due_to_fixed_period_exclusions, @footnote_id_40;
 
 
@@ -606,22 +606,22 @@ EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterI
 EXEC InsertFilterItemFootnote @subject_id_duration_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
 EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_State_funded_primary, @footnote_id_37;
 EXEC InsertFilterItemFootnote @subject_id_exclusions_by_geographic_level, @filterItem_State_funded_primary, @footnote_id_37;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_State_funded_primary, @footnote_id_37;
-EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_reason, @filterItem_State_funded_primary, @footnote_id_37;
+EXEC InsertFilterItemFootnote @subject_id_number_of_fixed_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
 EXEC InsertFilterItemFootnote @subject_id_total_days_missed_due_to_fixed_period_exclusions, @filterItem_State_funded_primary, @footnote_id_37;
 
 EXEC InsertFilterItemFootnote @subject_id_duration_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
 EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_State_funded_secondary, @footnote_id_38;
 EXEC InsertFilterItemFootnote @subject_id_exclusions_by_geographic_level, @filterItem_State_funded_secondary, @footnote_id_38;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_State_funded_secondary, @footnote_id_38;
-EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_reason, @filterItem_State_funded_secondary, @footnote_id_38;
+EXEC InsertFilterItemFootnote @subject_id_number_of_fixed_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
 EXEC InsertFilterItemFootnote @subject_id_total_days_missed_due_to_fixed_period_exclusions, @filterItem_State_funded_secondary, @footnote_id_38;
 
 EXEC InsertFilterItemFootnote @subject_id_duration_of_fixed_exclusions, @filterItem_Special, @footnote_id_39;
 EXEC InsertFilterItemFootnote @subject_id_exclusions_by_characteristic, @filterItem_Special, @footnote_id_39;
 EXEC InsertFilterItemFootnote @subject_id_exclusions_by_geographic_level, @filterItem_Special, @footnote_id_39;
-EXEC InsertFilterItemFootnote @subject_exclusions_by_reason, @filterItem_Special, @footnote_id_39;
-EXEC InsertFilterItemFootnote @subject_number_of_fixed_exclusions, @filterItem_Special, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_id_exclusions_by_reason, @filterItem_Special, @footnote_id_39;
+EXEC InsertFilterItemFootnote @subject_id_number_of_fixed_exclusions, @filterItem_Special, @footnote_id_39;
 EXEC InsertFilterItemFootnote @subject_id_total_days_missed_due_to_fixed_period_exclusions, @filterItem_Special, @footnote_id_39;
 
 
