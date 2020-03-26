@@ -301,6 +301,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
         </div>
       </div>
     </div>
+    
   </figure>
 </section>
 `;
