@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`EditableBlockRenderer Renders editable Markdown block correctly 1`] = `
+exports[`EditableBlockRenderer renders editable Markdown block correctly 1`] = `
 <div>
   <div role="button"
        class="editableContent unsaved"
@@ -26,7 +26,7 @@ exports[`EditableBlockRenderer Renders editable Markdown block correctly 1`] = `
 </div>
 `;
 
-exports[`EditableBlockRenderer Renders non-editable Markdown block correctly 1`] = `
+exports[`EditableBlockRenderer renders non-editable Markdown block correctly 1`] = `
 <div>
   <div role="button"
        class="editableContent unsaved"

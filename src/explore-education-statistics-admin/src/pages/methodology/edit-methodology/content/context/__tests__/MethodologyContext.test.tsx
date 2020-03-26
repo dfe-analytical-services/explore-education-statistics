@@ -77,10 +77,8 @@ describe('MethodologyContext', () => {
   test('REMOVE_BLOCK_FROM_SECTION removes a block from a section', () => {
     const sectionKey = 'annexes';
     const keyStatsSection = basicMethodology[sectionKey][0];
-    const removingBlockId = (keyStatsSection.content as EditableContentBlock[])[0]
-      .id;
-    const originalLength = (keyStatsSection.content as EditableContentBlock[])
-      .length;
+    const removingBlockId = keyStatsSection.content[0].id;
+    const originalLength = keyStatsSection.content.length;
 
     const { methodology } = methodologyReducer(
       {
@@ -113,10 +111,8 @@ describe('MethodologyContext', () => {
   test('REMOVE_BLOCK_FROM_SECTION removes a block from content section', () => {
     const sectionKey = 'content';
     const methodologyContent = basicMethodology[sectionKey];
-    const removingBlockId = (methodologyContent[0]
-      .content as EditableContentBlock[])[0].id;
-    const originalLength = (methodologyContent[0]
-      .content as EditableContentBlock[]).length;
+    const removingBlockId = methodologyContent[0].content[0].id;
+    const originalLength = methodologyContent[0].content.length;
 
     const { methodology } = methodologyReducer(
       {
