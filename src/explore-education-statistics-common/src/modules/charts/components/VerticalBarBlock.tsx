@@ -2,6 +2,7 @@ import '@common/modules/charts/components/charts.scss';
 import {
   AxisConfiguration,
   ChartDefinition,
+  RenderLegend,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import {
@@ -26,7 +27,7 @@ import {
   YAxis,
 } from 'recharts';
 
-export interface VerticalBarProps extends StackedBarProps {
+export interface VerticalBarProps extends StackedBarProps, RenderLegend {
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;

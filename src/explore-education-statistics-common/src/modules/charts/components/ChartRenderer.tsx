@@ -12,6 +12,10 @@ import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
+import {
+  chartDefinitions,
+  RenderLegend,
+} from '@common/modules/charts/types/chart';
 import omit from 'lodash/omit';
 import dynamic from 'next/dynamic';
 import React, { memo, useMemo, useState } from 'react';
@@ -25,16 +29,26 @@ const DynamicMapBlock = dynamic(
   },
 );
 
+function hasLegend(
+  props: ChartRendererProps,
+): props is ChartRendererProps & RenderLegend {
+  return Boolean(
+    chartDefinitions.find(
+      chart => chart.type === props.type && chart.capabilities.hasLegend,
+    ),
+  );
+}
+
 export type ChartRendererProps =
   | ({
       type: 'line';
-    } & LineChartProps)
+    } & Omit<LineChartProps, keyof RenderLegend>)
   | ({
       type: 'verticalbar';
-    } & VerticalBarProps)
+    } & Omit<VerticalBarProps, keyof RenderLegend>)
   | ({
       type: 'horizontalbar';
-    } & HorizontalBarProps)
+    } & Omit<HorizontalBarProps, keyof RenderLegend>)
   | ({
       type: 'map';
     } & MapBlockProps)
@@ -71,7 +85,7 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
       case 'horizontalbar':
         return <HorizontalBarBlock {...props} renderLegend={renderLegend} />;
       case 'map':
-        return <DynamicMapBlock {...props} renderLegend={renderLegend} />;
+        return <DynamicMapBlock {...props} />;
       case 'infographic':
         return <InfographicBlock {...props} />;
       default:
@@ -87,7 +101,7 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
       <figure className="govuk-!-margin-0">
         {title && <figcaption className="govuk-heading-s">{title}</figcaption>}
 
-        {props.type !== 'infographic' && props.legend === 'top' && legendProps && (
+        {hasLegend(props) && props.legend === 'top' && legendProps && (
           <div className="govuk-!-margin-bottom-6">
             <DefaultLegendContent {...legendProps} />
           </div>
@@ -95,13 +109,11 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
 
         <div className="govuk-!-margin-bottom-6">{chart}</div>
 
-        {props.type !== 'infographic' &&
-          props.legend === 'bottom' &&
-          legendProps && (
-            <div className="govuk-!-margin-bottom-6">
-              <DefaultLegendContent {...legendProps} />
-            </div>
-          )}
+        {hasLegend(props) && props.legend === 'bottom' && legendProps && (
+          <div className="govuk-!-margin-bottom-6">
+            <DefaultLegendContent {...legendProps} />
+          </div>
+        )}
 
         <FigureFootnotes footnotes={meta.footnotes} />
       </figure>

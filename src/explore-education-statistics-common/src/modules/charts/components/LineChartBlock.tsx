@@ -5,6 +5,7 @@ import {
   ChartDefinition,
   ChartProps,
   ChartSymbol,
+  RenderLegend,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
@@ -56,7 +57,7 @@ const generateLegendType = (symbol: LegendType | undefined): LegendType => {
   return symbol;
 };
 
-export interface LineChartProps extends ChartProps {
+export interface LineChartProps extends ChartProps, RenderLegend {
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
