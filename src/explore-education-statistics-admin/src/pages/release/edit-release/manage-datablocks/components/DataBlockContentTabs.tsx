@@ -4,7 +4,7 @@ import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablock
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -149,6 +149,12 @@ const DataBlockContentTabs = ({
           <div style={{ position: 'relative' }}>
             <ChartBuilder
               data={chartBuilderData}
+              meta={{
+                ...parseMetaData(chartBuilderData.metaData),
+                // Don't render footnotes as they take
+                // up too much screen space.
+                footnotes: [],
+              }}
               onChartSave={onChartSave}
               initialConfiguration={initialConfiguration}
               onRequiresDataUpdate={reRequestdata}

@@ -37,7 +37,6 @@ import {
   ChartProps,
   DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
-import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import {
   DataBlockRerequest,
@@ -53,13 +52,6 @@ const chartDefinitions: ChartDefinition[] = [
   horizontalBarBlockDefinition,
   mapBlockDefinition,
 ];
-
-interface Props {
-  data: DataBlockResponse;
-  initialConfiguration?: Chart;
-  onChartSave?: (chart: Chart) => void;
-  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
-}
 
 function getReduceMetaDataForAxis(
   data: DataBlockResponse,
@@ -99,21 +91,21 @@ function generateAxesMetaData(
   );
 }
 
+interface Props {
+  data: DataBlockResponse;
+  meta: ChartMetaData;
+  initialConfiguration?: Chart;
+  onChartSave?: (chart: Chart) => void;
+  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
+}
+
 const ChartBuilder = ({
   data,
+  meta,
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
 }: Props) => {
-  const metaData: ChartMetaData = useMemo(() => {
-    return {
-      ...parseMetaData(data.metaData),
-      // Don't bother showing footnotes as
-      // this uses up valuable screen space.
-      footnotes: [],
-    };
-  }, [data.metaData]);
-
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
     initialConfiguration,
   );
@@ -136,9 +128,9 @@ const ChartBuilder = ({
         },
         {},
       ),
-      ...generateAxesMetaData(axes, data, metaData),
+      ...generateAxesMetaData(axes, data, meta),
     }),
-    [axes, data, dataSetAndConfiguration, metaData],
+    [axes, data, dataSetAndConfiguration, meta],
   );
 
   const chartProps = useMemo<ChartRendererProps | undefined>(() => {
@@ -150,7 +142,7 @@ const ChartBuilder = ({
       ...options,
       data,
       axes,
-      meta: metaData,
+      meta,
       labels,
     };
 
@@ -186,7 +178,7 @@ const ChartBuilder = ({
       default:
         return undefined;
     }
-  }, [axes, data, definition, labels, metaData, options]);
+  }, [axes, data, definition, labels, meta, options]);
 
   const handleBoundaryLevelChange = useCallback(
     (boundaryLevel: string) => {
@@ -255,7 +247,7 @@ const ChartBuilder = ({
             >
               <ChartDataSelector
                 canSaveChart={isValid}
-                metaData={metaData}
+                meta={meta}
                 selectedData={dataSetAndConfiguration}
                 chartType={definition}
                 capabilities={definition.capabilities}
@@ -274,7 +266,7 @@ const ChartBuilder = ({
             <ChartConfiguration
               selectedChartType={definition}
               chartOptions={options}
-              meta={metaData}
+              meta={meta}
               data={data}
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={actions.updateChartOptions}
@@ -303,7 +295,7 @@ const ChartBuilder = ({
                   configuration={axisConfiguration}
                   capabilities={definition.capabilities}
                   data={data}
-                  meta={metaData}
+                  meta={meta}
                   labels={chartProps?.labels}
                   dataSets={axisConfiguration?.dataSets}
                   onChange={actions.updateChartAxis}
