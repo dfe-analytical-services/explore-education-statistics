@@ -8,7 +8,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
   role="tabpanel"
   tabindex="-1"
 >
-
+  
   <a
     aria-live="assertive"
     class="govuk-visually-hidden"
@@ -235,7 +235,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
             <h3
               class="govuk-heading-s"
             >
-              Key to
+              Key to 
               Unauthorised absence rate
             </h3>
             <dl
