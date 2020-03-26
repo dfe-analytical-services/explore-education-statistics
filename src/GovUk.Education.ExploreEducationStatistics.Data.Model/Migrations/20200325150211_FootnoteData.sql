@@ -12,7 +12,7 @@ BEGIN CATCH
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
     DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
     DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
-    RAISERROR (N'Error executing %s(SUBJECT: %s, FOOTNOTE: %uniq) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectIdString, @footnoteIdString, @errorMessage);
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FOOTNOTE: %s) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectIdString, @footnoteIdString, @errorMessage);
 END CATCH
 GO
 
