@@ -1,6 +1,6 @@
 import TabsSection from '@common/components/TabsSection';
-import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRender';
-import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
+import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import { Release } from '@common/services/publicationService';
@@ -25,8 +25,8 @@ const PublicationReleaseHeadlinesSection = ({
   keyStatisticsSecondarySection,
 }: Props) => {
   return (
-    <DataBlockTabs
-      id="releaseHeadlines-tabs"
+    <DataBlockRenderer
+      id="releaseHeadlines-dataBlock"
       releaseId={releaseId}
       dataBlock={keyStatisticsSecondarySection.content?.[0]}
       firstTabs={

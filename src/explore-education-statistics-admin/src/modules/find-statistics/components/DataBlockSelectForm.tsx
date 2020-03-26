@@ -3,7 +3,7 @@ import editReleaseDataService from '@admin/services/release/edit-release/data/ed
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 import React, { useState } from 'react';
 
 interface Props {
@@ -34,7 +34,7 @@ const DataBlockSelectForm = ({
           open
           onToggle={() => {}}
         >
-          <DataBlockTabs
+          <DataBlockRenderer
             dataBlock={selectedDataBlock}
             id={`dataBlockSelectForm-${
               selectedDataBlock ? `${selectedDataBlock.id}-tabs` : 'tabs'

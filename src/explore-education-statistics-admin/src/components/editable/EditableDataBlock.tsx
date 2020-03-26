@@ -1,9 +1,9 @@
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
-import DataBlockTabs, {
-  DataBlockTabsProps,
-} from '@common/modules/find-statistics/components/DataBlockTabs';
+import DataBlockRenderer, {
+  DataBlockRendererProps,
+} from '@common/modules/find-statistics/components/DataBlockRenderer';
 import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import React, { useState } from 'react';
@@ -13,7 +13,7 @@ type Props = {
   canDelete?: boolean;
   onDelete?: () => void;
   editable?: boolean;
-} & OmitStrict<DataBlockTabsProps, 'getInfographic'>;
+} & OmitStrict<DataBlockRendererProps, 'getInfographic'>;
 
 const EditableDataBlock = ({
   id,
@@ -26,7 +26,7 @@ const EditableDataBlock = ({
 
   return (
     <div className={styles.wrapper}>
-      <DataBlockTabs
+      <DataBlockRenderer
         {...props}
         id={id}
         releaseId={releaseId}

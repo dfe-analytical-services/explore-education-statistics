@@ -4,7 +4,7 @@ import { EditableRelease } from '@admin/services/publicationService';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import TabsSection from '@common/components/TabsSection';
-import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React, { useCallback, useContext } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
@@ -72,8 +72,8 @@ const ReleaseHeadlines = ({ release }: Props) => {
         <AddSecondaryStats release={release} isEditing={isEditing} />
       )}
 
-      <DataBlockTabs
-        id="releaseHeadlines-tabs"
+      <DataBlockRenderer
+        id="releaseHeadlines-dataBlock"
         dataBlock={release.keyStatisticsSecondarySection.content[0]}
         releaseId={release.id}
         getInfographic={editReleaseDataService.downloadChartFile}

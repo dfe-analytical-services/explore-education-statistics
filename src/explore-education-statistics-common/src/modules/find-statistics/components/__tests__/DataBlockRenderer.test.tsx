@@ -4,17 +4,11 @@ import {
   testDataBlockResponse,
 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import _dataBlockService, {
-  GeographicLevel,
-} from '@common/services/dataBlockService';
-import {
-  Chart,
-  DataBlock,
-  DataBlockRequest,
-} from '@common/services/types/blocks';
+import _dataBlockService, { GeographicLevel } from '@common/services/dataBlockService';
+import { Chart, DataBlock, DataBlockRequest } from '@common/services/types/blocks';
 import { render, wait } from '@testing-library/react';
 import React from 'react';
-import DataBlockTabs from '../DataBlockTabs';
+import DataBlockRenderer from '../DataBlockRenderer';
 
 jest.mock('@common/services/dataBlockService');
 
@@ -24,7 +18,7 @@ const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService
 >;
 
-describe('DataBlockTabs', () => {
+describe('DataBlockRenderer', () => {
   const testDataBlock: DataBlock = {
     id: 'test-id',
     type: 'DataBlock',
@@ -53,7 +47,7 @@ describe('DataBlockTabs', () => {
     );
 
     const { container } = render(
-      <DataBlockTabs
+      <DataBlockRenderer
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -88,7 +82,7 @@ describe('DataBlockTabs', () => {
     );
 
     const { container } = render(
-      <DataBlockTabs
+      <DataBlockRenderer
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -123,7 +117,7 @@ describe('DataBlockTabs', () => {
     );
 
     const { container } = render(
-      <DataBlockTabs
+      <DataBlockRenderer
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -173,7 +167,7 @@ describe('DataBlockTabs', () => {
     );
 
     const { container } = render(
-      <DataBlockTabs
+      <DataBlockRenderer
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,

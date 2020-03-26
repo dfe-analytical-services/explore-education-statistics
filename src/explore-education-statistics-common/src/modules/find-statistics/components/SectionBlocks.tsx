@@ -1,13 +1,13 @@
-import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRender';
-import DataBlockTabs, {
-  DataBlockTabsProps,
-} from '@common/modules/find-statistics/components/DataBlockTabs';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
+import DataBlockRenderer, {
+  DataBlockRendererProps,
+} from '@common/modules/find-statistics/components/DataBlockRenderer';
 import { Block } from '@common/services/types/blocks';
 import { OmitStrict } from '@common/types';
 import React from 'react';
 
 export interface SectionBlocksProps
-  extends OmitStrict<DataBlockTabsProps, 'id'> {
+  extends OmitStrict<DataBlockRendererProps, 'id'> {
   content: Block[];
 }
 
@@ -17,7 +17,7 @@ const SectionBlocks = ({ content, ...props }: SectionBlocksProps) => {
       {content.map(block => {
         if (block.type === 'DataBlock') {
           return (
-            <DataBlockTabs
+            <DataBlockRenderer
               {...props}
               key={block.id}
               id={`sectionBlocks-dataBlock-${block.id}`}

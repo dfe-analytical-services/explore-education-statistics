@@ -4,7 +4,8 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
-import TimePeriodDataTableRenderer from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
+import TimePeriodDataTableRenderer
+  from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
 import useDataBlockQuery from '@common/modules/find-statistics/hooks/useDataBlockQuery';
 import { DataBlock } from '@common/services/types/blocks';
 import React, { MouseEvent, ReactNode } from 'react';
@@ -15,7 +16,7 @@ export interface DataQuery {
   body: string;
 }
 
-export interface DataBlockTabsProps {
+export interface DataBlockRendererProps {
   additionalTabContent?: ReactNode;
   dataBlock?: DataBlock;
   firstTabs?: ReactNode;
@@ -30,7 +31,7 @@ export interface DataBlockTabsProps {
   ) => void;
 }
 
-const DataBlockTabs = ({
+const DataBlockRenderer = ({
   additionalTabContent,
   dataBlock,
   firstTabs,
@@ -39,7 +40,7 @@ const DataBlockTabs = ({
   id,
   releaseId,
   onToggle,
-}: DataBlockTabsProps) => {
+}: DataBlockRendererProps) => {
   const { value: dataBlockResponse, isLoading } = useDataBlockQuery(dataBlock);
 
   return (
@@ -112,4 +113,4 @@ const DataBlockTabs = ({
   );
 };
 
-export default DataBlockTabs;
+export default DataBlockRenderer;

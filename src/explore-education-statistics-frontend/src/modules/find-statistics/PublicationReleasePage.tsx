@@ -3,7 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRender';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
