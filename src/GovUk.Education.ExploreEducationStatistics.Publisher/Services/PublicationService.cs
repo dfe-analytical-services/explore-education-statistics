@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static PublicationTreeNode BuildPublicationNode(Publication publication,
             IEnumerable<Guid> includedReleaseIds)
         {
-            // Ignore any legacyPublicationUrl once the Publication has releases
+            // Ignore any legacyPublicationUrl once the Publication has Releases
             var legacyPublicationUrlIgnored =
                 publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
             var legacyPublicationUrl =

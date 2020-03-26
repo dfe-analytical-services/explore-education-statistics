@@ -241,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("publication-a", publications[0].Slug);
                 Assert.Equal("first publication summary", publications[0].Summary);
                 Assert.Equal("Publication A", publications[0].Title);
-                // The Publication has a legacy Url but it's not set because Releases exist
+                // The Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(publications[0].LegacyPublicationUrl);
                 Assert.Equal("publication-c", publications[1].Slug);
                 Assert.Equal("third publication summary", publications[1].Summary);
