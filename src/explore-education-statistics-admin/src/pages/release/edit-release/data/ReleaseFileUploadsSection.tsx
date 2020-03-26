@@ -93,24 +93,29 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
     await resetPage(actions);
   }, errorCodeMappings);
 
+  const setDeleting = (ancillaryFile: string, deleting: boolean) => {
+    setFiles(
+      files.map(file =>
+        file.filename !== ancillaryFile
+          ? file
+          : {
+              ...file,
+              isDeleting: deleting,
+            },
+      ),
+    );
+  };
+
   const handleDelete = async (
     ancillaryFileToDelete: string,
     form: FormikActions<{}>,
   ) => {
-    const ancillaryFiles = [...files];
-    const fileToDelete = ancillaryFiles.find(
-      file => file.filename === ancillaryFileToDelete,
-    );
-
-    if (!fileToDelete) {
-      return;
-    }
-    fileToDelete.isDeleting = true;
+    setDeleting(ancillaryFileToDelete, true);
     setDeleteFileName('');
     await editReleaseDataService
       .deleteAncillaryFile(releaseId, deleteFileName)
       .finally(() => {
-        fileToDelete.isDeleting = false;
+        setDeleting(ancillaryFileToDelete, false);
         resetPage(form);
       });
   };

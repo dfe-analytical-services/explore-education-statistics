@@ -129,22 +129,36 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     setDataFiles(files);
   };
 
+  const setDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
+    setDataFiles(
+      dataFiles.map(file =>
+        file.filename !== dataFile.file.filename
+          ? file
+          : {
+              ...file,
+              isDeleting: deleting,
+            },
+      ),
+    );
+  };
+
   const statusChangeHandler = async (
     dataFile: DataFile,
     importstatusCode: ImportStatusCode,
   ) => {
-    const updatedDataFiles = [...dataFiles];
-    const updatedFile = updatedDataFiles.find(
-      file => file.filename === dataFile.filename,
+    setDataFiles(
+      dataFiles.map(file =>
+        file.filename !== dataFile.filename
+          ? file
+          : {
+              ...file,
+              canDelete:
+                importstatusCode &&
+                (importstatusCode === 'COMPLETE' ||
+                  importstatusCode === 'FAILED'),
+            },
+      ),
     );
-
-    if (!updatedFile) {
-      return;
-    }
-    updatedFile.canDelete =
-      importstatusCode &&
-      (importstatusCode === 'COMPLETE' || importstatusCode === 'FAILED');
-    setDataFiles(updatedDataFiles);
   };
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
@@ -162,20 +176,12 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     dataFileToDelete: DeleteDataFile,
     form: FormikActions<{}>,
   ) => {
-    const files = [...dataFiles];
-    const fileToDelete = files.find(
-      file => file.filename === dataFileToDelete.file.filename,
-    );
-
-    if (!fileToDelete) {
-      return;
-    }
-    fileToDelete.isDeleting = true;
+    setDeleting(dataFileToDelete, true);
     setDeleteDataFile(undefined);
     await editReleaseDataService
       .deleteDataFiles(releaseId, (deleteDataFile as DeleteDataFile).file)
       .finally(() => {
-        fileToDelete.isDeleting = false;
+        setDeleting(dataFileToDelete, false);
         resetPage(form);
       });
   };
