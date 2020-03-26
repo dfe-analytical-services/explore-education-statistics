@@ -268,7 +268,20 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               <>
                 <hr />
                 <h2 className="govuk-heading-m">Uploaded data files</h2>
-                <Accordion id="uploaded-files">
+                <Accordion
+                  id="uploaded-files"
+                  onToggleAll={openAll => {
+                    if (openAll) {
+                      setOpenedAccordions(
+                        dataFiles.map((dataFile, index) => {
+                          return `${dataFile.title}-${index}`;
+                        }),
+                      );
+                    } else {
+                      setOpenedAccordions([]);
+                    }
+                  }}
+                >
                   {dataFiles.map((dataFile, index) => {
                     const accId = `${dataFile.title}-${index}`;
                     return (
