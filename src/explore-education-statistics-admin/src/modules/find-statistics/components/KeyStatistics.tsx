@@ -1,6 +1,5 @@
 import EditableKeyStatTile from '@admin/components/editable/EditableKeyStatTile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
@@ -15,7 +14,6 @@ export interface KeyStatisticsProps {
 }
 
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
-  const { releaseId } = useManageReleaseContext();
   const {
     deleteContentSectionBlock,
     updateContentSectionDataBlock,
@@ -44,7 +42,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
               isEditing={isEditing}
               onRemove={() => {
                 deleteContentSectionBlock({
-                  releaseId,
+                  releaseId: release.id,
                   sectionId: release.keyStatisticsSection.id,
                   blockId: stat.id,
                   sectionKey: 'keyStatisticsSection',
@@ -52,7 +50,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
               }}
               onSubmit={values =>
                 updateContentSectionDataBlock({
-                  releaseId,
+                  releaseId: release.id,
                   sectionId: release.keyStatisticsSection.id,
                   blockId: stat.id,
                   sectionKey: 'keyStatisticsSection',
