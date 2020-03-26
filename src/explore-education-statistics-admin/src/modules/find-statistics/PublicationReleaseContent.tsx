@@ -109,8 +109,6 @@ const PublicationReleaseContent = () => {
             <>
               <EditableSectionBlocks
                 sectionId={release.summarySection.id}
-                publication={release.publication}
-                id={release.summarySection.id as string}
                 content={release.summarySection.content}
                 onBlockContentChange={summaryBlockUpdate}
                 onBlockDelete={summaryBlockDelete}

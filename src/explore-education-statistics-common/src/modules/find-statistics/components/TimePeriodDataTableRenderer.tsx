@@ -1,24 +1,24 @@
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/table-tool/utils/tableHeaders';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import React from 'react';
 
 export interface Props {
   heading?: string;
-  response: DataBlockResponse;
+  data: DataBlockResponse;
   tableHeaders?: TableHeadersConfig;
 }
 
 const TimePeriodDataTableRenderer = ({
-  response,
+  data,
   tableHeaders,
   heading,
 }: Props) => {
-  const table = mapDataBlockResponseToFullTable(response);
+  const table = mapDataBlockResponseToFullTable(data);
   return (
     <TimePeriodDataTable
       fullTable={table}

@@ -1,28 +1,32 @@
-import { Publication } from '@common/services/publicationService';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRender';
+import DataBlockTabs, {
+  DataBlockTabsProps,
+} from '@common/modules/find-statistics/components/DataBlockTabs';
 import { Block } from '@common/services/types/blocks';
+import { OmitStrict } from '@common/types';
 import React from 'react';
-import BlockRenderer, { SectionToggleHandler } from './BlockRenderer';
 
-export interface BlocksProps {
+export interface SectionBlocksProps
+  extends OmitStrict<DataBlockTabsProps, 'id'> {
   content: Block[];
-  id: string;
-  publication?: Publication;
-  onToggle?: SectionToggleHandler;
 }
 
-const SectionBlocks = ({ content, id, publication, onToggle }: BlocksProps) => {
-  return content?.length > 0 ? (
+const SectionBlocks = ({ content, ...props }: SectionBlocksProps) => {
+  return content.length > 0 ? (
     <>
       {content.map(block => {
-        return (
-          <BlockRenderer
-            id={id}
-            block={block}
-            key={block.id}
-            publication={publication}
-            onToggle={onToggle}
-          />
-        );
+        if (block.type === 'DataBlock') {
+          return (
+            <DataBlockTabs
+              {...props}
+              key={block.id}
+              id={`sectionBlocks-dataBlock-${block.id}`}
+              dataBlock={block}
+            />
+          );
+        }
+
+        return <ContentBlockRenderer key={block.id} block={block} />;
       })}
     </>
   ) : (

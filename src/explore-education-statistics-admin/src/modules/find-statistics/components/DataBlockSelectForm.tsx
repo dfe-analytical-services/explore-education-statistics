@@ -1,8 +1,9 @@
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import DataBlock, { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import React, { useState } from 'react';
 
 interface Props {
@@ -18,7 +19,7 @@ const DataBlockSelectForm = ({
   hideCancel = false,
   label = 'Select a data block',
 }: Props) => {
-  const { availableDataBlocks } = useReleaseState();
+  const { availableDataBlocks, release } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const getDataBlockPreview = (dataBlockId: string) => {
@@ -33,7 +34,14 @@ const DataBlockSelectForm = ({
           open
           onToggle={() => {}}
         >
-          <DataBlock {...(selectedDataBlock as DataBlockProps)} />
+          <DataBlockTabs
+            dataBlock={selectedDataBlock}
+            id={`dataBlockSelectForm-${
+              selectedDataBlock ? `${selectedDataBlock.id}-tabs` : 'tabs'
+            }`}
+            releaseId={release.id}
+            getInfographic={editReleaseDataService.downloadChartFile}
+          />
         </Details>
       </section>
     ) : null;

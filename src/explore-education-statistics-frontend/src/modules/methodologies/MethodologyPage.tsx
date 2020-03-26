@@ -2,7 +2,7 @@ import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import FormattedDate from '@common/components/FormattedDate';
-import ContentBlock from '@common/modules/find-statistics/components/SectionBlocks';
+import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
@@ -118,11 +118,7 @@ class MethodologyPage extends Component<Props> {
                   </MethodologyHeader>
 
                   <MethodologyContent>
-                    <ContentBlock
-                      content={content}
-                      id={`${this.accId[0]}_${order}`}
-                      publication={data.publication}
-                    />
+                    <SectionBlocks content={content} />
                   </MethodologyContent>
                 </AccordionSection>
               );
@@ -142,11 +138,7 @@ class MethodologyPage extends Component<Props> {
                     caption={caption}
                     key={order}
                   >
-                    <ContentBlock
-                      content={content}
-                      id={`${this.accId[1]}_${order}`}
-                      publication={data.publication}
-                    />
+                    <SectionBlocks content={content} />
                   </AccordionSection>
                 );
               })}

@@ -132,7 +132,6 @@ const MethodologyAccordionSection = ({
       onRemoveSection={removeSection}
     >
       <EditableSectionBlocks
-        id={`${heading}-content`}
         isReordering={isReordering}
         sectionId={sectionId}
         onBlockSaveOrder={reorderBlocksInAccordionSection}

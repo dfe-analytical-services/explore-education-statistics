@@ -3,8 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import BlockRenderer from '@common/modules/find-statistics/components/BlockRenderer';
-import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRender';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
@@ -19,6 +18,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
+import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
@@ -150,14 +150,10 @@ class PublicationReleasePage extends Component<Props> {
               </div>
             </div>
 
-            {(data.summarySection.content || []).map((block, i) => (
-              <BlockRenderer
-                key={block.id}
-                id={`summary-section-${i}`}
-                publication={data.publication}
-                block={block}
-              />
+            {data.summarySection.content.map(block => (
+              <ContentBlockRenderer key={block.id} block={block} />
             ))}
+
             {data.downloadFiles && (
               <Details
                 summary="Download data files"
@@ -328,7 +324,7 @@ class PublicationReleasePage extends Component<Props> {
         </h2>
 
         <PublicationReleaseHeadlinesSection
-          publication={data.publication}
+          releaseId={data.id}
           keyStatisticsSection={data.keyStatisticsSection}
           headlinesSection={data.headlinesSection}
           keyStatisticsSecondarySection={data.keyStatisticsSecondarySection}
@@ -343,9 +339,8 @@ class PublicationReleasePage extends Component<Props> {
                   caption={caption}
                   key={order}
                 >
-                  <SectionBlocks
+                  <PublicationSectionBlocks
                     content={content}
-                    id={`content_${order}`}
                     publication={data.publication}
                     onToggle={(section: { id: string; title: string }) => {
                       logEvent(

@@ -2,7 +2,9 @@ import BlockDraggable from '@admin/modules/find-statistics/components/BlockDragg
 import BlockDroppable from '@admin/modules/find-statistics/components/BlockDroppable';
 import Comments from '@admin/modules/find-statistics/components/Comments';
 import { EditableBlock } from '@admin/services/publicationService';
-import SectionBlocks, { BlocksProps } from '@common/modules/find-statistics/components/SectionBlocks';
+import SectionBlocks, {
+  SectionBlocksProps,
+} from '@common/modules/find-statistics/components/SectionBlocks';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types/util';
 import orderBy from 'lodash/orderBy';
@@ -10,7 +12,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import EditableBlockRenderer from './EditableBlockRenderer';
 
-export interface Props extends BlocksProps {
+export interface Props extends SectionBlocksProps {
   content: EditableBlock[];
   sectionId: string;
   editable?: boolean;

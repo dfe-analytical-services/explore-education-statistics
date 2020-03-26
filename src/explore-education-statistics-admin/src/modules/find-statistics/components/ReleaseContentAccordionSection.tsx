@@ -130,7 +130,6 @@ const ReleaseContentAccordionSection = ({
       {...restOfProps}
     >
       <EditableSectionBlocks
-        id={`${heading}-content`}
         isReordering={isReordering}
         sectionId={sectionId}
         onBlockSaveOrder={reorderBlocksInAccordionSection}
