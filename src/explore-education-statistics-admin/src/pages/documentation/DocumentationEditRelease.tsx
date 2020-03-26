@@ -5,7 +5,7 @@ import Link from '@admin/components/Link';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageReleaseFind from './images/guidance/guidance-edit-release-find.png';
-import imageReleaseFilter from './images/guidance/guidance-edit-release-filter.png';
+import imageReleaseFilter from './images/guidance/guidance-publication-select-theme.png';
 import imageReleaseDraft from './images/guidance/guidance-edit-release-draft.png';
 import imageReleaseHighReview from './images/guidance/guidance-edit-release-high-review.png';
 import imageReleaseContent from './images/guidance/guidance-edit-release-content.png';

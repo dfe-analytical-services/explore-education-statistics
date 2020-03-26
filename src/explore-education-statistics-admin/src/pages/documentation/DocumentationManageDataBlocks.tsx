@@ -12,7 +12,7 @@ import imageDataBlockFilters from './images/guidance/guidance-datablocks-filters
 import imageDataBlockViewSave from './images/guidance/guidance-datablocks-view-save.png';
 import imageDataBlockCreateChart from './images/guidance/guidance-datablocks-create-chart.png';
 import imageDataBlockTitle from './images/guidance/guidance-datablocks-title.png';
-import imageDataBlockSourceFootnotes from './images/guidance/guidance-datablocks-source-footnotes.png';
+import imageDataBlockSource from './images/guidance/guidance-datablocks-source.png';
 import imageDataBlockName from './images/guidance/guidance-datablocks-name.png';
 import imageDataBlockViewEdit from './images/guidance/guidance-datablocks-view-edit.png';
 import imageDataBlockViewTable from './images/guidance/guidance-datablocks-view-table.png';
@@ -208,29 +208,6 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To create charts for your release - use the ‘Create chart’
-                    tab and select the type of chart you want to create.
-                  </h4>
-                  <p>
-                    For detailed guidance on how to configure charts within your
-                    release{' '}
-                    <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
-                      Configuring charts: step by step
-                    </a>{' '}
-                  </p>
-                  <p>
-                    If you can’t create the type of chart you’re looking for -
-                    you can upload an infographic as an alternative by selecting
-                    the ‘Choose an infographic as alternative’ link.
-                  </p>
-                  <img
-                    src={imageDataBlockCreateChart}
-                    className="govuk-!-width-three-quarters"
-                    alt=""
-                  />
-                </li>
-                <li>
-                  <h4 className="govuk-heading-s">
                     Add a plain English title for your data block into the open
                     text field under ‘Data block title’.
                   </h4>
@@ -260,7 +237,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     non-expert users.
                   </p>
                   <img
-                    src={imageDataBlockSourceFootnotes}
+                    src={imageDataBlockSource}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />
@@ -279,6 +256,29 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   </p>
                   <img
                     src={imageDataBlockName}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    To create charts for your release - use the ‘Create chart’
+                    tab and select the type of chart you want to create.
+                  </h4>
+                  <p>
+                    For detailed guidance on how to configure charts within your
+                    release{' '}
+                    <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
+                      Configuring charts: step by step
+                    </a>{' '}
+                  </p>
+                  <p>
+                    If you can’t create the type of chart you’re looking for -
+                    you can upload an infographic as an alternative by selecting
+                    the ‘Choose an infographic as alternative’ link.
+                  </p>
+                  <img
+                    src={imageDataBlockCreateChart}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />
