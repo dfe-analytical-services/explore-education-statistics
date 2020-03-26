@@ -27,6 +27,8 @@ const ReleaseServiceStatus = ({
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchReleaseServiceStatus = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    getReleaseStatusStages();
     return dashboardService
       .getReleaseStatus(releaseId)
       .then(status => {
@@ -53,6 +55,10 @@ const ReleaseServiceStatus = ({
       })
       .then(forceCheck);
   }, [releaseId, refreshPeriod]);
+
+  const getReleaseStatusStages = () => {
+    console.log(currentStatus);
+  };
 
   function cancelTimer() {
     if (timeoutRef.current) clearInterval(timeoutRef.current);
@@ -118,6 +124,7 @@ const ReleaseServiceStatus = ({
       )}
 
       {currentStatus &&
+        Object.entries(currentStatus).length > 2 &&
         currentStatus.overallStage !== 'Scheduled' &&
         currentStatus.overallStage !== 'Invalid' &&
         exclude !== 'details' && (
