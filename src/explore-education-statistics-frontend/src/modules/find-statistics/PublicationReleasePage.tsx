@@ -62,6 +62,15 @@ class PublicationReleasePage extends Component<Props> {
       data.publication.otherReleases.length +
       data.publication.legacyReleases.length;
 
+    let methodologyUrl = '';
+    let methodologySummary = '';
+    if (data.publication.methodology) {
+      methodologyUrl = `/methodology/${data.publication.methodology.slug}`;
+      methodologySummary = data.publication.methodology.summary;
+    } else if (data.publication.externalMethodology) {
+      methodologyUrl = data.publication.externalMethodology.url;
+    }
+
     return (
       <Page
         title={data.publication.title}
@@ -271,31 +280,44 @@ class PublicationReleasePage extends Component<Props> {
                   </dd>
                 </dl>
               )}
-              <h2
-                className="govuk-heading-m govuk-!-margin-top-6"
-                id="related-content"
-              >
-                Related guidance
-              </h2>
-              <nav role="navigation" aria-labelledby="related-content">
-                <ul className="govuk-list">
-                  {data.publication.methodology && (
-                    <li>
-                      <Link
-                        to={`/methodology/${data.publication.methodology.slug}`}
-                      >
-                        {`${data.publication.title}: methodology`}
-                      </Link>
-                    </li>
-                  )}
-                  {data.relatedInformation &&
-                    data.relatedInformation.map(link => (
-                      <li key={link.id}>
-                        <a href={link.url}>{link.description}</a>
-                      </li>
-                    ))}
-                </ul>
-              </nav>
+              {(data.publication.methodology ||
+                data.publication.externalMethodology ||
+                data.relatedInformation.length !== 0) && (
+                <>
+                  <h2
+                    className="govuk-heading-m govuk-!-margin-top-6"
+                    id="related-content"
+                  >
+                    Related guidance
+                  </h2>
+                  <nav role="navigation" aria-labelledby="related-content">
+                    <ul className="govuk-list">
+                      {data.publication.methodology && (
+                        <li>
+                          <Link
+                            to={`/methodology/${data.publication.methodology.slug}`}
+                          >
+                            {`${data.publication.title}: methodology`}
+                          </Link>
+                        </li>
+                      )}
+                      {data.publication.externalMethodology && (
+                        <li>
+                          <Link to={data.publication.externalMethodology.url}>
+                            {data.publication.externalMethodology.title}
+                          </Link>
+                        </li>
+                      )}
+                      {data.relatedInformation &&
+                        data.relatedInformation.map(link => (
+                          <li key={link.id}>
+                            <a href={link.url}>{link.description}</a>
+                          </li>
+                        ))}
+                    </ul>
+                  </nav>
+                </>
+              )}
             </RelatedAside>
           </div>
         </div>
@@ -342,13 +364,8 @@ class PublicationReleasePage extends Component<Props> {
         <HelpAndSupport
           accordionId={this.accId[1]}
           publicationTitle={data.publication.title}
-          methodologyUrl={
-            data.publication.methodology &&
-            `/methodology/${data.publication.methodology.slug}`
-          }
-          methodologySummary={
-            data.publication.methodology && data.publication.methodology.summary
-          }
+          methodologyUrl={methodologyUrl}
+          methodologySummary={methodologySummary}
           themeTitle={data.publication.topic.theme.title}
           publicationContact={data.publication.contact}
           releaseType={data.type.title}
