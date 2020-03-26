@@ -563,11 +563,7 @@ export function generateMajorAxis(
   return { domain, ticks };
 }
 
-export function parseMetaData(
-  metaData?: DataBlockMetadata,
-): ChartMetaData | undefined {
-  if (metaData === undefined) return undefined;
-
+export function parseMetaData(metaData: DataBlockMetadata): ChartMetaData {
   return {
     filters: metaData.filters,
     footnotes: metaData.footnotes,

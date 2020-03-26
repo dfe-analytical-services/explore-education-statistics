@@ -1,6 +1,7 @@
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
+import { ReleaseProvider } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import permissionService, {
   PreReleaseWindowStatus,
 } from '@admin/services/permissions/permissionService';
@@ -75,7 +76,17 @@ const PreReleasePage = ({
           includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
         >
           {model.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
-            model.content && <PublicationReleaseContent />}
+            model.content && (
+              <ReleaseProvider
+                value={{
+                  ...model?.content,
+                  canUpdateRelease: false,
+                  unresolvedComments: [],
+                }}
+              >
+                <PublicationReleaseContent />
+              </ReleaseProvider>
+            )}
 
           {model.preReleaseWindowStatus.preReleaseAccess === 'Before' && (
             <>

@@ -1,13 +1,15 @@
-import { produce } from 'immer';
 import {
+  EditableBlock,
   EditableContentBlock,
   EditableRelease,
 } from '@admin/services/publicationService';
+import { DataBlock } from '@common/services/types/blocks';
+import { produce } from 'immer';
 import {
-  releaseReducer as originalReleaseReducer,
   ReleaseContextState,
+  releaseReducer as originalReleaseReducer,
 } from '../ReleaseContext';
-import ReleaseDispatchAction from '../ReleaseContextActionTypes';
+import { ReleaseDispatchAction } from '../ReleaseContextActionTypes';
 
 const basicRelease: EditableRelease = {
   id: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
@@ -181,7 +183,6 @@ const basicRelease: EditableRelease = {
       {
         heading:
           "Table showing Main reason for issue: Arriving late for 'prma' from 'My Pub' in England for 2017/18",
-        customFootnotes: '',
         name: 'Main Reason (Key Stat)',
         source: '',
         dataBlockRequest: {
@@ -207,7 +208,6 @@ const basicRelease: EditableRelease = {
       {
         heading:
           "Table showing Main reason for issue: Absence due to other unauthorised circumstances for 'prma' from 'My Pub' in England for 2017/18",
-        customFootnotes: '',
         name: "Unauth'd (Key Stat)",
         source: '',
         dataBlockRequest: {
@@ -283,8 +283,15 @@ const basicRelease: EditableRelease = {
   relatedInformation: [],
 };
 
-const basicDataBlock = {
+const basicDataBlock: DataBlock = {
   id: 'datablock-0',
+  order: 1,
+  type: 'DataBlock',
+  name: 'Test data block',
+  heading: '',
+  source: '',
+  charts: [],
+  tables: [],
   dataBlockRequest: {
     filters: [],
     indicators: [],
@@ -298,70 +305,22 @@ const releaseReducer = (
 ) => produce(initial, draft => originalReleaseReducer(draft, action));
 
 describe('ReleaseContext', () => {
-  test('CLEAR_STATE clears state', () => {
-    expect(
-      releaseReducer(
-        {
-          release: basicRelease,
-          canUpdateRelease: true,
-          availableDataBlocks: [basicDataBlock],
-          unresolvedComments: [],
-        },
-        { type: 'CLEAR_STATE' },
-      ),
-    ).toEqual({
-      release: undefined,
-      canUpdateRelease: false,
-      availableDataBlocks: [],
-      unresolvedComments: [],
-    });
-  });
-
-  test('SET_STATE sets the state', () => {
-    expect(
-      releaseReducer(
-        {
-          release: undefined,
-          canUpdateRelease: false,
-          availableDataBlocks: [],
-          unresolvedComments: [],
-        },
-        {
-          type: 'SET_STATE',
-          payload: {
-            release: basicRelease,
-            canUpdateRelease: true,
-            availableDataBlocks: [basicDataBlock],
-            unresolvedComments: [],
-          },
-        },
-      ),
-    ).toEqual({
-      release: basicRelease,
-      canUpdateRelease: true,
-      availableDataBlocks: [basicDataBlock],
-      unresolvedComments: [],
-    });
-  });
-
   test('SET_AVAILABLE_DATABLOCKS sets datablocks', () => {
     expect(
       releaseReducer(
         {
-          release: undefined,
+          release: basicRelease,
           canUpdateRelease: false,
           availableDataBlocks: [],
           unresolvedComments: [],
         },
         {
           type: 'SET_AVAILABLE_DATABLOCKS',
-          payload: {
-            availableDataBlocks: [basicDataBlock],
-          },
+          payload: [basicDataBlock],
         },
       ),
     ).toEqual({
-      release: undefined,
+      release: basicRelease,
       canUpdateRelease: false,
       availableDataBlocks: [basicDataBlock],
       unresolvedComments: [],
@@ -371,10 +330,8 @@ describe('ReleaseContext', () => {
   test('REMOVE_BLOCK_FROM_SECTION removes a block from a section', () => {
     const sectionKey = 'keyStatisticsSection';
     const keyStatsSection = basicRelease[sectionKey];
-    const removingBlockId = (keyStatsSection.content as EditableContentBlock[])[0]
-      .id;
-    const originalLength = (keyStatsSection.content as EditableContentBlock[])
-      .length;
+    const removingBlockId = keyStatsSection.content[0].id;
+    const originalLength = keyStatsSection.content.length;
 
     const { release } = releaseReducer(
       {
@@ -518,6 +475,7 @@ describe('ReleaseContext', () => {
     const section = basicRelease[sectionKey];
     const newBlock: EditableContentBlock = {
       id: '123',
+      order: 0,
       body: 'This section is empty...',
       comments: [],
       type: 'MarkDownBlock',
@@ -559,6 +517,7 @@ describe('ReleaseContext', () => {
 
     const newBlock: EditableContentBlock = {
       id: '123',
+      order: 0,
       body: 'This section is empty...',
       comments: [],
       type: 'MarkDownBlock',
@@ -596,10 +555,11 @@ describe('ReleaseContext', () => {
   });
 
   test("UPDATE_SECTION_CONTENT updates a section's content with new content", () => {
-    const newContent: EditableContentBlock[] = [
+    const newContent: EditableBlock[] = [
       {
+        name: 'Test datablock',
         heading: "Table showing 'prma' from 'My Pub' in England for 2017/18",
-        body: '',
+        source: '',
         dataBlockRequest: {
           subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
           timePeriod: {
@@ -693,6 +653,7 @@ describe('ReleaseContext', () => {
             heading: 'A new section',
             id: 'new-section-1',
             order: basicRelease.content.length,
+            content: [],
           },
         },
       },

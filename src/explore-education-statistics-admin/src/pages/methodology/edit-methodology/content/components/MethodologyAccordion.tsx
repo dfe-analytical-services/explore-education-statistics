@@ -29,7 +29,7 @@ const MethodologyAccordion = ({
         order: methodology[sectionKey].length,
         sectionKey,
       }),
-    [methodology.id, addContentSection],
+    [addContentSection, methodology, sectionKey],
   );
 
   const reorderAccordionSections = useCallback(
@@ -40,7 +40,7 @@ const MethodologyAccordion = ({
         sectionKey,
       });
     },
-    [methodology.id, updateContentSectionsOrder],
+    [methodology.id, sectionKey, updateContentSectionsOrder],
   );
 
   if (sectionKey === 'annexes' && !isEditing && methodology.annexes.length < 1)

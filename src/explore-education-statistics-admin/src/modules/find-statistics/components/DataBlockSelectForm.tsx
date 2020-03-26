@@ -1,10 +1,9 @@
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import DataBlock, {
-  DataBlockProps,
-} from '@common/modules/find-statistics/components/DataBlock';
+import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 import React, { useState } from 'react';
 
 interface Props {
@@ -14,18 +13,18 @@ interface Props {
   label?: string;
 }
 
-const DatablockSelectForm = ({
+const DataBlockSelectForm = ({
   onSelect,
   onCancel = () => {},
   hideCancel = false,
   label = 'Select a data block',
 }: Props) => {
-  const { availableDataBlocks } = useReleaseState();
+  const { availableDataBlocks, release } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
-  const getDBPreview = (datablockId: string) => {
+  const getDataBlockPreview = (dataBlockId: string) => {
     const selectedDataBlock = availableDataBlocks.find(
-      datablock => datablock.id === datablockId,
+      dataBlock => dataBlock.id === dataBlockId,
     );
     return selectedDataBlock ? (
       <section>
@@ -35,7 +34,14 @@ const DatablockSelectForm = ({
           open
           onToggle={() => {}}
         >
-          <DataBlock {...(selectedDataBlock as DataBlockProps)} />
+          <DataBlockRenderer
+            dataBlock={selectedDataBlock}
+            id={`dataBlockSelectForm-${
+              selectedDataBlock ? `${selectedDataBlock.id}-tabs` : 'tabs'
+            }`}
+            releaseId={release.id}
+            getInfographic={editReleaseDataService.downloadChartFile}
+          />
         </Details>
       </section>
     ) : null;
@@ -65,7 +71,7 @@ const DatablockSelectForm = ({
       <Button className="govuk-button--secondary" onClick={onCancel}>
         Cancel
       </Button>
-      {getDBPreview(selectedDataBlockId)}
+      {getDataBlockPreview(selectedDataBlockId)}
       {selectedDataBlockId !== '' && (
         <>
           <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
@@ -80,4 +86,4 @@ const DatablockSelectForm = ({
   );
 };
 
-export default DatablockSelectForm;
+export default DataBlockSelectForm;

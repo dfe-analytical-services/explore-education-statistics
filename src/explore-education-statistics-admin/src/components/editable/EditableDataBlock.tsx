@@ -1,9 +1,10 @@
-import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
-import DataBlock, {
-  DataBlockProps,
-} from '@common/modules/find-statistics/components/DataBlock';
+import DataBlockRenderer, {
+  DataBlockRendererProps,
+} from '@common/modules/find-statistics/components/DataBlockRenderer';
+import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import styles from './EditableDataBlock.module.scss';
@@ -12,20 +13,26 @@ type Props = {
   canDelete?: boolean;
   onDelete?: () => void;
   editable?: boolean;
-} & DataBlockProps;
+} & OmitStrict<DataBlockRendererProps, 'getInfographic'>;
 
 const EditableDataBlock = ({
   id,
   onDelete,
   editable,
-  ...restOfProps
+  releaseId,
+  ...props
 }: Props) => {
-  const { releaseId } = useManageReleaseContext();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (
     <div className={styles.wrapper}>
-      <DataBlock id={id} {...restOfProps} releaseId={releaseId} />
+      <DataBlockRenderer
+        {...props}
+        id={id}
+        releaseId={releaseId}
+        getInfographic={editReleaseDataService.downloadChartFile}
+      />
+
       {editable && (
         <Button
           className={classNames(

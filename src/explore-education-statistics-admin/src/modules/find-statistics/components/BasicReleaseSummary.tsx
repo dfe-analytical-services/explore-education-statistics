@@ -2,7 +2,7 @@ import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryU
 import commonService from '@admin/services/common/service';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import FormattedDate from '@common/components/FormattedDate';
-import { AbstractRelease } from '@common/services/publicationService';
+import { Release } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import {
   dayMonthYearIsComplete,
@@ -22,7 +22,7 @@ const nationalStatisticsLogo: ReleaseTypeIcon = {
 };
 
 interface Props {
-  release: AbstractRelease<EditableContentBlock>;
+  release: Release<EditableContentBlock>;
 }
 
 const BasicReleaseSummary = ({ release }: Props) => {

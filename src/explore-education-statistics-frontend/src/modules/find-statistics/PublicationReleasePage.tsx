@@ -3,8 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
-import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
@@ -19,12 +18,13 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
+import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { NextPageContext } from 'next';
 import React, { Component } from 'react';
-import HeadlinesSection from './components/PublicationReleaseHeadlinesSection';
+import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
 interface Props {
@@ -150,14 +150,10 @@ class PublicationReleasePage extends Component<Props> {
               </div>
             </div>
 
-            {(data.summarySection.content || []).map((block, i) => (
-              <ContentSubBlockRenderer
-                key={block.id}
-                id={`summary-section-${i}`}
-                publication={data.publication}
-                block={block}
-              />
+            {data.summarySection.content.map(block => (
+              <ContentBlockRenderer key={block.id} block={block} />
             ))}
+
             {data.downloadFiles && (
               <Details
                 summary="Download data files"
@@ -327,8 +323,8 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        <HeadlinesSection
-          publication={data.publication}
+        <PublicationReleaseHeadlinesSection
+          releaseId={data.id}
           keyStatisticsSection={data.keyStatisticsSection}
           headlinesSection={data.headlinesSection}
           keyStatisticsSecondarySection={data.keyStatisticsSecondarySection}
@@ -343,9 +339,8 @@ class PublicationReleasePage extends Component<Props> {
                   caption={caption}
                   key={order}
                 >
-                  <ContentBlock
+                  <PublicationSectionBlocks
                     content={content}
-                    id={`content_${order}`}
                     publication={data.publication}
                     onToggle={(section: { id: string; title: string }) => {
                       logEvent(

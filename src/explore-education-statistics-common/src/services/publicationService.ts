@@ -1,6 +1,4 @@
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
-import { DataBlockRequest } from '@common/services/dataBlockService';
+import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 import { DayMonthYearValues } from '@common/utils/date/dayMonthYear';
 import { contentApi } from './api';
 
@@ -54,44 +52,6 @@ export interface PublicationTitle {
   title: string;
 }
 
-export interface DataQuery {
-  method: string;
-  path: string;
-  body: string;
-}
-
-export type Chart = ChartRendererProps;
-
-export interface Table {
-  indicators: string[];
-  tableHeaders: TableHeadersConfig;
-}
-
-export interface Summary {
-  dataKeys: string[];
-  dataSummary: string[];
-  dataDefinitionTitle: string[];
-  dataDefinition: string[];
-}
-
-export type ContentBlockType =
-  | 'MarkDownBlock'
-  | 'InsetTextBlock'
-  | 'DataBlock'
-  | 'HtmlBlock';
-
-export interface ContentBlock {
-  id: string;
-  order?: number;
-  type: ContentBlockType;
-  body: string;
-  heading?: string;
-  dataBlockRequest?: DataBlockRequest;
-  charts?: Chart[];
-  tables?: Table[];
-  summary?: Summary;
-}
-
 export interface BasicLink {
   id: string;
   description: string;
@@ -111,16 +71,17 @@ export enum ReleaseType {
   OfficialStatistics = 'Official Statistics',
 }
 
-export interface ContentSection<ContentBlockType> {
+export interface ContentSection<BlockType> {
   id: string;
   order: number;
   heading: string;
   caption: string;
-  content?: ContentBlockType[];
+  content: BlockType[];
 }
 
-export interface AbstractRelease<
-  ContentBlockType,
+export interface Release<
+  ContentBlockType extends ContentBlock = ContentBlock,
+  DataBlockType extends DataBlock = DataBlock,
   PublicationType = Publication
 > {
   id: string;
@@ -131,8 +92,8 @@ export interface AbstractRelease<
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
-  keyStatisticsSection: ContentSection<ContentBlockType>;
-  keyStatisticsSecondarySection?: ContentSection<ContentBlockType>;
+  keyStatisticsSection: ContentSection<DataBlockType>;
+  keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
   publication: PublicationType;
   latestRelease: boolean;
@@ -145,7 +106,7 @@ export interface AbstractRelease<
     title: ReleaseType;
   };
   updates: ReleaseNote[];
-  content: ContentSection<ContentBlockType>[];
+  content: ContentSection<ContentBlockType | DataBlockType>[];
   dataFiles?: {
     extension: string;
     name: string;
@@ -160,8 +121,6 @@ export interface AbstractRelease<
   }[];
   prerelease?: boolean;
 }
-
-export type Release = AbstractRelease<ContentBlock>;
 
 export default {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {

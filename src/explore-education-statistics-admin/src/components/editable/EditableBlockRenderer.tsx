@@ -3,22 +3,24 @@ import EditableHtmlRenderer from '@admin/components/editable/EditableHtmlRendere
 import EditableMarkdownRenderer, {
   MarkdownRendererProps,
 } from '@admin/components/editable/EditableMarkdownRenderer';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import { EditableBlock } from '@admin/services/publicationService';
 import React from 'react';
 
 interface Props extends MarkdownRendererProps {
-  block: EditableContentBlock;
+  block: EditableBlock;
 }
 
-function EditableContentSubBlockRenderer({
+function EditableBlockRenderer({
   block,
   editable,
-  releaseId,
   insideAccordion,
   onContentChange,
   canDelete = false,
   onDelete,
 }: Props) {
+  const { releaseId } = useManageReleaseContext();
+
   switch (block.type) {
     case 'MarkDownBlock':
       return (
@@ -36,11 +38,12 @@ function EditableContentSubBlockRenderer({
       return (
         <div className="dfe-content-overflow">
           <EditableDataBlock
+            id={`editableBlockRenderer-dataBlock-${block.id}`}
+            dataBlock={block}
             editable={editable}
-            {...block}
+            releaseId={releaseId}
             canDelete={canDelete}
             onDelete={onDelete}
-            releaseId={releaseId}
           />
         </div>
       );
@@ -57,8 +60,8 @@ function EditableContentSubBlockRenderer({
         />
       );
     default:
-      return <div>Unable to edit content type {block.type}</div>;
+      return <div>Unable to edit content</div>;
   }
 }
 
-export default EditableContentSubBlockRenderer;
+export default EditableBlockRenderer;
