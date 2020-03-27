@@ -135,5 +135,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             return true;
         }
+
+        public Task<List<Subject>> GetSubjectsForReleaseAsync(Guid releaseId)
+        {
+            return _context
+                .ReleaseSubject
+                .Include(s => s.Subject)
+                .Where(s => s.ReleaseId == releaseId)
+                .Select(s => s.Subject)
+                .ToListAsync();
+        } 
     }
 }

@@ -21,7 +21,7 @@ const AddDataBlockButton = ({ onAddDataBlock }: AddContentButtonProps) => {
     />
   ) : (
     <Button variant="secondary" onClick={() => setShowForm(true)}>
-      Add DataBlock
+      Add data block
     </Button>
   );
 };

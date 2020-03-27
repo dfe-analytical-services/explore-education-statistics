@@ -38,9 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ =>
+                .OnSuccess(async _ =>
                 {
-                    var subjects = _releaseMetaService.GetSubjects(releaseId).ToList();
+                    var subjects = (await _releaseMetaService.GetSubjectsAsync(releaseId)).ToList();
                     if (!subjects.Any())
                     {
                         return NotFound<ReleaseSubjectsMetaViewModel>();

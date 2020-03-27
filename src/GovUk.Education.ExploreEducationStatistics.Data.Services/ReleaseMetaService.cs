@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -20,10 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<IdLabel> GetSubjects(Guid releaseId)
+        public async Task<IEnumerable<IdLabel>> GetSubjectsAsync(Guid releaseId)
         {
-            return _mapper.Map<IEnumerable<IdLabel>>(
-                _subjectService.FindMany(subject => subject.Release.Id == releaseId));
+            var subjects = await _subjectService.GetSubjectsForReleaseAsync(releaseId);
+            return _mapper.Map<IEnumerable<IdLabel>>(subjects);
         }
     }
 }

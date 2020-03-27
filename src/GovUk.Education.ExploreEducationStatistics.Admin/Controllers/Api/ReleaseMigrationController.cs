@@ -32,11 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseMigrationService = releaseMigrationService;
         }
 
-        [HttpPost("release/{releaseId}/populate-release-file-tables")]
-        public async Task<ActionResult<List<ReleaseFile>>> PopulateReleaseFileTables(Guid releaseId)
+        [HttpPost("release/{releaseId}/populate-release-amendment-tables")]
+        public async Task<ActionResult<bool>> PopulateReleaseAmendmentTables(Guid releaseId)
         {
             return await _releaseMigrationService
-                .PopulateReleaseFileTables(releaseId)
+                .PopulateReleaseAmendmentTables(releaseId)
+                .OnSuccess(_ => true)
                 .HandleFailuresOrOk();
         }
     }

@@ -8,10 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -43,75 +45,92 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileStorageService = fileStorageService;
         }
 
-        public Task<Either<ActionResult, List<ReleaseFile>>> PopulateReleaseFileTables(Guid releaseId)
+        public Task<Either<ActionResult, Release>> PopulateReleaseAmendmentTables(Guid releaseId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
 //                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async _ =>
+                .OnSuccess(PopulateFileTables)
+                .OnSuccess(PopulateReleaseSubjectTable);
+        }
+
+        private async Task<Either<ActionResult, Release>> PopulateFileTables(Release release)
+        {
+            var dataFiles = (await _fileStorageService
+                    .ListFilesFromBlobStorage(release.Id, ReleaseFileTypes.Data))
+                .Where(f => f.MetaFileName?.Length > 0)
+                .Select(f => (f, ReleaseFileTypes.Data));
+
+            var metadataFiles = (await _fileStorageService
+                    .ListFilesFromBlobStorage(release.Id, ReleaseFileTypes.Data))
+                .Where(f => f.MetaFileName?.Length == 0)
+                .Select(f => (f, ReleaseFileTypes.Metadata));
+
+            var ancillaryFiles = (await _fileStorageService
+                    .ListFilesFromBlobStorage(release.Id, ReleaseFileTypes.Ancillary))
+                .Select(f => (f, ReleaseFileTypes.Ancillary));
+
+            var chartFiles = (await _fileStorageService
+                    .ListFilesFromBlobStorage(release.Id, ReleaseFileTypes.Chart))
+                .Select(f => (f, ReleaseFileTypes.Chart));
+
+            var allFiles = dataFiles
+                .Concat(metadataFiles)
+                .Concat(ancillaryFiles)
+                .Concat(chartFiles);
+
+            var existingLinks = _contentDbContext
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Where(f => f.ReleaseId == release.Id)
+                .ToList();
+
+            allFiles
+                .Where(file => !existingLinks
+                    .Select(e => e.ReleaseFileReference.Filename)
+                    .Contains(file.Item1.FileName))
+                .ToList()
+                .ForEach(fileAndType =>
                 {
-                    var dataFiles = (await _fileStorageService
-                        .ListFilesFromBlobStorage(releaseId, ReleaseFileTypes.Data))
-                        .Where(f => f.MetaFileName?.Length > 0)
-                        .Select(f => (f, ReleaseFileTypes.Data));
+                    var subject = _statisticsDbContext
+                        .Subject
+                        .FirstOrDefault(s => s.Name == fileAndType.Item1.Name);
 
-                    var metadataFiles = (await _fileStorageService
-                            .ListFilesFromBlobStorage(releaseId, ReleaseFileTypes.Data))
-                        .Where(f => f.MetaFileName?.Length == 0)
-                        .Select(f => (f, ReleaseFileTypes.Metadata));
-
-                    var ancillaryFiles = (await _fileStorageService
-                        .ListFilesFromBlobStorage(releaseId, ReleaseFileTypes.Ancillary)) 
-                        .Select(f => (f, ReleaseFileTypes.Ancillary));
-                    
-                    var chartFiles = (await _fileStorageService
-                        .ListFilesFromBlobStorage(releaseId, ReleaseFileTypes.Chart))
-                        .Select(f => (f, ReleaseFileTypes.Chart));
-
-                    return dataFiles
-                        .Concat(metadataFiles)
-                        .Concat(ancillaryFiles)
-                        .Concat(chartFiles);
-                })
-                .OnSuccess(async filesAndTypes =>
-                {
-                    var existingLinks = _contentDbContext
-                        .ReleaseFiles
-                        .Include(f => f.ReleaseFileReference)
-                        .Where(f => f.ReleaseId == releaseId)
-                        .ToList();
-                        
-                    filesAndTypes
-                        .Where(file => !existingLinks
-                            .Select(e => e.ReleaseFileReference.Filename)
-                            .Contains(file.Item1.FileName))
-                        .ToList()
-                        .ForEach(fileAndType =>
+                    _contentDbContext.Add(new ReleaseFile
+                    {
+                        ReleaseId = release.Id,
+                        ReleaseFileReference = new ReleaseFileReference
                         {
-                            var subject = _statisticsDbContext
-                                .Subject
-                                .FirstOrDefault(s => s.Name == fileAndType.Item1.Name);
-
-                            _contentDbContext.Add(new ReleaseFile
-                            {
-                                ReleaseId = releaseId,
-                                ReleaseFileReference = new ReleaseFileReference
-                                {
-                                    ReleaseId = releaseId,
-                                    Filename = fileAndType.Item1.FileName,
-                                    SubjectId = subject?.Id,
-                                    ReleaseFileType = fileAndType.Item2
-                                }
-                            });
-                        });
-
-                    await _contentDbContext.SaveChangesAsync();
-
-                    return await _contentDbContext
-                        .ReleaseFiles
-                        .Where(f => f.ReleaseId == releaseId)
-                        .ToListAsync();
+                            ReleaseId = release.Id,
+                            Filename = fileAndType.Item1.FileName,
+                            SubjectId = subject?.Id,
+                            ReleaseFileType = fileAndType.Item2
+                        }
+                    });
                 });
+
+            await _contentDbContext.SaveChangesAsync();
+
+            return release;
+        }
+
+        private async Task<Either<ActionResult, Release>> PopulateReleaseSubjectTable(Release release)
+        {
+            var subjectLinks = _statisticsDbContext
+                .Subject
+                .Where(s => s.ReleaseId == release.Id);
+
+            var releaseSubjectLinks = subjectLinks
+                .Select(s => new ReleaseSubject
+                {
+                    SubjectId = s.Id,
+                    ReleaseId = s.ReleaseId
+                });
+            
+            _statisticsDbContext.AddRange(releaseSubjectLinks);
+            await _statisticsDbContext.SaveChangesAsync();
+
+            return release;
         }
     }
 }

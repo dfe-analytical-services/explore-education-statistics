@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _context;
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IPublishingService _publishingService;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
@@ -59,7 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ITableStorageService tableStorageService, 
             IFileStorageService fileStorageService, 
             IImportStatusService importStatusService,
-	    IFootnoteService footnoteService)
+	        IFootnoteService footnoteService, 
+            StatisticsDbContext statisticsDbContext)
         {
             _context = context;
             _publishingService = publishingService;
@@ -72,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
             _footnoteService = footnoteService;
+            _statisticsDbContext = statisticsDbContext;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
@@ -156,9 +160,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
+                    .OnSuccess(CreateStatisticsReleaseRecord)
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id)));
+        }
+
+        private async Task<Either<ActionResult, Release>> CreateStatisticsReleaseRecord(Release amendment)
+        {
+            var statsRelease =_statisticsDbContext
+                .Release
+                .First(r => r.Id == amendment.OriginalId);
+
+            // TODO - this is currently only possible if a Live release was available
+            // without any subjects uploaded for it.  Does this check need to remain?
+            if (statsRelease != null)
+            {
+                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
+
+                var statsAmendmentSubjectLinks =_statisticsDbContext
+                    .ReleaseSubject
+                    .Where(s => s.ReleaseId == amendment.OriginalId)
+                    .Select(s => new ReleaseSubject
+                    {
+                        ReleaseId = statsAmendment.Id,
+                        SubjectId = s.SubjectId
+                    });
+
+                _statisticsDbContext.Release.Add(statsAmendment);
+                _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
+                await _statisticsDbContext.SaveChangesAsync();
+            }
+            
+            return amendment;
         }
 
         private async Task<Either<ActionResult, Release>> CopyReleaseTeam(Guid originalReleaseId, Release amendment)
@@ -221,9 +255,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
                 .OnSuccess(async () =>
                 {
-                    var release = await _context.Releases
-                        .Where(r => r.Id == releaseId)
-                        .FirstOrDefaultAsync();
+                    var release = await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(_context.Releases
+                            .Where(r => r.Id == releaseId));
 
                     release.Slug = request.Slug;
                     release.TypeId = request.TypeId;
@@ -284,13 +317,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<List<ContentSection>> GetContentAsync(Guid id)
         {
-            return await _context
-                .ReleaseContentSections
-                .Include(join => join.ContentSection)
-                .ThenInclude(section => section.Content)
-                .Where(join => join.ReleaseId == id)
-                .Select(join => join.ContentSection)
-                .ToListAsync();
+            return await EntityFrameworkQueryableExtensions.ToListAsync(_context
+                    .ReleaseContentSections
+                    .Include(join => @join.ContentSection)
+                    .ThenInclude(section => section.Content)
+                    .Where(join => @join.ReleaseId == id)
+                    .Select(join => @join.ContentSection));
         }
 
         private async Task<List<ContentSection>> TemplateFromRelease(Guid? releaseId)
@@ -410,10 +442,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var fileLink = await _context
-                        .ReleaseFiles
-                        .Include(f => f.ReleaseFileReference)
-                        .FirstOrDefaultAsync(f =>
+                    var fileLink = await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(_context
+                            .ReleaseFiles
+                            .Include(f => f.ReleaseFileReference), f =>
                             f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
 
                     if (fileLink == null)
