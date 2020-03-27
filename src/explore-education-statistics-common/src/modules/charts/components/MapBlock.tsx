@@ -463,7 +463,7 @@ const MapBlock = ({
             }))
             .map(
               ({ label, value, unit }) =>
-                `${label} : ${formatPretty(value)}${unit}`,
+                `${label} : ${formatPretty(value, unit)}`,
             );
 
           if (feature.id) {
@@ -666,11 +666,13 @@ const MapBlock = ({
                       >
                         &nbsp;
                       </span>
-                      {` ${formatPretty(min)}${
-                        labels[selectedDataSetKey].unit
-                      } to ${formatPretty(max)}${
-                        labels[selectedDataSetKey].unit
-                      }`}
+                      {` ${formatPretty(
+                        min,
+                        labels[selectedDataSetKey].unit,
+                      )} to ${formatPretty(
+                        max,
+                        labels[selectedDataSetKey].unit,
+                      )}`}
                     </dd>
                   ))}
               </dl>
@@ -693,7 +695,12 @@ const MapBlock = ({
                     className="govuk-heading-xl govuk-!-margin-bottom-2"
                     aria-label={labels[result.id].label}
                   >
-                    <span>{` ${result.value}${labels[result.id].unit} `}</span>
+                    <span>
+                      {` ${formatPretty(
+                        result.value,
+                        labels[result.id].unit,
+                      )} `}
+                    </span>
                   </p>
                   {/*
                 <Details summary={`What is ${labels[result.id].label}?`}>
