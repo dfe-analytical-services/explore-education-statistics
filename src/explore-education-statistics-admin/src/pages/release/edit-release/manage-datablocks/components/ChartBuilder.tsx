@@ -1,10 +1,10 @@
+import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
 import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
@@ -118,6 +118,8 @@ const ChartBuilder = ({
     isValid,
   } = chartBuilderState;
 
+  const getChartFile = useGetChartFile(data.releaseId);
+
   const labels: Dictionary<DataSetConfiguration> = useMemo(
     () => ({
       ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
@@ -152,8 +154,8 @@ const ChartBuilder = ({
           ...baseProps,
           labels: {},
           type: 'infographic',
-          releaseId: data.releaseId,
-          getInfographic: editReleaseDataService.downloadChartFile,
+          fileId: options.fileId ?? '',
+          getInfographic: getChartFile,
         };
       case 'line':
         return {

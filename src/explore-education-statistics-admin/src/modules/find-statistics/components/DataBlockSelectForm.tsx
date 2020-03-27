@@ -1,5 +1,5 @@
+import useGetChartFile from '@admin/hooks/useGetChartFile';
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
@@ -22,6 +22,8 @@ const DataBlockSelectForm = ({
   const { availableDataBlocks, release } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
+  const getChartFile = useGetChartFile(release.id);
+
   const getDataBlockPreview = (dataBlockId: string) => {
     const selectedDataBlock = availableDataBlocks.find(
       dataBlock => dataBlock.id === dataBlockId,
@@ -39,8 +41,7 @@ const DataBlockSelectForm = ({
             id={`dataBlockSelectForm-${
               selectedDataBlock ? `${selectedDataBlock.id}-tabs` : 'tabs'
             }`}
-            releaseId={release.id}
-            getInfographic={editReleaseDataService.downloadChartFile}
+            getInfographic={getChartFile}
           />
         </Details>
       </section>

@@ -1,4 +1,4 @@
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
+import useGetChartFile from '@admin/hooks/useGetChartFile';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import DataBlockRenderer, {
@@ -13,6 +13,7 @@ type Props = {
   canDelete?: boolean;
   onDelete?: () => void;
   editable?: boolean;
+  releaseId: string;
 } & OmitStrict<DataBlockRendererProps, 'getInfographic'>;
 
 const EditableDataBlock = ({
@@ -24,14 +25,11 @@ const EditableDataBlock = ({
 }: Props) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  const getChartFile = useGetChartFile(releaseId);
+
   return (
     <div className={styles.wrapper}>
-      <DataBlockRenderer
-        {...props}
-        id={id}
-        releaseId={releaseId}
-        getInfographic={editReleaseDataService.downloadChartFile}
-      />
+      <DataBlockRenderer {...props} id={id} getInfographic={getChartFile} />
 
       {editable && (
         <Button

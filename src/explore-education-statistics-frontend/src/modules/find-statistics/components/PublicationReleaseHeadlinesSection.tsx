@@ -1,4 +1,5 @@
 import TabsSection from '@common/components/TabsSection';
+import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
@@ -8,26 +9,25 @@ import { DataBlock } from '@common/services/types/blocks';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
-interface Props
-  extends Pick<
-    Release,
-    | 'keyStatisticsSection'
-    | 'keyStatisticsSecondarySection'
-    | 'headlinesSection'
-  > {
-  releaseId: string;
+interface Props {
+  release: Release;
 }
 
 const PublicationReleaseHeadlinesSection = ({
-  releaseId,
-  keyStatisticsSection,
-  headlinesSection,
-  keyStatisticsSecondarySection,
+  release: {
+    keyStatisticsSecondarySection,
+    keyStatisticsSection,
+    headlinesSection,
+    publication,
+    slug,
+  },
 }: Props) => {
+  const getChartFile = useGetChartFile(publication.slug, slug);
+
   return (
     <DataBlockRenderer
       id="releaseHeadlines-dataBlock"
-      releaseId={releaseId}
+      getInfographic={getChartFile}
       dataBlock={keyStatisticsSecondarySection.content?.[0]}
       firstTabs={
         <TabsSection title="Summary">
