@@ -95,10 +95,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName, releaseId));
         }
 
-        public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadDataFilesAsync(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
         {
-            return _persistenceHelper
+            return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>

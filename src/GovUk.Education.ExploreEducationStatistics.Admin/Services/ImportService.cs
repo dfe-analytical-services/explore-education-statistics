@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -16,6 +17,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using CloudStorageAccount = Microsoft.Azure.Storage.CloudStorageAccount;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -66,15 +69,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName)
         {
-            if (await _table.ExistsAsync(TableOperation.Retrieve<DatafileImport>(releaseId.ToString(), dataFileName), null, null))
+            var columns = new List<string>() {"Status"};
+            var result = await _table.ExecuteAsync(
+                TableOperation.Retrieve<DatafileImport>(releaseId.ToString(), dataFileName, columns));
+            
+            if (result.Result != null && ((DatafileImport)result.Result).Status == IStatus.UPLOADING)
             {
-                return new BadRequestObjectResult("The datafile is currently uploading");
+                return ValidationActionResult(UploadAlreadyInProgress);
             }
             
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(
                 new DatafileImport(releaseId.ToString(), dataFileName))
             );
             return true;
+        }
+        
+        public async Task RemoveImportTableRow(Guid releaseId, string dataFileName)
+        {
+            var dataImport = new DatafileImport(releaseId.ToString(), dataFileName) {ETag = "*"};
+            await _table.ExecuteAsync(TableOperation.Delete(dataImport));
         }
         
         private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)

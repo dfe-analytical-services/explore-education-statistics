@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -8,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         void Import(string dataFileName, Guid releaseId, IFormFile dataFile);
 
-        Task CreateImportTableRow(Guid releaseId, string dataFileName);
+        Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName);
+
+        Task RemoveImportTableRow(Guid releaseId, string dataFileName);
     }
 }

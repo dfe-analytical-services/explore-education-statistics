@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             RowKey = dataFileName;
             NumberOfRows = numberOfRows;
             Message = message;
+            Status = status;
             Errors = "";
         }
 

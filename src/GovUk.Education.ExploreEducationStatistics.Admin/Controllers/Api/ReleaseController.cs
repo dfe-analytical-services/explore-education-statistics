@@ -171,12 +171,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return await _importService.CreateImportTableRow(file.FileName, releaseId)
-                .OnSuccessDo(() => await _fileStorageService
-                .UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
-                // add message to queue to process these files
-                .OnSuccessDo(() => _importService.Import(file.FileName, releaseId, file))
-                .HandleFailuresOr(Ok);
+            return await _importService.CreateImportTableRow(releaseId, file.FileName)
+                .OnSuccess(() =>  _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
+                .OnSuccess(result =>
+                {
+                    // add message to queue to process these files
+                    _importService.Import(file.FileName, releaseId, file);
+                    return result;
+                }))
+                .OnFailure(async result => 
+                {
+                    // Have to do this as a last step on any failure but still need to wrap the errors as done in HandleFailuresOr
+                    _importService.RemoveImportTableRow(releaseId, file.FileName);
+                    return result;
+                });
         }
 
         [HttpGet("releases/{releaseId}")]
