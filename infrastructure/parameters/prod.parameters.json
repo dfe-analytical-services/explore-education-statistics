@@ -38,6 +38,9 @@
     "dataApiUrl": {
       "value": "data.explore-education-statistics.service.gov.uk"
     },
+    "publicAppGATrackingId": {
+      "value": "UA-139424173-5"
+    },
     "storageAccountPrefix": {
       "value": "sa"
     }

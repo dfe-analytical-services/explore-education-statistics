@@ -205,9 +205,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           return value;
         }
 
-        return indicator.unit === '£'
-          ? `${indicator.unit}${formatPretty(value)}`
-          : `${formatPretty(value)}${indicator.unit}`;
+        return formatPretty(value, indicator.unit);
       });
     });
 
