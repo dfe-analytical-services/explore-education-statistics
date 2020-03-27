@@ -1,29 +1,35 @@
 import EditableProps from '@admin/components/editable/types/EditableProps';
-import WysiwygEditor from '@admin/components/WysiwygEditor';
+import FormEditor from '@admin/components/form/FormEditor';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React from 'react';
 
 export interface EditableHtmlRendererProps extends EditableProps {
   allowHeadings?: boolean;
+  id: string;
+  label: string;
   source: string;
-  onContentChange: (content: string) => void;
+  onChange: (content: string) => void;
 }
 
 const EditableHtmlRenderer = ({
   allowHeadings,
-  source = '',
   canDelete,
   editable = true,
+  id,
+  label,
+  source = '',
   onDelete,
-  onContentChange,
+  onChange,
 }: EditableHtmlRendererProps) => {
   return (
-    <WysiwygEditor
-      content={source}
+    <FormEditor
+      value={source}
       editable={editable}
+      id={id}
+      label={label}
       allowHeadings={allowHeadings}
       canDelete={canDelete}
-      onContentChange={onContentChange}
+      onChange={onChange}
       onDelete={onDelete}
     />
   );

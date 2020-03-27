@@ -1,4 +1,4 @@
-@import '../styles/govuk-base';
+@import 'src/styles/govuk-base';
 
 .editableButton {
   display: none;
@@ -91,10 +91,10 @@
   }
 }
 
-.wysiwygPreview pre {
+.preview pre {
   white-space: normal;
 }
 
-.wysiwygPlaceholder {
+.previewPlaceholder {
   color: govuk-colour('dark-grey');
 }

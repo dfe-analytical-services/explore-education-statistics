@@ -23,6 +23,7 @@ function EditableBlockRenderer({
   onDelete,
 }: Props) {
   const { releaseId } = useManageReleaseContext();
+  const id = `editableDataBlockRenderer-dataBlock-${block.id}`;
 
   const handleDelete = useCallback(() => {
     if (onDelete) {
@@ -34,19 +35,21 @@ function EditableBlockRenderer({
     case 'MarkDownBlock':
       return (
         <EditableMarkdownRenderer
+          id={id}
+          label="Block content"
           editable={editable}
           allowHeadings={allowHeadings}
           source={block.body}
           canDelete={canDelete}
           onDelete={handleDelete}
-          onContentChange={onContentChange}
+          onChange={onContentChange}
         />
       );
     case 'DataBlock':
       return (
         <div className="dfe-content-overflow">
           <EditableDataBlock
-            id={`editableBlockRenderer-dataBlock-${block.id}`}
+            id={id}
             dataBlock={block}
             editable={editable}
             releaseId={releaseId}
@@ -58,12 +61,14 @@ function EditableBlockRenderer({
     case 'HtmlBlock':
       return (
         <EditableHtmlRenderer
+          id={id}
+          label="Block content"
           editable={editable}
           allowHeadings={allowHeadings}
           source={block.body}
           canDelete={canDelete}
           onDelete={handleDelete}
-          onContentChange={onContentChange}
+          onChange={onContentChange}
         />
       );
     default:

@@ -1,35 +1,41 @@
 import EditableProps from '@admin/components/editable/types/EditableProps';
-import WysiwygEditor from '@admin/components/WysiwygEditor';
+import FormEditor from '@admin/components/form/FormEditor';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export interface EditableMarkdownRendererProps extends EditableProps {
   allowHeadings?: boolean;
-  insideAccordion?: boolean;
+  id: string;
+  label: string;
   source: string;
   toolbarConfig?: string[];
-  onContentChange: (content: string) => void;
+  onChange: (content: string) => void;
 }
 
 const EditableMarkdownRenderer = ({
   allowHeadings,
   canDelete,
   editable = true,
+  id,
+  label,
   source = '',
   toolbarConfig,
-  onContentChange,
+  onChange,
   onDelete,
 }: EditableMarkdownRendererProps) => {
   return (
-    <WysiwygEditor
-      content={source}
+    <FormEditor
+      useMarkdown
+      hideLabel
+      value={source}
+      id={id}
+      label={label}
       allowHeadings={allowHeadings}
       canDelete={canDelete}
       editable={editable}
-      useMarkdown
       toolbarConfig={toolbarConfig}
-      onContentChange={onContentChange}
+      onChange={onChange}
       onDelete={onDelete}
     />
   );

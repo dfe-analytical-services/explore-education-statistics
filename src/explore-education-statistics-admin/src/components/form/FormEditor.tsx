@@ -1,25 +1,33 @@
-import styles from '@admin/components/wysiwyg.module.scss';
+import styles from '@admin/components/form/FormEditor.module.scss';
 // @ts-ignore
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // No types generated for ckeditor 5 for react
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
+import ErrorMessage from '@common/components/ErrorMessage';
 import ModalConfirm from '@common/components/ModalConfirm';
-import classnames from 'classnames';
+import classNames from 'classnames';
 import marked from 'marked';
-import React, { ChangeEvent, useMemo, useState } from 'react';
-import TurndownService from 'turndown';
+import React, { ChangeEvent, useCallback, useState } from 'react';
+import Turndown from 'turndown';
 
-interface Props {
+const turndownService = new Turndown();
+
+export interface FormEditorProps {
   allowHeadings?: boolean;
   canDelete?: boolean;
-  content: string;
+  value: string;
   editable?: boolean;
+  error?: string;
+  hideLabel?: boolean;
+  hint?: string;
+  id: string;
+  label: string;
   reviewing?: boolean;
   resolveComments?: boolean;
   toolbarConfig?: string[];
   useMarkdown?: boolean;
-  onContentChange: (content: string) => void;
+  onChange: (content: string) => void;
   onDelete?: () => void;
 }
 
@@ -43,27 +51,34 @@ export const toolbarConfigs = {
   reduced: ['bold', 'link', '|', 'bulletedList'],
 };
 
-const WysiwygEditor = ({
+const FormEditor = ({
   allowHeadings,
-  editable,
   canDelete = false,
-  content,
-  toolbarConfig,
-  onContentChange,
+  editable,
+  error,
+  hideLabel,
+  hint,
+  id,
+  label,
+  toolbarConfig = toolbarConfigs.full,
+  value,
+  onChange,
   onDelete,
   useMarkdown = false,
-}: Props) => {
+}: FormEditorProps) => {
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+
   const [temporaryContent, setTemporaryContent] = useState(() => {
-    if (useMarkdown) return marked(content);
-    return content;
+    if (useMarkdown) {
+      return marked(value);
+    }
+
+    return value;
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const turndownService = useMemo(() => new TurndownService(), []);
-
-  const save = () => {
+  const handleSave = useCallback(() => {
     setEditing(false);
     let contentChangeContent = temporaryContent;
 
@@ -71,12 +86,28 @@ const WysiwygEditor = ({
       contentChangeContent = turndownService.turndown(contentChangeContent);
     }
 
-    onContentChange(contentChangeContent);
+    onChange(contentChangeContent);
     setSaved(true);
-  };
+  }, [onChange, temporaryContent, useMarkdown]);
 
   return (
     <div>
+      <span
+        className={classNames('govuk-label', {
+          'govuk-visually-hidden': hideLabel,
+        })}
+      >
+        {label}
+      </span>
+
+      {hint && (
+        <span id={`${id}-hint`} className="govuk-hint">
+          {hint}
+        </span>
+      )}
+
+      {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
+
       <ModalConfirm
         onConfirm={() => {
           if (onDelete) onDelete();
@@ -97,13 +128,15 @@ const WysiwygEditor = ({
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus */}
       <div
         role="button"
-        className={classnames({
+        className={classNames({
           [styles.editableContentEditing]: editable && editing,
           [styles.editableContent]: editable && !editing,
           [styles.unsaved]: editable && !saved,
         })}
         onClick={() => {
-          if (!editing) setEditing(editable === true);
+          if (!editing) {
+            setEditing(editable === true);
+          }
         }}
         tabIndex={undefined}
       >
@@ -112,7 +145,7 @@ const WysiwygEditor = ({
             {editing ? (
               <button
                 className="govuk-button"
-                onClick={() => save()}
+                onClick={handleSave}
                 type="button"
               >
                 Save
@@ -146,7 +179,7 @@ const WysiwygEditor = ({
           <CKEditor
             editor={ClassicEditor}
             config={{
-              toolbar: toolbarConfig || toolbarConfigs.full,
+              toolbar: toolbarConfig,
               heading: allowHeadings && {
                 options: [
                   {
@@ -190,9 +223,9 @@ const WysiwygEditor = ({
               __html: temporaryContent || '<p>This section is empty</p>',
             }}
             className={`${
-              styles.wysiwygPreview
+              styles.preview
             } govuk-!-padding-left-2 govuk-!-padding-right-2 ${!temporaryContent &&
-              styles.wysiwygPlaceholder}`}
+              styles.previewPlaceholder}`}
           />
         )}
       </div>
@@ -200,4 +233,4 @@ const WysiwygEditor = ({
   );
 };
 
-export default WysiwygEditor;
+export default FormEditor;
