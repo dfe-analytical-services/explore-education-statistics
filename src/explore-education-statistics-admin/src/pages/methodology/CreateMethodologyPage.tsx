@@ -3,7 +3,7 @@ import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { ContactDetails } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
-import methodologyService from '@admin/services/methodology/service';
+import methodologyService from '@admin/services/methodology/methodologyService';
 import { CreateMethodologyRequest } from '@admin/services/methodology/types';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 import Button from '@common/components/Button';

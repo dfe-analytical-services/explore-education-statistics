@@ -11,7 +11,7 @@ import {
   DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import { generateKeyFromDataSet } from '@common/modules/charts/util/chartUtils';
-import { Chart } from '@common/services/publicationService';
+import { Chart } from '@common/services/types/blocks';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';

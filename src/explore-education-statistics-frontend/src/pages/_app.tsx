@@ -1,3 +1,4 @@
+import '@frontend/loadEnv';
 import '@frontend/polyfill';
 
 import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
@@ -9,8 +10,6 @@ import Router from 'next/router';
 import React from 'react';
 import { Cookies, CookiesProvider } from 'react-cookie';
 import './_app.scss';
-
-process.env.APP_ROOT_ID = '__next';
 
 interface Props {
   cookies: Cookies;

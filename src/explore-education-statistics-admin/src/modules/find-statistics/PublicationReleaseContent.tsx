@@ -1,11 +1,11 @@
-import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
+import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
-import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
+import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
@@ -14,7 +14,7 @@ import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useContext, useMemo, useCallback } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
@@ -50,7 +50,7 @@ const PublicationReleaseContent = () => {
         sectionId: release.summarySection.id,
         sectionKey: 'summarySection',
         block: {
-          type: 'MarkdownBlock',
+          type: 'MarkDownBlock',
           order: 0,
           body: '',
         },
@@ -107,13 +107,12 @@ const PublicationReleaseContent = () => {
 
           {release.summarySection && (
             <>
-              <ContentBlocks
+              <EditableSectionBlocks
                 sectionId={release.summarySection.id}
-                publication={release.publication}
-                id={release.summarySection.id as string}
                 content={release.summarySection.content}
                 onBlockContentChange={summaryBlockUpdate}
                 onBlockDelete={summaryBlockDelete}
+                allowComments
               />
               {release.summarySection.content?.length === 0 && (
                 <div className="govuk-!-margin-bottom-8 dfe-align--center">
