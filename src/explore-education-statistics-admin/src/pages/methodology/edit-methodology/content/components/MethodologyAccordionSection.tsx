@@ -1,12 +1,12 @@
-import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
+import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { ContentSection } from '@common/services/publicationService';
 import React, { useCallback, useContext, useState } from 'react';
-import useMethodologyActions from '../context/useMethodologyActions';
 import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
+import useMethodologyActions from '../context/useMethodologyActions';
 
 interface MethodologyAccordionSectionProps {
   content: ContentSection<EditableContentBlock>;
@@ -41,13 +41,19 @@ const MethodologyAccordionSection = ({
       methodologyId,
       sectionId,
       block: {
-        type: 'MarkdownBlock',
+        type: 'MarkDownBlock',
         order: sectionContent.length,
         body: '',
       },
       sectionKey,
     });
-  }, [methodologyId, sectionId, sectionContent.length, addContentSectionBlock]);
+  }, [
+    addContentSectionBlock,
+    methodologyId,
+    sectionId,
+    sectionContent.length,
+    sectionKey,
+  ]);
 
   const updateBlockInAccordionSection = useCallback(
     (blockId, bodyContent) => {
@@ -59,7 +65,7 @@ const MethodologyAccordionSection = ({
         sectionKey,
       });
     },
-    [methodologyId, sectionId, updateContentSectionBlock],
+    [methodologyId, sectionId, sectionKey, updateContentSectionBlock],
   );
 
   const removeBlockFromAccordionSection = useCallback(
@@ -70,7 +76,7 @@ const MethodologyAccordionSection = ({
         blockId,
         sectionKey,
       }),
-    [methodologyId, sectionId, deleteContentSectionBlock],
+    [deleteContentSectionBlock, methodologyId, sectionId, sectionKey],
   );
 
   const reorderBlocksInAccordionSection = useCallback(
@@ -82,7 +88,7 @@ const MethodologyAccordionSection = ({
         sectionKey,
       });
     },
-    [methodologyId, sectionId, updateSectionBlockOrder],
+    [methodologyId, sectionId, sectionKey, updateSectionBlockOrder],
   );
 
   const onSaveHeading = useCallback(
@@ -93,7 +99,7 @@ const MethodologyAccordionSection = ({
         heading: newHeading,
         sectionKey,
       }),
-    [methodologyId, sectionId, updateContentSectionHeading],
+    [methodologyId, sectionId, sectionKey, updateContentSectionHeading],
   );
 
   const removeSection = useCallback(
@@ -103,7 +109,7 @@ const MethodologyAccordionSection = ({
         sectionId,
         sectionKey,
       }),
-    [],
+    [methodologyId, removeContentSection, sectionId, sectionKey],
   );
 
   return (
@@ -125,8 +131,7 @@ const MethodologyAccordionSection = ({
       onHeadingChange={onSaveHeading}
       onRemoveSection={removeSection}
     >
-      <ContentBlocks
-        id={`${heading}-content`}
+      <EditableSectionBlocks
         isReordering={isReordering}
         sectionId={sectionId}
         onBlockSaveOrder={reorderBlocksInAccordionSection}

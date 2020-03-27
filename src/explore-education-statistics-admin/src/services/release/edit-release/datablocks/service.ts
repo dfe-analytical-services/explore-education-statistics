@@ -1,20 +1,34 @@
 import client from '@admin/services/util/service';
-import { DataBlock } from '@common/services/dataBlockService';
+import { DataBlock } from '@common/services/types/blocks';
+import { OmitStrict } from '@common/types';
+
+export type ReleaseDataBlock = OmitStrict<DataBlock, 'order' | 'type'>;
+export type UpdateReleaseDataBlock = ReleaseDataBlock;
+export type CreateReleaseDataBlock = OmitStrict<
+  DataBlock,
+  'id' | 'order' | 'type'
+>;
 
 const service = {
   async getDataBlocks(releaseId: string) {
-    return client.get<DataBlock[]>(`/release/${releaseId}/datablocks`, {});
+    return client.get<ReleaseDataBlock[]>(
+      `/release/${releaseId}/datablocks`,
+      {},
+    );
   },
 
-  async postDataBlock(releaseId: string, dataBlock: DataBlock) {
-    return client.post<DataBlock>(
+  async postDataBlock(releaseId: string, dataBlock: CreateReleaseDataBlock) {
+    return client.post<ReleaseDataBlock>(
       `/release/${releaseId}/datablocks`,
       dataBlock,
     );
   },
 
-  async putDataBlock(dataBlockId: string, dataBlock: DataBlock) {
-    return client.put<DataBlock>(`/datablocks/${dataBlockId}`, dataBlock);
+  async putDataBlock(dataBlockId: string, dataBlock: UpdateReleaseDataBlock) {
+    return client.put<ReleaseDataBlock>(
+      `/datablocks/${dataBlockId}`,
+      dataBlock,
+    );
   },
 
   async deleteDataBlock(id: string) {

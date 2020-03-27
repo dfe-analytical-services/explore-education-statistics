@@ -9,12 +9,8 @@ export type MethodologyContextDispatch = (
 ) => void;
 
 export type MethodologyContextState = {
-  methodology: MethodologyContent | undefined;
-  canUpdateMethodology: boolean;
-};
-type MethodologyProviderProps = {
   methodology: MethodologyContent;
-  children: ReactNode;
+  canUpdateMethodology: boolean;
 };
 
 const MethodologyStateContext = createContext<
@@ -29,18 +25,9 @@ export const methodologyReducer: Reducer<
   MethodologyDispatchAction
 > = (draft, action) => {
   switch (action.type) {
-    case 'CLEAR_STATE': {
-      return {
-        methodology: undefined,
-        canUpdateMethodology: false,
-      };
-    }
-    case 'SET_STATE': {
-      return { ...draft, ...action.payload };
-    }
     case 'REMOVE_BLOCK_FROM_SECTION': {
       const { sectionId, blockId, sectionKey } = action.payload.meta;
-      if (!draft.methodology?.[sectionKey]) {
+      if (!draft.methodology[sectionKey]) {
         throw new Error(
           `REMOVE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
         );
@@ -58,7 +45,7 @@ export const methodologyReducer: Reducer<
     case 'UPDATE_BLOCK_FROM_SECTION': {
       const { block, meta } = action.payload;
       const { sectionId, blockId, sectionKey } = meta;
-      if (!draft.methodology?.[sectionKey]) {
+      if (!draft.methodology[sectionKey]) {
         throw new Error(
           `UPDATE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
         );
@@ -78,7 +65,7 @@ export const methodologyReducer: Reducer<
     case 'ADD_BLOCK_TO_SECTION': {
       const { block, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
-      if (!draft.methodology?.[sectionKey]) {
+      if (!draft.methodology[sectionKey]) {
         throw new Error(
           `ADD_BLOCK_TO_SECTION: Error - Section "${sectionKey}" could not be found.`,
         );
@@ -98,7 +85,7 @@ export const methodologyReducer: Reducer<
     case 'UPDATE_SECTION_CONTENT': {
       const { sectionContent, meta } = action.payload;
       const { sectionId, sectionKey } = meta;
-      if (!draft.methodology?.[sectionKey]) {
+      if (!draft.methodology[sectionKey]) {
         throw new Error(
           `UPDATE_SECTION_CONTENT: Error - Section "${sectionKey}" could not be found.`,
         );
@@ -142,14 +129,14 @@ export const methodologyReducer: Reducer<
   }
 };
 
-function MethodologyProvider({
-  methodology,
-  children,
-}: MethodologyProviderProps) {
-  const [state, dispatch] = useImmerReducer(methodologyReducer, {
-    methodology,
-    canUpdateMethodology: false,
-  });
+interface MethodologyProviderProps {
+  children: ReactNode;
+  value: MethodologyContextState;
+}
+
+function MethodologyProvider({ children, value }: MethodologyProviderProps) {
+  const [state, dispatch] = useImmerReducer(methodologyReducer, value);
+
   return (
     <MethodologyStateContext.Provider value={state}>
       <MethodologyDispatchContext.Provider value={dispatch}>

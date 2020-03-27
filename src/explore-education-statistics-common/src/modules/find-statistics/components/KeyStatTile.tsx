@@ -1,14 +1,14 @@
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { AxiosErrorHandler } from '@common/services/api/Client';
-import DataBlockService, {
-  DataBlock,
+import dataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
+import { DataBlock } from '@common/services/types/blocks';
 import formatPretty from '@common/utils/number/formatPretty';
-import React, { ReactNode, useEffect, useState, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import styles from './SummaryRenderer.module.scss';
+import styles from './KeyStatTile.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
   children?: ReactNode;
@@ -26,10 +26,12 @@ const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
   >();
 
   useEffect(() => {
-    DataBlockService.getDataBlockForSubject({
-      ...dataBlockRequest,
-      includeGeoJson: false,
-    }).then(setDataBlockResponse);
+    dataBlockService
+      .getDataBlockForSubject({
+        ...dataBlockRequest,
+        includeGeoJson: false,
+      })
+      .then(setDataBlockResponse);
   }, [dataBlockRequest]);
 
   const config: KeyStatConfig = useMemo(() => {

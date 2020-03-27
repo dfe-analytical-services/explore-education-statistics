@@ -4,31 +4,38 @@ import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import methodologyRoutes from '@admin/routes/edit-methodology/routes';
 import methodologyService from '@admin/services/methodology/methodologyService';
-import { MethodologyContent } from '@admin/services/methodology/types';
+import permissionService from '@admin/services/permissions/permissionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
-import React, { useCallback, useEffect, useState } from 'react';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
-import { MethodologyProvider } from './content/context/MethodologyContext';
+import {
+  MethodologyContextState,
+  MethodologyProvider,
+} from './content/context/MethodologyContext';
 
 const MethodologyPage = ({
   match,
   location,
 }: RouteComponentProps<{ methodologyId: string }>) => {
   const { methodologyId } = match.params;
-  const [methodology, setMethodology] = useState<MethodologyContent>();
 
-  const refreshMethodology = useCallback(async () => {
-    setMethodology(undefined);
-    const methodologyResponse = await methodologyService.getMethodologyContent(
+  const { value, isLoading } = useAsyncRetry<
+    MethodologyContextState
+  >(async () => {
+    const methodology = await methodologyService.getMethodologyContent(
       methodologyId,
     );
-    setMethodology(methodologyResponse);
-  }, [methodologyId]);
+    const canUpdateMethodology = await permissionService.canUpdateMethodology(
+      methodologyId,
+    );
 
-  useEffect(() => {
-    refreshMethodology();
-  }, [refreshMethodology]);
+    return {
+      methodology,
+      canUpdateMethodology,
+    };
+  }, [methodologyId]);
 
   const currentRouteIndex =
     methodologyRoutes.findIndex(
@@ -67,72 +74,67 @@ const MethodologyPage = ({
         { name: 'Edit methodology' },
       ]}
     >
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            <span className="govuk-caption-xl">Edit methodology</span>
-            {methodology ? methodology.title : ''}
-          </h1>
-        </div>
+      <LoadingSpinner loading={isLoading}>
+        {value ? (
+          <>
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-two-thirds">
+                <h1 className="govuk-heading-xl">
+                  <span className="govuk-caption-xl">Edit methodology</span>
+                  {value?.methodology.title}
+                </h1>
+              </div>
 
-        <div className="govuk-grid-column-one-third">
-          <RelatedInformation heading="Help and guidance">
-            <ul className="govuk-list">
-              <li>
-                <Link to="/documentation" target="blank">
-                  Creating new methodology
-                </Link>
-              </li>
-            </ul>
-          </RelatedInformation>
-        </div>
-      </div>
+              <div className="govuk-grid-column-one-third">
+                <RelatedInformation heading="Help and guidance">
+                  <ul className="govuk-list">
+                    <li>
+                      <Link to="/documentation" target="blank">
+                        Creating new methodology
+                      </Link>
+                    </li>
+                  </ul>
+                </RelatedInformation>
+              </div>
+            </div>
 
-      {methodology ? (
-        <>
-          <nav className="app-navigation govuk-!-margin-top-6 govuk-!-margin-bottom-9">
-            <ul className="app-navigation__list govuk-!-margin-bottom-0">
-              {methodologyRoutes.map(route => (
-                <li key={route.path}>
-                  <NavLink
+            <nav className="app-navigation govuk-!-margin-top-6 govuk-!-margin-bottom-9">
+              <ul className="app-navigation__list govuk-!-margin-bottom-0">
+                {methodologyRoutes.map(route => (
+                  <li key={route.path}>
+                    <NavLink
+                      key={route.path}
+                      to={route.generateLink(methodologyId)}
+                    >
+                      {route.title}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <MethodologyProvider value={value}>
+              <Switch>
+                {methodologyRoutes.map(route => (
+                  <Route
+                    exact
                     key={route.path}
-                    to={route.generateLink(methodologyId)}
-                  >
-                    {route.title}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+                    path={route.path}
+                    component={route.component}
+                  />
+                ))}
+              </Switch>
+            </MethodologyProvider>
 
-          <MethodologyProvider methodology={methodology}>
-            <Switch>
-              {methodologyRoutes.map(route => (
-                <Route
-                  exact
-                  key={route.path}
-                  path={route.path}
-                  render={props => (
-                    <route.component
-                      methodology={methodology}
-                      setMethodology={setMethodology}
-                      refreshMethodology={refreshMethodology}
-                      {...props}
-                    />
-                  )}
-                />
-              ))}
-            </Switch>
-          </MethodologyProvider>
-
-          <PreviousNextLinks
-            previousSection={previousSection}
-            nextSection={nextSection}
-          />
-        </>
-      ) : (
-        <LoadingSpinner />
-      )}
+            <PreviousNextLinks
+              previousSection={previousSection}
+              nextSection={nextSection}
+            />
+          </>
+        ) : (
+          <p>Could not load methodology</p>
+        )}
+      </LoadingSpinner>
     </Page>
   );
 };

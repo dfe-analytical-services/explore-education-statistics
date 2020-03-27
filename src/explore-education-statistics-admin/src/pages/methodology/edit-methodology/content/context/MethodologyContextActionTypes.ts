@@ -1,7 +1,6 @@
 import { MethodologyContent } from '@admin/services/methodology/types';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import { ContentSection } from '@common/services/publicationService';
-import { MethodologyContextState } from './MethodologyContext';
 
 export type ContentSectionKeys = keyof Pick<
   MethodologyContent,
@@ -13,9 +12,6 @@ type BlockMeta = {
   sectionKey: ContentSectionKeys;
 };
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
-
-type ClearState = { type: 'CLEAR_STATE' };
-type SetState = { type: 'SET_STATE'; payload: MethodologyContextState };
 
 export type RemoveBlockFromSection = {
   type: 'REMOVE_BLOCK_FROM_SECTION';
@@ -72,8 +68,6 @@ export type UpdateContentSection = {
 };
 
 export type MethodologyDispatchAction =
-  | ClearState
-  | SetState
   | RemoveBlockFromSection
   | UpdateBlockFromSection
   | AddBlockToSection

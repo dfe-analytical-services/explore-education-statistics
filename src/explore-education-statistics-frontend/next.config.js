@@ -10,7 +10,7 @@ const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
 const envFilePath = fs.existsSync('.env.local') ? '.env.local' : '.env';
-const envConfig = DotEnv.parse(fs.readFileSync(envFilePath));
+const envConfig = DotEnv.config(fs.readFileSync(envFilePath));
 
 const createPlugin = plugin => {
   return (nextConfig = {}) =>
@@ -115,7 +115,9 @@ const withESLint = createPlugin((config, options) => {
 
 const nextConfig = {
   publicRuntimeConfig: {
-    ...envConfig,
+    CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
+    DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
+    FUNCTION_API_BASE_URL: process.env.FUNCTION_API_BASE_URL,
     APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
     GA_TRACKING_ID: process.env.GA_TRACKING_ID,
     HOTJAR_ID: process.env.HOTJAR_ID,

@@ -9,7 +9,6 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps } from 'react-router';
 import ManageReleaseContext from './ManageReleaseContext';
-import { ReleaseProvider } from './edit-release/content/ReleaseContext';
 
 interface MatchProps {
   publicationId: string;
@@ -105,11 +104,9 @@ const ManageReleasePageContainer = ({
               releaseId,
             }}
           >
-            <ReleaseProvider>
-              {releaseRoutes.manageReleaseRoutes.map(route => (
-                <Route exact key={route.path} {...route} />
-              ))}
-            </ReleaseProvider>
+            {releaseRoutes.manageReleaseRoutes.map(route => (
+              <Route exact key={route.path} {...route} />
+            ))}
           </ManageReleaseContext.Provider>
 
           <PreviousNextLinks

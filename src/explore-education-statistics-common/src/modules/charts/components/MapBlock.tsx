@@ -15,7 +15,7 @@ import {
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
 } from '@common/modules/charts/util/chartUtils';
-import stylesIndicators from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
+import stylesIndicators from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 
 import {
   DataBlockData,

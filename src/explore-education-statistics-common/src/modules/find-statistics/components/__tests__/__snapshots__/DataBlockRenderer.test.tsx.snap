@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DataBlock renders map instead of chart 1`] = `
+exports[`DataBlockRenderer renders map instead of chart 1`] = `
 <section
   aria-labelledby="test-datablock-charts-tab"
   class="govuk-tabs__panel panel"
@@ -160,18 +160,6 @@ exports[`DataBlock renders map instead of chart 1`] = `
                       stroke-opacity="1"
                       stroke-width="3"
                     />
-                    <path
-                      class="leaflet-interactive"
-                      d="M0 0"
-                      fill="#ff0000"
-                      fill-opacity="0.2"
-                      fill-rule="evenodd"
-                      stroke="#3388ff"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-opacity="1"
-                      stroke-width="3"
-                    />
                   </g>
                 </svg>
               </div>
@@ -262,7 +250,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
                 >
                    
                 </span>
-                 3.0% to 3.3%
+                 -3% to -3%
               </dd>
               <dd
                 class="legend"
@@ -273,7 +261,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
                 >
                    
                 </span>
-                 3.3% to 3.5%
+                 -3% to -3%
               </dd>
               <dd
                 class="legend"
@@ -284,7 +272,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
                 >
                    
                 </span>
-                 3.5% to 3.8%
+                 -3% to -2%
               </dd>
               <dd
                 class="legend"
@@ -295,7 +283,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
                 >
                    
                 </span>
-                 3.8% to 4.0%
+                 -2% to -2%
               </dd>
               <dd
                 class="legend"
@@ -306,7 +294,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
                 >
                    
                 </span>
-                 4.0% to 4.3%
+                 -2% to -2%
               </dd>
             </dl>
           </div>
@@ -317,6 +305,57 @@ exports[`DataBlock renders map instead of chart 1`] = `
 </section>
 `;
 
-exports[`DataBlock renders summary 1`] = `null`;
-
-exports[`DataBlock renders table 1`] = `null`;
+exports[`DataBlockRenderer renders table 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+>
+  <thead>
+    <tr>
+      <td
+        class="borderBottom"
+        colspan="1"
+        rowspan="1"
+      />
+      <th
+        class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+      <th
+        class="govuk-table__header--numeric borderBottom borderRightNone"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2015/16
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Unauthorised absence rate
+      </th>
+      <td
+        class="govuk-table__cell--numeric borderBottom"
+      >
+        3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric borderBottom"
+      >
+        -3%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;

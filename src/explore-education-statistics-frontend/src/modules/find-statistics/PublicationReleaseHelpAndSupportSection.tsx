@@ -25,7 +25,7 @@ const HelpAndSupport = ({
   accordionId,
   includeAnalytics = false,
   publicationTitle,
-  methodologyUrl,
+  methodologyUrl = '',
   methodologySummary,
   releaseType,
   themeTitle,
@@ -44,19 +44,21 @@ const HelpAndSupport = ({
         includeAnalytics={includeAnalytics}
         publicationTitle={publicationTitle}
       >
-        <AccordionSection
-          heading="Methodology"
-          caption={
-            methodologySummary ||
-            'Find out how and why we collect, process and publish these statistics'
-          }
-          headingTag="h3"
-        >
-          <p className="govuk-!-margin-bottom-9">
-            <Link to={methodologyUrl}>View methodology</Link> for{' '}
-            {publicationTitle}.
-          </p>
-        </AccordionSection>
+        {methodologyUrl !== '' && (
+          <AccordionSection
+            heading="Methodology"
+            caption={
+              methodologySummary ||
+              'Find out how and why we collect, process and publish these statistics'
+            }
+            headingTag="h3"
+          >
+            <p className="govuk-!-margin-bottom-9">
+              <Link to={methodologyUrl}>View methodology</Link> for{' '}
+              {publicationTitle}.
+            </p>
+          </AccordionSection>
+        )}
         {releaseType === ReleaseType.NationalStatistics && (
           <AccordionSection heading="National Statistics" headingTag="h3">
             <NationalStatisticsSection />

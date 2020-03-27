@@ -1,8 +1,8 @@
+import styles from '@admin/components/editable/EditableBlock.module.scss';
 import React, { ReactNode } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import styles from '@admin/components/editable/EditableContentBlock.module.scss';
 
-const ContentBlockDraggable = ({
+const BlockDraggable = ({
   draggable,
   draggableId,
   index,
@@ -36,4 +36,4 @@ const ContentBlockDraggable = ({
   </>
 );
 
-export default ContentBlockDraggable;
+export default BlockDraggable;

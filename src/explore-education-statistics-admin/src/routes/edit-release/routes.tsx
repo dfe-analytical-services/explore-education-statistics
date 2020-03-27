@@ -12,7 +12,7 @@ import { OmitStrict } from '@common/types';
 import React from 'react';
 import { generatePath, RouteComponentProps, RouteProps } from 'react-router';
 
-type ReleaseRouteParams = { publicationId: string; releaseId: string };
+export type ReleaseRouteParams = { publicationId: string; releaseId: string };
 
 export interface ReleaseRoute<Params extends ReleaseRouteParams>
   extends OmitStrict<RouteProps, 'path' | 'location'> {

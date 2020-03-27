@@ -1924,7 +1924,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         Year = "2019"
                     },
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2018, 3, 22),
+                    Published = new DateTime(2018, 4, 25, 9, 30, 0),
+                    PublishScheduled = new DateTime(2018, 4, 25),
+                    Status = ReleaseStatus.Approved,
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
@@ -1945,7 +1947,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         Year = "2019"
                     },
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Published = new DateTime(2018, 7, 19),
+                    Published = new DateTime(2018, 7, 19, 9, 30, 0),
+                    PublishScheduled = new DateTime(2018, 7, 19),
+                    Status = ReleaseStatus.Approved,
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     RelatedInformation = new List<BasicLink>
@@ -1981,7 +1985,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         Month = "6",
                         Year = "2019"
                     },
-                    Published = new DateTime(2018, 6, 14),
+                    Published = null,
+                    PublishScheduled = new DateTime(2018, 6, 14),
+                    Status = ReleaseStatus.Draft,
                     Slug = "2018",
                     TimePeriodCoverage = TimeIdentifier.CalendarYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),

@@ -1,12 +1,5 @@
-import {
-  ContentBlockType,
-  Chart,
-  Table,
-  Summary,
-  AbstractRelease,
-} from '@common/services/publicationService';
-
-import { DataBlockRequest } from '@common/services/dataBlockService';
+import { Release } from '@common/services/publicationService';
+import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 
 export type CommentState = 'open' | 'resolved';
 
@@ -20,17 +13,14 @@ export interface ExtendedComment {
   resolvedOn?: Date;
 }
 
-export interface EditableContentBlock {
-  id: string;
-  type: ContentBlockType;
-  body: string;
-  heading?: string;
-  dataBlockRequest?: DataBlockRequest;
-  charts?: Chart[];
-  tables?: Table[];
-  summary?: Summary;
+export type EditableContentBlock = ContentBlock & {
   comments: ExtendedComment[];
-  order?: number;
-}
+};
 
-export type EditableRelease = AbstractRelease<EditableContentBlock>;
+export type EditableDataBlock = DataBlock & {
+  comments: ExtendedComment[];
+};
+
+export type EditableBlock = EditableContentBlock | EditableDataBlock;
+
+export type EditableRelease = Release<EditableContentBlock, EditableDataBlock>;

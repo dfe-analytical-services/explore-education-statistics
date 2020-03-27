@@ -1,7 +1,11 @@
 import DataBlockContentTabs from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockContentTabs';
-import DataBlockSourceWizard from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
+import DataBlockSourceWizard, {
+  SavedDataBlock,
+} from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
 import { manageDataBlocksRoute } from '@admin/routes/edit-release/routes';
-import dataBlocksService from '@admin/services/release/edit-release/datablocks/service';
+import dataBlocksService, {
+  ReleaseDataBlock,
+} from '@admin/services/release/edit-release/datablocks/service';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -10,7 +14,6 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import dataBlockService, {
-  DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -23,11 +26,11 @@ export interface ReleaseManageDataBlocksPageParams {
 }
 
 interface SelectedDataBlock {
-  dataBlock: DataBlock;
+  dataBlock: ReleaseDataBlock;
   response: DataBlockResponse;
 }
 
-const emptyDataBlocks: DataBlock[] = [];
+const emptyDataBlocks: ReleaseDataBlock[] = [];
 
 const ReleaseManageDataBlocksPage = ({
   match,
@@ -43,7 +46,7 @@ const ReleaseManageDataBlocksPage = ({
   const [selectedDataBlock, setSelectedDataBlock] = useState<
     SelectedDataBlock
   >();
-  const [deleteDataBlock, setDeleteDataBlock] = useState<DataBlock>();
+  const [deleteDataBlock, setDeleteDataBlock] = useState<ReleaseDataBlock>();
 
   const {
     value: dataBlocks = emptyDataBlocks,
@@ -112,7 +115,7 @@ const ReleaseManageDataBlocksPage = ({
   ]);
 
   const onDeleteDataBlock = useCallback(
-    (dataBlock: DataBlock) => {
+    (dataBlock: SavedDataBlock) => {
       setDeleteDataBlock(undefined);
 
       if (dataBlock.id) {
@@ -130,16 +133,16 @@ const ReleaseManageDataBlocksPage = ({
   );
 
   const onDataBlockSave = useMemo(
-    () => async (dataBlock: DataBlock) => {
+    () => async (dataBlock: SavedDataBlock) => {
       setIsSaving(true);
 
-      let newDataBlock: DataBlock;
-      let newDataBlocks: DataBlock[];
+      let newDataBlock: ReleaseDataBlock;
+      let newDataBlocks: ReleaseDataBlock[];
 
       if (dataBlock.id) {
         newDataBlock = await dataBlocksService.putDataBlock(
           dataBlock.id,
-          dataBlock,
+          dataBlock as ReleaseDataBlock,
         );
 
         newDataBlocks = [...dataBlocks];

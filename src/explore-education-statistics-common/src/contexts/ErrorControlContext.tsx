@@ -16,7 +16,7 @@ export interface ErrorControlState {
    * This is useful in situations where we want to
    * handle errors in a different way to the default.
    */
-  withoutErrorHandling: (callback: () => void) => Promise<void>;
+  withoutErrorHandling: <T>(callback: () => Promise<T>) => Promise<T>;
 }
 
 export const ErrorControlContext = createContext<ErrorControlState>({
@@ -25,7 +25,7 @@ export const ErrorControlContext = createContext<ErrorControlState>({
     forbidden: noop,
   },
   withoutErrorHandling: async callback => {
-    await callback();
+    return callback();
   },
 });
 

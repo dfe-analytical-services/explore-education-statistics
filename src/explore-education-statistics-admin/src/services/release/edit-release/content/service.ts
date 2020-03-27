@@ -1,23 +1,27 @@
 import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
 import {
+  EditableBlock,
   EditableContentBlock,
+  EditableDataBlock,
   ExtendedComment,
 } from '@admin/services/publicationService';
 import client from '@admin/services/util/service';
-import { DataBlock } from '@common/services/dataBlockService';
 import {
-  AbstractRelease,
   BasicLink,
+  ContentSection,
+  Release,
   ReleaseNote,
 } from '@common/services/publicationService';
+import { DataBlock } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types/util';
 import {
   ContentBlockAttachRequest,
   ContentBlockPostModel,
   ContentBlockPutModel,
-  ContentSectionViewModel,
   ManageContentPageViewModel,
 } from './types';
+
+type ContentSectionViewModel = ContentSection<EditableBlock>;
 
 export const releaseContentService = {
   getContent(releaseId: string): Promise<ManageContentPageViewModel> {
@@ -105,8 +109,8 @@ export const releaseContentService = {
     contentSectionId: string,
     contentBlockId: string,
     newSummary: KeyStatsFormValues,
-  ): Promise<EditableContentBlock> {
-    return client.put<EditableContentBlock>(
+  ): Promise<EditableDataBlock> {
+    return client.put<EditableDataBlock>(
       `/release/${releaseId}/content/section/${contentSectionId}/data-block/${contentBlockId}`,
       newSummary,
     );
@@ -116,8 +120,8 @@ export const releaseContentService = {
     releaseId: string,
     sectionId: string,
     order: Dictionary<number>,
-  ): Promise<EditableContentBlock[]> {
-    return client.put<EditableContentBlock[]>(
+  ): Promise<EditableBlock[]> {
+    return client.put<EditableBlock[]>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/order`,
       order,
     );
@@ -186,8 +190,8 @@ export const releaseContentService = {
     releaseId: string,
     sectionId: string,
     block: ContentBlockAttachRequest,
-  ): Promise<EditableContentBlock> {
-    return client.post<EditableContentBlock>(
+  ): Promise<EditableBlock> {
+    return client.post<EditableBlock>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/attach`,
       block,
     );
@@ -220,9 +224,7 @@ export const releaseNoteService = {
 };
 
 export const relatedInformationService = {
-  getAll: (
-    releaseId: string,
-  ): Promise<AbstractRelease<{}>['relatedInformation']> => {
+  getAll: (releaseId: string): Promise<Release['relatedInformation']> => {
     return client.get(`/release/${releaseId}/content/related-information`);
   },
   create: (
