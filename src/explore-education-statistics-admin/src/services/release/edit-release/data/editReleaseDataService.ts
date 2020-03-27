@@ -47,6 +47,7 @@ export interface DataFile {
   userName: string;
   created: Date;
   canDelete?: boolean;
+  isDeleting?: boolean;
 }
 
 export interface UploadDataFilesRequest {
@@ -62,6 +63,7 @@ export interface AncillaryFile {
     size: number;
     unit: string;
   };
+  isDeleting?: boolean;
 }
 
 export interface UploadAncillaryFileRequest {
