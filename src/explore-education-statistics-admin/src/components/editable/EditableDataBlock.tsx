@@ -1,12 +1,13 @@
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
+import useToggle from '@common/hooks/useToggle';
 import DataBlockRenderer, {
   DataBlockRendererProps,
 } from '@common/modules/find-statistics/components/DataBlockRenderer';
 import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './EditableDataBlock.module.scss';
 
 type Props = {
@@ -23,7 +24,7 @@ const EditableDataBlock = ({
   releaseId,
   ...props
 }: Props) => {
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showConfirmation, toggleConfirmation] = useToggle(false);
 
   const getChartFile = useGetChartFile(releaseId);
 
@@ -37,7 +38,7 @@ const EditableDataBlock = ({
             styles.delete,
             'govuk-button--warning govuk-!-margin-bottom-0',
           )}
-          onClick={() => setShowConfirmation(true)}
+          onClick={toggleConfirmation.on}
         >
           Remove this data block
         </Button>
@@ -45,15 +46,13 @@ const EditableDataBlock = ({
 
       <ModalConfirm
         onConfirm={() => {
-          if (onDelete) onDelete();
-          setShowConfirmation(false);
+          if (onDelete) {
+            onDelete();
+          }
+          toggleConfirmation.off();
         }}
-        onExit={() => {
-          setShowConfirmation(false);
-        }}
-        onCancel={() => {
-          setShowConfirmation(false);
-        }}
+        onExit={toggleConfirmation.off}
+        onCancel={toggleConfirmation.off}
         title="Delete section"
         mounted={showConfirmation}
       >
