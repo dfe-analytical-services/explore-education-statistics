@@ -2,7 +2,6 @@ import useFormSubmit from '@admin/hooks/useFormSubmit';
 import permissionService from '@admin/services/permissions/permissionService';
 import editReleaseDataService, {
   AncillaryFile,
-  DataFile,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -12,6 +11,7 @@ import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -19,7 +19,6 @@ import Yup from '@common/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 
 const errorCodeMappings = [
   errorCodeToFieldError(

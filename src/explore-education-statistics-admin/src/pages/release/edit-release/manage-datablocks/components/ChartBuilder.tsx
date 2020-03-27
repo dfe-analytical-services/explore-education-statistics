@@ -178,7 +178,7 @@ const ChartBuilder = ({
       default:
         return undefined;
     }
-  }, [axes, data, definition, labels, meta, options]);
+  }, [axes, data, definition, getChartFile, labels, meta, options]);
 
   const handleBoundaryLevelChange = useCallback(
     (boundaryLevel: string) => {
