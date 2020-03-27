@@ -118,7 +118,7 @@ const ReleaseServiceStatus = ({
       )}
 
       {currentStatus &&
-        Object.entries(currentStatus).length > 2 &&
+        currentStatus.overallStage !== 'Validating' &&
         currentStatus.overallStage !== 'Scheduled' &&
         currentStatus.overallStage !== 'Invalid' &&
         exclude !== 'details' && (
