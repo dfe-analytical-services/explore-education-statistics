@@ -1,89 +1,49 @@
 @import 'src/styles/govuk-base';
 
-.editableButton {
-  display: none;
-}
-
-.editableButtonContent {
-  font-size: 0.8rem;
-  font-weight: bold;
-  position: absolute;
-  right: 0;
-
-  .govuk-button {
-    font-size: 0.5rem;
-  }
-}
-
-.editableContent {
+.readOnly {
   background: govuk-colour('light-grey');
+  border: 2px solid $govuk-border-colour;
   box-sizing: border-box;
   cursor: pointer;
   margin: 0;
-  min-height: 2.2em;
-  padding: 0.1rem;
+  min-height: 2.2rem;
   position: relative;
 
-  .editableButton {
-    border: 2px solid $govuk-border-colour;
-    display: block;
-    font-weight: bold;
-    height: 100%;
-    padding: 0;
-    position: absolute;
-    width: 100%;
-  }
-
-  .editableButtonContent {
-    opacity: 0;
-    transition: opacity 0.5s;
-  }
-
-  &.unsaved .editableButton {
-    text-align: center;
-    white-space: pre;
+  &:focus {
+    @include govuk-focused-text;
   }
 }
 
-.editableContentEditing.editableContent .editableButton button {
-  position: absolute;
-  right: 0;
-}
-
-.editableStatus {
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.editableButton:focus,
-.editableButton:hover {
-  .editableButtonContent {
+.readOnly:focus,
+.readOnly:hover {
+  .readOnlyButton {
     opacity: 1;
   }
 }
 
-.editableContentEditing {
-  background: govuk-colour('light-grey');
-  border: 2px solid #000;
-  cursor: pointer;
-  margin: 0;
-  padding: 0 0 2.45rem;
-  position: relative;
+.readOnlyButtons {
+  display: block;
+  position: absolute;
+  right: 0;
 
-  .editableButton {
-    border: 0;
-    bottom: 2px;
-    display: inline !important;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    right: 0;
-    z-index: 1000;
+  .readOnlyButton {
+    margin-right: 0;
+    opacity: 0;
+    transition: opacity 0.5s;
   }
 
-  :global(.govuk-button) {
-    margin-bottom: 0;
+  .readOnlyButton:focus {
+    opacity: 1;
+    transition: opacity 0s;
+  }
+}
+
+.editor {
+  background: govuk-colour('light-grey');
+  margin-bottom: govuk-spacing(2);
+
+  :global(.ck.ck-editor) {
+    border: 2px solid govuk-colour('black');
   }
 
   :global(.ck-focused) {
@@ -91,10 +51,10 @@
   }
 }
 
-.preview pre {
-  white-space: normal;
-}
+.preview {
+  padding: 0 govuk-spacing(2);
 
-.previewPlaceholder {
-  color: govuk-colour('dark-grey');
+  pre {
+    white-space: normal;
+  }
 }
