@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var numRows = FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
             var message = BuildMessage(dataFileName, releaseId, numRows);
             
-            await CreateImportTableRow(
+            await UpdateImportTableRow(
                 releaseId,
                 dataFileName,
                 numRows,
@@ -63,10 +64,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
         }
         
-        private async Task CreateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
+        public async Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName)
+        {
+            if (await _table.ExistsAsync(TableOperation.Retrieve<DatafileImport>(releaseId.ToString(), dataFileName), null, null))
+            {
+                return new BadRequestObjectResult("The datafile is currently uploading");
+            }
+            
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
+                new DatafileImport(releaseId.ToString(), dataFileName))
+            );
+            return true;
+        }
+        
+        private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows, JsonConvert.SerializeObject(message)))
+                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows, JsonConvert.SerializeObject(message), IStatus.QUEUED))
             );
         }
 
