@@ -21,10 +21,8 @@ import {
   lineChartBlockDefinition,
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import {
-  mapBlockDefinition,
-  MapBlockProps,
-} from '@common/modules/charts/components/MapBlock';
+import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
+import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
 import {
   verticalBarBlockDefinition,
   VerticalBarProps,
@@ -174,7 +172,7 @@ const ChartBuilder = ({
         };
       case 'map':
         return {
-          ...(baseProps as MapBlockProps),
+          ...(baseProps as MapBlockInternalProps),
           type: 'map',
         };
       default:

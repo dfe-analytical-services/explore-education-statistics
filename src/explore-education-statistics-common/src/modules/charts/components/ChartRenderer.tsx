@@ -8,29 +8,20 @@ import InfographicBlock, {
 import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
+import MapBlock from '@common/modules/charts/components/MapBlock';
+import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import { chartDefinitions } from '@common/modules/charts/types/chart';
 import omit from 'lodash/omit';
-import dynamic from 'next/dynamic';
 import React, { memo, useMemo, useState } from 'react';
 import { ContentRenderer, LegendProps } from 'recharts';
 import DefaultLegendContent from 'recharts/lib/component/DefaultLegendContent';
 
-const DynamicMapBlock = dynamic(
-  () => import('@common/modules/charts/components/MapBlock'),
-  {
-    ssr: false,
-  },
-);
-
 function hasLegend(props: ChartRendererProps): boolean {
-  return Boolean(
-    chartDefinitions.find(
-      chart => chart.type === props.type && chart.capabilities.hasLegend,
-    ),
+  return chartDefinitions.some(
+    chart => chart.type === props.type && chart.capabilities.hasLegend,
   );
 }
 
@@ -46,7 +37,7 @@ export type ChartRendererProps =
     } & HorizontalBarProps)
   | ({
       type: 'map';
-    } & MapBlockProps)
+    } & MapBlockInternalProps)
   | ({
       type: 'infographic';
     } & InfographicChartProps);
@@ -80,7 +71,7 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
       case 'horizontalbar':
         return <HorizontalBarBlock {...props} renderLegend={renderLegend} />;
       case 'map':
-        return <DynamicMapBlock {...props} />;
+        return <MapBlock {...props} />;
       case 'infographic':
         return <InfographicBlock {...props} />;
       default:
