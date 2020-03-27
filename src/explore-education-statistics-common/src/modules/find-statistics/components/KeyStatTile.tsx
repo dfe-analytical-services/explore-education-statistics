@@ -43,7 +43,8 @@ const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
         indicatorLabel: theIndicator.label,
         value: `${formatPretty(
           dataBlockResponse.result[0].measures[indicatorKey],
-        )}${theIndicator.unit}`,
+          theIndicator.unit,
+        )}`,
       };
     }
     return {
