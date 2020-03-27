@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -179,12 +178,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     _importService.Import(file.FileName, releaseId, file);
                     return result;
                 }))
-                .OnFailure(async result => 
-                {
+                .OnFailureDo(() => 
                     // Have to do this as a last step on any failure but still need to wrap the errors as done in HandleFailuresOr
-                    _importService.RemoveImportTableRow(releaseId, file.FileName);
-                    return result;
-                });
+                    _importService.RemoveImportTableRow(releaseId, file.FileName)
+                )
+                .HandleFailuresOrOk();
         }
 
         [HttpGet("releases/{releaseId}")]
