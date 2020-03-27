@@ -17,7 +17,7 @@ export interface Props extends SectionBlocksProps {
   sectionId: string;
   editable?: boolean;
   isReordering?: boolean;
-  insideAccordion?: boolean;
+  allowHeadings?: boolean;
   allowComments: boolean;
   onBlockSaveOrder?: (order: Dictionary<number>) => void;
   onBlockContentChange: (blockId: string, content: string) => void;
@@ -29,7 +29,7 @@ const EditableSectionBlocks = ({
   sectionId,
   editable = true,
   isReordering = false,
-  insideAccordion,
+  allowHeadings,
   allowComments = false,
   onBlockSaveOrder,
   onBlockContentChange,
@@ -120,11 +120,11 @@ const EditableSectionBlocks = ({
                 editable={editable && !isReordering}
                 canDelete={!isReordering}
                 block={block}
-                insideAccordion={insideAccordion}
+                allowHeadings={allowHeadings}
                 onContentChange={newContent =>
                   onBlockContentChange(block.id, newContent)
                 }
-                onDelete={() => onBlockDelete(block.id)}
+                onDelete={onBlockDelete}
               />
             </BlockDraggable>
           </div>

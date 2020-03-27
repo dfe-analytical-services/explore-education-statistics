@@ -11,13 +11,13 @@ import React, { ChangeEvent, useMemo, useState } from 'react';
 import TurndownService from 'turndown';
 
 interface Props {
-  editable?: boolean;
+  allowHeadings?: boolean;
   canDelete?: boolean;
+  content: string;
+  editable?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
-  content: string;
   toolbarConfig?: string[];
-  insideAccordion?: boolean;
   useMarkdown?: boolean;
   onContentChange: (content: string) => void;
   onDelete?: () => void;
@@ -44,12 +44,12 @@ export const toolbarConfigs = {
 };
 
 const WysiwygEditor = ({
+  allowHeadings,
   editable,
   canDelete = false,
   content,
-  onContentChange,
-  insideAccordion,
   toolbarConfig,
+  onContentChange,
   onDelete,
   useMarkdown = false,
 }: Props) => {
@@ -147,7 +147,7 @@ const WysiwygEditor = ({
             editor={ClassicEditor}
             config={{
               toolbar: toolbarConfig || toolbarConfigs.full,
-              heading: insideAccordion && {
+              heading: allowHeadings && {
                 options: [
                   {
                     model: 'paragraph',

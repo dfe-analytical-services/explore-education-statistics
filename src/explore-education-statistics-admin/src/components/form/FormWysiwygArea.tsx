@@ -1,16 +1,16 @@
+import EditableMarkdownRenderer, {
+  EditableMarkdownRendererProps,
+} from '@admin/components/editable/EditableMarkdownRenderer';
+import ErrorMessage from '@common/components/ErrorMessage';
 import React, {
   ChangeEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,
   ReactNode,
 } from 'react';
-import EditableMarkdownRenderer, {
-  MarkdownRendererProps,
-} from '@admin/components/editable/EditableMarkdownRenderer';
-import ErrorMessage from '@common/components/ErrorMessage';
 
 export interface FormWysiwygAreaProps
-  extends Omit<MarkdownRendererProps, 'onDelete'> {
+  extends Omit<EditableMarkdownRendererProps, 'onDelete'> {
   error?: ReactNode | string;
   hint?: string;
   id: string;

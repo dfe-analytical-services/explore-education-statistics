@@ -1,36 +1,31 @@
+import EditableProps from '@admin/components/editable/types/EditableProps';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
-import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React from 'react';
 
-export type Props = RendererProps & {
+export interface EditableHtmlRendererProps extends EditableProps {
+  allowHeadings?: boolean;
   source: string;
-  canDelete: boolean;
-  onDelete: () => void;
-  editable?: boolean;
-  insideAccordion?: boolean;
   onContentChange: (content: string) => void;
-};
+}
 
 const EditableHtmlRenderer = ({
+  allowHeadings,
   source = '',
   canDelete,
-  insideAccordion,
-  onDelete,
   editable = true,
+  onDelete,
   onContentChange,
-}: Props) => {
+}: EditableHtmlRendererProps) => {
   return (
-    <>
-      <WysiwygEditor
-        content={source}
-        editable={editable}
-        insideAccordion={insideAccordion}
-        canDelete={canDelete}
-        onContentChange={onContentChange}
-        onDelete={onDelete}
-      />
-    </>
+    <WysiwygEditor
+      content={source}
+      editable={editable}
+      allowHeadings={allowHeadings}
+      canDelete={canDelete}
+      onContentChange={onContentChange}
+      onDelete={onDelete}
+    />
   );
 };
 

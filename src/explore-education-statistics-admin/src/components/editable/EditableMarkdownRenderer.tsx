@@ -1,32 +1,30 @@
+import EditableProps from '@admin/components/editable/types/EditableProps';
 import WysiwygEditor from '@admin/components/WysiwygEditor';
-import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React from 'react';
-import ReactMarkdown, { ReactMarkdownProps } from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
 
-export type MarkdownRendererProps = RendererProps &
-  ReactMarkdownProps & {
-    canDelete?: boolean;
-    onDelete: () => void;
-    toolbarConfig?: string[];
-    insideAccordion?: boolean;
-    editable?: boolean;
-    onContentChange: (content: string) => void;
-  };
+export interface EditableMarkdownRendererProps extends EditableProps {
+  allowHeadings?: boolean;
+  insideAccordion?: boolean;
+  source: string;
+  toolbarConfig?: string[];
+  onContentChange: (content: string) => void;
+}
 
 const EditableMarkdownRenderer = ({
-  source = '',
+  allowHeadings,
   canDelete,
-  insideAccordion,
-  toolbarConfig,
-  onDelete,
   editable = true,
+  source = '',
+  toolbarConfig,
   onContentChange,
-}: MarkdownRendererProps) => {
+  onDelete,
+}: EditableMarkdownRendererProps) => {
   return (
     <WysiwygEditor
       content={source}
-      insideAccordion={insideAccordion}
+      allowHeadings={allowHeadings}
       canDelete={canDelete}
       editable={editable}
       useMarkdown

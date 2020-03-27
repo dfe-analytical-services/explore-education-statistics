@@ -1,36 +1,44 @@
 import EditableDataBlock from '@admin/components/editable/EditableDataBlock';
 import EditableHtmlRenderer from '@admin/components/editable/EditableHtmlRenderer';
-import EditableMarkdownRenderer, {
-  MarkdownRendererProps,
-} from '@admin/components/editable/EditableMarkdownRenderer';
+import EditableMarkdownRenderer from '@admin/components/editable/EditableMarkdownRenderer';
+import EditableProps from '@admin/components/editable/types/EditableProps';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableBlock } from '@admin/services/publicationService';
-import React from 'react';
+import { OmitStrict } from '@common/types';
+import React, { useCallback } from 'react';
 
-interface Props extends MarkdownRendererProps {
+interface Props extends OmitStrict<EditableProps, 'onDelete'> {
+  allowHeadings?: boolean;
   block: EditableBlock;
+  onContentChange: (content: string) => void;
+  onDelete: (blockId: string) => void;
 }
 
 function EditableBlockRenderer({
   block,
   editable,
-  insideAccordion,
+  allowHeadings,
   onContentChange,
   canDelete = false,
   onDelete,
 }: Props) {
   const { releaseId } = useManageReleaseContext();
 
+  const handleDelete = useCallback(() => {
+    if (onDelete) {
+      onDelete(block.id);
+    }
+  }, [block.id, onDelete]);
+
   switch (block.type) {
     case 'MarkDownBlock':
       return (
         <EditableMarkdownRenderer
           editable={editable}
-          contentId={block.id}
-          insideAccordion={insideAccordion}
+          allowHeadings={allowHeadings}
           source={block.body}
           canDelete={canDelete}
-          onDelete={onDelete}
+          onDelete={handleDelete}
           onContentChange={onContentChange}
         />
       );
@@ -43,7 +51,7 @@ function EditableBlockRenderer({
             editable={editable}
             releaseId={releaseId}
             canDelete={canDelete}
-            onDelete={onDelete}
+            onDelete={handleDelete}
           />
         </div>
       );
@@ -51,11 +59,10 @@ function EditableBlockRenderer({
       return (
         <EditableHtmlRenderer
           editable={editable}
-          insideAccordion={insideAccordion}
-          contentId={block.id}
+          allowHeadings={allowHeadings}
           source={block.body}
           canDelete={canDelete}
-          onDelete={onDelete}
+          onDelete={handleDelete}
           onContentChange={onContentChange}
         />
       );

@@ -19,11 +19,6 @@ import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
 
-export interface RendererProps {
-  contentId?: string;
-  releaseId?: string;
-}
-
 const PublicationReleaseContent = () => {
   const { isEditing } = useContext(EditingContext);
   const { release } = useReleaseState();
