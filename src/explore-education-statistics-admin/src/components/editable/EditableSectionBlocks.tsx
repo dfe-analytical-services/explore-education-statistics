@@ -85,7 +85,7 @@ const EditableSectionBlocks = ({
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <BlockDroppable draggable={isReordering} droppableId={`${sectionId}`}>
+      <BlockDroppable droppable={isReordering} droppableId={sectionId}>
         {blocks.map((block, index) => (
           <div
             key={`content-section-${block.id}`}
@@ -94,8 +94,8 @@ const EditableSectionBlocks = ({
           >
             <BlockDraggable
               draggable={isReordering}
-              draggableId={`${block.id}`}
-              key={`${block.id}`}
+              draggableId={block.id}
+              key={block.id}
               index={index}
             >
               {!isReordering && (
