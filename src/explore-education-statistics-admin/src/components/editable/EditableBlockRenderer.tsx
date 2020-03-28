@@ -10,7 +10,7 @@ import React, { useCallback } from 'react';
 interface Props extends OmitStrict<EditableProps, 'onDelete'> {
   allowHeadings?: boolean;
   block: EditableBlock;
-  onSave: (content: string) => void;
+  onContentSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
 }
 
@@ -18,12 +18,19 @@ function EditableBlockRenderer({
   block,
   editable,
   allowHeadings,
-  onSave,
   canDelete = false,
+  onContentSave,
   onDelete,
 }: Props) {
   const { releaseId } = useManageReleaseContext();
   const id = `editableDataBlockRenderer-dataBlock-${block.id}`;
+
+  const handleSave = useCallback(
+    (content: string) => {
+      onContentSave(block.id, content);
+    },
+    [block.id, onContentSave],
+  );
 
   const handleDelete = useCallback(() => {
     if (onDelete) {
@@ -42,7 +49,7 @@ function EditableBlockRenderer({
           source={block.body}
           canDelete={canDelete}
           onDelete={handleDelete}
-          onSave={onSave}
+          onSave={handleSave}
         />
       );
     case 'DataBlock':
@@ -68,7 +75,7 @@ function EditableBlockRenderer({
           source={block.body}
           canDelete={canDelete}
           onDelete={handleDelete}
-          onSave={onSave}
+          onSave={handleSave}
         />
       );
     default:
