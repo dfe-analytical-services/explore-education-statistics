@@ -1,5 +1,6 @@
 import styles from '@admin/components/DraggableAccordionSection.module.scss';
 import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
+import classNames from 'classnames';
 import React, { cloneElement, ReactElement } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
@@ -18,34 +19,31 @@ const DraggableAccordionSection = ({
   openAll,
   section,
 }: DraggableAccordionSectionProps) => {
-  if (isReordering) {
-    return (
-      <Draggable draggableId={id} index={index}>
-        {draggableProvided => (
-          <div
-            {...draggableProvided.draggableProps}
-            ref={draggableProvided.innerRef}
-            className={styles.dragContainer}
-          >
-            <span
-              {...draggableProvided.dragHandleProps}
-              className={styles.dragHandle}
-            />
-            {cloneElement<EditableAccordionSectionProps>(section, {
-              index,
-              open: false,
-              canToggle: false,
+  return (
+    <Draggable draggableId={id} isDragDisabled={!isReordering} index={index}>
+      {draggableProvided => (
+        <div
+          {...draggableProvided.draggableProps}
+          ref={draggableProvided.innerRef}
+          className={classNames({
+            [styles.dragContainer]: isReordering,
+          })}
+        >
+          <span
+            {...draggableProvided.dragHandleProps}
+            className={classNames({
+              [styles.dragHandle]: isReordering,
             })}
-          </div>
-        )}
-      </Draggable>
-    );
-  }
-
-  return cloneElement<EditableAccordionSectionProps>(section, {
-    index,
-    open: openAll,
-  });
+          />
+          {cloneElement<EditableAccordionSectionProps>(section, {
+            index,
+            open: isReordering ? false : openAll,
+            canToggle: !isReordering,
+          })}
+        </div>
+      )}
+    </Draggable>
+  );
 };
 
 export default DraggableAccordionSection;

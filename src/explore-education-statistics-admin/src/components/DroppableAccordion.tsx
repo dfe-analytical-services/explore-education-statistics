@@ -1,6 +1,6 @@
-import { Droppable } from 'react-beautiful-dnd';
-import React, { ReactNode } from 'react';
 import classnames from 'classnames';
+import React, { ReactNode } from 'react';
+import { Droppable } from 'react-beautiful-dnd';
 
 import styles from './DroppableAccordion.module.scss';
 
@@ -15,27 +15,23 @@ const DroppableAccordion = ({
   isReordering,
   children,
 }: DroppableAccordionProps) => {
-  if (isReordering) {
-    return (
-      <Droppable droppableId={id} type="accordion">
-        {(droppableProvided, snapshot) => (
-          <div
-            {...droppableProvided.droppableProps}
-            ref={droppableProvided.innerRef}
-            className={classnames({
-              [styles.dragover]: snapshot.isDraggingOver,
-            })}
-          >
-            {children}
+  return (
+    <Droppable droppableId={id} isDropDisabled={!isReordering} type="accordion">
+      {(droppableProvided, snapshot) => (
+        <div
+          {...droppableProvided.droppableProps}
+          ref={droppableProvided.innerRef}
+          className={classnames({
+            [styles.dragover]: snapshot.isDraggingOver && isReordering,
+          })}
+        >
+          {children}
 
-            {droppableProvided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    );
-  }
-
-  return <>{children}</>;
+          {droppableProvided.placeholder}
+        </div>
+      )}
+    </Droppable>
+  );
 };
 
 export default DroppableAccordion;
