@@ -2,27 +2,28 @@ import EditableDataBlock from '@admin/components/editable/EditableDataBlock';
 import EditableHtmlRenderer from '@admin/components/editable/EditableHtmlRenderer';
 import EditableMarkdownRenderer from '@admin/components/editable/EditableMarkdownRenderer';
 import EditableProps from '@admin/components/editable/types/EditableProps';
-import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { EditableBlock } from '@admin/services/publicationService';
+import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { OmitStrict } from '@common/types';
 import React, { useCallback } from 'react';
 
 interface Props extends OmitStrict<EditableProps, 'onDelete'> {
   allowHeadings?: boolean;
   block: EditableBlock;
+  getInfographic?: GetInfographic;
   onContentSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
 }
 
 function EditableBlockRenderer({
-  block,
-  editable,
   allowHeadings,
+  block,
   canDelete = false,
+  editable,
+  getInfographic,
   onContentSave,
   onDelete,
 }: Props) {
-  const { releaseId } = useManageReleaseContext();
   const id = `editableDataBlockRenderer-dataBlock-${block.id}`;
 
   const handleSave = useCallback(
@@ -59,7 +60,7 @@ function EditableBlockRenderer({
             id={id}
             dataBlock={block}
             editable={editable}
-            releaseId={releaseId}
+            getInfographic={getInfographic}
             canDelete={canDelete}
             onDelete={handleDelete}
           />

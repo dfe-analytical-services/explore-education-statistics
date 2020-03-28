@@ -31,6 +31,7 @@ const EditableSectionBlocks = ({
   isReordering = false,
   allowHeadings,
   allowComments = false,
+  getInfographic,
   onBlockSaveOrder,
   onBlockContentChange,
   onBlockDelete,
@@ -121,6 +122,7 @@ const EditableSectionBlocks = ({
                 canDelete={!isReordering}
                 block={block}
                 allowHeadings={allowHeadings}
+                getInfographic={getInfographic}
                 onContentSave={onBlockContentChange}
                 onDelete={onBlockDelete}
               />

@@ -1,5 +1,4 @@
 import EditableProps from '@admin/components/editable/types/EditableProps';
-import useGetChartFile from '@admin/hooks/useGetChartFile';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
@@ -10,26 +9,19 @@ import classNames from 'classnames';
 import React from 'react';
 import styles from './EditableDataBlock.module.scss';
 
-export interface EditableDataBlockProps
-  extends EditableProps,
-    Omit<DataBlockRendererProps, 'getInfographic'> {
-  releaseId: string;
-}
+export type EditableDataBlockProps = EditableProps & DataBlockRendererProps;
 
 const EditableDataBlock = ({
   id,
   onDelete,
   editable,
-  releaseId,
   ...props
 }: EditableDataBlockProps) => {
   const [showConfirmation, toggleConfirmation] = useToggle(false);
 
-  const getChartFile = useGetChartFile(releaseId);
-
   return (
     <div className={styles.wrapper}>
-      <DataBlockRenderer {...props} id={id} getInfographic={getChartFile} />
+      <DataBlockRenderer {...props} id={id} />
 
       {editable && (
         <Button
