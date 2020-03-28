@@ -1,9 +1,13 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import EditableAccordionSection from '@admin/components/EditableAccordionSection';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import {
+  EditableBlock,
+  EditableContentBlock,
+} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { ContentSection } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 import React, { useCallback, useContext, useState } from 'react';
 import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
@@ -23,9 +27,7 @@ const MethodologyAccordionSection = ({
   ...restOfProps
 }: MethodologyAccordionSectionProps) => {
   const { isEditing } = useContext(EditingContext);
-  const { caption, heading, id: sectionId } = content;
-  const { content: sectionContent = [] } = content;
-  const [isReordering, setIsReordering] = useState(false);
+  const { caption, heading, id: sectionId, content: sectionContent } = content;
 
   const {
     addContentSectionBlock,
@@ -36,8 +38,11 @@ const MethodologyAccordionSection = ({
     removeContentSection,
   } = useMethodologyActions();
 
-  const addBlockToAccordionSection = useCallback(() => {
-    addContentSectionBlock({
+  const [isReordering, setIsReordering] = useState(false);
+  const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
+
+  const addBlockToAccordionSection = useCallback(async () => {
+    await addContentSectionBlock({
       methodologyId,
       sectionId,
       block: {
@@ -79,17 +84,19 @@ const MethodologyAccordionSection = ({
     [deleteContentSectionBlock, methodologyId, sectionId, sectionKey],
   );
 
-  const reorderBlocksInAccordionSection = useCallback(
-    order => {
-      updateSectionBlockOrder({
-        methodologyId,
-        sectionId,
-        order,
-        sectionKey,
-      });
-    },
-    [methodologyId, sectionId, sectionKey, updateSectionBlockOrder],
-  );
+  const reorderBlocksInAccordionSection = useCallback(async () => {
+    const order = blocks.reduce<Dictionary<number>>((acc, block, newIndex) => {
+      acc[block.id] = newIndex;
+      return acc;
+    }, {});
+
+    await updateSectionBlockOrder({
+      methodologyId,
+      sectionId,
+      order,
+      sectionKey,
+    });
+  }, [blocks, methodologyId, sectionId, sectionKey, updateSectionBlockOrder]);
 
   const onSaveHeading = useCallback(
     (newHeading: string) =>
@@ -121,9 +128,15 @@ const MethodologyAccordionSection = ({
       isReordering={isReordering}
       headerButtons={
         <Button
-          onClick={() => setIsReordering(!isReordering)}
-          className={`govuk-button ${!isReordering &&
-            'govuk-button--secondary'}`}
+          variant={!isReordering ? 'secondary' : undefined}
+          onClick={async () => {
+            if (isReordering) {
+              await reorderBlocksInAccordionSection();
+              setIsReordering(false);
+            } else {
+              setIsReordering(true);
+            }
+          }}
         >
           {isReordering ? 'Save section order' : 'Reorder this section'}
         </Button>
@@ -134,10 +147,10 @@ const MethodologyAccordionSection = ({
       <EditableSectionBlocks
         isReordering={isReordering}
         sectionId={sectionId}
-        onBlockOrderSave={reorderBlocksInAccordionSection}
+        content={blocks}
         onBlockContentSave={updateBlockInAccordionSection}
         onBlockDelete={removeBlockFromAccordionSection}
-        content={sectionContent}
+        onBlocksChange={setBlocks}
       />
       {isEditing && !isReordering && (
         <div className="govuk-!-margin-bottom-8 dfe-align--center">

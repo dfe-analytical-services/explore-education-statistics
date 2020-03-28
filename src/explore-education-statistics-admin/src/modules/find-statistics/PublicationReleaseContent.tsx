@@ -7,6 +7,7 @@ import ReleaseContentAccordion from '@admin/modules/find-statistics/components/R
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
+import { EditableBlock } from '@admin/services/publicationService';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -14,7 +15,7 @@ import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
@@ -27,6 +28,10 @@ const PublicationReleaseContent = () => {
     updateContentSectionBlock,
     deleteContentSectionBlock,
   } = useReleaseActions();
+
+  const [summarySectionBlocks, setSummarySectionBlocks] = useState<
+    EditableBlock[]
+  >(release.summarySection.content);
 
   const releaseCount = useMemo(() => {
     if (release) {
@@ -103,11 +108,12 @@ const PublicationReleaseContent = () => {
           {release.summarySection && (
             <>
               <EditableSectionBlocks
+                allowComments
                 sectionId={release.summarySection.id}
-                content={release.summarySection.content}
+                content={summarySectionBlocks}
                 onBlockContentSave={summaryBlockUpdate}
                 onBlockDelete={summaryBlockDelete}
-                allowComments
+                onBlocksChange={setSummarySectionBlocks}
               />
               {release.summarySection.content?.length === 0 && (
                 <div className="govuk-!-margin-bottom-8 dfe-align--center">
