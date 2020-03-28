@@ -136,8 +136,8 @@ const ReleaseContentAccordionSection = ({
         isReordering={isReordering}
         sectionId={sectionId}
         getInfographic={getChartFile}
-        onBlockSaveOrder={reorderBlocksInAccordionSection}
-        onBlockContentChange={updateBlockInAccordionSection}
+        onBlockOrderSave={reorderBlocksInAccordionSection}
+        onBlockContentSave={updateBlockInAccordionSection}
         onBlockDelete={removeBlockFromAccordionSection}
         content={sectionContent}
         allowComments

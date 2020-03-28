@@ -134,8 +134,8 @@ const MethodologyAccordionSection = ({
       <EditableSectionBlocks
         isReordering={isReordering}
         sectionId={sectionId}
-        onBlockSaveOrder={reorderBlocksInAccordionSection}
-        onBlockContentChange={updateBlockInAccordionSection}
+        onBlockOrderSave={reorderBlocksInAccordionSection}
+        onBlockContentSave={updateBlockInAccordionSection}
         onBlockDelete={removeBlockFromAccordionSection}
         content={sectionContent}
       />

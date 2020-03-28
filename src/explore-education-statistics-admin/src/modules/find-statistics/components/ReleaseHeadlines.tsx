@@ -87,7 +87,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
               <EditableSectionBlocks
                 sectionId={release.headlinesSection.id}
                 content={release.headlinesSection.content}
-                onBlockContentChange={headlinesBlockUpdate}
+                onBlockContentSave={headlinesBlockUpdate}
                 onBlockDelete={headlinesBlockDelete}
                 allowComments
               />

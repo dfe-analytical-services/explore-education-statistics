@@ -105,7 +105,7 @@ const PublicationReleaseContent = () => {
               <EditableSectionBlocks
                 sectionId={release.summarySection.id}
                 content={release.summarySection.content}
-                onBlockContentChange={summaryBlockUpdate}
+                onBlockContentSave={summaryBlockUpdate}
                 onBlockDelete={summaryBlockDelete}
                 allowComments
               />

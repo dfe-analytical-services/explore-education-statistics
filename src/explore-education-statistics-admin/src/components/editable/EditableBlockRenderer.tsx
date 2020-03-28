@@ -24,7 +24,7 @@ function EditableBlockRenderer({
   onContentSave,
   onDelete,
 }: Props) {
-  const id = `editableDataBlockRenderer-dataBlock-${block.id}`;
+  const id = `editableBlockRenderer-${block.id}`;
 
   const handleSave = useCallback(
     (content: string) => {

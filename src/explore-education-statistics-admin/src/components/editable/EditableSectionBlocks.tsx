@@ -19,8 +19,8 @@ export interface Props extends SectionBlocksProps {
   isReordering?: boolean;
   allowHeadings?: boolean;
   allowComments: boolean;
-  onBlockSaveOrder?: (order: Dictionary<number>) => void;
-  onBlockContentChange: (blockId: string, content: string) => void;
+  onBlockOrderSave?: (order: Dictionary<number>) => void;
+  onBlockContentSave: (blockId: string, content: string) => void;
   onBlockDelete: (blockId: string) => void;
 }
 
@@ -32,8 +32,8 @@ const EditableSectionBlocks = ({
   allowHeadings,
   allowComments = false,
   getInfographic,
-  onBlockSaveOrder,
-  onBlockContentChange,
+  onBlockOrderSave,
+  onBlockContentSave,
   onBlockDelete,
 }: Props) => {
   const [blocks, setBlocks] = useState<EditableBlock[]>();
@@ -47,8 +47,8 @@ const EditableSectionBlocks = ({
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else if (!isReordering) {
-      if (onBlockSaveOrder && blocks !== undefined)
-        onBlockSaveOrder(
+      if (onBlockOrderSave && blocks !== undefined)
+        onBlockOrderSave(
           blocks.reduce<Dictionary<number>>(
             (map, { id: blockId }, index) => ({
               ...map,
@@ -123,7 +123,7 @@ const EditableSectionBlocks = ({
                 block={block}
                 allowHeadings={allowHeadings}
                 getInfographic={getInfographic}
-                onContentSave={onBlockContentChange}
+                onContentSave={onBlockContentSave}
                 onDelete={onBlockDelete}
               />
             </BlockDraggable>
