@@ -1,5 +1,5 @@
+import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import EditableProps from '@admin/components/editable/types/EditableProps';
-import FormEditor from '@admin/components/form/FormEditor';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React from 'react';
 
@@ -8,7 +8,7 @@ export interface EditableHtmlRendererProps extends EditableProps {
   id: string;
   label: string;
   source: string;
-  onChange: (content: string) => void;
+  onSave: (content: string) => void;
 }
 
 const EditableHtmlRenderer = ({
@@ -19,17 +19,17 @@ const EditableHtmlRenderer = ({
   label,
   source = '',
   onDelete,
-  onChange,
+  onSave,
 }: EditableHtmlRendererProps) => {
   return (
-    <FormEditor
-      value={source}
+    <EditableContentBlock
+      allowHeadings={allowHeadings}
       editable={editable}
       id={id}
       label={label}
-      allowHeadings={allowHeadings}
+      value={source}
       canDelete={canDelete}
-      onChange={onChange}
+      onSave={onSave}
       onDelete={onDelete}
     />
   );

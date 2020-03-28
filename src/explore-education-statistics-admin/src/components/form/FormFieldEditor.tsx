@@ -16,7 +16,6 @@ const FormFieldEditor = <T extends {}>({
   name,
   showError = true,
   formGroupClass,
-  editable = true,
   ...props
 }: Props<T>) => {
   return (
@@ -35,8 +34,10 @@ const FormFieldEditor = <T extends {}>({
             <FormEditor
               {...props}
               {...field}
+              onChange={value => {
+                form.setFieldValue(name as string, value);
+              }}
               error={errorMessage}
-              editable={editable}
             />
           </FormGroup>
         );

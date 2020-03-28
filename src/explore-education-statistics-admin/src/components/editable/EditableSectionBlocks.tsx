@@ -121,7 +121,7 @@ const EditableSectionBlocks = ({
                 canDelete={!isReordering}
                 block={block}
                 allowHeadings={allowHeadings}
-                onContentChange={newContent =>
+                onSave={newContent =>
                   onBlockContentChange(block.id, newContent)
                 }
                 onDelete={onBlockDelete}

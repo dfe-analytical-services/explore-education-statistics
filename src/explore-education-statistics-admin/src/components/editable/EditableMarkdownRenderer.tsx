@@ -1,5 +1,5 @@
+import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import EditableProps from '@admin/components/editable/types/EditableProps';
-import FormEditor from '@admin/components/form/FormEditor';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -9,34 +9,30 @@ export interface EditableMarkdownRendererProps extends EditableProps {
   id: string;
   label: string;
   source: string;
-  toolbarConfig?: string[];
-  onChange: (content: string) => void;
+  onSave: (content: string) => void;
 }
 
 const EditableMarkdownRenderer = ({
   allowHeadings,
   canDelete,
   editable = true,
+  source = '',
   id,
   label,
-  source = '',
-  toolbarConfig,
-  onChange,
+  onSave,
   onDelete,
 }: EditableMarkdownRendererProps) => {
   return (
-    <FormEditor
-      useMarkdown
-      hideLabel
-      value={source}
+    <EditableContentBlock
+      allowHeadings={allowHeadings}
+      editable={editable}
       id={id}
       label={label}
-      allowHeadings={allowHeadings}
+      value={source}
       canDelete={canDelete}
-      editable={editable}
-      toolbarConfig={toolbarConfig}
-      onChange={onChange}
+      onSave={onSave}
       onDelete={onDelete}
+      useMarkdown
     />
   );
 };

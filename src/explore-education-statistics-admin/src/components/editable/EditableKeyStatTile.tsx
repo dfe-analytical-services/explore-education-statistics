@@ -1,5 +1,7 @@
 import { toolbarConfigs } from '@admin/components/form/FormEditor';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import toHtml from '@admin/utils/markdown/toHtml';
+import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -102,22 +104,17 @@ const EditableKeyStatTile = ({
         <div className={styles.keyStatTile}>
           <Formik<KeyStatsFormValues>
             initialValues={{
-              dataSummary:
-                (summary && summary.dataSummary && summary.dataSummary[0]) ||
-                '',
-              dataDefinitionTitle:
-                (summary &&
-                  summary.dataDefinitionTitle &&
-                  summary.dataDefinitionTitle[0]) ||
-                'Help',
-              dataDefinition:
-                (summary &&
-                  summary.dataDefinition &&
-                  summary.dataDefinition[0]) ||
-                '',
+              dataSummary: summary?.dataSummary?.[0] ?? '',
+              dataDefinitionTitle: summary?.dataDefinitionTitle?.[0] ?? 'Help',
+              dataDefinition: summary?.dataDefinition?.[0]
+                ? toHtml(summary?.dataDefinition?.[0])
+                : '',
             }}
             onSubmit={values => {
-              onSubmit(values);
+              onSubmit({
+                ...values,
+                dataDefinition: toMarkdown(values.dataDefinition),
+              });
               setShowForm(false);
             }}
             render={(form: FormikProps<KeyStatsFormValues>) => {
