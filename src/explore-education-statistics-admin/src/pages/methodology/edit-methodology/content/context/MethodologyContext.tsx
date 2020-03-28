@@ -1,7 +1,8 @@
 import { MethodologyContent } from '@admin/services/methodology/types';
+import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
-import { Reducer, useImmerReducer } from 'use-immer';
+import { Reducer } from 'use-immer';
 import { MethodologyDispatchAction } from './MethodologyContextActionTypes';
 
 export type MethodologyContextDispatch = (
@@ -135,7 +136,11 @@ interface MethodologyProviderProps {
 }
 
 function MethodologyProvider({ children, value }: MethodologyProviderProps) {
-  const [state, dispatch] = useImmerReducer(methodologyReducer, value);
+  const [state, dispatch] = useLoggedImmerReducer(
+    'Methodology',
+    methodologyReducer,
+    value,
+  );
 
   return (
     <MethodologyStateContext.Provider value={state}>
