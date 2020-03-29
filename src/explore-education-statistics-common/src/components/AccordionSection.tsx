@@ -1,7 +1,7 @@
 import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
-import React, { createElement, ReactNode } from 'react';
+import React, { createElement, memo, ReactNode } from 'react';
 import styles from './Accordion.module.scss';
 import GoToTopLink from './GoToTopLink';
 
@@ -108,7 +108,7 @@ const AccordionSection = ({
   );
 };
 
-export default AccordionSection;
+export default memo(AccordionSection);
 
 export const openAllParentAccordionSections = (target: HTMLElement) => {
   const sections = findAllParents(target, `.${classes.section}`);

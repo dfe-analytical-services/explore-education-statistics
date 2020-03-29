@@ -6,6 +6,7 @@ import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, {
   cloneElement,
+  isValidElement,
   ReactElement,
   useCallback,
   useEffect,
@@ -39,7 +40,7 @@ const EditableAccordion = ({
 
   useEffect(() => {
     const nextSections = React.Children.toArray(children).filter(
-      child => !!child,
+      isValidElement,
     ) as ReactElement<EditableAccordionSectionProps>[];
 
     setSections(nextSections);
@@ -96,7 +97,7 @@ const EditableAccordion = ({
                 [styles.dragover]: snapshot.isDraggingOver && isReordering,
               })}
             >
-              <Accordion id={id} showToggleAll={!isReordering}>
+              <Accordion id={id} openAll={isReordering ? false : undefined}>
                 {sections.map((child, index) => {
                   const section = child as ReactElement<
                     EditableAccordionSectionProps &
