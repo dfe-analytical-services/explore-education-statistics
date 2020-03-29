@@ -1,6 +1,4 @@
 import EditableAccordion from '@admin/components/EditableAccordion';
-import ReleaseContentAccordionSection
-  from '@admin/modules/find-statistics/components/ReleaseContentAccordionSection';
 import { MethodologyContent } from '@admin/services/methodology/types';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { Dictionary } from '@common/types';
