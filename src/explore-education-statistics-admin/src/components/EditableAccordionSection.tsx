@@ -122,7 +122,12 @@ const EditableAccordionSection = ({
               [styles.dragHandle]: isReordering,
             })}
           />
-          <AccordionSection {...props} heading={heading} header={header}>
+          <AccordionSection
+            {...props}
+            id={id}
+            heading={heading}
+            header={header}
+          >
             <div>
               {onHeadingChange &&
                 (isEditingHeading ? (

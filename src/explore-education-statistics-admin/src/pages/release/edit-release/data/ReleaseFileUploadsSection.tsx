@@ -196,7 +196,6 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                       <AccordionSection
                         /* eslint-disable-next-line react/no-array-index-key */
                         key={accId}
-                        headingId={accId}
                         heading={file.title}
                         onToggle={() => {
                           if (openedAccordions.includes(accId)) {

@@ -5,17 +5,15 @@ import React, { createElement, memo, ReactNode } from 'react';
 import styles from './Accordion.module.scss';
 import GoToTopLink from './GoToTopLink';
 
-export type ToggleHandler = (open: boolean) => void;
+export type ToggleHandler = (open: boolean, id: string) => void;
 
 export interface AccordionSectionProps {
   caption?: string;
   children?: ReactNode;
   className?: string;
-  contentId?: string;
   goToTop?: boolean;
   header?: ReactNode;
   heading: string;
-  headingId?: string;
   /**
    * Only for accessibility/semantic markup,
    * does not change the actual styling
@@ -40,16 +38,18 @@ const AccordionSection = ({
   caption,
   className,
   children,
-  contentId,
   goToTop = true,
   header,
   heading,
-  headingId,
   headingTag = 'h2',
+  id = 'accordionSection',
   open = false,
   onToggle,
 }: AccordionSectionProps) => {
   const { isMounted } = useMounted();
+
+  const headingId = `${id}-heading`;
+  const contentId = `${id}-content`;
 
   return (
     <div
@@ -74,7 +74,7 @@ const AccordionSection = ({
                   type="button"
                   onClick={() => {
                     if (onToggle) {
-                      onToggle(!open);
+                      onToggle(!open, id);
                     }
                   }}
                 >
