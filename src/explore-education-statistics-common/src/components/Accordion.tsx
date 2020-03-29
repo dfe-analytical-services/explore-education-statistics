@@ -155,7 +155,6 @@ const Accordion = ({
         const isSectionOpen = isAllOpen || openSections[index];
 
         return cloneElement<AccordionSectionProps>(section, {
-          key: headingId,
           headingId,
           contentId,
           open: isSectionOpen,

@@ -38,18 +38,9 @@ const EditableAccordion = ({
   >([]);
 
   useEffect(() => {
-    const nextSections = React.Children.toArray(children)
-      .filter(child => !!child)
-      .map((child, index) => {
-        const section = child as ReactElement<
-          EditableAccordionSectionProps & DraggableAccordionSectionProps
-        >;
-
-        return cloneElement(section, {
-          index,
-          isReordering,
-        });
-      });
+    const nextSections = React.Children.toArray(children).filter(
+      child => !!child,
+    ) as ReactElement<EditableAccordionSectionProps>[];
 
     setSections(nextSections);
   }, [children, id, isReordering]);
@@ -106,7 +97,17 @@ const EditableAccordion = ({
               })}
             >
               <Accordion id={id} showToggleAll={!isReordering}>
-                {sections}
+                {sections.map((child, index) => {
+                  const section = child as ReactElement<
+                    EditableAccordionSectionProps &
+                      DraggableAccordionSectionProps
+                  >;
+
+                  return cloneElement(section, {
+                    index,
+                    isReordering,
+                  });
+                })}
               </Accordion>
             </div>
           )}
