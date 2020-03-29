@@ -8,7 +8,7 @@ import Button from '@common/components/Button';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { memo, useCallback, useContext, useState } from 'react';
 import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
 
@@ -160,4 +160,4 @@ const MethodologyAccordionSection = ({
   );
 };
 
-export default MethodologyAccordionSection;
+export default memo(MethodologyAccordionSection);
