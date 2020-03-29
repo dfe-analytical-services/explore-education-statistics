@@ -109,6 +109,7 @@ const EditableAccordion = ({
                   });
                 })}
               </Accordion>
+              {droppableProvided.placeholder}
             </div>
           )}
         </Droppable>
