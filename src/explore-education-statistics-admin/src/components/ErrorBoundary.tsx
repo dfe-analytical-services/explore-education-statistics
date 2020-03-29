@@ -70,7 +70,7 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
     this.isHandlingErrors = false;
 
     try {
-      return callback();
+      return await callback();
     } finally {
       this.isHandlingErrors = true;
     }
