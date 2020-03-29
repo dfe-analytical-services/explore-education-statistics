@@ -70,13 +70,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
+        private readonly IImportService _importService;
 
         private const string ContainerName = "releases";
 
         private const string NameKey = "name";
 
         public FileStorageService(IConfiguration config, ISubjectService subjectService, IUserService userService, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService, ContentDbContext context)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, IFileTypeService fileTypeService, ContentDbContext context,
+            IImportService importService)
         {
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _subjectService = subjectService;
@@ -84,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _fileTypeService = fileTypeService;
             _context = context;
+            _importService = importService;
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId)
@@ -108,10 +111,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {UserName, userName}};
                     var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}, {UserName, userName}};
                     return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, name, overwrite)
-                        .OnSuccess(() =>
+                        .OnSuccess(() => _importService.CreateImportTableRow(releaseId, dataFile.FileName))
+                        .OnSuccess(() => 
                             UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
                         .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data,
                             metaDataInfo, overwrite))
+                        // add message to queue to process these files
+                        .OnSuccessDo(() => _importService.Import(dataFile.FileName, releaseId, dataFile))
                         .OnSuccess(() => CreateBasicFileLink(dataFile.FileName, releaseId))
                         .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });

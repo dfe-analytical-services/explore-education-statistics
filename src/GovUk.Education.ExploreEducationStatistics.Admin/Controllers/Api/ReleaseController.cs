@@ -25,14 +25,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class ReleasesController : ControllerBase
     {   
-        private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReleasesController(IImportService importService,
+        public ReleasesController(
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IImportStatusService importStatusService,
@@ -40,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             UserManager<ApplicationUser> userManager
             )
         {
-            _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
@@ -170,19 +168,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return await _importService.CreateImportTableRow(releaseId, file.FileName)
-                .OnSuccess(() =>  _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
-                .OnSuccess(result =>
-                {
-                    // add message to queue to process these files
-                    _importService.Import(file.FileName, releaseId, file);
-                    return result;
-                }))
-                .OnFailureDo(() => 
-                    // Have to do this as a last step on any failure but still need to wrap the errors as done in HandleFailuresOr
-                    _importService.RemoveImportTableRow(releaseId, file.FileName)
-                )
-                .HandleFailuresOrOk();
+            return await _fileStorageService
+                .UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
+                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("releases/{releaseId}")]

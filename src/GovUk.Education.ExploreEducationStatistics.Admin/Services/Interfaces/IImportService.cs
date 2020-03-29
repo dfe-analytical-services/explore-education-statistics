@@ -11,7 +11,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         void Import(string dataFileName, Guid releaseId, IFormFile dataFile);
 
         Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName);
-
-        Task RemoveImportTableRow(Guid releaseId, string dataFileName);
     }
 }

@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var client = storageAccount.CreateCloudQueueClient();
             var pQueue = client.GetQueueReference("imports-pending");
             var aQueue = client.GetQueueReference("imports-available");
-            
+
             pQueue.CreateIfNotExists();
             aQueue.CreateIfNotExists();
             var numRows = FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
@@ -69,27 +69,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName)
         {
-            var columns = new List<string>() {"Status"};
             var result = await _table.ExecuteAsync(
-                TableOperation.Retrieve<DatafileImport>(releaseId.ToString(), dataFileName, columns));
+                TableOperation.Retrieve<DatafileImport>(releaseId.ToString(), dataFileName));
             
-            if (result.Result != null && ((DatafileImport)result.Result).Status == IStatus.UPLOADING)
+            if (result.Result != null)
             {
-                return ValidationActionResult(UploadAlreadyInProgress);
+                return ValidationActionResult(DatafileAlreadyUploaded);
             }
             
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
+            await _table.ExecuteAsync(TableOperation.Insert(
                 new DatafileImport(releaseId.ToString(), dataFileName))
             );
             return true;
         }
-        
-        public async Task RemoveImportTableRow(Guid releaseId, string dataFileName)
-        {
-            var dataImport = new DatafileImport(releaseId.ToString(), dataFileName) {ETag = "*"};
-            await _table.ExecuteAsync(TableOperation.Delete(dataImport));
-        }
-        
+
         private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(
