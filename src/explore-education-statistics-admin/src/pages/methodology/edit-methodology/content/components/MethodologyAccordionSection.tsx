@@ -96,7 +96,7 @@ const MethodologyAccordionSection = ({
     });
   }, [blocks, methodologyId, sectionId, sectionKey, updateSectionBlockOrder]);
 
-  const onSaveHeading = useCallback(
+  const handleHeadingChange = useCallback(
     (newHeading: string) =>
       updateContentSectionHeading({
         methodologyId,
@@ -107,7 +107,7 @@ const MethodologyAccordionSection = ({
     [methodologyId, sectionId, sectionKey, updateContentSectionHeading],
   );
 
-  const removeSection = useCallback(
+  const handleRemoveSection = useCallback(
     () =>
       removeContentSection({
         methodologyId,
@@ -138,8 +138,8 @@ const MethodologyAccordionSection = ({
           {isReordering ? 'Save section order' : 'Reorder this section'}
         </Button>
       }
-      onHeadingChange={onSaveHeading}
-      onRemoveSection={removeSection}
+      onHeadingChange={handleHeadingChange}
+      onRemoveSection={handleRemoveSection}
     >
       <EditableSectionBlocks
         isReordering={isReordering}

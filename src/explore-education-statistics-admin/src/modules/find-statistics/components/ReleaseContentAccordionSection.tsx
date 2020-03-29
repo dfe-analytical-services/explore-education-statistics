@@ -1,7 +1,5 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import EditableAccordionSection, {
-  EditableAccordionSectionProps,
-} from '@admin/components/EditableAccordionSection';
+import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import {
@@ -18,18 +16,12 @@ import AddDataBlockButton from './AddDataBlockButton';
 export interface ReleaseContentAccordionSectionProps {
   id: string;
   section: ContentSection<EditableBlock>;
-  onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
-  onRemoveSection?: EditableAccordionSectionProps['onRemoveSection'];
-  canAddBlocks?: boolean;
   release: EditableRelease;
 }
 
 const ReleaseContentAccordionSection = ({
   release,
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
-  onHeadingChange,
-  onRemoveSection,
-  canAddBlocks = true,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
   const { isEditing } = useContext(EditingContext);
@@ -40,6 +32,8 @@ const ReleaseContentAccordionSection = ({
     deleteContentSectionBlock,
     updateContentSectionBlock,
     updateSectionBlockOrder,
+    updateContentSectionHeading,
+    removeContentSection,
   } = useReleaseActions();
 
   const [isReordering, setIsReordering] = useState(false);
@@ -113,14 +107,33 @@ const ReleaseContentAccordionSection = ({
     });
   }, [blocks, release.id, sectionId, updateSectionBlockOrder]);
 
+  const handleHeadingChange = useCallback(
+    title =>
+      updateContentSectionHeading({
+        sectionId,
+        title,
+        releaseId: release.id,
+      }),
+    [release.id, sectionId, updateContentSectionHeading],
+  );
+
+  const handleRemoveSection = useCallback(
+    () =>
+      removeContentSection({
+        sectionId,
+        releaseId: release.id,
+      }),
+    [release.id, removeContentSection, sectionId],
+  );
+
   return (
     <EditableAccordionSection
       {...props}
       id={sectionId}
       heading={heading || ''}
       caption={caption}
-      onHeadingChange={onHeadingChange}
-      onRemoveSection={onRemoveSection}
+      onHeadingChange={handleHeadingChange}
+      onRemoveSection={handleRemoveSection}
       headerButtons={
         <Button
           variant={!isReordering ? 'secondary' : undefined}
@@ -149,7 +162,7 @@ const ReleaseContentAccordionSection = ({
         onBlocksChange={setBlocks}
       />
 
-      {isEditing && !isReordering && canAddBlocks && (
+      {isEditing && !isReordering && (
         <div className="govuk-!-margin-bottom-8 dfe-align--center">
           <Button variant="secondary" onClick={addBlockToAccordionSection}>
             Add text block

@@ -17,12 +17,7 @@ const ReleaseContentAccordion = ({
   accordionId,
   sectionName,
 }: ReleaseContentAccordionProps) => {
-  const {
-    addContentSection,
-    removeContentSection,
-    updateContentSectionHeading,
-    updateContentSectionsOrder,
-  } = useReleaseActions();
+  const { addContentSection, updateContentSectionsOrder } = useReleaseActions();
 
   const addAccordionSection = useCallback(
     () =>
@@ -58,19 +53,6 @@ const ReleaseContentAccordion = ({
           id={section.id}
           release={release}
           section={section}
-          onHeadingChange={title =>
-            updateContentSectionHeading({
-              releaseId: release.id,
-              sectionId: section.id,
-              title,
-            })
-          }
-          onRemoveSection={() =>
-            removeContentSection({
-              releaseId: release.id,
-              sectionId: section.id,
-            })
-          }
         />
       ))}
     </EditableAccordion>
