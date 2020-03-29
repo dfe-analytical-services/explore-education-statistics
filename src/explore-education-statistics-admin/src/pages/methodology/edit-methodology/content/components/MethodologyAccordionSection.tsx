@@ -13,21 +13,19 @@ import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
 
 interface MethodologyAccordionSectionProps {
-  content: ContentSection<EditableContentBlock>;
+  id: string;
+  section: ContentSection<EditableContentBlock>;
   sectionKey: ContentSectionKeys;
   methodologyId: string;
-  index: number;
-  id: string;
 }
 
 const MethodologyAccordionSection = ({
   sectionKey,
-  content,
+  section: { id: sectionId, caption, heading, content: sectionContent },
   methodologyId,
-  ...restOfProps
+  ...props
 }: MethodologyAccordionSectionProps) => {
   const { isEditing } = useContext(EditingContext);
-  const { caption, heading, id: sectionId, content: sectionContent } = content;
 
   const {
     addContentSectionBlock,
@@ -121,11 +119,10 @@ const MethodologyAccordionSection = ({
 
   return (
     <EditableAccordionSection
-      {...content}
-      {...restOfProps}
+      {...props}
+      id={sectionId}
       heading={heading}
       caption={caption}
-      isReordering={isReordering}
       headerButtons={
         <Button
           variant={!isReordering ? 'secondary' : undefined}

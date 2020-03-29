@@ -1,6 +1,9 @@
 import EditableAccordion from '@admin/components/EditableAccordion';
+import ReleaseContentAccordionSection
+  from '@admin/modules/find-statistics/components/ReleaseContentAccordionSection';
 import { MethodologyContent } from '@admin/services/methodology/types';
 import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback, useContext } from 'react';
 import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
@@ -33,8 +36,13 @@ const MethodologyAccordion = ({
   );
 
   const reorderAccordionSections = useCallback(
-    async order => {
-      updateContentSectionsOrder({
+    async (ids: string[]) => {
+      const order = ids.reduce<Dictionary<number>>((acc, id, index) => {
+        acc[id] = index;
+        return acc;
+      }, {});
+
+      await updateContentSectionsOrder({
         methodologyId: methodology.id,
         order,
         sectionKey,
@@ -50,20 +58,17 @@ const MethodologyAccordion = ({
       id={`methodology-accordion-${sectionKey}`}
       sectionName={sectionKey}
       onAddSection={onAddSection}
-      onSaveOrder={reorderAccordionSections}
+      onReorder={reorderAccordionSections}
     >
-      {orderBy(methodology[sectionKey], 'order').map(
-        (accordionSection, index) => (
-          <MethodologyAccordionSection
-            id={accordionSection.id}
-            methodologyId={methodology.id}
-            key={accordionSection.id}
-            content={accordionSection}
-            sectionKey={sectionKey}
-            index={index}
-          />
-        ),
-      )}
+      {orderBy(methodology[sectionKey], 'order').map(section => (
+        <MethodologyAccordionSection
+          key={section.id}
+          id={section.id}
+          methodologyId={methodology.id}
+          section={section}
+          sectionKey={sectionKey}
+        />
+      ))}
     </EditableAccordion>
   );
 };

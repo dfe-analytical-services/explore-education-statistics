@@ -1,5 +1,5 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import AccordionSection, {
+import EditableAccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
@@ -17,8 +17,7 @@ import AddDataBlockButton from './AddDataBlockButton';
 
 export interface ReleaseContentAccordionSectionProps {
   id: string;
-  contentItem: ContentSection<EditableBlock>;
-  index: number;
+  section: ContentSection<EditableBlock>;
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
   onRemoveSection?: EditableAccordionSectionProps['onRemoveSection'];
   canAddBlocks?: boolean;
@@ -27,17 +26,14 @@ export interface ReleaseContentAccordionSectionProps {
 
 const ReleaseContentAccordionSection = ({
   release,
-  id: sectionId,
-  index,
-  contentItem,
+  section: { id: sectionId, caption, heading, content: sectionContent = [] },
   onHeadingChange,
   onRemoveSection,
   canAddBlocks = true,
-  ...restOfProps
+  ...props
 }: ReleaseContentAccordionSectionProps) => {
   const { isEditing } = useContext(EditingContext);
-  const { caption, heading, content: sectionContent = [] } = contentItem;
-  const [isReordering, setIsReordering] = useState(false);
+
   const {
     addContentSectionBlock,
     attachContentSectionBlock,
@@ -46,6 +42,7 @@ const ReleaseContentAccordionSection = ({
     updateSectionBlockOrder,
   } = useReleaseActions();
 
+  const [isReordering, setIsReordering] = useState(false);
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
   const getChartFile = useGetChartFile(release.id);
@@ -117,15 +114,13 @@ const ReleaseContentAccordionSection = ({
   }, [blocks, release.id, sectionId, updateSectionBlockOrder]);
 
   return (
-    <AccordionSection
-      {...restOfProps}
+    <EditableAccordionSection
+      {...props}
       id={sectionId}
-      index={index}
       heading={heading || ''}
       caption={caption}
       onHeadingChange={onHeadingChange}
       onRemoveSection={onRemoveSection}
-      sectionId={sectionId}
       headerButtons={
         <Button
           variant={!isReordering ? 'secondary' : undefined}
@@ -164,7 +159,7 @@ const ReleaseContentAccordionSection = ({
           />
         </div>
       )}
-    </AccordionSection>
+    </EditableAccordionSection>
   );
 };
 

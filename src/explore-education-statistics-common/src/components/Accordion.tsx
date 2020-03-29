@@ -18,6 +18,7 @@ import {
 export interface AccordionProps {
   children: ReactNode;
   id: string;
+  showToggleAll?: boolean;
   onToggleAll?: (open: boolean) => void;
   onToggle?: (accordionSection: { id: string; title: string }) => void;
 }
@@ -26,14 +27,20 @@ export function generateIdList(count: number) {
   return new Array(count).fill('content-section-').map((id, n) => id + (n + 1));
 }
 
-const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
+const Accordion = ({
+  children,
+  id,
+  showToggleAll = true,
+  onToggleAll,
+  onToggle,
+}: AccordionProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [openSections, updateOpenSections] = useImmer<boolean[]>([]);
 
-  const sections = React.Children.toArray(children) as ReactComponentElement<
-    ComponentType<AccordionSectionProps>
-  >[];
+  const sections = React.Children.toArray(children).filter(
+    child => !!child,
+  ) as ReactComponentElement<ComponentType<AccordionSectionProps>>[];
 
   const getSectionIds = (
     sectionProps: AccordionSectionProps,
@@ -120,7 +127,7 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
       role="none"
       data-module="govuk-accordion"
     >
-      {isMounted && (
+      {isMounted && showToggleAll && (
         <div className="govuk-accordion__controls">
           <button
             aria-expanded={isAllOpen}

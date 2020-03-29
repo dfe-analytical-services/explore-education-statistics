@@ -1,168 +1,172 @@
+import styles from '@admin/components/EditableAccordionSection.module.scss';
 import AccordionSection, {
+  accordionSectionClasses,
   AccordionSectionProps,
 } from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import { FormTextInput } from '@common/components/form';
-import GoToTopLink from '@common/components/GoToTopLink';
 import ModalConfirm from '@common/components/ModalConfirm';
+import useToggle from '@common/hooks/useToggle';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
-import React, { createElement, createRef, ReactNode, useState } from 'react';
-import styles from './EditableAccordionSection.module.scss';
+import React, {
+  createElement,
+  ReactNode,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 
-export interface EditableAccordionSectionProps extends AccordionSectionProps {
-  sectionId: string;
-  index?: number;
-  headerButtons?: ReactNode;
-  footerButtons?: ReactNode;
-  canToggle?: boolean;
-  onHeadingChange: (heading: string) => Promise<unknown>;
-  canRemoveSection: boolean;
-  onRemoveSection: () => Promise<unknown>;
+export interface DraggableAccordionSectionProps {
+  index: number;
   isReordering: boolean;
 }
 
+export interface EditableAccordionSectionProps extends AccordionSectionProps {
+  id: string;
+  headerButtons?: ReactNode;
+  onHeadingChange: (heading: string) => void;
+  onRemoveSection?: () => void;
+}
+
 const EditableAccordionSection = ({
-  caption,
-  className,
   children,
-  contentId,
-  goToTop = true,
   heading,
-  headingId,
-  headingTag = 'h2',
-  canToggle = true,
-  open = false,
-  onToggle,
+  id,
   onHeadingChange,
   onRemoveSection,
   headerButtons,
+  headingTag = 'h2',
+  ...props
 }: EditableAccordionSectionProps) => {
-  const target = createRef<HTMLDivElement>();
-  const [isOpen, setIsOpen] = useState(open);
-  const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [previousOpen, setPreviousOpen] = useState(open);
-  const [isEditingHeading, setIsEditingHeading] = useState(false);
+  const { index, isReordering } = props as DraggableAccordionSectionProps;
+
+  const [showRemoveModal, toggleRemoveModal] = useToggle(false);
+  const [isEditingHeading, toggleEditingHeading] = useToggle(false);
 
   const [newHeading, setNewHeading] = useState(heading);
 
-  if (open !== previousOpen) {
-    setPreviousOpen(open);
-    setIsOpen(open);
-  }
-
-  const saveHeading = () => {
+  const saveHeading = useCallback(() => {
     if (isEditingHeading && onHeadingChange && newHeading !== heading) {
       onHeadingChange(newHeading);
     }
-    setIsEditingHeading(false);
-  };
+
+    toggleEditingHeading.off();
+  }, [
+    heading,
+    isEditingHeading,
+    newHeading,
+    onHeadingChange,
+    toggleEditingHeading,
+  ]);
+
+  const header = useMemo(() => {
+    if (isEditingHeading) {
+      return (
+        <FormTextInput
+          id="heading"
+          name="heading"
+          label="Edit Heading"
+          defaultValue={newHeading}
+          onChange={e => {
+            setNewHeading(e.target.value);
+          }}
+          onClick={e => {
+            e.stopPropagation();
+          }}
+          onKeyPress={e => {
+            if (e.key === 'Enter') saveHeading();
+            if (e.key === 'Esc') toggleEditingHeading.off();
+          }}
+        />
+      );
+    }
+
+    if (isReordering) {
+      return createElement(
+        headingTag,
+        {
+          className: accordionSectionClasses.sectionHeading,
+        },
+        <span className={accordionSectionClasses.sectionButton}>
+          {heading}
+        </span>,
+      );
+    }
+
+    return undefined;
+  }, [
+    heading,
+    headingTag,
+    isEditingHeading,
+    isReordering,
+    newHeading,
+    saveHeading,
+    toggleEditingHeading,
+  ]);
 
   return (
-    <div
-      ref={target}
-      onClick={() => {
-        if (canToggle && onToggle) {
-          onToggle(isOpen);
-        }
-      }}
-      className={classNames('govuk-accordion__section', className, {
-        'govuk-accordion__section--expanded': isOpen,
-      })}
-      role="presentation"
-    >
-      <div className="govuk-accordion__section-header">
-        {createElement(
-          headingTag,
-          {
-            className: 'govuk-accordion__section-heading',
-            onClick: () => {
-              if (canToggle && target.current) {
-                setIsOpen(!isOpen);
-              }
-            },
-          },
+    <Draggable draggableId={id} isDragDisabled={!isReordering} index={index}>
+      {draggableProvided => (
+        <div
+          {...draggableProvided.draggableProps}
+          ref={draggableProvided.innerRef}
+          className={classNames({
+            [styles.dragContainer]: isReordering,
+          })}
+        >
           <span
-            className={classNames(
-              'govuk-accordion__section-button',
-              'govuk-!-width-three-quarters',
-              styles['editable-header'],
-            )}
-          >
-            {isEditingHeading ? (
-              <FormTextInput
-                id="heading"
-                name="heading"
-                label="Edit Heading"
-                defaultValue={newHeading}
-                onChange={e => {
-                  setNewHeading(e.target.value);
-                }}
-                onClick={e => {
-                  e.stopPropagation();
-                }}
-                onKeyPress={e => {
-                  if (e.key === 'Enter') saveHeading();
-                  if (e.key === 'Esc') setIsEditingHeading(false);
-                }}
-              />
-            ) : (
-              heading
-            )}
-          </span>,
-          canToggle && <span className="govuk-accordion__icon" />,
-        )}
-        {caption && (
-          <span className="govuk-accordion__section-summary">{caption}</span>
-        )}
-      </div>
-      <div
-        className="govuk-accordion__section-content"
-        aria-labelledby={headingId}
-        id={contentId}
-      >
-        <div>
-          {onHeadingChange &&
-            (isEditingHeading ? (
-              <Button onClick={saveHeading}>Save section title</Button>
-            ) : (
-              <Button
-                type="button"
-                onClick={() => setIsEditingHeading(!isEditingHeading)}
-                variant="secondary"
-              >
-                Edit section title
-              </Button>
-            ))}
-          {headerButtons}
-          {!!onRemoveSection && (
-            <Button onClick={() => setShowRemoveModal(true)} variant="warning">
-              Remove this section
-              <ModalConfirm
-                title="Are you sure?"
-                mounted={showRemoveModal}
-                onConfirm={onRemoveSection}
-                onExit={() => setShowRemoveModal(false)}
-                onCancel={() => setShowRemoveModal(false)}
-              >
-                <p>
-                  Are you sure you want to remove the following section?
-                  <br />
-                  <strong>"{heading}"</strong>
-                </p>
-              </ModalConfirm>
-            </Button>
-          )}
-        </div>
+            {...draggableProvided.dragHandleProps}
+            className={classNames({
+              [styles.dragHandle]: isReordering,
+            })}
+          />
+          <AccordionSection {...props} heading={heading} header={header}>
+            <div>
+              {onHeadingChange &&
+                (isEditingHeading ? (
+                  <Button onClick={saveHeading}>Save section title</Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={toggleEditingHeading}
+                    variant="secondary"
+                  >
+                    Edit section title
+                  </Button>
+                ))}
 
-        {children && (
-          <>
+              {headerButtons}
+
+              {onRemoveSection && (
+                <>
+                  <Button onClick={toggleRemoveModal.on} variant="warning">
+                    Remove this section
+                  </Button>
+
+                  <ModalConfirm
+                    title="Are you sure?"
+                    mounted={showRemoveModal}
+                    onConfirm={onRemoveSection}
+                    onExit={toggleRemoveModal.off}
+                    onCancel={toggleRemoveModal.off}
+                  >
+                    <p>
+                      Are you sure you want to remove the following section?
+                      <br />
+                      <strong>"{heading}"</strong>
+                    </p>
+                  </ModalConfirm>
+                </>
+              )}
+            </div>
+
             {children}
-            {goToTop && <GoToTopLink />}
-          </>
-        )}
-      </div>
-    </div>
+          </AccordionSection>
+        </div>
+      )}
+    </Draggable>
   );
 };
 

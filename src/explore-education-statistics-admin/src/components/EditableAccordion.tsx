@@ -1,150 +1,88 @@
-/* eslint-disable no-shadow, react/jsx-indent */
-import DraggableAccordionSection from '@admin/components/DraggableAccordionSection';
-import DroppableAccordion from '@admin/components/DroppableAccordion';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
+import useToggle from '@common/hooks/useToggle';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { Dictionary } from '@common/types/util';
+import reorder from '@common/utils/reorder';
+import classNames from 'classnames';
 import React, {
-  createRef,
+  cloneElement,
   ReactElement,
-  ReactNode,
   useCallback,
   useEffect,
   useState,
 } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import styles from './EditableAccordion.module.scss';
-import { EditableAccordionSectionProps } from './EditableAccordionSection';
+import {
+  DraggableAccordionSectionProps,
+  EditableAccordionSectionProps,
+} from './EditableAccordionSection';
 
 export interface EditableAccordionProps extends AccordionProps {
   sectionName?: string;
-  onSaveOrder: (order: Dictionary<number>) => Promise<unknown>;
   onAddSection: () => Promise<unknown>;
+  onReorder: (sectionIds: string[]) => void;
 }
-
-interface ChildSection {
-  id: string;
-  key: string;
-  index: number;
-  section: ReactElement<EditableAccordionSectionProps>;
-}
-
-const mapReactNodeToChildSection = (children: ReactNode): ChildSection[] =>
-  React.Children.toArray(children)
-    .filter(child => !!child)
-    .map((child, index) => {
-      const section = child as ReactElement<EditableAccordionSectionProps>;
-
-      const key = section.props.id || `unknown_section_id_${index}`;
-
-      return {
-        id: key,
-        key,
-        index,
-        section,
-      };
-    });
 
 const EditableAccordion = ({
   children,
   id,
   sectionName,
-  onSaveOrder,
   onAddSection,
+  onReorder,
 }: EditableAccordionProps) => {
-  const ref = createRef<HTMLDivElement>();
-  const [openAll, setOpenAll] = useState(false);
-  const [isReordering, setIsReordering] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const [isReordering, toggleReordering] = useToggle(false);
 
-  const [currentChildren, setCurrentChildren] = useState<ChildSection[]>([]);
-
-  useEffect(() => {
-    setCurrentChildren(mapReactNodeToChildSection(children));
-  }, [children]);
-
-  const goToHash = useCallback(() => {
-    if (ref.current && window.location.hash) {
-      try {
-        const anchor = ref.current.querySelector(
-          window.location.hash,
-        ) as HTMLButtonElement;
-
-        if (anchor) {
-          anchor.scrollIntoView();
-        }
-      } catch (_) {
-        // ignoring any errors
-      }
-    }
-  }, [ref]);
+  const [sections, setSections] = useState<
+    ReactElement<EditableAccordionSectionProps>[]
+  >([]);
 
   useEffect(() => {
-    window.addEventListener('hashchange', goToHash);
+    const nextSections = React.Children.toArray(children)
+      .filter(child => !!child)
+      .map((child, index) => {
+        const section = child as ReactElement<
+          EditableAccordionSectionProps & DraggableAccordionSectionProps
+        >;
 
-    return () => {
-      window.removeEventListener('hashchange', goToHash);
-    };
-  }, [goToHash]);
-
-  const toggleAll = () => {
-    setOpenAll(!openAll);
-  };
-
-  const reorder = () => {
-    setIsError(false);
-    setIsReordering(true);
-  };
-
-  const saveOrder = () => {
-    if (onSaveOrder) {
-      const ids = currentChildren.reduce<Dictionary<number>>(
-        (result, { id, index }) => ({ ...result, [id]: index }),
-        {},
-      );
-
-      onSaveOrder(ids)
-        .then(() => {
-          setIsReordering(false);
-        })
-        .catch(() => {
-          setIsError(true);
+        return cloneElement(section, {
+          index,
+          isReordering,
         });
+      });
+
+    setSections(nextSections);
+  }, [children, id, isReordering]);
+
+  const saveOrder = useCallback(() => {
+    if (onReorder) {
+      onReorder(sections.map(({ props }) => props.id as string));
+      toggleReordering.off();
     }
-  };
+  }, [onReorder, sections, toggleReordering]);
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
-
-    if (source && destination) {
-      const newChildren = [...currentChildren];
-      const [removed] = newChildren.splice(source.index, 1);
-      newChildren.splice(destination.index, 0, removed);
-
-      const reordered = newChildren.map((child, index) => ({
-        ...child,
-        index,
-      }));
-
-      setCurrentChildren(reordered);
-    }
-  };
+  const handleDragEnd = useCallback(
+    ({ source, destination }: DropResult) => {
+      if (source && destination) {
+        setSections(reorder(sections, source.index, destination.index));
+      }
+    },
+    [sections],
+  );
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <>
       <h2 className="govuk-heading-l reorderable-relative">
         {sectionName}
-        {isError && <span className={styles.error}>An error occurred</span>}
-        {currentChildren.length > 1 &&
+
+        {sections.length > 1 &&
           (!isReordering ? (
             <Button
               variant="secondary"
               className="reorderable"
-              onClick={reorder}
+              onClick={toggleReordering.on}
             >
-              Reorder <span className="govuk-visually-hidden"> sections </span>
+              Reorder <span className="govuk-visually-hidden">sections</span>
             </Button>
           ) : (
             <Button className="reorderable" onClick={saveOrder}>
@@ -152,44 +90,39 @@ const EditableAccordion = ({
             </Button>
           ))}
       </h2>
-      <DroppableAccordion id={id} isReordering={isReordering}>
-        <div className="govuk-accordion" ref={ref} id={id}>
-          {!isReordering && (
-            <div className="govuk-accordion__controls">
-              <ButtonText
-                className="govuk-accordion__open-all"
-                aria-expanded="false"
-                onClick={() => toggleAll()}
-              >
-                Open all<span className="govuk-visually-hidden"> sections</span>
-              </ButtonText>
+
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable
+          droppableId={id}
+          isDropDisabled={!isReordering}
+          type="accordion"
+        >
+          {(droppableProvided, snapshot) => (
+            <div
+              {...droppableProvided.droppableProps}
+              ref={droppableProvided.innerRef}
+              className={classNames({
+                [styles.dragover]: snapshot.isDraggingOver && isReordering,
+              })}
+            >
+              <Accordion id={id} showToggleAll={!isReordering}>
+                {sections}
+              </Accordion>
             </div>
           )}
-          {currentChildren.map(({ id, key, index, section }) => (
-            <DraggableAccordionSection
-              id={id}
-              key={key}
-              index={index}
-              isReordering={isReordering}
-              section={section}
-              openAll={openAll}
-            />
-          ))}
-        </div>
-      </DroppableAccordion>
+        </Droppable>
+      </DragDropContext>
 
-      <div className="govuk-accordion" style={{ border: 'none' }}>
-        <div className="govuk-accordion__controls">
-          <Button
-            onClick={onAddSection}
-            className={styles.addSectionButton}
-            disabled={isReordering}
-          >
-            Add new section
-          </Button>
-        </div>
+      <div>
+        <Button
+          onClick={onAddSection}
+          className={styles.addSectionButton}
+          disabled={isReordering}
+        >
+          Add new section
+        </Button>
       </div>
-    </DragDropContext>
+    </>
   );
 };
 

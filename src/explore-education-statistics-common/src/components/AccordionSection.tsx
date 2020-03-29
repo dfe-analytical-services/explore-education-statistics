@@ -13,6 +13,7 @@ export interface AccordionSectionProps {
   className?: string;
   contentId?: string;
   goToTop?: boolean;
+  header?: ReactNode;
   heading: string;
   headingId?: string;
   /**
@@ -41,6 +42,7 @@ const AccordionSection = ({
   children,
   contentId,
   goToTop = true,
+  header,
   heading,
   headingId,
   headingTag = 'h2',
@@ -57,32 +59,36 @@ const AccordionSection = ({
       role="presentation"
     >
       <div className="govuk-accordion__section-header">
-        {createElement(
-          headingTag,
-          {
-            className: classes.sectionHeading,
-          },
-          isMounted ? (
-            <>
-              <button
-                aria-expanded={open}
-                className={classes.sectionButton}
-                id={headingId}
-                type="button"
-                onClick={() => {
-                  if (onToggle) {
-                    onToggle(!open);
-                  }
-                }}
-              >
+        {header ??
+          createElement(
+            headingTag,
+            {
+              className: classes.sectionHeading,
+            },
+            isMounted ? (
+              <>
+                <button
+                  aria-expanded={open}
+                  className={classes.sectionButton}
+                  id={headingId}
+                  type="button"
+                  onClick={() => {
+                    if (onToggle) {
+                      onToggle(!open);
+                    }
+                  }}
+                >
+                  {heading}
+                  <span aria-hidden className="govuk-accordion__icon" />
+                </button>
+              </>
+            ) : (
+              <span id={headingId} className={classes.sectionButton}>
                 {heading}
-                <span aria-hidden className="govuk-accordion__icon" />
-              </button>
-            </>
-          ) : (
-            <span id={headingId}>{heading}</span>
-          ),
-        )}
+              </span>
+            ),
+          )}
+
         {caption && (
           <div className="govuk-accordion__section-summary govuk-body">
             {caption}

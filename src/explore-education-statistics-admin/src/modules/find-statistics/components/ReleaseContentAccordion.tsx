@@ -1,6 +1,7 @@
-import Accordion from '@admin/components/EditableAccordion';
+import EditableAccordion from '@admin/components/EditableAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableRelease } from '@admin/services/publicationService';
+import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
@@ -33,41 +34,46 @@ const ReleaseContentAccordion = ({
   );
 
   const reorderAccordionSections = useCallback(
-    async order => {
-      updateContentSectionsOrder({ releaseId: release.id, order });
+    async (ids: string[]) => {
+      const order = ids.reduce<Dictionary<number>>((acc, id, index) => {
+        acc[id] = index;
+        return acc;
+      }, {});
+
+      await updateContentSectionsOrder({ releaseId: release.id, order });
     },
     [release.id, updateContentSectionsOrder],
   );
+
   return (
-    <Accordion
+    <EditableAccordion
       id={accordionId}
       sectionName={sectionName}
-      onSaveOrder={reorderAccordionSections}
+      onReorder={reorderAccordionSections}
       onAddSection={addAccordionSection}
     >
-      {orderBy(release.content, 'order').map((accordionSection, index) => (
+      {orderBy(release.content, 'order').map(section => (
         <ReleaseContentAccordionSection
+          key={section.id}
+          id={section.id}
           release={release}
-          id={accordionSection.id}
-          key={accordionSection.id}
-          contentItem={accordionSection}
-          index={index}
+          section={section}
           onHeadingChange={title =>
             updateContentSectionHeading({
               releaseId: release.id,
-              sectionId: accordionSection.id,
+              sectionId: section.id,
               title,
             })
           }
           onRemoveSection={() =>
             removeContentSection({
               releaseId: release.id,
-              sectionId: accordionSection.id,
+              sectionId: section.id,
             })
           }
         />
       ))}
-    </Accordion>
+    </EditableAccordion>
   );
 };
 
