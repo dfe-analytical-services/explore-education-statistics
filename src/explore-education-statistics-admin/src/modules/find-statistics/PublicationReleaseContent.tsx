@@ -125,14 +125,14 @@ const PublicationReleaseContent = () => {
           )}
 
           {release.downloadFiles && !isEditing && (
-            <Details summary="Download data files">
+            <Details summary="Download associated files">
               <ul className="govuk-list govuk-list--bullet">
                 {release.downloadFiles.map(
                   ({ extension, name, path, size }) => (
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          editReleaseDataService.downloadFile(path, name)
+                          editReleaseDataService.downloadFile(path)
                         }
                         className="govuk-link"
                       >
