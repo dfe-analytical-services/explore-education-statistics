@@ -1,5 +1,5 @@
+import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import {
   EditableBlock,

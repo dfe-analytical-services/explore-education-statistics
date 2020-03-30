@@ -1,4 +1,4 @@
-import styles from '@admin/components/EditableAccordionSection.module.scss';
+import styles from '@admin/components/editable/EditableAccordionSection.module.scss';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import AccordionSection, {
   accordionSectionClasses,
@@ -9,13 +9,7 @@ import { FormTextInput } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import React, {
-  createElement,
-  ReactNode,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
+import React, { createElement, ReactNode, useCallback, useMemo, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
 export interface DraggableAccordionSectionProps {

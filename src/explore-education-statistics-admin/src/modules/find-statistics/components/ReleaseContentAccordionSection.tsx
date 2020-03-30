@@ -1,5 +1,5 @@
+import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';

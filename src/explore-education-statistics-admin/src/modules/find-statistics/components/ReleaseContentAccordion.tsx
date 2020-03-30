@@ -1,4 +1,4 @@
-import EditableAccordion from '@admin/components/EditableAccordion';
+import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableRelease } from '@admin/services/publicationService';
 import { Dictionary } from '@common/types';

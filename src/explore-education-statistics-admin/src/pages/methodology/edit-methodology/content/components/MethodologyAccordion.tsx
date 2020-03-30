@@ -1,4 +1,4 @@
-import EditableAccordion from '@admin/components/EditableAccordion';
+import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { MethodologyContent } from '@admin/services/methodology/types';
 import { Dictionary } from '@common/types';
