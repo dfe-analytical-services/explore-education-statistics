@@ -1,3 +1,5 @@
+@import 'src/styles/govuk-base';
+
 .editable-header {
   position: relative;
 
@@ -13,20 +15,36 @@
 
 .dragContainer {
   position: relative;
-}
 
-.dragHandle {
-  margin-top: -1.125rem;
-  position: absolute;
-  right: 32px;
-  top: 50%;
-  width: 1rem;
   &::before {
-    color: #999;
+    color: govuk-colour('dark-grey');
     content: '\2630';
+    cursor: grab;
     font-size: 2.25rem;
     height: 2.25rem;
     position: absolute;
-    z-index: 1000;
+    right: 0;
+    top: govuk-spacing(1);
+  }
+
+  &:focus {
+    @include govuk-focused-text;
+  }
+
+  :global(.govuk-accordion__section-header) {
+    cursor: grab;
+  }
+
+  :global(.govuk-accordion__section-heading) {
+    font-size: 1.5rem;
+  }
+}
+
+.isDragging {
+  @include govuk-focused-text;
+
+  :global(.govuk-accordion__section-header) {
+    cursor: grabbing;
+    font-size: 1.5rem;
   }
 }

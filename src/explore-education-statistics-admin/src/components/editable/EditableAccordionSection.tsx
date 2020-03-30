@@ -9,7 +9,13 @@ import { FormTextInput } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import React, { createElement, ReactNode, useCallback, useMemo, useState } from 'react';
+import React, {
+  createElement,
+  ReactNode,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
 export interface DraggableAccordionSectionProps {
@@ -95,9 +101,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
         {
           className: accordionSectionClasses.sectionHeading,
         },
-        <span className={accordionSectionClasses.sectionButton}>
-          {heading}
-        </span>,
+        heading,
       );
     }
 
@@ -118,20 +122,16 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
 
   return (
     <Draggable draggableId={id} isDragDisabled={!isReordering} index={index}>
-      {draggableProvided => (
+      {(draggableProvided, snapshot) => (
         <div
           {...draggableProvided.draggableProps}
+          {...draggableProvided.dragHandleProps}
           ref={draggableProvided.innerRef}
           className={classNames({
             [styles.dragContainer]: isReordering,
+            [styles.isDragging]: snapshot.isDragging,
           })}
         >
-          <span
-            {...draggableProvided.dragHandleProps}
-            className={classNames({
-              [styles.dragHandle]: isReordering,
-            })}
-          />
           <AccordionSection
             {...props}
             id={id}

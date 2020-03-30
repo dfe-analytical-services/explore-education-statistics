@@ -112,8 +112,8 @@ const EditableAccordion = (props: EditableAccordionProps) => {
                     isReordering,
                   });
                 })}
+                {droppableProvided.placeholder}
               </Accordion>
-              {droppableProvided.placeholder}
             </div>
           )}
         </Droppable>
