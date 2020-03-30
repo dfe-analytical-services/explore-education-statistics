@@ -62,6 +62,7 @@ const DataBlockRenderer = ({
                   key={index}
                   fullTable={fullTable}
                   captionTitle={dataBlock?.heading}
+                  source={dataBlock?.source}
                   tableHeadersConfig={
                     table.tableHeaders
                       ? mapTableHeadersConfig(
@@ -100,6 +101,7 @@ const DataBlockRenderer = ({
                     key={key}
                     data={dataBlockResponse}
                     meta={parseMetaData(dataBlockResponse.metaData)}
+                    source={dataBlock?.source}
                     releaseId={releaseId}
                     getInfographic={getInfographic}
                   />
@@ -112,6 +114,7 @@ const DataBlockRenderer = ({
                   key={key}
                   data={dataBlockResponse}
                   meta={parseMetaData(dataBlockResponse.metaData)}
+                  source={dataBlock?.source}
                 />
               );
             })}

@@ -63,7 +63,7 @@ const CollapsibleList = ({
             {collapsed
               ? `Show ${collapsedCount} ${
                   listItems && listItems.length > collapsedCount ? 'more' : ''
-                } items`
+                } item${collapsedCount > 1 ? 's' : ''}`
               : 'Collapse list'}
           </ButtonText>
         </div>
