@@ -89,7 +89,10 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
         name: values.name,
         file: values.file as File,
       })
-      .then(() => resetPage(actions))
+      .then(() => {
+        setIsUploading(false);
+        resetPage(actions);
+      })
       .finally(() => {
         setIsUploading(false);
       });
