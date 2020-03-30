@@ -170,6 +170,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         metadataFile: values.metadataFile as File,
       })
       .then(() => {
+        setIsUploading(false);
         resetPage(actions);
       })
       .finally(() => {
@@ -186,6 +187,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     await editReleaseDataService
       .deleteDataFiles(releaseId, (deleteDataFile as DeleteDataFile).file)
       .then(() => {
+        setDeleting(dataFileToDelete, false);
         resetPage(form);
       })
       .finally(() => {

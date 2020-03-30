@@ -89,9 +89,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
         name: values.name,
         file: values.file as File,
       })
-      .then(() => {
-        resetPage(actions);
-      })
+      .then(() => resetPage(actions))
       .finally(() => {
         setIsUploading(false);
       });
@@ -119,6 +117,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
     await editReleaseDataService
       .deleteAncillaryFile(releaseId, deleteFileName)
       .then(() => {
+        setDeleting(ancillaryFileToDelete, false);
         resetPage(form);
       })
       .finally(() => {
