@@ -7,14 +7,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class DatafileImport : TableEntity
     {
-        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, string message)
+        public DatafileImport(string releaseId, string dataFileName) : this(releaseId, dataFileName, 0, "", IStatus.UPLOADING)
         {
             PartitionKey = releaseId;
             RowKey = dataFileName;
-            Errors = "";
-            Status = IStatus.QUEUED;
+            Status = IStatus.UPLOADING;
+        }
+        
+        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, string message, IStatus status)
+        {
+            PartitionKey = releaseId;
+            RowKey = dataFileName;
             NumberOfRows = numberOfRows;
             Message = message;
+            Status = status;
+            Errors = "";
         }
 
         public DatafileImport()

@@ -25,7 +25,9 @@ function hasLegend(props: ChartRendererProps): boolean {
   );
 }
 
-export type ChartRendererProps =
+export type ChartRendererProps = {
+  source?: string;
+} & (
   | ({
       type: 'line';
     } & LineChartProps)
@@ -40,9 +42,10 @@ export type ChartRendererProps =
     } & MapBlockInternalProps)
   | ({
       type: 'infographic';
-    } & InfographicChartProps);
+    } & InfographicChartProps)
+);
 
-function ChartRenderer({ title, ...props }: ChartRendererProps) {
+function ChartRenderer({ title, source, ...props }: ChartRendererProps) {
   const { data, meta } = props;
 
   const [legendProps, setLegendProps] = useState<LegendProps>();
@@ -102,6 +105,8 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
         )}
 
         <FigureFootnotes footnotes={meta.footnotes} />
+
+        {source && <p className="govuk-body-s">Source: {source}</p>}
       </figure>
     );
   }

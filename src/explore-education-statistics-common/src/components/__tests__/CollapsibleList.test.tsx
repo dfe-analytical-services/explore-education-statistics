@@ -1,5 +1,5 @@
-import { render, fireEvent } from '@testing-library/react';
 import CollapsibleList from '@common/components/CollapsibleList';
+import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 
 describe('CollapsibleList', () => {
@@ -21,6 +21,26 @@ describe('CollapsibleList', () => {
     expect(getByText('Item 5')).toHaveClass('govuk-visually-hidden');
 
     expect(queryByText('Show 2 more items'));
+  });
+
+  test('renders 5 items with 1 visually hidden', () => {
+    const { getByText, queryByText } = render(
+      <CollapsibleList collapseAfter={4}>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+        <li>Item 4</li>
+        <li>Item 5</li>
+      </CollapsibleList>,
+    );
+
+    expect(getByText('Item 1')).not.toHaveClass('govuk-visually-hidden');
+    expect(getByText('Item 2')).not.toHaveClass('govuk-visually-hidden');
+    expect(getByText('Item 3')).not.toHaveClass('govuk-visually-hidden');
+    expect(getByText('Item 4')).not.toHaveClass('govuk-visually-hidden');
+    expect(getByText('Item 5')).toHaveClass('govuk-visually-hidden');
+
+    expect(queryByText('Show 1 more item'));
   });
 
   test('renders no visually hidden items when `collapseAfter` is more than the list size', () => {

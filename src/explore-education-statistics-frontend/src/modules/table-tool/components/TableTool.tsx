@@ -147,10 +147,6 @@ const TableToolFinalStep = ({
                     subjectMeta={table.subjectMeta}
                   />
                 </li>
-
-                <li>
-                  <a href="#api">Access developer API</a>
-                </li>
                 <li>
                   <Link
                     as={`/methodology/${publication.slug}`}

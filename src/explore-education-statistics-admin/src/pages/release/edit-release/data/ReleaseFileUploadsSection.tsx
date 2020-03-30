@@ -84,12 +84,18 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
     setIsUploading(true);
-    await editReleaseDataService.uploadAncillaryFile(releaseId, {
-      name: values.name,
-      file: values.file as File,
-    });
-    setIsUploading(false);
-    await resetPage(actions);
+    await editReleaseDataService
+      .uploadAncillaryFile(releaseId, {
+        name: values.name,
+        file: values.file as File,
+      })
+      .then(() => {
+        setIsUploading(false);
+        resetPage(actions);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
   }, errorCodeMappings);
 
   const setDeleting = (ancillaryFile: string, deleting: boolean) => {
@@ -113,9 +119,12 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
     setDeleteFileName('');
     await editReleaseDataService
       .deleteAncillaryFile(releaseId, deleteFileName)
-      .finally(() => {
+      .then(() => {
         setDeleting(ancillaryFileToDelete, false);
         resetPage(form);
+      })
+      .finally(() => {
+        setDeleting(ancillaryFileToDelete, false);
       });
   };
 
@@ -205,7 +214,6 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                         {file.isDeleting && (
                           <LoadingSpinner text="Deleting file" overlay />
                         )}
-                        ;
                         <SummaryList key={file.filename}>
                           <SummaryListItem term="Name">
                             <h4 className="govuk-heading-m">{file.title}</h4>

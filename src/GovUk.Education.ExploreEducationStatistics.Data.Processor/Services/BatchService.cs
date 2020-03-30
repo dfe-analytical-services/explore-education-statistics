@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId, dataFileName, numberOfRows, JsonConvert.SerializeObject(message)))
+                new DatafileImport(releaseId, dataFileName, numberOfRows, JsonConvert.SerializeObject(message), IStatus.QUEUED))
             );
         }
 

@@ -156,12 +156,12 @@ class PublicationReleasePage extends Component<Props> {
 
             {data.downloadFiles && (
               <Details
-                summary="Download data files"
+                summary="Download associated files"
                 onToggle={(open: boolean) =>
                   open &&
                   logEvent(
                     'Downloads',
-                    'Release page download data files dropdown opened',
+                    'Release page download associated files dropdown opened',
                     window.location.pathname,
                   )
                 }
