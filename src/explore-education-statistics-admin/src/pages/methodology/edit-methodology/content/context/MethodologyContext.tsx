@@ -30,7 +30,7 @@ export const methodologyReducer: Reducer<
       const { sectionId, blockId, sectionKey } = action.payload.meta;
       if (!draft.methodology[sectionKey]) {
         throw new Error(
-          `REMOVE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Error - Section "${sectionKey}" could not be found.`,
         );
       }
 
@@ -48,7 +48,7 @@ export const methodologyReducer: Reducer<
       const { sectionId, blockId, sectionKey } = meta;
       if (!draft.methodology[sectionKey]) {
         throw new Error(
-          `UPDATE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Error - Section "${sectionKey}" could not be found.`,
         );
       }
       const matchingSection = draft.methodology[sectionKey].find(
@@ -68,7 +68,7 @@ export const methodologyReducer: Reducer<
       const { sectionId, sectionKey } = meta;
       if (!draft.methodology[sectionKey]) {
         throw new Error(
-          `ADD_BLOCK_TO_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Error - Section "${sectionKey}" could not be found.`,
         );
       }
       const matchingSection = draft.methodology[sectionKey].find(
@@ -88,7 +88,7 @@ export const methodologyReducer: Reducer<
       const { sectionId, sectionKey } = meta;
       if (!draft.methodology[sectionKey]) {
         throw new Error(
-          `UPDATE_SECTION_CONTENT: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Error - Section "${sectionKey}" could not be found.`,
         );
       }
 
