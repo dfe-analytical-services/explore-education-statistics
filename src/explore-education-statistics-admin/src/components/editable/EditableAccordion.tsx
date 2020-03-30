@@ -11,6 +11,7 @@ import React, {
   ReactElement,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
@@ -61,6 +62,23 @@ const EditableAccordion = (props: EditableAccordionProps) => {
     [sections],
   );
 
+  const accordion = useMemo(() => {
+    return (
+      <Accordion {...props} openAll={isReordering ? false : undefined}>
+        {sections.map((child, index) => {
+          const section = child as ReactElement<
+            EditableAccordionSectionProps & DraggableAccordionSectionProps
+          >;
+
+          return cloneElement(section, {
+            index,
+            isReordering,
+          });
+        })}
+      </Accordion>
+    );
+  }, [isReordering, props, sections]);
+
   if (!isEditing) {
     return <Accordion {...props}>{children}</Accordion>;
   }
@@ -100,20 +118,8 @@ const EditableAccordion = (props: EditableAccordionProps) => {
                 [styles.dragover]: snapshot.isDraggingOver && isReordering,
               })}
             >
-              <Accordion {...props} openAll={isReordering ? false : undefined}>
-                {sections.map((child, index) => {
-                  const section = child as ReactElement<
-                    EditableAccordionSectionProps &
-                      DraggableAccordionSectionProps
-                  >;
-
-                  return cloneElement(section, {
-                    index,
-                    isReordering,
-                  });
-                })}
-                {droppableProvided.placeholder}
-              </Accordion>
+              {accordion}
+              {droppableProvided.placeholder}
             </div>
           )}
         </Droppable>
