@@ -132,7 +132,7 @@ const PublicationReleaseContent = () => {
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          editReleaseDataService.downloadFile(path, name)
+                          editReleaseDataService.downloadFile(path)
                         }
                         className="govuk-link"
                       >

@@ -156,12 +156,12 @@ const editReleaseDataService = {
       })
       .then(response => downloadFile(response, fileName));
   },
-  downloadFile(path: string, fileName: string): Promise<void> {
+  downloadFile(path: string): Promise<void> {
     return client
       .get<Blob>(`/release/${path}`, {
         responseType: 'blob',
       })
-      .then(response => downloadFile(response, fileName));
+      .then(response => downloadFile(response, getFileNameFromPath(path)));
   },
   getAncillaryFiles(releaseId: string): Promise<AncillaryFile[]> {
     return client
