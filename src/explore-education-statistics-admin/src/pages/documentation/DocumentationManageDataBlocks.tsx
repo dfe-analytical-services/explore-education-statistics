@@ -15,7 +15,6 @@ import imageDataBlockTitle from './images/guidance/guidance-datablocks-title.png
 import imageDataBlockSource from './images/guidance/guidance-datablocks-source.png';
 import imageDataBlockName from './images/guidance/guidance-datablocks-name.png';
 import imageDataBlockViewEdit from './images/guidance/guidance-datablocks-view-edit.png';
-import imageDataBlockViewTable from './images/guidance/guidance-datablocks-view-table.png';
 import imageDataBlockEditTable from './images/guidance/guidance-datablocks-edit-table.png';
 import imageDataBlockViewChart from './images/guidance/guidance-datablocks-view-charts.png';
 import imageDataBlockViewPermalink from './images/guidance/guidance-datablocks-view-permalink.png';
@@ -81,9 +80,9 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               </div>
               <p>
                 For detailed guidance on how to add data to your release{' '}
-                <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
+                <Link to="/documentation/manage-data">
                   Managing data: step by step
-                </a>
+                </Link>
                 .
               </p>
               <h3>Do</h3>
@@ -91,8 +90,8 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To start the process of creating a data block for your
-                    release so you can create tables and charts - use the
-                    ‘Create data blocks’ tab.
+                    release so you can create tables and charts - select ‘Create
+                    new data block’ from the dropdown select box.
                   </h4>
                   <img
                     src={imageDataBlockCreate}
@@ -136,8 +135,8 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   <h4 className="govuk-heading-s">
                     To choose the data you want to use to create your initial
                     data block (and subsequent tables and charts) - under the
-                    ‘Choose data’ subheading, select your chosen data set from
-                    the list and select the green ‘Next step’ button.
+                    ‘Choose a subject’ subheading, select your chosen data set
+                    from the list and select the green ‘Next step’ button.
                   </h4>
                   <img
                     src={imageDataBlockDataset}
@@ -179,8 +178,8 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    Under the ‘Choose filters’ subheading - select at least one
-                    checkbox from each category and select the green ‘Create
+                    Under the ‘Choose your filters’ subheading - select at least
+                    one checkbox from each category and select the green ‘Create
                     data block’ button.
                   </h4>
                   <p>
@@ -197,8 +196,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     The data block you’ve created automatically generates a
-                    table, based on the data and filters you’ve chosen,under the
-                    ‘View and save data block’ subheading and its ‘Table’ tab.
+                    table, based on the data and filters you’ve chosen.
                   </h4>
                   <img
                     src={imageDataBlockViewSave}
@@ -209,7 +207,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     Add a plain English title for your data block into the open
-                    text field under ‘Data block title’.
+                    text field under ‘Data block name’.
                   </h4>
                   <p>
                     This will be shown to users to identify the data block
@@ -228,8 +226,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     Add source information into the open text field under
-                    ‘Source’ and add any release footnotes into the open text
-                    box under ‘Release footnotes’.
+                    ‘Source’.
                   </h4>
                   <p>
                     Your release footnotes should include details which will
@@ -262,20 +259,16 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To create charts for your release - use the ‘Create chart’
-                    tab and select the type of chart you want to create.
+                    After saving your data block, the 'Configure content' tab
+                    will appear, this wil allow you to edit your data block and
+                    also add a chart if required.
                   </h4>
                   <p>
                     For detailed guidance on how to configure charts within your
                     release{' '}
-                    <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
+                    <Link to="/documentation/configure-charts">
                       Configuring charts: step by step
-                    </a>{' '}
-                  </p>
-                  <p>
-                    If you can’t create the type of chart you’re looking for -
-                    you can upload an infographic as an alternative by selecting
-                    the ‘Choose an infographic as alternative’ link.
+                    </Link>
                   </p>
                   <img
                     src={imageDataBlockCreateChart}
@@ -308,7 +301,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 For detailed guidance on how to configure charts within your
                 release -{' '}
-                <Link to="/documentation/chartConfigure">
+                <Link to="/documentation/configure-charts">
                   Configuring charts: step by step
                 </Link>
               </p>
@@ -327,10 +320,14 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To view and edit the tables and charts for your release -
-                    use the ‘View saved tables and charts’ tab and select its
-                    name from the dropdown menu under ‘Select saved tables and
-                    charts.
+                    select your saved data block name from the dropdown select
+                    box.
                   </h4>
+                  <p>
+                    Select the 'Configure content' tab, this will show you a
+                    view of the data block table, and also the option to create
+                    a chart if required.
+                  </p>
                   <img
                     src={imageDataBlockViewEdit}
                     className="govuk-!-width-three-quarters"
@@ -339,23 +336,18 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To view a table - use the ‘Table’ tab. To edit a table -
-                    select the green ‘Edit table’ button.
+                    To edit the table data - select the 'Update data source'
+                    tab.
                   </h4>
-                  <img
-                    src={imageDataBlockViewTable}
-                    className="govuk-!-width-three-quarters"
-                    alt=""
-                  />
-                </li>
-                <li>
-                  <h4 className="govuk-heading-s">
-                    To edit the table data - select the ‘Change’ links from the
-                    right-hand side of the page, change your category and
-                    indicators selections from under the ‘Choose filters’
-                    subheading and select the green ‘Create data block’ button
-                    to save your changes.
-                  </h4>
+                  <p>
+                    This will return you to the data block configuration. Click
+                    on a 'Go to this step' link if you want to change anything
+                    in the data block configuration.
+                  </p>
+                  <p>
+                    Once you have made your changes select the 'Save' button at
+                    the bottom of the page.
+                  </p>
                   <img
                     src={imageDataBlockEditTable}
                     className="govuk-!-width-three-quarters"
@@ -364,62 +356,46 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To view a chart - use the ‘Chart’ tab. To edit a chart -
-                    select the green ‘Edit chart’ button.
+                    To view a chart - select the 'Configure content' tab, then
+                    select ‘Chart’ tab.
                   </h4>
+                  <p>
+                    To edit a chart, make changes to the inputs available below
+                    the chart preview.{' '}
+                  </p>
+
+                  <p>
+                    Once you have made your changes select the 'Save chart
+                    optionas' button at the bottom of the page.
+                  </p>
+                  <p>
+                    For detailed guidance on how to configure charts within your
+                    release{' '}
+                    <Link to="/documentation/configure-charts">
+                      Configuring charts: step by step
+                    </Link>
+                  </p>
                   <img
                     src={imageDataBlockViewChart}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />
                 </li>
-                <li>
-                  <h4 className="govuk-heading-s">
-                    To edit the data within the data block which has been used
-                    to create your chart - select the ‘Change’ links from the
-                    right-hand side of the page.
-                  </h4>
-                  <img
-                    src={imageFootnotesEdit}
-                    className="govuk-!-width-three-quarters"
-                    alt=""
-                  />
-                </li>
-                <li>
-                  <h4 className="govuk-heading-s">
-                    To change the configuration of your chart - use the ‘Charts’
-                    tab to view the chart you want to edit and reconfigure it by
-                    changing the available options.
-                  </h4>
-                  <p>
-                    For detailed guidance on how to configure charts within your
-                    release -{' '}
-                    <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
-                      Configuring charts: step by step
-                    </a>
-                    .
-                  </p>
-                  <img
-                    src={imageFootnotesEdit}
-                    className="govuk-!-width-three-quarters"
-                    alt=""
-                  />
-                  <h3>Help and support</h3>
-                  <p>
-                    If you have any issues viewing and editing tables and charts
-                    contact:
-                  </p>
-                  <h4>Explore education statistics team </h4>
-                  <p>
-                    Email <br />
-                    <a href="mailto:explore.statistics@education.gov.uk">
-                      explore.statistics@education.gov.uk
-                    </a>
-                  </p>
-                </li>
               </ul>
+              <h3>Help and support</h3>
+              <p>
+                If you have any issues viewing and editing tables and charts
+                contact:
+              </p>
+              <h4>Explore education statistics team </h4>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
             </StepNavItem>
-            <StepNavItem
+            {/*<StepNavItem
               stepNumber={4}
               stepHeading="Use permalinks"
               open={step === 4}
@@ -480,7 +456,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   explore.statistics@education.gov.uk
                 </a>
               </p>
-            </StepNavItem>
+            </StepNavItem>*/}
             <StepNavItem
               stepNumber={5}
               stepHeading="Delete tables and charts"
@@ -497,34 +473,18 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     and charts’ tab and select its name from the dropdown menu
                     under ‘Select saved tables and charts.
                   </h4>
+                  <p>
+                    Please note if you choose to delete a data block, it will
+                    also be removed from any instance where it has already been
+                    embedded within a release.
+                  </p>
                   <img
                     src={imageDataBlockDelete}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />
                 </li>
-                <li>
-                  <h4 className="govuk-heading-s">
-                    To delete a table - use the ‘Table’ tab and select the red
-                    ‘Delete table’ button.
-                  </h4>
-                  <img
-                    src={imageDataBlockDeleteTable}
-                    className="govuk-!-width-three-quarters"
-                    alt=""
-                  />
-                </li>
-                <li>
-                  <h4 className="govuk-heading-s">
-                    To delete a chart - use the ‘Chart’ tab and select the red
-                    ‘Delete chart’ button.
-                  </h4>
-                  <img
-                    src={imageDataBlockDeleteChart}
-                    className="govuk-!-width-three-quarters"
-                    alt=""
-                  />
-                </li>
+
                 <h3>Help and support</h3>
                 <p>
                   If you have any issues deleting tables and charts contact:
