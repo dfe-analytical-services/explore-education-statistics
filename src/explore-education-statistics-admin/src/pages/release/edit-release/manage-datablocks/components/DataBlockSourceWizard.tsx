@@ -1,6 +1,10 @@
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
+import {
+  CreateReleaseDataBlock,
+  ReleaseDataBlock,
+} from '@admin/services/release/edit-release/datablocks/service';
 import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
@@ -21,7 +25,6 @@ import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/table-tool/utils/tableHeaders';
 import {
-  DataBlock,
   DataBlockResponse,
   GeographicLevel,
 } from '@common/services/dataBlockService';
@@ -33,12 +36,16 @@ import React, {
   useState,
 } from 'react';
 
-interface CreateDataBlockProps {
+export type SavedDataBlock = CreateReleaseDataBlock & {
+  id?: string;
+};
+
+interface DataBlockSourceWizardProps {
   releaseId: string;
-  dataBlock?: DataBlock;
+  dataBlock?: ReleaseDataBlock;
   dataBlockResponse?: DataBlockResponse;
   loading?: boolean;
-  onDataBlockSave: (dataBlock: DataBlock) => void;
+  onDataBlockSave: (dataBlock: SavedDataBlock) => void;
   onTableToolLoaded?: () => void;
 }
 
@@ -48,7 +55,7 @@ const DataBlockSourceWizard = ({
   dataBlockResponse,
   onDataBlockSave,
   onTableToolLoaded,
-}: CreateDataBlockProps) => {
+}: DataBlockSourceWizardProps) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
   const [isLoading, setLoading] = useState(true);
@@ -131,9 +138,11 @@ const DataBlockSourceWizard = ({
         return;
       }
 
-      const savedDataBlock: DataBlock = {
+      const savedDataBlock: SavedDataBlock = {
+        charts: [],
+        tables: [],
+        ...(dataBlock ?? {}),
         ...values,
-        id: dataBlock ? dataBlock.id : undefined,
         dataBlockRequest: {
           ...query,
           geographicLevel: query.geographicLevel as GeographicLevel,
@@ -143,7 +152,6 @@ const DataBlockSourceWizard = ({
             endCode: query.timePeriod.endCode as TimeIdentifier,
           },
         },
-        tables: [],
       };
 
       onDataBlockSave({

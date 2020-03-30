@@ -1,4 +1,5 @@
-import { ContentBlock, Publication } from '@common/services/publicationService';
+import { Publication } from '@common/services/publicationService';
+import { ContentBlock } from '@common/services/types/blocks';
 import { contentApi } from './api';
 
 export interface Topic {

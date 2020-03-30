@@ -1,12 +1,12 @@
-import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
-import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
-import { DataBlock } from '@common/services/dataBlockService';
-import { Publication, Release } from '@common/services/publicationService';
-import React from 'react';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
+import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
+import { Release } from '@common/services/publicationService';
+import { DataBlock } from '@common/services/types/blocks';
+import orderBy from 'lodash/orderBy';
+import React from 'react';
 
 interface Props
   extends Pick<
@@ -15,67 +15,41 @@ interface Props
     | 'keyStatisticsSecondarySection'
     | 'headlinesSection'
   > {
-  publication: Publication;
+  releaseId: string;
 }
 
-const HeadlinesSection = ({
-  publication,
+const PublicationReleaseHeadlinesSection = ({
+  releaseId,
   keyStatisticsSection,
   headlinesSection,
   keyStatisticsSecondarySection,
 }: Props) => {
   return (
-    <Tabs id="headlines-section">
-      <TabsSection title="Summary">
-        <div className={styles.keyStatsContainer}>
-          {keyStatisticsSection.content &&
-            keyStatisticsSection.content.map(keyStat => {
-              if (keyStat.type !== 'DataBlock') return null;
+    <DataBlockRenderer
+      id="releaseHeadlines-dataBlock"
+      releaseId={releaseId}
+      dataBlock={keyStatisticsSecondarySection.content?.[0]}
+      firstTabs={
+        <TabsSection title="Summary">
+          <div className={styles.keyStatsContainer}>
+            {keyStatisticsSection.content.map(keyStat => {
+              if (keyStat.type !== 'DataBlock') {
+                return null;
+              }
+
               const block = keyStat as DataBlock;
+
               return <KeyStatTile key={block.id} {...block} />;
             })}
-        </div>
+          </div>
 
-        {(headlinesSection.content || [])
-          .sort((a, b) => {
-            if (a.order === undefined || b.order === undefined) {
-              return 0;
-            }
-            return a.order - b.order;
-          })
-          .map((block, i) => (
-            <ContentSubBlockRenderer
-              key={block.id}
-              id={`headlines-section-${i}`}
-              publication={publication}
-              block={block}
-            />
+          {orderBy(headlinesSection.content, 'order').map(block => (
+            <ContentBlockRenderer key={block.id} block={block} />
           ))}
-      </TabsSection>
-      {keyStatisticsSecondarySection &&
-        keyStatisticsSecondarySection.content &&
-        keyStatisticsSecondarySection.content[0] && (
-          <TabsSection title="Table">
-            <DataBlockRenderer
-              datablock={keyStatisticsSecondarySection.content[0] as DataBlock}
-              renderType="table"
-            />
-          </TabsSection>
-        )}
-      {keyStatisticsSecondarySection &&
-        keyStatisticsSecondarySection.content &&
-        keyStatisticsSecondarySection.content[0] &&
-        keyStatisticsSecondarySection.content[0].charts &&
-        keyStatisticsSecondarySection.content[0].charts[0] && (
-          <TabsSection title="Chart">
-            <DataBlockRenderer
-              datablock={keyStatisticsSecondarySection.content[0] as DataBlock}
-              renderType="chart"
-            />
-          </TabsSection>
-        )}
-    </Tabs>
+        </TabsSection>
+      }
+    />
   );
 };
 
-export default HeadlinesSection;
+export default PublicationReleaseHeadlinesSection;

@@ -3238,9 +3238,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 - secondary schools
 - special schools
 
-They also include information for [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.
+They also include information for [pupil referral units](/glossary#pupil-referral-unit) and pupils aged 4 years.
 
-We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).
+We use the key measures of [overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).
 
 The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.
 
@@ -3262,13 +3262,13 @@ Within this release, absence by reason is broken down in three different ways:
                             Type = "MarkDownBlock",
                             Body = @"**Overall absence**
 
-The [overall absence](../glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.
+The [overall absence](/glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.
 
-It increased from 4.6% to 4.7% over this period while the [unauthorised absence](../glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.
+It increased from 4.6% to 4.7% over this period while the [unauthorised absence](/glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.
 
 The rate stayed the same at 4% in primary schools but increased from 5.2% to 5.4% for secondary schools. However, in special schools it was much higher and rose to 9.7%.
 
-The overall and [authorised absence](../glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14."
+The overall and [authorised absence](/glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14."
                         },
                         new
                         {
@@ -3278,17 +3278,17 @@ The overall and [authorised absence](../glossary#authorised-absence) rates have 
                             Type = "MarkDownBlock",
                             Body = @"**Unauthorised absence**
 
-The [unauthorised absence](../glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.
+The [unauthorised absence](/glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.
 
 This is due to an increase in absence due to family holidays not agreed by schools.
 
 **Authorised absence**
 
-The [authorised absence](../glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.
+The [authorised absence](/glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.
 
 **Total number of days missed**
 
-The total number of days missed for [overall absence](../glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.
+The total number of days missed for [overall absence](/glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.
 
 This partly reflects a rise in the total number of pupils with the average number of days missed per pupil slightly increased to 8.2 days from 8.1 days in 2015/16.
 
@@ -3300,9 +3300,9 @@ In 2016/17, 91.8% of primary, secondary and special school pupils missed at leas
                             ContentSectionId = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015/16 but still down from 43.3% in 2011/12.
+                            Body = @"The [persistent absence](/glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015/16 but still down from 43.3% in 2011/12.
 
-It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).
+It also accounted for almost a third (31.6%) of all [authorised absence](/glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](/glossary#unauthorised-absence).
 
 Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015/16."
                         },
@@ -3314,7 +3314,7 @@ Overall, it's increased across primary and secondary schools to 10.8% - up from 
                             Type = "MarkDownBlock",
                             Body = @"**Persistent absentees**
 
-The [overall absence](../glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.
+The [overall absence](/glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.
 
 **Illness absence rate**
 
@@ -3328,7 +3328,7 @@ The illness absence rate is almost 4 times higher for persistent absentees at 7.
                             Type = "MarkDownBlock",
                             Body = @"**Illness**
 
-This is the main driver behind [overall absence](../glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.
+This is the main driver behind [overall absence](/glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.
 
 While the overall absence rate has slightly increased since 2015/16 the illness rate has stayed the same at 2.6%.
 
@@ -3370,11 +3370,11 @@ These pupils accounted for 23.5% of days missed while 8.2% of pupils had no abse
 
 Across all schools:
 
-* [overall absence](../glossary#overall-absence) - highest in summer and lowest in autumn
+* [overall absence](/glossary#overall-absence) - highest in summer and lowest in autumn
 
-* [authorised absence](../glossary#authorised-absence) - highest in spring and lowest in summer
+* [authorised absence](/glossary#authorised-absence) - highest in spring and lowest in summer
 
-* [unauthorised absence](../glossary#unauthorised-absence) - highest in summer"
+* [unauthorised absence](/glossary#unauthorised-absence) - highest in summer"
                         },
                         new
                         {
@@ -3382,7 +3382,7 @@ Across all schools:
                             ContentSectionId = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.
+                            Body = @"The [overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.
 **Ethnic groups**
 
 Overall absence rate:
@@ -3443,7 +3443,7 @@ Persistent absence rate:
                             ContentSectionId = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous two years.
+                            Body = @"The [overall absence](/glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous two years.
 
 Absence recorded for 4-year-olds is not treated as authorised or unauthorised and only reported as overall absence."
                         },
@@ -3453,9 +3453,9 @@ Absence recorded for 4-year-olds is not treated as authorised or unauthorised an
                             ContentSectionId = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The [overall absence](../glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.
+                            Body = @"The [overall absence](/glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.
 
-The [persistent absence](../glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16."
+The [persistent absence](/glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16."
                         },
                         new
                         {
@@ -3463,7 +3463,7 @@ The [persistent absence](../glossary#persistent-absence) rate increased to 73.9%
                             ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"[Overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).
+                            Body = @"[Overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).
 
 **Overall absence**
 
@@ -3495,7 +3495,7 @@ The region with the highest persistent absence rate was Yorkshire and the Humber
 
 * special schools
 
-They also include national-level information on permanent and fixed-period exclusions for [pupil referral units](../glossary#pupil-referral-unit).
+They also include national-level information on permanent and fixed-period exclusions for [pupil referral units](/glossary#pupil-referral-unit).
 
 All figures are based on unrounded data so constituent parts may not add up due to rounding."
                         },
@@ -3505,7 +3505,7 @@ All figures are based on unrounded data so constituent parts may not add up due 
                             ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The number of [permanent exclusions](../glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.
+                            Body = @"The number of [permanent exclusions](/glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.
 
 This works out to an average 40.6 permanent exclusions per day - up from 35.2 per day in 2015/16.
 
@@ -3519,7 +3519,7 @@ The permanent exclusion rate has also increased to 0.10% of pupils - up from 0.0
                             Type = "MarkDownBlock",
                             Body = @"Most occurred in secondary schools which accounted for 83% of all permanent exclusions.
 
-The [permanent exclusion](../glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
+The [permanent exclusion](/glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
 
 The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from 0.08% in 2015/16.
 
@@ -3533,7 +3533,7 @@ However, since 2012/13 it has been on the rise although rates are still lower no
                             ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The number of fixed-period exclusionshas increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.
+                            Body = @"The number of fixed-period exclusions has increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.
 
 This works out to around 2,010 fixed-period exclusions per day - up from 1,786 per day in 2015/16."
                         },
@@ -3569,13 +3569,13 @@ This works out to around 2,010 fixed-period exclusions per day - up from 1,786 p
                             Type = "MarkDownBlock",
                             Body = @"**Pupils with one or more fixed-period exclusion definition**
 
-The number of pupils with [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.
+The number of pupils with [one or more fixed-period exclusion](/glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.
 
 Of these kinds of pupils, 59.1% excluded on only 1 occasion while 1.5% received 10 or more fixed-period exclusions during the year.
 
-The percentage of pupils who went on to receive a [permanent exclusion](../glossary#permanent-exclusion) was 3.5%.
+The percentage of pupils who went on to receive a [permanent exclusion](/glossary#permanent-exclusion) was 3.5%.
 
-The average length of [fixed-period exclusion](../glossary#fixed-period-exclusion) across schools decreased to 2.1 days - slightly shorter than in 2015/16.
+The average length of [fixed-period exclusion](/glossary#fixed-period-exclusion) across schools decreased to 2.1 days - slightly shorter than in 2015/16.
 
 The highest proportion of fixed-period exclusions (46.6%) lasted for only 1 day.
 
@@ -3587,7 +3587,7 @@ Only 2.0% of fixed-period exclusions lasted for longer than 1 week and longer fi
                             ContentSectionId = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"All reasons (except bullying and theft) saw an increase in [permanent exclusions](../glossary#permanent-exclusion) since 2015/16.
+                            Body = @"All reasons (except bullying and theft) saw an increase in [permanent exclusions](/glossary#permanent-exclusion) since 2015/16.
 
 The following most common reasons saw the largest increases:
 
@@ -3601,7 +3601,7 @@ The following most common reasons saw the largest increases:
 
 Remained the most common reason for permanent exclusions accounting for 2,755 (35.7%) of all permanent exclusions - which is equivalent to 3 permanent exclusions per 10,000 pupils.
 
-However, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](../glossary#fixed-period-exclusion).
+However, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](/glossary#fixed-period-exclusion).
 
 Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
 
@@ -3625,9 +3625,9 @@ All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent
 
 **Age, national curriculum year group and gender**
 
-* more than half of all [permanent exclusions](../glossary#permanent-exclusion) (57.2%) and [fixed-period exclusions](../glossary#fixed-period-exclusion) (52.6 %) occur in national curriculum year 9 or above
+* more than half of all [permanent exclusions](/glossary#permanent-exclusion) (57.2%) and [fixed-period exclusions](/glossary#fixed-period-exclusion) (52.6 %) occur in national curriculum year 9 or above
 
-* a quarter (25%) of all permanent exclusions were for pupils aged 14 - who also had the highest rates for fixed-period exclusion and pupils receiving [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion)
+* a quarter (25%) of all permanent exclusions were for pupils aged 14 - who also had the highest rates for fixed-period exclusion and pupils receiving [one or more fixed-period exclusion](/glossary#one-or-more-fixed-period-exclusion)
 
 * the permanent exclusion rate for boys (0.15%) was more than 3 times higher than for girls (0.04%)
 
@@ -3661,7 +3661,7 @@ All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent
                             ContentSectionId = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = "There were 560 reviews lodged with [independent review panels](../glossary#independent-review-panel) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
+                            Body = "There were 560 reviews lodged with [independent review panels](/glossary#independent-review-panel) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
                         },
                         new
                         {
@@ -3671,13 +3671,13 @@ All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent
                             Type = "MarkDownBlock",
                             Body = @"**Permanent exclusion**
 
-The [permanent exclusion](../glossary#permanent-exclusion) rate in [pupil referral units](../glossary#pupil-referral-unit) decreased to 0.13 - down from 0.14% in 2015/16.
+The [permanent exclusion](/glossary#permanent-exclusion) rate in [pupil referral units](/glossary#pupil-referral-unit) decreased to 0.13 - down from 0.14% in 2015/16.
 
 Permanent exclusions rates have remained fairly steady following an increase between 2013/14 and 2014/15.
 
 **Fixed-period exclusion**
 
-The [fixed period exclusion](../glossary#fixed-period-exclusion) rate has been steadily increasing since 2013/14.
+The [fixed period exclusion](/glossary#fixed-period-exclusion) rate has been steadily increasing since 2013/14.
 
 The percentage of pupils in pupil referral units who 1 or more fixed-period exclusion increased to 59.17% - up from 58.15% in 2015/16."
                         },
@@ -3687,7 +3687,7 @@ The percentage of pupils in pupil referral units who 1 or more fixed-period excl
                             ContentSectionId = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"There's considerable variation in the [permanent exclusion](../glossary#permanent-exclusion) and [fixed-period exclusion](../glossary#fixed-period-exclusion) rate at the LA level.
+                            Body = @"There's considerable variation in the [permanent exclusion](/glossary#permanent-exclusion) and [fixed-period exclusion](/glossary#fixed-period-exclusion) rate at the LA level.
 
 **Permanent exclusion**
 
@@ -3741,7 +3741,7 @@ The proportion of applicants who received an offer of any of their preferred sch
 
 **Secondary National Offer Day**
 
-These statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of secondary school places to all applicants on the [Secondary National Offer Day](../glossary#national-offer-day) of 1 March 2018.
+These statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of secondary school places to all applicants on the [Secondary National Offer Day](/glossary#national-offer-day) of 1 March 2018.
 
 The secondary figures have been collected since 2008 and can be viewed as a time series in the following table."
                         },
@@ -3884,7 +3884,7 @@ As in previous years, at primary level a smaller proportion of offers were made 
                             Type = "MarkDownBlock",
                             Body = @"Read national statistical summaries, view charts and tables and download data files.
 
-Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).
+Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](/methodology/pupil-absence-in-schools-in-england).
 
 This release was created as example content during the platform’s Private Beta phase, whilst it provides access to real data, the below release should be used with some caution. To access the original, release please see [Pupil absence in schools in England: 2016 to 2017](https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2016-to-2017)"
                         },
@@ -3896,7 +3896,7 @@ This release was created as example content during the platform’s Private Beta
                             Type = "MarkDownBlock",
                             Body = @"Read national statistical summaries, view charts and tables and download data files.
 
-Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)
+Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](/methodology/permanent-and-fixed-period-exclusions-in-england)
 
 This release was created as example content during the platform’s Private Beta phase, whilst it provides access to real data, the below release should be used with some caution. To access the original release, please see [Permanent and fixed-period exclusions in England: 2016 to 2017](https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2016-to-2017)"
                         },
@@ -3908,7 +3908,7 @@ This release was created as example content during the platform’s Private Beta
                             Type = "MarkDownBlock",
                             Body = @"Read national statistical summaries, view charts and tables and download data files.
 
-Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)"
+Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](/methodology/secondary-and-primary-schools-applications-and-offers)"
                         },
                         new
                         {

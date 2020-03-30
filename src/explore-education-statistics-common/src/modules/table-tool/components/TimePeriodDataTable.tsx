@@ -25,6 +25,7 @@ interface Props {
   captionTitle?: string;
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersConfig;
+  source?: string;
 }
 
 const createFilterGroupHeaders = (group: Filter[]): HeaderSubGroup[] =>
@@ -119,7 +120,10 @@ const createHeaders = (
 };
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
-  ({ fullTable, tableHeadersConfig, captionTitle }: Props, dataTableRef) => {
+  (
+    { fullTable, tableHeadersConfig, captionTitle, source }: Props,
+    dataTableRef,
+  ) => {
     const { subjectMeta, results } = fullTable;
 
     if (results.length === 0) {
@@ -205,9 +209,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           return value;
         }
 
-        return indicator.unit === '£'
-          ? `${indicator.unit}${formatPretty(value)}`
-          : `${formatPretty(value)}${indicator.unit}`;
+        return formatPretty(value, indicator.unit);
       });
     });
 
@@ -232,6 +234,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           rows={rows}
           ref={dataTableRef}
           footnotes={subjectMeta.footnotes}
+          source={source}
         />
       </ErrorBoundary>
     );

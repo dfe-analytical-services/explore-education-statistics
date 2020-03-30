@@ -8,9 +8,9 @@ import {
 import {
   ContentBlockPostModel,
   ContentBlockPutModel,
-  ContentSectionViewModel,
 } from '@admin/services/release/edit-release/content/types';
 import client from '@admin/services/util/service';
+import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import {
   BasicMethodology,
@@ -18,6 +18,8 @@ import {
   MethodologyStatus,
 } from '../common/types';
 import { EditableContentBlock } from '../publicationService';
+
+type ContentSectionViewModel = ContentSection<EditableContentBlock>;
 
 const methodologyService = {
   getMethodologies(): Promise<MethodologyStatusListItem[]> {

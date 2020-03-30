@@ -7,8 +7,8 @@ import KeyStatTile, {
   KeyStatConfig,
   KeyStatProps,
 } from '@common/modules/find-statistics/components/KeyStatTile';
-import styles from '@common/modules/find-statistics/components/SummaryRenderer.module.scss';
-import DataBlockService, {
+import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
+import dataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import formatPretty from '@common/utils/number/formatPretty';
@@ -49,23 +49,26 @@ const EditableKeyStatTile = ({
 
   useEffect(() => {
     if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject({
-        ...dataBlockRequest,
-        includeGeoJson: false,
-      }).then(newResponse => {
-        if (newResponse) {
-          setDataBlockResponse(newResponse);
-          const [indicatorKey, theIndicator] = Object.entries(
-            newResponse.metaData.indicators,
-          )[0];
-          setConfig({
-            indicatorLabel: theIndicator.label,
-            value: `${formatPretty(
-              newResponse.result[0].measures[indicatorKey],
-            )}${theIndicator.unit}`,
-          });
-        }
-      });
+      dataBlockService
+        .getDataBlockForSubject({
+          ...dataBlockRequest,
+          includeGeoJson: false,
+        })
+        .then(newResponse => {
+          if (newResponse) {
+            setDataBlockResponse(newResponse);
+            const [indicatorKey, theIndicator] = Object.entries(
+              newResponse.metaData.indicators,
+            )[0];
+            setConfig({
+              indicatorLabel: theIndicator.label,
+              value: formatPretty(
+                newResponse.result[0].measures[indicatorKey],
+                theIndicator.unit,
+              ),
+            });
+          }
+        });
     }
   }, [dataBlockRequest, dataBlockResponse]);
 

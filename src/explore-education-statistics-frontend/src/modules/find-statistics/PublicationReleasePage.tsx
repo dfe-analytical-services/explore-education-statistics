@@ -3,8 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
-import ContentSubBlockRenderer from '@common/modules/find-statistics/components/ContentSubBlockRenderer';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
@@ -19,12 +18,13 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
+import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { NextPageContext } from 'next';
 import React, { Component } from 'react';
-import HeadlinesSection from './components/PublicationReleaseHeadlinesSection';
+import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
 interface Props {
@@ -61,6 +61,15 @@ class PublicationReleasePage extends Component<Props> {
     const releaseCount =
       data.publication.otherReleases.length +
       data.publication.legacyReleases.length;
+
+    let methodologyUrl = '';
+    let methodologySummary = '';
+    if (data.publication.methodology) {
+      methodologyUrl = `/methodology/${data.publication.methodology.slug}`;
+      methodologySummary = data.publication.methodology.summary;
+    } else if (data.publication.externalMethodology) {
+      methodologyUrl = data.publication.externalMethodology.url;
+    }
 
     return (
       <Page
@@ -141,22 +150,18 @@ class PublicationReleasePage extends Component<Props> {
               </div>
             </div>
 
-            {(data.summarySection.content || []).map((block, i) => (
-              <ContentSubBlockRenderer
-                key={block.id}
-                id={`summary-section-${i}`}
-                publication={data.publication}
-                block={block}
-              />
+            {data.summarySection.content.map(block => (
+              <ContentBlockRenderer key={block.id} block={block} />
             ))}
+
             {data.downloadFiles && (
               <Details
-                summary="Download data files"
+                summary="Download associated files"
                 onToggle={(open: boolean) =>
                   open &&
                   logEvent(
                     'Downloads',
-                    'Release page download data files dropdown opened',
+                    'Release page download associated files dropdown opened',
                     window.location.pathname,
                   )
                 }
@@ -271,31 +276,44 @@ class PublicationReleasePage extends Component<Props> {
                   </dd>
                 </dl>
               )}
-              <h2
-                className="govuk-heading-m govuk-!-margin-top-6"
-                id="related-content"
-              >
-                Related guidance
-              </h2>
-              <nav role="navigation" aria-labelledby="related-content">
-                <ul className="govuk-list">
-                  {data.publication.methodology && (
-                    <li>
-                      <Link
-                        to={`/methodology/${data.publication.methodology.slug}`}
-                      >
-                        {`${data.publication.title}: methodology`}
-                      </Link>
-                    </li>
-                  )}
-                  {data.relatedInformation &&
-                    data.relatedInformation.map(link => (
-                      <li key={link.id}>
-                        <a href={link.url}>{link.description}</a>
-                      </li>
-                    ))}
-                </ul>
-              </nav>
+              {(data.publication.methodology ||
+                data.publication.externalMethodology ||
+                data.relatedInformation.length !== 0) && (
+                <>
+                  <h2
+                    className="govuk-heading-m govuk-!-margin-top-6"
+                    id="related-content"
+                  >
+                    Related guidance
+                  </h2>
+                  <nav role="navigation" aria-labelledby="related-content">
+                    <ul className="govuk-list">
+                      {data.publication.methodology && (
+                        <li>
+                          <Link
+                            to={`/methodology/${data.publication.methodology.slug}`}
+                          >
+                            {`${data.publication.title}: methodology`}
+                          </Link>
+                        </li>
+                      )}
+                      {data.publication.externalMethodology && (
+                        <li>
+                          <Link to={data.publication.externalMethodology.url}>
+                            {data.publication.externalMethodology.title}
+                          </Link>
+                        </li>
+                      )}
+                      {data.relatedInformation &&
+                        data.relatedInformation.map(link => (
+                          <li key={link.id}>
+                            <a href={link.url}>{link.description}</a>
+                          </li>
+                        ))}
+                    </ul>
+                  </nav>
+                </>
+              )}
             </RelatedAside>
           </div>
         </div>
@@ -305,8 +323,8 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        <HeadlinesSection
-          publication={data.publication}
+        <PublicationReleaseHeadlinesSection
+          releaseId={data.id}
           keyStatisticsSection={data.keyStatisticsSection}
           headlinesSection={data.headlinesSection}
           keyStatisticsSecondarySection={data.keyStatisticsSecondarySection}
@@ -321,9 +339,8 @@ class PublicationReleasePage extends Component<Props> {
                   caption={caption}
                   key={order}
                 >
-                  <ContentBlock
+                  <PublicationSectionBlocks
                     content={content}
-                    id={`content_${order}`}
                     publication={data.publication}
                     onToggle={(section: { id: string; title: string }) => {
                       logEvent(
@@ -342,13 +359,8 @@ class PublicationReleasePage extends Component<Props> {
         <HelpAndSupport
           accordionId={this.accId[1]}
           publicationTitle={data.publication.title}
-          methodologyUrl={
-            data.publication.methodology &&
-            `/methodology/${data.publication.methodology.slug}`
-          }
-          methodologySummary={
-            data.publication.methodology && data.publication.methodology.summary
-          }
+          methodologyUrl={methodologyUrl}
+          methodologySummary={methodologySummary}
           themeTitle={data.publication.topic.theme.title}
           publicationContact={data.publication.contact}
           releaseType={data.type.title}

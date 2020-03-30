@@ -11,8 +11,10 @@
  */
 export default function formatPretty(
   value: string | number,
+  unit?: string,
   maxDecimals = 2,
 ): string {
+  let formattedValue;
   if (typeof value === 'string') {
     const numberValue = Number(value);
 
@@ -24,19 +26,25 @@ export default function formatPretty(
     const decimalPlaces = decimals ? decimals.length : 0;
 
     if (decimalPlaces > 0) {
-      return numberValue.toLocaleString('en-GB', {
+      formattedValue = numberValue.toLocaleString('en-GB', {
         maximumFractionDigits: maxDecimals,
         minimumFractionDigits:
           decimalPlaces > maxDecimals ? maxDecimals : decimalPlaces,
       });
+    } else {
+      formattedValue = Number(value).toLocaleString('en-GB', {
+        maximumFractionDigits: maxDecimals,
+      });
     }
-
-    return Number(value).toLocaleString('en-GB', {
+  } else {
+    formattedValue = value.toLocaleString('en-GB', {
       maximumFractionDigits: maxDecimals,
     });
   }
-
-  return value.toLocaleString('en-GB', {
-    maximumFractionDigits: maxDecimals,
-  });
+  if (unit) {
+    return unit === '£'
+      ? `${unit}${formattedValue}`
+      : `${formattedValue}${unit}`;
+  }
+  return formattedValue;
 }

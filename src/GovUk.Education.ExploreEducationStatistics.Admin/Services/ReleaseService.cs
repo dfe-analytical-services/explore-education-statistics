@@ -324,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         
                         SubjectId = subject?.Id ?? Guid.Empty,
                         
-                        TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName, 0, null),
+                        TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName),
                         
                         DependentDataBlocks = dependentDataBlocks.
                             Select(block => new DependentDataBlock

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -26,14 +25,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class ReleasesController : ControllerBase
     {   
-        private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReleasesController(IImportService importService,
+        public ReleasesController(
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IImportStatusService importStatusService,
@@ -41,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             UserManager<ApplicationUser> userManager
             )
         {
-            _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
@@ -173,8 +170,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return await _fileStorageService
                 .UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
-                // add message to queue to process these files
-                .OnSuccessDo(() => _importService.Import(file.FileName, releaseId, file))
                 .HandleFailuresOr(Ok);
         }
 
