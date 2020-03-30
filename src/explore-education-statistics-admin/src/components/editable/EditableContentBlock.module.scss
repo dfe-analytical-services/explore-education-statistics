@@ -1,0 +1,23 @@
+@import 'src/styles/govuk-base';
+
+.readOnly {
+  background: govuk-colour('light-grey');
+  border: 2px solid $govuk-border-colour;
+  box-sizing: border-box;
+  cursor: pointer;
+  margin-bottom: govuk-spacing(2);
+  min-height: 2.2rem;
+  position: relative;
+
+  &:focus {
+    @include govuk-focused-text;
+  }
+}
+
+.preview {
+  padding: 0 govuk-spacing(2);
+
+  pre {
+    white-space: normal;
+  }
+}

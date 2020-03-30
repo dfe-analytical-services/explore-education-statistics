@@ -1,6 +1,5 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import FormEditor, { FormEditorProps } from '@admin/components/form/FormEditor';
-import styles from '@admin/components/form/FormEditor.module.scss';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
@@ -8,6 +7,7 @@ import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import React, { useCallback, useState } from 'react';
+import styles from './EditableContentBlock.module.scss';
 
 interface EditableContentBlockProps
   extends OmitStrict<FormEditorProps, 'onChange'> {
