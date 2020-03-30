@@ -16,16 +16,17 @@ const BlockDraggable = ({ draggable, draggableId, index, children }: Props) => (
     index={index}
     isDragDisabled={!draggable}
   >
-    {draggableProvided => (
+    {(draggableProvided, snapshot) => (
       <div
         {...draggableProvided.draggableProps}
+        {...draggableProvided.dragHandleProps}
         ref={draggableProvided.innerRef}
         className={classNames({
-          [styles.isDragging]: draggable,
+          [styles.draggable]: draggable,
+          [styles.isDragging]: snapshot.isDragging,
         })}
       >
         <span
-          {...draggableProvided.dragHandleProps}
           className={classNames({
             [styles.dragHandle]: draggable,
           })}
