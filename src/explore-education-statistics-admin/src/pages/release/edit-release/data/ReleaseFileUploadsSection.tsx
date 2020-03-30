@@ -206,7 +206,6 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                         {file.isDeleting && (
                           <LoadingSpinner text="Deleting file" overlay />
                         )}
-                        ;
                         <SummaryList key={file.filename}>
                           <SummaryListItem term="Name">
                             <h4 className="govuk-heading-m">{file.title}</h4>
