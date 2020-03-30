@@ -57,6 +57,7 @@ const AccordionSection = ({
         [classes.expanded]: open,
       })}
       role="presentation"
+      id={id}
     >
       <div className="govuk-accordion__section-header">
         {header ??

@@ -88,29 +88,23 @@ const Accordion = ({
         return;
       }
 
-      const contentEl = sectionEl.querySelector(
-        `.${accordionSectionClasses.sectionContent}`,
-      );
-
-      if (contentEl) {
-        updateOpenSections(draft => {
-          const matchingSection = sections.find(
-            section => contentEl.id === `${section.id}-content`,
-          );
-
-          if (matchingSection) {
-            draft[matchingSection.id] = true;
-          }
-        });
-
-        setTimeout(
-          () =>
-            (locationHashEl as HTMLElement).scrollIntoView({
-              block: 'start',
-            }),
-          100,
+      updateOpenSections(draft => {
+        const matchingSection = sections.find(
+          section => sectionEl.id === section.id,
         );
-      }
+
+        if (matchingSection) {
+          draft[matchingSection.id] = true;
+        }
+      });
+
+      setTimeout(
+        () =>
+          (locationHashEl as HTMLElement).scrollIntoView({
+            block: 'start',
+          }),
+        100,
+      );
     };
 
     goToHash();
