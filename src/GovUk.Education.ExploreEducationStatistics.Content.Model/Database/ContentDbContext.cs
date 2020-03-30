@@ -2742,7 +2742,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1,
                     Body =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).\n\n" + 
+                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](/methodology/pupil-absence-in-schools-in-england).\n\n" + 
                         "This release was created as example content during the platform’s Private Beta phase, " +
                         "whilst it provides access to real data, the below release should be used with some caution. " +
                         "To access the original, release please see [Pupil absence in schools in England: 2016 to 2017](https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2016-to-2017)"
@@ -2755,7 +2755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Body = "Read national statistical summaries, view charts and tables and download " +
                            "data files.\n\nFind out how and why these statistics are collected and " +
                            "published - [Permanent and fixed-period exclusion statistics: methodology]" +
-                           "(../methodology/permanent-and-fixed-period-exclusions-in-england)\n\n" + 
+                           "(/methodology/permanent-and-fixed-period-exclusions-in-england)\n\n" + 
                            "This release was created as example content during the platform’s Private Beta phase, " + 
                            "whilst it provides access to real data, the below release should be used with some caution. " +
                            "To access the original release, please see [Permanent and fixed-period exclusions in England: 2016 to 2017](https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2016-to-2017)"
@@ -2768,7 +2768,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Body = "Read national statistical summaries, view charts and tables and download " +
                            "data files.\n\nFind out how and why these statistics are collected and " +
                            "published - [Secondary and primary school applications and offers: methodology]" +
-                           "(../methodology/secondary-and-primary-schools-applications-and-offers)"
+                           "(/methodology/secondary-and-primary-schools-applications-and-offers)"
                 },
 
                 // Headline section for each Release
