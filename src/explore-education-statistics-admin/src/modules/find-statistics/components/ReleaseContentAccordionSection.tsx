@@ -129,7 +129,6 @@ const ReleaseContentAccordionSection = ({
   return (
     <EditableAccordionSection
       {...props}
-      id={sectionId}
       heading={heading || ''}
       caption={caption}
       onHeadingChange={handleHeadingChange}

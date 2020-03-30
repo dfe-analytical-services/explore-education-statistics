@@ -9,6 +9,7 @@ import useMethodologyActions from '../context/useMethodologyActions';
 import MethodologyAccordionSection from './MethodologyAccordionSection';
 
 export interface MethodologyAccordionProps {
+  id?: string;
   sectionKey: ContentSectionKeys;
   methodology: MethodologyContent;
 }
@@ -16,6 +17,7 @@ export interface MethodologyAccordionProps {
 const MethodologyAccordion = ({
   sectionKey,
   methodology,
+  id = `methodologyAccordion-${sectionKey}`,
 }: MethodologyAccordionProps) => {
   const { isEditing } = useContext(EditingContext);
   const {
@@ -35,10 +37,13 @@ const MethodologyAccordion = ({
 
   const reorderAccordionSections = useCallback(
     async (ids: string[]) => {
-      const order = ids.reduce<Dictionary<number>>((acc, id, index) => {
-        acc[id] = index;
-        return acc;
-      }, {});
+      const order = ids
+        // Strip out the accordion id prefix
+        .map(sectionId => sectionId.replace(`${id}-`, ''))
+        .reduce<Dictionary<number>>((acc, sectionId, index) => {
+          acc[sectionId] = index;
+          return acc;
+        }, {});
 
       await updateContentSectionsOrder({
         methodologyId: methodology.id,
@@ -46,14 +51,14 @@ const MethodologyAccordion = ({
         sectionKey,
       });
     },
-    [methodology.id, sectionKey, updateContentSectionsOrder],
+    [id, methodology.id, sectionKey, updateContentSectionsOrder],
   );
 
   if (sectionKey === 'annexes' && !isEditing && methodology.annexes.length < 1)
     return null;
   return (
     <EditableAccordion
-      id={`methodology-accordion-${sectionKey}`}
+      id={id}
       sectionName={sectionKey}
       onAddSection={onAddSection}
       onReorder={reorderAccordionSections}
@@ -61,7 +66,7 @@ const MethodologyAccordion = ({
       {orderBy(methodology[sectionKey], 'order').map(section => (
         <MethodologyAccordionSection
           key={section.id}
-          id={section.id}
+          id={`${id}-${section.id}`}
           methodologyId={methodology.id}
           section={section}
           sectionKey={sectionKey}

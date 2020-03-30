@@ -84,7 +84,10 @@ const PublicationReleaseContent = () => {
     [release, deleteContentSectionBlock],
   );
 
-  if (release === undefined) return null;
+  if (!release) {
+    return null;
+  }
+
   return (
     <>
       <h1 className="govuk-heading-l">
@@ -215,11 +218,7 @@ const PublicationReleaseContent = () => {
 
       <ReleaseHeadlines release={release} />
 
-      <ReleaseContentAccordion
-        release={release}
-        accordionId="contents-accordion"
-        sectionName="Contents"
-      />
+      <ReleaseContentAccordion release={release} sectionName="Contents" />
 
       <AdminPublicationReleaseHelpAndSupportSection release={release} />
     </>
