@@ -1,33 +1,30 @@
-import EditableProps from '@admin/components/editable/types/EditableProps';
+import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import FormEditor, { FormEditorProps } from '@admin/components/form/FormEditor';
 import styles from '@admin/components/form/FormEditor.module.scss';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
-import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import React, { useCallback, useState } from 'react';
 
-interface EditableContentBlockRendererProps
-  extends EditableProps,
-    OmitStrict<FormEditorProps, 'onChange'> {
+interface EditableContentBlockProps
+  extends OmitStrict<FormEditorProps, 'onChange'> {
   id: string;
   onSave: (value: string) => void;
+  onDelete: () => void;
   useMarkdown?: boolean;
 }
 
 const EditableContentBlock = ({
-  canDelete = false,
-  editable,
   hideLabel = true,
   useMarkdown,
   value,
   onSave,
   onDelete,
   ...props
-}: EditableContentBlockRendererProps) => {
+}: EditableContentBlockProps) => {
   const [content, setContent] = useState(() => {
     if (useMarkdown) {
       return toHtml(value);
@@ -37,7 +34,6 @@ const EditableContentBlock = ({
   });
 
   const [editing, toggleEditing] = useToggle(false);
-  const [showConfirmation, toggleConfirmation] = useToggle(false);
 
   const handleSave = useCallback(() => {
     toggleEditing.off();
@@ -80,29 +76,17 @@ const EditableContentBlock = ({
       </div>
     </>
   ) : (
-    <div>
-      <ModalConfirm
-        title="Delete section"
-        mounted={showConfirmation}
-        onConfirm={() => {
-          if (onDelete) {
-            onDelete();
-          }
-
-          toggleConfirmation.off();
-        }}
-        onExit={toggleConfirmation.off}
-        onCancel={toggleConfirmation.off}
-      >
-        <p>Are you sure you want to delete this section?</p>
-      </ModalConfirm>
-
+    <EditableBlockWrapper onEdit={toggleEditing.on} onDelete={onDelete}>
       <div
         role="button"
-        className={classNames({
-          [styles.readOnly]: editable && !editing,
+        className={classNames(styles.preview, {
+          [styles.readOnly]: !editing,
         })}
         tabIndex={0}
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: content || '<p>This section is empty</p>',
+        }}
         onClick={toggleEditing.on}
         onKeyPress={e => {
           switch (e.key) {
@@ -114,37 +98,8 @@ const EditableContentBlock = ({
               break;
           }
         }}
-      >
-        <div className={styles.readOnlyButtons}>
-          <Button variant="secondary" className={styles.readOnlyButton}>
-            Edit
-          </Button>
-          {canDelete && (
-            <>
-              <Button
-                variant="warning"
-                className={styles.readOnlyButton}
-                onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleConfirmation.on();
-                }}
-              >
-                Delete
-              </Button>
-            </>
-          )}
-        </div>
-
-        <div
-          className={styles.preview}
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html: content || '<p>This section is empty</p>',
-          }}
-        />
-      </div>
-    </div>
+      />
+    </EditableBlockWrapper>
   );
 };
 

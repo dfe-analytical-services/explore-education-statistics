@@ -1,7 +1,7 @@
-import styles from '@admin/components/editable/EditableBlock.module.scss';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import styles from './BlockDraggable.module.scss';
 
 interface Props {
   draggable: boolean;

@@ -16,7 +16,6 @@ import EditableBlockRenderer from './EditableBlockRenderer';
 export interface EditableSectionBlockProps extends SectionBlocksProps {
   content: EditableBlock[];
   sectionId: string;
-  editable?: boolean;
   isReordering?: boolean;
   allowHeadings?: boolean;
   allowComments?: boolean;
@@ -29,7 +28,6 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
   const {
     content = [],
     sectionId,
-    editable = true,
     isReordering = false,
     allowHeadings,
     allowComments = false,
@@ -107,13 +105,11 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
               )}
 
               <EditableBlockRenderer
-                editable={editable && !isReordering}
-                canDelete={!isReordering}
                 block={block}
                 allowHeadings={allowHeadings}
                 getInfographic={getInfographic}
                 onContentSave={onBlockContentSave}
-                onDelete={onBlockDelete}
+                onDelete={!isReordering ? onBlockDelete : undefined}
               />
             </BlockDraggable>
           </div>
