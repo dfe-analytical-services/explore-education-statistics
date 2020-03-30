@@ -1,48 +1,47 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`EditableBlockRenderer renders editable Markdown block correctly 1`] = `
-<div>
-  <div role="button"
-       class="editableContent unsaved"
-  >
-    <div class="editableButton">
-      <div class="editableButtonContent">
-        <span class="govuk-button govuk-button--secondary govuk-body-s govuk-!-margin-bottom-0">
-          Edit
-        </span>
-        <button type="button"
-                class="govuk-button govuk-button--warning govuk-body-s govuk-!-margin-bottom-0"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-    <div class="wysiwygPreview govuk-!-padding-left-2 govuk-!-padding-right-2 false">
+exports[`EditableBlockRenderer MarkDownBlock renders editable version correctly 1`] = `
+<article>
+  <div class="block">
+    <div role="button"
+         class="preview readOnly"
+         tabindex="0"
+    >
       <p>
         test
       </p>
     </div>
   </div>
-</div>
+  <div class="buttons">
+    <button aria-disabled="false"
+            class="govuk-button marginRight govuk-button--secondary"
+            type="button"
+    >
+      Edit block
+    </button>
+    <button aria-disabled="false"
+            class="govuk-button marginRight govuk-button--warning"
+            type="button"
+    >
+      Remove block
+    </button>
+  </div>
+</article>
 `;
 
-exports[`EditableBlockRenderer renders non-editable Markdown block correctly 1`] = `
-<div>
-  <div role="button"
-       class="editableContent unsaved"
-  >
-    <div class="editableButton">
-      <div class="editableButtonContent">
-        <span class="govuk-button govuk-button--secondary govuk-body-s govuk-!-margin-bottom-0">
-          Edit
-        </span>
-      </div>
-    </div>
-    <div class="wysiwygPreview govuk-!-padding-left-2 govuk-!-padding-right-2 false">
+exports[`EditableBlockRenderer MarkDownBlock renders non-editable version correctly 1`] = `
+<article>
+  <div class="block">
+    <div role="button"
+         class="preview readOnly"
+         tabindex="0"
+    >
       <p>
         test
       </p>
     </div>
   </div>
-</div>
+  <div class="buttons">
+  </div>
+</article>
 `;

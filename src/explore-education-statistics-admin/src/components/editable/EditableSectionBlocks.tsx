@@ -106,10 +106,11 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
 
               <EditableBlockRenderer
                 block={block}
+                editable={!isReordering}
                 allowHeadings={allowHeadings}
                 getInfographic={getInfographic}
                 onContentSave={onBlockContentSave}
-                onDelete={!isReordering ? onBlockDelete : undefined}
+                onDelete={onBlockDelete}
               />
             </BlockDraggable>
           </div>

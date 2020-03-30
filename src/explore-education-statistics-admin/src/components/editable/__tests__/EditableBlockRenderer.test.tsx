@@ -1,72 +1,99 @@
 import EditableBlockRenderer from '@admin/components/editable/EditableBlockRenderer';
-import { EditingContext as EditingContext1 } from '@admin/contexts/EditingContext';
-import ManageReleaseContext from '@admin/pages/release/ManageReleaseContext';
-import { BasicPublicationDetails } from '@admin/services/common/types';
-import { render } from '@testing-library/react';
+import { render, fireEvent, wait } from '@testing-library/react';
 import React from 'react';
 
 describe('EditableBlockRenderer', () => {
-  test('renders non-editable Markdown block correctly', () => {
-    const { container } = render(
-      <EditingContext1
-        value={{
-          isEditing: true,
-        }}
-      >
-        <ManageReleaseContext.Provider
-          value={{
-            releaseId: '1',
-            publication: {} as BasicPublicationDetails,
+  describe('MarkDownBlock', () => {
+    test('renders non-editable version correctly', () => {
+      const { container, queryByText } = render(
+        <EditableBlockRenderer
+          block={{
+            id: 'block-000',
+            order: 0,
+            comments: [],
+            type: 'MarkDownBlock',
+            body: 'test',
           }}
-        >
-          <EditableBlockRenderer
-            block={{
-              id: 'block-000',
-              order: 0,
-              comments: [],
-              type: 'MarkDownBlock',
-              body: 'test',
-            }}
-            onDelete={() => {}}
-            onContentChange={async () => {}}
-          />
-        </ManageReleaseContext.Provider>
-      </EditingContext1>,
-    );
+          onContentSave={() => {}}
+          onDelete={() => {}}
+        />,
+      );
 
-    expect(container.innerHTML).toMatchSnapshot();
-  });
+      expect(queryByText('Edit block')).toBeNull();
+      expect(queryByText('Remove block')).toBeNull();
+      expect(container.innerHTML).toMatchSnapshot();
+    });
 
-  test('renders editable Markdown block correctly', () => {
-    const { container } = render(
-      <EditingContext1
-        value={{
-          isEditing: true,
-        }}
-      >
-        <ManageReleaseContext.Provider
-          value={{
-            releaseId: '1',
-            publication: {} as BasicPublicationDetails,
+    test('renders editable version correctly', () => {
+      const { container, queryByText } = render(
+        <EditableBlockRenderer
+          editable
+          block={{
+            id: 'block-000',
+            order: 0,
+            comments: [],
+            type: 'MarkDownBlock',
+            body: 'test',
           }}
-        >
-          <EditableBlockRenderer
-            canDelete
-            editable
-            block={{
-              id: 'block-000',
-              order: 0,
-              comments: [],
-              type: 'MarkDownBlock',
-              body: 'test',
-            }}
-            onDelete={() => {}}
-            onContentChange={async () => {}}
-          />
-        </ManageReleaseContext.Provider>
-      </EditingContext1>,
-    );
+          onContentSave={() => {}}
+          onDelete={() => {}}
+        />,
+      );
 
-    expect(container.innerHTML).toMatchSnapshot();
+      expect(queryByText('Edit block')).not.toBeNull();
+      expect(queryByText('Remove block')).not.toBeNull();
+      expect(container.innerHTML).toMatchSnapshot();
+    });
+
+    test('clicking "Edit block" and "Save" calls save callback', () => {
+      const handleContentSave = jest.fn();
+
+      const { getByText } = render(
+        <EditableBlockRenderer
+          editable
+          block={{
+            id: 'block-000',
+            order: 0,
+            comments: [],
+            type: 'MarkDownBlock',
+            body: '',
+          }}
+          onContentSave={handleContentSave}
+          onDelete={() => {}}
+        />,
+      );
+
+      fireEvent.click(getByText('Edit block'));
+      fireEvent.click(getByText('Save'));
+
+      expect(handleContentSave).toHaveBeenCalledWith('block-000', '');
+    });
+
+    test('clicking "Remove block" and "Confirm" calls delete callback', async () => {
+      const handleDelete = jest.fn();
+
+      const { getByText } = render(
+        <EditableBlockRenderer
+          editable
+          block={{
+            id: 'block-000',
+            order: 0,
+            comments: [],
+            type: 'MarkDownBlock',
+            body: '',
+          }}
+          onContentSave={() => {}}
+          onDelete={handleDelete}
+        />,
+      );
+
+      fireEvent.click(getByText('Remove block'));
+
+      await wait();
+
+      fireEvent.click(getByText('Confirm'));
+
+      expect(handleDelete).toHaveBeenCalledWith('block-000');
+    });
   });
 });

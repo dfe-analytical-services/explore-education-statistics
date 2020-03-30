@@ -28,26 +28,26 @@ const EditableBlockWrapper = ({
         )}
 
         {onDelete && (
-          <Button variant="warning" onClick={toggleConfirmDelete.on}>
-            Remove block
-          </Button>
+          <>
+            <Button variant="warning" onClick={toggleConfirmDelete.on}>
+              Remove block
+            </Button>
+
+            <ModalConfirm
+              title="Delete section"
+              mounted={showConfirmDelete}
+              onConfirm={async () => {
+                await onDelete();
+                toggleConfirmDelete.off();
+              }}
+              onExit={toggleConfirmDelete.off}
+              onCancel={toggleConfirmDelete.off}
+            >
+              <p>Are you sure you want to delete this block?</p>
+            </ModalConfirm>
+          </>
         )}
       </div>
-
-      {onDelete && (
-        <ModalConfirm
-          title="Delete section"
-          mounted={showConfirmDelete}
-          onConfirm={async () => {
-            await onDelete();
-            toggleConfirmDelete.off();
-          }}
-          onExit={toggleConfirmDelete.off}
-          onCancel={toggleConfirmDelete.off}
-        >
-          <p>Are you sure you want to delete this block?</p>
-        </ModalConfirm>
-      )}
     </article>
   );
 };

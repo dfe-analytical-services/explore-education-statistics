@@ -3,43 +3,43 @@ import EditableContentBlock from '@admin/components/editable/EditableContentBloc
 import { EditableBlock } from '@admin/services/publicationService';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 interface Props {
   allowHeadings?: boolean;
   block: EditableBlock;
+  editable?: boolean;
   getInfographic?: GetInfographic;
   onContentSave: (blockId: string, content: string) => void;
-  onDelete?: (blockId: string) => void;
+  onDelete: (blockId: string) => void;
 }
 
 function EditableBlockRenderer({
   allowHeadings,
   block,
+  editable,
   getInfographic,
   onContentSave,
   onDelete,
 }: Props) {
   const id = `editableBlockRenderer-${block.id}`;
 
-  const handleContentSave = useCallback(
-    (content: string) => {
+  const handleContentSave = useMemo(
+    () => (content: string) => {
       onContentSave(block.id, content);
     },
     [block.id, onContentSave],
   );
 
   const handleDelete = useCallback(() => {
-    if (onDelete) {
-      onDelete(block.id);
-    }
+    onDelete(block.id);
   }, [block.id, onDelete]);
 
   switch (block.type) {
     case 'DataBlock':
       return (
         <div className="dfe-content-overflow">
-          <EditableBlockWrapper onDelete={handleDelete}>
+          <EditableBlockWrapper onDelete={editable ? handleDelete : undefined}>
             <DataBlockRenderer
               id={id}
               dataBlock={block}
@@ -53,6 +53,7 @@ function EditableBlockRenderer({
       return (
         <EditableContentBlock
           allowHeadings={allowHeadings}
+          editable={editable}
           id={id}
           label="Block content"
           value={block.body}

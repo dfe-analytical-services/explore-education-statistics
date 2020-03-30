@@ -11,6 +11,7 @@ import styles from './EditableContentBlock.module.scss';
 
 interface EditableContentBlockProps
   extends OmitStrict<FormEditorProps, 'onChange'> {
+  editable?: boolean;
   id: string;
   onSave: (value: string) => void;
   onDelete: () => void;
@@ -18,6 +19,7 @@ interface EditableContentBlockProps
 }
 
 const EditableContentBlock = ({
+  editable,
   hideLabel = true,
   useMarkdown,
   value,
@@ -59,46 +61,65 @@ const EditableContentBlock = ({
     setContent(nextContent);
   }, [toggleEditing, useMarkdown, value]);
 
-  return editing ? (
-    <>
-      <FormEditor
-        {...props}
-        hideLabel={hideLabel}
-        value={content}
-        onChange={setContent}
-      />
+  if (onSave && editing) {
+    return (
+      <>
+        <FormEditor
+          {...props}
+          hideLabel={hideLabel}
+          value={content}
+          onChange={setContent}
+        />
 
-      <div>
-        <Button onClick={handleSave}>Save</Button>
-        <Button variant="secondary" onClick={handleCancel}>
-          Cancel
-        </Button>
-      </div>
-    </>
-  ) : (
-    <EditableBlockWrapper onEdit={toggleEditing.on} onDelete={onDelete}>
+        <div>
+          <Button onClick={handleSave}>Save</Button>
+          <Button variant="secondary" onClick={handleCancel}>
+            Cancel
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <EditableBlockWrapper
+      onEdit={editable ? toggleEditing.on : undefined}
+      onDelete={editable ? onDelete : undefined}
+    >
       <div
-        role="button"
         className={classNames(styles.preview, {
           [styles.readOnly]: !editing,
         })}
-        tabIndex={0}
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{
-          __html: content || '<p>This section is empty</p>',
-        }}
-        onClick={toggleEditing.on}
-        onKeyPress={e => {
-          switch (e.key) {
-            case 'Enter':
-            case ' ':
-              toggleEditing.on();
-              break;
-            default:
-              break;
-          }
-        }}
-      />
+      >
+        {editable ? (
+          <div
+            role="button"
+            tabIndex={0}
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: content || '<p>This section is empty</p>',
+            }}
+            onClick={toggleEditing.on}
+            onKeyPress={e => {
+              switch (e.key) {
+                case 'Enter':
+                case ' ':
+                  toggleEditing.on();
+                  break;
+                default:
+                  break;
+              }
+            }}
+          />
+        ) : (
+          <div
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: content || '<p>This section is empty</p>',
+            }}
+          />
+        )}
+      </div>
     </EditableBlockWrapper>
   );
 };
