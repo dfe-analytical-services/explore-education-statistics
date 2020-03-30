@@ -26,7 +26,9 @@ const Comments = ({
   canResolve = false,
   canComment = false,
 }: Props) => {
-  const [newComment, setNewComment] = useState<string>('');
+  const [newComment, setNewComment] = React.useState<string>('');
+  const [editableComment, setEditableComment] = useState<string>('');
+  const [editableCommentText, setEditableCommentText] = useState<string>('');
   const [comments, setComments] = useState<ExtendedComment[]>(initialComments);
 
   const { releaseId } = useManageReleaseContext();
@@ -116,6 +118,31 @@ const Comments = ({
     }
   };
 
+  const updateComment = (index: number, newContent: string) => {
+    const editedComment = { ...comments[index] };
+    editedComment.commentText = newContent;
+    if (releaseId && sectionId) {
+      service
+        .updateContentSectionComment(
+          releaseId,
+          sectionId,
+          contentBlockId,
+          editedComment,
+        )
+        .then(() => {
+          const newComments = [...comments];
+
+          newComments[index] = editedComment;
+
+          onCommentsChange(newComments).then(() => {
+            setComments(newComments);
+          });
+          setEditableComment('');
+          setEditableCommentText('');
+        });
+    }
+  };
+
   const ref = createRef<HTMLDivElement>();
 
   return (
@@ -193,9 +220,30 @@ const Comments = ({
                         {name} <FormattedDate>{time}</FormattedDate>
                       </strong>
                     </h2>
-                    <p className="govuk-body-xs govuk-!-margin-bottom-1">
-                      {commentText}
-                    </p>
+                    {editableComment && editableComment === id ? (
+                      <form>
+                        <textarea
+                          name="editComment"
+                          id={`edit_comment_${id}`}
+                          value={editableCommentText}
+                          onChange={e => setEditableCommentText(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className="govuk-button"
+                          disabled={editableCommentText.length === 0}
+                          onClick={() => {
+                            updateComment(index, editableCommentText);
+                          }}
+                        >
+                          Update
+                        </button>
+                      </form>
+                    ) : (
+                      <p className="govuk-body-xs govuk-!-margin-bottom-1">
+                        {commentText}
+                      </p>
+                    )}
                     {state === 'open' &&
                       (canResolve ? (
                         <button
@@ -225,13 +273,34 @@ const Comments = ({
                       <>
                         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
                         <a
-                          className="govuk-body-xs"
+                          className="govuk-body-xs govuk-!-margin-right-3"
                           role="button"
                           tabIndex={0}
                           onClick={() => removeComment(index)}
                           style={{ cursor: 'pointer' }}
                         >
                           Remove
+                        </a>
+                      </>
+                    )}
+                    {canComment && (
+                      <>
+                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                        <a
+                          className="govuk-body-xs govuk-!-margin-right-3"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => {
+                            setEditableCommentText(commentText);
+                            return editableComment
+                              ? setEditableComment('')
+                              : setEditableComment(id);
+                          }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {editableComment && editableComment === id
+                            ? 'Cancel'
+                            : 'Edit'}
                         </a>
                         <hr />
                       </>
