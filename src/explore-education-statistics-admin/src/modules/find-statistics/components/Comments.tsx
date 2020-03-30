@@ -7,7 +7,6 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import classNames from 'classnames';
 import React, { createRef, useState } from 'react';
-
 import styles from './Comments.module.scss';
 
 interface Props {
