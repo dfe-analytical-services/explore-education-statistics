@@ -163,13 +163,18 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
     setIsUploading(true);
-    await editReleaseDataService.uploadDataFiles(releaseId, {
-      subjectTitle: values.subjectTitle,
-      dataFile: values.dataFile as File,
-      metadataFile: values.metadataFile as File,
-    });
-    setIsUploading(false);
-    await resetPage(actions);
+    await editReleaseDataService
+      .uploadDataFiles(releaseId, {
+        subjectTitle: values.subjectTitle,
+        dataFile: values.dataFile as File,
+        metadataFile: values.metadataFile as File,
+      })
+      .then(() => {
+        resetPage(actions);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
   }, errorCodeMappings);
 
   const handleDelete = async (
@@ -180,9 +185,11 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     setDeleteDataFile(undefined);
     await editReleaseDataService
       .deleteDataFiles(releaseId, (deleteDataFile as DeleteDataFile).file)
+      .then(() => {
+        resetPage(form);
+      })
       .finally(() => {
         setDeleting(dataFileToDelete, false);
-        resetPage(form);
       });
   };
 
@@ -340,7 +347,6 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                         {dataFile.isDeleting && (
                           <LoadingSpinner text="Deleting files" overlay />
                         )}
-                        ;
                         <SummaryList
                           key={dataFile.filename}
                           additionalClassName="govuk-!-margin-bottom-9"
