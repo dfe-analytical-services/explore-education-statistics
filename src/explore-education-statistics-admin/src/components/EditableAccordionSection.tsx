@@ -1,4 +1,5 @@
 import styles from '@admin/components/EditableAccordionSection.module.scss';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import AccordionSection, {
   accordionSectionClasses,
   AccordionSectionProps,
@@ -16,7 +17,6 @@ import React, {
   useState,
 } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import wrapEditableComponent from '../hocs/wrapEditableComponent';
 
 export interface DraggableAccordionSectionProps {
   index: number;
@@ -30,17 +30,21 @@ export interface EditableAccordionSectionProps extends AccordionSectionProps {
   onRemoveSection?: () => void;
 }
 
-const EditableAccordionSection = ({
-  children,
-  heading,
-  id,
-  onHeadingChange,
-  onRemoveSection,
-  headerButtons,
-  headingTag = 'h2',
-  ...props
-}: EditableAccordionSectionProps) => {
-  const { index, isReordering } = props as DraggableAccordionSectionProps;
+const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
+  const {
+    children,
+    heading,
+    id,
+    onHeadingChange,
+    onRemoveSection,
+    headerButtons,
+    headingTag = 'h2',
+    ...restProps
+  } = props;
+
+  const { index, isReordering } = restProps as DraggableAccordionSectionProps;
+
+  const { isEditing } = useEditingContext();
 
   const [showRemoveModal, toggleRemoveModal] = useToggle(false);
   const [isEditingHeading, toggleEditingHeading] = useToggle(false);
@@ -114,6 +118,10 @@ const EditableAccordionSection = ({
     toggleEditingHeading,
   ]);
 
+  if (!isEditing) {
+    return <AccordionSection {...props} />;
+  }
+
   return (
     <Draggable draggableId={id} isDragDisabled={!isReordering} index={index}>
       {draggableProvided => (
@@ -183,7 +191,4 @@ const EditableAccordionSection = ({
   );
 };
 
-export default wrapEditableComponent(
-  EditableAccordionSection,
-  AccordionSection,
-);
+export default EditableAccordionSection;

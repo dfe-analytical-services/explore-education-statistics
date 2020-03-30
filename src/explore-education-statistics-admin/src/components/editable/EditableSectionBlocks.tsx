@@ -1,3 +1,4 @@
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import BlockDraggable from '@admin/modules/find-statistics/components/BlockDraggable';
 import BlockDroppable from '@admin/modules/find-statistics/components/BlockDroppable';
 import Comments, {
@@ -10,10 +11,9 @@ import SectionBlocks, {
 import reorder from '@common/utils/reorder';
 import React, { useCallback } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import wrapEditableComponent from '../../hocs/wrapEditableComponent';
 import EditableBlockRenderer from './EditableBlockRenderer';
 
-export interface Props extends SectionBlocksProps {
+export interface EditableSectionBlockProps extends SectionBlocksProps {
   content: EditableBlock[];
   sectionId: string;
   editable?: boolean;
@@ -25,18 +25,22 @@ export interface Props extends SectionBlocksProps {
   onBlockDelete: (blockId: string) => void;
 }
 
-const EditableSectionBlocks = ({
-  content = [],
-  sectionId,
-  editable = true,
-  isReordering = false,
-  allowHeadings,
-  allowComments = false,
-  getInfographic,
-  onBlockContentSave,
-  onBlockDelete,
-  onBlocksChange,
-}: Props) => {
+const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
+  const {
+    content = [],
+    sectionId,
+    editable = true,
+    isReordering = false,
+    allowHeadings,
+    allowComments = false,
+    getInfographic,
+    onBlockContentSave,
+    onBlockDelete,
+    onBlocksChange,
+  } = props;
+
+  const { isEditing } = useEditingContext();
+
   const handleDragEnd = useCallback(
     ({ source, destination }: DropResult) => {
       if (destination && onBlocksChange) {
@@ -63,6 +67,10 @@ const EditableSectionBlocks = ({
     },
     [content, onBlocksChange],
   );
+
+  if (!isEditing) {
+    return <SectionBlocks {...props} />;
+  }
 
   if (content.length === 0) {
     return (
@@ -115,4 +123,4 @@ const EditableSectionBlocks = ({
   );
 };
 
-export default wrapEditableComponent(EditableSectionBlocks, SectionBlocks);
+export default EditableSectionBlocks;

@@ -1,6 +1,8 @@
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
 import useToggle from '@common/hooks/useToggle';
+import { OmitStrict } from '@common/types';
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, {
@@ -12,26 +14,23 @@ import React, {
   useState,
 } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-import wrapEditableComponent from '../hocs/wrapEditableComponent';
 import styles from './EditableAccordion.module.scss';
 import {
   DraggableAccordionSectionProps,
   EditableAccordionSectionProps,
 } from './EditableAccordionSection';
 
-export interface EditableAccordionProps extends AccordionProps {
+export interface EditableAccordionProps
+  extends OmitStrict<AccordionProps, 'openAll'> {
   sectionName?: string;
   onAddSection: () => Promise<unknown>;
   onReorder: (sectionIds: string[]) => void;
 }
 
-const EditableAccordion = ({
-  children,
-  id,
-  sectionName,
-  onAddSection,
-  onReorder,
-}: EditableAccordionProps) => {
+const EditableAccordion = (props: EditableAccordionProps) => {
+  const { children, id, sectionName, onAddSection, onReorder } = props;
+
+  const { isEditing } = useEditingContext();
   const [isReordering, toggleReordering] = useToggle(false);
 
   const [sections, setSections] = useState<
@@ -48,7 +47,7 @@ const EditableAccordion = ({
 
   const saveOrder = useCallback(async () => {
     if (onReorder) {
-      await onReorder(sections.map(({ props }) => props.id));
+      await onReorder(sections.map(section => section.props.id));
       toggleReordering.off();
     }
   }, [onReorder, sections, toggleReordering]);
@@ -61,6 +60,10 @@ const EditableAccordion = ({
     },
     [sections],
   );
+
+  if (!isEditing) {
+    return <Accordion {...props}>{children}</Accordion>;
+  }
 
   return (
     <>
@@ -97,7 +100,7 @@ const EditableAccordion = ({
                 [styles.dragover]: snapshot.isDraggingOver && isReordering,
               })}
             >
-              <Accordion id={id} openAll={isReordering ? false : undefined}>
+              <Accordion {...props} openAll={isReordering ? false : undefined}>
                 {sections.map((child, index) => {
                   const section = child as ReactElement<
                     EditableAccordionSectionProps &
@@ -129,4 +132,4 @@ const EditableAccordion = ({
   );
 };
 
-export default wrapEditableComponent(EditableAccordion, Accordion);
+export default EditableAccordion;

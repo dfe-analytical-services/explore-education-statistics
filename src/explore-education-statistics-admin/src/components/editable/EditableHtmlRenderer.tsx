@@ -1,7 +1,7 @@
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import EditableProps from '@admin/components/editable/types/EditableProps';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import React from 'react';
-import wrapEditableComponent from '../../hocs/wrapEditableComponent';
 
 export interface EditableHtmlRendererProps extends EditableProps {
   allowHeadings?: boolean;
@@ -21,6 +21,17 @@ const EditableHtmlRenderer = ({
   onDelete,
   onSave,
 }: EditableHtmlRendererProps) => {
+  const { isEditing } = useEditingContext();
+
+  if (!isEditing) {
+    return (
+      <div
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: source }}
+      />
+    );
+  }
+
   return (
     <EditableContentBlock
       allowHeadings={allowHeadings}
@@ -35,13 +46,4 @@ const EditableHtmlRenderer = ({
   );
 };
 
-const HtmlRenderer = ({ source }: { source: string }) => {
-  return (
-    <div
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: source }}
-    />
-  );
-};
-
-export default wrapEditableComponent(EditableHtmlRenderer, HtmlRenderer);
+export default EditableHtmlRenderer;
