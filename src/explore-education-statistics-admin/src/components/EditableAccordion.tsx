@@ -46,9 +46,9 @@ const EditableAccordion = ({
     setSections(nextSections);
   }, [children, id, isReordering]);
 
-  const saveOrder = useCallback(() => {
+  const saveOrder = useCallback(async () => {
     if (onReorder) {
-      onReorder(sections.map(({ props }) => props.id as string));
+      await onReorder(sections.map(({ props }) => props.id));
       toggleReordering.off();
     }
   }, [onReorder, sections, toggleReordering]);
