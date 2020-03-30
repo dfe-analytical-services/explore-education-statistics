@@ -1,12 +1,5 @@
+import { EditingContext } from '@common/contexts/EditingContext';
 import React, { ComponentType, useContext } from 'react';
-
-export interface ReleaseContentContext {
-  isEditing: boolean;
-}
-
-export const EditingContext = React.createContext<ReleaseContentContext>({
-  isEditing: false,
-});
 
 const wrapEditableComponent = <EditableProps extends RenderProps, RenderProps>(
   EditableComponent: ComponentType<EditableProps>,

@@ -2,18 +2,18 @@ import Link from '@admin/components/Link';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import { useEditingContext } from '@common/contexts/EditingContext';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { ReleaseType } from '@common/services/publicationService';
-import React, { useContext } from 'react';
+import React from 'react';
 
 const AdminPublicationReleaseHelpAndSupportSection = ({
   release,
 }: {
   release: ManageContentPageViewModel['release'];
 }) => {
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
   const { publication } = release;
   return (
     <>

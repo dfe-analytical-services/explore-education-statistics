@@ -7,10 +7,10 @@ import {
   EditableRelease,
 } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { useEditingContext } from '@common/contexts/EditingContext';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React, { memo, useCallback, useContext, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import AddDataBlockButton from './AddDataBlockButton';
 
 export interface ReleaseContentAccordionSectionProps {
@@ -24,7 +24,7 @@ const ReleaseContentAccordionSection = ({
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   ...props
 }: ReleaseContentAccordionSectionProps) => {
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
 
   const {
     addContentSectionBlock,

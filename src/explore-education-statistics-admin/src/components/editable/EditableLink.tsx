@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
 import Link, { LinkProps } from '@admin/components/Link';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import Button from '@common/components/Button';
+import { useEditingContext } from '@common/contexts/EditingContext';
+import React from 'react';
 
 interface Props extends LinkProps {
   to: string;
@@ -14,7 +14,7 @@ const EditableLink = ({
   children,
   ...props
 }: Props) => {
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
 
   return !isEditing ? (
     <Link

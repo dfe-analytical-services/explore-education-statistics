@@ -1,14 +1,14 @@
 import EditableBlockRenderer from '@admin/components/editable/EditableBlockRenderer';
 import ManageReleaseContext from '@admin/pages/release/ManageReleaseContext';
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { EditingContext as EditingContext1 } from '@common/contexts/EditingContext';
 import { render } from '@testing-library/react';
 import React from 'react';
 
 describe('EditableBlockRenderer', () => {
   test('renders non-editable Markdown block correctly', () => {
     const { container } = render(
-      <EditingContext.Provider
+      <EditingContext1
         value={{
           isEditing: true,
         }}
@@ -31,7 +31,7 @@ describe('EditableBlockRenderer', () => {
             onContentChange={async () => {}}
           />
         </ManageReleaseContext.Provider>
-      </EditingContext.Provider>,
+      </EditingContext1>,
     );
 
     expect(container.innerHTML).toMatchSnapshot();
@@ -39,7 +39,7 @@ describe('EditableBlockRenderer', () => {
 
   test('renders editable Markdown block correctly', () => {
     const { container } = render(
-      <EditingContext.Provider
+      <EditingContext1
         value={{
           isEditing: true,
         }}
@@ -64,7 +64,7 @@ describe('EditableBlockRenderer', () => {
             onContentChange={async () => {}}
           />
         </ManageReleaseContext.Provider>
-      </EditingContext.Provider>,
+      </EditingContext1>,
     );
 
     expect(container.innerHTML).toMatchSnapshot();

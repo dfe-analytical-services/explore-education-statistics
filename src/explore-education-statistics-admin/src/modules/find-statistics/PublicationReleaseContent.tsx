@@ -14,14 +14,14 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { useEditingContext } from '@common/contexts/EditingContext';
+import React, { useCallback, useMemo, useState } from 'react';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
 
 const PublicationReleaseContent = () => {
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
   const { release } = useReleaseState();
   const {
     addContentSectionBlock,

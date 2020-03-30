@@ -9,7 +9,7 @@ import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { useEditingContext } from '@common/contexts/EditingContext';
 import { ReleaseNote } from '@common/services/publicationService';
 import {
   dateToDayMonthYear,
@@ -19,7 +19,7 @@ import {
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import merge from 'lodash/merge';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
@@ -56,7 +56,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
   const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>(
     release.updates,
   );
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
 
   const addReleaseNote = (releaseNote: AddFormValues) => {
     return new Promise(resolve => {

@@ -10,11 +10,11 @@ import {
   FormFieldTextInput,
   Formik,
 } from '@common/components/form';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { useEditingContext } from '@common/contexts/EditingContext';
 import { BasicLink } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   release: ManageContentPageViewModel['release'];
@@ -24,7 +24,7 @@ const RelatedInformationSection = ({ release }: Props) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
     return new Promise(resolve => {

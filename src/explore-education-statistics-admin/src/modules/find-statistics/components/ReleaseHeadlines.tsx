@@ -7,9 +7,9 @@ import {
 } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import TabsSection from '@common/components/TabsSection';
+import { useEditingContext } from '@common/contexts/EditingContext';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
 import KeyStatistics from './KeyStatistics';
 
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const ReleaseHeadlines = ({ release }: Props) => {
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
   const {
     addContentSectionBlock,
     deleteContentSectionBlock,

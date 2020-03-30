@@ -1,9 +1,9 @@
 import EditableAccordion from '@admin/components/EditableAccordion';
 import { MethodologyContent } from '@admin/services/methodology/types';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { useEditingContext } from '@common/contexts/EditingContext';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback } from 'react';
 import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
 import MethodologyAccordionSection from './MethodologyAccordionSection';
@@ -19,7 +19,7 @@ const MethodologyAccordion = ({
   methodology,
   id = `methodologyAccordion-${sectionKey}`,
 }: MethodologyAccordionProps) => {
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
   const {
     addContentSection,
     updateContentSectionsOrder,

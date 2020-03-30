@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import { useEditingContext } from '@common/contexts/EditingContext';
 import { PublicationContact } from '@common/services/publicationService';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import React from 'react';
 
 const ContactUsSection = ({
   publicationContact,
@@ -9,7 +9,7 @@ const ContactUsSection = ({
   publicationContact: PublicationContact;
   themeTitle: string;
 }) => {
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
   return (
     <>
       <p>
