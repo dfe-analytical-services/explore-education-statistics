@@ -1,4 +1,4 @@
-import { EditingContext } from '@common/contexts/EditingContext';
+import { EditingContext } from '@admin/contexts/EditingContext';
 import React, { ComponentType, useContext } from 'react';
 
 const wrapEditableComponent = <EditableProps extends RenderProps, RenderProps>(

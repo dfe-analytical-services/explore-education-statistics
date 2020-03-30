@@ -1,8 +1,8 @@
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import EditableProps from '@admin/components/editable/types/EditableProps';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import wrapEditableComponent from '../../hocs/wrapEditableComponent';
 
 export interface EditableMarkdownRendererProps extends EditableProps {
   allowHeadings?: boolean;

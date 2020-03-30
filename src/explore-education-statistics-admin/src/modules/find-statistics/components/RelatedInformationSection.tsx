@@ -1,5 +1,6 @@
 import EditableLink from '@admin/components/editable/EditableLink';
 import Link from '@admin/components/Link';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { relatedInformationService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Button from '@common/components/Button';
@@ -10,7 +11,6 @@ import {
   FormFieldTextInput,
   Formik,
 } from '@common/components/form';
-import { useEditingContext } from '@common/contexts/EditingContext';
 import { BasicLink } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';

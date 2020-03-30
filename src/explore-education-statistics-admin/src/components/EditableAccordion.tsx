@@ -1,7 +1,6 @@
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
 import useToggle from '@common/hooks/useToggle';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, {
@@ -13,6 +12,7 @@ import React, {
   useState,
 } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
+import wrapEditableComponent from '../hocs/wrapEditableComponent';
 import styles from './EditableAccordion.module.scss';
 import {
   DraggableAccordionSectionProps,

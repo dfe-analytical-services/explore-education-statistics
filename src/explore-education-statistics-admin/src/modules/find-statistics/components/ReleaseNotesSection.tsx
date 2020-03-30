@@ -1,3 +1,4 @@
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
@@ -9,7 +10,6 @@ import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
-import { useEditingContext } from '@common/contexts/EditingContext';
 import { ReleaseNote } from '@common/services/publicationService';
 import {
   dateToDayMonthYear,

@@ -1,8 +1,8 @@
 import Link from '@admin/components/Link';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import { useEditingContext } from '@common/contexts/EditingContext';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import { ReleaseType } from '@common/services/publicationService';

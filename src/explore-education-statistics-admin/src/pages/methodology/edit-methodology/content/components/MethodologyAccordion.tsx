@@ -1,6 +1,6 @@
 import EditableAccordion from '@admin/components/EditableAccordion';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { MethodologyContent } from '@admin/services/methodology/types';
-import { useEditingContext } from '@common/contexts/EditingContext';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback } from 'react';

@@ -1,11 +1,11 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import EditableAccordionSection from '@admin/components/EditableAccordionSection';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import {
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
-import { useEditingContext } from '@common/contexts/EditingContext';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { memo, useCallback, useState } from 'react';

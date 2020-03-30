@@ -7,7 +7,6 @@ import Button from '@common/components/Button';
 import { FormTextInput } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, {
   createElement,
@@ -17,6 +16,7 @@ import React, {
   useState,
 } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import wrapEditableComponent from '../hocs/wrapEditableComponent';
 
 export interface DraggableAccordionSectionProps {
   index: number;

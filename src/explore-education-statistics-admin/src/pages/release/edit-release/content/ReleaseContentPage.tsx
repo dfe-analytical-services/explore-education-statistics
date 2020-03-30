@@ -1,3 +1,4 @@
+import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { ReleaseRouteParams } from '@admin/routes/edit-release/routes';
 import permissionService from '@admin/services/permissions/permissionService';
@@ -11,7 +12,6 @@ import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import { EditingContextProvider } from '@common/contexts/EditingContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';

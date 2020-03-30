@@ -7,10 +7,10 @@ import { EditableBlock } from '@admin/services/publicationService';
 import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import reorder from '@common/utils/reorder';
 import React, { useCallback } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import wrapEditableComponent from '../../hocs/wrapEditableComponent';
 import EditableBlockRenderer from './EditableBlockRenderer';
 
 export interface Props extends SectionBlocksProps {

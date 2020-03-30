@@ -1,4 +1,3 @@
-import { useEditingContext } from '@common/contexts/EditingContext';
 import { PublicationContact } from '@common/services/publicationService';
 import React from 'react';
 
@@ -9,7 +8,6 @@ const ContactUsSection = ({
   publicationContact: PublicationContact;
   themeTitle: string;
 }) => {
-  const { isEditing } = useEditingContext();
   return (
     <>
       <p>
@@ -20,13 +18,9 @@ const ContactUsSection = ({
       </h4>
       <p className="govuk-!-margin-top-0">
         Email <br />
-        {isEditing ? (
-          <a>{publicationContact.teamEmail}</a>
-        ) : (
-          <a href={`mailto:${publicationContact.teamEmail}`}>
-            {publicationContact.teamEmail}
-          </a>
-        )}
+        <a href={`mailto:${publicationContact.teamEmail}`}>
+          {publicationContact.teamEmail}
+        </a>
       </p>
       <p>
         Telephone: {publicationContact.contactName} <br />{' '}

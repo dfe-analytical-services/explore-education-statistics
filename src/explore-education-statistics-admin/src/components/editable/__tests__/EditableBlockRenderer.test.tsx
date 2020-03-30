@@ -1,7 +1,7 @@
 import EditableBlockRenderer from '@admin/components/editable/EditableBlockRenderer';
+import { EditingContext as EditingContext1 } from '@admin/contexts/EditingContext';
 import ManageReleaseContext from '@admin/pages/release/ManageReleaseContext';
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import { EditingContext as EditingContext1 } from '@common/contexts/EditingContext';
 import { render } from '@testing-library/react';
 import React from 'react';
 

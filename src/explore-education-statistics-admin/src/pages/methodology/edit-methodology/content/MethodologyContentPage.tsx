@@ -1,8 +1,8 @@
+import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import { FormFieldset, FormRadioGroup } from '@common/components/form';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
-import { EditingContextProvider } from '@common/contexts/EditingContext';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import MethodologyAccordion from './components/MethodologyAccordion';

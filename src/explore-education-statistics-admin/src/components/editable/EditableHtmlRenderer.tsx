@@ -1,7 +1,7 @@
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import EditableProps from '@admin/components/editable/types/EditableProps';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import React from 'react';
+import wrapEditableComponent from '../../hocs/wrapEditableComponent';
 
 export interface EditableHtmlRendererProps extends EditableProps {
   allowHeadings?: boolean;
