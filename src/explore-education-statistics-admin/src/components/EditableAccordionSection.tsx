@@ -47,9 +47,9 @@ const EditableAccordionSection = ({
 
   const [newHeading, setNewHeading] = useState(heading);
 
-  const saveHeading = useCallback(() => {
+  const saveHeading = useCallback(async () => {
     if (isEditingHeading && onHeadingChange && newHeading !== heading) {
-      onHeadingChange(newHeading);
+      await onHeadingChange(newHeading);
     }
 
     toggleEditingHeading.off();
@@ -75,9 +75,17 @@ const EditableAccordionSection = ({
           onClick={e => {
             e.stopPropagation();
           }}
-          onKeyPress={e => {
-            if (e.key === 'Enter') saveHeading();
-            if (e.key === 'Esc') toggleEditingHeading.off();
+          onKeyPress={async e => {
+            switch (e.key) {
+              case 'Enter':
+                await saveHeading();
+                break;
+              case 'Esc':
+                toggleEditingHeading.off();
+                break;
+              default:
+                break;
+            }
           }}
         />
       );

@@ -43,9 +43,9 @@ const PublicationReleaseContent = () => {
     return 0;
   }, [release]);
 
-  const addSummaryBlock = useCallback(() => {
+  const addSummaryBlock = useCallback(async () => {
     if (release)
-      addContentSectionBlock({
+      await addContentSectionBlock({
         releaseId: release.id,
         sectionId: release.summarySection.id,
         sectionKey: 'summarySection',
@@ -58,9 +58,9 @@ const PublicationReleaseContent = () => {
   }, [release, addContentSectionBlock]);
 
   const summaryBlockUpdate = useCallback(
-    (blockId, bodyContent) => {
+    async (blockId, bodyContent) => {
       if (release)
-        updateContentSectionBlock({
+        await updateContentSectionBlock({
           releaseId: release.id,
           sectionId: release.summarySection.id,
           blockId,
@@ -72,9 +72,9 @@ const PublicationReleaseContent = () => {
   );
 
   const summaryBlockDelete = useCallback(
-    (blockId: string) => {
+    async (blockId: string) => {
       if (release)
-        deleteContentSectionBlock({
+        await deleteContentSectionBlock({
           releaseId: release.id,
           sectionId: release.summarySection.id,
           blockId,
