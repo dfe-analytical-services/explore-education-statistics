@@ -340,7 +340,6 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                         {dataFile.isDeleting && (
                           <LoadingSpinner text="Deleting files" overlay />
                         )}
-                        ;
                         <SummaryList
                           key={dataFile.filename}
                           additionalClassName="govuk-!-margin-bottom-9"
