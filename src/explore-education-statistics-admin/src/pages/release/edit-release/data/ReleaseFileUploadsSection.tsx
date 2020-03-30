@@ -2,7 +2,6 @@ import useFormSubmit from '@admin/hooks/useFormSubmit';
 import permissionService from '@admin/services/permissions/permissionService';
 import editReleaseDataService, {
   AncillaryFile,
-  DataFile,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -85,12 +84,18 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
     setIsUploading(true);
-    await editReleaseDataService.uploadAncillaryFile(releaseId, {
-      name: values.name,
-      file: values.file as File,
-    });
-    setIsUploading(false);
-    await resetPage(actions);
+    await editReleaseDataService
+      .uploadAncillaryFile(releaseId, {
+        name: values.name,
+        file: values.file as File,
+      })
+      .then(() => {
+        setIsUploading(false);
+        resetPage(actions);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
   }, errorCodeMappings);
 
   const setDeleting = (ancillaryFile: string, deleting: boolean) => {
@@ -114,9 +119,12 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
     setDeleteFileName('');
     await editReleaseDataService
       .deleteAncillaryFile(releaseId, deleteFileName)
-      .finally(() => {
+      .then(() => {
         setDeleting(ancillaryFileToDelete, false);
         resetPage(form);
+      })
+      .finally(() => {
+        setDeleting(ancillaryFileToDelete, false);
       });
   };
 

@@ -326,7 +326,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<UserManager<ApplicationUser>> UserManager) mocks)
         {
             return new ReleasesController(
-                mocks.ImportService.Object,
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.ImportStatusService.Object,
