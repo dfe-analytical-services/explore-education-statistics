@@ -1,3 +1,4 @@
+import FigureFootnotes from '@common/components/FigureFootnotes';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
@@ -24,7 +25,9 @@ const DynamicMapBlock = dynamic(
   },
 );
 
-export type ChartRendererProps =
+export type ChartRendererProps = {
+  source?: string;
+} & (
   | ({
       type: 'line';
     } & LineChartProps)
@@ -39,9 +42,10 @@ export type ChartRendererProps =
     } & MapBlockProps)
   | ({
       type: 'infographic';
-    } & InfographicChartProps);
+    } & InfographicChartProps)
+);
 
-function ChartRenderer({ title, ...props }: ChartRendererProps) {
+function ChartRenderer({ title, source, ...props }: ChartRendererProps) {
   const { data, meta } = props;
 
   const [legendProps, setLegendProps] = useState<LegendProps>();
@@ -83,8 +87,8 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
 
   if (data && meta && data.result.length > 0) {
     return (
-      <>
-        {title && <h3 className="govuk-heading-s">{title}</h3>}
+      <figure className="govuk-!-margin-0">
+        {title && <figcaption className="govuk-heading-s">{title}</figcaption>}
 
         {props.type !== 'infographic' && props.legend === 'top' && legendProps && (
           <div className="govuk-!-margin-bottom-6">
@@ -101,7 +105,11 @@ function ChartRenderer({ title, ...props }: ChartRendererProps) {
               <DefaultLegendContent {...legendProps} />
             </div>
           )}
-      </>
+
+        <FigureFootnotes footnotes={meta.footnotes} />
+
+        {source && <p className="govuk-body-s">Source: {source}</p>}
+      </figure>
     );
   }
 

@@ -1,5 +1,6 @@
 import ChartBuilder from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import mapFullTable from '@admin/pages/release/edit-release/manage-datablocks/util/mapFullTable';
+import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablocks/service';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -12,18 +13,16 @@ import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/table-tool/utils/tableHeaders';
 import dataBlockService, {
-  DataBlock,
-  DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Chart } from '@common/services/publicationService';
+import { Chart, DataBlockRequest } from '@common/services/types/blocks';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface Props {
-  dataBlock: DataBlock;
+  dataBlock: ReleaseDataBlock;
   dataBlockResponse: DataBlockResponse;
-  onDataBlockSave: (dataBlock: DataBlock) => void;
+  onDataBlockSave: (dataBlock: ReleaseDataBlock) => void;
 }
 
 const DataBlockContentTabs = ({
@@ -80,7 +79,7 @@ const DataBlockContentTabs = ({
   }, [dataBlock.tables, chartBuilderData]);
 
   const onChartSave = (props: ChartRendererProps) => {
-    const newDataBlock: DataBlock = {
+    const newDataBlock: ReleaseDataBlock = {
       ...dataBlock,
       charts: [props],
     };

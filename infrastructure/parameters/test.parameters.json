@@ -34,6 +34,9 @@
     },
     "detailedErrors": {
       "value": true
+    },
+    "publicAppGATrackingId": {
+      "value": "UA-139424173-3"
     }
   }
 }

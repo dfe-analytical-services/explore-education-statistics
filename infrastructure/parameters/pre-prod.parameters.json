@@ -34,6 +34,12 @@
     },
     "dataApiUrl": {
       "value": "s101p02-as-ees-data.azurewebsites.net"
+    },
+    "publicAppGATrackingId": {
+      "value": "UA-139424173-4"
+    },
+    "publicAppHotjarId": {
+      "value": "1341531"
     }
   }
 }

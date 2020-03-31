@@ -1,15 +1,15 @@
-import { dataApi } from '@common/services/api';
-import { Dictionary, PartialRecord } from '@common/types/util';
-import { Feature, Geometry } from 'geojson';
 import {
   FilterOption,
   IndicatorOption,
   LocationLevelKeys,
   PublicationSubjectMeta,
-  TableDataQuery,
   TimePeriodOption,
 } from '@common/modules/table-tool/services/tableBuilderService';
-import { Table, Chart, Summary } from '@common/services/publicationService';
+import { dataApi } from '@common/services/api';
+import { DataBlockRequest } from '@common/services/types/blocks';
+import { Footnote } from '@common/services/types/footnotes';
+import { Dictionary, PartialRecord } from '@common/types/util';
+import { Feature, Geometry } from 'geojson';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -107,11 +107,6 @@ export interface BoundaryLevel {
   label: string;
 }
 
-export interface FootnoteMetadata {
-  id: string;
-  label: string;
-}
-
 export interface DataBlockMetadata {
   filters: PublicationSubjectMeta['filters'];
   indicators: Dictionary<LabelValueUnitMetadata>;
@@ -120,7 +115,7 @@ export interface DataBlockMetadata {
   timePeriod: Dictionary<TimePeriodOptionMetadata>;
   publicationName: string;
   subjectName: string;
-  footnotes: FootnoteMetadata[];
+  footnotes: Footnote[];
   geoJsonAvailable: boolean;
 }
 
@@ -128,28 +123,11 @@ export interface DataBlockRerequest {
   boundaryLevel?: number;
 }
 
-export interface DataBlock {
-  id?: string;
-  order?: number;
-  type?: 'DataBlock';
-
-  heading?: string;
-  name?: string;
-  source?: string;
-
-  dataBlockRequest: DataBlockRequest;
-  charts?: Chart[];
-  tables?: Table[];
-  summary?: Summary;
-}
-
-export type DataBlockRequest = TableDataQuery;
-
 export interface DataBlockResponse extends DataBlockData {
   metaData: DataBlockMetadata;
 }
 
-const DataBlockService = {
+const dataBlockService = {
   async getDataBlockForSubject(
     request: DataBlockRequest,
   ): Promise<DataBlockResponse | undefined> {
@@ -161,4 +139,4 @@ const DataBlockService = {
   },
 };
 
-export default DataBlockService;
+export default dataBlockService;

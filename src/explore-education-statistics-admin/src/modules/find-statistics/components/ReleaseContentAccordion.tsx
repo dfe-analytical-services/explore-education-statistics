@@ -1,14 +1,9 @@
 import Accordion from '@admin/components/EditableAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import {
-  EditableContentBlock,
-  EditableRelease,
-} from '@admin/services/publicationService';
-import { AbstractRelease } from '@common/services/publicationService';
+import { EditableRelease } from '@admin/services/publicationService';
+import orderBy from 'lodash/orderBy';
 import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
-
-export type ContentType = AbstractRelease<EditableContentBlock>['content'][0];
 
 interface ReleaseContentAccordionProps {
   accordionId: string;
@@ -46,12 +41,11 @@ const ReleaseContentAccordion = ({
   return (
     <Accordion
       id={accordionId}
-      canReorder
       sectionName={sectionName}
       onSaveOrder={reorderAccordionSections}
       onAddSection={addAccordionSection}
     >
-      {release.content.map((accordionSection, index) => (
+      {orderBy(release.content, 'order').map((accordionSection, index) => (
         <ReleaseContentAccordionSection
           release={release}
           id={accordionSection.id}

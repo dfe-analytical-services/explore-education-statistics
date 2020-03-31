@@ -1,17 +1,21 @@
-import ContentBlocks from '@admin/components/editable/EditableContentBlocks';
+import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
-import { ContentType } from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { EditableRelease } from '@admin/services/publicationService';
+import {
+  EditableBlock,
+  EditableRelease,
+} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
-import React, { useCallback, useState } from 'react';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import { ContentSection } from '@common/services/publicationService';
+import React, { useCallback, useContext, useState } from 'react';
 import AddDataBlockButton from './AddDataBlockButton';
 
 export interface ReleaseContentAccordionSectionProps {
   id: string;
-  contentItem: ContentType;
+  contentItem: ContentSection<EditableBlock>;
   index: number;
   onHeadingChange?: EditableAccordionSectionProps['onHeadingChange'];
   onRemoveSection?: EditableAccordionSectionProps['onRemoveSection'];
@@ -29,6 +33,7 @@ const ReleaseContentAccordionSection = ({
   canAddBlocks = true,
   ...restOfProps
 }: ReleaseContentAccordionSectionProps) => {
+  const { isEditing } = useContext(EditingContext);
   const { caption, heading } = contentItem;
   const { content: sectionContent = [] } = contentItem;
   const [isReordering, setIsReordering] = useState(false);
@@ -46,7 +51,7 @@ const ReleaseContentAccordionSection = ({
       sectionId,
       sectionKey: 'content',
       block: {
-        type: 'MarkdownBlock',
+        type: 'MarkDownBlock',
         order: sectionContent.length,
         body: '',
       },
@@ -54,13 +59,13 @@ const ReleaseContentAccordionSection = ({
   }, [release.id, sectionId, sectionContent.length, addContentSectionBlock]);
 
   const attachDataBlockToAccordionSection = useCallback(
-    (datablockId: string) => {
+    (contentBlockId: string) => {
       attachContentSectionBlock({
         releaseId: release.id,
         sectionId,
         sectionKey: 'content',
         block: {
-          contentBlockId: datablockId,
+          contentBlockId,
           order: sectionContent.length,
         },
       });
@@ -124,8 +129,7 @@ const ReleaseContentAccordionSection = ({
       }
       {...restOfProps}
     >
-      <ContentBlocks
-        id={`${heading}-content`}
+      <EditableSectionBlocks
         isReordering={isReordering}
         sectionId={sectionId}
         onBlockSaveOrder={reorderBlocksInAccordionSection}
@@ -136,7 +140,7 @@ const ReleaseContentAccordionSection = ({
         insideAccordion
       />
 
-      {!isReordering && canAddBlocks && (
+      {isEditing && !isReordering && canAddBlocks && (
         <div className="govuk-!-margin-bottom-8 dfe-align--center">
           <Button variant="secondary" onClick={addBlockToAccordionSection}>
             Add text block

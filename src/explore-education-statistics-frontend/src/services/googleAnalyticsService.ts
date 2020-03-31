@@ -4,11 +4,7 @@ let initialised = false;
 
 export const googleAnalyticsCookies = ['_ga', '_gid', '_gat'];
 
-if (
-  process.env.GA_TRACKING_ID !== undefined &&
-  process.env.GA_TRACKING === 'true' &&
-  !initialised
-) {
+if (process.env.GA_TRACKING_ID && !initialised) {
   ReactGA.initialize(process.env.GA_TRACKING_ID);
   initialised = true;
 

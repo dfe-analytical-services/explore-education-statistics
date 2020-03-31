@@ -99,23 +99,20 @@ function generateAxesMetaData(
   );
 }
 
-const emptyMetadata = {
-  timePeriod: {},
-  filters: {},
-  indicators: {},
-  locations: {},
-};
-
 const ChartBuilder = ({
   data,
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
 }: Props) => {
-  const metaData = useMemo(
-    () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
-    [data.metaData],
-  );
+  const metaData: ChartMetaData = useMemo(() => {
+    return {
+      ...parseMetaData(data.metaData),
+      // Don't bother showing footnotes as
+      // this uses up valuable screen space.
+      footnotes: [],
+    };
+  }, [data.metaData]);
 
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
     initialConfiguration,
