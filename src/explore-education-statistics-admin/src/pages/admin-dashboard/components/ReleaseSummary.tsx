@@ -49,16 +49,22 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
             {release.published || release.publishScheduled}
           </FormattedDate>
         </SummaryListItem>
-        <SummaryListItem term="Next release date">
-          {dayMonthYearIsComplete(release.nextReleaseDate) && (
-            <FormattedDate>
-              {dayMonthYearToDate(release.nextReleaseDate)}
-            </FormattedDate>
-          )}
-        </SummaryListItem>
-        <SummaryListItem term="Release process status">
-          <ReleaseServiceStatus releaseId={release.id} />
-        </SummaryListItem>
+        {(release.nextReleaseDate.day ||
+          release.nextReleaseDate.month ||
+          release.nextReleaseDate.year) && (
+          <SummaryListItem term="Next release date">
+            {dayMonthYearIsComplete(release.nextReleaseDate) && (
+              <FormattedDate>
+                {dayMonthYearToDate(release.nextReleaseDate)}
+              </FormattedDate>
+            )}
+          </SummaryListItem>
+        )}
+        {release.status === 'Approved' && (
+          <SummaryListItem term="Release process status">
+            <ReleaseServiceStatus releaseId={release.id} />
+          </SummaryListItem>
+        )}
         <SummaryListItem term="Lead statistician">
           {release.contact && (
             <span>
