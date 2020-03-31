@@ -56,7 +56,7 @@ class PublicationReleasePage extends Component<Props> {
   }
 
   public render() {
-    const { data, publication } = this.props;
+    const { data } = this.props;
 
     const releaseCount =
       data.publication.otherReleases.length +
