@@ -72,7 +72,7 @@ Add key statistics summary content to release
     [Tags]  HappyPath
     user clicks element   xpath://button[text()="Add a headlines text block"]
     user waits until page contains element  xpath://p[text()="This section is empty"]
-    user clicks element   xpath://section[@id="headlines"]//span[text()="Edit"]
+    user clicks element   xpath://section[@id="releaseHeadlines-headlines"]//span[text()="Edit"]
     user presses keys   Test key statistics summary text for Manage content test %{RUN_IDENTIFIER}
     user clicks element  xpath://button[text()="Save"]
 

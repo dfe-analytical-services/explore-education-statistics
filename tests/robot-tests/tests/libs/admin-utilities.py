@@ -34,9 +34,9 @@ def user_changes_accordion_section_title(num, new_title):
         raise AssertionError(f'Cannot open accordion section number "{num}"')
 
     try:
-        elem.find_element_by_xpath('.//button[.="Edit title"]').click()
+        elem.find_element_by_xpath('.//button[.="Edit section title"]').click()
     except:
-        raise AssertionError('Cannot click "Edit title" button!')
+        raise AssertionError('Cannot click "Edit section title" button!')
 
     try:
         elem.find_element_by_xpath('.//input[@id="heading"]').clear()
@@ -49,9 +49,9 @@ def user_changes_accordion_section_title(num, new_title):
         raise AssertionError('Failed to press keys!?!')
 
     try:
-        elem.find_element_by_xpath('.//button[.="Save title"]').click()
+        elem.find_element_by_xpath('.//button[.="Save section title"]').click()
     except:
-        raise AssertionError('Cannot click "Save title" button!')
+        raise AssertionError('Cannot click "Save section title" button!')
 
     try:
         elem.find_element_by_xpath('.//h2[@class="govuk-accordion__section-heading"]').click()
