@@ -12,7 +12,22 @@ interface Props {
 }
 
 export interface ReleaseStatus {
-  overallStage: string;
+  releaseId?: string;
+  dataStage?: string;
+  contentStage?: string;
+  filesStage?: string;
+  publishingStage?: string;
+  overallStage:
+    | 'Scheduled'
+    | 'NotStarted'
+    | 'Invalid'
+    | 'Failed'
+    | 'Cancelled'
+    | 'Validating'
+    | 'Queued'
+    | 'Started'
+    | 'Complete';
+  lastUpdated?: string;
 }
 
 const ReleaseServiceStatus = ({
@@ -118,9 +133,9 @@ const ReleaseServiceStatus = ({
       )}
 
       {currentStatus &&
-        currentStatus.overallStage !== 'Validating' &&
-        currentStatus.overallStage !== 'Scheduled' &&
-        currentStatus.overallStage !== 'Invalid' &&
+        !['Validating', 'Scheduled', 'Invalid'].includes(
+          currentStatus.overallStage,
+        ) &&
         exclude !== 'details' && (
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
