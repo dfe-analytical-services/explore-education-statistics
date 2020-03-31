@@ -7,7 +7,7 @@ import { OmitStrict } from '@common/types';
 import React from 'react';
 
 export interface SectionBlocksProps
-  extends OmitStrict<DataBlockRendererProps, 'id'> {
+  extends OmitStrict<DataBlockRendererProps, 'id' | 'dataBlock'> {
   content: Block[];
 }
 

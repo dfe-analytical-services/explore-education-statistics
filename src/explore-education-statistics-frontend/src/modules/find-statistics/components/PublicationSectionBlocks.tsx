@@ -1,23 +1,25 @@
 import ButtonLink from '@common/components/ButtonLink';
+import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';
-import { Publication } from '@common/services/publicationService';
-import { OmitStrict } from '@common/types';
+import { Release } from '@common/services/publicationService';
 import React from 'react';
 
-export interface PublicationSectionBlocksProps
-  extends OmitStrict<SectionBlocksProps, 'getInfographic'> {
-  publication: Publication;
+export interface PublicationSectionBlocksProps extends SectionBlocksProps {
+  release: Release;
 }
 
 const PublicationSectionBlocks = ({
-  publication,
+  release: { slug, publication },
   ...props
 }: PublicationSectionBlocksProps) => {
+  const getChartFile = useGetChartFile(publication.slug, slug);
+
   return (
     <SectionBlocks
       {...props}
+      getInfographic={getChartFile}
       additionalTabContent={
         <div className="dfe-print-hidden">
           <h2 className="govuk-heading-m govuk-!-margin-top-9">

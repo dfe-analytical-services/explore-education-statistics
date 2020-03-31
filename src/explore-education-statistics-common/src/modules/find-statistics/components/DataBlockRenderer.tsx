@@ -25,7 +25,6 @@ export interface DataBlockRendererProps {
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
   id: string;
-  releaseId?: string;
   onToggle?: (section: { id: string; title: string }) => void;
   onSummaryDetailsToggle?: (
     isOpened: boolean,
@@ -40,7 +39,6 @@ const DataBlockRenderer = ({
   lastTabs,
   getInfographic,
   id,
-  releaseId,
   onToggle,
 }: DataBlockRendererProps) => {
   const { value: dataBlockResponse, isLoading } = useDataBlockQuery(dataBlock);
@@ -102,7 +100,6 @@ const DataBlockRenderer = ({
                     data={dataBlockResponse}
                     meta={parseMetaData(dataBlockResponse.metaData)}
                     source={dataBlock?.source}
-                    releaseId={releaseId}
                     getInfographic={getInfographic}
                   />
                 );

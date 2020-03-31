@@ -5,6 +5,7 @@ import {
   ChartDefinition,
   ChartProps,
   ChartSymbol,
+  RenderLegend,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
@@ -72,7 +73,7 @@ const LineChartBlock = ({
   legend,
   width,
   renderLegend,
-}: LineChartProps) => {
+}: LineChartProps & RenderLegend) => {
   if (
     axes === undefined ||
     axes.major === undefined ||

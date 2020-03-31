@@ -56,7 +56,7 @@ class PublicationReleasePage extends Component<Props> {
   }
 
   public render() {
-    const { data } = this.props;
+    const { data, publication } = this.props;
 
     const releaseCount =
       data.publication.otherReleases.length +
@@ -323,12 +323,7 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        <PublicationReleaseHeadlinesSection
-          releaseId={data.id}
-          keyStatisticsSection={data.keyStatisticsSection}
-          headlinesSection={data.headlinesSection}
-          keyStatisticsSecondarySection={data.keyStatisticsSecondarySection}
-        />
+        <PublicationReleaseHeadlinesSection release={data} />
 
         {data.content.length > 0 && (
           <Accordion id={this.accId[0]}>
@@ -341,7 +336,7 @@ class PublicationReleasePage extends Component<Props> {
                 >
                   <PublicationSectionBlocks
                     content={content}
-                    publication={data.publication}
+                    release={data}
                     onToggle={(section: { id: string; title: string }) => {
                       logEvent(
                         'Publication Release Data Tabs',

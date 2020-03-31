@@ -1,7 +1,7 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
+import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableRelease } from '@admin/services/publicationService';
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import TabsSection from '@common/components/TabsSection';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
@@ -21,6 +21,8 @@ const ReleaseHeadlines = ({ release }: Props) => {
     deleteContentSectionBlock,
     updateContentSectionBlock,
   } = useReleaseActions();
+
+  const getChartFile = useGetChartFile(release.id);
 
   const addHeadlinesBlock = useCallback(() => {
     addContentSectionBlock({
@@ -75,8 +77,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
       <DataBlockRenderer
         id="releaseHeadlines-dataBlock"
         dataBlock={release.keyStatisticsSecondarySection.content[0]}
-        releaseId={release.id}
-        getInfographic={editReleaseDataService.downloadChartFile}
+        getInfographic={getChartFile}
         firstTabs={
           <TabsSection title="Headlines">
             <section id="releaseHeadlines-keyStatistics">

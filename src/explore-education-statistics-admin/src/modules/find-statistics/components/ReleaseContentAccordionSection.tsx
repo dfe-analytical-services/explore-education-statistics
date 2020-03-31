@@ -2,6 +2,7 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import AccordionSection, {
   EditableAccordionSectionProps,
 } from '@admin/components/EditableAccordionSection';
+import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import {
   EditableBlock,
@@ -44,6 +45,8 @@ const ReleaseContentAccordionSection = ({
     updateContentSectionBlock,
     updateSectionBlockOrder,
   } = useReleaseActions();
+
+  const getChartFile = useGetChartFile(release.id);
 
   const addBlockToAccordionSection = useCallback(() => {
     addContentSectionBlock({
@@ -132,6 +135,7 @@ const ReleaseContentAccordionSection = ({
       <EditableSectionBlocks
         isReordering={isReordering}
         sectionId={sectionId}
+        getInfographic={getChartFile}
         onBlockSaveOrder={reorderBlocksInAccordionSection}
         onBlockContentChange={updateBlockInAccordionSection}
         onBlockDelete={removeBlockFromAccordionSection}
