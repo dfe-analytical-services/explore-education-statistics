@@ -17,25 +17,24 @@ export default function useLoggedReducer<S, A>(
 ): [S, Dispatch<A>] {
   const cachedReducer = useCallback(
     (state: S, action: A) => {
+      logger.debugGroup(`${name} reducer:`);
       logger.debug(
-        `%c[${name}] Previous State:`,
+        '%cPrevious State:',
         'color: #9E9E9E; font-weight: 700;',
         state,
       );
 
-      logger.debug(
-        `%c[${name}] Action:`,
-        'color: #00A7F7; font-weight: 700;',
-        action,
-      );
+      logger.debug('%cAction:', 'color: #00A7F7; font-weight: 700;', action);
 
       const nextState = reducer(state, action);
 
       logger.debug(
-        `%c[${name}] Next State:`,
+        '%cNext State:',
         'color: #47B04B; font-weight: 700;',
         nextState,
       );
+
+      logger.debugGroupEnd();
 
       return nextState;
     },
