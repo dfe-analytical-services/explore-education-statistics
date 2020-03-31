@@ -287,9 +287,12 @@ function GlossaryIndexPage() {
           </p>
           <p>
             For further information on this change read our{' '}
-            <a href="/prototypes/methodology-absence">
+            <Link
+              as="/methodology/pupil-absence-in-schools-in-england"
+              to="/methodology/methodology?publication=pupil-absence-in-schools-in-england"
+            >
               Pupil absence statistics: methodology
-            </a>{' '}
+            </Link>{' '}
             guidance.
           </p>
           <h3 id="possible-school-session">Possible school session</h3>
