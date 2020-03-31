@@ -175,30 +175,24 @@ const PublicationReleaseContent = () => {
                     <ul className="govuk-list">
                       {[
                         ...release.publication.otherReleases.map(
-                          ({ id, title }) => [
-                            title,
+                          ({ id, title }) => (
                             <li key={id} data-testid="other-release-item">
                               <Link to="#">{title}</Link>
-                            </li>,
-                          ],
+                            </li>
+                          ),
                         ),
                         ...release.publication.legacyReleases.map(
-                          ({ id, description, url }) => [
-                            description,
+                          ({ id, description, url }) => (
                             <li key={id} data-testid="other-release-item">
                               {!isEditing ? (
                                 <a href={url}>{description}</a>
                               ) : (
                                 <a>{description}</a>
                               )}
-                            </li>,
-                          ],
+                            </li>
+                          ),
                         ),
-                      ]
-                        .sort((a, b) =>
-                          b[0].toString().localeCompare(a[0].toString()),
-                        )
-                        .map(([, link]) => link)}
+                      ]}
                     </ul>
                   </Details>
                 </dd>
