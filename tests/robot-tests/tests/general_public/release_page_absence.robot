@@ -28,8 +28,8 @@ Validate URL
 
 Validate Published date, Next update date, and Email alerts link
     [Tags]     HappyPath
-    user checks element contains  css:[data-testid="published-date"]   22 March 2018
-    user checks element contains  css:[data-testid="next-update"]      March 2019
+    user checks element contains  css:[data-testid="published-date"]   25 April 2018
+    user checks element contains  css:[data-testid="next-update"]      22 March 2019
     user checks page contains link with text and url  Sign up for email alerts    /subscriptions?slug=pupil-absence-in-schools-in-england
 
 Validate "About these statistics" -- "For school year"
@@ -83,7 +83,6 @@ Validate absence_in_prus.csv file can be downloaded
 Validate Key Statistics data block -- Summary tab
     [Documentation]  DFE-915   EES-806   EES-1508
     [Tags]  HappyPath
-    #user waits until page contains element   css:#keystats-summary    90
     user waits until page contains element   xpath://h3[text()="Overall absence rate"]    90
     user waits until page contains element   xpath://h3[text()="Authorised absence rate"]    90
     user waits until page contains element   xpath://h3[text()="Unauthorised absence rate"]    90
@@ -92,23 +91,23 @@ Validate Key Statistics data block -- Summary tab
     user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
     user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
 
-    #user checks key stat bullet exists   pupils missed on average 8.2 school days
-    #user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
-    #user checks key stat bullet exists   unauthorised absence rise due to higher rates of unauthorised holidays
-    #user checks key stat bullet exists   10% of pupils persistently absent during 2016/17
+    user checks key stat bullet exists   pupils missed on average 8.2 school days
+    user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
+    user checks key stat bullet exists   unauthorised absence rise due to higher rates of unauthorised holidays
+    user checks key stat bullet exists   10% of pupils persistently absent during 2016/17
 
 Validate Key Statistics data block -- Data tables tab
-   [Tags]  HappyPath    Failing
-   user clicks element   css:#headlines-section-2-tab   # Click Table tab
+   [Tags]  HappyPath
+   user clicks element   css:#releaseHeadlines-dataBlock-tables-tab
    user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
 
-   user checks results table column heading contains  css:table  1   1   2012/13
-   user checks results table column heading contains  css:table  1   2   2013/14
-   user checks results table column heading contains  css:table  1   3   2014/15
-   user checks results table column heading contains  css:table  1   4   2015/16
-   user checks results table column heading contains  css:table  1   5   2016/17
+   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   1   2012/13
+   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   2   2013/14
+   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   3   2014/15
+   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   4   2015/16
+   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   5   2016/17
 
-   ${row}=  user gets row with group and indicator  css:#headlines-section-2 table   England   Authorised absence rate
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Authorised absence rate
    user checks row contains heading  ${row}   Authorised absence rate
    user checks row cell contains text  ${row}   1    4.2
    user checks row cell contains text  ${row}   2    3.5
@@ -116,7 +115,7 @@ Validate Key Statistics data block -- Data tables tab
    user checks row cell contains text  ${row}   4    3.4
    user checks row cell contains text  ${row}   5    3.4
 
-   ${row}=  user gets row with group and indicator  css:#headlines-section-2 table   England   Unauthorised absence rateh
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Unauthorised absence rate
    user checks row contains heading  ${row}   Unauthorised absence rate
    user checks row cell contains text  ${row}   1    1.1
    user checks row cell contains text  ${row}   2    1.1
@@ -124,7 +123,7 @@ Validate Key Statistics data block -- Data tables tab
    user checks row cell contains text  ${row}   4    1.1
    user checks row cell contains text  ${row}   5    1.3
 
-   ${row}=  user gets row with group and indicator  css:#headlines-section-2 table   England   Overall absence rateh
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Overall absence rate
    user checks row contains heading  ${row}   Overall absence rate
    user checks row cell contains text  ${row}   1    5.3
    user checks row cell contains text  ${row}   2    4.5
@@ -134,7 +133,7 @@ Validate Key Statistics data block -- Data tables tab
 
 Validate Key Statistics data block -- Charts tab
    [Tags]  HappyPath
-   user clicks element   css:#headlines-section-3-tab   # Click Chart tab
+   user clicks element   css:#releaseHeadlines-dataBlock-charts-tab
    user waits until element is visible  css:.recharts-responsive-container
    # TODO: Possible to verify chart?
 
@@ -153,7 +152,8 @@ Validate accordion sections order
     user checks accordion is in position  Contact us                        11
 
 Validate Regional and local authority (LA) breakdown table
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
+    [Documentation]  BAU-540
     user opens accordion section  Regional and local authority (LA) breakdown
     user checks element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
 

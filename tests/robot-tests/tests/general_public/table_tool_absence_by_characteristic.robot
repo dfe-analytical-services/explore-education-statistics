@@ -62,7 +62,6 @@ Select Characteristics
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
-    # Extra timeout until EES-234
     user waits until results table appears
 
 Validate results table column headings

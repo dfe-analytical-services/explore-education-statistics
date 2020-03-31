@@ -13,9 +13,7 @@ Navigate to Find Statistics page
     user goes to url   %{PUBLIC_URL}/find-statistics
     user waits until page contains heading  Find statistics and data
 
-User uses search
-    [Tags]   UnderConstruction
-    user checks page contains  css:body
+# TODO: User uses search
 
 Validate accordion sections exist
     [Tags]  HappyPath
@@ -35,6 +33,7 @@ Open "Pupils and schools" accordion section
 
 Validate "Pupils and schools" section
     [Tags]  HappyPath   Failing
+    [Documentation]  EES-1577
     user checks accordion section contains text  Pupils and schools    Admission appeals
     user checks accordion section contains text  Pupils and schools    Exclusions
     user checks accordion section contains text  Pupils and schools    Parental responsibility measures
