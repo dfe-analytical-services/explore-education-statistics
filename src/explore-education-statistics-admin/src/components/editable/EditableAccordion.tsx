@@ -85,20 +85,23 @@ const EditableAccordion = (props: EditableAccordionProps) => {
 
   return (
     <>
-      <h2 className="govuk-heading-l reorderable-relative">
+      <h2 className={classNames('govuk-heading-l', styles.heading)}>
         {sectionName}
 
         {sections.length > 1 &&
           (!isReordering ? (
             <Button
               variant="secondary"
-              className="reorderable"
+              className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
               onClick={toggleReordering.on}
             >
               Reorder <span className="govuk-visually-hidden">sections</span>
             </Button>
           ) : (
-            <Button className="reorderable" onClick={saveOrder}>
+            <Button
+              className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
+              onClick={saveOrder}
+            >
               Save order
             </Button>
           ))}

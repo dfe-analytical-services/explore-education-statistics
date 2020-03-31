@@ -1,9 +1,10 @@
-@import 'node_modules/explore-education-statistics-common/src/styles/govuk-base';
-
-.error {
-  background: $govuk-error-colour;
-}
+@import 'src/styles/govuk-base';
 
 .dragover {
   background: govuk-colour('light-grey');
+}
+
+.heading {
+  display: flex;
+  justify-content: space-between;
 }
