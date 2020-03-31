@@ -93,6 +93,7 @@ const EditableContentBlock = ({
       >
         {editable ? (
           <div
+            className={styles.editButton}
             role="button"
             tabIndex={0}
             // eslint-disable-next-line react/no-danger
