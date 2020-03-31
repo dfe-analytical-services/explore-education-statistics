@@ -4,7 +4,8 @@ exports[`EditableBlockRenderer MarkDownBlock renders editable version correctly 
 <article>
   <div class="block">
     <div class="preview readOnly">
-      <div role="button"
+      <div class="editButton"
+           role="button"
            tabindex="0"
       >
         <p>
