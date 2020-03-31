@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             })
                             .ToList(),
                         LegacyReleases = r.Publication.LegacyReleases
-                            .Select(legacy => new BasicLink
+                            .Select(legacy => new LegacyReleaseViewModel
                             {
                                 Id = legacy.Id,
                                 Description = legacy.Description,

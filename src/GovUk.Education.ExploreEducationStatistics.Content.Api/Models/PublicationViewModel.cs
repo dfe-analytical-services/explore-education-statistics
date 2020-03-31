@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             string summary,
             Guid latestReleaseId,
             List<ReleaseTitleViewModel> otherReleases,
-            List<LinkViewModel> legacyReleases,
+            List<LegacyReleaseViewModel> legacyReleases,
             TopicViewModel topic,
             ContactViewModel contact,
             ExternalMethodologyViewModel externalMethodology,
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
         public List<ReleaseTitleViewModel> OtherReleases { get; set; }
 
-        public List<LinkViewModel> LegacyReleases { get; set; }
+        public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
         public TopicViewModel Topic { get; set; }
 

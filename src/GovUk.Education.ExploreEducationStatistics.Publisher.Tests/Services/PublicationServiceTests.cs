@@ -83,24 +83,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
               Title  = "external methodology title",
               Url = new Uri("http://external.methodology/")
             },
-            LegacyReleases = new List<Link>
+            LegacyReleases = new List<LegacyRelease>
             {
-              new Link
+              new LegacyRelease
               {
                   Id = Guid.NewGuid(),
                   Description = "Academic Year 2008/09",
+                  Order = 0,
                   Url = "http://link.one/"
               },
-              new Link
+              new LegacyRelease
               {
                   Id = Guid.NewGuid(),
                   Description = "Academic Year 2010/11",
+                  Order = 1,
                   Url = "http://link.three/"
               },
-              new Link
+              new LegacyRelease
               {
                   Id = Guid.NewGuid(),
                   Description = "Academic Year 2009/10",
+                  Order = 2,
                   Url = "http://link.two/"
               }
             },
@@ -312,13 +315,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.NotNull(viewModel.LegacyReleases);
                 var legacyReleases = viewModel.LegacyReleases;
                 Assert.Equal(3, legacyReleases.Count);
-                Assert.Equal("Academic Year 2008/09", legacyReleases[0].Description);
-                Assert.Equal("http://link.one/", legacyReleases[0].Url);
+                Assert.Equal("Academic Year 2010/11", legacyReleases[0].Description);
+                Assert.Equal("http://link.three/", legacyReleases[0].Url);
                 Assert.Equal("Academic Year 2009/10", legacyReleases[1].Description);
                 Assert.Equal("http://link.two/", legacyReleases[1].Url);
-                Assert.Equal("Academic Year 2010/11", legacyReleases[2].Description);
-                Assert.Equal("http://link.three/", legacyReleases[2].Url);
-                
+                Assert.Equal("Academic Year 2008/09", legacyReleases[2].Description);
+                Assert.Equal("http://link.one/", legacyReleases[2].Url);
+
                 Assert.NotNull(viewModel.Methodology);
                 var methodology = viewModel.Methodology;
                 Assert.Equal(Methodology.Id, methodology.Id);

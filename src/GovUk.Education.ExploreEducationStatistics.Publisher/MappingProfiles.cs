@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public MappingProfiles()
         {
-            CreateMap<BasicLink, LinkViewModel>();
+            CreateMap<Link, LinkViewModel>();
 
             CreateMap<Contact, ContactViewModel>();
 
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
 
-            CreateMap<Link, LinkViewModel>();
+            CreateMap<LegacyRelease, LegacyReleaseViewModel>();
 
             CreateMap<Methodology, MethodologySummaryViewModel>();
 
