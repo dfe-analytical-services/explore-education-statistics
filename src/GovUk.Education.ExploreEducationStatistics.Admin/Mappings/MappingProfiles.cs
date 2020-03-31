@@ -144,6 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         },
                         OtherReleases = r.Publication.Releases
                             .FindAll(otherRelease => otherRelease.Id != r.Id)    
+                            .OrderByDescending(otherRelease => otherRelease.Year)
+                            .ThenByDescending(otherRelease => otherRelease.TimePeriodCoverage)
                             .Select(otherRelease => new PreviousReleaseViewModel
                             {
                                 Id = otherRelease.Id,
