@@ -3,13 +3,14 @@
 exports[`EditableBlockRenderer MarkDownBlock renders editable version correctly 1`] = `
 <article>
   <div class="block">
-    <div role="button"
-         class="preview readOnly"
-         tabindex="0"
-    >
-      <p>
-        test
-      </p>
+    <div class="preview readOnly">
+      <div role="button"
+           tabindex="0"
+      >
+        <p>
+          test
+        </p>
+      </div>
     </div>
   </div>
   <div class="buttons">
@@ -32,13 +33,12 @@ exports[`EditableBlockRenderer MarkDownBlock renders editable version correctly 
 exports[`EditableBlockRenderer MarkDownBlock renders non-editable version correctly 1`] = `
 <article>
   <div class="block">
-    <div role="button"
-         class="preview readOnly"
-         tabindex="0"
-    >
-      <p>
-        test
-      </p>
+    <div class="preview readOnly">
+      <div>
+        <p>
+          test
+        </p>
+      </div>
     </div>
   </div>
   <div class="buttons">
