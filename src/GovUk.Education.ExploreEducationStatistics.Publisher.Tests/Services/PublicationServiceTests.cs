@@ -88,19 +88,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
               new Link
               {
                   Id = Guid.NewGuid(),
-                  Description = "2008 to 2009",
+                  Description = "Academic Year 2008/09",
                   Url = "http://link.one/"
               },
               new Link
               {
                   Id = Guid.NewGuid(),
-                  Description = "2010 to 2011",
+                  Description = "Academic Year 2010/11",
                   Url = "http://link.three/"
               },
               new Link
               {
                   Id = Guid.NewGuid(),
-                  Description = "2009 to 2010",
+                  Description = "Academic Year 2009/10",
                   Url = "http://link.two/"
               }
             },
@@ -312,11 +312,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.NotNull(viewModel.LegacyReleases);
                 var legacyReleases = viewModel.LegacyReleases;
                 Assert.Equal(3, legacyReleases.Count);
-                Assert.Equal("2008 to 2009", legacyReleases[0].Description);
+                Assert.Equal("Academic Year 2008/09", legacyReleases[0].Description);
                 Assert.Equal("http://link.one/", legacyReleases[0].Url);
-                Assert.Equal("2009 to 2010", legacyReleases[1].Description);
+                Assert.Equal("Academic Year 2009/10", legacyReleases[1].Description);
                 Assert.Equal("http://link.two/", legacyReleases[1].Url);
-                Assert.Equal("2010 to 2011", legacyReleases[2].Description);
+                Assert.Equal("Academic Year 2010/11", legacyReleases[2].Description);
                 Assert.Equal("http://link.three/", legacyReleases[2].Url);
                 
                 Assert.NotNull(viewModel.Methodology);
@@ -329,15 +329,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.NotNull(viewModel.Releases);
                 var releases = viewModel.Releases;
                 Assert.Equal(3, releases.Count);
-                Assert.Equal(PublicationARelease3.Id, releases[0].Id);
-                Assert.Equal("publication-a-release-2017-q4", releases[0].Slug);
-                Assert.Equal("Academic Year Q4 2017/18", releases[0].Title);
+                Assert.Equal(PublicationARelease2.Id, releases[0].Id);
+                Assert.Equal("publication-a-release-2018-q2", releases[0].Slug);
+                Assert.Equal("Academic Year Q2 2018/19", releases[0].Title);
                 Assert.Equal(PublicationARelease1.Id, releases[1].Id);
                 Assert.Equal("publication-a-release-2018-q1", releases[1].Slug);
                 Assert.Equal("Academic Year Q1 2018/19", releases[1].Title);
-                Assert.Equal(PublicationARelease2.Id, releases[2].Id);
-                Assert.Equal("publication-a-release-2018-q2", releases[2].Slug);
-                Assert.Equal("Academic Year Q2 2018/19", releases[2].Title);
+                Assert.Equal(PublicationARelease3.Id, releases[2].Id);
+                Assert.Equal("publication-a-release-2017-q4", releases[2].Slug);
+                Assert.Equal("Academic Year Q4 2017/18", releases[2].Title);
             }
         }
     }
