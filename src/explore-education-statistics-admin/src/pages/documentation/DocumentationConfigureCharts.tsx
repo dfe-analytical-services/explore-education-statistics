@@ -89,6 +89,10 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">Select the type of chart</h4>
+                  <p>
+                    Choose from line, vertical bar, horizontal bar and
+                    geographic map.
+                  </p>
                   <img
                     src={imageChartSelect}
                     className="govuk-!-width-three-quarters"
@@ -97,6 +101,11 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">Add data to chart</h4>
+                  <p>
+                    Select an option from each of the available dropdown menus,
+                    and select the 'Add data' button
+                  </p>
+                  <p>You can continue to add mulitiple items to the chart</p>
                   <img
                     src={imageChartAddData}
                     className="govuk-!-width-three-quarters"
@@ -108,7 +117,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   <p>
                     At any stage you can make alterations to the chart
                     configuration, for instance change to a different type of
-                    chart, or alter the confoguration options (shown below the
+                    chart, or alter the configuration options (shown below the
                     chart preview) in order to tidy up the chart presentation.
                   </p>
                   <img
@@ -138,6 +147,10 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">Change legend titles</h4>
+                  <p>
+                    The label for the indicator can be edited, this option is
+                    useful if the default indicator is a long string of text.
+                  </p>
                   <img
                     src={imageChartLabel}
                     className="govuk-!-width-three-quarters"
@@ -150,8 +163,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   </h4>
                   <p>
                     Click on the colour option to reveal pre-set options or
-                    choose your own colour from the palette, by selecting the
-                    'other' button.
+                    choose your own colour by selecting the 'other' button.
                   </p>
                   <img
                     src={imageChartColour}
@@ -209,19 +221,6 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   </p>
                   <img
                     src={imageChartHeight}
-                    className="govuk-!-width-three-quarters"
-                    alt=""
-                  />
-                </li>
-                <li>
-                  <h4 className="govuk-heading-s">Set chart width</h4>
-                  <p>
-                    By default the chart is set to be displayed as full width of
-                    the release page. Thos width can be reduced by adding in a
-                    value less than 900.
-                  </p>
-                  <img
-                    src={imageChartWidth}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />

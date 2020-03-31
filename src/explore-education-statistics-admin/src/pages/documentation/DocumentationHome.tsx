@@ -118,6 +118,13 @@ const BrowseReleasesPage = () => {
         How to manage data blocks within a release - including creating tables
         and charts.{' '}
       </p>
+
+      <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+        <Link to="/documentation/configure-charts">Creating charts</Link>
+      </h3>
+      <p className="govuk-caption-m govuk-!-margin-top-1">
+        How to create charts based on a saved data block.{' '}
+      </p>
     </Page>
   );
 };
