@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Publication, CachedPublicationViewModel>()
                 .ForMember(dest => dest.LegacyReleases,
-                    m => m.MapFrom(p => p.LegacyReleases.OrderBy(l => l.Description)))
+                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Release, CachedReleaseViewModel>()

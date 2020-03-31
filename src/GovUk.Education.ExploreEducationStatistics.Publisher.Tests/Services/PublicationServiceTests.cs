@@ -96,14 +96,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
               {
                   Id = Guid.NewGuid(),
                   Description = "Academic Year 2010/11",
-                  Order = 1,
+                  Order = 2,
                   Url = "http://link.three/"
               },
               new LegacyRelease
               {
                   Id = Guid.NewGuid(),
                   Description = "Academic Year 2009/10",
-                  Order = 2,
+                  Order = 1,
                   Url = "http://link.two/"
               }
             },
