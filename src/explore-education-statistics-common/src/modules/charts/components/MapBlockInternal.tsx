@@ -243,7 +243,7 @@ function getFeatureElementById(
 }
 
 function calculateColour({ scaledData = 1.0, color = '#ff0000' }) {
-  const rescale = scaledData * 0.75 + 0.25;
+  const rescale = 1 - (scaledData * 0.75 + 0.25);
 
   return [
     '#',
