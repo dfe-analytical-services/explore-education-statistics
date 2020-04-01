@@ -330,13 +330,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
-                    c.RoutePrefix = "docs";
-                });
             }
             else
             {
@@ -346,6 +339,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.MaxAge(365);
                     options.IncludeSubdomains();
                     options.Preload();
+                });
+            }
+
+            if(env.IsDevelopment() || Environment.GetEnvironmentVariable("enableSwagger") == "True")
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
+                    c.RoutePrefix = "docs";
                 });
             }
 

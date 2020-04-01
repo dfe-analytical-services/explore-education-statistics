@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
@@ -61,7 +62,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 app.UseDeveloperExceptionPage();
                 
                 GenerateReleaseContent();
+            }
+            else
+            {
+                app.UseHttpsRedirection();
+                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+            }
 
+            if(env.IsDevelopment() || Environment.GetEnvironmentVariable("enableSwagger") == "True")
+            {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
@@ -72,11 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 var option = new RewriteOptions();
                 option.AddRedirect("^$", "docs");
                 app.UseRewriter(option);
-            }
-            else
-            {
-                app.UseHttpsRedirection();
-                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
             app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());

@@ -137,7 +137,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHttpsRedirection();
+                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+            }
 
+            if(env.IsDevelopment() || Environment.GetEnvironmentVariable("enableSwagger") == "True")
+            {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
@@ -148,11 +156,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 var option = new RewriteOptions();
                 option.AddRedirect("^$", "docs");
                 app.UseRewriter(option);
-            }
-            else
-            {
-                app.UseHttpsRedirection();
-                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
             
             // ReSharper disable once CommentTypo
