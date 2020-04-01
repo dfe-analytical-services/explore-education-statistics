@@ -37,6 +37,7 @@ const TableToolFinalStep = ({
     // and table only render together as a matching pair
     setCurrentTable(table);
     setCurrentTableHeaders(tableHeaders);
+    setPermalinkId('');
   }, [tableHeaders, table]);
 
   const handlePermalinkClick = async () => {
