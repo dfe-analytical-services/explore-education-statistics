@@ -52,11 +52,9 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
 
         {dayMonthYearIsComplete(release.nextReleaseDate) && (
           <SummaryListItem term="Next release date">
-            {dayMonthYearIsComplete(release.nextReleaseDate) && (
-              <FormattedDate>
-                {dayMonthYearToDate(release.nextReleaseDate)}
-              </FormattedDate>
-            )}
+            <FormattedDate>
+              {dayMonthYearToDate(release.nextReleaseDate)}
+            </FormattedDate>
           </SummaryListItem>
         )}
         {release.status === 'Approved' && (
