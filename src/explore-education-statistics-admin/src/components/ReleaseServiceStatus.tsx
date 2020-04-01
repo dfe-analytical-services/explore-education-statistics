@@ -11,8 +11,25 @@ interface Props {
   exclude?: 'status' | 'details';
 }
 
+type Stage =
+  | 'Scheduled'
+  | 'NotStarted'
+  | 'Invalid'
+  | 'Failed'
+  | 'Cancelled'
+  | 'Validating'
+  | 'Queued'
+  | 'Started'
+  | 'Complete';
+
 export interface ReleaseStatus {
-  overallStage: string;
+  releaseId?: string;
+  dataStage?: Stage;
+  contentStage?: Stage;
+  filesStage?: Stage;
+  publishingStage?: Stage;
+  overallStage: Stage;
+  lastUpdated?: string;
 }
 
 const ReleaseServiceStatus = ({
@@ -104,6 +121,7 @@ const ReleaseServiceStatus = ({
   }, [currentStatus, statusDetailColor]);
 
   if (!currentStatus) return null;
+
   return (
     <>
       {exclude !== 'status' && (
@@ -118,8 +136,9 @@ const ReleaseServiceStatus = ({
       )}
 
       {currentStatus &&
-        currentStatus.overallStage !== 'Scheduled' &&
-        currentStatus.overallStage !== 'Invalid' &&
+        !['Validating', 'Scheduled', 'Invalid'].includes(
+          currentStatus.overallStage,
+        ) &&
         exclude !== 'details' && (
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">
