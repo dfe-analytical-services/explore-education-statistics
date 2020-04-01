@@ -30,7 +30,6 @@ const ReleaseServiceStatus = ({
     return dashboardService
       .getReleaseStatus(releaseId)
       .then(status => {
-        console.log(status);
         if (!status) {
           // 204 response waiting for status
           setCurrentStatus({ overallStage: 'Validating' });

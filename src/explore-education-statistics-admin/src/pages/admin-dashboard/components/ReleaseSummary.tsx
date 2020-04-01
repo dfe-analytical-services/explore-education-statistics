@@ -49,9 +49,8 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
             {release.published || release.publishScheduled}
           </FormattedDate>
         </SummaryListItem>
-        {(release.nextReleaseDate.day ||
-          release.nextReleaseDate.month ||
-          release.nextReleaseDate.year) && (
+
+        {dayMonthYearIsComplete(release.nextReleaseDate) && (
           <SummaryListItem term="Next release date">
             {dayMonthYearIsComplete(release.nextReleaseDate) && (
               <FormattedDate>
