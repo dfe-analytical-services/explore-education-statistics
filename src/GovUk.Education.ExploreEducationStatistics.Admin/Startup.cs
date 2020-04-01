@@ -330,6 +330,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
+                    c.RoutePrefix = "docs";
+                });
             }
             else
             {
@@ -365,7 +372,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ScriptSources(s => s.UnsafeInline())
             );
 
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
@@ -392,13 +398,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     template: "{controller}/{action=Index}/{id?}");
             });
             
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
-                c.RoutePrefix = "docs";
-            });
-
             app.UseSpa(spa =>
             {
                 if (env.IsDevelopment())
