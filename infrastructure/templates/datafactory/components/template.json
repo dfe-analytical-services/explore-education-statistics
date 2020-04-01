@@ -2,22 +2,23 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "subscription": {
+            "type": "string",
+            "metadata": {
+                "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "ees",
+            "metadata": {
+                "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
+            }
+        },
         "factoryName": {
             "type": "string",
             "metadata": {
                 "description": "Data Factory name"
-            }
-        },
-        "ls_sql_statistics_connectionString": {
-            "type": "string",
-            "metadata": {
-               "description": "Secure string for 'connectionString' of 'ls_sql_statistics'"
-            }
-        },
-        "ls_sql_public_statistics_connectionString": {
-            "type": "string",
-            "metadata": {
-              "description": "Secure string for 'connectionString' of 'ls_sql_public_statistics'"
             }
         },
         "publisherAppName": {
@@ -25,10 +26,21 @@
             "metadata": {
               "description": "The name of the publisher app"
             }
+        },
+        "keyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the key vault"
+            }
         }
     },
     "variables": {
-        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
+        "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
+        "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
+        "sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'ees-sql-admin-password-datafactory')]",
+        "sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'ees-sql-public-password-datafactory')]",
+        "sql-user": "[resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'ees-sql-user-datafactory')]"
     },
     "resources": [
         {
@@ -97,7 +109,7 @@
                 "annotations": [],
                 "type": "AzureSqlDatabase",
                 "typeProperties": {
-                    "connectionString": "[parameters('ls_sql_statistics_connectionString')]"
+                    "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', variables('sql-user'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', variables('sql-admin-password'), ';')]"
                 }
             },
             "dependsOn": []
@@ -110,7 +122,7 @@
                 "annotations": [],
                 "type": "AzureSqlDatabase",
                 "typeProperties": {
-                    "connectionString": "[parameters('ls_sql_public_statistics_connectionString')]"
+                    "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', variables('sql-user'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', variables('sql-public-password'), ';')]"
                 }
             },
             "dependsOn": []
