@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
 import Button from '@common/components/Button';
-import DatablockSelectForm from './DatablockSelectForm';
+import React, { useState } from 'react';
+import DataBlockSelectForm from './DataBlockSelectForm';
 
 interface AddContentButtonProps {
   onAddDataBlock: (datablockId: string) => void;
@@ -10,7 +10,7 @@ const AddDataBlockButton = ({ onAddDataBlock }: AddContentButtonProps) => {
   const [showForm, setShowForm] = useState(false);
 
   return showForm ? (
-    <DatablockSelectForm
+    <DataBlockSelectForm
       onSelect={selectedDataBlockId => {
         onAddDataBlock(selectedDataBlockId);
         setShowForm(false);
@@ -21,7 +21,7 @@ const AddDataBlockButton = ({ onAddDataBlock }: AddContentButtonProps) => {
     />
   ) : (
     <Button variant="secondary" onClick={() => setShowForm(true)}>
-      Add DataBlock
+      Add data block
     </Button>
   );
 };

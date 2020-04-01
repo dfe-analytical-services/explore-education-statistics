@@ -11,6 +11,7 @@ import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -50,10 +51,11 @@ interface Props {
 const formId = 'fileUploadForm';
 
 const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
-  const [files, setFiles] = useState<AncillaryFile[]>();
+  const [files, setFiles] = useState<AncillaryFile[]>([]);
   const [deleteFileName, setDeleteFileName] = useState('');
   const [canUpdateRelease, setCanUpdateRelease] = useState(false);
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -81,13 +83,50 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   };
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
-    await editReleaseDataService.uploadAncillaryFile(releaseId, {
-      name: values.name,
-      file: values.file as File,
-    });
-
-    await resetPage(actions);
+    setIsUploading(true);
+    await editReleaseDataService
+      .uploadAncillaryFile(releaseId, {
+        name: values.name,
+        file: values.file as File,
+      })
+      .then(() => {
+        setIsUploading(false);
+        resetPage(actions);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
   }, errorCodeMappings);
+
+  const setDeleting = (ancillaryFile: string, deleting: boolean) => {
+    setFiles(
+      files.map(file =>
+        file.filename !== ancillaryFile
+          ? file
+          : {
+              ...file,
+              isDeleting: deleting,
+            },
+      ),
+    );
+  };
+
+  const handleDelete = async (
+    ancillaryFileToDelete: string,
+    form: FormikActions<{}>,
+  ) => {
+    setDeleting(ancillaryFileToDelete, true);
+    setDeleteFileName('');
+    await editReleaseDataService
+      .deleteAncillaryFile(releaseId, deleteFileName)
+      .then(() => {
+        setDeleting(ancillaryFileToDelete, false);
+        resetPage(form);
+      })
+      .finally(() => {
+        setDeleting(ancillaryFileToDelete, false);
+      });
+  };
 
   return (
     <Formik<FormValues>
@@ -106,6 +145,9 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
           <Form id={formId}>
             {canUpdateRelease && (
               <>
+                {isUploading && (
+                  <LoadingSpinner text="Uploading files" overlay />
+                )}
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
                   legend="Upload file"
@@ -154,7 +196,6 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                       <AccordionSection
                         /* eslint-disable-next-line react/no-array-index-key */
                         key={accId}
-                        headingId={accId}
                         heading={file.title}
                         onToggle={() => {
                           if (openedAccordions.includes(accId)) {
@@ -169,6 +210,9 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                         }}
                         open={openedAccordions.includes(accId)}
                       >
+                        {file.isDeleting && (
+                          <LoadingSpinner text="Deleting file" overlay />
+                        )}
                         <SummaryList key={file.filename}>
                           <SummaryListItem term="Name">
                             <h4 className="govuk-heading-m">{file.title}</h4>
@@ -216,14 +260,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
               title="Confirm deletion of file"
               onExit={() => setDeleteFileName('')}
               onCancel={() => setDeleteFileName('')}
-              onConfirm={async () => {
-                await editReleaseDataService.deleteAncillaryFile(
-                  releaseId,
-                  deleteFileName,
-                );
-                setDeleteFileName('');
-                resetPage(form);
-              }}
+              onConfirm={() => handleDelete(deleteFileName, form)}
             >
               <p>
                 This file will no longer be available for use in this release

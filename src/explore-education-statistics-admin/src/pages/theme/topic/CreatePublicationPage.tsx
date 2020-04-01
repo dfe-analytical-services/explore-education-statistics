@@ -3,7 +3,11 @@ import Page from '@admin/components/Page';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import appRouteList from '@admin/routes/dashboard/routes';
-import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
+import {
+  BasicMethodology,
+  ContactDetails,
+  IdTitlePair,
+} from '@admin/services/common/types';
 import { ExternalMethodology } from '@admin/services/dashboard/types';
 import service from '@admin/services/edit-publication/service';
 import { Dictionary } from '@admin/types';
@@ -39,7 +43,7 @@ interface FormValues extends AssignMethodologyFormValues {
 }
 
 interface CreatePublicationModel {
-  methodologies: IdTitlePair[];
+  methodologies: BasicMethodology[];
   contacts: ContactDetails[];
   topic: IdTitlePair;
 }
@@ -188,7 +192,7 @@ const CreatePublicationPage = ({
                             { label: 'Choose a methodology', value: '' },
                             ...orderBy(
                               model.methodologies.map(methodology => ({
-                                label: methodology.title,
+                                label: `${methodology.title} [${methodology.status}]`,
                                 value: methodology.id,
                               })),
                               'label',

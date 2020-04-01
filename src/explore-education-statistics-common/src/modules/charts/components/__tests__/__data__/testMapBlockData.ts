@@ -1,16 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/camelcase
 import testResponseData_23_26_28__1_2_LA_JSON from '@common/modules/charts/components/__tests__/__data__/testResponseData_23_26_28__1_2_LA.json';
 import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
-import { ChartMetaData } from '@common/modules/charts/types/chart';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 
 // eslint-disable-next-line @typescript-eslint/camelcase
 const testDataBlockResponse: DataBlockResponse = (testResponseData_23_26_28__1_2_LA_JSON as unknown) as DataBlockResponse;
 
-const largeMetaData = parseMetaData(
-  testDataBlockResponse.metaData,
-) as ChartMetaData;
+const largeMetaData = parseMetaData(testDataBlockResponse.metaData);
 
 export const testMapBlockProps: MapBlockProps = {
   data: testDataBlockResponse,
@@ -70,7 +67,7 @@ export const testMapBlockProps: MapBlockProps = {
 
 const largeMetaDataWithSamllerDataSets = parseMetaData(
   testDataBlockResponse.metaData,
-) as ChartMetaData;
+);
 
 export const testMapBlockPropsWithSmallerDataSets: MapBlockProps = {
   data: {

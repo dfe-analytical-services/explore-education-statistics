@@ -64,11 +64,13 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
     }
   };
 
-  private withoutErrorHandling = async (callback: () => void) => {
+  private withoutErrorHandling = async <T extends unknown>(
+    callback: () => Promise<T>,
+  ): Promise<T> => {
     this.isHandlingErrors = false;
 
     try {
-      await callback();
+      return await callback();
     } finally {
       this.isHandlingErrors = true;
     }

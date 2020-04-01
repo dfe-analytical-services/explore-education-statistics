@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 GenerateReleaseContentFunction.QueueName);
             var releasesList = releases.ToList();
             _logger.LogInformation(
-                $"Queuing content message for releases: {releasesList.Select(tuple => tuple.ReleaseId)}");
+                $"Queuing content message for releases: {string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId))}");
             await queue.AddMessageAsync(ToCloudQueueMessage(BuildGenerateReleaseContentMessage(releasesList)));
         }
 

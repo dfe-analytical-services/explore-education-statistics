@@ -80,8 +80,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
-            
-            CreateMap<Release, ReleaseSummaryViewModel>();
 
             CreateMap<Methodology, MethodologyViewModel>();
             CreateMap<Methodology, MethodologyStatusViewModel>();
@@ -146,6 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         },
                         OtherReleases = r.Publication.Releases
                             .FindAll(otherRelease => otherRelease.Id != r.Id)    
+                            .OrderByDescending(otherRelease => otherRelease.Year)
+                            .ThenByDescending(otherRelease => otherRelease.TimePeriodCoverage)
                             .Select(otherRelease => new PreviousReleaseViewModel
                             {
                                 Id = otherRelease.Id,
@@ -154,7 +154,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             })
                             .ToList(),
                         LegacyReleases = r.Publication.LegacyReleases
-                            .Select(legacy => new BasicLink
+                            .OrderByDescending(legacyRelease => legacyRelease.Order)
+                            .Select(legacy => new LegacyReleaseViewModel
                             {
                                 Id = legacy.Id,
                                 Description = legacy.Description,

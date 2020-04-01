@@ -1,5 +1,5 @@
-import React from 'react';
 import { fireEvent, render, wait } from '@testing-library/react';
+import React from 'react';
 import Accordion from '../Accordion';
 import AccordionSection from '../AccordionSection';
 
@@ -91,12 +91,10 @@ describe('Accordion', () => {
   test('can use custom heading or content IDs for sections', async () => {
     const { getAllByText } = render(
       <Accordion id="test-sections">
-        <AccordionSection heading="Test heading" contentId="custom-content">
+        <AccordionSection heading="Test heading" id="custom-1">
           Test content
         </AccordionSection>
-        <AccordionSection heading="Test heading" headingId="custom-heading">
-          Test content
-        </AccordionSection>
+        <AccordionSection heading="Test heading">Test content</AccordionSection>
       </Accordion>,
     );
 
@@ -105,10 +103,10 @@ describe('Accordion', () => {
     const headings = getAllByText('Test heading');
     const contents = getAllByText('Test content');
 
-    expect(headings[0]).toHaveAttribute('id', 'test-sections-1-heading');
-    expect(contents[0]).toHaveAttribute('id', 'custom-content');
+    expect(headings[0]).toHaveAttribute('id', 'custom-1-heading');
+    expect(contents[0]).toHaveAttribute('id', 'custom-1-content');
 
-    expect(headings[1]).toHaveAttribute('id', 'custom-heading');
+    expect(headings[1]).toHaveAttribute('id', 'test-sections-2-heading');
     expect(contents[1]).toHaveAttribute('id', 'test-sections-2-content');
   });
 

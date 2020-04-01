@@ -37,6 +37,7 @@ const TableToolFinalStep = ({
     // and table only render together as a matching pair
     setCurrentTable(table);
     setCurrentTableHeaders(tableHeaders);
+    setPermalinkId('');
   }, [tableHeaders, table]);
 
   const handlePermalinkClick = async () => {
@@ -146,10 +147,6 @@ const TableToolFinalStep = ({
                     tableRef={dataTableRef}
                     subjectMeta={table.subjectMeta}
                   />
-                </li>
-
-                <li>
-                  <a href="#api">Access developer API</a>
                 </li>
                 <li>
                   <Link

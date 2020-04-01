@@ -123,7 +123,43 @@ public class Either<Tl, Tr> {
             return next;
         }
         
-        public static async Task<Either<Tl, Tr>> OnFailure<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tl, Task<Tr>> func)
+        /**
+         * If the previous Either failed, perform the given action and then return the original failure's errors.
+         */
+        public static async Task<Either<Tl, Tr>> OnFailureDo<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Task> failureTask)
+        {
+            var firstResult = await task;
+            if (firstResult.IsRight)
+            {
+                return firstResult.Right;
+            }
+
+            await failureTask();
+            return firstResult.Left;
+        }
+        
+        /**
+         * If the previous Either failed, provide the errors to the given action and then return a new set of errors
+         * provided by the action.
+         */
+        public static async Task<Either<Tl, Tr>> OnFailureFailWith<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tl, Task<Tl>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsRight)
+            {
+                return firstResult.Right;
+            }
+
+            var next = await func(firstResult.Left);
+            return next;
+        }
+        
+        /**
+         * If the previous Either failed, perform the given action and then handle it as a success case anyway.
+         * This allows a prior step to fail but overall be treated as a success (unless a subsequent step happens to
+         * fail after this one).
+        */
+        public static async Task<Either<Tl, Tr>> OnFailureSucceedWith<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tl, Task<Tr>> func)
         {
             var firstResult = await task;
             if (firstResult.IsRight)

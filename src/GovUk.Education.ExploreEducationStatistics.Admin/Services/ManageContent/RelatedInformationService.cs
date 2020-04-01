@@ -28,14 +28,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _userService = userService;
         }
         
-        public Task<Either<ActionResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId)
+        public Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => release.RelatedInformation);
         }
 
-        public Task<Either<ActionResult, List<BasicLink>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request)
+        public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -44,10 +44,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     if (release.RelatedInformation == null)
                     {
-                        release.RelatedInformation = new List<BasicLink>();
+                        release.RelatedInformation = new List<Link>();
                     }
                     
-                    release.RelatedInformation.Add(new BasicLink
+                    release.RelatedInformation.Add(new Link
                     {
                         Id = Guid.NewGuid(),
                         Description = request.Description,
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
         
-        public Task<Either<ActionResult, List<BasicLink>>> UpdateRelatedInformationAsync(
+        public Task<Either<ActionResult, List<Link>>> UpdateRelatedInformationAsync(
             Guid releaseId, Guid relatedInformationId, CreateUpdateLinkRequest request)
         {
             return _persistenceHelper
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     if (toUpdate == null)
                     {
-                        return NotFound<List<BasicLink>>();
+                        return NotFound<List<Link>>();
                     }
 
                     toUpdate.Description = request.Description;
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
         
-        public Task<Either<ActionResult, List<BasicLink>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId)
+        public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)

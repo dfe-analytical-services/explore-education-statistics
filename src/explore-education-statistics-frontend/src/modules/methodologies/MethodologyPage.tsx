@@ -2,14 +2,14 @@ import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import FormattedDate from '@common/components/FormattedDate';
+import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
-import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
-import PrintThisPage from '@frontend/components/PrintThisPage';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import ContentBlock from '@common/modules/find-statistics/components/ContentBlocks';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
+import PrintThisPage from '@frontend/components/PrintThisPage';
 import MethodologyContent from '@frontend/modules/methodologies/components/MethodologyContent';
 import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
 import { NextPageContext } from 'next';
@@ -118,11 +118,7 @@ class MethodologyPage extends Component<Props> {
                   </MethodologyHeader>
 
                   <MethodologyContent>
-                    <ContentBlock
-                      content={content}
-                      id={`${this.accId[0]}_${order}`}
-                      publication={data.publication}
-                    />
+                    <SectionBlocks content={content} />
                   </MethodologyContent>
                 </AccordionSection>
               );
@@ -142,11 +138,7 @@ class MethodologyPage extends Component<Props> {
                     caption={caption}
                     key={order}
                   >
-                    <ContentBlock
-                      content={content}
-                      id={`${this.accId[1]}_${order}`}
-                      publication={data.publication}
-                    />
+                    <SectionBlocks content={content} />
                   </AccordionSection>
                 );
               })}

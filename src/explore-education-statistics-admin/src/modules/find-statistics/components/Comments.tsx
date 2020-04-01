@@ -9,25 +9,31 @@ import classNames from 'classnames';
 import React, { createRef, useState } from 'react';
 import styles from './Comments.module.scss';
 
+export type CommentsChangeHandler = (
+  blockId: string,
+  comments: ExtendedComment[],
+) => void;
+
 interface Props {
-  contentBlockId: string;
+  blockId: string;
   sectionId: string;
-  initialComments: ExtendedComment[];
-  onCommentsChange?: (comments: ExtendedComment[]) => Promise<void>;
+  comments: ExtendedComment[];
   canResolve?: boolean;
   canComment?: boolean;
+  onChange: CommentsChangeHandler;
 }
 
 const Comments = ({
-  contentBlockId,
+  blockId,
   sectionId,
-  initialComments,
-  onCommentsChange = () => Promise.resolve(),
+  comments,
+  onChange,
   canResolve = false,
   canComment = false,
 }: Props) => {
-  const [newComment, setNewComment] = useState<string>('');
-  const [comments, setComments] = useState<ExtendedComment[]>(initialComments);
+  const [newComment, setNewComment] = React.useState<string>('');
+  const [editableComment, setEditableComment] = useState<string>('');
+  const [editableCommentText, setEditableCommentText] = useState<string>('');
 
   const { releaseId } = useManageReleaseContext();
   const context = useAuthContext();
@@ -48,7 +54,7 @@ const Comments = ({
         .addContentSectionComment(
           releaseId,
           sectionId,
-          contentBlockId,
+          blockId,
           additionalComment,
         )
         .then(populatedComment => {
@@ -58,10 +64,8 @@ const Comments = ({
             newComments = [...newComments, ...comments];
           }
 
-          onCommentsChange(newComments).then(() => {
-            setComments(newComments);
-            setNewComment('');
-          });
+          onChange(blockId, newComments);
+          setNewComment('');
         });
     }
   };
@@ -71,20 +75,12 @@ const Comments = ({
 
     if (releaseId && sectionId) {
       service
-        .deleteContentSectionComment(
-          releaseId,
-          sectionId,
-          contentBlockId,
-          commentId,
-        )
+        .deleteContentSectionComment(releaseId, sectionId, blockId, commentId)
         .then(() => {
           const newComments = [...comments];
-
           newComments.splice(index, 1);
 
-          onCommentsChange(newComments).then(() => {
-            setComments(newComments);
-          });
+          onChange(blockId, newComments);
         });
     }
   };
@@ -101,17 +97,37 @@ const Comments = ({
         .updateContentSectionComment(
           releaseId,
           sectionId,
-          contentBlockId,
+          blockId,
           resolvedComment,
         )
         .then(() => {
           const newComments = [...comments];
-
           newComments[index] = resolvedComment;
 
-          onCommentsChange(newComments).then(() => {
-            setComments(newComments);
-          });
+          onChange(blockId, newComments);
+        });
+    }
+  };
+
+  const updateComment = (index: number, newContent: string) => {
+    const editedComment = { ...comments[index] };
+    editedComment.commentText = newContent;
+    if (releaseId && sectionId) {
+      service
+        .updateContentSectionComment(
+          releaseId,
+          sectionId,
+          blockId,
+          editedComment,
+        )
+        .then(() => {
+          const newComments = [...comments];
+
+          newComments[index] = editedComment;
+
+          onChange(blockId, newComments);
+          setEditableComment('');
+          setEditableCommentText('');
         });
     }
   };
@@ -133,7 +149,7 @@ const Comments = ({
           onToggle={isOpen => {
             if (ref.current) {
               const section = document.getElementById(
-                `content-section-${contentBlockId}`,
+                `content-section-${blockId}`,
               );
               if (isOpen) {
                 ref.current.classList.add(styles.top);
@@ -154,7 +170,7 @@ const Comments = ({
               <form>
                 <textarea
                   name="comment"
-                  id={`new_comment_${contentBlockId}`}
+                  id={`new_comment_${blockId}`}
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                 />
@@ -193,9 +209,30 @@ const Comments = ({
                         {name} <FormattedDate>{time}</FormattedDate>
                       </strong>
                     </h2>
-                    <p className="govuk-body-xs govuk-!-margin-bottom-1">
-                      {commentText}
-                    </p>
+                    {editableComment && editableComment === id ? (
+                      <form>
+                        <textarea
+                          name="editComment"
+                          id={`edit_comment_${id}`}
+                          value={editableCommentText}
+                          onChange={e => setEditableCommentText(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className="govuk-button"
+                          disabled={editableCommentText.length === 0}
+                          onClick={() => {
+                            updateComment(index, editableCommentText);
+                          }}
+                        >
+                          Update
+                        </button>
+                      </form>
+                    ) : (
+                      <p className="govuk-body-xs govuk-!-margin-bottom-1">
+                        {commentText}
+                      </p>
+                    )}
                     {state === 'open' &&
                       (canResolve ? (
                         <button
@@ -225,13 +262,34 @@ const Comments = ({
                       <>
                         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
                         <a
-                          className="govuk-body-xs"
+                          className="govuk-body-xs govuk-!-margin-right-3"
                           role="button"
                           tabIndex={0}
                           onClick={() => removeComment(index)}
                           style={{ cursor: 'pointer' }}
                         >
                           Remove
+                        </a>
+                      </>
+                    )}
+                    {canComment && (
+                      <>
+                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                        <a
+                          className="govuk-body-xs govuk-!-margin-right-3"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => {
+                            setEditableCommentText(commentText);
+                            return editableComment
+                              ? setEditableComment('')
+                              : setEditableComment(id);
+                          }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {editableComment && editableComment === id
+                            ? 'Cancel'
+                            : 'Edit'}
                         </a>
                         <hr />
                       </>

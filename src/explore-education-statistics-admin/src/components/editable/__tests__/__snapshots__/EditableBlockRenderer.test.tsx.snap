@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EditableBlockRenderer MarkDownBlock renders editable version correctly 1`] = `
+<article>
+  <div class="block">
+    <div class="preview readOnly">
+      <div class="editButton"
+           role="button"
+           tabindex="0"
+      >
+        <p>
+          test
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="buttons">
+    <button aria-disabled="false"
+            class="govuk-button marginRight govuk-button--secondary"
+            type="button"
+    >
+      Edit block
+    </button>
+    <button aria-disabled="false"
+            class="govuk-button marginRight govuk-button--warning"
+            type="button"
+    >
+      Remove block
+    </button>
+  </div>
+</article>
+`;
+
+exports[`EditableBlockRenderer MarkDownBlock renders non-editable version correctly 1`] = `
+<article>
+  <div class="block">
+    <div class="preview readOnly">
+      <div>
+        <p>
+          test
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="buttons">
+  </div>
+</article>
+`;

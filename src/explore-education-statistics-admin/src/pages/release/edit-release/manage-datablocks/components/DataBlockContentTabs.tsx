@@ -1,9 +1,10 @@
 import ChartBuilder from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import mapFullTable from '@admin/pages/release/edit-release/manage-datablocks/util/mapFullTable';
+import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablocks/service';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -12,18 +13,16 @@ import getDefaultTableHeaderConfig, {
   TableHeadersConfig,
 } from '@common/modules/table-tool/utils/tableHeaders';
 import dataBlockService, {
-  DataBlock,
-  DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Chart } from '@common/services/publicationService';
+import { Chart, DataBlockRequest } from '@common/services/types/blocks';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface Props {
-  dataBlock: DataBlock;
+  dataBlock: ReleaseDataBlock;
   dataBlockResponse: DataBlockResponse;
-  onDataBlockSave: (dataBlock: DataBlock) => void;
+  onDataBlockSave: (dataBlock: ReleaseDataBlock) => void;
 }
 
 const DataBlockContentTabs = ({
@@ -79,10 +78,10 @@ const DataBlockContentTabs = ({
     });
   }, [dataBlock.tables, chartBuilderData]);
 
-  const onChartSave = (props: ChartRendererProps) => {
-    const newDataBlock: DataBlock = {
+  const onChartSave = (chart: Chart) => {
+    const newDataBlock: ReleaseDataBlock = {
       ...dataBlock,
-      charts: [props],
+      charts: [chart],
     };
 
     onDataBlockSave(newDataBlock);
@@ -150,6 +149,12 @@ const DataBlockContentTabs = ({
           <div style={{ position: 'relative' }}>
             <ChartBuilder
               data={chartBuilderData}
+              meta={{
+                ...parseMetaData(chartBuilderData.metaData),
+                // Don't render footnotes as they take
+                // up too much screen space.
+                footnotes: [],
+              }}
               onChartSave={onChartSave}
               initialConfiguration={initialConfiguration}
               onRequiresDataUpdate={reRequestdata}

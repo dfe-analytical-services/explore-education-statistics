@@ -1,33 +1,11 @@
 import methodologyService from '@admin/services/methodology/methodologyService';
-import permissionService from '@admin/services/permissions/permissionService';
 import { ContentBlockPostModel } from '@admin/services/release/edit-release/content/types';
 import { Dictionary } from '@admin/types';
-import { useCallback } from 'react';
 import { useMethodologyDispatch } from './MethodologyContext';
 import { ContentSectionKeys } from './MethodologyContextActionTypes';
 
 export default function useMethodologyActions() {
   const dispatch = useMethodologyDispatch();
-
-  const getMethodologyContent = useCallback(
-    async (methodologyId: string) => {
-      dispatch({ type: 'CLEAR_STATE' });
-      const methodology = await methodologyService.getMethodologyContent(
-        methodologyId,
-      );
-      const canUpdateMethodology = await permissionService.canUpdateMethodology(
-        methodologyId,
-      );
-      dispatch({
-        type: 'SET_STATE',
-        payload: {
-          methodology,
-          canUpdateMethodology,
-        },
-      });
-    },
-    [dispatch],
-  );
 
   async function deleteContentSectionBlock({
     methodologyId,
@@ -238,7 +216,6 @@ export default function useMethodologyActions() {
   }
 
   return {
-    getMethodologyContent,
     deleteContentSectionBlock,
     updateContentSectionBlock,
     addContentSectionBlock,

@@ -26,6 +26,7 @@ exports[`Accordion renders with hidden content by default 1`] = `
     </div>
     <div
       class="govuk-accordion__section section"
+      id="test-sections-1"
       role="presentation"
     >
       <div
@@ -98,6 +99,7 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
     </div>
     <div
       class="govuk-accordion__section section govuk-accordion__section--expanded"
+      id="test-sections-1"
       role="presentation"
     >
       <div

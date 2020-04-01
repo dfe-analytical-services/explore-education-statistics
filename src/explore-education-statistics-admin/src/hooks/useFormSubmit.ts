@@ -45,15 +45,14 @@ function useFormSubmit<FormValues>(
         if (!isServerValidationError(typedError)) {
           handleApiErrors(typedError);
         } else {
-          const validationHandler = handleServerSideValidation(...errorMappers);
-
-          const errorHandled = validationHandler(
+          const isErrorHandled = handleServerSideValidation(
+            errorMappers,
             typedError.response?.data,
             actions.setFieldError,
             actions.setError,
           );
 
-          if (!errorHandled) {
+          if (!isErrorHandled) {
             handleApiErrors(typedError);
           }
         }

@@ -1,8 +1,5 @@
 import { MethodologyStatus } from '@admin/services/common/types';
-import {
-  ContentBlock,
-  ContentSection,
-} from '@common/services/publicationService';
+import { ContentSection } from '@common/services/publicationService';
 import { EditableContentBlock } from '../publicationService';
 
 export interface MethodologyStatusListItem {
