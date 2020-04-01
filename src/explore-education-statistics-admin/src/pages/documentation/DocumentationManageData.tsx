@@ -11,6 +11,7 @@ import imageDataTitle from './images/guidance/guidance-data-title.png';
 import imageDataUpload from './images/guidance/guidance-data-upload.png';
 import imageDataCurrentData from './images/guidance/guidance-data-current-data.png';
 import imageDataActions from './images/guidance/guidance-data-actions.png';
+import imageDataDelete from './images/guidance/guidance-data-delete.png';
 import imageFootnotesTab from './images/guidance/guidance-footnotes-tab.png';
 import imageFootnotesSelect from './images/guidance/guidance-footnotes-select.png';
 import imageFootnotesConfig from './images/guidance/guidance-footnotes-config.png';
@@ -267,11 +268,24 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To delete or replace any of your data or metadata files -
-                    select the corresponding links under the ‘Actions’ column.
+                    To delete any of your data, select the 'Delete files' link.
                   </h4>
                   <img
                     src={imageDataActions}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">Confirm deletion</h4>
+                  <p>
+                    A confirmation window will appear, this will also alert you
+                    to any instances where this data is already being used in
+                    your release.
+                  </p>
+                  <p>Select the green 'Confirm' button to delete the files. </p>
+                  <img
+                    src={imageDataDelete}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />
@@ -430,16 +444,16 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
               stepHeading="Upload files"
               open={step === 4}
             >
-              <p>
-                You can also upload other files to the service, such as
-                infographics and public metadata, which you can then refer or
-                link to via hyperlinks or embed within your release.
-              </p>
-              <p>
-                For example, these files could be infographics or images of more
-                complex tables and charts which you haven’t been able to build
-                within the service.
-              </p>
+              <p>You can upload various file types including:</p>
+              <ul className="govuk-bullet govuk-bullet--list">
+                <li>Plain text: .txt</li>
+                <li>Microsoft word: .doc, .docx</li>
+                <li>Excel: .xls</li>
+                <li>PDF</li>
+                <li>Open document files</li>
+                <li>Open xml formats</li>
+                <li>Image files: .png, .jpg, .gif</li>
+              </ul>
               <p>
                 Uploading these kinds of files is optional but users will be
                 able to download them from your release.
@@ -541,21 +555,21 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                   <h4 className="govuk-heading-s">
                     To upload more files repeat steps 2 to 5 above.
                   </h4>
-                  <img
-                    src={imageFileDelete}
-                    className="govuk-!-width-three-quarters"
-                    alt=""
-                  />
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
                     To view or delete any of your files - select the
                     corresponding links under the ‘Actions’ column.
                   </h4>
+                  <img
+                    src={imageFileDelete}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
                 </li>
               </ul>
               <h3>Don't</h3>
-              <ul className="govuk-list govuk-list--number dfe-guidance-list">
+              <ul className="govuk-list govuk-list--number">
                 <li>
                   Don’t upload any sensitive files. Only upload files which are
                   suitable for the public domain.
@@ -615,7 +629,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 For more detailed guidance on how to create data blocks, tables
                 and charts for your release -{' '}
-                <Link to="/documentation/data-blocks">
+                <Link to="/documentation/manage-data-block">
                   Managing data blocks and creating tables and charts: step by
                   step.
                 </Link>

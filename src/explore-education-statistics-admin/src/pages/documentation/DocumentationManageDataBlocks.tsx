@@ -366,7 +366,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
 
                   <p>
                     Once you have made your changes select the 'Save chart
-                    optionas' button at the bottom of the page.
+                    options' button at the bottom of the page.
                   </p>
                   <p>
                     For detailed guidance on how to configure charts within your

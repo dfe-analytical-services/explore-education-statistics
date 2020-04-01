@@ -263,18 +263,13 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               </p>
               <p>
                 However, only a ‘Responsible statistician’ can edit a release
-                once it’s been approved for sign-off by the ‘Production team’
-                and sent for ‘Higher review’.
+                once it’s status has been set to ‘Ready for higher review’.
               </p>
-              <p>
-                A release is in ‘Higher review’ once it’s been reviewed,
-                approved for sign-off and its release status updated to one of
-                the following:
-              </p>
+              <p>A release can have a status of the following:</p>
               <ul className="govuk-list govuk-list--bullet">
-                <li>‘Ready for sign-off’</li>
-                <li>‘Approved for release’</li>
-                <li>‘In pre-release’</li>
+                <li>‘In draft’</li>
+                <li>‘Ready for higher review’</li>
+                <li>‘Approved for publication’</li>
               </ul>
               <p>
                 If you need to edit a ‘Live’ release (ie a release which has

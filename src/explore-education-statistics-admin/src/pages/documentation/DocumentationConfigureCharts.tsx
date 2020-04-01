@@ -63,8 +63,8 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               </p>
               <h3>Before you start</h3>
               <p>
-                Make sure your have already created a data block on which to
-                base your chart.
+                Make sure you have already created a data block on which to base
+                your chart.
               </p>
 
               <p>
@@ -105,6 +105,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     Select an option from each of the available dropdown menus,
                     and select the 'Add data' button
                   </p>
+                  <p>After selecting 'Add data' a preview chart will appear.</p>
                   <p>You can continue to add mulitiple items to the chart</p>
                   <img
                     src={imageChartAddData}
@@ -115,16 +116,32 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">Preview chart</h4>
                   <p>
+                    The preview chart will appear after data has been added.
+                  </p>
+                  <p>
                     At any stage you can make alterations to the chart
                     configuration, for instance change to a different type of
                     chart, or alter the configuration options (shown below the
-                    chart preview) in order to tidy up the chart presentation.
+                    chart preview).
                   </p>
                   <img
                     src={imageChartPreview}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">Save chart options</h4>
+                  <p>
+                    Once you are happy with your chart, select the green 'Save
+                    chart options' button.
+                  </p>
+                  <h3>Don't</h3>
+                  <p>
+                    Don't worry you need to make any changes, you can come back
+                    and edit the chart at any point, by following the steps
+                    above again.
+                  </p>
                 </li>
               </ul>
             </StepNavItem>
@@ -203,8 +220,11 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">Set legend position</h4>
                   <p>
-                    The default position is 'top' set to display above the
-                    chart, but can be moved below or removed altogether.
+                    The default legend position is 'top' shown above the chart.
+                  </p>
+                  <p>
+                    The legend can be moved to 'bottom' shown below the chart,
+                    or 'none' where the legend details won't be shown.
                   </p>
                   <img
                     src={imageChartLegend}
@@ -229,7 +249,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   <h4 className="govuk-heading-s">Set chart width</h4>
                   <p>
                     By default the chart is set to be displayed as full width of
-                    the release page. Thos width can be reduced by adding in a
+                    the release page. This width can be reduced by adding in a
                     value less than 900.
                   </p>
                   <img
