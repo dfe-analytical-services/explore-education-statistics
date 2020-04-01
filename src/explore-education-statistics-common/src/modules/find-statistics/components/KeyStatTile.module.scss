@@ -18,17 +18,6 @@
   margin-bottom: 1rem;
 }
 
-// If there are four key stat tiles, have two per row
-.keyStatTile:first-child:nth-last-child(4),
-.keyStatTile:first-child:nth-last-child(4) ~ .keyStatTile {
-  flex: 1 0 49%;
-  max-width: 49%;
-
-  @include govuk-media-query($from: desktop) {
-    max-width: 49%;
-  }
-}
-
 .keyStatTile {
   @include print-block;
 
@@ -52,6 +41,16 @@
 
   @include govuk-media-query($from: desktop) {
     max-width: 32.2%;
+  }
+
+  // If there are four key stat tiles, have two per row
+  &:first-child:nth-last-child(4),
+  &:first-child:nth-last-child(4) ~ & {
+    flex: 1 0 49%;
+
+    @include govuk-media-query($from: desktop) {
+      max-width: 49%;
+    }
   }
 
   .keyStat {
