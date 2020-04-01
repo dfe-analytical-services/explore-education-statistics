@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _tableStorageService = tableStorageService;
         }
 
-        public async Task<Either<ActionResult, ReleaseStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
+        public async Task<Either<ActionResult, ReleaseStatusViewModel>> GetReleaseStatusAsync(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)

@@ -9,7 +9,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusDataStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {

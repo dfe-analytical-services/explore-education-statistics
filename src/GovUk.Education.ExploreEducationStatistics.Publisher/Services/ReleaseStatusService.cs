@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -31,28 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _tableStorageService = tableStorageService;
         }
 
-        public async Task CreateOrUpdateAsync(Guid releaseId, ReleaseStatusState state,
+        public async Task CreateAsync(Guid releaseId, ReleaseStatusState state,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
-
-            var releaseStatus = await GetReleaseStatus(releaseId);
-            if (releaseStatus == null)
-            {
-                releaseStatus = new ReleaseStatus(release.Publication.Slug, release.PublishScheduled, release.Id,
-                    release.Slug, state, logMessages);
-            }
-            else
-            {
-                releaseStatus.PublicationSlug = release.Publication.Slug;
-                releaseStatus.Publish = release.PublishScheduled;
-                releaseStatus.ReleaseSlug = release.Slug;
-                releaseStatus.State = state;
-                releaseStatus.AppendLogMessages(logMessages);
-            }
-
-            await table.ExecuteAsync(TableOperation.InsertOrReplace(releaseStatus));
+            var releaseStatus = new ReleaseStatus(release.Publication.Slug, release.PublishScheduled, release.Id,
+                release.Slug, state, logMessages);
+            await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
         }
 
         public async Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
@@ -79,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+        public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
@@ -90,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+        public async Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusDataStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
@@ -101,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
+        public async Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusFilesStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
@@ -112,8 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId, Stage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        public async Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId,
+            ReleaseStatusPublishingStage stage, ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
@@ -162,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         {
                             throw;
                         }
-                    } 
+                    }
                     else
                     {
                         throw;
@@ -171,14 +156,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task<ReleaseStatus> GetReleaseStatus(Guid releaseId)
-        {
-            var table = await GetTableAsync();
-            var queryResults = table.ExecuteQuery(new TableQuery<ReleaseStatus>().Where(
-                TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey), QueryComparisons.Equal,
-                    releaseId.ToString())));
-            return queryResults.SingleOrDefault();
-        }
+        // private async Task<ReleaseStatus> GetReleaseStatus(Guid releaseId)
+        // {
+        //     var table = await GetTableAsync();
+        //     var queryResults = table.ExecuteQuery(new TableQuery<ReleaseStatus>().Where(
+        //         TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey), QueryComparisons.Equal,
+        //             releaseId.ToString())));
+        //     return queryResults.SingleOrDefault();
+        // }
 
         private Task<Release> GetReleaseAsync(Guid releaseId)
         {

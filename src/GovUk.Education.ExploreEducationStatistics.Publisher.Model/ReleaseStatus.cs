@@ -63,10 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 DataStage = value.Data.ToString();
                 FilesStage = value.Files.ToString();
                 PublishingStage = value.Publishing.ToString();
-                OverallStage = value.Overall.ToString();
+                OverallStage = value.ReleaseStatusOverall.ToString();
 
                 _state = new ReleaseStatusState(value.Content, value.Files, value.Data, value.Publishing,
-                    value.Overall);
+                    value.ReleaseStatusOverall);
                 _state.PropertyChanged += StateChangedCallback;
             }
         }
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                     break;
             }
 
-            OverallStage = _state.Overall.ToString();
+            OverallStage = _state.ReleaseStatusOverall.ToString();
         }
     }
 }

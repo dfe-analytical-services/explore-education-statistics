@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusContentStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -24,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("GenerateReleaseContent")]
+        // ReSharper disable once UnusedMember.Global
         public async Task GenerateReleaseContent(
             [QueueTrigger(QueueName)] GenerateReleaseContentMessage message,
             ExecutionContext executionContext,
@@ -46,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateStage(GenerateReleaseContentMessage message, Stage stage,
+        private async Task UpdateStage(GenerateReleaseContentMessage message, ReleaseStatusContentStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             foreach (var (releaseId, releaseStatusId) in message.Releases)

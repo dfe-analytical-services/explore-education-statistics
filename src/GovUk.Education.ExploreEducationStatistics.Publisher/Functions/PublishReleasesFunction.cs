@@ -7,17 +7,22 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
+    // ReSharper disable once UnusedType.Global
     public class PublishReleasesFunction
     {
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
-        
+
         private static readonly ReleaseStatusState StartedState =
-            new ReleaseStatusState(NotStarted, Queued, Queued, Scheduled, Started);
+            new ReleaseStatusState(ReleaseStatusContentStage.NotStarted,
+                ReleaseStatusFilesStage.Queued,
+                ReleaseStatusDataStage.Queued,
+                ReleaseStatusPublishingStage.Scheduled,
+                Started);
 
         public PublishReleasesFunction(IQueueService queueService, IReleaseStatusService releaseStatusService)
         {
@@ -29,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
          * Azure function which publishes all Releases that are scheduled to be published during the day.
          */
         [FunctionName("PublishReleases")]
+        // ReSharper disable once UnusedMember.Global
         public void PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")]
             TimerInfo timer,
             ExecutionContext executionContext,

@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     /**
      * Development / BAU Function which performs a full content refresh
      */
+    // ReSharper disable once UnusedType.Global
     public class GenerateAllContentFunction
     {
         private readonly IContentService _contentService;
@@ -22,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("GenerateAllContent")]
+        // ReSharper disable once UnusedMember.Global
         public async Task GenerateAllContent(
             [QueueTrigger(QueueName)] GenerateAllContentMessage message,
             ExecutionContext executionContext,

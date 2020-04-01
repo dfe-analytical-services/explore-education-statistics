@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<ReleaseStatusViewModel>>> GetReleaseStatusesAsync(Guid releaseId)
         {
             return await _releaseStatusService
-                .GetReleaseStatusesAsync(releaseId)
+                .GetReleaseStatusAsync(releaseId)
                 .HandleFailuresOr(Ok);
         }
 

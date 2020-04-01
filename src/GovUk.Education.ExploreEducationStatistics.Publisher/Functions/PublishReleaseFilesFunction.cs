@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusFilesStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("PublishReleaseFiles")]
+        // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseFiles(
             [QueueTrigger(QueueName)] PublishReleaseFilesMessage message,
             ExecutionContext executionContext,
@@ -56,19 +57,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             foreach (var (releaseId, releaseStatusId) in published)
             {
                 await UpdateFilesStage(releaseId, releaseStatusId, Complete);
-                await UpdateContentStage(releaseId, releaseStatusId, Queued);
+                await UpdateContentStage(releaseId, releaseStatusId, ReleaseStatusContentStage.Queued);
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateFilesStage(Guid releaseId, Guid releaseStatusId, Stage stage,
+        private async Task UpdateFilesStage(Guid releaseId, Guid releaseStatusId, ReleaseStatusFilesStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage, logMessage);
         }
 
-        private async Task UpdateContentStage(Guid releaseId, Guid releaseStatusId, Stage stage)
+        private async Task UpdateContentStage(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage stage)
         {
             await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, stage);
         }

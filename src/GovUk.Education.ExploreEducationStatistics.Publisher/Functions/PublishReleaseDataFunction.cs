@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusDataStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -28,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("PublishReleaseData")]
+        // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseData(
             [QueueTrigger(QueueName)] PublishReleaseDataMessage message,
             ExecutionContext executionContext,
@@ -59,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateStage(PublishReleaseDataMessage message, Stage stage,
+        private async Task UpdateStage(PublishReleaseDataMessage message, ReleaseStatusDataStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage,
