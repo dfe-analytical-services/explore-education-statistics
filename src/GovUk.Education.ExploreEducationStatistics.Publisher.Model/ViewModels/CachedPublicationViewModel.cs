@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public List<ReleaseTitleViewModel> Releases { get; set; }
 
-        public List<LinkViewModel> LegacyReleases { get; set; }
+        public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
         public TopicViewModel Topic { get; set; }
 

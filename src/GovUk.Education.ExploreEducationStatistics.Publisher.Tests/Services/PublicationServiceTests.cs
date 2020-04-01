@@ -83,24 +83,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
               Title  = "external methodology title",
               Url = new Uri("http://external.methodology/")
             },
-            LegacyReleases = new List<Link>
+            LegacyReleases = new List<LegacyRelease>
             {
-              new Link
+              new LegacyRelease
               {
                   Id = Guid.NewGuid(),
-                  Description = "2008 to 2009",
+                  Description = "Academic Year 2008/09",
+                  Order = 0,
                   Url = "http://link.one/"
               },
-              new Link
+              new LegacyRelease
               {
                   Id = Guid.NewGuid(),
-                  Description = "2010 to 2011",
+                  Description = "Academic Year 2010/11",
+                  Order = 2,
                   Url = "http://link.three/"
               },
-              new Link
+              new LegacyRelease
               {
                   Id = Guid.NewGuid(),
-                  Description = "2009 to 2010",
+                  Description = "Academic Year 2009/10",
+                  Order = 1,
                   Url = "http://link.two/"
               }
             },
@@ -312,13 +315,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.NotNull(viewModel.LegacyReleases);
                 var legacyReleases = viewModel.LegacyReleases;
                 Assert.Equal(3, legacyReleases.Count);
-                Assert.Equal("2008 to 2009", legacyReleases[0].Description);
-                Assert.Equal("http://link.one/", legacyReleases[0].Url);
-                Assert.Equal("2009 to 2010", legacyReleases[1].Description);
+                Assert.Equal("Academic Year 2010/11", legacyReleases[0].Description);
+                Assert.Equal("http://link.three/", legacyReleases[0].Url);
+                Assert.Equal("Academic Year 2009/10", legacyReleases[1].Description);
                 Assert.Equal("http://link.two/", legacyReleases[1].Url);
-                Assert.Equal("2010 to 2011", legacyReleases[2].Description);
-                Assert.Equal("http://link.three/", legacyReleases[2].Url);
-                
+                Assert.Equal("Academic Year 2008/09", legacyReleases[2].Description);
+                Assert.Equal("http://link.one/", legacyReleases[2].Url);
+
                 Assert.NotNull(viewModel.Methodology);
                 var methodology = viewModel.Methodology;
                 Assert.Equal(Methodology.Id, methodology.Id);
@@ -329,15 +332,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.NotNull(viewModel.Releases);
                 var releases = viewModel.Releases;
                 Assert.Equal(3, releases.Count);
-                Assert.Equal(PublicationARelease3.Id, releases[0].Id);
-                Assert.Equal("publication-a-release-2017-q4", releases[0].Slug);
-                Assert.Equal("Academic Year Q4 2017/18", releases[0].Title);
+                Assert.Equal(PublicationARelease2.Id, releases[0].Id);
+                Assert.Equal("publication-a-release-2018-q2", releases[0].Slug);
+                Assert.Equal("Academic Year Q2 2018/19", releases[0].Title);
                 Assert.Equal(PublicationARelease1.Id, releases[1].Id);
                 Assert.Equal("publication-a-release-2018-q1", releases[1].Slug);
                 Assert.Equal("Academic Year Q1 2018/19", releases[1].Title);
-                Assert.Equal(PublicationARelease2.Id, releases[2].Id);
-                Assert.Equal("publication-a-release-2018-q2", releases[2].Slug);
-                Assert.Equal("Academic Year Q2 2018/19", releases[2].Title);
+                Assert.Equal(PublicationARelease3.Id, releases[2].Id);
+                Assert.Equal("publication-a-release-2017-q4", releases[2].Slug);
+                Assert.Equal("Academic Year Q4 2017/18", releases[2].Title);
             }
         }
     }

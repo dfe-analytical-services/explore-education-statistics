@@ -68,9 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
-            RelatedInformation = new List<BasicLink>
+            RelatedInformation = new List<Link>
             {
-                new BasicLink
+                new Link
                 {
                     Id = new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"),
                     Description = "Related Information",
@@ -87,9 +87,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ2,
-            RelatedInformation = new List<BasicLink>
+            RelatedInformation = new List<Link>
             {
-                new BasicLink
+                new Link
                 {
                     Id = new Guid("a0855237-b2f1-4dae-b2fc-027bb2802ba3"),
                     Description = "Related Information",
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ3,
-            RelatedInformation = new List<BasicLink>(),
+            RelatedInformation = new List<Link>(),
             Published = null,
             Status = Approved
         };

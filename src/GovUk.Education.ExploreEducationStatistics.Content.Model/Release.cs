@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
         
-        public List<BasicLink> RelatedInformation { get; set; }
+        public List<Link> RelatedInformation { get; set; }
 
         public Release CreateReleaseAmendment(DateTime createdDate, Guid createdByUserId)
         {
