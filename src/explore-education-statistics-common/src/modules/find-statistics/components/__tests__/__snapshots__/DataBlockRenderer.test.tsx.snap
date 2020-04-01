@@ -151,7 +151,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
                     <path
                       class="leaflet-interactive"
                       d="M0 0"
-                      fill="#3f0000"
+                      fill="#bf0000"
                       fill-opacity="0.2"
                       fill-rule="evenodd"
                       stroke="#3388ff"
@@ -246,7 +246,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
               >
                 <span
                   class="rate0"
-                  style="background-color: rgb(63, 0, 0);"
+                  style="background-color: rgb(191, 0, 0);"
                 >
                    
                 </span>
@@ -257,7 +257,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
               >
                 <span
                   class="rate1"
-                  style="background-color: rgb(111, 0, 0);"
+                  style="background-color: rgb(143, 0, 0);"
                 >
                    
                 </span>
@@ -268,7 +268,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
               >
                 <span
                   class="rate2"
-                  style="background-color: rgb(159, 0, 0);"
+                  style="background-color: rgb(95, 0, 0);"
                 >
                    
                 </span>
@@ -279,7 +279,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
               >
                 <span
                   class="rate3"
-                  style="background-color: rgb(207, 0, 0);"
+                  style="background-color: rgb(47, 0, 0);"
                 >
                    
                 </span>
@@ -290,7 +290,7 @@ exports[`DataBlockRenderer renders map instead of chart 1`] = `
               >
                 <span
                   class="rate4"
-                  style="background-color: rgb(255, 0, 0);"
+                  style="background-color: rgb(0, 0, 0);"
                 >
                    
                 </span>
