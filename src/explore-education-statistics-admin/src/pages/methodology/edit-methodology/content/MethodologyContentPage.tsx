@@ -1,8 +1,8 @@
+import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import { FormFieldset, FormRadioGroup } from '@common/components/form';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import MethodologyAccordion from './components/MethodologyAccordion';
@@ -42,7 +42,7 @@ const MethodologyContentPage = () => {
           }}
         />
       </FormFieldset>
-      <EditingContext.Provider
+      <EditingContextProvider
         value={{
           isEditing,
         }}
@@ -116,7 +116,7 @@ const MethodologyContentPage = () => {
             />
           </section>
         </div>
-      </EditingContext.Provider>
+      </EditingContextProvider>
     </>
   );
 };

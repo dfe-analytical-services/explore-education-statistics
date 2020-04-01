@@ -19,6 +19,7 @@ beforeAll(() => {
   Element.prototype.scrollIntoView = jest.fn();
 
   window.scroll = jest.fn();
+  window.scrollTo = jest.fn();
 
   URL.createObjectURL = jest.fn();
 });

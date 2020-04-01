@@ -1,27 +1,23 @@
-import Accordion from '@admin/components/EditableAccordion';
+import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableRelease } from '@admin/services/publicationService';
+import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback } from 'react';
 import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
 interface ReleaseContentAccordionProps {
-  accordionId: string;
+  id?: string;
   sectionName: string;
   release: EditableRelease;
 }
 
 const ReleaseContentAccordion = ({
   release,
-  accordionId,
+  id = 'releaseContentAccordion',
   sectionName,
 }: ReleaseContentAccordionProps) => {
-  const {
-    addContentSection,
-    removeContentSection,
-    updateContentSectionHeading,
-    updateContentSectionsOrder,
-  } = useReleaseActions();
+  const { addContentSection, updateContentSectionsOrder } = useReleaseActions();
 
   const addAccordionSection = useCallback(
     () =>
@@ -33,41 +29,36 @@ const ReleaseContentAccordion = ({
   );
 
   const reorderAccordionSections = useCallback(
-    async order => {
-      updateContentSectionsOrder({ releaseId: release.id, order });
+    async (ids: string[]) => {
+      const order = ids
+        // Strip out the accordion id prefix
+        .map(sectionId => sectionId.replace(`${id}-`, ''))
+        .reduce<Dictionary<number>>((acc, sectionId, index) => {
+          acc[sectionId] = index;
+          return acc;
+        }, {});
+
+      await updateContentSectionsOrder({ releaseId: release.id, order });
     },
-    [release.id, updateContentSectionsOrder],
+    [id, release.id, updateContentSectionsOrder],
   );
+
   return (
-    <Accordion
-      id={accordionId}
+    <EditableAccordion
+      id={id}
       sectionName={sectionName}
-      onSaveOrder={reorderAccordionSections}
+      onReorder={reorderAccordionSections}
       onAddSection={addAccordionSection}
     >
-      {orderBy(release.content, 'order').map((accordionSection, index) => (
+      {orderBy(release.content, 'order').map(section => (
         <ReleaseContentAccordionSection
+          key={section.id}
+          id={`${id}-${section.id}`}
           release={release}
-          id={accordionSection.id}
-          key={accordionSection.id}
-          contentItem={accordionSection}
-          index={index}
-          onHeadingChange={title =>
-            updateContentSectionHeading({
-              releaseId: release.id,
-              sectionId: accordionSection.id,
-              title,
-            })
-          }
-          onRemoveSection={() =>
-            removeContentSection({
-              releaseId: release.id,
-              sectionId: accordionSection.id,
-            })
-          }
+          section={section}
         />
       ))}
-    </Accordion>
+    </EditableAccordion>
   );
 };
 

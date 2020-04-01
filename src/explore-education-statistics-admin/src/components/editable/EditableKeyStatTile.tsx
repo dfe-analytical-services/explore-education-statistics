@@ -1,5 +1,7 @@
-import FormFieldWysiwygArea from '@admin/components/form/FormFieldWysiwygArea';
-import { toolbarConfigs } from '@admin/components/WysiwygEditor';
+import { toolbarConfigs } from '@admin/components/form/FormEditor';
+import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import toHtml from '@admin/utils/markdown/toHtml';
+import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import { Form, FormFieldTextInput, Formik } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -12,6 +14,7 @@ import dataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import formatPretty from '@common/utils/number/formatPretty';
+import classNames from 'classnames';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
@@ -101,41 +104,45 @@ const EditableKeyStatTile = ({
         <div className={styles.keyStatTile}>
           <Formik<KeyStatsFormValues>
             initialValues={{
-              dataSummary:
-                (summary && summary.dataSummary && summary.dataSummary[0]) ||
-                '',
-              dataDefinitionTitle:
-                (summary &&
-                  summary.dataDefinitionTitle &&
-                  summary.dataDefinitionTitle[0]) ||
-                'Help',
-              dataDefinition:
-                (summary &&
-                  summary.dataDefinition &&
-                  summary.dataDefinition[0]) ||
-                '',
+              dataSummary: summary?.dataSummary?.[0] ?? '',
+              dataDefinitionTitle: summary?.dataDefinitionTitle?.[0] ?? 'Help',
+              dataDefinition: summary?.dataDefinition?.[0]
+                ? toHtml(summary?.dataDefinition?.[0])
+                : '',
             }}
             onSubmit={values => {
-              onSubmit(values);
+              onSubmit({
+                ...values,
+                dataDefinition: toMarkdown(values.dataDefinition),
+              });
               setShowForm(false);
             }}
             render={(form: FormikProps<KeyStatsFormValues>) => {
               return (
                 <Form id={`key-stats-form-${id}`}>
-                  <span className="govuk-heading-s">{name}</span>
-                  <div className={styles.keyStat} data-testid="key-stat-tile">
-                    <h3
+                  <h3 className="govuk-heading-s">{name}</h3>
+
+                  <div
+                    className={classNames(
+                      styles.keyStat,
+                      'govuk-!-margin-bottom-2',
+                    )}
+                    data-testid="key-stat-tile"
+                  >
+                    <h4
                       className="govuk-heading-s"
                       data-testid="key-stat-tile-title"
                     >
                       {config.indicatorLabel}
-                    </h3>
+                    </h4>
+
                     <p
                       className="govuk-heading-xl"
                       data-testid="key-stat-tile-value"
                     >
                       {config.value}
                     </p>
+
                     <div className="govuk-!-margin-top-1">
                       <FormFieldTextInput<KeyStatsFormValues>
                         id={`key-stat-dataSummary-${id}`}
@@ -144,26 +151,20 @@ const EditableKeyStatTile = ({
                       />
                     </div>
                   </div>
-                  <div className="govuk-inset-text">
-                    <FormFieldTextInput<KeyStatsFormValues>
-                      id={`key-stat-dataDefinitionTitle-${id}`}
-                      name="dataDefinitionTitle"
-                      label="Guidance title"
-                    />
-                    <FormFieldWysiwygArea
-                      name="dataDefinition"
-                      toolbarConfig={toolbarConfigs.reduced}
-                      id={`key-stat-dataDefinition-${id}`}
-                      label="Guidance text"
-                      onContentChange={(content: string) => {
-                        form.setValues({
-                          ...form.values,
-                          dataDefinition: content,
-                        });
-                      }}
-                      source={(summary && summary.dataDefinition[0]) || ''}
-                    />
-                  </div>
+
+                  <FormFieldTextInput<KeyStatsFormValues>
+                    id={`key-stat-dataDefinitionTitle-${id}`}
+                    name="dataDefinitionTitle"
+                    label="Guidance title"
+                  />
+
+                  <FormFieldEditor<KeyStatsFormValues>
+                    name="dataDefinition"
+                    toolbarConfig={toolbarConfigs.reduced}
+                    id={`key-stat-dataDefinition-${id}`}
+                    label="Guidance text"
+                  />
+
                   <Button
                     disabled={!form.isValid}
                     type="submit"

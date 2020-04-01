@@ -3,11 +3,12 @@ import {
   EditableRelease,
   ExtendedComment,
 } from '@admin/services/publicationService';
+import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ContentSection } from '@common/services/publicationService';
 import { BaseBlock, DataBlock } from '@common/services/types/blocks';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
-import { Reducer, useImmerReducer } from 'use-immer';
+import { Reducer } from 'use-immer';
 import { ReleaseDispatchAction } from './ReleaseContextActionTypes';
 
 export type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
@@ -42,7 +43,7 @@ export const releaseReducer: Reducer<
 
       if (!matchingSection) {
         throw new Error(
-          `REMOVE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Section "${sectionKey}" could not be found.`,
         );
       }
 
@@ -73,7 +74,7 @@ export const releaseReducer: Reducer<
 
       if (!matchingSection) {
         throw new Error(
-          `UPDATE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Section "${sectionKey}" could not be found.`,
         );
       }
 
@@ -111,7 +112,7 @@ export const releaseReducer: Reducer<
 
       if (!matchingSection) {
         throw new Error(
-          `ADD_BLOCK_TO_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Section "${sectionKey}" could not be found.`,
         );
       }
 
@@ -145,7 +146,7 @@ export const releaseReducer: Reducer<
 
       if (!matchingSection) {
         throw new Error(
-          `UPDATE_SECTION_CONTENT: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Section "${sectionKey}" could not be found.`,
         );
       }
 
@@ -210,7 +211,11 @@ interface ReleaseProviderProps {
 }
 
 function ReleaseProvider({ children, value }: ReleaseProviderProps) {
-  const [state, dispatch] = useImmerReducer(releaseReducer, value);
+  const [state, dispatch] = useLoggedImmerReducer(
+    'Release',
+    releaseReducer,
+    value,
+  );
 
   return (
     <ReleaseStateContext.Provider value={state}>

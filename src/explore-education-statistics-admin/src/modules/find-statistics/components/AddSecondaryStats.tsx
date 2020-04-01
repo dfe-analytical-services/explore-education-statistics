@@ -1,9 +1,9 @@
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
 import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import DataBlockSelectForm from './DataBlockSelectForm';
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 const AddSecondaryStats = ({ release, updating = false }: Props) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const { isEditing } = useContext(EditingContext);
+  const { isEditing } = useEditingContext();
 
   const {
     attachContentSectionBlock,

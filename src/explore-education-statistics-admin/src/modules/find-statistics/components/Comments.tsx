@@ -9,27 +9,31 @@ import classNames from 'classnames';
 import React, { createRef, useState } from 'react';
 import styles from './Comments.module.scss';
 
+export type CommentsChangeHandler = (
+  blockId: string,
+  comments: ExtendedComment[],
+) => void;
+
 interface Props {
-  contentBlockId: string;
+  blockId: string;
   sectionId: string;
-  initialComments: ExtendedComment[];
-  onCommentsChange?: (comments: ExtendedComment[]) => Promise<void>;
+  comments: ExtendedComment[];
   canResolve?: boolean;
   canComment?: boolean;
+  onChange: CommentsChangeHandler;
 }
 
 const Comments = ({
-  contentBlockId,
+  blockId,
   sectionId,
-  initialComments,
-  onCommentsChange = () => Promise.resolve(),
+  comments,
+  onChange,
   canResolve = false,
   canComment = false,
 }: Props) => {
   const [newComment, setNewComment] = React.useState<string>('');
   const [editableComment, setEditableComment] = useState<string>('');
   const [editableCommentText, setEditableCommentText] = useState<string>('');
-  const [comments, setComments] = useState<ExtendedComment[]>(initialComments);
 
   const { releaseId } = useManageReleaseContext();
   const context = useAuthContext();
@@ -50,7 +54,7 @@ const Comments = ({
         .addContentSectionComment(
           releaseId,
           sectionId,
-          contentBlockId,
+          blockId,
           additionalComment,
         )
         .then(populatedComment => {
@@ -60,10 +64,8 @@ const Comments = ({
             newComments = [...newComments, ...comments];
           }
 
-          onCommentsChange(newComments).then(() => {
-            setComments(newComments);
-            setNewComment('');
-          });
+          onChange(blockId, newComments);
+          setNewComment('');
         });
     }
   };
@@ -73,20 +75,12 @@ const Comments = ({
 
     if (releaseId && sectionId) {
       service
-        .deleteContentSectionComment(
-          releaseId,
-          sectionId,
-          contentBlockId,
-          commentId,
-        )
+        .deleteContentSectionComment(releaseId, sectionId, blockId, commentId)
         .then(() => {
           const newComments = [...comments];
-
           newComments.splice(index, 1);
 
-          onCommentsChange(newComments).then(() => {
-            setComments(newComments);
-          });
+          onChange(blockId, newComments);
         });
     }
   };
@@ -103,17 +97,14 @@ const Comments = ({
         .updateContentSectionComment(
           releaseId,
           sectionId,
-          contentBlockId,
+          blockId,
           resolvedComment,
         )
         .then(() => {
           const newComments = [...comments];
-
           newComments[index] = resolvedComment;
 
-          onCommentsChange(newComments).then(() => {
-            setComments(newComments);
-          });
+          onChange(blockId, newComments);
         });
     }
   };
@@ -126,7 +117,7 @@ const Comments = ({
         .updateContentSectionComment(
           releaseId,
           sectionId,
-          contentBlockId,
+          blockId,
           editedComment,
         )
         .then(() => {
@@ -134,9 +125,7 @@ const Comments = ({
 
           newComments[index] = editedComment;
 
-          onCommentsChange(newComments).then(() => {
-            setComments(newComments);
-          });
+          onChange(blockId, newComments);
           setEditableComment('');
           setEditableCommentText('');
         });
@@ -160,7 +149,7 @@ const Comments = ({
           onToggle={isOpen => {
             if (ref.current) {
               const section = document.getElementById(
-                `content-section-${contentBlockId}`,
+                `content-section-${blockId}`,
               );
               if (isOpen) {
                 ref.current.classList.add(styles.top);
@@ -181,7 +170,7 @@ const Comments = ({
               <form>
                 <textarea
                   name="comment"
-                  id={`new_comment_${contentBlockId}`}
+                  id={`new_comment_${blockId}`}
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                 />

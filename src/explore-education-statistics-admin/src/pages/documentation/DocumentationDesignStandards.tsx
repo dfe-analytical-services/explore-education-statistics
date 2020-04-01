@@ -1,7 +1,7 @@
+import Page from '@admin/components/Page';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
-import Page from '@admin/components/Page';
 import imageInvertedPyramid from './images/guidance/guidance-design-standards-inverted-pyramid.png';
 
 const DocumentationDesignStandards = () => {
@@ -28,7 +28,7 @@ const DocumentationDesignStandards = () => {
 
           <Accordion id="a-z">
             <AccordionSection
-              headingId="what-is-content-design"
+              id="what-is-content-design"
               heading="What is content design?"
             >
               <p>
@@ -114,7 +114,7 @@ const DocumentationDesignStandards = () => {
             </AccordionSection>
             <AccordionSection
               heading="Creating good web content"
-              headingId="creating-good-web-content"
+              id="creating-good-web-content"
             >
               <p>
                 People read web pages differently to how they read pages in
@@ -201,7 +201,7 @@ const DocumentationDesignStandards = () => {
             </AccordionSection>
             <AccordionSection
               heading="Creating specialist content"
-              headingId="Creating specialist content"
+              id="Creating specialist content"
             >
               <p>
                 Government often explains that because they’re creating
@@ -261,7 +261,7 @@ const DocumentationDesignStandards = () => {
             </AccordionSection>
             <AccordionSection
               heading="Understanding your audience"
-              headingId="understanding-your-audience"
+              id="understanding-your-audience"
             >
               <p>
                 Your content will be most effective if you understand who you’re
@@ -316,7 +316,7 @@ const DocumentationDesignStandards = () => {
             </AccordionSection>
             <AccordionSection
               heading="How people use content"
-              headingId="how-people-use-content"
+              id="how-people-use-content"
             >
               <p>
                 Knowing how our audience uses content means you can create
@@ -397,7 +397,7 @@ const DocumentationDesignStandards = () => {
             </AccordionSection>
             <AccordionSection
               heading="Content design best practice, concepts and tips"
-              headingId="content-design-best-practice-concepts-and-tips"
+              id="content-design-best-practice-concepts-and-tips"
             >
               <p>
                 This section contains a range of practical guidance and
@@ -725,10 +725,7 @@ const DocumentationDesignStandards = () => {
                 right.
               </p>
             </AccordionSection>
-            <AccordionSection
-              heading="Help and support"
-              headingId="help-and-support"
-            >
+            <AccordionSection heading="Help and support" id="help-and-support">
               <p>
                 The following are links to more detailed guidance on concepts
                 and guidance we’ve already covered in this guide:
@@ -784,7 +781,7 @@ const DocumentationDesignStandards = () => {
                 </a>
               </p>
             </AccordionSection>
-            <AccordionSection heading="Feedback" headingId="feedback">
+            <AccordionSection heading="Feedback" id="feedback">
               <p>
                 This guidance pulls together all our current content design
                 guidance for explore education statistics but there are and will

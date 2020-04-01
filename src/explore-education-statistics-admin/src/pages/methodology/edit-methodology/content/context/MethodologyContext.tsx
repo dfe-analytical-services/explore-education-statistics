@@ -1,7 +1,8 @@
 import { MethodologyContent } from '@admin/services/methodology/types';
+import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
-import { Reducer, useImmerReducer } from 'use-immer';
+import { Reducer } from 'use-immer';
 import { MethodologyDispatchAction } from './MethodologyContextActionTypes';
 
 export type MethodologyContextDispatch = (
@@ -29,7 +30,7 @@ export const methodologyReducer: Reducer<
       const { sectionId, blockId, sectionKey } = action.payload.meta;
       if (!draft.methodology[sectionKey]) {
         throw new Error(
-          `REMOVE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Error - Section "${sectionKey}" could not be found.`,
         );
       }
 
@@ -47,7 +48,7 @@ export const methodologyReducer: Reducer<
       const { sectionId, blockId, sectionKey } = meta;
       if (!draft.methodology[sectionKey]) {
         throw new Error(
-          `UPDATE_BLOCK_FROM_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Error - Section "${sectionKey}" could not be found.`,
         );
       }
       const matchingSection = draft.methodology[sectionKey].find(
@@ -67,7 +68,7 @@ export const methodologyReducer: Reducer<
       const { sectionId, sectionKey } = meta;
       if (!draft.methodology[sectionKey]) {
         throw new Error(
-          `ADD_BLOCK_TO_SECTION: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Error - Section "${sectionKey}" could not be found.`,
         );
       }
       const matchingSection = draft.methodology[sectionKey].find(
@@ -87,7 +88,7 @@ export const methodologyReducer: Reducer<
       const { sectionId, sectionKey } = meta;
       if (!draft.methodology[sectionKey]) {
         throw new Error(
-          `UPDATE_SECTION_CONTENT: Error - Section "${sectionKey}" could not be found.`,
+          `${action.type}: Error - Section "${sectionKey}" could not be found.`,
         );
       }
 
@@ -135,7 +136,11 @@ interface MethodologyProviderProps {
 }
 
 function MethodologyProvider({ children, value }: MethodologyProviderProps) {
-  const [state, dispatch] = useImmerReducer(methodologyReducer, value);
+  const [state, dispatch] = useLoggedImmerReducer(
+    'Methodology',
+    methodologyReducer,
+    value,
+  );
 
   return (
     <MethodologyStateContext.Provider value={state}>

@@ -1,80 +1,76 @@
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import BlockDraggable from '@admin/modules/find-statistics/components/BlockDraggable';
 import BlockDroppable from '@admin/modules/find-statistics/components/BlockDroppable';
-import Comments from '@admin/modules/find-statistics/components/Comments';
+import Comments, {
+  CommentsChangeHandler,
+} from '@admin/modules/find-statistics/components/Comments';
 import { EditableBlock } from '@admin/services/publicationService';
 import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';
-import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import { Dictionary } from '@common/types/util';
-import orderBy from 'lodash/orderBy';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import reorder from '@common/utils/reorder';
+import React, { useCallback } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import EditableBlockRenderer from './EditableBlockRenderer';
 
-export interface Props extends SectionBlocksProps {
+export interface EditableSectionBlockProps extends SectionBlocksProps {
   content: EditableBlock[];
   sectionId: string;
-  editable?: boolean;
   isReordering?: boolean;
-  insideAccordion?: boolean;
-  allowComments: boolean;
-  onBlockSaveOrder?: (order: Dictionary<number>) => void;
-  onBlockContentChange: (blockId: string, content: string) => void;
+  allowHeadings?: boolean;
+  allowComments?: boolean;
+  onBlocksChange?: (nextBlocks: EditableBlock[]) => void;
+  onBlockContentSave: (blockId: string, content: string) => void;
   onBlockDelete: (blockId: string) => void;
 }
 
-const EditableSectionBlocks = ({
-  content = [],
-  sectionId,
-  editable = true,
-  isReordering = false,
-  insideAccordion,
-  allowComments = false,
-  onBlockSaveOrder,
-  onBlockContentChange,
-  onBlockDelete,
-}: Props) => {
-  const [blocks, setBlocks] = useState<EditableBlock[]>();
-  const isInitialMount = useRef(true);
+const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
+  const {
+    content = [],
+    sectionId,
+    isReordering = false,
+    allowHeadings,
+    allowComments = false,
+    getInfographic,
+    onBlockContentSave,
+    onBlockDelete,
+    onBlocksChange,
+  } = props;
 
-  useEffect(() => {
-    setBlocks(orderBy(content, 'order'));
-  }, [content]);
+  const { isEditing } = useEditingContext();
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    } else if (!isReordering) {
-      if (onBlockSaveOrder && blocks !== undefined)
-        onBlockSaveOrder(
-          blocks.reduce<Dictionary<number>>(
-            (map, { id: blockId }, index) => ({
-              ...map,
-              [blockId]: index,
-            }),
-            {},
-          ),
-        );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReordering]);
-
-  const onDragEnd = useCallback(
-    (result: DropResult) => {
-      const { source, destination, type } = result;
-
-      if (type === 'content' && destination) {
-        const newBlocks = [...(blocks || [])];
-        const [removed] = newBlocks.splice(source.index, 1);
-        newBlocks.splice(destination.index, 0, removed);
-        setBlocks(newBlocks);
+  const handleDragEnd = useCallback(
+    ({ source, destination }: DropResult) => {
+      if (destination && onBlocksChange) {
+        onBlocksChange(reorder(content, source.index, destination.index));
       }
     },
-    [blocks],
+    [content, onBlocksChange],
   );
 
-  if (blocks === undefined || blocks.length === 0) {
+  const handleCommentsChange: CommentsChangeHandler = useCallback(
+    (blockId, comments) => {
+      if (!onBlocksChange) {
+        return;
+      }
+
+      const blockIndex = content.findIndex(block => block.id === blockId);
+
+      if (blockIndex > -1) {
+        const nextBlocks = [...content];
+        nextBlocks[blockIndex].comments = comments;
+
+        onBlocksChange(nextBlocks);
+      }
+    },
+    [content, onBlocksChange],
+  );
+
+  if (!isEditing) {
+    return <SectionBlocks {...props} />;
+  }
+
+  if (content.length === 0) {
     return (
       <div className="govuk-inset-text">
         There is no content for this section.
@@ -83,48 +79,38 @@ const EditableSectionBlocks = ({
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <BlockDroppable draggable={isReordering} droppableId={`${sectionId}`}>
-        {blocks.map((block, index) => (
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <BlockDroppable droppable={isReordering} droppableId={sectionId}>
+        {content.map((block, index) => (
           <div
-            key={`content-section-${block.id}`}
-            id={`content-section-${block.id}`}
+            key={block.id}
+            id={`editableSectionBlocks-${block.id}`}
             className="govuk-!-margin-bottom-9"
           >
             <BlockDraggable
               draggable={isReordering}
-              draggableId={`${block.id}`}
-              key={`${block.id}`}
+              draggableId={block.id}
+              key={block.id}
               index={index}
             >
-              {!isReordering && (
-                <>
-                  {allowComments && (
-                    <Comments
-                      sectionId={sectionId}
-                      contentBlockId={block.id}
-                      initialComments={block.comments}
-                      canResolve={false}
-                      canComment
-                      onCommentsChange={async comments => {
-                        const newBlocks = [...blocks];
-                        newBlocks[index] = { ...newBlocks[index], comments };
-                        setBlocks(newBlocks);
-                      }}
-                    />
-                  )}
-                </>
+              {!isReordering && allowComments && (
+                <Comments
+                  sectionId={sectionId}
+                  blockId={block.id}
+                  comments={block.comments}
+                  canResolve={false}
+                  canComment
+                  onChange={handleCommentsChange}
+                />
               )}
 
               <EditableBlockRenderer
-                editable={editable && !isReordering}
-                canDelete={!isReordering}
                 block={block}
-                insideAccordion={insideAccordion}
-                onContentChange={newContent =>
-                  onBlockContentChange(block.id, newContent)
-                }
-                onDelete={() => onBlockDelete(block.id)}
+                editable={!isReordering}
+                allowHeadings={allowHeadings}
+                getInfographic={getInfographic}
+                onContentSave={onBlockContentSave}
+                onDelete={onBlockDelete}
               />
             </BlockDraggable>
           </div>
@@ -134,4 +120,4 @@ const EditableSectionBlocks = ({
   );
 };
 
-export default wrapEditableComponent(EditableSectionBlocks, SectionBlocks);
+export default EditableSectionBlocks;

@@ -1,6 +1,7 @@
 @import '../styles/govuk-base';
 
 .panel {
+  background: #fff;
   page-break-inside: avoid;
 
   &:focus {

@@ -1,11 +1,14 @@
 import useMounted from '@common/hooks/useMounted';
+import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React, {
   cloneElement,
-  ComponentType,
-  ReactComponentElement,
+  isValidElement,
+  ReactElement,
   ReactNode,
+  useCallback,
   useEffect,
+  useMemo,
   useRef,
 } from 'react';
 import { useImmer } from 'use-immer';
@@ -18,6 +21,7 @@ import {
 export interface AccordionProps {
   children: ReactNode;
   id: string;
+  openAll?: boolean;
   onToggleAll?: (open: boolean) => void;
   onToggle?: (accordionSection: { id: string; title: string }) => void;
 }
@@ -26,82 +30,81 @@ export function generateIdList(count: number) {
   return new Array(count).fill('content-section-').map((id, n) => id + (n + 1));
 }
 
-const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
+const Accordion = ({
+  children,
+  id,
+  openAll,
+  onToggleAll,
+  onToggle,
+}: AccordionProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const [openSections, updateOpenSections] = useImmer<boolean[]>([]);
+  const sections = useMemo(
+    () =>
+      React.Children.toArray(children)
+        .filter<ReactElement<AccordionSectionProps>>(isValidElement)
+        .map((element, index) => {
+          return {
+            id: element.props.id ?? `${id}-${index + 1}`,
+            element,
+          };
+        }),
+    [children, id],
+  );
 
-  const sections = React.Children.toArray(children) as ReactComponentElement<
-    ComponentType<AccordionSectionProps>
-  >[];
+  const [openSections, updateOpenSections] = useImmer<Dictionary<boolean>>(() =>
+    sections.reduce<Dictionary<boolean>>((acc, section) => {
+      if (section.id) {
+        acc[section.id] = openAll ?? section.element.props.open ?? false;
+      }
 
-  const getSectionIds = (
-    sectionProps: AccordionSectionProps,
-    index: number,
-  ) => {
-    return {
-      contentId: sectionProps.contentId || `${id}-${index + 1}-content`,
-      headingId: sectionProps.headingId || `${id}-${index + 1}-heading`,
-    };
-  };
-
-  useEffect(() => {
-    updateOpenSections(() =>
-      sections.map(section => {
-        return section.props.open || false;
-      }),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [children, updateOpenSections]);
+      return acc;
+    }, {}),
+  );
 
   const { isMounted } = useMounted(() => {
     const goToHash = () => {
-      if (ref.current && window.location.hash) {
-        let locationHashEl: HTMLElement | null = null;
-
-        try {
-          locationHashEl = ref.current.querySelector(window.location.hash);
-        } catch (_) {
-          return;
-        }
-
-        if (locationHashEl) {
-          const sectionEl = locationHashEl.closest(
-            `.${accordionSectionClasses.section}`,
-          );
-
-          if (sectionEl) {
-            const contentEl = sectionEl.querySelector(
-              `.${accordionSectionClasses.sectionContent}`,
-            );
-
-            if (contentEl) {
-              updateOpenSections(draft => {
-                const openIndex = sections.findIndex((section, index) => {
-                  const { contentId, headingId } = getSectionIds(
-                    section.props,
-                    index,
-                  );
-                  const hashId = contentEl.id;
-                  return hashId === contentId || hashId === headingId;
-                });
-
-                if (openIndex > -1) {
-                  draft[openIndex] = true;
-                }
-              });
-
-              setTimeout(
-                () =>
-                  (locationHashEl as HTMLElement).scrollIntoView({
-                    block: 'start',
-                  }),
-                100,
-              );
-            }
-          }
-        }
+      if (!ref.current || !window.location.hash) {
+        return;
       }
+
+      let locationHashEl: HTMLElement | null = null;
+
+      try {
+        locationHashEl = ref.current.querySelector(window.location.hash);
+      } catch (_) {
+        return;
+      }
+
+      if (!locationHashEl) {
+        return;
+      }
+
+      const sectionEl = locationHashEl.closest(
+        `.${accordionSectionClasses.section}`,
+      );
+
+      if (!sectionEl) {
+        return;
+      }
+
+      updateOpenSections(draft => {
+        const matchingSection = sections.find(
+          section => sectionEl.id === section.id,
+        );
+
+        if (matchingSection) {
+          draft[matchingSection.id] = true;
+        }
+      });
+
+      setTimeout(
+        () =>
+          (locationHashEl as HTMLElement).scrollIntoView({
+            block: 'start',
+          }),
+        100,
+      );
     };
 
     goToHash();
@@ -110,7 +113,44 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
     return () => window.removeEventListener('hashchange', goToHash);
   });
 
-  const isAllOpen = openSections.every(isOpen => isOpen);
+  useEffect(() => {
+    // Changing `openAll` prop toggles all sections.
+    updateOpenSections(draft => {
+      sections.forEach(section => {
+        draft[section.id] = openAll ?? draft[section.id] ?? false;
+      });
+    });
+  }, [sections, updateOpenSections, openAll]);
+
+  const handleToggle = useCallback(
+    (isOpen: boolean, sectionId: string) => {
+      const matchingSection = sections.find(
+        section => section.id === sectionId,
+      );
+
+      if (!matchingSection) {
+        return;
+      }
+
+      updateOpenSections(draft => {
+        draft[matchingSection.id] = isOpen;
+      });
+
+      if (onToggle && isOpen) {
+        onToggle({
+          id: sectionId,
+          title: matchingSection.element.props.heading,
+        });
+      }
+
+      if (matchingSection.element.props.onToggle) {
+        matchingSection.element.props.onToggle(isOpen, sectionId);
+      }
+    },
+    [onToggle, sections, updateOpenSections],
+  );
+
+  const isAllOpen = Object.values(openSections).every(isOpen => isOpen);
 
   return (
     <div
@@ -120,7 +160,7 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
       role="none"
       data-module="govuk-accordion"
     >
-      {isMounted && (
+      {isMounted && typeof openAll !== 'boolean' && (
         <div className="govuk-accordion__controls">
           <button
             aria-expanded={isAllOpen}
@@ -128,7 +168,9 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
             className="govuk-accordion__open-all"
             onClick={() => {
               updateOpenSections(draft => {
-                return draft.map(() => !isAllOpen);
+                Object.keys(draft).forEach(key => {
+                  draft[key] = !isAllOpen;
+                });
               });
 
               if (onToggleAll) {
@@ -142,34 +184,13 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
         </div>
       )}
 
-      {sections.map((section, index) => {
-        const { headingId, contentId } = getSectionIds(section.props, index);
-
-        const isSectionOpen = isAllOpen || openSections[index];
-
-        return cloneElement<AccordionSectionProps>(section, {
-          key: headingId,
-          headingId,
-          contentId,
-          open: isSectionOpen,
-          onToggle(isOpen) {
-            updateOpenSections(draft => {
-              draft[index] = isOpen;
-            });
-
-            if (onToggle && isOpen) {
-              onToggle({
-                id: headingId,
-                title: section.props.heading,
-              });
-            }
-
-            if (section.props.onToggle) {
-              section.props.onToggle(isOpen);
-            }
-          },
-        });
-      })}
+      {sections.map(section =>
+        cloneElement<AccordionSectionProps>(section.element, {
+          id: section.id,
+          open: openSections[section.id] ?? false,
+          onToggle: handleToggle,
+        }),
+      )}
     </div>
   );
 };

@@ -1,33 +1,29 @@
 import React, { ReactNode } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
-const BlockDroppable = ({
-  draggable,
-  droppableId,
-  children,
-}: {
-  draggable: boolean;
+interface Props {
+  droppable: boolean;
   droppableId: string;
   children: ReactNode | ReactNode[];
-}) => {
+}
+
+const BlockDroppable = ({ droppable, droppableId, children }: Props) => {
   return (
-    <>
-      {draggable ? (
-        <Droppable droppableId={droppableId} type="content">
-          {droppableProvided => (
-            <div
-              {...droppableProvided.droppableProps}
-              ref={droppableProvided.innerRef}
-            >
-              {children}
-              {droppableProvided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      ) : (
-        children
+    <Droppable
+      droppableId={droppableId}
+      isDropDisabled={!droppable}
+      type="content"
+    >
+      {droppableProvided => (
+        <div
+          {...droppableProvided.droppableProps}
+          ref={droppableProvided.innerRef}
+        >
+          {children}
+          {droppableProvided.placeholder}
+        </div>
       )}
-    </>
+    </Droppable>
   );
 };
 

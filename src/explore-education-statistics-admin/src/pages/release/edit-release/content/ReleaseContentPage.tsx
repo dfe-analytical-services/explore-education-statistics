@@ -1,3 +1,4 @@
+import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { ReleaseRouteParams } from '@admin/routes/edit-release/routes';
 import permissionService from '@admin/services/permissions/permissionService';
@@ -12,7 +13,6 @@ import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
 import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { useState } from 'react';
@@ -82,13 +82,13 @@ const ReleaseContentPageLoaded = () => {
             pageMode === 'edit' ? 'dfe-page-editing' : 'dfe-page-preview'
           }
         >
-          <EditingContext.Provider
+          <EditingContextProvider
             value={{
               isEditing: pageMode === 'edit',
             }}
           >
             <PublicationReleaseContent />
-          </EditingContext.Provider>
+          </EditingContextProvider>
         </div>
       </div>
     </>
