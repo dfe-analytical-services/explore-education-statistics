@@ -11,22 +11,24 @@ interface Props {
   exclude?: 'status' | 'details';
 }
 
+type Stage =
+  | 'Scheduled'
+  | 'NotStarted'
+  | 'Invalid'
+  | 'Failed'
+  | 'Cancelled'
+  | 'Validating'
+  | 'Queued'
+  | 'Started'
+  | 'Complete';
+
 export interface ReleaseStatus {
   releaseId?: string;
-  dataStage?: string;
-  contentStage?: string;
-  filesStage?: string;
-  publishingStage?: string;
-  overallStage:
-    | 'Scheduled'
-    | 'NotStarted'
-    | 'Invalid'
-    | 'Failed'
-    | 'Cancelled'
-    | 'Validating'
-    | 'Queued'
-    | 'Started'
-    | 'Complete';
+  dataStage?: Stage;
+  contentStage?: Stage;
+  filesStage?: Stage;
+  publishingStage?: Stage;
+  overallStage: Stage;
   lastUpdated?: string;
 }
 
@@ -119,6 +121,7 @@ const ReleaseServiceStatus = ({
   }, [currentStatus, statusDetailColor]);
 
   if (!currentStatus) return null;
+
   return (
     <>
       {exclude !== 'status' && (
