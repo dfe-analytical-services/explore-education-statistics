@@ -108,7 +108,7 @@ const MethodologiesPage = () => {
 
       <Tabs id="methodologyTabs">
         <TabsSection
-          id="live-methodologies-tab"
+          id="live-methodologies"
           title={`Live methodologies ${
             model && model.liveMethodologies.length
               ? `(${model.liveMethodologies.length})`
@@ -133,7 +133,7 @@ const MethodologiesPage = () => {
           </Link>
         </TabsSection>
         <TabsSection
-          id="draft-methodologies-tab"
+          id="draft-methodologies"
           title={`Draft methodologies ${
             model && model.draftMethodologies.length
               ? `(${model.draftMethodologies.length})`
@@ -149,7 +149,7 @@ const MethodologiesPage = () => {
           )}
         </TabsSection>
         <TabsSection
-          id="approved-methodologies-tab"
+          id="approved-methodologies"
           title={`Approved methodologies ${
             model && model.approvedMethodologies.length
               ? `(${model.approvedMethodologies.length})`
