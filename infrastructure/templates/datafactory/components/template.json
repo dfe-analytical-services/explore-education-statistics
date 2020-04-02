@@ -35,12 +35,7 @@
         }
     },
     "variables": {
-        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
-        "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
-        "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
-        "sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'ees-sql-admin-password-datafactory')]",
-        "sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'ees-sql-public-password-datafactory')]",
-        "sql-user": "[resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'ees-sql-user-datafactory')]"
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
     },
     "resources": [
         {
@@ -109,10 +104,19 @@
                 "annotations": [],
                 "type": "AzureSqlDatabase",
                 "typeProperties": {
-                    "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', variables('sql-user'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', variables('sql-admin-password'), ';')]"
+                    "connectionString": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "AzureKeyVault",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "ees-sql-admin-datafactory-connectionstring"
+                    }
                 }
             },
-            "dependsOn": []
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+            ]
         },
         {
             "name": "[concat(parameters('factoryName'), '/ls_sql_public_statistics')]",
@@ -122,7 +126,29 @@
                 "annotations": [],
                 "type": "AzureSqlDatabase",
                 "typeProperties": {
-                    "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', variables('sql-user'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', variables('sql-public-password'), ';')]"
+                    "connectionString": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "AzureKeyVault",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "ees-sql-public-datafactory-connectionstring"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureKeyVault')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureKeyVault",
+                "typeProperties": {
+                    "baseUrl": "[concat('https://'parameters('keyVaultName'), '.vault.azure.net/')]"
                 }
             },
             "dependsOn": []
