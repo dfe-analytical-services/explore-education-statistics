@@ -148,7 +148,7 @@
                 "annotations": [],
                 "type": "AzureKeyVault",
                 "typeProperties": {
-                    "baseUrl": "[concat('https://'parameters('keyVaultName'), '.vault.azure.net/')]"
+                    "baseUrl": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net/')]"
                 }
             },
             "dependsOn": []
