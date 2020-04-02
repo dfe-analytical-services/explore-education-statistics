@@ -8,7 +8,7 @@ import {
 import Button from '@common/components/Button';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
 
@@ -21,7 +21,7 @@ interface MethodologyAccordionSectionProps {
 
 const MethodologyAccordionSection = ({
   sectionKey,
-  section: { id: sectionId, caption, heading, content: sectionContent },
+  section: { id: sectionId, caption, heading, content: sectionContent = [] },
   methodologyId,
   ...props
 }: MethodologyAccordionSectionProps) => {
@@ -38,6 +38,10 @@ const MethodologyAccordionSection = ({
 
   const [isReordering, setIsReordering] = useState(false);
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
+
+  useEffect(() => {
+    setBlocks(sectionContent);
+  }, [sectionContent]);
 
   const addBlockToAccordionSection = useCallback(async () => {
     await addContentSectionBlock({
