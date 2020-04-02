@@ -10,7 +10,8 @@ import React, { useEffect, useState } from 'react';
 
 interface Model {
   liveMethodologies: MethodologyStatusListItem[];
-  otherMethodologies: MethodologyStatusListItem[];
+  approvedMethodologies: MethodologyStatusListItem[];
+  draftMethodologies: MethodologyStatusListItem[];
 }
 
 const MethodologiesPage = () => {
@@ -18,16 +19,25 @@ const MethodologiesPage = () => {
 
   useEffect(() => {
     methodologyService.getMethodologies().then(methodologies => {
-      const liveMethodologies: MethodologyStatusListItem[] = [];
+      const liveMethodologies: MethodologyStatusListItem[] = methodologies.filter(
+        methodology => {
+          return methodology.status === 'Live';
+        },
+      );
+      const approvedMethodologies: MethodologyStatusListItem[] = methodologies.filter(
+        methodology => {
+          return methodology.status === 'Approved';
+        },
+      );
+      const draftMethodologies: MethodologyStatusListItem[] = methodologies.filter(
+        methodology => {
+          return methodology.status === 'Draft';
+        },
+      );
       setModel({
-        otherMethodologies: methodologies.filter(method => {
-          if (method.status.toLocaleLowerCase() === 'live') {
-            liveMethodologies.push(method);
-            return false;
-          }
-          return true;
-        }),
         liveMethodologies,
+        approvedMethodologies,
+        draftMethodologies,
       });
     });
   }, []);
@@ -52,7 +62,20 @@ const MethodologiesPage = () => {
       </div>
 
       <Tabs id="methodologyTabs">
-        <TabsSection id="manage-methodology" title="Methodologies">
+        <TabsSection
+          id="live-methodologies-tab"
+          title={`Live methodologies ${
+            model && model.liveMethodologies.length
+              ? `(${model.liveMethodologies.length})`
+              : '(0)'
+          }`}
+        >
+          <Link
+            to="/methodologies/create"
+            className="govuk-button govuk-!-margin-bottom-1"
+          >
+            Create new methodology
+          </Link>
           {model && model.liveMethodologies.length ? (
             <table className="govuk-table">
               <thead className="govuk-table__head">
@@ -94,7 +117,7 @@ const MethodologiesPage = () => {
             </table>
           ) : (
             <div className="govuk-inset-text">
-              There is currently no draft methodology
+              There is currently no live methodologies
             </div>
           )}
           <Link to="/methodologies/create" className="govuk-button">
@@ -102,14 +125,14 @@ const MethodologiesPage = () => {
           </Link>
         </TabsSection>
         <TabsSection
-          id="draft-methodology"
+          id="draft-methodologies-tab"
           title={`Draft methodologies ${
-            model && model.otherMethodologies.length
-              ? `(${model.otherMethodologies.length})`
+            model && model.draftMethodologies.length
+              ? `(${model.draftMethodologies.length})`
               : '(0)'
           }`}
         >
-          {model && model.otherMethodologies.length ? (
+          {model && model.draftMethodologies.length ? (
             <table className="govuk-table">
               <thead className="govuk-table__head">
                 <tr className="govuk-table__row">
@@ -125,7 +148,7 @@ const MethodologiesPage = () => {
                 </tr>
               </thead>
               <tbody className="govuk-table__body">
-                {model.otherMethodologies.map(methodology => (
+                {model.draftMethodologies.map(methodology => (
                   <tr className="govuk-table__row" key={methodology.id}>
                     <td className="govuk-table__header">
                       <Link to={contentRoute.generateLink(methodology.id)}>
@@ -151,6 +174,59 @@ const MethodologiesPage = () => {
           ) : (
             <div className="govuk-inset-text">
               There is currently no draft methodology
+            </div>
+          )}
+        </TabsSection>
+        <TabsSection
+          id="approved-methodologies-tab"
+          title={`Approved methodologies ${
+            model && model.approvedMethodologies.length
+              ? `(${model.approvedMethodologies.length})`
+              : '(0)'
+          }`}
+        >
+          {model && model.approvedMethodologies.length ? (
+            <table className="govuk-table">
+              <thead className="govuk-table__head">
+                <tr className="govuk-table__row">
+                  <th scope="col" className="govuk-table__header">
+                    Methodology title
+                  </th>
+                  <th scope="col" className="govuk-table__header">
+                    Status
+                  </th>
+                  <th scope="col" className="govuk-table__header">
+                    Related publications
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="govuk-table__body">
+                {model.approvedMethodologies.map(methodology => (
+                  <tr className="govuk-table__row" key={methodology.id}>
+                    <td className="govuk-table__header">
+                      <Link to={contentRoute.generateLink(methodology.id)}>
+                        {methodology.title}
+                      </Link>
+                    </td>
+                    <td className="govuk-table__cell">
+                      <strong className="govuk-tag">
+                        {methodology.status}
+                      </strong>
+                    </td>
+                    <td className="govuk-table__cell">
+                      <ul className="govuk-list">
+                        {methodology.publications.map(publication => (
+                          <li key={publication.id}>{publication.title}</li>
+                        ))}
+                      </ul>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="govuk-inset-text">
+              There is currently no approved methodologies
             </div>
           )}
         </TabsSection>
