@@ -21,7 +21,7 @@ interface MethodologyAccordionSectionProps {
 
 const MethodologyAccordionSection = ({
   sectionKey,
-  section: { id: sectionId, caption, heading, content: sectionContent },
+  section: { id: sectionId, caption, heading, content: sectionContent = [] },
   methodologyId,
   ...props
 }: MethodologyAccordionSectionProps) => {

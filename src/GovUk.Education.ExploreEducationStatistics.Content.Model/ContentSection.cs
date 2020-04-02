@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Caption { get; set; }
 
-        public List<IContentBlock> Content { get; set; }
+        public List<IContentBlock> Content { get; set; } = new List<IContentBlock>();
 
         public ReleaseContentSection? Release { get; set; }
 
