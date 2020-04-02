@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using WindowsAzure.Table.Extensions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -43,17 +42,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var table = await GetTableAsync();
-                    var query = table.CreateQuery<ReleaseStatus>()
-                        .Where(releaseStatus => releaseStatus.PartitionKey.Equals(releaseId.ToString()));
-                    var result = await query.FirstOrDefaultAsync();
-                    return _mapper.Map<ReleaseStatusViewModel>(result);
-                });
-        }
+                    var query = new TableQuery<ReleaseStatus>()
+                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+                            QueryComparisons.Equal, releaseId.ToString()))
+                        .OrderByDesc(nameof(ReleaseStatus.Created));
 
-        private async Task<CloudTable> GetTableAsync()
-        {
-            return await _tableStorageService.GetTableAsync(TableName);
+                    var result = await _tableStorageService.ExecuteQueryAsync(TableName, query);
+                    return _mapper.Map<ReleaseStatusViewModel>(result.FirstOrDefault());
+                });
         }
     }
 }

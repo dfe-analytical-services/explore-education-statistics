@@ -40,19 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
         }
 
-        public async Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
+        public Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
         {
-            var results = new List<ReleaseStatus>();
-            var table = await GetTableAsync();
-            TableContinuationToken token = null;
-            do
-            {
-                var queryResult = await table.ExecuteQuerySegmentedAsync(query, token);
-                results.AddRange(queryResult.Results);
-                token = queryResult.ContinuationToken;
-            } while (token != null);
-
-            return results;
+            return _tableStorageService.ExecuteQueryAsync(TableName, query);
         }
 
         public async Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state)
