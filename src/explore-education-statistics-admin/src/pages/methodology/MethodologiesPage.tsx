@@ -125,7 +125,7 @@ const MethodologiesPage = () => {
             <MethodologiesTable methodologies={model.liveMethodologies} />
           ) : (
             <div className="govuk-inset-text">
-              There is currently no live methodologies
+              There are currently no live methodologies
             </div>
           )}
           <Link to="/methodologies/create" className="govuk-button">
@@ -144,7 +144,7 @@ const MethodologiesPage = () => {
             <MethodologiesTable methodologies={model.draftMethodologies} />
           ) : (
             <div className="govuk-inset-text">
-              There is currently no draft methodology
+              There are currently no draft methodologies
             </div>
           )}
         </TabsSection>
@@ -160,7 +160,7 @@ const MethodologiesPage = () => {
             <MethodologiesTable methodologies={model.approvedMethodologies} />
           ) : (
             <div className="govuk-inset-text">
-              There is currently no approved methodologies
+              There are currently no approved methodologies
             </div>
           )}
         </TabsSection>
