@@ -12,15 +12,13 @@ interface Props {
 }
 
 type Stage =
-  | 'Scheduled'
-  | 'NotStarted'
-  | 'Invalid'
-  | 'Failed'
-  | 'Cancelled'
   | 'Validating'
+  | 'Cancelled'
+  | 'Complete'
+  | 'Failed'
   | 'Queued'
-  | 'Started'
-  | 'Complete';
+  | 'NotStarted'
+  | 'Started';
 
 export interface ReleaseStatus {
   releaseId?: string;
@@ -87,11 +85,8 @@ const ReleaseServiceStatus = ({
     (status: string): { color: StatusBlockProps['color']; text: string } => {
       if (currentStatus) {
         switch (status) {
-          case 'Scheduled':
-            return { color: 'blue', text: status };
           case 'NotStarted':
             return { color: 'blue', text: 'Not Started' };
-          case 'Invalid':
           case 'Failed':
           case 'Cancelled':
             return { color: 'red', text: status };
