@@ -14,6 +14,51 @@ interface Model {
   draftMethodologies: MethodologyStatusListItem[];
 }
 
+interface MethodologiesTableProps {
+  methodologies: MethodologyStatusListItem[];
+}
+
+const MethodologiesTable = ({ methodologies }: MethodologiesTableProps) => {
+  return (
+    <table className="govuk-table">
+      <thead className="govuk-table__head">
+        <tr className="govuk-table__row">
+          <th scope="col" className="govuk-table__header">
+            Methodology title
+          </th>
+          <th scope="col" className="govuk-table__header">
+            Status
+          </th>
+          <th scope="col" className="govuk-table__header">
+            Related publications
+          </th>
+        </tr>
+      </thead>
+      <tbody className="govuk-table__body">
+        {methodologies.map(methodology => (
+          <tr className="govuk-table__row" key={methodology.id}>
+            <td className="govuk-table__header">
+              <Link to={contentRoute.generateLink(methodology.id)}>
+                {methodology.title}
+              </Link>
+            </td>
+            <td className="govuk-table__cell">
+              <strong className="govuk-tag">{methodology.status}</strong>
+            </td>
+            <td className="govuk-table__cell">
+              <ul className="govuk-list">
+                {methodology.publications.map(publication => (
+                  <li key={publication.id}>{publication.title}</li>
+                ))}
+              </ul>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
 const MethodologiesPage = () => {
   const [model, setModel] = useState<Model>();
 
@@ -77,44 +122,7 @@ const MethodologiesPage = () => {
             Create new methodology
           </Link>
           {model && model.liveMethodologies.length ? (
-            <table className="govuk-table">
-              <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header">
-                    Methodology title
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Status
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Related publications
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="govuk-table__body">
-                {model.liveMethodologies.map(methodology => (
-                  <tr className="govuk-table__row" key={methodology.id}>
-                    <td className="govuk-table__header">
-                      <Link to={contentRoute.generateLink(methodology.id)}>
-                        {methodology.title}
-                      </Link>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <strong className="govuk-tag">
-                        {methodology.status}
-                      </strong>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <ul className="govuk-list">
-                        {methodology.publications.map(publication => (
-                          <li key={publication.id}>{publication.title}</li>
-                        ))}
-                      </ul>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <MethodologiesTable methodologies={model.liveMethodologies} />
           ) : (
             <div className="govuk-inset-text">
               There is currently no live methodologies
@@ -133,44 +141,7 @@ const MethodologiesPage = () => {
           }`}
         >
           {model && model.draftMethodologies.length ? (
-            <table className="govuk-table">
-              <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header">
-                    Methodology title
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Status
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Related publications
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="govuk-table__body">
-                {model.draftMethodologies.map(methodology => (
-                  <tr className="govuk-table__row" key={methodology.id}>
-                    <td className="govuk-table__header">
-                      <Link to={contentRoute.generateLink(methodology.id)}>
-                        {methodology.title}
-                      </Link>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <strong className="govuk-tag">
-                        {methodology.status}
-                      </strong>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <ul className="govuk-list">
-                        {methodology.publications.map(publication => (
-                          <li key={publication.id}>{publication.title}</li>
-                        ))}
-                      </ul>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <MethodologiesTable methodologies={model.draftMethodologies} />
           ) : (
             <div className="govuk-inset-text">
               There is currently no draft methodology
@@ -186,44 +157,7 @@ const MethodologiesPage = () => {
           }`}
         >
           {model && model.approvedMethodologies.length ? (
-            <table className="govuk-table">
-              <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header">
-                    Methodology title
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Status
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Related publications
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="govuk-table__body">
-                {model.approvedMethodologies.map(methodology => (
-                  <tr className="govuk-table__row" key={methodology.id}>
-                    <td className="govuk-table__header">
-                      <Link to={contentRoute.generateLink(methodology.id)}>
-                        {methodology.title}
-                      </Link>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <strong className="govuk-tag">
-                        {methodology.status}
-                      </strong>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <ul className="govuk-list">
-                        {methodology.publications.map(publication => (
-                          <li key={publication.id}>{publication.title}</li>
-                        ))}
-                      </ul>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <MethodologiesTable methodologies={model.approvedMethodologies} />
           ) : (
             <div className="govuk-inset-text">
               There is currently no approved methodologies
