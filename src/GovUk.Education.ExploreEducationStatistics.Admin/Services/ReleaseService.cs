@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -18,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -39,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
         private readonly ISubjectService _subjectService;
-        private readonly ITableStorageService _tableStorageService;
+        private readonly ITableStorageService _coreTableStorageService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
@@ -54,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService, 
             IReleaseRepository repository, 
             ISubjectService subjectService,
-            ITableStorageService tableStorageService, 
+            ITableStorageService coreTableStorageService, 
             IFileStorageService fileStorageService, 
             IImportStatusService importStatusService,
 	    IFootnoteService footnoteService)
@@ -66,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _repository = repository;
             _subjectService = subjectService;
-            _tableStorageService = tableStorageService;
+            _coreTableStorageService = coreTableStorageService;
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
             _footnoteService = footnoteService;
@@ -287,8 +289,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
-                .OnSuccess(async release => {
-
+                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, status))
+                .OnSuccess(async release =>
+                {
                     if (status == ReleaseStatus.Approved && !release.PublishScheduled.HasValue)
                     {
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
@@ -385,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .DeleteDataFileAsync(releaseId, fileName)
                         .OnSuccessDo(async () =>
                         {
-                            await _tableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
+                            await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
                         });
                 });
         }
@@ -440,6 +443,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Cast<DataBlock>()
                 .Where(block => block.DataBlockRequest.SubjectId == subjectId)
                 .ToList();
+        }
+        private async Task<Either<ActionResult,bool>> CheckAllDatafilesUploadedComplete(Guid releaseId, ReleaseStatus status)
+        {
+            if (status == ReleaseStatus.Approved)
+            {
+                var filters = TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterCondition("PartitionKey", 
+                        QueryComparisons.Equal, releaseId.ToString())
+                    , TableOperators.And, 
+                    TableQuery.GenerateFilterCondition("Status", 
+                        QueryComparisons.NotEqual, IStatus.COMPLETE.ToString()));
+                
+                var query = new TableQuery<DatafileImport>().Where(filters);
+                var cloudTable = _coreTableStorageService.GetCloudTable("imports");
+                var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
+                if (results.Results.Count != 0)
+                {
+                    return ValidationActionResult(AllDatafilesUploadedMustBeComplete);
+                }
+            }
+            return true;
         }
 
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)

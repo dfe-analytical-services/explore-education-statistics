@@ -23,17 +23,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private const string TableName = "ReleaseStatus";
 
         private readonly IMapper _mapper;
-        private readonly ITableStorageService _tableStorageService;
+        private readonly ITableStorageService _publisherTableStorageService;
         private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
         public ReleaseStatusService(IMapper mapper, IUserService userService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper, ITableStorageService tableStorageService)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, ITableStorageService publisherTableStorageService)
         {
             _mapper = mapper;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
-            _tableStorageService = tableStorageService;
+            _publisherTableStorageService = publisherTableStorageService;
         }
 
         public async Task<Either<ActionResult, ReleaseStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<CloudTable> GetTableAsync()
         {
-            return await _tableStorageService.GetTableAsync(TableName);
+            return await _publisherTableStorageService.GetTableAsync(TableName);
         }
     }
 }

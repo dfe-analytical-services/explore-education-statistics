@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 
@@ -58,6 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             var table = _client.GetTableReference(tableName);
             return await table.ExecuteAsync(TableOperation.InsertOrReplace(entity));
+        }
+        
+        public CloudTable GetCloudTable(string tableName)
+        {
+            return _client.GetTableReference(tableName);
         }
     }
 }
