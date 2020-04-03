@@ -116,6 +116,7 @@ const LineChartBlock = ({
         />
 
         <YAxis
+          label={axes.minor.label}
           type="number"
           dataKey="value"
           hide={!axes.minor.visible}
@@ -126,6 +127,7 @@ const LineChartBlock = ({
         />
 
         <XAxis
+          label={axes.major.label}
           type="category"
           dataKey="name"
           hide={!axes.major.visible}

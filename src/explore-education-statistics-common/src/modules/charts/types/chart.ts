@@ -15,7 +15,7 @@ import {
 import { Footnote } from '@common/services/types/footnotes';
 import { Dictionary } from '@common/types';
 import { ReactNode } from 'react';
-import { LegendProps, PositionType } from 'recharts';
+import { LegendProps, PositionType, LabelProps } from 'recharts';
 
 export type ChartType =
   | 'line'
@@ -66,6 +66,12 @@ export interface ReferenceLine {
 
 export interface AxisConfiguration {
   type: AxisType;
+  label: {
+    value: string;
+    offset: number;
+    angle: number;
+    position: LabelProps['position'];
+  };
   groupBy?: AxisGroupBy;
   sortBy?: string;
   sortAsc?: boolean;

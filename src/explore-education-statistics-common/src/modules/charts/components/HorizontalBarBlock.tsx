@@ -83,6 +83,7 @@ const HorizontalBarBlock = ({
         />
 
         <XAxis
+          label={axes.minor.label}
           type="number"
           dataKey="value"
           hide={!axes.minor.visible}
@@ -95,6 +96,7 @@ const HorizontalBarBlock = ({
         />
 
         <YAxis
+          label={axes.major.label}
           type="category"
           dataKey="name"
           hide={!axes.major.visible}

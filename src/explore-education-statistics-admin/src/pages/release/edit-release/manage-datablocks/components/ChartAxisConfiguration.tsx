@@ -12,7 +12,6 @@ import {
   FormTextInput,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
-
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   AxisConfiguration,
@@ -31,6 +30,7 @@ import { DataBlockData } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
+import noCase from 'no-case';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Schema } from 'yup';
 
@@ -239,6 +239,64 @@ const ChartAxisConfiguration = ({
               />
             )}
           </FormGroup>
+          <FormFieldset
+            id={`${id}-label`}
+            legend="Axis label"
+            legendSize="m"
+            hint="Label your axes"
+          >
+            <FormFieldTextInput
+              id={`${id}-label.value`}
+              label="Axis label"
+              name="label.value"
+              width={10}
+            />
+            <FormFieldTextInput
+              id={`${id}-label.angle`}
+              label="Axis label angle"
+              name="label.angle"
+              type="number"
+              min="-180"
+              max="180"
+              width={4}
+            />
+            <FormFieldSelect
+              id={`${id}-label.position`}
+              label="Axis label position"
+              name="label.position"
+              options={[
+                'top',
+                'bottom',
+                'center',
+                'end',
+                'left',
+                'right',
+                'inside',
+                'outside',
+                'insideLeft',
+                'insideRight',
+                'insideTop',
+                'insideBottom',
+                'insideTopLeft',
+                'insideBottomLeft',
+                'insideTopRight',
+                'insideBottomRight',
+                'insideStart',
+                'insideEnd',
+              ].map(position => {
+                return { label: noCase(position), value: position };
+              })}
+            />
+            <FormFieldTextInput
+              id={`${id}-label.offset`}
+              label="Axis label position offset"
+              name="label.offset"
+              type="number"
+              min="-50"
+              max="50"
+              width={3}
+            />
+          </FormFieldset>
 
           {configuration.type === 'minor' && (
             <FormFieldset

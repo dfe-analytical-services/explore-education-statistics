@@ -77,6 +77,12 @@ const defaultAxisOptions: Partial<AxisConfiguration> = {
   tickSpacing: 1,
   visible: true,
   unit: '',
+  label: {
+    value: '',
+    offset: 0,
+    angle: 0,
+    position: 'center',
+  },
 };
 
 export const chartBuilderReducer: Reducer<
