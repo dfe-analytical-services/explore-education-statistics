@@ -52,6 +52,9 @@
     },
     "publicAppGATrackingId": {
       "value": "UA-139424173-2"
+    },
+    "enableSwagger": {
+       "value": true
     }
   }
 }

@@ -417,6 +417,10 @@
     "detailedErrors": {
       "type": "bool",
       "defaultValue": false
+    },
+    "enableSwagger": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
@@ -624,7 +628,8 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2015-05-01').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
-        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]"
+        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
+        "enableSwagger": "[parameters('enableSwagger')]"
       }
     },
     {
@@ -828,7 +833,8 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2015-05-01').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
-        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]"
+        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
+        "enableSwagger": "[parameters('enableSwagger')]"
       }
     },
     {
@@ -1056,7 +1062,8 @@
         "OpenIdConnect:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnect:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core'), '2018-02-14').secretUriWithVersion, ')')]",
-        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]"
+        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
+        "enableSwagger": "[parameters('enableSwagger')]"
       }
     },
     {
