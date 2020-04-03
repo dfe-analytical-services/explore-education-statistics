@@ -1273,10 +1273,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Publication
                 {
                     Id = new Guid("2e510281-ca8c-41bf-bbe0-fd15fcc81aae"),
-                    Title = "NEET statistics quarterly brief",
+                    Title = "NEET statistics annual brief",
                     Summary = "",
                     TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
-                    Slug = "neet-statistics-quarterly-brief",
+                    Slug = "neet-statistics-annual-brief",
                     LegacyPublicationUrl =
                         new Uri("https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-"),
                     ContactId = new Guid("ee490e40-201a-4b25-bc52-76c15de72344")
