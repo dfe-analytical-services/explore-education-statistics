@@ -1,170 +1,132 @@
+import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import last from 'lodash/last';
-import sumBy from 'lodash/sumBy';
-import times from 'lodash/times';
+import omit from 'lodash/omit';
 import React, { forwardRef, ReactNode } from 'react';
 import styles from './MultiHeaderTable.module.scss';
 
-/**
- * Header groups can have subgroups. This is intended
- * for use with 'filter groups' in table tool to make it
- * more obvious which filters are grouped together.
- * e.g.
- * 'Ethnic group major' is the filter group for
- * 'Ethnicity Major Asian Total' and 'Ethnicity Major Black Total'.
- */
-export interface HeaderSubGroup {
+export interface Header {
+  id: string;
   text: string;
-  span?: number;
-}
-
-/**
- * A header group describes a row/column of table headers.
- * We can have multiple header groups in the row or
- * column directions.
- * Header groups can have additional subgroups which
- * introduce additional rows/columns into the rendered headers.
- */
-export interface HeaderGroup {
-  headers: {
-    text: string;
-  }[];
-  groups?: HeaderSubGroup[];
-}
-
-interface ExpandedHeader {
-  text: string;
+  /**
+   * The number of cells that
+   * this header should span.
+   */
   span: number;
-  crossSpan: number;
+  /**
+   * The starting cell index in
+   * the row/col direction.
+   */
   start: number;
-  isGroup: boolean;
-  isHidden?: boolean;
+  /**
+   * Headers may have extra subgroups.
+   * These can be used to provide more
+   * context.
+   *
+   * They are expanded as additional
+   * rowgroup/colgroups in the table.
+   */
+  group?: string;
 }
 
-/**
- * Create {@see ExpandedHeader}s that provide a more
- * detailed model for rendering the table headers.
- */
-const createExpandedHeaders = (
-  headerGroups: HeaderGroup[],
-): ExpandedHeader[][] => {
-  // The max number of rows/column spans that any
-  // header group can be for this table.
-  const maxSpan = headerGroups.reduce(
-    (acc, headerGroup) => acc * headerGroup?.headers?.length,
-    1,
-  );
+interface ExpandedHeader extends OmitStrict<Header, 'group'> {
+  crossSpan: number;
+  isHidden: boolean;
+  isGroup: boolean;
+}
 
-  return headerGroups.reduce<ExpandedHeader[][]>(
-    (acc, headerGroup, headerGroupIndex) => {
-      const previousGroupLength = last(acc)?.length ?? 1;
-      const span = maxSpan / (headerGroup.headers.length * previousGroupLength);
-
-      let expandedHeaderGroups: ExpandedHeader[] = [];
-
-      if (headerGroup.groups && headerGroup.groups.length) {
-        const hasMultipleGroups = headerGroup.groups.length > 1;
-
-        // Header subgroups can have different sizes depending
-        // on the `span` that is specified.
-        // It should not be bigger or smaller than it's parent
-        // header group's span as this will break the table.
-        // If we have a single header subgroup, then we just
-        // make it span the entire header group.
-        const groupSpan = hasMultipleGroups
-          ? sumBy(headerGroup.groups, header => (header.span ?? 1) * span)
-          : maxSpan;
-
-        expandedHeaderGroups = times(
-          maxSpan / groupSpan,
-          repeat =>
-            headerGroup.groups?.reduce((headerSubGroups, header) => {
-              const previous = last(headerSubGroups);
-
-              headerSubGroups.push({
-                text: header.text,
-                span: hasMultipleGroups ? (header.span ?? 1) * span : groupSpan,
-                crossSpan: 1,
-                start: previous
-                  ? previous.start + previous.span
-                  : repeat * groupSpan,
-                isGroup: true,
-              });
-
-              return headerSubGroups;
-            }, [] as ExpandedHeader[]) ?? [],
-        ).flat();
-
-        acc.push(expandedHeaderGroups);
-      }
-
-      const expandedHeaders: ExpandedHeader[] = times(
-        previousGroupLength,
-        repeat =>
-          headerGroup.headers.map((header, headerIndex) => {
-            return {
-              text: header.text,
-              // Headers are expected to have equal sizes
-              // within their group (unlike header subgroups)
-              span,
-              crossSpan: 1,
-              start:
-                repeat * headerGroup.headers.length * span + headerIndex * span,
-              isGroup: headerGroupIndex !== headerGroups.length - 1,
-            };
-          }),
-      )
-        .flat()
-        .map(expandedHeader => {
-          // We want to find any headers that duplicate their
-          // corresponding header group to clean up the headers.
-          const matchingHeaderGroup = expandedHeaderGroups.find(
-            expandedHeaderGroup =>
-              expandedHeaderGroup.start === expandedHeader.start &&
-              expandedHeaderGroup.text === expandedHeader.text &&
-              expandedHeaderGroup.span === expandedHeader.span,
-          );
-
-          // We simply make the header group take up the space
-          // that the header would normally have taken in the table.
-          // We then prevent the header itself from being rendered.
-          if (matchingHeaderGroup) {
-            // A bit naughty, but we mutate the header group
-            // to re-use the current context and avoid
-            // having to perform any further complex loops.
-            matchingHeaderGroup.isGroup = false;
-            matchingHeaderGroup.crossSpan = 2;
-
-            // eslint-disable-next-line no-param-reassign
-            return {
-              ...expandedHeader,
-              isHidden: true,
-            };
-          }
-
-          return expandedHeader;
-        });
-
-      acc.push(expandedHeaders);
-
-      return acc;
-    },
-    [],
-  );
-};
-
-interface Props {
+export interface MultiHeaderTableProps {
   ariaLabelledBy?: string;
   className?: string;
-  columnHeaders: HeaderGroup[];
-  rowHeaders: HeaderGroup[];
+  columnHeaders: Header[][];
+  rowHeaders: Header[][];
   rows: string[][];
 }
 
-const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
+const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
   ({ ariaLabelledBy, className, columnHeaders, rowHeaders, rows }, ref) => {
-    const expandedColumnHeaders = createExpandedHeaders(columnHeaders);
+    const createExpandedHeaders = (
+      headerGroups: Header[][],
+    ): ExpandedHeader[][] => {
+      return headerGroups.reduce<ExpandedHeader[][]>(
+        (acc, headerGroup, headerGroupIndex) => {
+          const isLastHeaderGroup =
+            headerGroupIndex === headerGroups.length - 1;
+
+          // Insert a new set of rowgroup/colgroups for
+          // header groups with subgroups defined
+          const hasExtraHeaderGroups = headerGroup.some(group => group.group);
+
+          if (hasExtraHeaderGroups) {
+            acc.push(
+              headerGroup.reduce<ExpandedHeader[]>(
+                (subHeaders, { group, ...header }) => {
+                  const prevSubHeader = last(subHeaders);
+
+                  // Increase the span size of the previous header.
+                  if (prevSubHeader && prevSubHeader?.id === group) {
+                    prevSubHeader.span += header.span;
+
+                    // Previous header can't simultaneously have spans in
+                    // both directions. This breaks the HTML table, so we
+                    // convert it back to a normal rowgroup/colgroup.
+                    if (prevSubHeader.crossSpan > 1) {
+                      prevSubHeader.crossSpan = 1;
+                      prevSubHeader.isGroup = true;
+                    }
+                  } else {
+                    const hasMatchingChild = header.text === group;
+
+                    subHeaders.push({
+                      ...header,
+                      id: group ?? '',
+                      text: group ?? '',
+                      crossSpan: hasMatchingChild ? 2 : 1,
+                      isGroup: hasMatchingChild ? !isLastHeaderGroup : true,
+                      isHidden: false,
+                    });
+                  }
+
+                  return subHeaders;
+                },
+                [],
+              ),
+            );
+          }
+
+          acc.push(
+            headerGroup.map(header => {
+              const prevHeaderGroup = last(acc);
+
+              const hasMatchingParent =
+                (hasExtraHeaderGroups &&
+                  prevHeaderGroup?.some(
+                    parentHeader =>
+                      parentHeader.start <= header.start &&
+                      header.start <= parentHeader.start + parentHeader.span &&
+                      parentHeader.text === header.text &&
+                      parentHeader.crossSpan === 2,
+                  )) ??
+                false;
+
+              return {
+                ...omit(header, 'group'),
+                crossSpan: 1,
+                isHidden: hasMatchingParent,
+                isGroup: !isLastHeaderGroup,
+              };
+            }),
+          );
+
+          return acc;
+        },
+        [],
+      );
+    };
+
     const expandedRowHeaders = createExpandedHeaders(rowHeaders);
+    const expandedColumnHeaders = createExpandedHeaders(columnHeaders);
+
     const firstRowHeaderLength = expandedRowHeaders[0].length;
 
     // Expanded headers need to be transposed so that
