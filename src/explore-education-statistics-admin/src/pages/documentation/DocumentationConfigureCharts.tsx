@@ -32,6 +32,14 @@ import imageChartYAxisSize from './images/guidance/guidance-chart-y-axis-size.pn
 import imageChartYUnit from './images/guidance/guidance-chart-y-unit.png';
 import imageChartYAxisDefault from './images/guidance/guidance-chart-y-axis-range-default.png';
 import imageChartYAxisAdjusted from './images/guidance/guidance-chart-y-axis-range-adjusted.png';
+import imageMapLocation from './images/guidance/guidance-map-locations.png';
+import imageMapAddData from './images/guidance/guidance-map-add-data.png';
+import imageMapPreview from './images/guidance/guidance-map-preview.png';
+import imageMapConfig from './images/guidance/guidance-map-config.png';
+import imageInfographicLink from './images/guidance/guidance-infographic-link.png';
+import imageInfographicSelect from './images/guidance/guidance-infographic-select.png';
+import imageInfographicLarge from './images/guidance/guidance-infographic-image-large.png';
+import imageInfographicResized from './images/guidance/guidance-infographic-image-resized.png';
 
 const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -78,9 +86,14 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4 className="govuk-heading-s">
-                    To start the process of creating a chart - select an
-                    exisitng data block from the dropdown select box
+                    To start the process of creating a chart - within 'Manage
+                    data' select a saved data block from the dropdown box, and
+                    then select the 'Configure content' tab.
                   </h4>
+                  <p>
+                    The page will default to the table view, click the
+                    'Configure chart' tab to continue.
+                  </p>
                   <img
                     src={imageChartCreate}
                     className="govuk-!-width-three-quarters"
@@ -147,8 +160,84 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
             </StepNavItem>
             <StepNavItem
               stepNumber={2}
-              stepHeading="Change line or bar styling"
+              stepHeading="Create a geographic map"
               open={step === 2}
+            >
+              <h3>Before you start</h3>
+              <p>
+                Ensure you have first created a data block with multiple
+                locations selected.
+              </p>
+              <p>Example below shows all local authorities selected</p>
+              <img
+                src={imageMapLocation}
+                alt=""
+                className="govuk-!-margin-bottom-9"
+                width="400"
+              />
+              <h3>Do</h3>
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
+                <li>
+                  <h4>
+                    Select a saved data block from the dropdown box, and then
+                    select the 'Configure content' tab.
+                  </h4>
+                  <p>
+                    The page will default to the table view, click the
+                    'Configure chart' and then select the 'Geographic' link.
+                  </p>
+
+                  <img
+                    src={imageMapAddData}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">Add data and preview map</h4>
+                  <p>
+                    Select an option from each of the available dropdown menus,
+                    and select the 'Add data' button
+                  </p>
+                  <p>After selecting 'Add data' a preview map will appear.</p>
+                  <p>You can continue to add mulitiple items to the chart</p>
+                  <img
+                    src={imageMapPreview}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">Resizing map</h4>
+                  <p>
+                    The default map size had a height of 300px, this can be
+                    adjusted and increased in size if required.
+                  </p>
+                  <img
+                    src={imageMapConfig}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">Save chart options</h4>
+                  <p>
+                    Once you are happy with your map, select the green 'Save
+                    chart options' button.
+                  </p>
+                  <h3>Don't</h3>
+                  <p>
+                    Don't worry you need to make any changes, you can come back
+                    and edit the map at any point, by following the steps above
+                    again.
+                  </p>
+                </li>
+              </ul>
+            </StepNavItem>
+            <StepNavItem
+              stepNumber={3}
+              stepHeading="Change line or bar styling"
+              open={step === 3}
             >
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
@@ -203,9 +292,9 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               </ul>
             </StepNavItem>
             <StepNavItem
-              stepNumber={3}
+              stepNumber={4}
               stepHeading="Chart configuration"
-              open={step === 3}
+              open={step === 4}
             >
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
@@ -282,9 +371,9 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               </ul>
             </StepNavItem>
             <StepNavItem
-              stepNumber={4}
+              stepNumber={5}
               stepHeading="X Axis (major axis)"
-              open={step === 4}
+              open={step === 5}
             >
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
@@ -421,9 +510,9 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               </ul>
             </StepNavItem>
             <StepNavItem
-              stepNumber={5}
+              stepNumber={6}
               stepHeading="Y Axis (minor axis)"
-              open={step === 5}
+              open={step === 6}
             >
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
@@ -462,6 +551,85 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />
+                </li>
+              </ul>
+            </StepNavItem>
+            <StepNavItem
+              stepNumber={7}
+              stepHeading="Choose an infographic as an alternative"
+              open={step === 7}
+            >
+              <h3>Before you start</h3>
+              <p>Please try to create a chart using the steps above.</p>
+              <p>
+                If you are unable to create the correct style of chart required
+                you can upload an image as an alternative, by following the
+                steps below.
+              </p>
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
+                <li>
+                  <h4 className="govuk-heading-s">
+                    Select 'Choose an infographic as an alternative' link
+                  </h4>
+                  <img
+                    src={imageInfographicLink}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    Select an image, name the file and upload
+                  </h4>
+                  <p>Image files include:</p>
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li className="govuk-!-margin-bottom-0">.png</li>
+                    <li className="govuk-!-margin-bottom-0">.jpg</li>
+                    <li className="govuk-!-margin-bottom-0">.gif</li>
+                  </ul>
+                  <img
+                    src={imageInfographicSelect}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    Configure image size to fit to page
+                  </h4>
+                  <p>
+                    Alter the height value so the infographic is positioned
+                    correctly in the preview pane.
+                  </p>
+                  <p>
+                    Large images may break out of the page boundary, so it is
+                    important to reduce the image dimensions if this is the
+                    case.
+                  </p>
+                  <img
+                    src={imageInfographicLarge}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                  <p>Adjusted image shown below:</p>
+                  <img
+                    src={imageInfographicResized}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">Save chart options</h4>
+                  <p>
+                    Once you are happy with your infographic, select the green
+                    'Save chart options' button.
+                  </p>
+                  <h3>Don't</h3>
+                  <p>
+                    Don't worry you need to make any changes, you can come back
+                    and edit the infographic at any point, by following the
+                    steps above again.
+                  </p>
                 </li>
               </ul>
             </StepNavItem>

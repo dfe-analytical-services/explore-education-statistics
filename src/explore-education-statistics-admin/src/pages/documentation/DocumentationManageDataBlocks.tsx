@@ -17,13 +17,7 @@ import imageDataBlockName from './images/guidance/guidance-datablocks-name.png';
 import imageDataBlockViewEdit from './images/guidance/guidance-datablocks-view-edit.png';
 import imageDataBlockEditTable from './images/guidance/guidance-datablocks-edit-table.png';
 import imageDataBlockViewChart from './images/guidance/guidance-datablocks-view-charts.png';
-import imageDataBlockViewPermalink from './images/guidance/guidance-datablocks-view-permalink.png';
-import imageDataBlockCopyPermalink from './images/guidance/guidance-datablocks-copy-permalink.png';
-import imageDataBlockCopyChartPermalink from './images/guidance/guidance-datablocks-copy-chart-permalink.png';
 import imageDataBlockDelete from './images/guidance/guidance-datablocks-delete.png';
-import imageDataBlockDeleteTable from './images/guidance/guidance-datablocks-delete-table.png';
-import imageDataBlockDeleteChart from './images/guidance/guidance-datablocks-delete-chart.png';
-import imageFootnotesEdit from './images/guidance/guidance-footnotes-edit.png';
 
 const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
