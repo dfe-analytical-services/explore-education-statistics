@@ -104,8 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     public class Label
     {
         public string Value;
-        public int Offset;
-        public int Angle;
+        public int? Offset;
+        public int? Angle;
         [JsonConverter(typeof(StringEnumConverter))]
         public LabelPosition Position;
     }
