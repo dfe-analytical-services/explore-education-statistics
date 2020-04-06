@@ -36,8 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         [JsonConverter(typeof(StringEnumConverter))]
         public TickConfig TickConfig;
-
+        
         public int? TickSpacing;
+        
+        public Label Label;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -81,7 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         insideBottom,
         insideTopLeft,
         insideBottomLeft,
-        insideTopRight
+        insideTopRight,
+        center
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -96,6 +99,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Label;
         public string Position;
+    }
+    
+    public class Label
+    {
+        public string Value;
+        public int Offset;
+        public int Angle;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public LabelPosition Position;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
