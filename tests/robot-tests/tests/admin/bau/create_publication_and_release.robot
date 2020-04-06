@@ -21,7 +21,7 @@ Select an existing methodology
     user waits until page contains element   xpath://label[text()="Choose an existing methodology"]
     user clicks element          xpath://label[text()="Choose an existing methodology"]
     user checks element is visible    xpath://label[text()="Select methodology"]
-    user selects from list by label  css:#createPublicationForm-selectedMethodologyId   Test methodology
+    user selects from list by label  css:#createPublicationForm-selectedMethodologyId   Test methodology [Approved]
 
 Select contact "Sean Gibson"
     [Tags]  HappyPath

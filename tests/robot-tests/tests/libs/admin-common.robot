@@ -19,7 +19,7 @@ user creates publication
     user enters text into element  css:#createPublicationForm-publicationTitle   ${title}
     user selects radio     Choose an existing methodology
     user checks element is visible    xpath://label[text()="Select methodology"]
-    user selects from list by label  css:#createPublicationForm-selectedMethodologyId   ${methodology}
+    user selects from list by label  css:#createPublicationForm-selectedMethodologyId   ${methodology} [Approved]
     user selects from list by label  css:#createPublicationForm-selectedContactId   ${contact}
     user clicks button   Create publication
     user waits until page contains element   xpath://span[text()="Welcome"]
