@@ -429,19 +429,6 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                     className="govuk-!-width-three-quarters"
                   />
                 </li>
-                <li>
-                  <h4>
-                    If you have access to a long list of publications, first
-                    find the publication and then the related methodology you
-                    want to view or edit using the ‘Select theme’ and ‘Select
-                    topic’ dropdowns.
-                  </h4>
-                  <img
-                    src={imagePublicationSelectTheme}
-                    alt="Select theme and topic to show relevant publications"
-                    className="govuk-!-width-three-quarters"
-                  />
-                </li>
               </ul>
               <h3>Help and support</h3>
               <p>

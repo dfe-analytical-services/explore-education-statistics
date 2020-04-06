@@ -332,7 +332,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 For detailed guidance on how to use your data to create data
                 blocks, tables and charts for your release -{' '}
-                <Link to="/documentation/data-blocks">
+                <Link to="/documentation/manage-data-block">
                   Managing data blocks and creating tables and charts: step by
                   step.
                 </Link>

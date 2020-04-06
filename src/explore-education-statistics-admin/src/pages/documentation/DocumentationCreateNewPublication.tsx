@@ -5,10 +5,11 @@ import Page from '@admin/components/Page';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageCreatePublication from './images/guidance/guidance-publication-create.png';
-import imageContactPublication from './images/guidance/guidance-publication-contact.jpg';
-import imageProductionTeamPublication from './images/guidance/guidance-publication-production-team.jpg';
-import imageEditDeletePublication from './images/guidance/guidance-publication-edit-delete.jpg';
-import imageCreateReleasePublication from './images/guidance/guidance-publication-create-new-release.jpg';
+import imagePublicationMethodologySelect from './images/guidance/guidance-publication-methodology-select.png';
+import imagePublicationMethodologyLink from './images/guidance/guidance-publication-methodology-link.png';
+import imageContactPublication from './images/guidance/guidance-publication-contact.png';
+import imageProductionTeamPublication from './images/guidance/guidance-publication-team.png';
+import imageCreateReleasePublication from './images/guidance/guidance-publication-create-new-release.png';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -83,6 +84,41 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 You’ll need to link your publication to a methodology before it
                 goes live.
               </p>
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
+                <li>
+                  <h4>
+                    Choose an existing methodology, select from the drop down
+                    select box
+                  </h4>
+                  <img
+                    src={imagePublicationMethodologySelect}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4>Alternatively link to an external methodology file</h4>
+                  <p>
+                    For example, this may be a link to a methodology page hosted
+                    on the legacy system
+                  </p>
+                  <img
+                    src={imagePublicationMethodologyLink}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4>
+                    If a methodology file isn't currently ready, choose 'Select
+                    a methodology later'.
+                  </h4>
+                  <p>
+                    You can apply a methodology file at any point prior to
+                    publication.{' '}
+                  </p>
+                </li>
+              </ul>
               <h3>Help and support</h3>
               <p>
                 If you can’t find the methodology you’re looking for or have any
@@ -135,11 +171,44 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 of contact for data and methodology enquiries for the
                 publication and all its related releases.
               </p>
-              <img
-                src={imageContactPublication}
-                className="govuk-!-width-three-quarters"
-                alt="Choose a contact"
-              />
+              <ul className="govuk-list govuk-list--bullet">
+                <li>
+                  <a href="https://gss.civilservice.gov.uk/wp-content/uploads/2018/11/Writing-about-statistics-Edition-2.0-October-2018-1.pdf">
+                    GSS - Writing about statistics: Guidance for producers
+                  </a>{' '}
+                  - Page 20
+                </li>
+              </ul>
+
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
+                <li>
+                  <h4>Choose a contact from the drop down select box</h4>
+                  <img
+                    src={imageContactPublication}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4>
+                    After making a selection, a summary of the contact details
+                    will appear, re-select using the step above if you have
+                    chosen an incorrect contact.
+                  </h4>
+                  <img
+                    src={imageProductionTeamPublication}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4>
+                    After checking that all the details are correct, select
+                    'Create publication'
+                  </h4>
+                </li>
+              </ul>
+
               <h3>Help and support</h3>
               <p>
                 If you can’t find the contact you’re looking for or the details
@@ -153,64 +222,13 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 </a>
               </p>
             </StepNavItem>
-            <StepNavItem
-              stepNumber={4}
-              stepHeading="Check your Production team"
-              open={step === 4}
-            >
-              <p>
-                All publications will be assigned a ‘Production team’ under the
-                following roles:{' '}
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>Responsible statistician</li>
-                <li>Team leader</li>
-                <li>Primary analyst</li>
-              </ul>
-              <p>
-                The members of this team will be responsible for putting
-                together the publication’s related releases within the admin
-                system.
-              </p>
-              <h3>Do</h3>
-              <p>
-                Make sure you check the listed members of your production team
-                are correct.
-              </p>
-              <img
-                src={imageProductionTeamPublication}
-                className="govuk-!-width-three-quarters"
-                alt="Check your Production team"
-              />
-              <h3>Help and support</h3>
-              <p>
-                If you need to add or remove members of your ‘Production Team’
-                or individual details need updating contact:
-              </p>
-              <h3>Explore education statistics team </h3>
-              <p>
-                Email <br />
-                <a href="mailto:explore.statistics@education.gov.uk">
-                  explore.statistics@education.gov.uk
-                </a>
-              </p>
-            </StepNavItem>
+
             <StepNavItem
               stepNumber={5}
               stepHeading="Edit and delete a publication"
               open={step === 5}
             >
-              <p>
-                To edit any of the publication details you’ve entered (including
-                the publication title) - use the ‘Edit publication details’
-                link.
-              </p>
-              <img
-                src={imageEditDeletePublication}
-                className="govuk-!-width-three-quarters"
-                alt="Edit and delete a publication"
-              />
-              <p>If you need to delete a publication contact:</p>
+              <p>If you need to edit or delete a publication contact:</p>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">
@@ -234,7 +252,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               </p>
               <img
                 src={imageCreateReleasePublication}
-                className="govuk-!-width-three-quarters"
+                className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
                 alt="Create a new release"
               />
               <h3>Next steps</h3>
