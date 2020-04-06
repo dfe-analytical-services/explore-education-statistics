@@ -59,12 +59,6 @@ const ManageUserPage = ({
   const cancelHandler = () => history.push('/administration/users');
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
-    // const submission: UserInvite = {
-    //   email: values.userEmail,
-    // };
-
-    // await userService.inviteUser(submission);
-
     history.push(`/administration/users`);
   }, errorCodeMappings);
 
