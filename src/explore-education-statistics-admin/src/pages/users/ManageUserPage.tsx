@@ -21,6 +21,8 @@ import Yup from '@common/validation/yup';
 import React, { useEffect, useState } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import { IdLabelPair } from 'src/services/common/types';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -94,42 +96,16 @@ const ManageUserPage = ({
                 legend="Detals"
                 legendSize="m"
               >
-                <dl className="govuk-summary-list">
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">Name</dt>
-                    <dd className="govuk-summary-list__value">
-                      {model?.user.name}
-                    </dd>
-                    <dd className="govuk-summary-list__actions">
-                      {/* <a className="govuk-link" href="#">
-                        Change
-                        <span className="govuk-visually-hidden"> name</span>
-                      </a> */}
-                    </dd>
-                  </div>
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">Email</dt>
-                    <dd className="govuk-summary-list__value">
-                      {model?.user.email}
-                    </dd>
-                    <dd className="govuk-summary-list__actions">
-                      {/* <a className="govuk-link" href="#">
-                        Change
-                        <span className="govuk-visually-hidden"> email</span>
-                      </a> */}
-                    </dd>
-                  </div>
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">Phone</dt>
-                    <dd className="govuk-summary-list__value">-</dd>
-                    <dd className="govuk-summary-list__actions">
-                      {/* <a className="govuk-link" href="#">
-                        Change
-                        <span className="govuk-visually-hidden"> phone</span>
-                      </a> */}
-                    </dd>
-                  </div>
-                </dl>
+                <SummaryList>
+                  <SummaryListItem term="Name">
+                    {model?.user.name}
+                  </SummaryListItem>
+                  <SummaryListItem term="Email">
+                    {' '}
+                    {model?.user.email}
+                  </SummaryListItem>
+                  <SummaryListItem term="Phone">-</SummaryListItem>
+                </SummaryList>
               </FormFieldset>
               <FormFieldset
                 id={`${formId}-role`}
