@@ -2,25 +2,32 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters":{
+    "subscription": {
+      "type": "string",
+      "metadata": {
+        "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "ees",
+      "metadata": {
+        "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
+      }
+    },
     "publisherAppName": {
       "type": "string"
-    },
-    "ls_sql_statistics_connectionString": {
-      "type": "string",
-      "metadata": {
-        "description": "Secure string for 'connectionString' of 'ls_sql_statistics'"
-      }
-    },
-    "ls_sql_public_statistics_connectionString": {
-      "type": "string",
-      "metadata": {
-        "description": "Secure string for 'connectionString' of 'ls_sql_public_statistics'"
-      }
     },
     "dataFactoryName": {
       "type": "string",
       "metadata": {
         "description": "The data factory name"
+      }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the key vault"
       }
     }
   },
@@ -51,17 +58,20 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
           "factoryName": {
             "value": "[parameters('dataFactoryName')]"
           },
           "publisherAppName": {
             "value": "[parameters('publisherAppName')]"
           },
-          "ls_sql_statistics_connectionString": {
-            "value": "[parameters('ls_sql_statistics_connectionString')]"
-          },
-          "ls_sql_public_statistics_connectionString": {
-            "value": "[parameters('ls_sql_public_statistics_connectionString')]"
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
           }
         }
       },

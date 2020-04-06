@@ -11,24 +11,39 @@ interface Props {
   exclude?: 'status' | 'details';
 }
 
-type Stage =
+type PublishingStage =
+  | 'Validating'
+  | 'Cancelled'
+  | 'Complete'
+  | 'Failed'
   | 'Scheduled'
   | 'NotStarted'
-  | 'Invalid'
-  | 'Failed'
-  | 'Cancelled'
+  | 'Started';
+
+type OverallStage =
   | 'Validating'
+  | 'Complete'
+  | 'Failed'
+  | 'Invalid'
+  | 'Scheduled'
+  | 'Started';
+
+type TaskStage =
+  | 'Validating'
+  | 'Cancelled'
+  | 'Complete'
+  | 'Failed'
   | 'Queued'
-  | 'Started'
-  | 'Complete';
+  | 'NotStarted'
+  | 'Started';
 
 export interface ReleaseStatus {
   releaseId?: string;
-  dataStage?: Stage;
-  contentStage?: Stage;
-  filesStage?: Stage;
-  publishingStage?: Stage;
-  overallStage: Stage;
+  dataStage?: TaskStage;
+  contentStage?: TaskStage;
+  filesStage?: TaskStage;
+  publishingStage?: PublishingStage;
+  overallStage: OverallStage;
   lastUpdated?: string;
 }
 
@@ -56,11 +71,7 @@ const ReleaseServiceStatus = ({
           );
         } else {
           setCurrentStatus(status);
-          if (
-            status &&
-            (status.overallStage === 'Started' ||
-              status.overallStage === 'Queued')
-          ) {
+          if (status && status.overallStage === 'Started') {
             timeoutRef.current = setTimeout(
               fetchReleaseServiceStatus,
               refreshPeriod,
@@ -87,11 +98,8 @@ const ReleaseServiceStatus = ({
     (status: string): { color: StatusBlockProps['color']; text: string } => {
       if (currentStatus) {
         switch (status) {
-          case 'Scheduled':
-            return { color: 'blue', text: status };
           case 'NotStarted':
             return { color: 'blue', text: 'Not Started' };
-          case 'Invalid':
           case 'Failed':
           case 'Cancelled':
             return { color: 'red', text: status };
