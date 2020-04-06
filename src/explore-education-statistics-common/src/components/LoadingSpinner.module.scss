@@ -51,6 +51,7 @@
 .overlay {
   background-color: rgba(255, 255, 255, 0.75);
   height: 100%;
+  left: 0;
   position: absolute;
   width: 100%;
   z-index: 5000;
@@ -71,4 +72,8 @@
 
 .noInlineFlex {
   display: flex;
+}
+
+:global(.govuk-accordion__section) {
+  position: relative;
 }

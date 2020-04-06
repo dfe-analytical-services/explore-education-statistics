@@ -68,23 +68,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
+            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
-                c.RoutePrefix = "docs";
-            });
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
+                    c.RoutePrefix = "docs";
+                });
+
+                var option = new RewriteOptions();
+                option.AddRedirect("^$", "docs");
+                app.UseRewriter(option);
+            }
 
             app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
-
-            var option = new RewriteOptions();
-            option.AddRedirect("^$", "docs");
-            app.UseRewriter(option);
         }
         
         /**

@@ -59,7 +59,7 @@ const AssignMethodologyForm = ({
   refreshPublication,
 }: Props) => {
   const [formOpen, setFormOpen] = useState(false);
-  const [methodologies, setMethodologies] = useState<IdTitlePair[]>();
+  const [methodologies, setMethodologies] = useState<BasicMethodology[]>([]);
 
   useEffect(() => {
     setFormOpen(false);
@@ -180,12 +180,17 @@ const AssignMethodologyForm = ({
                         id={`${formId}-selectedMethodologyId`}
                         name="selectedMethodologyId"
                         label="Select methodology"
-                        options={(methodologies as BasicMethodology[]).map(
-                          methodology => ({
-                            label: `${methodology.title} [${methodology.status}]`,
-                            value: methodology.id,
-                          }),
-                        )}
+                        options={[
+                          { label: 'Choose a methodology', value: '' },
+                          ...methodologies
+                            .filter(
+                              methodology => methodology.status !== 'Draft',
+                            )
+                            .map(methodology => ({
+                              label: `${methodology.title} [${methodology.status}]`,
+                              value: methodology.id,
+                            })),
+                        ]}
                       />
                     ),
                   },
