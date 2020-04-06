@@ -17,5 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<List<UserViewModel>> ListPendingAsync();
 
         Task<bool> InviteAsync(string email, string user, string roleId);
+        
+        Task<bool> CancelInviteAsync(string email);
+
     }
 }

@@ -8,6 +8,7 @@ export interface UsersService {
   getPreReleaseUsers(): Promise<UserStatus[]>;
   getPendingInvites(): Promise<UserStatus[]>;
   inviteUser: (invite: UserInvite) => Promise<boolean>;
+  cancelInvite: (email: string) => Promise<boolean>;
 }
 
 const service: UsersService = {
@@ -28,6 +29,9 @@ const service: UsersService = {
   },
   inviteUser(invite: UserInvite): Promise<boolean> {
     return client.post(`/bau/users/invite`, invite);
+  },
+  cancelInvite(email: string): Promise<boolean> {
+    return client.delete(`/bau/users/invite/${email}`);
   },
 };
 

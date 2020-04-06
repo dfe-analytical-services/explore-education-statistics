@@ -101,5 +101,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             
             return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
+        
+        [HttpDelete("bau/users/invite/{email}")]
+        public async Task<ActionResult> InviteUser(string email)
+        {
+            var invite = await _userManagementService.CancelInviteAsync(email);
+
+            if (invite)
+            {
+                return Ok();
+            }
+
+            AddErrors(ModelState, ValidationResult(UnableToCancelInvite));
+            
+            return ValidationProblem(new ValidationProblemDetails(ModelState));
+        }
     }
 }

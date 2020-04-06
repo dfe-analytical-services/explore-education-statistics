@@ -148,6 +148,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
+        public async Task<bool> CancelInviteAsync(string email)
+        {
+            var invite = _context.UserInvites.FirstOrDefault(i => i.Email == email);
+            _context.UserInvites.Remove(invite);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         private string GetUserRole(string userId)
         {
             var userRole = _context.UserRoles.FirstOrDefault(r => r.UserId == userId);

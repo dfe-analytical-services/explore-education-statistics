@@ -58,9 +58,19 @@ const PendingInvitesPage = () => {
                 <td className="govuk-table__cell">{user.email}</td>
                 <td className="govuk-table__cell">{user.role}</td>
                 <td className="govuk-table__cell">
-                  {/* <ButtonText onClick={cancelInviteHandler}>
+                  <ButtonText
+                    onClick={() => {
+                      userService.cancelInvite(user.email).then(() => {
+                        userService.getPendingInvites().then(updatedInvites =>
+                          setModel({
+                            users: updatedInvites,
+                          }),
+                        );
+                      });
+                    }}
+                  >
                     Cancel invite
-                  </ButtonText> */}
+                  </ButtonText>
                 </td>
               </tr>
             ))}
