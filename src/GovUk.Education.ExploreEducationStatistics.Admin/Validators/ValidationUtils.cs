@@ -81,6 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentBlockNotAttachedToThisContentSection,
         CommentNotFound,
         UserAlreadyExists,
+        UnableToCancelInvite,
         InvalidEmailAddress,
         ApprovedReleaseMustHavePublishScheduledDate,
         PublicationDoesNotExist,

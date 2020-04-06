@@ -89,6 +89,16 @@ const LoggedInLinks = ({ user }: Authentication) => (
         </a>
       </li>
     )}
+
+    {user &&
+      (user.permissions.canAccessUserAdministrationPages ||
+        user.permissions.canAccessMethodologyAdministrationPages) && (
+        <li className="govuk-header__navigation-item">
+          <a className="govuk-header__link" href="/administration">
+            Platform administration
+          </a>
+        </li>
+      )}
     <li className="govuk-header__navigation-item">
       <Link className="govuk-header__link" to={loginService.getSignOutLink()}>
         Sign out
