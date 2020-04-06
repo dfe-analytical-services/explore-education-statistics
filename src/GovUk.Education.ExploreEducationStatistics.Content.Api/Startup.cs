@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -93,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
          */
         private void PublishAllContent()
         {
-            const string queueName = "publish-all-content";
+            const string queueName = PublishAllContentQueue;
             try
             {
                 var storageConnectionString = Configuration.GetConnectionString("PublisherStorage");

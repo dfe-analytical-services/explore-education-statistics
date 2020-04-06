@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -11,8 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishAllContentFunction
     {
         private readonly IContentService _contentService;
-
-        private const string QueueName = "publish-all-content";
 
         public PublishAllContentFunction(IContentService contentService)
         {
@@ -26,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("PublishAllContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishAllContent(
-            [QueueTrigger(QueueName)] PublishAllContentMessage message,
+            [QueueTrigger(PublishAllContentQueue)] PublishAllContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {

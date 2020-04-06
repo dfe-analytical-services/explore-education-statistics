@@ -10,18 +10,17 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusDataStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    // ReSharper disable once UnusedType.Global
     public class PublishReleaseDataFunction
     {
         private readonly IConfiguration _configuration;
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
-
-        public const string QueueName = "publish-release-data";
 
         public PublishReleaseDataFunction(IConfiguration configuration,
             IQueueService queueService,
@@ -39,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("PublishReleaseData")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseData(
-            [QueueTrigger(QueueName)] PublishReleaseDataMessage message,
+            [QueueTrigger(PublishReleaseDataQueue)] PublishReleaseDataMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {

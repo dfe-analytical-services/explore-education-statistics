@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task QueueValidateReleaseAsync(Guid releaseId)
         {
             var release = await GetRelease(releaseId);
-            var queue = await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, "releases");
+            var queue = await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, ValidateReleaseQueue);
             var message = BuildValidateReleaseMessage(release);
             await queue.AddMessageAsync(ToCloudQueueMessage(message));
 

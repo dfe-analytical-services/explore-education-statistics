@@ -6,18 +6,17 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusFilesStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    // ReSharper disable once UnusedType.Global
     public class PublishReleaseFilesFunction
     {
         private readonly IPublishingService _publishingService;
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
-
-        public const string QueueName = "publish-release-files";
 
         public PublishReleaseFilesFunction(IPublishingService publishingService,
             IQueueService queueService,
@@ -36,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("PublishReleaseFiles")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseFiles(
-            [QueueTrigger(QueueName)] PublishReleaseFilesMessage message,
+            [QueueTrigger(PublishReleaseFilesQueue)]
+            PublishReleaseFilesMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -63,7 +63,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             if (immediate)
             {
                 await _queueService.QueuePublishReleaseDataMessagesAsync(published);
-            } else {
+            }
+            else
+            {
                 await _queueService.QueueGenerateReleaseContentMessageAsync(published);
             }
 
@@ -86,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var (releaseId, releaseStatusId) = message.Releases.Single();
             return await _releaseStatusService.IsImmediate(releaseId, releaseStatusId);
         }
-        
+
         private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, ReleaseStatusFilesStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {

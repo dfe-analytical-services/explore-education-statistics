@@ -5,17 +5,16 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusContentStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    // ReSharper disable once UnusedType.Global
     public class GenerateReleaseContentFunction
     {
         private readonly IContentService _contentService;
         private readonly IReleaseStatusService _releaseStatusService;
-
-        public const string QueueName = "generate-release-content";
 
         public GenerateReleaseContentFunction(IContentService contentService,
             IReleaseStatusService releaseStatusService)
@@ -31,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("GenerateReleaseContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task GenerateReleaseContent(
-            [QueueTrigger(QueueName)] GenerateReleaseContentMessage message,
+            [QueueTrigger(GenerateReleaseContentQueue)] GenerateReleaseContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {

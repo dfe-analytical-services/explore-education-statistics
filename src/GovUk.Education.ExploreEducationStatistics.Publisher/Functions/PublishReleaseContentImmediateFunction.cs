@@ -4,19 +4,18 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    // ReSharper disable once UnusedType.Global
     public class PublishReleaseContentImmediateFunction
     {
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseService _releaseService;
         private readonly IReleaseStatusService _releaseStatusService;
-
-        public const string QueueName = "publish-release-content-immediate";
 
         public PublishReleaseContentImmediateFunction(IContentService contentService,
             INotificationsService notificationsService,
@@ -37,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("PublishReleaseContentImmediate")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseContentImmediate(
-            [QueueTrigger(QueueName)] PublishReleaseContentImmediateMessage message,
+            [QueueTrigger(PublishReleaseContentImmediateQueue)] PublishReleaseContentImmediateMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {

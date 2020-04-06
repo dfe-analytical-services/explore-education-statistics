@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusStates;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -15,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IValidationService _validationService;
-
-        private const string QueueName = "releases";
 
         public ValidateReleaseFunction(IQueueService queueService,
             IReleaseStatusService releaseStatusService,
@@ -34,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("ValidateRelease")]
         // ReSharper disable once UnusedMember.Global
         public async Task ValidateRelease(
-            [QueueTrigger(QueueName)] ValidateReleaseMessage message,
+            [QueueTrigger(ValidateReleaseQueue)] ValidateReleaseMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
