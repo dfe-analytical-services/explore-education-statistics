@@ -98,7 +98,8 @@ const UserInvitePage = ({
               enableReinitialize
               initialValues={{
                 userEmail: '',
-                selectedRoleId: orderBy(model.roles, role => role.name)[0].id,
+                selectedRoleId:
+                  orderBy(model.roles, role => role.name)?.[0]?.id ?? '',
               }}
               validationSchema={Yup.object({
                 userEmail: Yup.string()
