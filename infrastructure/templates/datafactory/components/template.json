@@ -2,28 +2,35 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "subscription": {
+            "type": "string",
+            "metadata": {
+                "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "ees",
+            "metadata": {
+                "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
+            }
+        },
         "factoryName": {
             "type": "string",
             "metadata": {
                 "description": "Data Factory name"
             }
         },
-        "ls_sql_statistics_connectionString": {
-            "type": "string",
-            "metadata": {
-               "description": "Secure string for 'connectionString' of 'ls_sql_statistics'"
-            }
-        },
-        "ls_sql_public_statistics_connectionString": {
-            "type": "string",
-            "metadata": {
-              "description": "Secure string for 'connectionString' of 'ls_sql_public_statistics'"
-            }
-        },
         "publisherAppName": {
             "type": "string",
             "metadata": {
               "description": "The name of the publisher app"
+            }
+        },
+        "keyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the key vault"
             }
         }
     },
@@ -97,10 +104,19 @@
                 "annotations": [],
                 "type": "AzureSqlDatabase",
                 "typeProperties": {
-                    "connectionString": "[parameters('ls_sql_statistics_connectionString')]"
+                    "connectionString": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "AzureKeyVault",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "ees-sql-admin-datafactory-connectionstring"
+                    }
                 }
             },
-            "dependsOn": []
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+            ]
         },
         {
             "name": "[concat(parameters('factoryName'), '/ls_sql_public_statistics')]",
@@ -110,7 +126,29 @@
                 "annotations": [],
                 "type": "AzureSqlDatabase",
                 "typeProperties": {
-                    "connectionString": "[parameters('ls_sql_public_statistics_connectionString')]"
+                    "connectionString": {
+                        "type": "AzureKeyVaultSecret",
+                        "store": {
+                            "referenceName": "AzureKeyVault",
+                            "type": "LinkedServiceReference"
+                        },
+                        "secretName": "ees-sql-public-datafactory-connectionstring"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureKeyVault')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureKeyVault",
+                "typeProperties": {
+                    "baseUrl": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net/')]"
                 }
             },
             "dependsOn": []

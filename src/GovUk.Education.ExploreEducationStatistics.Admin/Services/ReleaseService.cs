@@ -194,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     release.Slug = request.Slug;
                     release.TypeId = request.TypeId;
-                    release.PublishScheduled = request.PublishScheduled;
+                    release.PublishScheduled = request.PublishScheduled?.Date;
                     release.ReleaseName = request.ReleaseName;
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;

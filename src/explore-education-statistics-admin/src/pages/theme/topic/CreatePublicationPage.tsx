@@ -191,10 +191,14 @@ const CreatePublicationPage = ({
                           options={[
                             { label: 'Choose a methodology', value: '' },
                             ...orderBy(
-                              model.methodologies.map(methodology => ({
-                                label: `${methodology.title} [${methodology.status}]`,
-                                value: methodology.id,
-                              })),
+                              model.methodologies
+                                .filter(
+                                  methodology => methodology.status !== 'Draft',
+                                )
+                                .map(methodology => ({
+                                  label: `${methodology.title} [${methodology.status}]`,
+                                  value: methodology.id,
+                                })),
                               'label',
                             ),
                           ]}

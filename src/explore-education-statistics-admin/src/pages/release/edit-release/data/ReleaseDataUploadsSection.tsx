@@ -53,12 +53,12 @@ const errorCodeMappings = [
   errorCodeToFieldError(
     'DATA_FILE_MUST_BE_CSV_FILE',
     'dataFile',
-    'Data file must be a csv file',
+    'Data file must be a csv file with UTF-8 encoding',
   ),
   errorCodeToFieldError(
     'META_FILE_MUST_BE_CSV_FILE',
     'metadataFile',
-    'Meta file must be a csv file',
+    'Meta file must be a csv file with UTF-8 encoding',
   ),
   errorCodeToFieldError(
     'SUBJECT_TITLE_MUST_BE_UNIQUE',

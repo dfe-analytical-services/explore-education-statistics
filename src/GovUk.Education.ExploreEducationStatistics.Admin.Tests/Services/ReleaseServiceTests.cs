@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -39,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate"))
             {
-                context.Add(new ReleaseType {Id = new Guid("484e6b5c-4a0f-47fd-914e-ac4dac5bdd1c"), Title = "Ad Hoc",});
+                context.Add(new ReleaseType {Id = new Guid("484e6b5c-4a0f-47fd-914e-ac4dac5bdd1c"), Title = "Ad Hoc"});
                 context.Add(publication);
                 context.SaveChanges();
             }
@@ -49,6 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = new ReleaseService(context, AdminMapper(), 
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object);
+
+                var publishScheduled = new DateTime(2050, 6, 30, 14, 0, 0);
+                var publishScheduledMidnight = new DateTime(2050, 6, 30, 0, 0, 0);
                 
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
@@ -56,12 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publication.Id,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = DateTime.Parse("2050/01/01"),
+                        PublishScheduled = publishScheduled,
                         TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                     });
 
                 Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
                 Assert.Null(result.Result.Right.Published);
+                Assert.Equal(publishScheduledMidnight, result.Result.Right.PublishScheduled);
                 Assert.False(result.Result.Right.LatestRelease); // Most recent - but not published yet.
                 Assert.Equal(TimeIdentifier.AcademicYear, result.Result.Right.TimePeriodCoverage);
             }
@@ -151,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TemplateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = DateTime.Parse("2050/01/01"),
+                        PublishScheduled = new DateTime(2050,6,30,14,0,0),
                         TypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
                     });
 
@@ -286,7 +289,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.SaveChanges();
             }
             
-            var publishScheduledEdited = DateTime.Now.AddDays(1);
+            var publishScheduledEdited = new DateTime(2051, 6, 30, 14, 0, 0);
+            var publishScheduledEditedMidnight = new DateTime(2051, 6, 30, 0, 0, 0);
+            
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var typeEdited = officialStatisticsReleaseType;
             const string releaseNameEdited = "2035";
@@ -311,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = timePeriodCoverageEdited
                         });
 
-                Assert.Equal(publishScheduledEdited, edited.Right.PublishScheduled);
+                Assert.Equal(publishScheduledEditedMidnight, edited.Right.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, edited.Right.NextReleaseDate);
                 Assert.Equal(typeEdited, edited.Right.Type);
                 Assert.Equal(releaseNameEdited, edited.Right.ReleaseName);

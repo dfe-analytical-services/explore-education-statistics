@@ -143,33 +143,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 app.UseHttpsRedirection();
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
+
+            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Data API V1");
+                    c.RoutePrefix = "docs";
+                });
+
+                var option = new RewriteOptions();
+                option.AddRedirect("^$", "docs");
+                app.UseRewriter(option);
+            }
             
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
             app.UseResponseCompression();
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Data API V1");
-                c.RoutePrefix = "docs";
-            });
-
-            if (!env.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
-            }
-
             app.UseCors(options => options.WithOrigins("http://localhost:3000","http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
-
-            var option = new RewriteOptions();
-            option.AddRedirect("^$", "docs");
-            app.UseRewriter(option);
         }
 
         private static void AddPersistenceHelper<TDbContext>(IServiceCollection services)
