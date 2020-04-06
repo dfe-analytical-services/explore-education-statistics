@@ -22,10 +22,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             _userManagementService = userManagementService;
         }
 
+        [HttpGet("bau/users/{userId}")]
+        public async Task<ActionResult<UserViewModel>> GetUser(string userId)
+        {
+            var user = await _userManagementService.GetAsync(userId);
+
+            if (user != null)
+            {
+                return Ok(user);
+            }
+
+            return NotFound();
+        }
+        
         [HttpGet("bau/users")]
         public async Task<ActionResult<List<UserViewModel>>> GetUserList()
         {
             var users = await _userManagementService.ListAsync();
+
+            if (users.Any())
+            {
+                return Ok(users);
+            }
+
+            return NotFound();
+        }
+        
+        [HttpGet("bau/users/roles")]
+        public async Task<ActionResult<List<RoleViewModel>>> GetRoleList()
+        {
+            var users = await _userManagementService.ListRolesAsync();
+
+            if (users.Any())
+            {
+                return Ok(users);
+            }
+
+            return NotFound();
+        }
+        
+        [HttpGet("bau/users/pre-release")]
+        public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
+        {
+            var users = await _userManagementService.ListPreReleaseUsersAsync();
 
             if (users.Any())
             {
@@ -51,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
         [HttpPost("bau/users/invite")]
         public async Task<ActionResult> GetUserList(UserInviteViewModel userInviteViewModel)
         {
-            var invite = await _userManagementService.InviteAsync(userInviteViewModel.Email, User.Identity.Name);
+            var invite = await _userManagementService.InviteAsync(userInviteViewModel.Email, User.Identity.Name, userInviteViewModel.RoleId);
 
             if (invite)
             {

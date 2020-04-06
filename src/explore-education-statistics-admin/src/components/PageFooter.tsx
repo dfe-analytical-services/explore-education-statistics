@@ -26,11 +26,6 @@ const PageFooter = ({ wide }: Props) => {
                   user.permissions.canAccessMethodologyAdministrationPages) && (
                   <>
                     <li className="govuk-footer__inline-list-item">
-                      <Link className="govuk-footer__link" to="/administration">
-                        Platform administration
-                      </Link>
-                    </li>
-                    <li className="govuk-footer__inline-list-item">
                       <a className="govuk-footer__link" href="/docs">
                         API Documentation
                       </a>

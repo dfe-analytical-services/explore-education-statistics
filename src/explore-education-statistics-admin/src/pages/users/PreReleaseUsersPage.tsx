@@ -1,3 +1,4 @@
+import ButtonText from '@common/components/ButtonText';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import userService from '@admin/services/users/service';
@@ -8,30 +9,35 @@ interface Model {
   users: UserStatus[];
 }
 
-const BauUsersPage = () => {
+const PreReleaseUsersPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    userService.getUsers().then(users => {
+    userService.getPreReleaseUsers().then(users => {
       setModel({
         users,
       });
     });
   }, []);
+
+  const removeAccessHander = () => {};
+
   return (
     <Page
       wide
       breadcrumbs={[
         { name: 'Platform administration', link: '/administration' },
-        { name: 'Users' },
+        { name: 'Pre-release users' },
       ]}
     >
       <h1 className="govuk-heading-xl">
-        <span className="govuk-caption-xl">Manage access to the service</span>
-        Users
+        <span className="govuk-caption-xl">Manage pre-release users</span>
+        Pre-release users
       </h1>
       <table className="govuk-table">
-        <caption className="govuk-table__caption">Active user accounts</caption>
+        <caption className="govuk-table__caption">
+          Users with pre-release access
+        </caption>
         <thead className="govuk-table__head">
           <tr className="govuk-table__row">
             <th scope="col" className="govuk-table__header">
@@ -40,8 +46,9 @@ const BauUsersPage = () => {
             <th scope="col" className="govuk-table__header">
               Email
             </th>
-            <th>Role</th>
-            <th>Actions</th>
+            <th scope="col" className="govuk-table__header">
+              Actions
+            </th>
           </tr>
         </thead>
         {model && (
@@ -52,24 +59,14 @@ const BauUsersPage = () => {
                   {user.name}
                 </th>
                 <td className="govuk-table__cell">{user.email}</td>
-                <td className="govuk-table__cell">{user.role}</td>
                 <td className="govuk-table__cell">
-                  <Link to={`/administration/users/${user.id}`}>Manage</Link>
+                  {/* <ButtonText onClick={removeAccessHander}>Remove</ButtonText> */}
                 </td>
               </tr>
             ))}
           </tbody>
         )}
       </table>
-      <Link
-        to="/administration/users/pending"
-        className="govuk-button govuk-button--secondary"
-      >
-        View pending invites
-      </Link>{' '}
-      <Link to="/administration/users/invite" className="govuk-button">
-        Invite a new user
-      </Link>
       <p>
         <Link to="/administration/" className="govuk-back-link">
           Back
@@ -79,4 +76,4 @@ const BauUsersPage = () => {
   );
 };
 
-export default BauUsersPage;
+export default PreReleaseUsersPage;

@@ -1,10 +1,12 @@
+import ButtonText from '@common/components/ButtonText';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import userService from '@admin/services/users/service';
+import { UserStatus } from '@admin/services/users/types';
 import React, { useEffect, useState } from 'react';
 
 interface Model {
-  users: string[];
+  users: UserStatus[];
 }
 
 const PendingInvitesPage = () => {
@@ -17,6 +19,9 @@ const PendingInvitesPage = () => {
       });
     });
   }, []);
+
+  const cancelInviteHandler = () => {};
+
   return (
     <Page
       wide
@@ -38,13 +43,25 @@ const PendingInvitesPage = () => {
             <th scope="col" className="govuk-table__header">
               Email
             </th>
+            <th scope="col" className="govuk-table__header">
+              Role
+            </th>
+            <th scope="col" className="govuk-table__header">
+              Actions
+            </th>
           </tr>
         </thead>
         {model && (
           <tbody className="govuk-table__body">
             {model.users.map(user => (
-              <tr className="govuk-table__row" key={user}>
-                <td className="govuk-table__cell">{user}</td>
+              <tr className="govuk-table__row" key={user.email}>
+                <td className="govuk-table__cell">{user.email}</td>
+                <td className="govuk-table__cell">{user.role}</td>
+                <td className="govuk-table__cell">
+                  {/* <ButtonText onClick={cancelInviteHandler}>
+                    Cancel invite
+                  </ButtonText> */}
+                </td>
               </tr>
             ))}
           </tbody>
