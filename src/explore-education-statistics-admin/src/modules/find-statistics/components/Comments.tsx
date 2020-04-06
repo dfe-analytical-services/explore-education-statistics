@@ -233,20 +233,15 @@ const Comments = ({
                         {commentText}
                       </p>
                     )}
-                    {state === 'open' &&
-                      (canResolve ? (
-                        <button
-                          type="button"
-                          className="govuk-body-xs govuk-!-margin-right-3"
-                          onClick={() => resolveComment(index)}
-                        >
-                          Resolve
-                        </button>
-                      ) : (
-                        <span className="govuk-body-xs govuk-!-margin-right-3">
-                          Open
-                        </span>
-                      ))}
+                    {state === 'open' && canResolve && (
+                      <button
+                        type="button"
+                        className="govuk-body-xs govuk-!-margin-right-3"
+                        onClick={() => resolveComment(index)}
+                      >
+                        Resolve
+                      </button>
+                    )}
                     {state === 'resolved' && (
                       <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
                         <em>
