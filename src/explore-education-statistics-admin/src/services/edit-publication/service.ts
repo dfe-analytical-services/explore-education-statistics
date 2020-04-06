@@ -1,4 +1,4 @@
-import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
+import { BasicMethodology, ContactDetails } from '@admin/services/common/types';
 import {
   CreatePublicationRequest,
   PublicationMethodologyDetails,
@@ -6,8 +6,8 @@ import {
 import client from '@admin/services/util/service';
 
 const service = {
-  getMethodologies(): Promise<IdTitlePair[]> {
-    return client.get<IdTitlePair[]>('/methodologies');
+  getMethodologies(): Promise<BasicMethodology[]> {
+    return client.get<BasicMethodology[]>('/methodologies');
   },
   getPublicationAndReleaseContacts(): Promise<ContactDetails[]> {
     return client.get<ContactDetails[]>('/contacts');

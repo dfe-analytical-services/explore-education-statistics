@@ -1,62 +1,65 @@
-import EditableDataBlock from '@admin/components/editable/EditableDataBlock';
-import EditableHtmlRenderer from '@admin/components/editable/EditableHtmlRenderer';
-import EditableMarkdownRenderer, {
-  MarkdownRendererProps,
-} from '@admin/components/editable/EditableMarkdownRenderer';
-import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
+import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
+import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { EditableBlock } from '@admin/services/publicationService';
-import React from 'react';
+import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
+import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
+import React, { useCallback, useMemo } from 'react';
 
-interface Props extends MarkdownRendererProps {
+interface Props {
+  allowHeadings?: boolean;
   block: EditableBlock;
+  editable?: boolean;
+  getInfographic?: GetInfographic;
+  onContentSave: (blockId: string, content: string) => void;
+  onDelete: (blockId: string) => void;
 }
 
 function EditableBlockRenderer({
+  allowHeadings,
   block,
   editable,
-  insideAccordion,
-  onContentChange,
-  canDelete = false,
+  getInfographic,
+  onContentSave,
   onDelete,
 }: Props) {
-  const { releaseId } = useManageReleaseContext();
+  const id = `editableBlockRenderer-${block.id}`;
+
+  const handleContentSave = useMemo(
+    () => (content: string) => {
+      onContentSave(block.id, content);
+    },
+    [block.id, onContentSave],
+  );
+
+  const handleDelete = useCallback(() => {
+    onDelete(block.id);
+  }, [block.id, onDelete]);
 
   switch (block.type) {
-    case 'MarkDownBlock':
-      return (
-        <EditableMarkdownRenderer
-          editable={editable}
-          contentId={block.id}
-          insideAccordion={insideAccordion}
-          source={block.body}
-          canDelete={canDelete}
-          onDelete={onDelete}
-          onContentChange={onContentChange}
-        />
-      );
     case 'DataBlock':
       return (
         <div className="dfe-content-overflow">
-          <EditableDataBlock
-            id={`editableBlockRenderer-dataBlock-${block.id}`}
-            dataBlock={block}
-            editable={editable}
-            releaseId={releaseId}
-            canDelete={canDelete}
-            onDelete={onDelete}
-          />
+          <EditableBlockWrapper onDelete={editable ? handleDelete : undefined}>
+            <DataBlockRenderer
+              id={id}
+              dataBlock={block}
+              getInfographic={getInfographic}
+            />
+          </EditableBlockWrapper>
         </div>
       );
     case 'HtmlBlock':
+    case 'MarkDownBlock':
       return (
-        <EditableHtmlRenderer
+        <EditableContentBlock
+          allowHeadings={allowHeadings}
           editable={editable}
-          insideAccordion={insideAccordion}
-          contentId={block.id}
-          source={block.body}
-          canDelete={canDelete}
-          onDelete={onDelete}
-          onContentChange={onContentChange}
+          id={id}
+          label="Block content"
+          value={block.body}
+          useMarkdown={block.type === 'MarkDownBlock'}
+          onSave={handleContentSave}
+          onDelete={handleDelete}
         />
       );
     default:

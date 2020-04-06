@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
         public PartialDate NextReleaseDate { get; set; }
         
-        public List<BasicLink> RelatedInformation { get; set; } = new List<BasicLink>();
+        public List<Link> RelatedInformation { get; set; } = new List<Link>();
     }
 
     public class PublicationViewModel
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
         public List<PreviousReleaseViewModel> OtherReleases { get; set; }
         
-        public List<BasicLink> LegacyReleases { get; set; }
+        public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
         public TopicViewModel Topic { get; set; }
         
@@ -113,6 +113,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public string Slug { get; set; }
 
         public string Title { get; set; }
+    }
+    
+    public class LegacyReleaseViewModel
+    {
+        public Guid Id { get; set; }
+        
+        public string Description { get; set; }
+
+        public string Url { get; set; }
     }
 
     public class ThemeViewModel

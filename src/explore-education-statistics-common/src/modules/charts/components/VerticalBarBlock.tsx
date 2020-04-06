@@ -2,6 +2,7 @@ import '@common/modules/charts/components/charts.scss';
 import {
   AxisConfiguration,
   ChartDefinition,
+  RenderLegend,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import {
@@ -43,7 +44,7 @@ const VerticalBarBlock = ({
   stacked,
   legend,
   renderLegend,
-}: VerticalBarProps) => {
+}: VerticalBarProps & RenderLegend) => {
   if (
     axes === undefined ||
     axes.major === undefined ||

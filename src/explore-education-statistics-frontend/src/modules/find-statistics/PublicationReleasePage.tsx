@@ -100,7 +100,7 @@ class PublicationReleasePage extends Component<Props> {
                   >
                     View latest data:{' '}
                     <span className="govuk-!-font-weight-bold">
-                      {data.publication.otherReleases.slice(-1)[0].title}
+                      {data.publication.otherReleases[0].title}
                     </span>
                   </Link>
                 )}
@@ -323,12 +323,7 @@ class PublicationReleasePage extends Component<Props> {
           Headline facts and figures - {data.yearTitle}
         </h2>
 
-        <PublicationReleaseHeadlinesSection
-          releaseId={data.id}
-          keyStatisticsSection={data.keyStatisticsSection}
-          headlinesSection={data.headlinesSection}
-          keyStatisticsSecondarySection={data.keyStatisticsSecondarySection}
-        />
+        <PublicationReleaseHeadlinesSection release={data} />
 
         {data.content.length > 0 && (
           <Accordion id={this.accId[0]}>
@@ -341,7 +336,7 @@ class PublicationReleasePage extends Component<Props> {
                 >
                   <PublicationSectionBlocks
                     content={content}
-                    publication={data.publication}
+                    release={data}
                     onToggle={(section: { id: string; title: string }) => {
                       logEvent(
                         'Publication Release Data Tabs',

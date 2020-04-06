@@ -44,6 +44,8 @@ const ChartConfiguration = ({
   onChange,
   onSubmit,
 }: Props) => {
+  const { fileId, ...initialValues } = chartOptions;
+
   const normalizeValues = (values: ChartOptions): ChartOptions => {
     return {
       ...values,
@@ -67,11 +69,11 @@ const ChartConfiguration = ({
         <>
           <InfographicChartForm
             releaseId={data.releaseId}
-            fileId={chartOptions.fileId || ''}
-            onSubmit={fileId => {
+            fileId={fileId || ''}
+            onSubmit={nextFileId => {
               onChange({
                 ...chartOptions,
-                fileId,
+                fileId: nextFileId,
                 isValid: true,
               });
             }}
@@ -81,7 +83,7 @@ const ChartConfiguration = ({
       )}
 
       <Formik<ChartOptions>
-        initialValues={chartOptions}
+        initialValues={initialValues}
         onSubmit={values => {
           onSubmit(normalizeValues(values));
         }}

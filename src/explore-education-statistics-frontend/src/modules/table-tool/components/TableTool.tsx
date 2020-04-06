@@ -37,10 +37,11 @@ const TableToolFinalStep = ({
     // and table only render together as a matching pair
     setCurrentTable(table);
     setCurrentTableHeaders(tableHeaders);
+    setPermalinkId('');
   }, [tableHeaders, table]);
 
   const handlePermalinkClick = async () => {
-    if (!tableHeaders || !query) {
+    if (!currentTableHeaders || !query) {
       return;
     }
     setPermalinkLoading(true);
@@ -48,7 +49,7 @@ const TableToolFinalStep = ({
     const { id } = await permalinkService.createTablePermalink({
       ...query,
       configuration: {
-        tableHeadersConfig: tableHeaders,
+        tableHeadersConfig: currentTableHeaders,
       },
     });
 

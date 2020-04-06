@@ -142,6 +142,7 @@ export const chartBuilderReducer: Reducer<
       draft.options = {
         ...defaultOptions,
         ...(draft?.definition?.options.defaults ?? {}),
+        ...draft.options,
         ...action.payload,
         ...(draft?.definition?.options.constants ?? {}),
       };

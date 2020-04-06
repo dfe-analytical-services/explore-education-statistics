@@ -1,46 +1,45 @@
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import {
   ChartDefinition,
   ChartProps,
 } from '@common/modules/charts/types/chart';
-import React, { memo, useEffect, useState } from 'react';
+import toDataUrl from '@common/utils/file/toDataUrl';
+import React, { memo } from 'react';
 
-export type GetInfographic = (
-  releaseId: string,
-  fileName: string,
-) => Promise<Blob>;
+export type GetInfographic = (fileId: string) => Promise<Blob>;
 
 export interface InfographicChartProps extends ChartProps {
-  releaseId?: string;
-  fileId?: string;
+  fileId: string;
   getInfographic?: GetInfographic;
 }
 
 const InfographicBlock = ({
-  releaseId,
   fileId,
   getInfographic,
   width = 0,
   height = 0,
 }: InfographicChartProps) => {
-  const [file, setFile] = useState<string>();
-
-  useEffect(() => {
-    if (fileId && releaseId && getInfographic) {
-      getInfographic(releaseId, fileId).then(blob => {
-        const a = new FileReader();
-        // @ts-ignore
-        a.onload = (e: ProgressEvent) => setFile(e.target.result);
-        a.readAsDataURL(blob);
-      });
+  const { value: file, error, isLoading } = useAsyncRetry(async () => {
+    if (fileId && getInfographic) {
+      const infographic = await getInfographic(fileId);
+      const dataUrl = await toDataUrl(infographic);
+      return dataUrl.toString();
     }
-  }, [getInfographic, fileId, releaseId]);
 
-  if (fileId === undefined || fileId === '') {
-    return <div>Infographic not configured</div>;
+    return undefined;
+  }, [getInfographic, fileId]);
+
+  if (error) {
+    return <p className="govuk-inset-text">Could not load infographic</p>;
+  }
+
+  if (!fileId) {
+    return null;
   }
 
   return (
-    <>
+    <LoadingSpinner loading={isLoading}>
       {file && (
         <img
           alt="infographic"
@@ -49,7 +48,7 @@ const InfographicBlock = ({
           height={height > 0 ? height : undefined}
         />
       )}
-    </>
+    </LoadingSpinner>
   );
 };
 

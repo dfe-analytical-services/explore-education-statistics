@@ -14,6 +14,7 @@ import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -22,7 +23,6 @@ import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -53,12 +53,12 @@ const errorCodeMappings = [
   errorCodeToFieldError(
     'DATA_FILE_MUST_BE_CSV_FILE',
     'dataFile',
-    'Data file must be a csv file',
+    'Data file must be a csv file with UTF-8 encoding',
   ),
   errorCodeToFieldError(
     'META_FILE_MUST_BE_CSV_FILE',
     'metadataFile',
-    'Meta file must be a csv file',
+    'Meta file must be a csv file with UTF-8 encoding',
   ),
   errorCodeToFieldError(
     'SUBJECT_TITLE_MUST_BE_UNIQUE',
@@ -329,9 +329,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     const accId = `${dataFile.title}-${index}`;
                     return (
                       <AccordionSection
-                        /* eslint-disable-next-line react/no-array-index-key */
                         key={accId}
-                        headingId={accId}
                         heading={dataFile.title}
                         onToggle={() => {
                           if (openedAccordions.includes(accId)) {

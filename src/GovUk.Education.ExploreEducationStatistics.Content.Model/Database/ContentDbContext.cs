@@ -11,6 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
@@ -267,10 +269,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasMaxLength(6);
 
             modelBuilder.Entity<Release>()
-                .Property<List<BasicLink>>("RelatedInformation")
+                .Property<List<Link>>("RelatedInformation")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<BasicLink>>(v));
+                    v => JsonConvert.DeserializeObject<List<Link>>(v));
 
             modelBuilder.Entity<Release>()
                 .HasIndex(r => new {r.OriginalId, r.Version});
@@ -1271,10 +1273,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Publication
                 {
                     Id = new Guid("2e510281-ca8c-41bf-bbe0-fd15fcc81aae"),
-                    Title = "NEET statistics quarterly brief",
+                    Title = "NEET statistics annual brief",
                     Summary = "",
                     TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
-                    Slug = "neet-statistics-quarterly-brief",
+                    Slug = "neet-statistics-annual-brief",
                     LegacyPublicationUrl =
                         new Uri("https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-"),
                     ContactId = new Guid("ee490e40-201a-4b25-bc52-76c15de72344")
@@ -1592,11 +1594,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                     MethodologyId = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
-
                     Title = "Secondary and primary schools applications and offers",
                     Summary = "",
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                     Slug = "secondary-and-primary-schools-applications-and-offers",
+                    LegacyPublicationUrl =
+                        new Uri("https://www.gov.uk/government/collections/statistics-school-applications"),
                     ContactId = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191")
                 },
                 new Publication
@@ -1952,15 +1955,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Status = ReleaseStatus.Approved,
                     Slug = "2016-17",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    RelatedInformation = new List<BasicLink>
+                    RelatedInformation = new List<Link>
                     {
-                        new BasicLink
+                        new Link
                         {
                             Id = new Guid("f3c67bc9-6132-496e-a848-c39dfcd16f49"),
                             Description = "Additional guidance",
                             Url = "http://example.com"
                         },
-                        new BasicLink
+                        new Link
                         {
                             Id = new Guid("45acb50c-8b21-46b4-989f-36f4b0ee37fb"),
                             Description = "Statistics guide",
@@ -5322,180 +5325,202 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Reason = "First published."
                 }
             );
-            modelBuilder.Entity<Link>().HasData(
-                new Link
+            modelBuilder.Entity<LegacyRelease>().HasData(
+                new LegacyRelease
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("08134c1d-8a58-49a4-8d8b-22e586ffd5ae"),
-                    Description = "2008 to 2009",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2008, AcademicYear)}",
+                    Order = 0,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("250bace6-aeb9-4fe9-8de2-3a25e0dc717f"),
-                    Description = "2009 to 2010",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2009, AcademicYear)}",
+                    Order = 1,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("a319e4ef-b957-40fb-8a47-b1a97814b220"),
-                    Description = "2010 to 2011",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2010, AcademicYear)}",
+                    Order = 2,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("13acf54a-8016-49ff-9050-c61ebe7acad2"),
-                    Description = "2011 to 2012",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2011, AcademicYear)}",
+                    Order = 3,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("45bd7f62-2018-4a5c-9b93-ccece8e89c46"),
-                    Description = "2012 to 2013",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2012, AcademicYear)}",
+                    Order = 4,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("f1225f98-40d5-494c-90f9-99f9fb59ac9d"),
-                    Description = "2013 to 2014",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2013, AcademicYear)}",
+                    Order = 5,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("78239816-507d-42b7-98fd-4a71d0d4eb1f"),
-                    Description = "2014 to 2015",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2014, AcademicYear)}",
+                    Order = 6,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("564dacdc-f58e-4aa0-8dbd-d8368b4fb6ba"),
-                    Description = "2015 to 2016",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2015, AcademicYear)}",
+                    Order = 7,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("89c02688-646d-45b5-8919-9a3fafcfe0e9"),
-                    Description = "2009 to 2010",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2009, AcademicYear)}",
+                    Order = 0,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("81d91c86-9bf2-496c-b026-9dc255c35635"),
-                    Description = "2010 to 2011",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2010, AcademicYear)}",
+                    Order = 1,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("e20141d0-d894-4b8d-a78f-e41c23500786"),
-                    Description = "2011 to 2012",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2011, AcademicYear)}",
+                    Order = 2,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("ce15f487-87b0-4c07-98f1-6c6732196be7"),
-                    Description = "2012 to 2013",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2012, AcademicYear)}",
+                    Order = 3,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("75991639-ad77-4ba6-91fc-ac08c00a4ce8"),
-                    Description = "2013 to 2014",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2013, AcademicYear)}",
+                    Order = 4,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("28e53936-5a52-44be-a7a6-d2f14a426d28"),
-                    Description = "2014 to 2015",
+                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2014, AcademicYear)}",
+                    Order = 5,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("dc8b0d8c-08bb-47cc-b3a1-9e6ac9c2c268"),
                     Description = "January 2010",
+                    Order = 0,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("b086ba70-703c-40dd-aaef-d2e19335188e"),
                     Description = "January 2011",
+                    Order = 1,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2011",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("181ec43e-cf22-4cab-a128-0a5702468566"),
                     Description = "January 2012",
+                    Order = 2,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2012",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("e6b36ee8-ef66-4864-a4b3-9047ee3da338"),
                     Description = "January 2013",
+                    Order = 3,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2013",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("398ba8c6-3ea0-49da-8645-ceb3c7fb9860"),
                     Description = "January 2014",
+                    Order = 4,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2014",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("5e244416-6f2a-4d22-bea4-c22a229befef"),
                     Description = "January 2015",
+                    Order = 5,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2015",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("e3c1db23-8a8f-47fe-b2cd-8e677db700a2"),
                     Description = "January 2016",
+                    Order = 6,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2016",
                 },
-                new Link
+                new LegacyRelease
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("313435b3-fe56-4b92-8e13-670dbf510062"),
                     Description = "January 2017",
+                    Order = 7,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2017",
                 }

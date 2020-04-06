@@ -119,8 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds))
-                .OrderBy(release => release.Year)
-                .ThenBy(release => release.TimePeriodCoverage);
+                .OrderByDescending(release => release.Year)
+                .ThenByDescending(release => release.TimePeriodCoverage);
             return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
         }
 
