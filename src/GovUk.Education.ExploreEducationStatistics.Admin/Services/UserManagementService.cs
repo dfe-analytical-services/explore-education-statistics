@@ -67,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }).OrderBy(x => x.Name)
                 .ToListAsync();
 
+            // Potentially user role could be null in the above result in an empty array so assign role afterwards
             foreach (var user in users)
             {
                 user.Role = GetUserRole(user.Id);
@@ -95,7 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<UserViewModel>> ListPendingAsync()
         {
-            // Bit of a hack to get the role of the user.
             var pendingUsers = await _context.UserInvites.Where(u => u.Accepted == false)
                 .OrderBy(x => x.Email).Select(u => new UserViewModel
                 {
@@ -106,6 +106,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return pendingUsers;
         }
 
+        // TODO: Part 2: Switch this to and Either result with validation errors
+        // TODO: Part 2: Verify the role exists
+        // TODO: Part 2: Verify valid email address
         public async Task<bool> InviteAsync(string email, string user, string roleId)
         {
             if (_context.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email)) return false;
@@ -117,7 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // TODO add role selection to Invite Users UI
                     var analystRole = await _context
                         .Roles
-                        // TODO represent roles with an enum
                         .Where(r => r.Id == roleId)
                         .FirstAsync();
 
