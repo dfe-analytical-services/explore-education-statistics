@@ -1,23 +1,16 @@
 import Link from '@admin/components/Link';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Page from '@admin/components/Page';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import userService from '@admin/services/users/service';
 import { UserStatus } from '@admin/services/users/types';
 import React, { useEffect, useState } from 'react';
 
-interface Model {
-  users: UserStatus[];
-}
-
 const BauUsersPage = () => {
-  const [model, setModel] = useState<Model>();
+  const { value, isLoading, error } = useAsyncRetry(() =>
+    userService.getUsers(),
+  );
 
-  useEffect(() => {
-    userService.getUsers().then(users => {
-      setModel({
-        users,
-      });
-    });
-  }, []);
   return (
     <Page
       wide
@@ -44,22 +37,24 @@ const BauUsersPage = () => {
             <th>Actions</th>
           </tr>
         </thead>
-        {model && (
-          <tbody className="govuk-table__body">
-            {model.users.map(user => (
-              <tr className="govuk-table__row" key={user.id}>
-                <th scope="row" className="govuk-table__header">
-                  {user.name}
-                </th>
-                <td className="govuk-table__cell">{user.email}</td>
-                <td className="govuk-table__cell">{user.role}</td>
-                <td className="govuk-table__cell">
-                  {/* <Link to={`/administration/users/${user.id}`}>Manage</Link> */}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        )}
+        <LoadingSpinner loading={isLoading} text="Loading users">
+          {value && (
+            <tbody className="govuk-table__body">
+              {value.map(user => (
+                <tr className="govuk-table__row" key={user.id}>
+                  <th scope="row" className="govuk-table__header">
+                    {user.name}
+                  </th>
+                  <td className="govuk-table__cell">{user.email}</td>
+                  <td className="govuk-table__cell">{user.role}</td>
+                  <td className="govuk-table__cell">
+                    {/* <Link to={`/administration/users/${user.id}`}>Manage</Link> */}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </LoadingSpinner>
       </table>
       <Link
         to="/administration/users/pending"
