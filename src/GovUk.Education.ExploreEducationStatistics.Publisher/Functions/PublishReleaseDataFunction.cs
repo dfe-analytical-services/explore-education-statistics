@@ -14,19 +14,28 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseS
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class PublishReleaseDataFunction
     {
         private readonly IConfiguration _configuration;
+        private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
 
         public const string QueueName = "publish-release-data";
 
-        public PublishReleaseDataFunction(IConfiguration configuration, IReleaseStatusService releaseStatusService)
+        public PublishReleaseDataFunction(IConfiguration configuration,
+            IQueueService queueService,
+            IReleaseStatusService releaseStatusService)
         {
             _configuration = configuration;
+            _queueService = queueService;
             _releaseStatusService = releaseStatusService;
         }
 
+        /**
+         * Azure function which publishes the statistics data for a Release by triggering an ADF Pipeline to copy it between databases.
+         * Triggers publishing content for the Release if publishing is immediate and the function is running locally where the ADF Pipeline is skipped.
+         */
         [FunctionName("PublishReleaseData")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseData(
@@ -38,7 +47,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             if (IsDevelopment())
             {
-                // Skip Data Factory
+                // Skip the ADF Pipeline which doesn't run locally
+                // If the Release is immediate then trigger publishing the content
+                // This usually happens when the ADF Pipeline is complete
+                if (await _releaseStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
+                {
+                    await _queueService.QueuePublishReleaseContentImmediateMessageAsync(message.ReleaseId,
+                        message.ReleaseStatusId);
+                }
+
                 await UpdateStage(message, Complete);
             }
             else

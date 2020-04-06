@@ -8,11 +8,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleaseStatusService
     {
-        Task CreateAsync(Guid releaseId, ReleaseStatusState state,
+        Task<ReleaseStatus> CreateAsync(Guid releaseId, ReleaseStatusState state, bool immediate,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null);
-
+        
         Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query);
 
+        Task<ReleaseStatus> GetAsync(Guid releaseId, Guid releaseStatusId);
+
+        Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId);
+        
         Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state);
 
         Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage stage,

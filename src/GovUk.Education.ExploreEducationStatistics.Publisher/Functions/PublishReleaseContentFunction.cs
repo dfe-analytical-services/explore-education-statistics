@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -26,6 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _publishingService = publishingService;
         }
 
+        /**
+         * Azure function which publishes the content for a Release at a scheduled time by moving it from a staging directory.
+         * Sets the published time on the Release which means it's considered as 'Live'.
+         */
         [FunctionName("PublishReleaseContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseContent([TimerTrigger("%PublishReleaseContentCronSchedule%")]
@@ -42,16 +47,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 foreach (var releaseStatus in scheduled)
                 {
                     logger.LogInformation($"Moving content for release: {releaseStatus.ReleaseId}");
-                    await UpdateStage(releaseStatus, ReleaseStatusPublishingStage.Started);
+                    await UpdateStage(releaseStatus, Started);
                     try
                     {
-                        await _publishingService.PublishReleaseContentAsync(releaseStatus.ReleaseId);
+                        await _publishingService.PublishStagedReleaseContentAsync(releaseStatus.ReleaseId);
                         published.Add(releaseStatus);
                     }
                     catch (Exception e)
                     {
                         logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                        await UpdateStage(releaseStatus, ReleaseStatusPublishingStage.Failed,
+                        await UpdateStage(releaseStatus, Failed,
                             new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                     }
                 }
@@ -61,12 +66,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 try
                 {
                     await _notificationsService.NotifySubscribersAsync(releaseIds);
-                    await UpdateStage(published, ReleaseStatusPublishingStage.Complete);
+                    await UpdateStage(published, Complete);
                 }
                 catch (Exception e)
                 {
                     logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                    await UpdateStage(published, ReleaseStatusPublishingStage.Failed,
+                    await UpdateStage(published, Failed,
                         new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                 }
             }
@@ -81,13 +86,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 QueryComparisons.LessThan, DateTime.Today.AddDays(1));
             var contentStageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.ContentStage),
                 QueryComparisons.Equal, ReleaseStatusContentStage.Complete.ToString());
+            var dataStageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.DataStage),
+                QueryComparisons.Equal, ReleaseStatusDataStage.Complete.ToString());
             var publishingStageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PublishingStage),
-                QueryComparisons.Equal, ReleaseStatusPublishingStage.Scheduled.ToString());
-            var stageQuery = TableQuery.CombineFilters(contentStageQuery, TableOperators.And, publishingStageQuery);
-            var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And,
-                stageQuery));
+                QueryComparisons.Equal, Scheduled.ToString());
 
-            return await _releaseStatusService.ExecuteQueryAsync(query);
+            var stageQuery = TableQuery.CombineFilters(
+                TableQuery.CombineFilters(contentStageQuery, TableOperators.And, dataStageQuery),
+                TableOperators.And, publishingStageQuery);
+            var combinedQuery = TableQuery.CombineFilters(dateQuery, TableOperators.And, stageQuery);
+
+            return await _releaseStatusService.ExecuteQueryAsync(new TableQuery<ReleaseStatus>().Where(combinedQuery));
         }
 
         private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, ReleaseStatusPublishingStage stage,

@@ -5,63 +5,68 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusStates;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
     public class ValidateReleaseFunction
     {
+        private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IValidationService _validationService;
 
-        private static readonly ReleaseStatusState InvalidState =
-            new ReleaseStatusState(ReleaseStatusContentStage.Cancelled,
-                ReleaseStatusFilesStage.Cancelled,
-                ReleaseStatusDataStage.Cancelled,
-                ReleaseStatusPublishingStage.Cancelled,
-                ReleaseStatusOverallStage.Invalid);
+        private const string QueueName = "releases";
 
-        private static readonly ReleaseStatusState ValidState = 
-            new ReleaseStatusState(ReleaseStatusContentStage.NotStarted,
-                ReleaseStatusFilesStage.NotStarted,
-                ReleaseStatusDataStage.NotStarted,
-                ReleaseStatusPublishingStage.NotStarted,
-                ReleaseStatusOverallStage.Scheduled);
-
-        public ValidateReleaseFunction(IReleaseStatusService releaseStatusService, IValidationService validationService)
+        public ValidateReleaseFunction(IQueueService queueService,
+            IReleaseStatusService releaseStatusService,
+            IValidationService validationService)
         {
+            _queueService = queueService;
             _releaseStatusService = releaseStatusService;
             _validationService = validationService;
         }
 
         /**
-         * Azure function which validates that a Release is in a state to be published and if so creates a ReleaseStatus entry scheduling its publication.
+         * Azure function which validates that a Release is in a state to be published.
+         * Creates a ReleaseStatus entry scheduling its publication or triggers publishing files if immediate.
          */
         [FunctionName("ValidateRelease")]
         // ReSharper disable once UnusedMember.Global
         public async Task ValidateRelease(
-            [QueueTrigger("releases")] ReleaseStatusMessage statusMessage,
+            [QueueTrigger(QueueName)] ValidateReleaseMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered: {statusMessage}");
-            await ValidateReleaseAsync(statusMessage, async () =>
-                // TODO EESB-28 fail is there is already a run that is Started
-                // TODO EESB-28 cancel an existing run that is already Scheduled
-                await CreateReleaseStatusAsync(statusMessage, ValidState));
+            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            await ValidateReleaseAsync(message, async () =>
+            {
+                // TODO BAU-541 fail is there is already a run that is Started
+                // TODO BAU-541 cancel an existing run that is already Scheduled
+                if (message.Immediate)
+                {
+                    // TODO BAU-541 fail if the staging directory already exists
+                    var releaseStatus = await CreateReleaseStatusAsync(message, StartedImmediateState);
+                    await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId, releaseStatus.Id);
+                }
+                else
+                {
+                    await CreateReleaseStatusAsync(message, ScheduledState);
+                }
+            });
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task ValidateReleaseAsync(ReleaseStatusMessage statusMessage, Func<Task> andThen)
+        private async Task ValidateReleaseAsync(ValidateReleaseMessage message, Func<Task> andThen)
         {
-            var (valid, logMessages) = await _validationService.ValidateAsync(statusMessage);
-            await (valid ? andThen.Invoke() : CreateReleaseStatusAsync(statusMessage, InvalidState, logMessages));
+            var (valid, logMessages) = await _validationService.ValidateAsync(message);
+            await (valid ? andThen.Invoke() : CreateReleaseStatusAsync(message, InvalidState, logMessages));
         }
 
-        private async Task CreateReleaseStatusAsync(ReleaseStatusMessage statusMessage,
+        private async Task<ReleaseStatus> CreateReleaseStatusAsync(ValidateReleaseMessage message,
             ReleaseStatusState state, IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
-            await _releaseStatusService.CreateAsync(statusMessage.ReleaseId, state, logMessages);
+            return await _releaseStatusService.CreateAsync(message.ReleaseId, state, message.Immediate, logMessages);
         }
     }
 }

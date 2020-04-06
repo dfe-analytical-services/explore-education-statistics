@@ -30,14 +30,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _tableStorageService = tableStorageService;
         }
 
-        public async Task CreateAsync(Guid releaseId, ReleaseStatusState state,
+        public async Task<ReleaseStatus> CreateAsync(Guid releaseId, ReleaseStatusState state, bool immediate,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
             var releaseStatus = new ReleaseStatus(release.Publication.Slug, release.PublishScheduled, release.Id,
-                release.Slug, state, logMessages);
-            await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
+                release.Slug, state, immediate, logMessages);
+            var tableResult = await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
+            return tableResult.Result as ReleaseStatus;
+        }
+
+        public async Task<ReleaseStatus> GetAsync(Guid releaseId, Guid releaseStatusId)
+        {
+            var table = await GetTableAsync();
+            var tableResult = await table.ExecuteAsync(
+                TableOperation.Retrieve<ReleaseStatus>(releaseId.ToString(), releaseStatusId.ToString(),
+                    new List<string>
+                    {
+                        nameof(ReleaseStatus.Created),
+                        nameof(ReleaseStatus.PublicationSlug),
+                        nameof(ReleaseStatus.Publish),
+                        nameof(ReleaseStatus.ReleaseSlug),
+                        nameof(ReleaseStatus.ContentStage),
+                        nameof(ReleaseStatus.DataStage),
+                        nameof(ReleaseStatus.FilesStage),
+                        nameof(ReleaseStatus.PublishingStage),
+                        nameof(ReleaseStatus.OverallStage),
+                        nameof(ReleaseStatus.Immediate),
+                        nameof(ReleaseStatus.Messages)
+                    }));
+
+            return tableResult.Result as ReleaseStatus;
+        }
+
+        public async Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId)
+        {
+            var releaseStatus = await GetAsync(releaseId, releaseStatusId);
+            return releaseStatus.Immediate;
         }
 
         public Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
@@ -102,58 +132,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             Func<ReleaseStatus, ReleaseStatus> updateFunction, int retry = 0)
         {
             var table = await GetTableAsync();
-            var tableResult = await table.ExecuteAsync(
-                TableOperation.Retrieve<ReleaseStatus>(releaseId.ToString(), releaseStatusId.ToString(),
-                    new List<string>
-                    {
-                        nameof(ReleaseStatus.Created),
-                        nameof(ReleaseStatus.PublicationSlug),
-                        nameof(ReleaseStatus.Publish),
-                        nameof(ReleaseStatus.ReleaseSlug),
-                        nameof(ReleaseStatus.ContentStage),
-                        nameof(ReleaseStatus.DataStage),
-                        nameof(ReleaseStatus.FilesStage),
-                        nameof(ReleaseStatus.PublishingStage),
-                        nameof(ReleaseStatus.OverallStage),
-                        nameof(ReleaseStatus.Messages)
-                    }));
+            var releaseStatus = await GetAsync(releaseId, releaseStatusId);
 
-            if (tableResult.Result is ReleaseStatus releaseStatus)
+            try
             {
-                try
+                await table.ExecuteAsync(TableOperation.Replace(updateFunction.Invoke(releaseStatus)));
+            }
+            catch (StorageException e)
+            {
+                if (e.RequestInformation.HttpStatusCode == (int) HttpStatusCode.PreconditionFailed)
                 {
-                    await table.ExecuteAsync(TableOperation.Replace(updateFunction.Invoke(releaseStatus)));
-                }
-                catch (StorageException e)
-                {
-                    if (e.RequestInformation.HttpStatusCode == (int) HttpStatusCode.PreconditionFailed)
+                    _logger.LogDebug("Precondition failure as expected. ETag does not match");
+                    if (retry++ < 5)
                     {
-                        _logger.LogDebug("Precondition failure as expected. ETag does not match");
-                        if (retry++ < 5)
-                        {
-                            await UpdateRowAsync(releaseId, releaseStatusId, updateFunction, retry);
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        await UpdateRowAsync(releaseId, releaseStatusId, updateFunction, retry);
                     }
                     else
                     {
                         throw;
                     }
                 }
+                else
+                {
+                    throw;
+                }
             }
         }
-
-        // private async Task<ReleaseStatus> GetReleaseStatus(Guid releaseId)
-        // {
-        //     var table = await GetTableAsync();
-        //     var queryResults = table.ExecuteQuery(new TableQuery<ReleaseStatus>().Where(
-        //         TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey), QueryComparisons.Equal,
-        //             releaseId.ToString())));
-        //     return queryResults.SingleOrDefault();
-        // }
 
         private Task<Release> GetReleaseAsync(Guid releaseId)
         {

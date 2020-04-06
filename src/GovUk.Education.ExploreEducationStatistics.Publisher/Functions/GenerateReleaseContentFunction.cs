@@ -9,6 +9,7 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseS
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class GenerateReleaseContentFunction
     {
         private readonly IContentService _contentService;
@@ -23,6 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
         }
 
+        /**
+         * Azure function which generates the content for a Release into a staging directory.
+         * Depends on the download files existing.
+         */
         [FunctionName("GenerateReleaseContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task GenerateReleaseContent(

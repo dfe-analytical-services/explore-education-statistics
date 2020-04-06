@@ -13,17 +13,26 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseS
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
+    // ReSharper disable once UnusedType.Global
     public class DataFactoryPipelineStatusFunction
     {
+        private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
 
-        public DataFactoryPipelineStatusFunction(IReleaseStatusService releaseStatusService)
+        public DataFactoryPipelineStatusFunction(IQueueService queueService, IReleaseStatusService releaseStatusService)
         {
+            _queueService = queueService;
             _releaseStatusService = releaseStatusService;
         }
 
+        /**
+         * Azure function which updates the stage of the statistics data task depending on the result of the ADF Pipeline.
+         * This is triggered when the ADF Pipeline completes regardless of whether it was successful or not.
+         * Triggers publishing content for the Release if publishing is immediate.
+         */
         [FunctionName("DataFactoryPipelineStatusFunction")]
-        public async Task<IActionResult> Run(
+        // ReSharper disable once UnusedMember.Global
+        public async Task<IActionResult> Status(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "datafactory/pipeline/status/")]
             HttpRequest req,
             ILogger logger,
@@ -37,6 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
                     Complete);
+
+                if (await _releaseStatusService.IsImmediate(response.ReleaseId, response.ReleaseStatusId))
+                {
+                    await _queueService.QueuePublishReleaseContentImmediateMessageAsync(response.ReleaseId,
+                        response.ReleaseStatusId);
+                }
             }
             else
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -9,6 +10,7 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseS
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class PublishReleaseFilesFunction
     {
         private readonly IPublishingService _publishingService;
@@ -26,6 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
         }
 
+        /**
+         * Azure function which publishes the files for a Release by copying them between storage accounts.
+         * Triggers publishing statistics data for the Release if publishing is immediate.
+         * Triggers generating staged content for the Release if publishing is not immediate.
+         */
         [FunctionName("PublishReleaseFiles")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseFiles(
@@ -35,10 +42,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
 
+            var immediate = await IsImmediate(message);
             var published = new List<(Guid ReleaseId, Guid ReleaseStatusId)>();
             foreach (var (releaseId, releaseStatusId) in message.Releases)
             {
-                await UpdateFilesStage(releaseId, releaseStatusId, Started);
+                await UpdateStage(releaseId, releaseStatusId, Started);
                 try
                 {
                     _publishingService.PublishReleaseFilesAsync(releaseId).Wait();
@@ -47,31 +55,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 catch (Exception e)
                 {
                     logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                    await UpdateFilesStage(releaseId, releaseStatusId, Failed,
+                    await UpdateStage(releaseId, releaseStatusId, Failed,
                         new ReleaseStatusLogMessage($"Exception in files stage: {e.Message}"));
                 }
             }
 
-            await _queueService.QueueGenerateReleaseContentMessageAsync(published);
+            if (immediate)
+            {
+                await _queueService.QueuePublishReleaseDataMessagesAsync(published);
+            } else {
+                await _queueService.QueueGenerateReleaseContentMessageAsync(published);
+            }
 
             foreach (var (releaseId, releaseStatusId) in published)
             {
-                await UpdateFilesStage(releaseId, releaseStatusId, Complete);
-                await UpdateContentStage(releaseId, releaseStatusId, ReleaseStatusContentStage.Queued);
+                await UpdateStage(releaseId, releaseStatusId, Complete);
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateFilesStage(Guid releaseId, Guid releaseStatusId, ReleaseStatusFilesStage stage,
+        private async Task<bool> IsImmediate(PublishReleaseFilesMessage message)
+        {
+            if (message.Releases.Count() > 1)
+            {
+                // If there's more than one Release this invocation couldn't have been triggered for immediate publishing
+                return false;
+            }
+
+            var (releaseId, releaseStatusId) = message.Releases.Single();
+            return await _releaseStatusService.IsImmediate(releaseId, releaseStatusId);
+        }
+        
+        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, ReleaseStatusFilesStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage, logMessage);
-        }
-
-        private async Task UpdateContentStage(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage stage)
-        {
-            await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, stage);
         }
     }
 }

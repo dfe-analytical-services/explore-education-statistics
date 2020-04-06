@@ -105,12 +105,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
 
             if (Content == ReleaseStatusContentStage.Failed
-                || Data == ReleaseStatusDataStage.Failed 
+                || Data == ReleaseStatusDataStage.Failed
                 || Files == ReleaseStatusFilesStage.Failed
                 || Publishing == ReleaseStatusPublishingStage.Failed)
             {
                 if (Content == ReleaseStatusContentStage.Failed
-                    || Data == ReleaseStatusDataStage.Failed 
+                    || Data == ReleaseStatusDataStage.Failed
                     || Files == ReleaseStatusFilesStage.Failed)
                 {
                     Publishing = ReleaseStatusPublishingStage.Cancelled;
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         NotStarted,
         Started
     }
-    
+
     public enum ReleaseStatusDataStage
     {
         Cancelled,
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         NotStarted,
         Started
     }
-    
+
     public enum ReleaseStatusFilesStage
     {
         Cancelled,
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         NotStarted,
         Started
     }
-    
+
     public enum ReleaseStatusOverallStage
     {
         Complete,
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         Scheduled,
         Started
     }
-    
+
     public enum ReleaseStatusPublishingStage
     {
         Cancelled,
@@ -170,6 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         Failed,
         Scheduled,
         NotStarted,
-        Started
+        Started,
+        // TODO BAU-541 Remove me
+        ToDo,
     }
 }

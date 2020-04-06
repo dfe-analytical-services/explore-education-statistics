@@ -7,6 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     public interface IContentService
     {
         Task UpdateAllContentAsync();
-        Task UpdateContentAsync(IEnumerable<Guid> releaseIds);
+        Task UpdateContentAsync(IEnumerable<Guid> releaseIds, bool staging = true);
     }
 }

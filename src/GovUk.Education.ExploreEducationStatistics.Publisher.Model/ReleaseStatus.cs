@@ -18,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string FilesStage { get; set; }
         public string PublishingStage { get; set; }
         public string OverallStage { get; set; }
+        public bool Immediate { get; set; }
         public string Messages { get; set; }
         private ReleaseStatusState _state;
 
@@ -30,12 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             Guid releaseId,
             string releaseSlug,
             ReleaseStatusState state,
+            bool immediate,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;
             ReleaseSlug = releaseSlug;
+            Immediate = immediate;
             Messages = logMessages == null ? null : JsonConvert.SerializeObject(logMessages);
             State = state;
             RowKey = Guid.NewGuid().ToString();

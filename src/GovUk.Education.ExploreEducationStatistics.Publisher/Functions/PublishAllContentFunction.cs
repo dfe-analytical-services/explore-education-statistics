@@ -7,25 +7,26 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    /**
-     * Development / BAU Function which performs a full content refresh
-     */
     // ReSharper disable once UnusedType.Global
-    public class GenerateAllContentFunction
+    public class PublishAllContentFunction
     {
         private readonly IContentService _contentService;
 
-        private const string QueueName = "generate-all-content";
+        private const string QueueName = "publish-all-content";
 
-        public GenerateAllContentFunction(IContentService contentService)
+        public PublishAllContentFunction(IContentService contentService)
         {
             _contentService = contentService;
         }
 
-        [FunctionName("GenerateAllContent")]
+        /**
+         * Development / BAU Function to generate and publish the content of all Releases immediately.
+         * Depends on the download files existing.
+         */
+        [FunctionName("PublishAllContent")]
         // ReSharper disable once UnusedMember.Global
-        public async Task GenerateAllContent(
-            [QueueTrigger(QueueName)] GenerateAllContentMessage message,
+        public async Task PublishAllContent(
+            [QueueTrigger(QueueName)] PublishAllContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
