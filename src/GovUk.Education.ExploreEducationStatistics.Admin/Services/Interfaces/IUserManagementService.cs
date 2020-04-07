@@ -6,10 +6,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserManagementService
     {
+        Task<UserViewModel> GetAsync(string userId);
+        
         Task<List<UserViewModel>> ListAsync();
+        
+        Task<List<RoleViewModel>> ListRolesAsync();
+        
+        Task<List<UserViewModel>> ListPreReleaseUsersAsync();
+        
+        Task<List<UserViewModel>> ListPendingAsync();
 
-        Task<List<string>> ListPendingAsync();
+        Task<bool> InviteAsync(string email, string user, string roleId);
+        
+        Task<bool> CancelInviteAsync(string email);
 
-        Task<bool> InviteAsync(string email, string user);
     }
 }

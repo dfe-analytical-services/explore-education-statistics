@@ -36,18 +36,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }).OrderBy(x => x.Name)
                 .ToListAsync();
 
-            return users;
+            foreach (var user in users)
+            {
+                user.Role = GetUserRole(user.Id);
+            }
+
+            return users.Where(u => u.Role != "Prerelease User").ToList();
         }
 
-        public async Task<List<string>> ListPendingAsync()
+        public async Task<List<RoleViewModel>> ListRolesAsync()
         {
-            var pendingUsers = await _context.UserInvites.Where(u => u.Accepted == false).Select(u => u.Email)
-                .OrderBy(x => x).ToListAsync();
+            var roles = await _context.Roles.Select(r => new RoleViewModel()
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    NormalizedName = r.NormalizedName
+                }).OrderBy(x => x.Name)
+                .ToListAsync();
+
+            return roles.Where(r => r.NormalizedName != "PRERELEASE USER").ToList();
+        }
+
+        public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
+        {
+            var users = await _context.Users.Select(u => new UserViewModel
+                {
+                    Id = u.Id,
+                    Name = u.FirstName + " " + u.LastName,
+                    Email = u.Email
+                }).OrderBy(x => x.Name)
+                .ToListAsync();
+
+            // Potentially user role could be null in the above result in an empty array so assign role afterwards
+            foreach (var user in users)
+            {
+                user.Role = GetUserRole(user.Id);
+            }
+
+            return users.Where(u => u.Role == "Prerelease User").ToList();
+        }
+
+        public async Task<UserViewModel> GetAsync(string userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user != null)
+            {
+                return new UserViewModel
+                {
+                    Id = user.Id,
+                    Name = user.FirstName + " " + user.LastName,
+                    Email = user.Email,
+                    Role = GetUserRole(user.Id)
+                };
+            }
+
+            return null;
+        }
+
+        public async Task<List<UserViewModel>> ListPendingAsync()
+        {
+            var pendingUsers = await _context.UserInvites.Where(u => u.Accepted == false)
+                .OrderBy(x => x.Email).Select(u => new UserViewModel
+                {
+                    Email = u.Email,
+                    Role = u.Role.Name
+                }).ToListAsync();
 
             return pendingUsers;
         }
 
-        public async Task<bool> InviteAsync(string email, string user)
+        // TODO: Part 2: Switch this to and Either result with validation errors
+        // TODO: Part 2: Verify the role exists
+        // TODO: Part 2: Verify valid email address
+        public async Task<bool> InviteAsync(string email, string user, string roleId)
         {
             if (_context.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email)) return false;
 
@@ -58,10 +120,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // TODO add role selection to Invite Users UI
                     var analystRole = await _context
                         .Roles
-                        // TODO represent roles with an enum
-                        .Where(r => r.Name == "Analyst")
+                        .Where(r => r.Id == roleId)
                         .FirstAsync();
-                    
+
                     var invite = new UserInvite
                     {
                         Email = email,
@@ -85,6 +146,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return false;
             }
+        }
+
+        public async Task<bool> CancelInviteAsync(string email)
+        {
+            var invite = _context.UserInvites.FirstOrDefault(i => i.Email == email);
+            _context.UserInvites.Remove(invite);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        private string GetUserRole(string userId)
+        {
+            var userRole = _context.UserRoles.FirstOrDefault(r => r.UserId == userId);
+
+            return _context.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
         }
 
         private void SendInviteEmail(string email)
