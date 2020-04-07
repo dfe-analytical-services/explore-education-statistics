@@ -25,6 +25,8 @@ import ThemeTopicWrapper, {
 } from '@admin/pages/theme/ThemeTopicWrapper';
 import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
+import ManageUserPage from '@admin/pages/users/ManageUserPage';
+import PreReleaseUsersPage from '@admin/pages/users/PreReleaseUsersPage';
 import { User } from '@admin/services/sign-in/types';
 import { Dictionary } from '@admin/types';
 import { generatePath, RouteProps } from 'react-router';
@@ -96,6 +98,17 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     component: PendingInvitesPage,
     protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
+  },
+  administrationPreReleaseUsers: {
+    path: '/administration/users/pre-release',
+    component: PreReleaseUsersPage,
+    protectedAction: user => user.permissions.canAccessUserAdministrationPages,
+    exact: true,
+  },
+  administrationUserManage: {
+    path: '/administration/users/:userId',
+    component: ManageUserPage,
+    protectedAction: user => user.permissions.canAccessUserAdministrationPages,
   },
   methodologies: {
     path: '/methodologies',
