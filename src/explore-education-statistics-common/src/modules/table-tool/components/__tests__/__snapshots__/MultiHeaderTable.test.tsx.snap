@@ -56,14 +56,7 @@ exports[`MultiHeaderTable does not render \`colgroup\` headers with multi-span s
         E
       </th>
       <th class="govuk-table__header--numeric borderBottom"
-          colspan="1"
-          rowspan="1"
-          scope="col"
-      >
-        E
-      </th>
-      <th class="govuk-table__header--numeric borderBottom"
-          colspan="1"
+          colspan="2"
           rowspan="1"
           scope="col"
       >
@@ -196,7 +189,7 @@ exports[`MultiHeaderTable does not render \`rowgroup\` headers with multi-span s
         C
       </th>
       <th class
-          rowspan="1"
+          rowspan="2"
           colspan="1"
           scope="row"
       >
@@ -210,13 +203,6 @@ exports[`MultiHeaderTable does not render \`rowgroup\` headers with multi-span s
       </td>
     </tr>
     <tr>
-      <th class
-          rowspan="1"
-          colspan="1"
-          scope="row"
-      >
-        E
-      </th>
       <td class="govuk-table__cell--numeric">
         CDE1
       </td>
@@ -1191,15 +1177,8 @@ exports[`MultiHeaderTable renders table with multi-span \`colgroup\` merged with
       >
         F
       </th>
-      <th class="govuk-table__header--numeric borderBottom"
-          colspan="1"
-          rowspan="1"
-          scope="col"
-      >
-        F
-      </th>
       <th class="govuk-table__header--numeric borderBottom borderRightNone"
-          colspan="1"
+          colspan="2"
           rowspan="1"
           scope="col"
       >
@@ -1312,7 +1291,7 @@ exports[`MultiHeaderTable renders table with multi-span \`rowgroup\` merged with
         C
       </th>
       <th class
-          rowspan="1"
+          rowspan="2"
           colspan="1"
           scope="row"
       >
@@ -1326,13 +1305,6 @@ exports[`MultiHeaderTable renders table with multi-span \`rowgroup\` merged with
       </td>
     </tr>
     <tr>
-      <th class
-          rowspan="1"
-          colspan="1"
-          scope="row"
-      >
-        F
-      </th>
       <td class="govuk-table__cell--numeric">
         CCF1
       </td>

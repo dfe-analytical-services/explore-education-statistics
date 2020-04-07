@@ -1,6 +1,6 @@
 import ErrorBoundary from '@common/components/ErrorBoundary';
 import WarningMessage from '@common/components/WarningMessage';
-import { Header } from '@common/modules/table-tool/components/MultiHeaderTable';
+import Header from '@common/modules/table-tool/components/utils/Header';
 import {
   CategoryFilter,
   Filter,
@@ -21,12 +21,23 @@ import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 
+const EMPTY_CELL_TEXT = 'n/a';
+
+class FilterGroup extends Filter {
+  constructor(label: string) {
+    super({
+      label,
+      value: label,
+    });
+  }
+}
+
 const getCellText = (
   result: FullTableResult | undefined,
   indicator: Indicator,
 ): string => {
   if (!result) {
-    return 'n/a';
+    return EMPTY_CELL_TEXT;
   }
 
   const value = result.measures[indicator.value];
@@ -77,175 +88,91 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       tableHeadersConfig.columns as Filter[],
     );
 
+    // Track which columns actually have text values
+    // as we want to remove empty ones later.
+    const columnsWithText = columnHeadersCartesian.map(() => false);
+
     const tableCartesian: TableCell[][] = rowHeadersCartesian.map(
       rowFilterCombination => {
         const rowCol1 = last(rowFilterCombination);
 
-        return columnHeadersCartesian.map(columnFilterCombination => {
-          const rowCol2 = last(columnFilterCombination);
+        return columnHeadersCartesian.map(
+          (columnFilterCombination, columnIndex) => {
+            const rowCol2 = last(columnFilterCombination);
 
-          // User could choose to flip rows and columns
-          const indicator = (rowCol1 instanceof Indicator
-            ? rowCol1
-            : rowCol2) as Indicator;
+            // User could choose to flip rows and columns
+            const indicator = (rowCol1 instanceof Indicator
+              ? rowCol1
+              : rowCol2) as Indicator;
 
-          const timePeriod = (rowCol2 instanceof TimePeriodFilter
-            ? rowCol2
-            : rowCol1) as TimePeriodFilter;
+            const timePeriod = (rowCol2 instanceof TimePeriodFilter
+              ? rowCol2
+              : rowCol1) as TimePeriodFilter;
 
-          const filterCombination = [
-            ...rowFilterCombination,
-            ...columnFilterCombination,
-          ];
+            const filterCombination = [
+              ...rowFilterCombination,
+              ...columnFilterCombination,
+            ];
 
-          const categoryFilters = filterCombination.filter(
-            filter => filter instanceof CategoryFilter,
-          );
-
-          const locationFilters = filterCombination.filter(
-            filter => filter instanceof LocationFilter,
-          ) as LocationFilter[];
-
-          const matchingResult = results.find(result => {
-            return (
-              categoryFilters.every(filter =>
-                result.filters.includes(filter.value),
-              ) &&
-              result.timePeriod === timePeriod.value &&
-              locationFilters.every(filter => {
-                const geographicLevel = camelCase(result.geographicLevel);
-                return (
-                  result.location[geographicLevel] &&
-                  result.location[geographicLevel].code === filter.value &&
-                  filter.level === geographicLevel
-                );
-              })
+            const categoryFilters = filterCombination.filter(
+              filter => filter instanceof CategoryFilter,
             );
-          });
 
-          return {
-            text: getCellText(matchingResult, indicator),
-            rowFilters: rowFilterCombination,
-            columnFilters: columnFilterCombination,
-          };
-        });
+            const locationFilters = filterCombination.filter(
+              filter => filter instanceof LocationFilter,
+            ) as LocationFilter[];
+
+            const matchingResult = results.find(result => {
+              return (
+                categoryFilters.every(filter =>
+                  result.filters.includes(filter.value),
+                ) &&
+                result.timePeriod === timePeriod.value &&
+                locationFilters.every(filter => {
+                  const geographicLevel = camelCase(result.geographicLevel);
+                  return (
+                    result.location[geographicLevel] &&
+                    result.location[geographicLevel].code === filter.value &&
+                    filter.level === geographicLevel
+                  );
+                })
+              );
+            });
+
+            const text = getCellText(matchingResult, indicator);
+
+            // There is at least one cell in this
+            // column that has a text value.
+            if (text !== EMPTY_CELL_TEXT) {
+              columnsWithText[columnIndex] = true;
+            }
+
+            return {
+              text,
+              rowFilters: rowFilterCombination,
+              columnFilters: columnFilterCombination,
+            };
+          },
+        );
       },
     );
+
+    const filteredCartesian = tableCartesian
+      .filter(row => row.some(cell => cell.text !== EMPTY_CELL_TEXT))
+      .map(row => row.filter((_, index) => columnsWithText[index]));
 
     /**
-     * Extract and push table headers from a set
-     * of filters into an accumulator of the new
-     * headers that we are trying to create.
+     * Function to optimize a set of filters for the
+     * best viewing experience.
      *
-     * This function isn't particularly glamorous as
-     * we rely on mutation, but it seems like the
-     * simplest way of creating our table headers
-     * without needing lots of transient transformations.
+     * Typically we add or remove filters depending
+     * on whether they are actually needed for the
+     * user to understand the table.
      */
-    const pushHeaders = ({
-      acc,
-      filters,
-      start,
-    }: {
-      acc: Header[][];
-      filters: Filter[];
-      start: number;
-    }): Header[][] => {
-      filters.forEach((filter, filterGroupIndex) => {
-        const isLastHeader = filterGroupIndex === filters.length - 1;
+    const optimizeFilters = (filters: Filter[], headerConfig: Filter[][]) => {
+      const rowColFilters = last(headerConfig);
 
-        const currentGroup = acc[filterGroupIndex];
-
-        if (!currentGroup) {
-          acc.push([
-            {
-              id: filter.id,
-              text: filter.label,
-              start,
-              span: 1,
-              group: filter.filterGroup,
-            },
-          ]);
-
-          return;
-        }
-
-        const lastHeaderGroup = last(currentGroup);
-        const isGroupHeader = !isLastHeader;
-
-        // Increase spans for rowgroup/colgroup headers as these
-        // are able to span multiple row/col headers.
-        if (isGroupHeader && lastHeaderGroup?.id === filter.id) {
-          lastHeaderGroup.span += 1;
-        } else {
-          currentGroup.push({
-            id: filter.id,
-            text: filter.label,
-            start,
-            span: 1,
-            group: filter.filterGroup,
-          });
-        }
-      });
-
-      return acc;
-    };
-
-    const rowHeaders = tableCartesian.reduce<Header[][]>(
-      (acc, row, rowIndex) => {
-        // Only need to use first column's rowFilters
-        // as they are the same for every column.
-        return pushHeaders({
-          acc,
-          filters: row[0].rowFilters,
-          start: rowIndex,
-        });
-      },
-      [],
-    );
-
-    // Only need to use first row's columnFilters
-    // as they are the same for every row.
-    const columnHeaders = tableCartesian[0].reduce<Header[][]>(
-      (acc, column, columnIndex) => {
-        return pushHeaders({
-          acc,
-          filters: column.columnFilters,
-          start: columnIndex,
-        });
-      },
-      [],
-    );
-
-    const rows = tableCartesian.map(row => row.map(cell => cell.text));
-
-    const cleanupHeaders = (
-      headerGroups: Header[][],
-      rowColFilters: Filter[],
-    ): Header[][] => {
-      const headers = headerGroups.map(headerGroup => {
-        const firstHeaderSubGroup = headerGroup[0].group;
-
-        // Don't bother showing a single subgroup as this adds
-        // additional groups on a potentially crowded table.
-        const hasMultipleSubGroups = headerGroup.some(
-          header => header.group !== firstHeaderSubGroup,
-        );
-
-        return headerGroup.map(header => {
-          return {
-            ...header,
-            group:
-              hasMultipleSubGroups && header.group !== 'Default'
-                ? header.group
-                : undefined,
-          };
-        });
-      });
-
-      if (rowColFilters.length > 1) {
-        return headers;
-      }
+      let optimizedFilters = filters;
 
       // There is only one or zero row/col filter header,
       // and we want to avoid having only a single header
@@ -254,8 +181,89 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       // We should should try and display these filter group
       // headers instead of the row/col header as they
       // should provide more useful information to the user.
-      return headers.length > 1 ? headers.slice(0, -1) : headers;
+      if (rowColFilters && rowColFilters.length <= 1) {
+        optimizedFilters = filters.length > 1 ? filters.slice(0, -1) : filters;
+      }
+
+      return (
+        optimizedFilters
+          // Add additional filter sub groups
+          // to our filters if required.
+          .flatMap((filter, index) => {
+            const firstSubGroup = headerConfig[index][0].filterGroup;
+
+            // Don't bother showing a single subgroup as this adds
+            // additional groups to a potentially crowded table.
+            const hasMultipleSubGroups = headerConfig[index].some(
+              header => header.filterGroup !== firstSubGroup,
+            );
+
+            return hasMultipleSubGroups &&
+              filter.filterGroup &&
+              filter.filterGroup !== 'Default'
+              ? [new FilterGroup(filter.filterGroup), filter]
+              : filter;
+          })
+      );
     };
+
+    /**
+     * Convert {@param filters} and add them into {@param headers}.
+     */
+    const addFilters = (headers: Header[], filters: Filter[]): Header[] => {
+      filters.forEach((filter, filterIndex) => {
+        if (!headers.length) {
+          headers.push(new Header(filter.id, filter.label));
+          return;
+        }
+
+        const currentHeader = last(headers);
+
+        if (!currentHeader) {
+          return;
+        }
+
+        if (currentHeader.id === filter.id) {
+          currentHeader.span += 1;
+        } else if (filterIndex === 0) {
+          headers.push(new Header(filter.id, filter.label));
+        } else {
+          currentHeader.addChildToLastParent(
+            new Header(filter.id, filter.label),
+            filterIndex - 1,
+          );
+        }
+      });
+
+      return headers;
+    };
+
+    const rowHeaders = filteredCartesian.reduce<Header[]>((acc, row) => {
+      // Only need to use first column's rowFilters
+      // as they are the same for every column.
+      const filters = optimizeFilters(row[0].rowFilters, [
+        ...tableHeadersConfig.rowGroups,
+        tableHeadersConfig.rows,
+      ]);
+
+      return addFilters(acc, filters);
+    }, []);
+
+    // Only need to use first row's columnFilters
+    // as they are the same for every row.
+    const columnHeaders = filteredCartesian[0].reduce<Header[]>(
+      (acc, column) => {
+        const filters = optimizeFilters(column.columnFilters, [
+          ...tableHeadersConfig.columnGroups,
+          tableHeadersConfig.columns,
+        ]);
+
+        return addFilters(acc, filters);
+      },
+      [],
+    );
+
+    const rows = filteredCartesian.map(row => row.map(cell => cell.text));
 
     return (
       <ErrorBoundary
@@ -273,11 +281,8 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               id="dataTableCaption"
             />
           }
-          columnHeaders={cleanupHeaders(
-            columnHeaders,
-            tableHeadersConfig.columns,
-          )}
-          rowHeaders={cleanupHeaders(rowHeaders, tableHeadersConfig.rows)}
+          columnHeaders={columnHeaders}
+          rowHeaders={rowHeaders}
           rows={rows}
           ref={dataTableRef}
           footnotes={subjectMeta.footnotes}

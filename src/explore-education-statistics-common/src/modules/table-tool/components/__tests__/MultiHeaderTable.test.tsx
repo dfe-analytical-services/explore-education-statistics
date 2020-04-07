@@ -1,3 +1,4 @@
+import Header from '@common/modules/table-tool/components/utils/Header';
 import { render } from '@testing-library/react';
 import React from 'react';
 import MultiHeaderTable from '../MultiHeaderTable';
@@ -7,28 +8,20 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [
-            { id: 'A', text: 'A', span: 2, start: 0 },
-            { id: 'B', text: 'B', span: 2, start: 2 },
-          ],
-          [
-            { id: 'C', text: 'C', span: 1, start: 0 },
-            { id: 'D', text: 'D', span: 1, start: 1 },
-            { id: 'C', text: 'C', span: 1, start: 2 },
-            { id: 'D', text: 'D', span: 1, start: 3 },
-          ],
+          new Header('A', 'A')
+            .addChild(new Header('C', 'C'))
+            .addChild(new Header('D', 'D')),
+          new Header('B', 'B')
+            .addChild(new Header('C', 'C'))
+            .addChild(new Header('D', 'D')),
         ]}
         rowHeaders={[
-          [
-            { id: '1', text: '1', span: 2, start: 0 },
-            { id: '2', text: '2', span: 2, start: 2 },
-          ],
-          [
-            { id: '3', text: '3', span: 1, start: 0 },
-            { id: '4', text: '4', span: 1, start: 1 },
-            { id: '3', text: '3', span: 1, start: 2 },
-            { id: '4', text: '4', span: 1, start: 3 },
-          ],
+          new Header('1', '1')
+            .addChild(new Header('3', '3'))
+            .addChild(new Header('4', '4')),
+          new Header('2', '2')
+            .addChild(new Header('3', '3'))
+            .addChild(new Header('4', '4')),
         ]}
         rows={[
           ['AC13', 'AD13', 'BC13', 'BD13'],
@@ -68,48 +61,52 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [
-            { id: 'A', text: 'A', span: 4, start: 0 },
-            { id: 'B', text: 'B', span: 4, start: 4 },
-          ],
-          [
-            { id: 'C', text: 'C', span: 2, start: 0 },
-            { id: 'D', text: 'D', span: 2, start: 2 },
-            { id: 'C', text: 'C', span: 2, start: 4 },
-            { id: 'D', text: 'D', span: 2, start: 6 },
-          ],
-          [
-            { id: 'E', text: 'E', span: 1, start: 0 },
-            { id: 'F', text: 'F', span: 1, start: 1 },
-            { id: 'E', text: 'E', span: 1, start: 2 },
-            { id: 'F', text: 'F', span: 1, start: 3 },
-            { id: 'E', text: 'E', span: 1, start: 4 },
-            { id: 'F', text: 'F', span: 1, start: 5 },
-            { id: 'E', text: 'E', span: 1, start: 6 },
-            { id: 'F', text: 'F', span: 1, start: 7 },
-          ],
+          new Header('A', 'A')
+            .addChild(
+              new Header('C', 'C')
+                .addChild(new Header('E', 'E'))
+                .addChild(new Header('F', 'F')),
+            )
+            .addChild(
+              new Header('D', 'D')
+                .addChild(new Header('E', 'E'))
+                .addChild(new Header('F', 'F')),
+            ),
+          new Header('B', 'B')
+            .addChild(
+              new Header('C', 'C')
+                .addChild(new Header('E', 'E'))
+                .addChild(new Header('F', 'F')),
+            )
+            .addChild(
+              new Header('D', 'D')
+                .addChild(new Header('E', 'E'))
+                .addChild(new Header('F', 'F')),
+            ),
         ]}
         rowHeaders={[
-          [
-            { id: '1', text: '1', span: 4, start: 0 },
-            { id: '2', text: '2', span: 4, start: 4 },
-          ],
-          [
-            { id: '3', text: '3', span: 2, start: 0 },
-            { id: '4', text: '4', span: 2, start: 2 },
-            { id: '3', text: '3', span: 2, start: 4 },
-            { id: '4', text: '4', span: 2, start: 6 },
-          ],
-          [
-            { id: '5', text: '5', span: 1, start: 0 },
-            { id: '6', text: '6', span: 1, start: 1 },
-            { id: '5', text: '5', span: 1, start: 2 },
-            { id: '6', text: '6', span: 1, start: 3 },
-            { id: '5', text: '5', span: 1, start: 4 },
-            { id: '6', text: '6', span: 1, start: 5 },
-            { id: '5', text: '5', span: 1, start: 6 },
-            { id: '6', text: '6', span: 1, start: 7 },
-          ],
+          new Header('1', '1')
+            .addChild(
+              new Header('3', '3')
+                .addChild(new Header('5', '5'))
+                .addChild(new Header('6', '6')),
+            )
+            .addChild(
+              new Header('4', '4')
+                .addChild(new Header('5', '5'))
+                .addChild(new Header('6', '6')),
+            ),
+          new Header('2', '2')
+            .addChild(
+              new Header('3', '3')
+                .addChild(new Header('5', '5'))
+                .addChild(new Header('6', '6')),
+            )
+            .addChild(
+              new Header('4', '4')
+                .addChild(new Header('5', '5'))
+                .addChild(new Header('6', '6')),
+            ),
         ]}
         rows={[
           [
@@ -239,18 +236,13 @@ describe('MultiHeaderTable', () => {
   test('renders table with one `rowgroup` header subgroup', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [{ id: 'A', text: 'A', span: 2, start: 0, group: 'B' }],
-          [
-            { id: 'C', text: 'C', span: 1, start: 0 },
-            { id: 'D', text: 'D', span: 1, start: 1 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A')
+              .addChild(new Header('C', 'C'))
+              .addChild(new Header('D', 'D')),
+          ),
         ]}
         rows={[
           ['BAC1', 'BAC2'],
@@ -292,23 +284,14 @@ describe('MultiHeaderTable', () => {
   test('renders table with two `rowgroup` header subgroups', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'D', text: 'D', span: 1, start: 1, group: 'C' },
-            { id: 'E', text: 'E', span: 1, start: 2, group: 'C' },
-          ],
-          [
-            { id: 'F', text: 'F', span: 1, start: 0 },
-            { id: 'F', text: 'F', span: 1, start: 1 },
-            { id: 'F', text: 'F', span: 1, start: 2 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('F', 'F')),
+          ),
+          new Header('C', 'C')
+            .addChild(new Header('D', 'D').addChild(new Header('F', 'F')))
+            .addChild(new Header('E', 'E').addChild(new Header('F', 'F'))),
         ]}
         rows={[
           ['BAF1', 'BAF2'],
@@ -371,25 +354,17 @@ describe('MultiHeaderTable', () => {
   test('renders table with three `rowgroup` header subgroups', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'D', text: 'D', span: 1, start: 1, group: 'C' },
-            { id: 'F', text: 'F', span: 1, start: 2, group: 'C' },
-            { id: 'G', text: 'G', span: 1, start: 3, group: 'E' },
-          ],
-          [
-            { id: 'H', text: 'H', span: 1, start: 0 },
-            { id: 'H', text: 'H', span: 1, start: 1 },
-            { id: 'H', text: 'H', span: 1, start: 2 },
-            { id: 'H', text: 'H', span: 1, start: 3 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('H', 'H')),
+          ),
+          new Header('C', 'C')
+            .addChild(new Header('D', 'D').addChild(new Header('H', 'H')))
+            .addChild(new Header('F', 'F').addChild(new Header('H', 'H'))),
+          new Header('E', 'E').addChild(
+            new Header('G', 'G').addChild(new Header('H', 'H')),
+          ),
         ]}
         rows={[
           ['BAH1', 'BAH2'],
@@ -469,23 +444,17 @@ describe('MultiHeaderTable', () => {
   test('renders table with `rowgroup` header merged with identical subgroup', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'C', text: 'C', span: 1, start: 1, group: 'C' },
-            { id: 'E', text: 'E', span: 1, start: 2, group: 'D' },
-          ],
-          [
-            { id: 'F', text: 'F', span: 1, start: 0 },
-            { id: 'F', text: 'F', span: 1, start: 1 },
-            { id: 'F', text: 'F', span: 1, start: 2 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('F', 'F')),
+          ),
+          new Header('C', 'C').addChild(
+            new Header('C', 'C').addChild(new Header('F', 'F')),
+          ),
+          new Header('D', 'D').addChild(
+            new Header('E', 'E').addChild(new Header('F', 'F')),
+          ),
         ]}
         rows={[
           ['BAF1', 'BAF2'],
@@ -518,22 +487,16 @@ describe('MultiHeaderTable', () => {
   test('renders table with multi-span `rowgroup` merged with its identical groups', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'C', text: 'C', span: 2, start: 1, group: 'C' },
-          ],
-          [
-            { id: 'F', text: 'F', span: 1, start: 0 },
-            { id: 'F', text: 'F', span: 1, start: 1 },
-            { id: 'F', text: 'F', span: 1, start: 2 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('F', 'F')),
+          ),
+          new Header('C', 'C').addChild(
+            new Header('C', 'C')
+              .addChild(new Header('F', 'F'))
+              .addChild(new Header('F', 'F')),
+          ),
         ]}
         rows={[
           ['BAF1', 'BAF2'],
@@ -557,7 +520,7 @@ describe('MultiHeaderTable', () => {
 
     expect(row2Headers[1]).toHaveTextContent('F');
     expect(row2Headers[1]).toHaveAttribute('scope', 'row');
-    expect(row2Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row2Headers[1]).toHaveAttribute('rowspan', '2');
     expect(row2Headers[1]).toHaveAttribute('colspan', '1');
 
     expect(container.innerHTML).toMatchSnapshot();
@@ -566,24 +529,18 @@ describe('MultiHeaderTable', () => {
   test('does not render `rowgroup` headers with multi-span subgroup with invalid rowspans and colspans', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'C', text: 'C', span: 2, start: 1, group: 'C' },
-            { id: 'D', text: 'D', span: 1, start: 3, group: 'C' },
-          ],
-          [
-            { id: 'E', text: 'E', span: 1, start: 0 },
-            { id: 'E', text: 'E', span: 1, start: 1 },
-            { id: 'E', text: 'E', span: 1, start: 2 },
-            { id: 'E', text: 'E', span: 1, start: 3 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('E', 'E')),
+          ),
+          new Header('C', 'C')
+            .addChild(
+              new Header('C', 'C')
+                .addChild(new Header('E', 'E'))
+                .addChild(new Header('E', 'E')),
+            )
+            .addChild(new Header('D', 'D').addChild(new Header('E', 'E'))),
         ]}
         rows={[
           ['BAE1', 'BAE2'],
@@ -613,7 +570,7 @@ describe('MultiHeaderTable', () => {
 
     expect(row2Headers[2]).toHaveTextContent('E');
     expect(row2Headers[2]).toHaveAttribute('scope', 'row');
-    expect(row2Headers[2]).toHaveAttribute('rowspan', '1');
+    expect(row2Headers[2]).toHaveAttribute('rowspan', '2');
     expect(row2Headers[2]).toHaveAttribute('colspan', '1');
 
     expect(container.innerHTML).toMatchSnapshot();
@@ -622,18 +579,13 @@ describe('MultiHeaderTable', () => {
   test('renders table with one `row` header subgroup', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [{ id: 'A', text: 'A', span: 2, start: 0 }],
-          [
-            { id: 'C', text: 'C', span: 1, start: 0, group: 'B' },
-            { id: 'D', text: 'D', span: 1, start: 1, group: 'B' },
-          ],
+          new Header('A', 'A').addChild(
+            new Header('B', 'B')
+              .addChild(new Header('C', 'C'))
+              .addChild(new Header('D', 'D')),
+          ),
         ]}
         rows={[
           ['ABC1', 'ABC2'],
@@ -675,19 +627,15 @@ describe('MultiHeaderTable', () => {
   test('renders table with two `row` header subgroups', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [{ id: 'A', text: 'A', span: 3, start: 0 }],
-          [
-            { id: 'D', text: 'D', span: 1, start: 0, group: 'B' },
-            { id: 'E', text: 'E', span: 1, start: 1, group: 'C' },
-            { id: 'F', text: 'F', span: 1, start: 2, group: 'C' },
-          ],
+          new Header('A', 'A')
+            .addChild(new Header('B', 'B').addChild(new Header('D', 'D')))
+            .addChild(
+              new Header('C', 'C')
+                .addChild(new Header('E', 'E'))
+                .addChild(new Header('F', 'F')),
+            ),
         ]}
         rows={[
           ['ABD1', 'ABD2'],
@@ -742,20 +690,16 @@ describe('MultiHeaderTable', () => {
   test('renders table with three `row` header subgroups', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [{ id: 'A', text: 'A', span: 4, start: 0 }],
-          [
-            { id: 'E', text: 'E', span: 1, start: 0, group: 'B' },
-            { id: 'F', text: 'F', span: 1, start: 1, group: 'C' },
-            { id: 'G', text: 'G', span: 1, start: 2, group: 'C' },
-            { id: 'H', text: 'H', span: 1, start: 3, group: 'D' },
-          ],
+          new Header('A', 'A')
+            .addChild(new Header('B', 'B').addChild(new Header('E', 'E')))
+            .addChild(
+              new Header('C', 'C')
+                .addChild(new Header('F', 'F'))
+                .addChild(new Header('G', 'G')),
+            )
+            .addChild(new Header('D', 'D').addChild(new Header('H', 'H'))),
         ]}
         rows={[
           ['ABE1', 'ABE2'],
@@ -823,19 +767,12 @@ describe('MultiHeaderTable', () => {
   test('renders table with `row` header merged with identical subgroup', () => {
     const { container } = render(
       <MultiHeaderTable
-        columnHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rowHeaders={[
-          [{ id: 'A', text: 'A', span: 3, start: 0 }],
-          [
-            { id: 'E', text: 'E', span: 1, start: 0, group: 'B' },
-            { id: 'C', text: 'C', span: 1, start: 1, group: 'C' },
-            { id: 'F', text: 'F', span: 1, start: 2, group: 'D' },
-          ],
+          new Header('A', 'A')
+            .addChild(new Header('B', 'B').addChild(new Header('E', 'E')))
+            .addChild(new Header('C', 'C').addChild(new Header('C', 'C')))
+            .addChild(new Header('D', 'D').addChild(new Header('F', 'F'))),
         ]}
         rows={[
           ['ABE1', 'ABE2'],
@@ -864,18 +801,13 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [{ id: 'A', text: 'A', span: 2, start: 0, group: 'B' }],
-          [
-            { id: 'C', text: 'C', span: 1, start: 0 },
-            { id: 'D', text: 'D', span: 1, start: 1 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A')
+              .addChild(new Header('C', 'C'))
+              .addChild(new Header('D', 'D')),
+          ),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['BAC1', 'BAC1'],
           ['BAD2', 'BAD2'],
@@ -923,23 +855,14 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'D', text: 'D', span: 1, start: 1, group: 'C' },
-            { id: 'E', text: 'E', span: 1, start: 2, group: 'C' },
-          ],
-          [
-            { id: 'F', text: 'F', span: 1, start: 0 },
-            { id: 'F', text: 'F', span: 1, start: 1 },
-            { id: 'F', text: 'F', span: 1, start: 2 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('F', 'F')),
+          ),
+          new Header('C', 'C')
+            .addChild(new Header('D', 'D').addChild(new Header('F', 'F')))
+            .addChild(new Header('E', 'E').addChild(new Header('F', 'F'))),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['BAF1', 'CDF1', 'CEF1'],
           ['BAF2', 'CDF2', 'CEF2'],
@@ -1003,25 +926,17 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'D', text: 'D', span: 1, start: 1, group: 'C' },
-            { id: 'F', text: 'F', span: 1, start: 2, group: 'C' },
-            { id: 'G', text: 'G', span: 1, start: 3, group: 'E' },
-          ],
-          [
-            { id: 'H', text: 'H', span: 1, start: 0 },
-            { id: 'H', text: 'H', span: 1, start: 1 },
-            { id: 'H', text: 'H', span: 1, start: 2 },
-            { id: 'H', text: 'H', span: 1, start: 3 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('H', 'H')),
+          ),
+          new Header('C', 'C')
+            .addChild(new Header('D', 'D').addChild(new Header('H', 'H')))
+            .addChild(new Header('F', 'F').addChild(new Header('H', 'H'))),
+          new Header('E', 'E').addChild(
+            new Header('G', 'G').addChild(new Header('H', 'H')),
+          ),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['BAH1', 'CDH1', 'CFH1', 'EGH1'],
           ['BAH2', 'CDH2', 'CFH2', 'EGH2'],
@@ -1097,23 +1012,17 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'C', text: 'C', span: 1, start: 1, group: 'C' },
-            { id: 'E', text: 'E', span: 1, start: 2, group: 'D' },
-          ],
-          [
-            { id: 'F', text: 'F', span: 1, start: 0 },
-            { id: 'F', text: 'F', span: 1, start: 1 },
-            { id: 'F', text: 'F', span: 1, start: 2 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('F', 'F')),
+          ),
+          new Header('C', 'C').addChild(
+            new Header('C', 'C').addChild(new Header('F', 'F')),
+          ),
+          new Header('D', 'D').addChild(
+            new Header('E', 'E').addChild(new Header('F', 'F')),
+          ),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['BAF1', 'CCF1', 'DEF1'],
           ['BAF2', 'CCF2', 'DEF2'],
@@ -1166,22 +1075,16 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'C', text: 'C', span: 2, start: 1, group: 'C' },
-          ],
-          [
-            { id: 'F', text: 'F', span: 1, start: 0 },
-            { id: 'F', text: 'F', span: 1, start: 1 },
-            { id: 'F', text: 'F', span: 1, start: 2 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('F', 'F')),
+          ),
+          new Header('C', 'C').addChild(
+            new Header('C', 'C')
+              .addChild(new Header('F', 'F'))
+              .addChild(new Header('F', 'F')),
+          ),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['BAF1', 'CCF1', 'CCF1'],
           ['BAF2', 'CCF2', 'CCF2'],
@@ -1224,24 +1127,18 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [
-            { id: 'A', text: 'A', span: 1, start: 0, group: 'B' },
-            { id: 'C', text: 'C', span: 2, start: 1, group: 'C' },
-            { id: 'D', text: 'D', span: 1, start: 3, group: 'C' },
-          ],
-          [
-            { id: 'E', text: 'E', span: 1, start: 0 },
-            { id: 'E', text: 'E', span: 1, start: 1 },
-            { id: 'E', text: 'E', span: 1, start: 2 },
-            { id: 'E', text: 'E', span: 1, start: 3 },
-          ],
+          new Header('B', 'B').addChild(
+            new Header('A', 'A').addChild(new Header('E', 'E')),
+          ),
+          new Header('C', 'C')
+            .addChild(
+              new Header('C', 'C')
+                .addChild(new Header('E', 'E'))
+                .addChild(new Header('E', 'E')),
+            )
+            .addChild(new Header('D', 'D').addChild(new Header('E', 'E'))),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['BAE1', 'CCE1', 'CCE1', 'CDE1'],
           ['BAE2', 'CCE2', 'CCE2', 'CDE2'],
@@ -1294,18 +1191,13 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [{ id: 'A', text: 'A', span: 2, start: 0 }],
-          [
-            { id: 'C', text: 'C', span: 1, start: 0, group: 'B' },
-            { id: 'D', text: 'D', span: 1, start: 1, group: 'B' },
-          ],
+          new Header('A', 'A').addChild(
+            new Header('B', 'B')
+              .addChild(new Header('C', 'C'))
+              .addChild(new Header('D', 'D')),
+          ),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['ABC1', 'ABC2'],
           ['ABD1', 'ABD2'],
@@ -1351,19 +1243,15 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [{ id: 'A', text: 'A', span: 3, start: 0 }],
-          [
-            { id: 'D', text: 'D', span: 1, start: 0, group: 'B' },
-            { id: 'E', text: 'E', span: 1, start: 1, group: 'C' },
-            { id: 'F', text: 'F', span: 1, start: 2, group: 'C' },
-          ],
+          new Header('A', 'A')
+            .addChild(new Header('B', 'B').addChild(new Header('D', 'D')))
+            .addChild(
+              new Header('C', 'C')
+                .addChild(new Header('E', 'E'))
+                .addChild(new Header('F', 'F')),
+            ),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['ABD1', 'ABE1', 'ABF1'],
           ['ABD2', 'ABE2', 'ABF2'],
@@ -1419,20 +1307,16 @@ describe('MultiHeaderTable', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
-          [{ id: 'A', text: 'A', span: 4, start: 0 }],
-          [
-            { id: 'E', text: 'E', span: 1, start: 0, group: 'B' },
-            { id: 'F', text: 'F', span: 1, start: 1, group: 'C' },
-            { id: 'G', text: 'G', span: 1, start: 2, group: 'C' },
-            { id: 'H', text: 'H', span: 1, start: 3, group: 'D' },
-          ],
+          new Header('A', 'A')
+            .addChild(new Header('B', 'B').addChild(new Header('E', 'E')))
+            .addChild(
+              new Header('C', 'C')
+                .addChild(new Header('F', 'F'))
+                .addChild(new Header('G', 'G')),
+            )
+            .addChild(new Header('D', 'D').addChild(new Header('H', 'H'))),
         ]}
-        rowHeaders={[
-          [
-            { id: '1', text: '1', span: 1, start: 0 },
-            { id: '2', text: '2', span: 1, start: 1 },
-          ],
-        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
         rows={[
           ['ABE1', 'ACF1', 'ACG1', 'ADH1'],
           ['ABE2', 'ACF2', 'ACG2', 'ADH2'],

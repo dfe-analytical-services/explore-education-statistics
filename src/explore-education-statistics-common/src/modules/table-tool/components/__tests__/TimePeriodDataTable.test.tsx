@@ -2,6 +2,7 @@ import {
   testData1,
   testData2,
   testData3,
+  testDataFiltersWithNoResults,
   testDataNoFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
@@ -482,6 +483,164 @@ describe('TimePeriodDataTable', () => {
     ).toHaveTextContent('England');
 
     expect(container.querySelectorAll('table tbody td')).toHaveLength(1);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with completely empty rows removed', () => {
+    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+
+    const tableHeadersConfig = {
+      columnGroups: [
+        [
+          {
+            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            label: 'Special',
+          },
+        ],
+      ],
+      rowGroups: [
+        [
+          { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
+          { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
+        ],
+        [
+          {
+            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            label: 'First language Known or believed to be other than English',
+          },
+          {
+            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            label: 'First language Unclassified',
+          },
+        ],
+      ],
+      columns: [
+        { value: '2013_AY', label: '2013/14' },
+        { value: '2014_AY', label: '2014/15' },
+        { value: '2015_AY', label: '2015/16' },
+      ],
+      rows: [
+        {
+          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          label: 'Number of authorised absence sessions',
+        },
+        {
+          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          label: 'Number of overall absence sessions',
+        },
+      ],
+    };
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(2);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(4);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(3);
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(6);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(11);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(5);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(6);
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(18);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with completely empty columns removed', () => {
+    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+
+    const tableHeadersConfig = {
+      columnGroups: [
+        [
+          {
+            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            label: 'First language Known or believed to be other than English',
+          },
+          {
+            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            label: 'First language Unclassified',
+          },
+        ],
+      ],
+      rowGroups: [
+        [
+          { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
+          { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
+        ],
+        [
+          {
+            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            label: 'Special',
+          },
+        ],
+      ],
+      columns: [
+        { value: '2013_AY', label: '2013/14' },
+        { value: '2014_AY', label: '2014/15' },
+        { value: '2015_AY', label: '2015/16' },
+      ],
+      rows: [
+        {
+          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          label: 'Number of authorised absence sessions',
+        },
+        {
+          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          label: 'Number of overall absence sessions',
+        },
+      ],
+    };
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(2);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(6);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(4);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(8);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(4);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(16);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
