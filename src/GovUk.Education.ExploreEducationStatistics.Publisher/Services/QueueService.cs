@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var queue = await GetQueueReferenceAsync(_storageConnectionString, PublishReleaseFilesQueue);
             var releasesList = releases.ToList();
             _logger.LogInformation(
-                $"Queuing files message for releases: {releasesList.Select(tuple => tuple.ReleaseId)}");
+                $"Queuing files message for releases: {string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId))}");
             await queue.AddMessageAsync(ToCloudQueueMessage(BuildPublishReleaseFilesMessage(releasesList)));
             foreach (var (releaseId, releaseStatusId) in releasesList)
             {
