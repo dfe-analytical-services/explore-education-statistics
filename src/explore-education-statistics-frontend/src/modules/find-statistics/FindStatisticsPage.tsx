@@ -3,9 +3,9 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
 import { contentApi } from '@common/services/api';
-import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import React, { Component } from 'react';
 import PublicationList from './components/PublicationList';
 import { Topic } from './components/TopicList';
@@ -92,7 +92,11 @@ class FindStatisticsPage extends Component<Props> {
                 >
                   {topics.map(
                     ({ id: topicId, title: topicTitle, publications }) => (
-                      <Details key={topicId} summary={topicTitle}>
+                      <Details
+                        key={topicId}
+                        summary={topicTitle}
+                        id={`topic-${topicId}`}
+                      >
                         <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
                           <ul className="govuk-bulllet-list govuk-!-margin-bottom-3 govuk-!-margin-top-0">
                             <PublicationList publications={publications} />
