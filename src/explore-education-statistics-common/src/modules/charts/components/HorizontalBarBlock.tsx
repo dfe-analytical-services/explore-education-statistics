@@ -1,4 +1,3 @@
-import '@common/modules/charts/components/charts.scss';
 import {
   AxisConfiguration,
   ChartDefinition,

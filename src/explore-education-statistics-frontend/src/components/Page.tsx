@@ -1,6 +1,6 @@
+import CookieBanner from '@frontend/components/CookieBanner';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import CookieBanner from '@frontend/components/CookieBanner';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PageBanner from './PageBanner';
 import PageFooter from './PageFooter';
@@ -14,6 +14,7 @@ type Props = {
   description?: string;
   breadcrumbLabel?: string;
   pageMeta?: PageMetaProps;
+  className?: string;
   children?: ReactNode;
   wide?: boolean;
   isHomepage?: boolean;
@@ -25,6 +26,7 @@ const Page = ({
   description,
   breadcrumbLabel = '',
   pageMeta,
+  className,
   children = null,
   wide = false,
   isHomepage = false,
@@ -41,7 +43,7 @@ const Page = ({
       <PageHeader wide={wide} />
 
       <div
-        className={classNames('govuk-width-container', {
+        className={classNames('govuk-width-container', className, {
           'dfe-width-container--wide': wide,
         })}
       >
