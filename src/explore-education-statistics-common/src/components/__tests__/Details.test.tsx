@@ -1,5 +1,5 @@
-import React from 'react';
 import { fireEvent, render, wait } from '@testing-library/react';
+import React from 'react';
 import Details from '../Details';
 
 describe('Details', () => {
@@ -13,6 +13,22 @@ describe('Details', () => {
     await wait();
 
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('re-rendering does not change auto-generated `id`', () => {
+    const { container, rerender } = render(
+      <Details summary="Test summary">Test content</Details>,
+    );
+
+    const originalId = container.querySelector('.govuk-details__text')?.id;
+
+    expect(originalId).toBeDefined();
+
+    rerender(<Details summary="Test summary 2">Test content 2</Details>);
+
+    const currentId = container.querySelector('.govuk-details__text')?.id;
+
+    expect(currentId).toBe(originalId);
   });
 
   test('renders correctly with `open` prop set to true', async () => {
