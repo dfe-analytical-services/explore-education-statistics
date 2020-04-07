@@ -85,7 +85,7 @@ Enable google analytics
 
 Validate Cookies Details page
     [Tags]  HappyPath
-    user clicks link    Find out more about cookies on Explore education statistics
+    user clicks link   Find out more about cookies on Explore education statistics
     user waits until page contains heading   Details about cookies
     user checks url contains   %{PUBLIC_URL}/cookies/details
 
