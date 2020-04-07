@@ -21,6 +21,11 @@ const errorCodeMappings = [
     'releaseStatus',
     'Enter a publish scheduled date before approving',
   ),
+  errorCodeToFieldError(
+    'ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE',
+    'releaseStatus',
+    'Check all uploaded datafiles are complete before approving',
+  ),
 ];
 
 interface FormValues {
