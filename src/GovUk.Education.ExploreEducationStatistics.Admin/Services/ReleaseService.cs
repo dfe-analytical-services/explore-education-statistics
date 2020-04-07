@@ -456,7 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         QueryComparisons.NotEqual, IStatus.COMPLETE.ToString()));
                 
                 var query = new TableQuery<DatafileImport>().Where(filters);
-                var cloudTable = _coreTableStorageService.GetCloudTable("imports");
+                var cloudTable = await _coreTableStorageService.GetTableAsync("imports", true);
                 var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
                 if (results.Results.Count != 0)
                 {
