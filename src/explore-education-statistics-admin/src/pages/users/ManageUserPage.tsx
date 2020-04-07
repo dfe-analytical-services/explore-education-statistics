@@ -17,6 +17,11 @@ import SummaryListItem from '@common/components/SummaryListItem';
 
 const errorCodeMappings = [
   errorCodeToFieldError('USER_DOES_NOT_EXIST', 'userId', 'User does not exist'),
+  errorCodeToFieldError(
+    'ROLE_DOES_NOT_EXIST',
+    'selectedRoleId',
+    'Role does not exist',
+  ),
 ];
 
 interface FormValues {
