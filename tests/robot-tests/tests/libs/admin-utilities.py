@@ -130,7 +130,7 @@ def user_adds_content_to_accordion_section_text_block(section_elem, block_num, c
 def user_checks_accordion_section_text_block_contains_text(section_elem, block_num, content):
     try:
         section_elem.find_element_by_xpath(
-            f'.//*[@class="govuk-accordion__section-content"]/div[contains(@id,"content-section")][{block_num}]//*[text()="{content}"]'
+            f'.//*[@class="govuk-accordion__section-content"]//*[contains(@id,"editableSectionBlocks")][{block_num}]//*[text()="{content}"]'
         )
     except:
         raise AssertionError(f'Failed to find text "{content}" in content block number {block_num}')
