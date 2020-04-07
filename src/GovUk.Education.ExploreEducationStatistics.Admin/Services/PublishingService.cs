@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return new ValidateReleaseMessage
             {
-                Immediate = false,
+                Immediate = true,
                 ReleaseId = release.Id
             };
         }
