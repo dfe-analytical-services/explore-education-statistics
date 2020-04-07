@@ -10,14 +10,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<ReleaseStatus> CreateAsync(Guid releaseId, ReleaseStatusState state, bool immediate,
             IEnumerable<ReleaseStatusLogMessage> logMessages = null);
-        
+
         Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query);
 
         Task<ReleaseStatus> GetAsync(Guid releaseId, Guid releaseStatusId);
 
         Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId);
-        
+
         Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state);
+
+        Task UpdateStagesAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage? contentStage = null,
+            ReleaseStatusDataStage? dataStage = null, ReleaseStatusFilesStage? filesStage = null,
+            ReleaseStatusPublishingStage? publishingStage = null, ReleaseStatusLogMessage logMessage = null);
 
         Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage stage,
             ReleaseStatusLogMessage logMessage = null);

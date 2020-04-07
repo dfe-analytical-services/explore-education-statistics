@@ -170,8 +170,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         Failed,
         Scheduled,
         NotStarted,
-        Started,
-        // TODO BAU-541 Remove me
-        ToDo,
+        Started
     }
 }

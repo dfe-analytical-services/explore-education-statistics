@@ -23,9 +23,9 @@
                 ReleaseStatusOverallStage.Scheduled);
 
         /**
-         * State used when the process of publishing a Release has started
+         * State used when the process of publishing a scheduled Release has started
          */
-        public static readonly ReleaseStatusState StartedState =
+        public static readonly ReleaseStatusState ScheduledReleaseStartedState =
             new ReleaseStatusState(ReleaseStatusContentStage.NotStarted,
                 ReleaseStatusFilesStage.NotStarted,
                 ReleaseStatusDataStage.NotStarted,
@@ -33,13 +33,13 @@
                 ReleaseStatusOverallStage.Started);
         
         /**
-         * TODO BAU-541 Combine with the above and make pubishing state notstarted?
+         * State used when the process of publishing an immediate Release has started
          */
-        public static readonly ReleaseStatusState StartedImmediateState =
+        public static readonly ReleaseStatusState ImmediateReleaseStartedState =
             new ReleaseStatusState(ReleaseStatusContentStage.NotStarted,
                 ReleaseStatusFilesStage.NotStarted,
                 ReleaseStatusDataStage.NotStarted,
-                ReleaseStatusPublishingStage.ToDo,
+                ReleaseStatusPublishingStage.NotStarted,
                 ReleaseStatusOverallStage.Started);
     }
 }

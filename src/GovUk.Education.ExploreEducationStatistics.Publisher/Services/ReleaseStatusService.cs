@@ -84,6 +84,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
+        public async Task UpdateStagesAsync(Guid releaseId, Guid releaseStatusId,
+            ReleaseStatusContentStage? contentStage,
+            ReleaseStatusDataStage? dataStage, ReleaseStatusFilesStage? filesStage,
+            ReleaseStatusPublishingStage? publishingStage, ReleaseStatusLogMessage logMessage = null)
+        {
+            await UpdateRowAsync(releaseId, releaseStatusId, row =>
+            {
+                if (contentStage.HasValue)
+                {
+                    row.State.Content = contentStage.Value;
+                }
+
+                if (dataStage.HasValue)
+                {
+                    row.State.Data = dataStage.Value;
+                }
+
+                if (filesStage.HasValue)
+                {
+                    row.State.Files = filesStage.Value;
+                }
+
+                if (publishingStage.HasValue)
+                {
+                    row.State.Publishing = publishingStage.Value;
+                }
+
+                row.AppendLogMessage(logMessage);
+                return row;
+            });
+        }
+
         public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {

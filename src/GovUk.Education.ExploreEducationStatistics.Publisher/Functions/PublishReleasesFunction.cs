@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 foreach (var (releaseId, releaseStatusId) in scheduled)
                 {
-                    await _releaseStatusService.UpdateStateAsync(releaseId, releaseStatusId, StartedState);
+                    await _releaseStatusService.UpdateStateAsync(releaseId, releaseStatusId, ScheduledReleaseStartedState);
                 }
 
                 await _queueService.QueuePublishReleaseFilesMessageAsync(scheduled);

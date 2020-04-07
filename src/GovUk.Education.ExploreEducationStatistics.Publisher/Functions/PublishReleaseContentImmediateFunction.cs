@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -36,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("PublishReleaseContentImmediate")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseContentImmediate(
-            [QueueTrigger(PublishReleaseContentImmediateQueue)] PublishReleaseContentImmediateMessage message,
+            [QueueTrigger(PublishReleaseContentImmediateQueue)]
+            PublishReleaseContentImmediateMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -46,24 +46,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await _contentService.UpdateContentAsync(new[] {message.ReleaseId}, false);
                 await _releaseService.SetPublishedDateAsync(message.ReleaseId);
                 await _notificationsService.NotifySubscribersAsync(new[] {message.ReleaseId});
-                // TODO BAU-541 This isn't updating the content stage
-                await UpdateStage(message, Complete);
+                await CompleteContentAndPublishingStages(message);
             }
             catch (Exception e)
             {
                 logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                await UpdateStage(message, Failed,
+                await FailContentAndPublishingStages(message,
                     new ReleaseStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateStage(PublishReleaseContentImmediateMessage message,
-            ReleaseStatusPublishingStage stage, ReleaseStatusLogMessage logMessage = null)
+        private async Task CompleteContentAndPublishingStages(PublishReleaseContentImmediateMessage message)
         {
-            await _releaseStatusService.UpdatePublishingStageAsync(message.ReleaseId, message.ReleaseStatusId, stage,
-                logMessage);
+            await _releaseStatusService.UpdateStagesAsync(message.ReleaseId, message.ReleaseStatusId,
+                publishingStage: ReleaseStatusPublishingStage.Complete,
+                contentStage: ReleaseStatusContentStage.Complete);
+        }
+
+        private async Task FailContentAndPublishingStages(PublishReleaseContentImmediateMessage message,
+            ReleaseStatusLogMessage logMessage = null)
+        {
+            await _releaseStatusService.UpdateStagesAsync(message.ReleaseId,
+                message.ReleaseStatusId,
+                logMessage: logMessage,
+                publishingStage: ReleaseStatusPublishingStage.Failed,
+                contentStage: ReleaseStatusContentStage.Failed);
         }
     }
 }

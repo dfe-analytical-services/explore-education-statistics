@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 if (message.Immediate)
                 {
                     // TODO BAU-563 fail if the staging directory already exists
-                    var releaseStatus = await CreateReleaseStatusAsync(message, StartedImmediateState);
+                    var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
                     await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId, releaseStatus.Id);
                 }
                 else
