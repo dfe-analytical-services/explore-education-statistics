@@ -40,12 +40,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
         {
             var user = await _userManagementService.UpdateAsync(userId, model.RoleId);
 
-            if (user != null)
+            if (user)
             {
                 return Ok(user);
             }
-
-            return NotFound();
+            
+            AddErrors(ModelState, ValidationResult(UserDoesNotExist));
+            
+            return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
         
         [HttpGet("bau/users")]

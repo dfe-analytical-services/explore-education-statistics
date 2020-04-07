@@ -16,11 +16,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 
 const errorCodeMappings = [
-  errorCodeToFieldError(
-    'USER_ALREADY_EXISTS',
-    'userEmail',
-    'User already exists',
-  ),
+  errorCodeToFieldError('USER_DOES_NOT_EXIST', 'userId', 'User does not exist'),
 ];
 
 interface FormValues {
