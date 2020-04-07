@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/public-common.robot
 
-Force Tags  GeneralPublic  Local  Dev  Test   UnderConstruction
+Force Tags  GeneralPublic  Local  Dev  Test
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -60,7 +60,6 @@ Select Indicators
 Select Characteristics
     [Tags]   HappyPath
     user opens details dropdown     School type
-    user clicks category checkbox   School type   State-funded primary
     user clicks category checkbox   School type   State-funded secondary
 
 Create table
@@ -72,13 +71,9 @@ Create table
 Validate results table column headings
     [Tags]  HappyPath
     user checks results table column heading contains  css:table  1   1   State-funded secondary
-    user checks results table column heading contains  css:table  1   2   State-funded primary
     user checks results table column heading contains  css:table  2   1   2006/07
     user checks results table column heading contains  css:table  2   2   2007/08
     user checks results table column heading contains  css:table  2   3   2008/09
-    user checks results table column heading contains  css:table  2   4   2006/07
-    user checks results table column heading contains  css:table  2   5   2007/08
-    user checks results table column heading contains  css:table  2   6   2008/09
 
 Validate Bury Number of fixed period exclusions row
     [Tags]  HappyPath
@@ -87,9 +82,6 @@ Validate Bury Number of fixed period exclusions row
     user checks row cell contains text  ${row}    1     1,539
     user checks row cell contains text  ${row}    2     1,469
     user checks row cell contains text  ${row}    3     1,298
-    user checks row cell contains text  ${row}    4     95
-    user checks row cell contains text  ${row}    5     106
-    user checks row cell contains text  ${row}    6     111
 
 User generates a permanent link
     [Tags]   HappyPath
@@ -110,13 +102,9 @@ User validates permalink contains correct date
 User validates permalink table headers
     [Tags]   HappyPath
     user checks results table column heading contains  css:table  1   1   State-funded secondary
-    user checks results table column heading contains  css:table  1   2   State-funded primary
     user checks results table column heading contains  css:table  2   1   2006/07
     user checks results table column heading contains  css:table  2   2   2007/08
     user checks results table column heading contains  css:table  2   3   2008/09
-    user checks results table column heading contains  css:table  2   4   2006/07
-    user checks results table column heading contains  css:table  2   5   2007/08
-    user checks results table column heading contains  css:table  2   6   2008/09
 
 User validates permalink table rows for Bury
     ${row}=  user gets row with group and indicator   xpath://table  Bury   Number of fixed period exclusions
@@ -124,27 +112,18 @@ User validates permalink table rows for Bury
     user checks row cell contains text  ${row}    1     1,539
     user checks row cell contains text  ${row}    2     1,469
     user checks row cell contains text  ${row}    3     1,298
-    user checks row cell contains text  ${row}    4     95
-    user checks row cell contains text  ${row}    5     106
-    user checks row cell contains text  ${row}    6     111
 
     ${row}=  user gets row with group and indicator   xpath://table  Bury   Number of permanent exclusions
     user checks row contains heading  ${row}  Number of permanent exclusions
     user checks row cell contains text  ${row}    1     74
     user checks row cell contains text  ${row}    2     75
     user checks row cell contains text  ${row}    3     65
-    user checks row cell contains text  ${row}    4     4
-    user checks row cell contains text  ${row}    5     3
-    user checks row cell contains text  ${row}    6     x
 
     ${row}=  user gets row with group and indicator   xpath://table  Bury   Number of pupils
     user checks row contains heading  ${row}  Number of pupils
     user checks row cell contains text  ${row}    1     11,618
     user checks row cell contains text  ${row}    2     11,389
     user checks row cell contains text  ${row}    3     11,217
-    user checks row cell contains text  ${row}    4     16,058
-    user checks row cell contains text  ${row}    5     15,978
-    user checks row cell contains text  ${row}    6     16,088
 
 User validates permalink table rows for Sheffield
     ${row}=  user gets row with group and indicator   xpath://table  Sheffield   Number of fixed period exclusions
@@ -152,27 +131,18 @@ User validates permalink table rows for Sheffield
     user checks row cell contains text  ${row}    1     5,351
     user checks row cell contains text  ${row}    2     3,869
     user checks row cell contains text  ${row}    3     3,374
-    user checks row cell contains text  ${row}    4     539
-    user checks row cell contains text  ${row}    5     425
-    user checks row cell contains text  ${row}    6     362
 
     ${row}=  user gets row with group and indicator   xpath://table  Sheffield   Number of permanent exclusions
     user checks row contains heading  ${row}  Number of permanent exclusions
     user checks row cell contains text  ${row}    1     12
     user checks row cell contains text  ${row}    2     8
     user checks row cell contains text  ${row}    3     4
-    user checks row cell contains text  ${row}    4     0
-    user checks row cell contains text  ${row}    5     x
-    user checks row cell contains text  ${row}    6     0
 
     ${row}=  user gets row with group and indicator   xpath://table  Sheffield   Number of pupils
     user checks row contains heading  ${row}  Number of pupils
     user checks row cell contains text  ${row}    1     31,261
     user checks row cell contains text  ${row}    2     31,105
     user checks row cell contains text  ${row}    3     30,948
-    user checks row cell contains text  ${row}    4     42,091
-    user checks row cell contains text  ${row}    5     41,843
-    user checks row cell contains text  ${row}    6     41,650
 
 User validates permalink table rows for York
     ${row}=  user gets row with group and indicator   xpath://table  York   Number of fixed period exclusions
@@ -180,26 +150,17 @@ User validates permalink table rows for York
     user checks row cell contains text  ${row}    1     1,073
     user checks row cell contains text  ${row}    2     1,214
     user checks row cell contains text  ${row}    3     892
-    user checks row cell contains text  ${row}    4     190
-    user checks row cell contains text  ${row}    5     147
-    user checks row cell contains text  ${row}    6     126
 
     ${row}=  user gets row with group and indicator   xpath://table  York   Number of permanent exclusions
     user checks row contains heading  ${row}  Number of permanent exclusions
     user checks row cell contains text  ${row}    1     55
     user checks row cell contains text  ${row}    2     25
     user checks row cell contains text  ${row}    3     3
-    user checks row cell contains text  ${row}    4     3
-    user checks row cell contains text  ${row}    5     x
-    user checks row cell contains text  ${row}    6     0
 
     ${row}=  user gets row with group and indicator   xpath://table  York   Number of pupils
     user checks row contains heading  ${row}  Number of pupils
     user checks row cell contains text  ${row}    1     10,179
     user checks row cell contains text  ${row}    2     9,955
     user checks row cell contains text  ${row}    3     9,870
-    user checks row cell contains text  ${row}    4     13,145
-    user checks row cell contains text  ${row}    5     13,009
-    user checks row cell contains text  ${row}    6     12,884
 
 
