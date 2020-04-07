@@ -35,6 +35,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             return NotFound();
         }
         
+        [HttpPut("bau/users/{userId}")]
+        public async Task<ActionResult<UserViewModel>> UpdateUser(string userId, EditUserViewModel model)
+        {
+            var user = await _userManagementService.UpdateAsync(userId, model.RoleId);
+
+            if (user != null)
+            {
+                return Ok(user);
+            }
+
+            return NotFound();
+        }
+        
         [HttpGet("bau/users")]
         public async Task<ActionResult<List<UserViewModel>>> GetUserList()
         {

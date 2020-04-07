@@ -1,26 +1,17 @@
-import Link from '@admin/components/Link';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
-import {
-  FormFieldset,
-  FormFieldSelect,
-  FormFieldCheckboxGroup,
-  FormFieldTextInput,
-  FormGroup,
-  Formik,
-} from '@common/components/form';
+import { FormFieldset, FormFieldSelect, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService from '@admin/services/users/service';
-import { UserStatus } from '@admin/services/users/types';
+import { UserUpdate } from '@admin/services/users/types';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import Yup from '@common/validation/yup';
 
-import React, { useEffect, useState } from 'react';
-import { Route, RouteComponentProps, Switch } from 'react-router';
-import { IdLabelPair } from 'src/services/common/types';
+import React from 'react';
+import { RouteComponentProps } from 'react-router';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 
@@ -32,12 +23,9 @@ const errorCodeMappings = [
   ),
 ];
 
-interface Model {
-  user: UserStatus;
-}
-
 interface FormValues {
-  userEmail: string;
+  userId: string;
+  selectedRoleId: string;
 }
 
 const ManageUserPage = ({
@@ -45,20 +33,24 @@ const ManageUserPage = ({
   history,
 }: RouteComponentProps<{ userId: string }>) => {
   const { userId } = match.params;
-  const [model, setModel] = useState<Model>();
   const formId = userId;
 
-  useEffect(() => {
-    userService.getUser(userId).then(user => {
-      setModel({
-        user,
-      });
-    });
-  }, []);
+  const { value: user, isLoading, error } = useAsyncRetry(() =>
+    userService.getUser(userId),
+  );
+
+  const { value: roles } = useAsyncRetry(() => userService.getRoles());
 
   const cancelHandler = () => history.push('/administration/users');
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
+    const submission: UserUpdate = {
+      id: userId,
+      roleId: values.selectedRoleId,
+    };
+
+    await userService.updateUser(submission);
+
     history.push(`/administration/users`);
   }, errorCodeMappings);
 
@@ -73,14 +65,18 @@ const ManageUserPage = ({
     >
       <h1 className="govuk-heading-xl">
         <span className="govuk-caption-xl">Manage user</span>
-        {model?.user.name}
+        {user?.name}
       </h1>
 
       <Formik<FormValues>
         enableReinitialize
         initialValues={{
-          userEmail: '',
+          userId: userId ?? '',
+          selectedRoleId: user?.role ?? '',
         }}
+        validationSchema={Yup.object({
+          selectedRoleId: Yup.string().required('Choose role for the user'),
+        })}
         onSubmit={handleSubmit}
         render={_ => {
           return (
@@ -91,13 +87,8 @@ const ManageUserPage = ({
                 legendSize="m"
               >
                 <SummaryList>
-                  <SummaryListItem term="Name">
-                    {model?.user.name}
-                  </SummaryListItem>
-                  <SummaryListItem term="Email">
-                    {' '}
-                    {model?.user.email}
-                  </SummaryListItem>
+                  <SummaryListItem term="Name">{user?.name}</SummaryListItem>
+                  <SummaryListItem term="Email"> {user?.email}</SummaryListItem>
                   <SummaryListItem term="Phone">-</SummaryListItem>
                 </SummaryList>
               </FormFieldset>
@@ -108,24 +99,24 @@ const ManageUserPage = ({
                 hint="The users role within the service."
               >
                 <FormFieldSelect
-                  id={`${formId}-role`}
+                  id={`${formId}-selectedRoleId`}
                   label="Role"
-                  name="userRole"
-                  // options={model.roles.map(role => ({
-                  //   label: role.name,
-                  //   value: role.id,
-                  // }))}
+                  name="selectedRoleId"
+                  options={roles?.map(role => ({
+                    label: role.name,
+                    value: role.id,
+                  }))}
                 />
               </FormFieldset>
 
-              <FormFieldCheckboxGroup
+              {/* <FormFieldCheckboxGroup
                 id={`${formId}-releaseaccess`}
                 legend="Release access"
                 legendSize="m"
                 hint="The releases a user has access to (BAU Users have access to all releases)."
                 name="releaseAccess"
                 options={[]}
-              />
+              /> */}
 
               <Button type="submit" className="govuk-!-margin-top-6">
                 Save
