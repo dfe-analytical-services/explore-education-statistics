@@ -1,18 +1,16 @@
 import FigureFootnotes from '@common/components/FigureFootnotes';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { OmitStrict } from '@common/types';
 import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
-import MultiHeaderTable, { HeaderGroup } from './MultiHeaderTable';
+import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 
 const mobileWidth = 1024;
 
-interface Props {
+interface Props extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy'> {
   caption: ReactNode;
   captionId?: string;
   innerRef?: Ref<HTMLElement>;
-  columnHeaders: HeaderGroup[];
-  rowHeaders: HeaderGroup[];
-  rows: string[][];
   footnotes?: FullTableMeta['footnotes'];
   source?: string;
 }

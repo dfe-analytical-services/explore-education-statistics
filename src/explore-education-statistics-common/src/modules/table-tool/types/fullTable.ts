@@ -25,17 +25,19 @@ export interface FullTableMeta {
   geoJsonAvailable: boolean;
 }
 
+export interface FullTableResult {
+  filters: string[];
+  geographicLevel: string;
+  location: Dictionary<{
+    code: string;
+    name: string;
+  }>;
+  measures: Dictionary<string>;
+  timePeriod: string;
+}
+
 export interface FullTable {
   title?: string;
   subjectMeta: FullTableMeta;
-  results: {
-    filters: string[];
-    geographicLevel: string;
-    location: Dictionary<{
-      code: string;
-      name: string;
-    }>;
-    measures: Dictionary<string>;
-    timePeriod: string;
-  }[];
+  results: FullTableResult[];
 }
