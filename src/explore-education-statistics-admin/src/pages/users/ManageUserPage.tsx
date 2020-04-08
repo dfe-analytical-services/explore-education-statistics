@@ -25,7 +25,6 @@ const errorCodeMappings = [
 ];
 
 interface FormValues {
-  userId: string;
   selectedRoleId: string;
 }
 
@@ -73,7 +72,6 @@ const ManageUserPage = ({
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
-            userId: userId ?? '',
             selectedRoleId: user?.role ?? '',
           }}
           validationSchema={Yup.object({
@@ -91,7 +89,6 @@ const ManageUserPage = ({
                   <SummaryList>
                     <SummaryListItem term="Name">{user?.name}</SummaryListItem>
                     <SummaryListItem term="Email">
-                      {' '}
                       {user?.email}
                     </SummaryListItem>
                     <SummaryListItem term="Phone">-</SummaryListItem>
