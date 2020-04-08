@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 {
-    [Route("api/bau/release")]
+    [Route("api")]
     [ApiController]
-    [Authorize(Policy = "CanManageUsersOnSystem")]
+    [Authorize]
     public class BauReleaseController : ControllerBase
     {
         private readonly IReleaseService _releaseService;

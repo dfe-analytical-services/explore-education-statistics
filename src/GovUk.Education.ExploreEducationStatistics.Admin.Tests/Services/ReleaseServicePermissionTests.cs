@@ -125,6 +125,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
+        public void PublishContentAsync()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.PublishContentAsync(_release.Id),  
+                _release,
+                CanPublishContentOfSpecificRelease);
+        }
+        
+        [Fact]
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 

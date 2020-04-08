@@ -86,7 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new MakeAmendmentOfSpecificReleaseRequirement()));
 
-                
+                // does this user have permission to publish the content of a specific Release?
+                options.AddPolicy(SecurityPolicies.CanPublishContentOfSpecificRelease.ToString(), policy => 
+                    policy.Requirements.Add(new PublishContentOfSpecificReleaseRequirement()));
+
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectDataForRelease.ToString(), policy => 
                     policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
