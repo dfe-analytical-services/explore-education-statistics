@@ -20,5 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         
         Task<bool> CancelInviteAsync(string email);
 
+        Task<bool> UpdateAsync(string userId, string roleId);
+
     }
 }
