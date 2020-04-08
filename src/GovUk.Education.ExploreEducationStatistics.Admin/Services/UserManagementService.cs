@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userRole = _context.UserRoles.FirstOrDefault(r => r.UserId == userId);
 
-            return _context.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
+            return userRole == null ? null : _context.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
         }
 
         private void SendInviteEmail(string email)
