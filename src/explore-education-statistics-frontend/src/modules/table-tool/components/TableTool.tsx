@@ -152,7 +152,7 @@ const TableToolFinalStep = ({
                 <li>
                   <Link
                     as={`/methodology/${publication.slug}`}
-                    to={`/methodology/methodology?publication=${publication.slug}`}
+                    to={`/methodology/methodology?methodologySlug=${publication.slug}`}
                   >
                     Go to methodology
                   </Link>

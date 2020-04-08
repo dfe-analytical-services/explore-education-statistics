@@ -16,7 +16,7 @@ import { NextPageContext } from 'next';
 import React, { Component } from 'react';
 
 interface Props {
-  publication: string;
+  methodologySlug: string;
   data: Methodology;
 }
 
@@ -24,14 +24,16 @@ class MethodologyPage extends Component<Props> {
   private accId: string[] = generateIdList(2);
 
   public static async getInitialProps({ query }: NextPageContext) {
-    const { publication } = query;
-    const request = methodologyService.getMethodology(publication as string);
+    const { methodologySlug } = query;
+    const request = methodologyService.getMethodology(
+      methodologySlug as string,
+    );
 
     const data = await request;
 
     return {
       data,
-      publication,
+      methodologySlug,
     };
   }
 
