@@ -251,10 +251,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return ValidationActionResult(ReleaseNotApproved);
                     }
-                    
-                    // TODO BAU-565 Move looking up the latest status id to the Publisher
-                    var releaseStatusId = new Guid();
-                    await _publishingService.QueuePublishReleaseContentImmediateMessageAsync(releaseId, releaseStatusId);
+
+                    await _publishingService.QueuePublishReleaseContentImmediateMessageAsync(releaseId);
 
                     return new Either<ActionResult, bool>(true);
                 }));

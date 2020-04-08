@@ -31,11 +31,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public async Task QueuePublishReleaseContentImmediateMessageAsync(Guid releaseId, Guid releaseStatusId)
+        public async Task QueuePublishReleaseContentImmediateMessageAsync(Guid releaseId)
         {
             var queue = await GetQueueReferenceAsync(_storageConnectionString, PublishReleaseContentImmediateQueue);
-            await queue.AddMessageAsync(
-                ToCloudQueueMessage(BuildPublishReleaseContentImmediateMessage(releaseId, releaseStatusId)));
+            await queue.AddMessageAsync(ToCloudQueueMessage(BuildPublishReleaseContentImmediateMessage(releaseId)));
 
             _logger.LogTrace($"Sent publish release content message for release: {releaseId}");
         }
@@ -65,14 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private static PublishReleaseContentImmediateMessage BuildPublishReleaseContentImmediateMessage(
-            Guid releaseId, Guid releaseStatusId)
+        private static PublishReleaseContentImmediateMessage BuildPublishReleaseContentImmediateMessage(Guid releaseId)
         {
-            return new PublishReleaseContentImmediateMessage
-            {
-                ReleaseId = releaseId,
-                ReleaseStatusId = releaseStatusId
-            };
+            return new PublishReleaseContentImmediateMessage(releaseId);
         }
 
         private static CloudQueueMessage ToCloudQueueMessage(object value)

@@ -99,11 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static PublishReleaseContentImmediateMessage BuildPublishReleaseContentImmediateMessage(
             Guid releaseId, Guid releaseStatusId)
         {
-            return new PublishReleaseContentImmediateMessage
-            {
-                ReleaseId = releaseId,
-                ReleaseStatusId = releaseStatusId
-            };
+            return new PublishReleaseContentImmediateMessage(releaseId, releaseStatusId);
         }
 
         private static PublishReleaseDataMessage BuildPublishReleaseDataMessage(Guid releaseId, Guid releaseStatusId)
