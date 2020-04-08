@@ -12,8 +12,12 @@ interface GetFileResponse {
 }
 
 export interface DeleteDataFilePlan {
-  dependentDataBlocks: DependentDataBlock[];
+  deleteDataBlockPlan: DeleteDataBlockPlan;
   footnoteIds: string[];
+}
+
+export interface DeleteDataBlockPlan {
+  dependentDataBlocks: DependentDataBlock[];
 }
 
 export interface DependentDataBlock {

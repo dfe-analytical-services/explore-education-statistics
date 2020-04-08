@@ -7,12 +7,15 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -22,16 +25,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
+        private readonly IFileStorageService _fileStorageService;
 
         public DataBlockService(
             ContentDbContext context,
             IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper, 
-            IUserService userService)
+            IUserService userService,
+            IFileStorageService fileStorageService)
         {
             _context = context;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> CreateAsync(Guid releaseId, CreateDataBlockViewModel createDataBlock)
@@ -55,17 +61,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteAsync(Guid id)
+        public async Task<Either<ActionResult, bool>> DeleteAsync(Guid releaseId, Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<DataBlock>(id)
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
-                .OnSuccess(async dataBlock =>
+                .OnSuccess(block => GetDeleteDataBlockFilePlan(releaseId, id)
+                .OnSuccess(async deletePlan =>
                 {
-                    _context.DataBlocks.Remove(dataBlock);
+                    await DeleteDependentDataBlocks(deletePlan);
+                    await DeleteChartFiles(deletePlan);
+                    _context.DataBlocks.Remove(block);
                     await _context.SaveChangesAsync();
                     return true;
-                });
+                }));
         }
         
         public async Task<DataBlockViewModel> GetAsync(Guid id)
@@ -100,6 +109,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await GetAsync(id);
                 });
         }
+        
+        public async Task<Either<ActionResult, DeleteDataBlockFilePlan>> GetDeleteDataBlockFilePlan(Guid releaseId, Guid id)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<DataBlock>(id)
+                .OnSuccess(CheckCanUpdateReleaseForDataBlock)
+                .OnSuccess(block =>
+                {
+                   return new DeleteDataBlockFilePlan
+                    {
+                        ReleaseId = releaseId,
+                        DependentDataBlocks = new List<DependentDataBlock>()
+                        {
+                            new DependentDataBlock() {
+                                
+                                Id = block.Id,
+                                Name = block.Name,
+                                ContentSectionHeading = GetContentSectionHeading(block),
+                                InfographicFilenames = block
+                                   .Charts
+                                   .Where(chart => chart.Type == ChartType.infographic.ToString())
+                                   .Cast<InfographicChart>()
+                                   .Select(chart => chart.FileId)
+                                   .ToList(),
+                            }
+                        }
+                     };
+                });
+        }
+        
+        public string GetContentSectionHeading(DataBlock block)
+        {
+            var section = block.ContentSection;
+
+            if (section == null)
+            {
+                return null;
+            }
+
+            switch (block.ContentSection.Type)
+            {
+                case ContentSectionType.Generic: return section.Heading;
+                case ContentSectionType.ReleaseSummary: return "Release Summary";
+                case ContentSectionType.Headlines: return "Headlines";
+                case ContentSectionType.KeyStatistics: return "Key Statistics";
+                case ContentSectionType.KeyStatisticsSecondary: return "Key Statistics";
+                default: return block.ContentSection.Type.ToString();
+            }
+        }
+        
+        public async Task DeleteChartFiles(DeleteDataBlockFilePlan deletePlan)
+        {
+            var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
+                block.InfographicFilenames.Select(chartFilename =>
+                    _fileStorageService.DeleteFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
+                )
+            );
+            
+            await Task.WhenAll(deletes);
+        }
+
+        public async Task DeleteDependentDataBlocks(DeleteDataBlockFilePlan deletePlan)
+        {
+            var blockIdsToDelete = deletePlan
+                .DependentDataBlocks
+                .Select(block => block.Id);
+            
+            var dependentDataBlocks = _context
+                .DataBlocks
+                .Where(block => blockIdsToDelete.Contains(block.Id));
+            
+            _context.ContentBlocks.RemoveRange(dependentDataBlocks);
+            await _context.SaveChangesAsync();
+        }
 
         private async Task<Either<ActionResult, DataBlock>> CheckCanUpdateReleaseForDataBlock(DataBlock dataBlock)
         {
@@ -113,5 +196,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanUpdateRelease(release)
                 .OnSuccess(_ => dataBlock);
         }
+    }
+    
+    public class DependentDataBlock
+    {
+        [JsonIgnore]
+        public Guid Id { get; set; }
+        
+        public string Name { get; set; }
+        
+        public string? ContentSectionHeading { get; set; }
+        
+        public List<string> InfographicFilenames { get; set; }
+    }
+    
+    public class DeleteDataBlockFilePlan
+    {
+        [JsonIgnore]
+        public Guid ReleaseId { get; set; }
+        
+        public List<DependentDataBlock> DependentDataBlocks { get; set; }
     }
 }

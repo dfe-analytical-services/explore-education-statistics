@@ -45,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
+        private readonly IDataBlockService _dataBlockService;
 
         // TODO PP-318 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -59,7 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ITableStorageService coreTableStorageService, 
             IFileStorageService fileStorageService, 
             IImportStatusService importStatusService,
-	    IFootnoteService footnoteService)
+	        IFootnoteService footnoteService,
+            IDataBlockService dataBlockService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -72,6 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
             _footnoteService = footnoteService;
+            _dataBlockService = dataBlockService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
@@ -329,46 +332,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         
                         TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName),
                         
-                        DependentDataBlocks = dependentDataBlocks.
-                            Select(block => new DependentDataBlock
-                            {
-                                Id = block.Id,
-                                Name = block.Name,
-                                ContentSectionHeading = GetContentSectionHeading(block),
-                                InfographicFilenames = block
-                                   .Charts
-                                   .Where(chart => chart.Type == ChartType.infographic.ToString())
-                                   .Cast<InfographicChart>()
-                                   .Select(chart => chart.FileId)
-                                   .ToList(),
-                            })
-                            .ToList(),
-                        
+                        DeleteDataBlockFilePlan = new DeleteDataBlockFilePlan() {
+                            ReleaseId = releaseId,
+                            DependentDataBlocks = dependentDataBlocks.
+                                Select(block => new DependentDataBlock()
+                                {
+                                    Id = block.Id,
+                                    Name = block.Name,
+                                    ContentSectionHeading = _dataBlockService.GetContentSectionHeading(block),
+                                    InfographicFilenames = block
+                                       .Charts
+                                       .Where(chart => chart.Type == ChartType.infographic.ToString())
+                                       .Cast<InfographicChart>()
+                                       .Select(chart => chart.FileId)
+                                       .ToList(),
+                                }).ToList()
+                        },
                         FootnoteIds = orphanFootnotes
                            .Select(footnote => footnote.Id)
                            .ToList()
                      };
                 });
-        }
-
-        private string GetContentSectionHeading(DataBlock block)
-        {
-            var section = block.ContentSection;
-
-            if (section == null)
-            {
-                return null;
-            }
-
-            switch (block.ContentSection.Type)
-            {
-                case ContentSectionType.Generic: return section.Heading;
-                case ContentSectionType.ReleaseSummary: return "Release Summary";
-                case ContentSectionType.Headlines: return "Headlines";
-                case ContentSectionType.KeyStatistics: return "Key Statistics";
-                case ContentSectionType.KeyStatisticsSecondary: return "Key Statistics";
-                default: return block.ContentSection.Type.ToString();
-            }
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
@@ -381,8 +365,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async deletePlan =>
                 {
                     await _subjectService.DeleteAsync(deletePlan.SubjectId);
-                    await DeleteDependentDataBlocks(deletePlan);
-                    await DeleteChartFiles(deletePlan);
+                    await _dataBlockService.DeleteDependentDataBlocks(deletePlan.DeleteDataBlockFilePlan);
+                    await _dataBlockService.DeleteChartFiles(deletePlan.DeleteDataBlockFilePlan);
 
                     return await _fileStorageService
                         .DeleteDataFileAsync(releaseId, fileName)
@@ -391,31 +375,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
                         });
                 });
-        }
-
-        private async Task DeleteChartFiles(DeleteDataFilePlan deletePlan)
-        {
-            var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
-                block.InfographicFilenames.Select(chartFilename =>
-                    _fileStorageService.DeleteFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
-                )
-            );
-            
-            await Task.WhenAll(deletes);
-        }
-
-        private async Task DeleteDependentDataBlocks(DeleteDataFilePlan deletePlan)
-        {
-            var blockIdsToDelete = deletePlan
-                .DependentDataBlocks
-                .Select(block => block.Id);
-            
-            var dependentDataBlocks = _context
-                .DataBlocks
-                .Where(block => blockIdsToDelete.Contains(block.Id));
-            
-            _context.ContentBlocks.RemoveRange(dependentDataBlocks);
-            await _context.SaveChangesAsync();
         }
 
         private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string fileName)
@@ -506,20 +465,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         [JsonIgnore]
         public DatafileImport TableStorageItem { get; set; }
         
-        public List<DependentDataBlock> DependentDataBlocks { get; set; }
+        public DeleteDataBlockFilePlan DeleteDataBlockFilePlan { get; set; }
         
         public List<Guid> FootnoteIds { get; set; }
-    }
-
-    public class DependentDataBlock
-    {
-        [JsonIgnore]
-        public Guid Id { get; set; }
-        
-        public string Name { get; set; }
-        
-        public string? ContentSectionHeading { get; set; }
-        
-        public List<string> InfographicFilenames { get; set; }
     }
 }

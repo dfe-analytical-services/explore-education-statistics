@@ -445,33 +445,36 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                 <p>
                   This data will no longer be available for use in this release.
                 </p>
-                {deleteDataFile.plan.dependentDataBlocks.length > 0 && (
+                {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks
+                  .length > 0 && (
                   <p>
                     The following data blocks will also be deleted:
                     <ul>
-                      {deleteDataFile.plan.dependentDataBlocks.map(block => (
-                        <li key={block.name}>
-                          <p>{block.name}</p>
-                          {block.contentSectionHeading && (
-                            <p>
-                              {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
-                            </p>
-                          )}
-                          {block.infographicFilenames.length > 0 && (
-                            <p>
-                              The following infographic files will also be
-                              removed:
-                              <ul>
-                                {block.infographicFilenames.map(filename => (
-                                  <li key={filename}>
-                                    <p>{filename}</p>
-                                  </li>
-                                ))}
-                              </ul>
-                            </p>
-                          )}
-                        </li>
-                      ))}
+                      {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.map(
+                        block => (
+                          <li key={block.name}>
+                            <p>{block.name}</p>
+                            {block.contentSectionHeading && (
+                              <p>
+                                {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
+                              </p>
+                            )}
+                            {block.infographicFilenames.length > 0 && (
+                              <p>
+                                The following infographic files will also be
+                                removed:
+                                <ul>
+                                  {block.infographicFilenames.map(filename => (
+                                    <li key={filename}>
+                                      <p>{filename}</p>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </p>
+                            )}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </p>
                 )}

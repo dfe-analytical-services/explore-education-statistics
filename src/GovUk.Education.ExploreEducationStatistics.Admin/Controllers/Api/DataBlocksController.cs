@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -40,14 +41,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
-        [HttpDelete("datablocks/{id}")]
-        public Task<ActionResult> DeleteDataBlockAsync(Guid id)
+        [HttpDelete("release/{releaseId}/datablocks/{id}")]
+        public Task<ActionResult> DeleteDataBlockAsync(Guid releaseId, Guid id)
         {
             // TODO EES-918 - remove in favour of checking for release inside service calls
             return _persistenceHelper
                 .CheckEntityExists<DataBlock>(id)
-                .OnSuccess(_ => _dataBlockService.DeleteAsync(id))
+                .OnSuccess(_ => _dataBlockService.DeleteAsync(releaseId, id))
                 .HandleFailuresOr(_ => new NoContentResult());
+        }
+        
+        [HttpGet("release/{releaseId}/datablocks/{id}/delete-plan")]
+        public async Task<ActionResult<DeleteDataBlockFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid id)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<DataBlock>(id)
+                .OnSuccess(block => _dataBlockService.GetDeleteDataBlockFilePlan(releaseId, block.Id))
+                .HandleFailuresOr(Ok);
         }
 
         [HttpGet("release/{releaseId}/datablocks")]
