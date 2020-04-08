@@ -1,13 +1,13 @@
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
 import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
-import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { OmitStrict } from '@common/types';
 
 export type Chart = OmitStrict<ChartRendererProps, 'data' | 'meta'>;
 
 export interface Table {
   indicators: string[];
-  tableHeaders: TableHeadersConfig;
+  tableHeaders: UnmappedTableHeadersConfig;
 }
 
 export interface Summary {

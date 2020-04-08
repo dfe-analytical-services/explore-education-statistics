@@ -48,7 +48,7 @@ const BauUsersPage = () => {
                   <td className="govuk-table__cell">{user.email}</td>
                   <td className="govuk-table__cell">{user.role}</td>
                   <td className="govuk-table__cell">
-                    {/* <Link to={`/administration/users/${user.id}`}>Manage</Link> */}
+                    <Link to={`/administration/users/${user.id}`}>Manage</Link>
                   </td>
                 </tr>
               ))}

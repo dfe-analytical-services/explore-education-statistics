@@ -36,7 +36,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="1"
         scope="col"
       >
-        Col group C
+        Col C
       </th>
       <th
         class="govuk-table__header--numeric borderBottom"
@@ -44,7 +44,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="1"
         scope="col"
       >
-        Col group D
+        Col D
       </th>
       <th
         class="govuk-table__header--numeric borderBottom"
@@ -52,7 +52,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="1"
         scope="col"
       >
-        Col group C
+        Col C
       </th>
       <th
         class="govuk-table__header--numeric borderBottom borderRightNone"
@@ -60,7 +60,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="1"
         scope="col"
       >
-        Col group D
+        Col D
       </th>
     </tr>
   </thead>
@@ -72,7 +72,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="1"
         scope="row"
       >
-        Row group A
+        Row A
       </th>
       <td
         class="govuk-table__cell--numeric"
@@ -102,7 +102,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="1"
         scope="row"
       >
-        Row group B
+        Row B
       </th>
       <td
         class="govuk-table__cell--numeric borderBottom"

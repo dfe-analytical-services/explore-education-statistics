@@ -1,5 +1,10 @@
 import client from '@admin/services/util/service';
-import { UserStatus, UserInvite, Role } from '@admin/services/users/types';
+import {
+  UserStatus,
+  UserInvite,
+  Role,
+  UserUpdate,
+} from '@admin/services/users/types';
 
 export interface UsersService {
   getRoles(): Promise<Role[]>;
@@ -9,6 +14,7 @@ export interface UsersService {
   getPendingInvites(): Promise<UserStatus[]>;
   inviteUser: (invite: UserInvite) => Promise<boolean>;
   cancelInvite: (email: string) => Promise<boolean>;
+  updateUser: (user: UserUpdate) => Promise<boolean>;
 }
 
 const service: UsersService = {
@@ -32,6 +38,9 @@ const service: UsersService = {
   },
   cancelInvite(email: string): Promise<boolean> {
     return client.delete(`/bau/users/invite/${email}`);
+  },
+  updateUser(user: UserUpdate): Promise<boolean> {
+    return client.put(`/bau/users/${user.id}`, user);
   },
 };
 
