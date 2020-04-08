@@ -272,7 +272,7 @@ const ManagePublicationsAndReleasesTab = ({
             ) : (
               <>
                 {loading ? (
-                  <LoadingSpinner />
+                  <LoadingSpinner loading={loading} />
                 ) : (
                   <p>
                     You do not currently have permission to view any releases
