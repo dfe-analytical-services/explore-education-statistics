@@ -27,9 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetReleaseStatusesAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.GetReleaseStatusesAsync(_release.Id),  
-                _release,
-                CanViewSpecificRelease);
+                    service.GetReleaseStatusAsync(_release.Id), _release, CanViewSpecificRelease);
         }
         
         private void AssertSecurityPoliciesChecked<T, TEntity>(

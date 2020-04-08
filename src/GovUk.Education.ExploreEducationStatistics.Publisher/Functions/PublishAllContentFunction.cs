@@ -4,26 +4,28 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    /**
-     * Development / BAU Function which performs a full content refresh
-     */
-    public class GenerateAllContentFunction
+    // ReSharper disable once UnusedType.Global
+    public class PublishAllContentFunction
     {
         private readonly IContentService _contentService;
 
-        private const string QueueName = "generate-all-content";
-
-        public GenerateAllContentFunction(IContentService contentService)
+        public PublishAllContentFunction(IContentService contentService)
         {
             _contentService = contentService;
         }
 
-        [FunctionName("GenerateAllContent")]
-        public async Task GenerateAllContent(
-            [QueueTrigger(QueueName)] GenerateAllContentMessage message,
+        /**
+         * Development / BAU Function to generate and publish the content of all Releases immediately.
+         * Depends on the download files existing.
+         */
+        [FunctionName("PublishAllContent")]
+        // ReSharper disable once UnusedMember.Global
+        public async Task PublishAllContent(
+            [QueueTrigger(PublishAllContentQueue)] PublishAllContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {

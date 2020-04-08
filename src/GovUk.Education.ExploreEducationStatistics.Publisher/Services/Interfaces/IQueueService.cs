@@ -8,8 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task QueueGenerateReleaseContentMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
 
+        Task QueuePublishReleaseContentImmediateMessageAsync(Guid releaseId, Guid releaseStatusId);
+
         Task QueuePublishReleaseDataMessagesAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
 
+        Task QueuePublishReleaseFilesMessageAsync(Guid releaseId, Guid releaseStatusId);
+        
         Task QueuePublishReleaseFilesMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
     }
 }

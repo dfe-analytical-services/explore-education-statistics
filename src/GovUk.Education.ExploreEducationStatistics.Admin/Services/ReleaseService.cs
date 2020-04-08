@@ -302,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
 
-                    await _publishingService.QueueReleaseStatusAsync(releaseId);
+                    await _publishingService.QueueValidateReleaseAsync(releaseId);
 
                     return await GetReleaseSummaryAsync(releaseId);
                 });
