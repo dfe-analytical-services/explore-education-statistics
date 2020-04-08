@@ -10,6 +10,11 @@ export interface UserInvite {
   roleId: string;
 }
 
+export interface UserUpdate {
+  id: string;
+  roleId: string;
+}
+
 export interface Role {
   id: string;
   name: string;

@@ -154,7 +154,8 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               ...file,
               canDelete:
                 importstatusCode &&
-                (importstatusCode === 'COMPLETE' ||
+                (importstatusCode === 'NOT_FOUND' ||
+                  importstatusCode === 'COMPLETE' ||
                   importstatusCode === 'FAILED'),
             },
       ),

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,13 +19,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly UsersAndRolesDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly UserManager<ApplicationUser> _userManager;
+
 
         public UserManagementService(UsersAndRolesDbContext context, IEmailService emailService,
-            IConfiguration configuration)
+            IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _emailService = emailService;
             _configuration = configuration;
+            _userManager = userManager;
         }
 
         public async Task<List<UserViewModel>> ListAsync()
@@ -38,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             foreach (var user in users)
             {
-                user.Role = GetUserRole(user.Id);
+                user.Role = GetUserRoleName(user.Id);
             }
 
             return users.Where(u => u.Role != "Prerelease User").ToList();
@@ -70,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Potentially user role could be null in the above result in an empty array so assign role afterwards
             foreach (var user in users)
             {
-                user.Role = GetUserRole(user.Id);
+                user.Role = GetUserRoleName(user.Id);
             }
 
             return users.Where(u => u.Role == "Prerelease User").ToList();
@@ -87,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Id = user.Id,
                     Name = user.FirstName + " " + user.LastName,
                     Email = user.Email,
-                    Role = GetUserRole(user.Id)
+                    Role = GetUserRoleId(user.Id)
                 };
             }
 
@@ -158,11 +163,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private string GetUserRole(string userId)
+        public async Task<bool> UpdateAsync(string userId, string roleId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(i => i.Id == userId);
+            var userRole = await _context.UserRoles.FirstOrDefaultAsync(i => i.UserId == userId);
+
+            if (user == null || userRole == null)
+            {
+                return false;
+            }
+
+            await _userManager.RemoveFromRoleAsync(user, GetRoleName(userRole.RoleId));
+            await _userManager.AddToRoleAsync(user, GetRoleName(roleId));
+
+            return true;
+        }
+
+
+        private string GetRoleName(string roleId)
+        {
+            var userRole = _context.Roles.FirstOrDefault(r => r.Id == roleId);
+
+            return userRole?.Name;
+        }
+
+        private string GetUserRoleName(string userId)
         {
             var userRole = _context.UserRoles.FirstOrDefault(r => r.UserId == userId);
 
-            return _context.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
+            return userRole == null ? null : _context.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
+        }
+
+        private string GetUserRoleId(string userId)
+        {
+            var userRole = _context.UserRoles.FirstOrDefault(r => r.UserId == userId);
+
+            return userRole?.RoleId;
         }
 
         private void SendInviteEmail(string email)
