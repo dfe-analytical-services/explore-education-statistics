@@ -170,6 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataForSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, PublishContentOfSpecificReleaseAuthorizationHandler>();
 
             /**
              * Pre Release management

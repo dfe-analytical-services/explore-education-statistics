@@ -92,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         MethodologyOrExternalMethodologyLinkMustBeDefined,
         CannotRemoveDataFilesUntilImportComplete,
         DatafileAlreadyUploaded,
-        AllDatafilesUploadedMustBeComplete
+        AllDatafilesUploadedMustBeComplete,
+        ReleaseNotApproved
     }
 }

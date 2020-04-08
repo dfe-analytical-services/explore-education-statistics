@@ -239,7 +239,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 releaseStatuses));
                 });
         }
-        
+
+        public Task<Either<ActionResult, bool>> PublishContentAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _userService.CheckCanPublishContent(release)
+                .OnSuccess(async release =>
+                {
+                    if (release.Status != ReleaseStatus.Approved)
+                    {
+                        return ValidationActionResult(ReleaseNotApproved);
+                    }
+                    
+                    // TODO BAU-565 Move looking up the latest status id to the Publisher
+                    var releaseStatusId = new Guid();
+                    await _publishingService.QueuePublishReleaseContentImmediateMessageAsync(releaseId, releaseStatusId);
+
+                    return new Either<ActionResult, bool>(true);
+                }));
+        }
+
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
@@ -302,6 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
 
+                    // TODO BAU-564 Allow publishing the release immediately. Currently defaults to immediate = false
                     await _publishingService.QueueValidateReleaseAsync(releaseId);
 
                     return await GetReleaseSummaryAsync(releaseId);
