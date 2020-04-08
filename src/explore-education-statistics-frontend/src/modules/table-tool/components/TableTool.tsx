@@ -32,8 +32,10 @@ const TableToolFinalStep = ({
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
   >();
-  const [methodologySlug, setMethodologySlug] = useState<string>('');
-  const [methodologyLink, setMethodologyLink] = useState<string>('');
+  const [methodologyLink, setMethodologyLink] = useState<{
+    slug?: string;
+    url?: string;
+  }>({});
 
   useEffect(() => {
     // The current table is stored to ensure the headers
@@ -44,22 +46,23 @@ const TableToolFinalStep = ({
   }, [tableHeaders, table]);
 
   useEffect(() => {
-    const getRelease = async () => {
+    const setGoToMethodologyLinkData = async () => {
       if (publication) {
         const response = await publicationService.getLatestPublicationRelease(
           publication.slug,
         );
         if (response.publication.methodology) {
-          setMethodologySlug(response.publication.methodology.slug);
-          setMethodologyLink('');
-        }
-        if (response.publication.externalMethodology) {
-          setMethodologyLink(response.publication.externalMethodology.url);
-          setMethodologySlug('');
+          setMethodologyLink({ slug: response.publication.methodology.slug });
+        } else if (response.publication.externalMethodology) {
+          setMethodologyLink({
+            url: response.publication.externalMethodology.url,
+          });
+        } else {
+          setMethodologyLink({});
         }
       }
     };
-    getRelease();
+    setGoToMethodologyLinkData();
   }, [publication]);
 
   const handlePermalinkClick = async () => {
@@ -172,16 +175,16 @@ const TableToolFinalStep = ({
                   />
                 </li>
                 <li>
-                  {methodologySlug && (
+                  {methodologyLink?.slug && (
                     <Link
-                      as={`/methodology/${methodologySlug}`}
-                      to={`/methodology/methodology?methodologySlug=${methodologySlug}`}
+                      as={`/methodology/${methodologyLink.slug}`}
+                      to={`/methodology/methodology?methodologySlug=${methodologyLink.slug}`}
                     >
                       Go to methodology
                     </Link>
                   )}
-                  {methodologyLink && (
-                    <a href={methodologyLink}>Go to methodology</a>
+                  {methodologyLink?.url && (
+                    <a href={methodologyLink.url}>Go to methodology</a>
                   )}
                 </li>
               </ul>
