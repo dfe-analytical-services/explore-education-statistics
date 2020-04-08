@@ -63,6 +63,7 @@ class ImporterStatus extends Component<Props> {
   private getImportStatusClass = (importstatusCode: ImportStatusCode) => {
     switch (importstatusCode) {
       case 'NOT_FOUND':
+        this.cancelTimer();
         return [styles.ragStatusAmber];
       case 'UPLOADING':
         return [styles.ragStatusAmber];
@@ -106,7 +107,7 @@ class ImporterStatus extends Component<Props> {
           this.setState({
             current: importStatus,
             isFetching: false,
-            running: 'NOT_FOUND,UPLOADING,QUEUED,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
+            running: 'UPLOADING,QUEUED,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
               importStatus.status,
             ),
           }),
