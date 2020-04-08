@@ -92,7 +92,7 @@ Select indicators
 Create table
     [Tags]  HappyPath
     user clicks element   css:#filtersForm-submit
-    user waits until results table appears     90
+    user waits until results table appears     180
 
 Validate table's column headings
     [Tags]  HappyPath
