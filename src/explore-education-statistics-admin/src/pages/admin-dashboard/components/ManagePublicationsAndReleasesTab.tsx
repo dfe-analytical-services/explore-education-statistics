@@ -15,10 +15,10 @@ import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
 import FormSelect from '@common/components/form/FormSelect';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -60,6 +60,8 @@ const ManagePublicationsAndReleasesTab = ({
   >();
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [apiErrors, setApiErrors] = useState<ErrorSummaryMessage[]>([]);
 
@@ -138,6 +140,7 @@ const ManagePublicationsAndReleasesTab = ({
 
   useEffect(() => {
     if (selectedThemeAndTopic.topic.id) {
+      setLoading(true);
       Promise.all([
         dashboardService
           .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
@@ -267,7 +270,19 @@ const ManagePublicationsAndReleasesTab = ({
             {apiErrors.length > 0 ? (
               <ErrorSummary id="publications-error" errors={apiErrors} />
             ) : (
-              <LoadingSpinner />
+              <>
+                {loading ? (
+                  <LoadingSpinner />
+                ) : (
+                  <p>
+                    You do not currently have permission to view any releases
+                    within the service, to request access contact the team{' '}
+                    <a href="mailto:explore.statistics@education.gov.uk">
+                      explore.statistics@education.gov.uk
+                    </a>
+                  </p>
+                )}
+              </>
             )}
           </>
         )}
