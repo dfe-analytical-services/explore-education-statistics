@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
@@ -10,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public Dictionary<string, IndicatorMetaViewModel> Indicators { get; set; }
 
-        public Dictionary<string, ObservationalUnitGeoJsonMeta> Locations { get; set; }
+        public Dictionary<string, ObservationalUnitMetaViewModel> Locations { get; set; }
         
         public IEnumerable<BoundaryLevelIdLabel> BoundaryLevels { get; set; }
         
