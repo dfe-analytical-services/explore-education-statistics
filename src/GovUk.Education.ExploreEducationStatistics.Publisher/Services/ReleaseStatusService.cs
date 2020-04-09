@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -62,6 +63,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     }));
 
             return tableResult.Result as ReleaseStatus;
+        }
+
+        public async Task<ReleaseStatus> GetLatestAsync(Guid releaseId)
+        {
+            var query = new TableQuery<ReleaseStatus>()
+                .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+                    QueryComparisons.Equal, releaseId.ToString()))
+                .OrderByDesc(nameof(ReleaseStatus.Created));
+
+            var result = await _tableStorageService.ExecuteQueryAsync(TableName, query);
+            return result.FirstOrDefault();
         }
 
         public async Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId)
