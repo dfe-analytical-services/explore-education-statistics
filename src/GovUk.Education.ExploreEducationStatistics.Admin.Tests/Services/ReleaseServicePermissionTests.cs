@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AssertSecurityPoliciesChecked(service =>
                     service.PublishReleaseAsync(_release.Id),
                 _release,
-                CanPublishContentOfSpecificRelease);
+                CanPublishSpecificRelease);
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AssertSecurityPoliciesChecked(service =>
                     service.PublishReleaseContentAsync(_release.Id),
                 _release,
-                CanPublishContentOfSpecificRelease);
+                CanPublishSpecificRelease);
         }
 
         [Fact]

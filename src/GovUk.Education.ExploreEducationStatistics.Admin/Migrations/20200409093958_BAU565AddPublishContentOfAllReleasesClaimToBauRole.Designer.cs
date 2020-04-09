@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    [Migration("20200408083954_BAU565AddPublishContentOfAllReleasesClaimToBauRole")]
+    [Migration("20200409093958_BAU565AddPublishContentOfAllReleasesClaimToBauRole")]
     partial class BAU565AddPublishContentOfAllReleasesClaimToBauRole
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -592,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         new
                         {
                             Id = -30,
-                            ClaimType = "PublishContentOfAllReleases",
+                            ClaimType = "PublishAllReleases",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         });

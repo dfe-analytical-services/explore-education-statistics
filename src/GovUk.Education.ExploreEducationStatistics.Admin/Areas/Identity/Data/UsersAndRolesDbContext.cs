@@ -302,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     {
                         Id = -30,
                         RoleId = bauUserRoleId,
-                        ClaimType = SecurityClaimTypes.PublishContentOfAllReleases.ToString(),
+                        ClaimType = SecurityClaimTypes.PublishAllReleases.ToString(),
                         ClaimValue = "",
                     }
                 );

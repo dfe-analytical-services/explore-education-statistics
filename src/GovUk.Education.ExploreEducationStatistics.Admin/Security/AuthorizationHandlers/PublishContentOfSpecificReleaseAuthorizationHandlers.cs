@@ -6,32 +6,32 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.Authoriza
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class PublishContentOfSpecificReleaseRequirement : IAuthorizationRequirement
+    public class PublishSpecificReleaseRequirement : IAuthorizationRequirement
     {
     }
 
     public class
-        PublishContentOfSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<
-            PublishContentOfSpecificReleaseRequirement, Release>
+        PublishSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<
+            PublishSpecificReleaseRequirement, Release>
     {
-        public PublishContentOfSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new CanPublishContentOfAllReleasesAuthorizationHandler(),
+        public PublishSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
+            new CanPublishAllReleasesAuthorizationHandler(),
             new HasApproverRoleOnReleaseAuthorizationHandler(context))
         {
         }
 
-        private class CanPublishContentOfAllReleasesAuthorizationHandler :
-            EntityAuthorizationHandler<PublishContentOfSpecificReleaseRequirement, Release>
+        private class CanPublishAllReleasesAuthorizationHandler :
+            EntityAuthorizationHandler<PublishSpecificReleaseRequirement, Release>
         {
-            public CanPublishContentOfAllReleasesAuthorizationHandler() : base(ctx =>
+            public CanPublishAllReleasesAuthorizationHandler() : base(ctx =>
                 ctx.Entity.Status == ReleaseStatus.Approved
-                && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.PublishContentOfAllReleases))
+                && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.PublishAllReleases))
             {
             }
         }
 
         private class HasApproverRoleOnReleaseAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<PublishContentOfSpecificReleaseRequirement>
+            : HasRoleOnReleaseAuthorizationHandler<PublishSpecificReleaseRequirement>
         {
             public HasApproverRoleOnReleaseAuthorizationHandler(ContentDbContext context)
                 : base(context, ctx => ContainsApproverRole(ctx.Roles))

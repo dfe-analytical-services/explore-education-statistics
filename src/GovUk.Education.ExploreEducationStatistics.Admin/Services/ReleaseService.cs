@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanPublishContent(release)
+                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
                     .OnSuccess(async release =>
                     {
                         if (release.Status != ReleaseStatus.Approved)
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanPublishContent(release)
+                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
                     .OnSuccess(async release =>
                     {
                         if (release.Status != ReleaseStatus.Approved)
