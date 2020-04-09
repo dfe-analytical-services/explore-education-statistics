@@ -17,9 +17,8 @@ import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeader
 import { OmitStrict } from '@common/types';
 import Link from '@frontend/components/Link';
 import React, { useEffect, useRef, useState } from 'react';
-import publicationService, {
-  Publication,
-} from '@common/services/publicationService';
+import publicationService from '@common/services/publicationService';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 
 const TableToolFinalStep = ({
   table,
@@ -34,7 +33,6 @@ const TableToolFinalStep = ({
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
   >();
-  const [contentPublication, setContentPublication] = useState<Publication>();
 
   useEffect(() => {
     // The current table is stored to ensure the headers
@@ -44,17 +42,13 @@ const TableToolFinalStep = ({
     setPermalinkId('');
   }, [tableHeaders, table]);
 
-  useEffect(() => {
-    const setContentPublicationData = async () => {
-      if (publication) {
-        const response = await publicationService.getLatestPublicationRelease(
-          publication.slug,
-        );
-        setContentPublication(response.publication);
-      }
-    };
-    setContentPublicationData();
+  const { value: release } = useAsyncRetry(async () => {
+    if (publication) {
+      return publicationService.getLatestPublicationRelease(publication.slug);
+    }
+    return undefined;
   }, [publication]);
+  const contentPublication = release?.publication;
 
   const handlePermalinkClick = async () => {
     if (!currentTableHeaders || !query) {
