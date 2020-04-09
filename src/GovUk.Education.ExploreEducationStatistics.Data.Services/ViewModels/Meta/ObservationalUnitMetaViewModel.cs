@@ -13,8 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public dynamic GeoJson { get; set; }
 
-        public bool GeoJsonAvailable => GeoJson != null;
-
         protected bool Equals(ObservationalUnitMetaViewModel other)
         {
             return base.Equals(other) && Level == other.Level;
