@@ -240,22 +240,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, bool>> PublishContentAsync(Guid releaseId)
+        public Task<Either<ActionResult, bool>> PublishReleaseAsync(Guid releaseId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => _userService.CheckCanPublishContent(release)
-                .OnSuccess(async release =>
-                {
-                    if (release.Status != ReleaseStatus.Approved)
+                    .OnSuccess(async release =>
                     {
-                        return ValidationActionResult(ReleaseNotApproved);
-                    }
+                        if (release.Status != ReleaseStatus.Approved)
+                        {
+                            return ValidationActionResult(ReleaseNotApproved);
+                        }
 
-                    await _publishingService.QueuePublishReleaseContentImmediateMessageAsync(releaseId);
+                        await _publishingService.QueueValidateReleaseAsync(releaseId, true);
 
-                    return new Either<ActionResult, bool>(true);
-                }));
+                        return new Either<ActionResult, bool>(true);
+                    }));
+        }
+
+        public Task<Either<ActionResult, bool>> PublishReleaseContentAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _userService.CheckCanPublishContent(release)
+                    .OnSuccess(async release =>
+                    {
+                        if (release.Status != ReleaseStatus.Approved)
+                        {
+                            return ValidationActionResult(ReleaseNotApproved);
+                        }
+
+                        await _publishingService.QueuePublishReleaseContentImmediateMessageAsync(releaseId);
+
+                        return new Either<ActionResult, bool>(true);
+                    }));
         }
 
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
@@ -314,13 +332,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
                     }
-                    
+
                     release.Status = status;
                     release.InternalReleaseNote = internalReleaseNote;
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
 
-                    // TODO BAU-564 Allow publishing the release immediately. Currently defaults to immediate = false
                     await _publishingService.QueueValidateReleaseAsync(releaseId);
 
                     return await GetReleaseSummaryAsync(releaseId);

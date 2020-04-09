@@ -27,17 +27,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
          * If the Release is already published consider creating a new version instead.
          * Alternatively, republish only the content.
          * Publishing will fail at the validation stage if this Release is already in the process of being published.
-         * An existing schedule for this Release that's not complete will be cancelled unless it's already started.
+         * A future schedule for publishing the Release that's not yet started will be cancelled.
          */
         [HttpPut("bau/release/{releaseId}/publish")]
         public async Task<ActionResult<bool>> PublishReleaseAsync(Guid releaseId)
         {
-            // BAU-564 TODO
-            return false;
+            return await _releaseService
+                .PublishReleaseAsync(releaseId)
+                .HandleFailuresOrOk();
         }
 
         /**
-         * Regenerates and publishes the content for a Release immediately.
+         * Regenerate and publish the content for a Release immediately.
          * Note that this is a combination of the Content and Publishing stages of the publishing workflow.
          * It doesn't include the Files or Data stages so is intended to be used with a Release already published.
          */
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
         public async Task<ActionResult<bool>> PublishReleaseContentAsync(Guid releaseId)
         {
             return await _releaseService
-                .PublishContentAsync(releaseId)
+                .PublishReleaseContentAsync(releaseId)
                 .HandleFailuresOrOk();
         }
     }

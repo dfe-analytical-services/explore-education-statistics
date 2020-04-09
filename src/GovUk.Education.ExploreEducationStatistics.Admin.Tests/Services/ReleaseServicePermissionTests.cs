@@ -123,16 +123,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _release,
                 CanMakeAmendmentOfSpecificRelease);
         }
-        
+
         [Fact]
-        public void PublishContentAsync()
+        public void PublishReleaseAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
-                    service.PublishContentAsync(_release.Id),  
+            AssertSecurityPoliciesChecked(service =>
+                    service.PublishReleaseAsync(_release.Id),
                 _release,
                 CanPublishContentOfSpecificRelease);
         }
-        
+
+        [Fact]
+        public void PublishReleaseContentAsync()
+        {
+            AssertSecurityPoliciesChecked(service =>
+                    service.PublishReleaseContentAsync(_release.Id),
+                _release,
+                CanPublishContentOfSpecificRelease);
+        }
+
         [Fact]
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
         {
