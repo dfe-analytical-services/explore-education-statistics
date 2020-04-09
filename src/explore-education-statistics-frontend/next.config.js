@@ -1,7 +1,5 @@
 /* eslint-disable no-param-reassign */
 
-const withCss = require('@zeit/next-css');
-const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
 const DotEnv = require('dotenv');
 const fs = require('fs');
 const compose = require('lodash/fp/compose');
@@ -45,50 +43,6 @@ const withFonts = createPlugin((config, options) => {
       },
     ],
   });
-
-  return config;
-});
-
-const withSassModules = createPlugin((config, options) => {
-  const { dev, isServer } = options;
-
-  const sassLoader = useModules =>
-    cssLoaderConfig(config, {
-      extensions: ['scss', 'sass'],
-      cssModules: useModules,
-      dev,
-      isServer,
-      loaders: [
-        {
-          loader: 'sass-loader',
-          options: {},
-        },
-      ],
-      cssLoaderOptions: {
-        localIdentName: 'dfe-[name]__[local]--[hash:base64:5]',
-      },
-    });
-
-  config.module.rules.push(
-    {
-      test: /\.module.scss$/,
-      use: sassLoader(true),
-    },
-    {
-      test: /\.module.sass$/,
-      use: sassLoader(true),
-    },
-    {
-      test: /\.scss$/,
-      exclude: /\.module.scss$/,
-      use: sassLoader(false),
-    },
-    {
-      test: /\.sass$/,
-      exclude: /\.module.scss$/,
-      use: sassLoader(false),
-    },
-  );
 
   return config;
 });
@@ -179,7 +133,5 @@ module.exports = compose(
   withTranspileModules(['explore-education-statistics-common', '@common']),
   withFonts,
   withImages,
-  withCss,
-  withSassModules,
   withESLint,
 )(nextConfig);

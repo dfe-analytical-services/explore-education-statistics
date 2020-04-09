@@ -30,6 +30,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
     <Page
       title={`'${fullTable.subjectMeta.subjectName}' from '${fullTable.subjectMeta.publicationName}'`}
       caption="Permanent data table"
+      className={styles.permalinkPage}
       wide
       breadcrumbs={[
         { name: 'Data tables', link: '/data-tables' },

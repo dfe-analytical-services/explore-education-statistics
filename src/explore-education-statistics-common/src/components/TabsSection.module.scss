@@ -7,32 +7,15 @@
   &:focus {
     outline: none;
   }
+
+  @media print {
+    display: contents !important;
+    position: relative !important;
+    width: 100% !important;
+  }
 }
 
 .forceFullWidth {
   position: relative !important;
   width: 100% !important;
-}
-
-@media print {
-  :global(.govuk-tabs__list) {
-    list-style: none;
-  }
-
-  :global(.govuk-tabs__list-item) {
-    display: block;
-  }
-
-  :global(.govuk-tabs__panel) {
-    display: contents !important;
-    position: relative !important;
-    width: 100% !important;
-  }
-
-  :global(.govuk-tabs__tab) {
-    background: none !important;
-    border: 0 !important;
-    color: govuk-colour('black') !important;
-    float: none !important;
-  }
 }

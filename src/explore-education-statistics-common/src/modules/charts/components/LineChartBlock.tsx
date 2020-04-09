@@ -1,4 +1,3 @@
-import '@common/modules/charts/components/charts.scss';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
   AxisConfiguration,
