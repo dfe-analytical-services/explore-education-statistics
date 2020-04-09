@@ -48,7 +48,6 @@ const TableToolFinalStep = ({
     }
     return undefined;
   }, [publication]);
-  const contentPublication = release?.publication;
 
   const handlePermalinkClick = async () => {
     if (!currentTableHeaders || !query) {
@@ -160,16 +159,16 @@ const TableToolFinalStep = ({
                   />
                 </li>
                 <li>
-                  {contentPublication?.methodology?.slug && (
+                  {release?.publication?.methodology?.slug && (
                     <Link
-                      as={`/methodology/${contentPublication.methodology.slug}`}
-                      to={`/methodology/methodology?methodologySlug=${contentPublication.methodology.slug}`}
+                      as={`/methodology/${release.publication.methodology.slug}`}
+                      to={`/methodology/methodology?methodologySlug=${release.publication.methodology.slug}`}
                     >
                       Go to methodology
                     </Link>
                   )}
-                  {contentPublication?.externalMethodology?.url && (
-                    <a href={contentPublication.externalMethodology.url}>
+                  {release?.publication?.externalMethodology?.url && (
+                    <a href={release.publication.externalMethodology.url}>
                       Go to methodology
                     </a>
                   )}
