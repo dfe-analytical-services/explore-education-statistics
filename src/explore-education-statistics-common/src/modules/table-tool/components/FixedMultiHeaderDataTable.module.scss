@@ -8,8 +8,8 @@
   }
 }
 
-@include govuk-media-query($from: desktop) {
-  :global(.dfe-width-container--wide) {
+:global(.dfe-width-container--wide) .figure {
+  @include govuk-media-query($from: desktop) {
     figcaption {
       max-width: 66.6%;
       @media print {
@@ -29,32 +29,30 @@
   &:focus {
     outline: none;
   }
-}
 
-@media print {
-  .container {
+  @media print {
     max-height: none;
     overflow: visible !important;
     padding-right: 0;
     width: auto;
-  }
 
-  thead {
-    display: table-row-group;
-  }
+    thead {
+      display: table-row-group;
+    }
 
-  table {
-    break-inside: auto;
-  }
+    table {
+      break-inside: auto;
+    }
 
-  tr,
-  td {
-    break-after: auto;
-    break-inside: avoid;
-  }
+    tr,
+    td {
+      break-after: auto;
+      break-inside: avoid;
+    }
 
-  thead tr th,
-  thead tr td {
-    transform: none !important;
+    thead th,
+    thead td {
+      transform: none !important;
+    }
   }
 }

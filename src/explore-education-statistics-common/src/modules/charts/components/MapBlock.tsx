@@ -1,7 +1,5 @@
 import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
-
-import 'leaflet/dist/leaflet.css';
 import dynamic from 'next/dynamic';
 import React, { memo } from 'react';
 

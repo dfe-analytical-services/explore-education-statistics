@@ -154,11 +154,10 @@ const Accordion = ({
 
   return (
     <div
-      className={classNames('govuk-accordion', styles.accordionPrint)}
+      className={classNames('govuk-accordion', styles.accordion)}
       id={id}
       ref={ref}
       role="none"
-      data-module="govuk-accordion"
     >
       {isMounted && typeof openAll !== 'boolean' && (
         <div className="govuk-accordion__controls">

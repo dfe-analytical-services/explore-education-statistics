@@ -1,21 +1,20 @@
+.accordion {
+  :global(.govuk-accordion__section-heading) {
+    color: inherit;
+    font-size: inherit;
+  }
+}
+
 :global(.js-enabled) {
-  .accordionPrint :global(.govuk-accordion__controls) {
+  .accordion :global(.govuk-accordion__controls) {
     @media print {
       display: none !important;
     }
   }
-  .accordionPrint :global(.govuk-accordion__section-content) {
+  .accordion :global(.govuk-accordion__section-content) {
     @media print {
       display: block !important;
     }
-  }
-}
-
-:global(.govuk-accordion__section-header) {
-  h2,
-  h3 {
-    color: inherit;
-    font-size: inherit;
   }
 }
 
