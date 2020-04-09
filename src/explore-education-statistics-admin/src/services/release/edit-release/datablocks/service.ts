@@ -1,6 +1,7 @@
 import client from '@admin/services/util/service';
 import { DataBlock } from '@common/services/types/blocks';
 import { OmitStrict } from '@common/types';
+import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
 
 export type ReleaseDataBlock = OmitStrict<DataBlock, 'order' | 'type'>;
 export type UpdateReleaseDataBlock = ReleaseDataBlock;
@@ -31,8 +32,15 @@ const service = {
     );
   },
 
-  async deleteDataBlock(id: string) {
-    return client.delete(`/datablocks/${id}`);
+  async deleteDataBlock(releaseId: string, id: string) {
+    return client.delete(`/release/${releaseId}/datablocks/${id}`);
+  },
+
+  async getDeleteBlockPlan(releaseId: string, id: string) {
+    return client.get<DeleteDataBlockPlan>(
+      `/release/${releaseId}/datablocks/${id}/delete-plan`,
+      {},
+    );
   },
 };
 

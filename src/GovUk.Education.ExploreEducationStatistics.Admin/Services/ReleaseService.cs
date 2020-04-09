@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -321,7 +320,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async footnotes =>
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var dependentDataBlocks = subject == null ? new List<DataBlock>() : GetDependentDataBlocks(releaseId, subject.Id);
                     var orphanFootnotes = subject == null ? new List<Footnote>() : await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
                     
                     return new DeleteDataFilePlan
@@ -332,22 +330,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         
                         TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName),
                         
-                        DeleteDataBlockFilePlan = new DeleteDataBlockFilePlan() {
-                            ReleaseId = releaseId,
-                            DependentDataBlocks = dependentDataBlocks.
-                                Select(block => new DependentDataBlock()
-                                {
-                                    Id = block.Id,
-                                    Name = block.Name,
-                                    ContentSectionHeading = _dataBlockService.GetContentSectionHeading(block),
-                                    InfographicFilenames = block
-                                       .Charts
-                                       .Where(chart => chart.Type == ChartType.infographic.ToString())
-                                       .Cast<InfographicChart>()
-                                       .Select(chart => chart.FileId)
-                                       .ToList(),
-                                }).ToList()
-                        },
+                        DeleteDataBlockPlan = _dataBlockService.GetDeleteDataBlockPlan(releaseId, subject),
+                        
                         FootnoteIds = orphanFootnotes
                            .Select(footnote => footnote.Id)
                            .ToList()
@@ -365,8 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async deletePlan =>
                 {
                     await _subjectService.DeleteAsync(deletePlan.SubjectId);
-                    await _dataBlockService.DeleteDependentDataBlocks(deletePlan.DeleteDataBlockFilePlan);
-                    await _dataBlockService.DeleteChartFiles(deletePlan.DeleteDataBlockFilePlan);
+                    await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
 
                     return await _fileStorageService
                         .DeleteDataFileAsync(releaseId, fileName)
@@ -388,21 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return true;
         }
-
-        private List<DataBlock> GetDependentDataBlocks(Guid releaseId, Guid subjectId)
-        {
-            return _context
-                .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
-                .ThenInclude(block => block.ContentSection)
-                .Where(join => join.ReleaseId == releaseId)
-                .ToList()
-                .Select(join => join.ContentBlock)
-                .Where(block => block.GetType() == typeof(DataBlock))
-                .Cast<DataBlock>()
-                .Where(block => block.DataBlockRequest.SubjectId == subjectId)
-                .ToList();
-        }
+        
         private async Task<Either<ActionResult,bool>> CheckAllDatafilesUploadedComplete(Guid releaseId, ReleaseStatus status)
         {
             if (status == ReleaseStatus.Approved)
@@ -465,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         [JsonIgnore]
         public DatafileImport TableStorageItem { get; set; }
         
-        public DeleteDataBlockFilePlan DeleteDataBlockFilePlan { get; set; }
+        public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; }
         
         public List<Guid> FootnoteIds { get; set; }
     }

@@ -52,11 +52,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/datablocks/{id}/delete-plan")]
-        public async Task<ActionResult<DeleteDataBlockFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid id)
+        public async Task<ActionResult<DeleteDataBlockPlan>> GetDeleteDataFilePlan(Guid releaseId, Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<DataBlock>(id)
-                .OnSuccess(block => _dataBlockService.GetDeleteDataBlockFilePlan(releaseId, block.Id))
+                .OnSuccess(block => _dataBlockService.GetDeleteDataBlockPlan(releaseId, block.Id))
                 .HandleFailuresOr(Ok);
         }
 
