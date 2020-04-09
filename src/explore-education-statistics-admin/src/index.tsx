@@ -2,12 +2,14 @@ import '@admin/polyfill';
 
 import initApplicationInsights from '@admin/services/applicationInsightsService';
 import configureAxios from '@admin/services/util/configureAxios';
+import { enableES5 } from 'immer';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 
 process.env.APP_ROOT_ID = 'root';
 
+enableES5();
 configureAxios();
 
 import('./App').then(({ default: App }) => {
