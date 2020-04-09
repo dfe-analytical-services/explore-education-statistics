@@ -17,7 +17,9 @@ import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeader
 import { OmitStrict } from '@common/types';
 import Link from '@frontend/components/Link';
 import React, { useEffect, useRef, useState } from 'react';
-import publicationService from '@common/services/publicationService';
+import publicationService, {
+  Publication,
+} from '@common/services/publicationService';
 
 const TableToolFinalStep = ({
   table,
@@ -32,10 +34,7 @@ const TableToolFinalStep = ({
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
   >();
-  const [methodologyLink, setMethodologyLink] = useState<{
-    slug?: string;
-    url?: string;
-  }>({});
+  const [methodologyLink, setMethodologyLink] = useState<Publication>();
 
   useEffect(() => {
     // The current table is stored to ensure the headers
@@ -51,15 +50,7 @@ const TableToolFinalStep = ({
         const response = await publicationService.getLatestPublicationRelease(
           publication.slug,
         );
-        if (response.publication.methodology) {
-          setMethodologyLink({ slug: response.publication.methodology.slug });
-        } else if (response.publication.externalMethodology) {
-          setMethodologyLink({
-            url: response.publication.externalMethodology.url,
-          });
-        } else {
-          setMethodologyLink({});
-        }
+        setMethodologyLink(response.publication);
       }
     };
     setGoToMethodologyLinkData();
@@ -175,16 +166,18 @@ const TableToolFinalStep = ({
                   />
                 </li>
                 <li>
-                  {methodologyLink?.slug && (
+                  {methodologyLink?.methodology?.slug && (
                     <Link
-                      as={`/methodology/${methodologyLink.slug}`}
-                      to={`/methodology/methodology?methodologySlug=${methodologyLink.slug}`}
+                      as={`/methodology/${methodologyLink.methodology.slug}`}
+                      to={`/methodology/methodology?methodologySlug=${methodologyLink.methodology.slug}`}
                     >
                       Go to methodology
                     </Link>
                   )}
-                  {methodologyLink?.url && (
-                    <a href={methodologyLink.url}>Go to methodology</a>
+                  {methodologyLink?.externalMethodology?.url && (
+                    <a href={methodologyLink.externalMethodology.url}>
+                      Go to methodology
+                    </a>
                   )}
                 </li>
               </ul>
