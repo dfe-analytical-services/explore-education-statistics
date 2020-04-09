@@ -7,6 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public Guid ReleaseId { get; set; }
         public Guid? ReleaseStatusId { get; set; }
 
+        public PublishReleaseContentImmediateMessage()
+        {
+        }
+
         public PublishReleaseContentImmediateMessage(Guid releaseId)
         {
             ReleaseId = releaseId;
