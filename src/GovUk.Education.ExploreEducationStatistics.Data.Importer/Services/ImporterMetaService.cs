@@ -17,7 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         filter_grouping_column,
         filter_hint,
         indicator_grouping,
-        indicator_unit
+        indicator_unit,
+        indicator_dp
     }
 
     public class ImporterMetaService : IImporterMetaService
@@ -146,7 +147,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
                             Name = row.ColumnName,
-                            Unit = row.IndicatorUnit
+                            Unit = row.IndicatorUnit,
+                            DecimalPlaces = row.DecimalPlaces
                         },
                         column: row.ColumnName
                     );
