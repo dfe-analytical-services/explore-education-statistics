@@ -34,7 +34,7 @@ const TableToolFinalStep = ({
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
   >();
-  const [methodologyLink, setMethodologyLink] = useState<Publication>();
+  const [contentPublication, setContentPublication] = useState<Publication>();
 
   useEffect(() => {
     // The current table is stored to ensure the headers
@@ -45,15 +45,15 @@ const TableToolFinalStep = ({
   }, [tableHeaders, table]);
 
   useEffect(() => {
-    const setGoToMethodologyLinkData = async () => {
+    const setContentPublicationData = async () => {
       if (publication) {
         const response = await publicationService.getLatestPublicationRelease(
           publication.slug,
         );
-        setMethodologyLink(response.publication);
+        setContentPublication(response.publication);
       }
     };
-    setGoToMethodologyLinkData();
+    setContentPublicationData();
   }, [publication]);
 
   const handlePermalinkClick = async () => {
@@ -166,16 +166,16 @@ const TableToolFinalStep = ({
                   />
                 </li>
                 <li>
-                  {methodologyLink?.methodology?.slug && (
+                  {contentPublication?.methodology?.slug && (
                     <Link
-                      as={`/methodology/${methodologyLink.methodology.slug}`}
-                      to={`/methodology/methodology?methodologySlug=${methodologyLink.methodology.slug}`}
+                      as={`/methodology/${contentPublication.methodology.slug}`}
+                      to={`/methodology/methodology?methodologySlug=${contentPublication.methodology.slug}`}
                     >
                       Go to methodology
                     </Link>
                   )}
-                  {methodologyLink?.externalMethodology?.url && (
-                    <a href={methodologyLink.externalMethodology.url}>
+                  {contentPublication?.externalMethodology?.url && (
+                    <a href={contentPublication.externalMethodology.url}>
                       Go to methodology
                     </a>
                   )}
