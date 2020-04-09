@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var locations = GetGeoJsonObservationalUnits(observationalUnits, query.IncludeGeoJson,
+                    var locations = GetGeoJsonObservationalUnits(observationalUnits, query.IncludeGeoJson ?? false,
                         query.BoundaryLevel);
                     _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private IEnumerable<ObservationalUnitMetaViewModel> GetGeoJsonObservationalUnits(
             Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits,
             bool geoJsonRequested,
-            long? boundaryLevelId = null)
+            long? boundaryLevelId)
         {
             var viewModels = observationalUnits.SelectMany(pair =>
                 BuildObservationalUnitMetaViewModelsWithGeoJsonIfAvailable(

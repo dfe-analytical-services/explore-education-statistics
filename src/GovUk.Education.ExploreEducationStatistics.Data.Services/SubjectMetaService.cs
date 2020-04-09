@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var locations = GetGeoJsonObservationalUnits(observationalUnits, query.IncludeGeoJson,
+                    var locations = GetGeoJsonObservationalUnits(observationalUnits, query.IncludeGeoJson ?? true,
                         query.BoundaryLevel);
                     var geoJsonAvailable = HasBoundaryLevelDataForAnyObservationalUnits(observationalUnits);
 

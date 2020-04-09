@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GeographicLevel geographicLevel,
             ICollection<IObservationalUnit> observationalUnits,
             bool geoJsonRequested,
-            long? boundaryLevelId = null)
+            long? boundaryLevelId)
         {
             var geoJsonByCode = new Dictionary<string, GeoJson>();
 
