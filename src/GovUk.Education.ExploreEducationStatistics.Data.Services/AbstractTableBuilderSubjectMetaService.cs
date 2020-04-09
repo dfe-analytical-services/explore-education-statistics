@@ -1,19 +1,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractTableBuilderSubjectMetaService
     {
+        private readonly IBoundaryLevelService _boundaryLevelService;
         private readonly IFilterItemService _filterItemService;
+        private readonly IGeoJsonService _geoJsonService;
 
-        protected AbstractTableBuilderSubjectMetaService(IFilterItemService filterItemService)
+        protected AbstractTableBuilderSubjectMetaService(IBoundaryLevelService boundaryLevelService,
+            IFilterItemService filterItemService,
+            IGeoJsonService geoJsonService)
         {
+            _boundaryLevelService = boundaryLevelService;
             _filterItemService = filterItemService;
+            _geoJsonService = geoJsonService;
+        }
+
+        private BoundaryLevel GetBoundaryLevel(GeographicLevel geographicLevel)
+        {
+            return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
         }
 
         protected Dictionary<string, FilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
@@ -35,6 +48,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             ),
                         TotalValue = GetTotalValue(itemsGroupedByFilter)
                     });
+        }
+
+        protected IEnumerable<ObservationalUnitMetaViewModel> BuildObservationalUnitMetaViewModelsWithGeoJsonIfAvailable(
+            GeographicLevel geographicLevel,
+            ICollection<IObservationalUnit> observationalUnits,
+            bool geoJsonRequested,
+            long? boundaryLevelId = null)
+        {
+            var geoJsonByCode = new Dictionary<string, GeoJson>();
+
+            if (geoJsonRequested)
+            {
+                var boundaryLevel = boundaryLevelId ?? GetBoundaryLevel(geographicLevel)?.Id;
+                if (boundaryLevel.HasValue)
+                {
+                    var codes = observationalUnits.Select(unit =>
+                        unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code);
+                    geoJsonByCode = _geoJsonService.Find(boundaryLevel.Value, codes).ToDictionary(g => g.Code);
+                }
+            }
+
+            return observationalUnits.Select(observationalUnit =>
+            {
+                var value = observationalUnit is LocalAuthority localAuthority
+                    ? localAuthority.GetCodeOrOldCodeIfEmpty()
+                    : observationalUnit.Code;
+
+                var serializedGeoJson = geoJsonByCode.GetValueOrDefault(value);
+                var geoJson = DeserializeGeoJson(serializedGeoJson);
+
+                return new ObservationalUnitMetaViewModel
+                {
+                    GeoJson = geoJson,
+                    Label = observationalUnit.Name,
+                    Level = geographicLevel,
+                    Value = value
+                };
+            });
+        }
+
+        protected bool HasBoundaryLevelDataForAnyObservationalUnits(
+            Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
+        {
+            return observationalUnits.Any(pair => HasBoundaryLevelForGeographicLevel(pair.Key));
         }
 
         protected static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
@@ -102,10 +159,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return value;
             });
         }
+        
+        private static dynamic DeserializeGeoJson(GeoJson geoJson)
+        {
+            return geoJson == null ? null : JsonConvert.DeserializeObject(geoJson.Value);
+        }
 
         private string GetTotalValue(IEnumerable<FilterItem> filterItems)
         {
             return _filterItemService.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
+        }
+        
+        private bool HasBoundaryLevelForGeographicLevel(GeographicLevel geographicLevel)
+        {
+            return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel) != null;
         }
     }
 }

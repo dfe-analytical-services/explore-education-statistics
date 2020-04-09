@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
@@ -10,6 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
     {
         [JsonConverter(typeof(StringEnumConverter), true)]
         public GeographicLevel Level { get; set; }
+
+        public dynamic GeoJson { get; set; }
+
+        public bool GeoJsonAvailable => GeoJson != null;
 
         protected bool Equals(ObservationalUnitMetaViewModel other)
         {
@@ -26,10 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return (base.GetHashCode() * 397) ^ (int) Level;
-            }
+            return HashCode.Combine(base.GetHashCode(), (int) Level);
         }
     }
 }
