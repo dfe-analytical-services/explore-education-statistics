@@ -14,7 +14,6 @@ import {
   ChartDefinition,
   ChartMetaData,
 } from '@common/modules/charts/types/chart';
-import { DataBlockResponse } from '@common/services/dataBlockService';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import React, { useCallback } from 'react';
@@ -26,7 +25,7 @@ type ChartOptionsChangeValue = ChartOptions & { isValid: boolean };
 interface Props {
   selectedChartType: ChartDefinition;
   chartOptions: ChartOptions;
-  data: DataBlockResponse;
+  releaseId: string;
   meta: ChartMetaData;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptionsChangeValue) => void;
@@ -39,7 +38,7 @@ const ChartConfiguration = ({
   chartOptions,
   selectedChartType,
   meta,
-  data,
+  releaseId,
   onBoundaryLevelChange,
   onChange,
   onSubmit,
@@ -68,7 +67,7 @@ const ChartConfiguration = ({
       {selectedChartType.type === 'infographic' && (
         <>
           <InfographicChartForm
-            releaseId={data.releaseId}
+            releaseId={releaseId}
             fileId={fileId || ''}
             onSubmit={nextFileId => {
               onChange({

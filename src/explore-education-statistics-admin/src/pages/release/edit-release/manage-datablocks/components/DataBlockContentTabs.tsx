@@ -22,12 +22,14 @@ import React, { useEffect, useRef, useState } from 'react';
 interface Props {
   dataBlock: ReleaseDataBlock;
   dataBlockResponse: DataBlockResponse;
+  releaseId: string;
   onDataBlockSave: (dataBlock: ReleaseDataBlock) => void;
 }
 
 const DataBlockContentTabs = ({
   dataBlock,
   dataBlockResponse,
+  releaseId,
   onDataBlockSave,
 }: Props) => {
   const dataTableRef = useRef<HTMLElement>(null);
@@ -155,6 +157,7 @@ const DataBlockContentTabs = ({
                 // up too much screen space.
                 footnotes: [],
               }}
+              releaseId={releaseId}
               onChartSave={onChartSave}
               initialConfiguration={initialConfiguration}
               onRequiresDataUpdate={reRequestdata}

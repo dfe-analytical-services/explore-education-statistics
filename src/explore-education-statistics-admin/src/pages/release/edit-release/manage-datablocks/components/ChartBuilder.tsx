@@ -92,6 +92,7 @@ function generateAxesMetaData(
 interface Props {
   data: DataBlockResponse;
   meta: ChartMetaData;
+  releaseId: string;
   initialConfiguration?: Chart;
   onChartSave?: (chart: Chart) => void;
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
@@ -100,6 +101,7 @@ interface Props {
 const ChartBuilder = ({
   data,
   meta,
+  releaseId,
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
@@ -116,7 +118,7 @@ const ChartBuilder = ({
     isValid,
   } = chartBuilderState;
 
-  const getChartFile = useGetChartFile(data.releaseId);
+  const getChartFile = useGetChartFile(releaseId);
 
   const labels: Dictionary<DataSetConfiguration> = useMemo(
     () => ({
@@ -267,7 +269,7 @@ const ChartBuilder = ({
               selectedChartType={definition}
               chartOptions={options}
               meta={meta}
-              data={data}
+              releaseId={releaseId}
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={actions.updateChartOptions}
               onSubmit={handleChartSave}

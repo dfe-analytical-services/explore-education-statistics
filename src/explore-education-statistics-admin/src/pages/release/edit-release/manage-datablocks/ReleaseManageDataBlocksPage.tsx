@@ -104,10 +104,7 @@ const ReleaseManageDataBlocksPage = ({
         if (response) {
           setSelectedDataBlock({
             dataBlock,
-            response: {
-              ...response,
-              releaseId,
-            },
+            response,
           });
         }
       });
@@ -329,6 +326,7 @@ const ReleaseManageDataBlocksPage = ({
                 <DataBlockContentTabs
                   dataBlock={selectedDataBlock?.dataBlock}
                   dataBlockResponse={selectedDataBlock?.response}
+                  releaseId={releaseId}
                   onDataBlockSave={onDataBlockSave}
                 />
               </TabsSection>
