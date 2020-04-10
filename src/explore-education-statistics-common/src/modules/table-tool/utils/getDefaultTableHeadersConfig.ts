@@ -1,19 +1,11 @@
 import {
   CategoryFilter,
-  Filter,
   Indicator,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import sortBy from 'lodash/sortBy';
-
-export interface TableHeadersConfig {
-  columns: Filter[];
-  columnGroups: Filter[][];
-  rows: Filter[];
-  rowGroups: Filter[][];
-}
 
 const removeSiblinglessTotalRows = (
   filters: Dictionary<CategoryFilter[]>,

@@ -1,5 +1,5 @@
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,

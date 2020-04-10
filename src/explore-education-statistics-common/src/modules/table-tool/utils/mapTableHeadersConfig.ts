@@ -5,7 +5,7 @@ import {
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import {
   FilterOption,

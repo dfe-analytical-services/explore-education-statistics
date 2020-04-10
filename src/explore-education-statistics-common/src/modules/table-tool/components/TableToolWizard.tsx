@@ -18,6 +18,7 @@ import TimePeriodForm, {
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import tableBuilderService, {
   LocationLevelKeys,
   locationLevelKeys,
@@ -28,7 +29,6 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
-import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import omitBy from 'lodash/omitBy';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useImmer } from 'use-immer';

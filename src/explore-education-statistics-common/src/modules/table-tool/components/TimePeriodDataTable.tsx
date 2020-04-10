@@ -9,7 +9,7 @@ import {
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import cartesian from '@common/utils/cartesian';
 import formatPretty from '@common/utils/number/formatPretty';
