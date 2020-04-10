@@ -5,7 +5,6 @@ import { Feature, Geometry } from 'geojson';
 export interface FilterOption {
   label: string;
   value: string;
-  filterGroup?: string;
 }
 
 export interface IndicatorOption extends FilterOption {

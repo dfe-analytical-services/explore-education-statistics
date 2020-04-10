@@ -1,12 +1,10 @@
 import {
+  CategoryFilter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import {
-  GroupedFilterOptions,
-  TableDataResult,
-} from '@common/services/tableBuilderService';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 
 export interface FullTableMeta {
@@ -16,10 +14,7 @@ export interface FullTableMeta {
   timePeriodRange: TimePeriodFilter[];
   filters: Dictionary<{
     name: string;
-    legend: string;
-    hint?: string;
-    options: GroupedFilterOptions;
-    totalValue?: string;
+    options: CategoryFilter[];
   }>;
   indicators: Indicator[];
   footnotes: {

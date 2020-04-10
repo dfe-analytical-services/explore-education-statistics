@@ -1,6 +1,3 @@
-import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
-import { FilterOption } from '@common/services/tableBuilderService';
 import {
   CategoryFilter,
   Indicator,
@@ -9,6 +6,11 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import {
+  FilterOption,
+  LocationOption,
+} from '@common/services/tableBuilderService';
 import isGuid from '@common/utils/string/isGuid';
 import compact from 'lodash/compact';
 
@@ -31,20 +33,15 @@ export default function mapTableHeadersConfig(
   let mappedRows: (TimePeriodFilter | Indicator | undefined)[];
   let mappedColumns: (TimePeriodFilter | Indicator | undefined)[];
 
-  const mapTimePeriod = ({ value }: FilterOption) => {
-    const filter = fullTableSubjectMeta.timePeriodRange.find(
+  const mapTimePeriod = ({ value }: FilterOption) =>
+    fullTableSubjectMeta.timePeriodRange.find(
       timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
-    ) as TimePeriodFilter;
+    );
 
-    return filter ? new TimePeriodFilter(filter) : undefined;
-  };
-
-  const mapIndicator = ({ value }: FilterOption) => {
-    const filter = fullTableSubjectMeta.indicators.find(
+  const mapIndicator = ({ value }: FilterOption) =>
+    fullTableSubjectMeta.indicators.find(
       indicator => indicator.value === value,
-    ) as Indicator;
-    return filter ? new Indicator(filter) : undefined;
-  };
+    );
 
   if (columns.length > 0 && isTimePeriod(columns[0].value)) {
     mappedColumns = columns.map(mapTimePeriod);
@@ -56,9 +53,7 @@ export default function mapTableHeadersConfig(
 
   // rowGroups/columnGroups can only be filters and locations
   const locationAndFilterGroups: (LocationFilter | CategoryFilter)[][] = [
-    ...Object.values(
-      transformTableMetaFiltersToCategoryFilters(fullTableSubjectMeta.filters),
-    ),
+    ...Object.values(fullTableSubjectMeta.filters),
     fullTableSubjectMeta.locations,
   ];
 
@@ -85,7 +80,7 @@ export default function mapTableHeadersConfig(
 
               // The filter might be a location so just cast
               // these as variables for convenience.
-              const locationOption = option as LocationFilter;
+              const locationOption = option as LocationOption;
               const locationFilter = filter as LocationFilter;
 
               if (locationOption.level && locationFilter.level) {

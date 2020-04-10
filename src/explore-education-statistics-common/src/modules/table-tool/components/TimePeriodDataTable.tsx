@@ -188,18 +188,18 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           // Add additional filter sub groups
           // to our filters if required.
           .flatMap((filter, index) => {
-            const firstSubGroup = headerConfig[index][0].filterGroup;
+            const firstSubGroup = headerConfig[index][0].group;
 
             // Don't bother showing a single subgroup as this adds
             // additional groups to a potentially crowded table.
             const hasMultipleSubGroups = headerConfig[index].some(
-              header => header.filterGroup !== firstSubGroup,
+              header => header.group !== firstSubGroup,
             );
 
             return hasMultipleSubGroups &&
-              filter.filterGroup &&
-              filter.filterGroup !== 'Default'
-              ? [new FilterGroup(filter.filterGroup), filter]
+              filter.group &&
+              filter.group !== 'Default'
+              ? [new FilterGroup(filter.group), filter]
               : filter;
           })
       );
