@@ -3,10 +3,9 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
-import { parseMetaData } from '@common/modules/charts/util/chartUtils';
-import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import useDataBlockQuery from '@common/modules/find-statistics/hooks/useDataBlockQuery';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlock } from '@common/services/types/blocks';
@@ -51,9 +50,7 @@ const DataBlockRenderer = ({
         {dataBlock?.tables?.length && dataBlockResponse && (
           <TabsSection id={`${id}-tables`} title="Table">
             {dataBlock?.tables.map((table, index) => {
-              const fullTable = mapDataBlockResponseToFullTable(
-                dataBlockResponse,
-              );
+              const fullTable = mapFullTable(dataBlockResponse);
 
               return (
                 <TimePeriodDataTable
@@ -97,8 +94,8 @@ const DataBlockRenderer = ({
                   <ChartRenderer
                     {...chart}
                     key={key}
-                    data={dataBlockResponse}
-                    meta={parseMetaData(dataBlockResponse.metaData)}
+                    data={dataBlockResponse?.results}
+                    meta={dataBlockResponse?.subjectMeta}
                     source={dataBlock?.source}
                     getInfographic={getInfographic}
                   />
@@ -109,8 +106,8 @@ const DataBlockRenderer = ({
                 <ChartRenderer
                   {...chart}
                   key={key}
-                  data={dataBlockResponse}
-                  meta={parseMetaData(dataBlockResponse.metaData)}
+                  data={dataBlockResponse?.results}
+                  meta={dataBlockResponse?.subjectMeta}
                   source={dataBlock?.source}
                 />
               );

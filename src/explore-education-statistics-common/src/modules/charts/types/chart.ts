@@ -3,16 +3,11 @@ import { infographicBlockDefinition } from '@common/modules/charts/components/In
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
-import { PublicationSubjectMeta } from '@common/modules/table-tool/services/tableBuilderService';
+import { DataBlockLocation } from '@common/services/dataBlockService';
 import {
-  BoundaryLevel,
-  DataBlockData,
-  DataBlockLocation,
-  DataBlockLocationMetadata,
-  LabelValueMetadata,
-  LabelValueUnitMetadata,
-} from '@common/services/dataBlockService';
-import { Footnote } from '@common/services/types/footnotes';
+  TableDataResult,
+  TableDataSubjectMeta,
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import { ReactNode } from 'react';
 import { LegendProps, PositionType } from 'recharts';
@@ -91,18 +86,9 @@ export type AxesConfiguration = {
   [key in AxisType]?: AxisConfiguration;
 };
 
-export interface ChartMetaData {
-  footnotes: Footnote[];
-  filters: PublicationSubjectMeta['filters'];
-  indicators: Dictionary<LabelValueUnitMetadata>;
-  locations: Dictionary<DataBlockLocationMetadata>;
-  boundaryLevels?: BoundaryLevel[];
-  timePeriod: Dictionary<LabelValueMetadata>;
-}
-
 export interface ChartProps {
-  data: DataBlockData;
-  meta: ChartMetaData;
+  data: TableDataResult[];
+  meta: TableDataSubjectMeta;
   title?: string;
   height: number;
   width?: number;

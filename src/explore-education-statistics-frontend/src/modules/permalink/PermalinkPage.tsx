@@ -4,7 +4,7 @@ import DownloadExcelButton from '@common/modules/table-tool/components/DownloadE
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import permalinkService, {
   UnmappedPermalink,
-} from '@common/modules/table-tool/services/permalinkService';
+} from '@common/services/permalinkService';
 import mapPermalink from '@common/modules/table-tool/utils/mapPermalink';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';

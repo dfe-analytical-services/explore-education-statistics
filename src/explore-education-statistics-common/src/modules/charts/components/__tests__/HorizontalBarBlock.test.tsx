@@ -3,8 +3,10 @@ import { expectTicks } from '@common/modules/charts/components/__tests__/testUti
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
-import { ChartMetaData } from '@common/modules/charts/types/chart';
-import { DataBlockData } from '@common/services/dataBlockService';
+import {
+  TableDataResponse,
+  TableDataSubjectMeta,
+} from '@common/services/tableBuilderService';
 import { render } from '@testing-library/react';
 import React from 'react';
 
@@ -207,8 +209,8 @@ describe('HorizontalBarBlock', () => {
   });
 
   test('dies gracefully with bad data', () => {
-    const invalidData = (undefined as unknown) as DataBlockData;
-    const invalidMeta = (undefined as unknown) as ChartMetaData;
+    const invalidData = (undefined as unknown) as TableDataResponse;
+    const invalidMeta = (undefined as unknown) as TableDataSubjectMeta;
     const invalidAxes = (undefined as unknown) as HorizontalBarProps['axes'];
 
     const { container } = render(

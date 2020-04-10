@@ -11,7 +11,7 @@ import useResetFormOnPreviousStep from '@common/modules/table-tool/components/ho
 import {
   PublicationSubjectMeta,
   TimePeriodQuery,
-} from '@common/modules/table-tool/services/tableBuilderService';
+} from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useMemo, useRef } from 'react';

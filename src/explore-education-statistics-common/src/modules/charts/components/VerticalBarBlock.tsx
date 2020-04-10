@@ -6,12 +6,12 @@ import {
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
-  createSortedAndMappedDataForAxis,
   generateMajorAxis,
   generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/charts/util/chartUtils';
+import { createChartData } from '@common/modules/charts/util/createChartData';
 import parseNumber from '@common/utils/number/parseNumber';
 import React, { memo } from 'react';
 import {
@@ -53,9 +53,9 @@ const VerticalBarBlock = ({
   )
     return <div>Unable to render chart, chart incorrectly configured</div>;
 
-  const chartData: ChartData[] = createSortedAndMappedDataForAxis(
+  const chartData: ChartData[] = createChartData(
     axes.major,
-    data.result,
+    data,
     meta,
     labels,
   );

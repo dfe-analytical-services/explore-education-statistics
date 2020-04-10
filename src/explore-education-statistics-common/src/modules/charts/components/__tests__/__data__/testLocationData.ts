@@ -1,8 +1,8 @@
-import { DataBlockGeoJSON } from '@common/services/dataBlockService';
+import { GeoJsonFeature } from '@common/services/tableBuilderService';
 import { Geometry } from 'geojson';
 import testGeometry from './testGeometry.json';
 
-const E92000001: DataBlockGeoJSON = {
+const E92000001: GeoJsonFeature = {
   type: 'Feature',
   properties: {
     code: 'E92000001',
@@ -14,7 +14,7 @@ const E92000001: DataBlockGeoJSON = {
   geometry: testGeometry as Geometry,
 };
 
-const S92000001: DataBlockGeoJSON = {
+const S92000001: GeoJsonFeature = {
   type: 'Feature',
   properties: {
     code: 'S92000001',

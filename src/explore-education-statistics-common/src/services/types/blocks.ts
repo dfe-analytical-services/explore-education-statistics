@@ -1,6 +1,6 @@
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
-import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { TableDataQuery } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
 
 export type Chart = OmitStrict<ChartRendererProps, 'data' | 'meta'>;

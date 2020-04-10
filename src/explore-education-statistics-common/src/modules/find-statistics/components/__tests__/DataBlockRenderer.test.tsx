@@ -4,9 +4,7 @@ import {
   testDataBlockResponse,
 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import _dataBlockService, {
-  GeographicLevel,
-} from '@common/services/dataBlockService';
+import _tableBuilderService from '@common/services/tableBuilderService';
 import {
   Chart,
   DataBlock,
@@ -20,8 +18,8 @@ jest.mock('@common/services/dataBlockService');
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const dataBlockService = _dataBlockService as jest.Mocked<
-  typeof _dataBlockService
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
 >;
 
 describe('DataBlockRenderer', () => {
@@ -34,7 +32,7 @@ describe('DataBlockRenderer', () => {
     source: '',
     dataBlockRequest: {
       subjectId: '1',
-      geographicLevel: GeographicLevel.Country,
+      geographicLevel: 'country',
       timePeriod: {
         startYear: 2014,
         startCode: 'HT6',
@@ -48,7 +46,7 @@ describe('DataBlockRenderer', () => {
     tables: [],
   };
   test('renders horizontal chart', async () => {
-    const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
+    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
       () => Promise.resolve(testDataBlockResponse),
     );
 
@@ -81,7 +79,7 @@ describe('DataBlockRenderer', () => {
   });
 
   test('renders vertical chart', async () => {
-    const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
+    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testDataBlockResponse);
       },
@@ -116,7 +114,7 @@ describe('DataBlockRenderer', () => {
   });
 
   test('renders table', async () => {
-    const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
+    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testDataBlockResponse);
       },
@@ -166,7 +164,7 @@ describe('DataBlockRenderer', () => {
   });
 
   test('renders map instead of chart', async () => {
-    const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
+    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testDataBlockResponse);
       },

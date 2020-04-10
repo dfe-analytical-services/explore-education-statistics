@@ -1,4 +1,4 @@
-import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import {
   CategoryFilter,
   Indicator,
@@ -134,6 +134,7 @@ describe('mapTableHeadersConfig', () => {
         { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
         { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
       ],
+      boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
       timePeriodRange: [

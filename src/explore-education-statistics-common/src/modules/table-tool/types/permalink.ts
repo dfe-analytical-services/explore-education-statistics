@@ -1,4 +1,4 @@
-import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
+import { TableDataQuery } from '@common/services/tableBuilderService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 

@@ -25,7 +25,7 @@ import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
-} from '@common/modules/table-tool/services/tableBuilderService';
+} from '@common/services/tableBuilderService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';

@@ -11,7 +11,7 @@ import TableToolWizard, {
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import permalinkService from '@common/modules/table-tool/services/permalinkService';
+import permalinkService from '@common/services/permalinkService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
 import { OmitStrict } from '@common/types';

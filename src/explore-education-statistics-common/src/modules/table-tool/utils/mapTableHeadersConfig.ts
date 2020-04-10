@@ -1,6 +1,6 @@
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
-import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
-import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { FilterOption } from '@common/services/tableBuilderService';
 import {
   CategoryFilter,
   Indicator,

@@ -1,17 +1,16 @@
-// eslint-disable-next-line @typescript-eslint/camelcase
-import testResponseData_23_26_28__1_2_LA_JSON from '@common/modules/charts/components/__tests__/__data__/testResponseData_23_26_28__1_2_LA.json';
 import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
-import { parseMetaData } from '@common/modules/charts/util/chartUtils';
-import { DataBlockResponse } from '@common/services/dataBlockService';
+import {
+  TableDataResponse,
+  TableDataResult,
+} from '@common/services/tableBuilderService';
 
-// eslint-disable-next-line @typescript-eslint/camelcase
-const testDataBlockResponse: DataBlockResponse = (testResponseData_23_26_28__1_2_LA_JSON as unknown) as DataBlockResponse;
+const testData: TableDataResponse = {};
 
-const largeMetaData = parseMetaData(testDataBlockResponse.metaData);
+const largeMetaData = testData.subjectMeta;
 
 export const testMapBlockProps: MapBlockProps = {
-  data: testDataBlockResponse,
-  meta: largeMetaData,
+  data: testData.results,
+  meta: testData.subjectMeta,
   width: 900,
   height: 300,
   labels: {
@@ -65,14 +64,12 @@ export const testMapBlockProps: MapBlockProps = {
   },
 };
 
-const largeMetaDataWithSamllerDataSets = parseMetaData(
-  testDataBlockResponse.metaData,
-);
+const largeMetaDataWithSamllerDataSets = testData.metaData;
 
 export const testMapBlockPropsWithSmallerDataSets: MapBlockProps = {
   data: {
-    ...testDataBlockResponse,
-    result: testDataBlockResponse.result.map(r => {
+    ...testData,
+    result: testData.result.map(r => {
       return {
         ...r,
         measures: {

@@ -85,7 +85,7 @@ function ChartRenderer({ title, source, ...props }: ChartRendererProps) {
   // TODO : Temporary sort on the results to get them in date order
   // data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
 
-  if (data && meta && data.result.length > 0) {
+  if (data && meta && data.length > 0) {
     return (
       <figure className="govuk-!-margin-0">
         {title && <figcaption className="govuk-heading-s">{title}</figcaption>}

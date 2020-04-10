@@ -8,11 +8,9 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import {
-  FullTable,
-  FullTableResult,
-} from '@common/modules/table-tool/types/fullTable';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import cartesian from '@common/utils/cartesian';
 import formatPretty from '@common/utils/number/formatPretty';
 import camelCase from 'lodash/camelCase';
@@ -33,7 +31,7 @@ class FilterGroup extends Filter {
 }
 
 const getCellText = (
-  result: FullTableResult | undefined,
+  result: TableDataResult | undefined,
   indicator: Indicator,
 ): string => {
   if (!result) {

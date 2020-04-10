@@ -5,20 +5,18 @@ import {
   AxisConfiguration,
   AxisGroupBy,
   ChartDataSet,
-  ChartMetaData,
   ChartProps,
   DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
-import {
-  ChartData,
-  createSortedAndMappedDataForAxis,
-  generateKeyFromDataSet,
-} from '@common/modules/charts/util/chartUtils';
+import { ChartData } from '@common/modules/charts/util/chartUtils';
+import { createChartData } from '@common/modules/charts/util/createChartData';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import stylesIndicators from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import {
-  DataBlockData,
-  DataBlockGeoJsonProperties,
-} from '@common/services/dataBlockService';
+  GeoJsonFeatureProperties,
+  TableDataResult,
+  TableDataSubjectMeta,
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import classNames from 'classnames';
@@ -33,7 +31,7 @@ import React, {
 } from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 
-type MapBlockProperties = DataBlockGeoJsonProperties & {
+type MapBlockProperties = GeoJsonFeatureProperties & {
   scaledData: number;
   data: number;
   color: string;
@@ -72,8 +70,8 @@ interface MapClickEvent extends LeafletMouseEvent {
 }
 
 function getLocationsForDataSet(
-  data: DataBlockData,
-  meta: ChartMetaData,
+  data: TableDataResult[],
+  meta: TableDataSubjectMeta,
   chartData: ChartData[],
 ) {
   const allLocationIds = chartData.map(({ __name }) => __name);
@@ -99,12 +97,12 @@ function getLocationsForDataSet(
 }
 
 function getGeometryForOptions(
-  meta: ChartMetaData,
+  meta: TableDataSubjectMeta,
   selectedDataSet: DataSetConfiguration,
   sourceData: ChartData[],
   min: number,
   scale: number,
-): FeatureCollection<Geometry, DataBlockGeoJsonProperties> {
+): FeatureCollection<Geometry, GeoJsonFeatureProperties> {
   return {
     type: 'FeatureCollection',
     features: sourceData.map(({ __name: id, name: _, data, ...measures }) => {
@@ -147,7 +145,7 @@ function calculateMinAndScaleForSourceData(sourceData: ChartData[]) {
 }
 
 function generateGeometryAndLegendForSelectedOptions(
-  meta: ChartMetaData,
+  meta: TableDataSubjectMeta,
   labels: Dictionary<DataSetConfiguration>,
   chartData: ChartData[],
   selectedDataSet: string,
@@ -219,7 +217,7 @@ function registerResizingCheck(
 
 function getFeatureElementById(
   id: string,
-  geometry?: FeatureCollection<Geometry, DataBlockGeoJsonProperties>,
+  geometry?: FeatureCollection<Geometry, GeoJsonFeatureProperties>,
 ): { element?: Element; layer?: Path; feature?: Feature } {
   if (geometry) {
     const selectedFeature = geometry.features.find(
@@ -278,7 +276,7 @@ function generateDataOptions(
   groupBy?: AxisGroupBy,
 ) {
   return dataSets.map(dataSet => {
-    const dataKey = generateKeyFromDataSet(dataSet, groupBy);
+    const dataKey = generateDataSetKey(dataSet, groupBy);
     return { ...labels[dataKey], value: dataKey };
   });
 }
@@ -298,7 +296,7 @@ export const MapBlockInternal = ({
   const ukRef = createRef<GeoJSON>();
 
   const [geometry, setGeometry] = useState<
-    FeatureCollection<Geometry, DataBlockGeoJsonProperties>
+    FeatureCollection<Geometry, GeoJsonFeatureProperties>
   >();
 
   const [ukGeometry, setUkGeometry] = useState<FeatureCollection>();
@@ -364,12 +362,11 @@ export const MapBlockInternal = ({
 
   // initialise on prop changes
   useEffect(() => {
-    const generatedChartData = createSortedAndMappedDataForAxis(
+    const generatedChartData = createChartData(
       axisMajor,
-      data.result,
+      data,
       meta,
       labels,
-      true,
     ).filter(
       ({ __name: id }) => meta.locations[id] && meta.locations[id].geoJson,
     );
@@ -385,7 +382,7 @@ export const MapBlockInternal = ({
       labels[selectedDataSetKey] === undefined
     ) {
       setSelectedDataSetKey(
-        generateKeyFromDataSet(axisMajor.dataSets[0], axisMajor.groupBy),
+        generateDataSetKey(axisMajor.dataSets[0], axisMajor.groupBy),
       );
     }
   }, [axisMajor.dataSets, axisMajor.groupBy, labels, selectedDataSetKey]);

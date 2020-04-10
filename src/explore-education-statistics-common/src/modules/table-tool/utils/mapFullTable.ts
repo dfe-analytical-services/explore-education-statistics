@@ -1,4 +1,4 @@
-import { UnmappedFullTable } from '@common/modules/table-tool/services/tableBuilderService';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 import {
   Indicator,
   LocationFilter,
@@ -7,7 +7,7 @@ import {
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 
 export default function mapFullTable(
-  unmappedFullTable: UnmappedFullTable,
+  unmappedFullTable: TableDataResponse,
 ): FullTable {
   const subjectMeta = unmappedFullTable.subjectMeta || {
     indicators: [],
