@@ -33,8 +33,8 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(url)
 
-    wait_until_page_contains_xpath(driver, '//button[contains(text(), "Sign-in")]')
-    driver.find_element_by_xpath('//button[contains(text(), "Sign-in")]').click()
+    wait_until_page_contains_xpath(driver, '//button[contains(text(), "Sign in")]')
+    driver.find_element_by_xpath('//button[contains(text(), "Sign in")]').click()
 
     try:
         wait_until_page_contains_xpath(driver, '//div[text()="Sign in"]')

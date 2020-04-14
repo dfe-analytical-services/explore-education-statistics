@@ -190,6 +190,7 @@ def user_selects_end_date(end_date):
   sl.select_from_list_by_label('css:#timePeriodForm-end', end_date)
 
 def user_clicks_indicator_checkbox(indicator_label):
+  sl.wait_until_page_contains_element(f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]')
   sl.driver.find_element_by_xpath(
     f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]').click()
 

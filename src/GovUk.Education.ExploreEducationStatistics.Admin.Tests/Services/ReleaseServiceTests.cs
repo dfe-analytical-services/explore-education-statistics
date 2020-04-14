@@ -453,6 +453,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public void PublishReleaseAsync()
+        {
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
+                importStatusService, footnoteService) = Mocks();
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Status = ReleaseStatus.Approved
+            };
+
+            using (var context = InMemoryApplicationDbContext("PublishReleaseAsync"))
+            {
+                context.Add(release);
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("PublishReleaseAsync"))
+            {
+                var releaseService = new ReleaseService(context,
+                    AdminMapper(),
+                    publishingService.Object,
+                    new PersistenceHelper<ContentDbContext>(context), userService.Object,
+                    repository.Object,
+                    subjectService.Object,
+                    tableStorageService.Object,
+                    fileStorageService.Object,
+                    importStatusService.Object,
+                    footnoteService.Object);
+
+                var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
+
+                publishingService.Verify(mock => mock.QueueValidateReleaseAsync(release.Id, true), Times.Once());
+
+                Assert.True(result);
+            }
+        }
+
+        [Fact]
+        public void PublishReleaseContentAsync()
+        {
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
+                importStatusService, footnoteService) = Mocks();
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Status = ReleaseStatus.Approved
+            };
+
+            using (var context = InMemoryApplicationDbContext("PublishReleaseContentAsync"))
+            {
+                context.Add(release);
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("PublishReleaseContentAsync"))
+            {
+                var releaseService = new ReleaseService(context, AdminMapper(),
+                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object,
+                    repository.Object,
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object);
+
+                var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
+
+                publishingService.Verify(mock => mock.QueueValidateReleaseAsync(release.Id, true), Times.Once());
+
+                Assert.True(result);
+            }
+        }
+
         private (
             Mock<IUserService>, 
             Mock<IPersistenceHelper<ContentDbContext>>, 

@@ -41,46 +41,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
-            await UpdateStage(message, Stage.Started);
+
+            var releaseStatusId = await GetReleaseStatusId(message);
+            await UpdateStage(message.ReleaseId, releaseStatusId, Stage.Started);
             try
             {
                 await _contentService.UpdateContentAsync(new[] {message.ReleaseId}, false);
                 await _releaseService.SetPublishedDateAsync(message.ReleaseId);
                 await _notificationsService.NotifySubscribersAsync(new[] {message.ReleaseId});
-                await UpdateStage(message, Stage.Complete);
+                await UpdateStage(message.ReleaseId, releaseStatusId, Stage.Complete);
             }
             catch (Exception e)
             {
                 logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                await UpdateStage(message, Stage.Failed,
+                await UpdateStage(message.ReleaseId, releaseStatusId, Stage.Failed,
                     new ReleaseStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateStage(PublishReleaseContentImmediateMessage message, Stage stage,
+        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, Stage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             switch (stage)
             {
                 case Stage.Started:
-                    await _releaseStatusService.UpdateStagesAsync(message.ReleaseId,
-                        message.ReleaseStatusId,
+                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                        releaseStatusId,
                         logMessage: logMessage,
                         publishingStage: ReleaseStatusPublishingStage.Started,
                         contentStage: ReleaseStatusContentStage.Started);
                     break;
                 case Stage.Complete:
-                    await _releaseStatusService.UpdateStagesAsync(message.ReleaseId,
-                        message.ReleaseStatusId,
+                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                        releaseStatusId,
                         logMessage: logMessage,
                         publishingStage: ReleaseStatusPublishingStage.Complete,
                         contentStage: ReleaseStatusContentStage.Complete);
                     break;
                 case Stage.Failed:
-                    await _releaseStatusService.UpdateStagesAsync(message.ReleaseId,
-                        message.ReleaseStatusId,
+                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                        releaseStatusId,
                         logMessage: logMessage,
                         publishingStage: ReleaseStatusPublishingStage.Failed,
                         contentStage: ReleaseStatusContentStage.Failed);
@@ -88,6 +90,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stage), stage, null);
             }
+        }
+
+        /**
+         * ReleaseStatusId in the message is optional.
+         * If it's set this function has been invoked in the context of all the other tasks with this ReleaseStatus.
+         * If it's not set this function has been invoked directly for the purpose of regenerating and publishing just the content.
+         * In this case we update the latest existing ReleaseStatus rather than creating a new one.
+         */
+        private async Task<Guid> GetReleaseStatusId(PublishReleaseContentImmediateMessage message)
+        {
+            if (message.ReleaseStatusId.HasValue)
+            {
+                return message.ReleaseStatusId.Value;
+            }
+
+            var releaseStatus = await _releaseStatusService.GetLatestAsync(message.ReleaseId);
+            if (releaseStatus == null)
+            {
+                throw new InvalidOperationException(
+                    $"Status not found for release: {message.ReleaseId}. Has it been approved?");
+            }
+
+            return releaseStatus.Id;
         }
 
         private enum Stage

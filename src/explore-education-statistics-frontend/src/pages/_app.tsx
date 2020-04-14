@@ -4,12 +4,15 @@ import '@frontend/polyfill';
 import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';
+import { enableES5 } from 'immer';
 import { NextPageContext } from 'next';
 import BaseApp, { AppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import { Cookies, CookiesProvider } from 'react-cookie';
 import './_app.scss';
+
+enableES5();
 
 interface Props {
   cookies: Cookies;

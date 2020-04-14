@@ -27,11 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             using (var context = new StatisticsDbContext(options, null))
             {
-                var (filterService, filterItemService, indicatorGroupService, locationService,
-                    observationService, timePeriodService, userService) = Mocks();
+                var (boundaryLevelService, filterService, filterItemService, geoJsonService, indicatorGroupService, locationService, observationService, timePeriodService, userService) = Mocks();
 
-                var service = new TableBuilderSubjectMetaService(filterService.Object,
+                var service = new TableBuilderSubjectMetaService(boundaryLevelService.Object,
+                    filterService.Object,
                     filterItemService.Object,
+                    geoJsonService.Object,
                     indicatorGroupService.Object,
                     locationService.Object,
                     new Mock<ILogger<TableBuilderSubjectMetaService>>().Object,
@@ -72,13 +73,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 context.SaveChanges();
 
-                var (filterService, filterItemService, indicatorGroupService, locationService,
-                    observationService, timePeriodService, userService) = Mocks();
+                var (boundaryLevelService,filterService, filterItemService, geoJsonService, indicatorGroupService, locationService, observationService, timePeriodService, userService) = Mocks();
 
                 userService.Setup(s => s.MatchesPolicy(release, CanViewSubjectDataForRelease)).ReturnsAsync(false);
 
-                var service = new TableBuilderSubjectMetaService(filterService.Object,
+                var service = new TableBuilderSubjectMetaService(boundaryLevelService.Object,
+                    filterService.Object,
                     filterItemService.Object,
+                    geoJsonService.Object,
                     indicatorGroupService.Object,
                     locationService.Object,
                     new Mock<ILogger<TableBuilderSubjectMetaService>>().Object,
@@ -94,16 +96,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static (Mock<IFilterService>,
+        private static (Mock<IBoundaryLevelService>,
+            Mock<IFilterService>,
             Mock<IFilterItemService>,
+            Mock<IGeoJsonService>,
             Mock<IIndicatorGroupService>,
             Mock<ILocationService>,
             Mock<IObservationService>,
             Mock<ITimePeriodService>,
             Mock<IUserService>) Mocks()
         {
-            return (new Mock<IFilterService>(),
+            return (new Mock<IBoundaryLevelService>(),
+                new Mock<IFilterService>(),
                 new Mock<IFilterItemService>(),
+                new Mock<IGeoJsonService>(), 
                 new Mock<IIndicatorGroupService>(),
                 new Mock<ILocationService>(),
                 new Mock<IObservationService>(),

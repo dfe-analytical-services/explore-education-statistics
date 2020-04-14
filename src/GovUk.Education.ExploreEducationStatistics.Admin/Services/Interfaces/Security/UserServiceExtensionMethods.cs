@@ -194,7 +194,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             return userService.DoCheck(release, SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease);
         }
-        
+
+        public static Task<Either<ActionResult, Release>> CheckCanPublishRelease(
+            this IUserService userService, Release release)
+        {
+            return userService.DoCheck(release, SecurityPolicies.CanPublishSpecificRelease);
+        }
+
         private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy) 
         {
             var result = await userService.MatchesPolicy(resource, policy);
