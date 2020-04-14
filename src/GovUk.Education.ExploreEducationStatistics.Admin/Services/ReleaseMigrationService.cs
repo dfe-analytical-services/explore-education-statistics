@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -125,9 +124,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     SubjectId = s.Id,
                     ReleaseId = s.ReleaseId
-                });
+                })
+                .ToList();
+
+            var existingSubjectLinks = _statisticsDbContext
+                .ReleaseSubject
+                .Where(r => r.ReleaseId == release.Id)
+                .ToList();
+
+            var newSubjectLinks = releaseSubjectLinks
+                .Where(r => existingSubjectLinks.Find(e => e.SubjectId == r.SubjectId) == null);
             
-            _statisticsDbContext.AddRange(releaseSubjectLinks);
+            _statisticsDbContext.AddRange(newSubjectLinks);
             await _statisticsDbContext.SaveChangesAsync();
 
             return release;

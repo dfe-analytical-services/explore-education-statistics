@@ -485,7 +485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
                 block.InfographicFilenames.Select(chartFilename =>
-                    _fileStorageService.DeleteFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
+                    _fileStorageService.DeleteNonDataFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
                 )
             );
             

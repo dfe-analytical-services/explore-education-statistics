@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteFileAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.DeleteFileAsync(
+                    service.DeleteNonDataFileAsync(
                         _release.Id, 
                         ReleaseFileTypes.Ancillary, 
                         ""

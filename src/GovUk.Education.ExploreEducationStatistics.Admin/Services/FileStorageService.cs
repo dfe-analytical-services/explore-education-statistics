@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -119,18 +120,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> DeleteDataFileAsync(Guid releaseId,
-            string fileName)
+            string dataFileName)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(GetCloudBlobContainer)
-                .OnSuccess(blobContainer => DataPathsForDeletion(blobContainer, releaseId, fileName)
-                    .OnSuccess(fileNames => 
-                        DeleteDataFilesAsync(blobContainer, fileNames)
-                        .OnSuccess(() => DeleteFileLink(releaseId, fileNames.dataFileName, ReleaseFileTypes.Data))
-                        .OnSuccess(() => DeleteFileLink(releaseId, fileNames.metadataFileName, ReleaseFileTypes.Metadata))
-                        .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data))));
+                .OnSuccess(async blobContainer =>
+                {
+                    var willOrphanFiles = await CheckFileDeletionWillOrphanFileAsync(releaseId, dataFileName, ReleaseFileTypes.Data);
+
+                    if (willOrphanFiles)
+                    {
+                        return
+                            await DataPathsForDeletion(blobContainer, releaseId, dataFileName)
+                            .OnSuccess(fileNames =>
+                                DeleteDataFilesAsync(blobContainer, fileNames)
+                                    .OnSuccess(() => DeleteFileReference(releaseId, fileNames.dataFileName, ReleaseFileTypes.Data))
+                                    .OnSuccess(() => DeleteFileReference(releaseId, fileNames.metadataFileName, ReleaseFileTypes.Metadata))
+                                    .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
+                    }
+
+                    return
+                        await DataPathsForDeletion(blobContainer, releaseId, dataFileName)
+                            .OnSuccess(fileNames =>
+                                DeleteFileLink(releaseId, fileNames.dataFileName, ReleaseFileTypes.Data)
+                                    .OnSuccess(() => DeleteFileLink(releaseId, fileNames.metadataFileName, ReleaseFileTypes.Metadata))
+                                    .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
+                });
+        }
+
+        private async Task<bool> CheckFileDeletionWillOrphanFileAsync(Guid releaseId, string filename, ReleaseFileTypes type)
+        {
+            var fileReference = await _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .SingleAsync(f =>
+                    f.ReleaseId == releaseId
+                    && f.ReleaseFileReference.Filename == filename
+                    && f.ReleaseFileReference.ReleaseFileType == type);
+
+            var fileReferenceUsages = await _context
+                .ReleaseFiles
+                .CountAsync(f => f.ReleaseFileReferenceId == fileReference.Id);
+
+            return fileReferenceUsages > 1;
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadFilesAsync(Guid releaseId,
@@ -156,22 +190,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> DeleteFileAsync(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> DeleteNonDataFileAsync(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
-            return _persistenceHelper
+            if (type == ReleaseFileTypes.Data || type == ReleaseFileTypes.Metadata)
+            {
+                return ValidationActionResult(ValidationErrorMessages.CannotUseGenericFunctionToDeleteDataFile);
+            }
+            
+            return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .OnSuccess(async () =>
                 {
-                    if (type == ReleaseFileTypes.Data)
+                    var willOrphanFiles = await CheckFileDeletionWillOrphanFileAsync(releaseId, fileName, type);
+
+                    if (willOrphanFiles)
                     {
-                        return ValidationActionResult(CannotUseGenericFunctionToDeleteDataFile);
+                        return await 
+                            DeleteFileAsync(await GetCloudBlobContainer(), AdminReleasePath(releaseId, type, fileName))
+                            .OnSuccess(() => DeleteFileLink(releaseId, fileName, type))
+                            .OnSuccess(() => ListFilesAsync(releaseId, type));
                     }
 
-                    return await DeleteFileAsync(await GetCloudBlobContainer(),
-                            AdminReleasePath(releaseId, type, fileName))
-                        .OnSuccess(() => DeleteFileLink(releaseId, fileName, type))
+                    return await 
+                        DeleteFileReference(releaseId, fileName, type)
                         .OnSuccess(() => ListFilesAsync(releaseId, type));
                 });
         }
@@ -427,6 +470,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefaultAsync();
 
             _context.ReleaseFiles.Remove(fileLink);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task<Either<ActionResult, bool>> DeleteFileReference(Guid releaseId, string filename, ReleaseFileTypes type)
+        {
+            var fileLink = await _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Where(f => 
+                    f.ReleaseId == releaseId 
+                    && f.ReleaseFileReference.ReleaseFileType == type 
+                    && f.ReleaseFileReference.Filename == filename)
+                .FirstOrDefaultAsync();
+
+            _context.ReleaseFileReferences.Remove(fileLink.ReleaseFileReference);
             await _context.SaveChangesAsync();
             return true;
         }

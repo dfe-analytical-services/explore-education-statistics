@@ -261,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseId, string fileName)
         {
             return await _fileStorageService
-                .DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)
+                .DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)
                 .HandleFailuresOrOk();
         }
 
@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseId, string fileName)
         {
             return await _fileStorageService
-                .DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName)
+                .DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName)
                 .HandleFailuresOrOk();
         }
         

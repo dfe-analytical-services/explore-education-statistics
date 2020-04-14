@@ -35,16 +35,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             // Avoid potential collisions
             Thread.Sleep(new Random().Next(1, 5) * 1000);
+            
             var release = CreateOrUpdateRelease(message, context);
             var subject = RemoveAndCreateSubject(message.SubjectId, subjectData.Name, release, context);
             
+            CreateReleaseFileLink(message, contentDbContext, release, subject);
+            CreateReleaseSubjectLink(context, release, subject);
+            
+            return subject;
+        }
+
+        private static void CreateReleaseSubjectLink(StatisticsDbContext context, Release release, Subject subject)
+        {
+            context
+                .ReleaseSubject
+                .Add(new ReleaseSubject
+                {
+                    ReleaseId = release.Id,
+                    SubjectId = subject.Id
+                });
+        }
+
+        private static void CreateReleaseFileLink(ImportMessage message, ContentDbContext contentDbContext, Release release,
+            Subject subject)
+        {
             var releaseFileLink = contentDbContext
                 .ReleaseFiles
                 .Include(
                     f => f.ReleaseFileReference)
                 .FirstOrDefault(
-                    f => f.ReleaseId == release.Id 
-                    && f.ReleaseFileReference.Filename == message.DataFileName);
+                    f => f.ReleaseId == release.Id
+                         && f.ReleaseFileReference.Filename == message.DataFileName);
 
             if (releaseFileLink != null)
             {
@@ -52,8 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 contentDbContext.Update(releaseFileLink);
                 contentDbContext.SaveChanges();
             }
-
-            return subject;
         }
 
         private Subject RemoveAndCreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext context)
