@@ -13,6 +13,21 @@ interface Props {
 const PageHeader = ({ wide }: Props) => {
   const { user } = useAuthContext();
 
+  let envClassName = '';
+
+  const envs: string[] = ['dev', 'test', 'pre-prod', 'prod'];
+
+  function checkURL(env: string) {
+    let envClass = '';
+    const url = window.location.href;
+    if (url.indexOf(env) > 0) {
+      envClass = `dfe-env-${env}`;
+    }
+    return envClass;
+  }
+
+  envClassName = checkURL(envs[3]);
+
   return (
     <>
       <a href="#main-content" className="govuk-skip-link">
@@ -20,7 +35,7 @@ const PageHeader = ({ wide }: Props) => {
       </a>
 
       <header
-        className="govuk-header dfe-env-dev"
+        className={classNames('govuk-header', envClassName)}
         role="banner"
         data-module="header"
       >

@@ -13,6 +13,10 @@ type Props = {
 } & BreadcrumbsProps;
 
 const Page = ({ children, wide, pageTitle, ...breadcrumbProps }: Props) => {
+  const url = window.location.href;
+
+  console.log(url);
+
   return (
     <>
       <Helmet>
