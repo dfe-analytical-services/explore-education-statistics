@@ -457,7 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void PublishReleaseAsync()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
-                importStatusService, footnoteService) = Mocks();
+                importStatusService, footnoteService, dataBlockService) = Mocks();
 
             var release = new Release
             {
@@ -482,7 +482,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     tableStorageService.Object,
                     fileStorageService.Object,
                     importStatusService.Object,
-                    footnoteService.Object);
+                    footnoteService.Object,
+                    dataBlockService.Object);
 
                 var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
 
@@ -496,7 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void PublishReleaseContentAsync()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
-                importStatusService, footnoteService) = Mocks();
+                importStatusService, footnoteService, dataBlockService) = Mocks();
 
             var release = new Release
             {
@@ -516,7 +517,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object,
                     repository.Object,
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object,
-                    importStatusService.Object, footnoteService.Object);
+                    importStatusService.Object,
+                    footnoteService.Object,
+                    dataBlockService.Object);
 
                 var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
 
