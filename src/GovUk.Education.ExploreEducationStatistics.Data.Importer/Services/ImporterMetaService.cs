@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     }
 
     public class ImporterMetaService : IImporterMetaService
-    {
+    {        
         public ImporterMetaService()
         {
         }
@@ -77,7 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 FilterGroupingColumn = values[3],
                 FilterHint = values[4],
                 IndicatorGrouping = values[5],
-                IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6] ?? "")
+                IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6] ?? ""),
+                DecimalPlaces = values[7] == null ? (int?) null : int.Parse(values[7])
             });
         }
 
