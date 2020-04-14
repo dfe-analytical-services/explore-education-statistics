@@ -1,34 +1,39 @@
+import formatPretty from '@common/utils/number/formatPretty';
+import orderBy from 'lodash/orderBy';
 import React from 'react';
 import { TooltipProps } from 'recharts';
+import styles from './CustomTooltip.module.scss';
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
-  if (active) {
-    return (
-      <div className="graph-tooltip">
-        <p className="govuk-!-font-weight-bold">{label}</p>
-        {payload &&
-          [...payload]
-            .sort((a, b) => {
-              if (typeof b.value === 'number' && typeof a.value === 'number') {
-                return b.value - a.value;
-              }
+const CustomTooltip = ({ payload, label }: TooltipProps) => {
+  return (
+    <div className={styles.tooltip}>
+      <p className="govuk-!-font-weight-bold">{label}</p>
 
-              return 0;
-            })
-            .map((_, index) => {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <p key={index}>
-                  {payload[index].name} :{' '}
-                  <strong> {payload[index].value}</strong>
-                </p>
-              );
-            })}
-      </div>
-    );
-  }
+      {payload && (
+        <ul className={styles.itemList}>
+          {orderBy(payload, 'value').map((item, index) => {
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <li key={index}>
+                <span
+                  className={styles.itemColour}
+                  style={{ backgroundColor: item.fill }}
+                />
 
-  return null;
+                <span>
+                  {`${item.name} : `}
+
+                  <strong>
+                    {formatPretty(item.value.toString(), item.unit)}
+                  </strong>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default CustomTooltip;

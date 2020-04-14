@@ -102,7 +102,7 @@ const LineChartBlock = ({
           left: 30,
         }}
       >
-        <Tooltip content={CustomTooltip} />
+        <Tooltip content={CustomTooltip} wrapperStyle={{ zIndex: 1000 }} />
 
         {legend && legend !== 'none' && (
           <Legend content={renderLegend} align="left" layout="vertical" />
