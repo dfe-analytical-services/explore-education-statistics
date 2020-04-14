@@ -153,22 +153,27 @@ h1.govuk-panel__title {
 
 // Setting page header colours based on environment
 $envs: (
-  dev: (
+  local: (
+    govuk-colour('orange'),
+    govuk-colour('white'),
+    'Local development',
+  ),
+  admin-dev: (
     govuk-colour('light-green'),
     govuk-colour('white'),
     'Development',
   ),
-  test: (
+  admin-test: (
     govuk-colour('yellow'),
     govuk-colour('black'),
     'Test',
   ),
-  pre-prod: (
+  admin-pre-prod: (
     govuk-colour('red'),
     govuk-colour('white'),
     'Pre-production',
   ),
-  prod: (
+  admin-explore: (
     govuk-colour('red'),
     govuk-colour('white'),
     'Production',

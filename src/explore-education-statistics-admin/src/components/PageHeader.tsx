@@ -15,18 +15,35 @@ const PageHeader = ({ wide }: Props) => {
 
   let envClassName = '';
 
-  const envs: string[] = ['dev', 'test', 'pre-prod', 'prod'];
+  const envs: string[] = [
+    'localhost:5021',
+    'admin.dev',
+    'admin.test',
+    'admin.pre-prod',
+    'admin.explore',
+  ];
 
-  function checkURL(env: string) {
-    let envClass = '';
+  function checkURL(arrEnvs: string[]) {
     const url = window.location.href;
-    if (url.indexOf(env) > 0) {
-      envClass = `dfe-env-${env}`;
+    let envClass = '';
+    let env = '';
+    for (let i = 0; i < arrEnvs.length; i += 1) {
+      env = arrEnvs[i].replace('.', '-');
+      if (url.indexOf(arrEnvs[i]) > 0) {
+        if (env === 'localhost:5021') {
+          envClass = 'dfe-env-local';
+        } else {
+          envClass = `dfe-env-${env}`;
+        }
+
+        console.log(env);
+      }
     }
+
     return envClass;
   }
 
-  envClassName = checkURL(envs[3]);
+  envClassName = checkURL(envs);
 
   return (
     <>
