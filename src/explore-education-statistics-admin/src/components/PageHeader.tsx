@@ -19,7 +19,11 @@ const PageHeader = ({ wide }: Props) => {
         Skip to main content
       </a>
 
-      <header className="govuk-header " role="banner" data-module="header">
+      <header
+        className="govuk-header dfe-env-dev"
+        role="banner"
+        data-module="header"
+      >
         <div
           className={classNames(
             'govuk-header__container',
