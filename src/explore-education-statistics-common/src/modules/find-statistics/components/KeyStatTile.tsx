@@ -44,6 +44,7 @@ const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
         value: `${formatPretty(
           dataBlockResponse.result[0].measures[indicatorKey],
           theIndicator.unit,
+          theIndicator.decimalPlaces,
         )}`,
       };
     }

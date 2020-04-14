@@ -10,6 +10,7 @@ export interface FilterOption {
 
 export interface IndicatorOption extends FilterOption {
   unit: string;
+  decimalPlaces?: number;
 }
 
 export interface TimePeriodOption {

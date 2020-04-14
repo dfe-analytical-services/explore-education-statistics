@@ -54,9 +54,18 @@ export class LocationFilter extends Filter {
 export class Indicator extends Filter {
   public readonly unit: string;
 
-  public constructor({ value, label, unit, filterGroup }: IndicatorOption) {
+  public readonly decimalPlaces?: number;
+
+  public constructor({
+    value,
+    label,
+    unit,
+    filterGroup,
+    decimalPlaces,
+  }: IndicatorOption) {
     super({ value, label, filterGroup });
     this.unit = unit;
+    this.decimalPlaces = decimalPlaces;
   }
 }
 

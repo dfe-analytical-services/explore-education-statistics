@@ -46,7 +46,7 @@ const getCellText = (
     return value;
   }
 
-  return formatPretty(value, indicator.unit);
+  return formatPretty(value, indicator.unit, indicator.decimalPlaces);
 };
 
 interface TableCell {

@@ -50,6 +50,7 @@ export interface DataSetConfiguration extends LabelConfiguration {
   value: string;
   name?: string;
   unit?: string;
+  decimalPlaces?: number;
   colour?: string;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;

@@ -445,12 +445,12 @@ export const MapBlockInternal = ({
         if (feature.properties) {
           const content = Object.entries(feature.properties.measures)
             .map(([id, value]) => ({
-              ...(labels[id] || { label: '', unit: '' }),
+              ...(labels[id] || { label: '', unit: '', decimalPlaces: 0 }),
               value,
             }))
             .map(
-              ({ label, value, unit }) =>
-                `${label} : ${formatPretty(value, unit)}`,
+              ({ label, value, unit, decimalPlaces }) =>
+                `${label} : ${formatPretty(value, unit, decimalPlaces)}`,
             );
 
           if (feature.id) {
@@ -656,9 +656,11 @@ export const MapBlockInternal = ({
                       {` ${formatPretty(
                         min,
                         labels[selectedDataSetKey].unit,
+                        labels[selectedDataSetKey].decimalPlaces,
                       )} to ${formatPretty(
                         max,
                         labels[selectedDataSetKey].unit,
+                        labels[selectedDataSetKey].decimalPlaces,
                       )}`}
                     </dd>
                   ))}
@@ -686,6 +688,7 @@ export const MapBlockInternal = ({
                       {` ${formatPretty(
                         result.value,
                         labels[result.id].unit,
+                        labels[result.id].decimalPlaces,
                       )} `}
                     </span>
                   </p>
