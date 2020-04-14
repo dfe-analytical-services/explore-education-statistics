@@ -78,14 +78,14 @@ const DocumentationManageContent = () => {
               <h3>Do</h3>
               <p>
                 To create and edit any content and add comments to your release
-                - select the 'Add / view comments' radio button.
+                - click the 'Add / view comments' radio button.
               </p>
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
-                    Select the 'Add / view comments and edit content' radio
+                    Click the 'Add / view comments and edit content' radio
                     button located in the bottom left of the screen.
-                  </h4>{' '}
+                  </h4>
                   <p>
                     This will be selected by default when you enter this page.
                   </p>
@@ -136,7 +136,7 @@ const DocumentationManageContent = () => {
                 boxes.
               </p>
               <p>
-                Once you've dealt with the issues raised within comments you
+                Once you've dealt with the issues raised within comments, you
                 should record them as either being resolved or remove them if
                 they're no longer relevant.
               </p>
@@ -144,11 +144,11 @@ const DocumentationManageContent = () => {
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
-                    To add and view comments - select any of the 'Add / view
+                    To add and view comments - click any of the 'Add / View
                     comments to section' links within the orange boxes down the
                     left hand side of a release.
                   </h4>
-                  <p>Select 'Add / view comments' link</p>
+                  <p>Click 'Add / view comments' link</p>
                   <img
                     src={imageCommentAdd}
                     className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
@@ -157,10 +157,10 @@ const DocumentationManageContent = () => {
                 </li>
                 <li>
                   <h4>
-                    To add comments - add them into the text box and select the
+                    To add comments - add them into the text box and click the
                     green 'Submit' button.
                   </h4>
-                  <p>Add comments and select green 'Submit' button.</p>
+                  <p>Add comments and click green 'Submit' button.</p>
                   <img
                     src={imageCommentSave}
                     className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
@@ -170,11 +170,11 @@ const DocumentationManageContent = () => {
                 {/*
                 <li>
                   <h4>
-                    To resolve comments - select the grey 'Resolve' button if
+                    To resolve comments - click the grey 'Resolve' button if
                     you’ve dealt with them or select 'Remove' if they're no
                     longer relevant.
                   </h4>
-                  <p>Select grey 'Resolve' button or select 'Remove'</p>
+                  <p>Click grey 'Resolve' button or select 'Remove'</p>
                 </li>
                 */}
               </ul>
@@ -232,14 +232,14 @@ const DocumentationManageContent = () => {
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
-                    To add content to or edit content within any section -
-                    select the 'Add text block' button, a text area will appear
-                    which you will then be able to edit.
+                    To add content to or edit content within any section - click
+                    the 'Add text block' button, a text area will appear which
+                    you will then be able to edit.
                   </h4>
                   <ul className="govuk-list govuk-list--bullet">
                     <li>
                       <h5>
-                        If you want to add a new content block select the 'Add
+                        If you want to add a new content block click the 'Add
                         text block' button
                       </h5>
                       <img
@@ -250,7 +250,7 @@ const DocumentationManageContent = () => {
                     </li>
                     <li>
                       <h5>
-                        Select 'Edit' button when hovering on the grey editable
+                        Click 'Edit' button when hovering on the grey editable
                         content blocks
                       </h5>
                       <img
@@ -261,11 +261,11 @@ const DocumentationManageContent = () => {
                     </li>
                     <li>
                       <h5>
-                        Add and edit content and select green 'Save' button
+                        Add and edit content and click green 'Save' button
                       </h5>
                       <p>
                         Add and edit content in the same way you would using
-                        Word or in an email and then select the green 'Save'
+                        Word or in an email and then click the green 'Save'
                         button when you've finished.
                       </p>
                       <img
@@ -278,12 +278,12 @@ const DocumentationManageContent = () => {
                 </li>
                 <li>
                   <h4>
-                    To add tables and charts to a section - select the 'Add data
+                    To add tables and charts to a section - click the 'Add data
                     block' button.
                   </h4>
                   <ul className="govuk-list govuk-list--bullet">
                     <li>
-                      <h5>Select 'Add data block' button</h5>
+                      <h5>Click 'Add data block' button</h5>
                       <img
                         src={imageAddDatablock}
                         className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
@@ -311,7 +311,7 @@ const DocumentationManageContent = () => {
                 <li>
                   <h4>
                     To add key indicators to the 'Headline facts and figures'
-                    section - select the green 'Add key statistic' button.
+                    section - click the green 'Add key statistic' button.
                   </h4>
                   <p>
                     Our research has shown you should aim to add up to a maximum
@@ -319,7 +319,7 @@ const DocumentationManageContent = () => {
                   </p>
                   <p>
                     You'll also need to add text to the 'Guidance text' text box
-                    to explain what the indicator means.
+                    to explain what each indicator means.
                   </p>
                   <p>
                     Read and refer to the guidance and tips about 'Key
@@ -330,7 +330,7 @@ const DocumentationManageContent = () => {
                   </p>
                   <ul className="govuk-list govuk-list--bullet">
                     <li>
-                      <h5>Select green 'Add key statistic' button</h5>
+                      <h5>Click green 'Add key statistic' button</h5>
                       <img
                         src={imageKeyStatBtn}
                         className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
@@ -339,8 +339,8 @@ const DocumentationManageContent = () => {
                     </li>
                     <li>
                       <h5>
-                        Choose key statistic from drop down list and select
-                        green 'Embed' button
+                        Choose key statistic from drop down list and click green
+                        'Embed' button
                       </h5>
                       <img
                         src={imageKeyStatSelect}
@@ -350,7 +350,7 @@ const DocumentationManageContent = () => {
                     </li>
                     <li>
                       <h5>
-                        Select the green 'Edit' button to add trend and guidance
+                        Click the green 'Edit' button to add trend and guidance
                         details
                       </h5>
                       <img
@@ -368,9 +368,7 @@ const DocumentationManageContent = () => {
                         alt=""
                         width="300"
                       />
-                      <p>
-                        Select the green 'Save' button when you've finished.
-                      </p>
+                      <p>Click the green 'Save' button when you've finished.</p>
                     </li>
                     <li>
                       <h5>Add up to a maximum of 6 key indicators</h5>
@@ -385,12 +383,12 @@ const DocumentationManageContent = () => {
                 <li>
                   <h4>
                     To add related information - add the related information
-                    title and link to the text boxes and then select the green
+                    title and link to the text boxes and then click the green
                     'Add related information'.
                   </h4>
                   <ul className="govuk-list govuk-list--bullet">
                     <li>
-                      <h5>Select 'Add related information button'</h5>
+                      <h5>click 'Add related information button'</h5>
                       <img
                         src={imageRelatedBtn}
                         className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
@@ -399,7 +397,7 @@ const DocumentationManageContent = () => {
                     </li>
                     <li>
                       <h5>
-                        Add title and link and select green 'Add related
+                        Add title and link and click green 'Add related
                         information'
                       </h5>
                       <img
@@ -425,8 +423,8 @@ const DocumentationManageContent = () => {
                   </p>
                   <h3>Don't</h3>
                   <p>
-                    Don't worry if you haven't got all the content to complete
-                    your release. You can come back and add it later.
+                    Worry if you haven't got all the content to complete your
+                    release. You can come back and add it later.
                   </p>
                   <h3>Help and support</h3>
                   <p>
@@ -435,9 +433,9 @@ const DocumentationManageContent = () => {
                   </p>
                   <p>
                     If you have any issues adding or editing content within the
-                    admin system:{' '}
+                    admin system:
                   </p>
-                  <strong>Explore education statistics team </strong>
+                  <strong>Explore education statistics team</strong>
                   <p>
                     Email <br />
                     <a href="mailto:explore.statistics@education.gov.uk">
@@ -470,10 +468,6 @@ const DocumentationManageContent = () => {
               open={step === 4}
             >
               <p>
-                You should aim to add up to 8 sections to the 'Contents' section
-                of your release.
-              </p>
-              <p>
                 Our research has shown you should aim to add up to a maximum of
                 8 sections of content within a release.
               </p>
@@ -485,12 +479,12 @@ const DocumentationManageContent = () => {
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
-                    To add a new section - select the green 'Add new section'
+                    To add a new section - click the green 'Add new section'
                     button.
                   </h4>
                   <ul className="govuk-list govuk-list--bullet">
                     <li>
-                      <h5>Select green 'Add new section' button</h5>
+                      <h5>Click green 'Add new section' button</h5>
                       <img
                         src={imageSectionAdd}
                         className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
@@ -503,7 +497,7 @@ const DocumentationManageContent = () => {
                   <h4>To reorder your sections:</h4>
                   <ul className="govuk-list govuk-list--bullet">
                     <li>
-                      <h5>select the grey 'Reorder sections' button</h5>
+                      <h5>click the grey 'Reorder sections' button</h5>
                       <img
                         src={imageReorderBtn}
                         className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
@@ -513,7 +507,7 @@ const DocumentationManageContent = () => {
                     <li>
                       <h5>
                         reorder them using the 3 grey lines on the right-hand
-                        side of each section, once in the correct order select
+                        side of each section, once in the correct order click
                         the green 'Save reordering' button
                       </h5>
                       <img
@@ -537,9 +531,9 @@ const DocumentationManageContent = () => {
               </p>
               <h3>Help and support</h3>
               <p>
-                If you have any issues adding or reordering sections contact:{' '}
+                If you have any issues adding or reordering sections contact:
               </p>
-              <strong>Explore education statistics team </strong>
+              <strong>Explore education statistics team</strong>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">
@@ -559,11 +553,11 @@ const DocumentationManageContent = () => {
               <h3>Do</h3>
               <p>
                 To preview your content as it will appear on your live release -
-                select the 'Preview content' radio button.
+                click the 'Preview content' radio button.
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <h4>Select 'Preview content' radio button</h4>
+                  <h4>Click 'Preview content' radio button</h4>
                   <img
                     src={imageContentPreview}
                     className="govuk-!-width-three-quarters govuk-!-margin-bottom-9"
@@ -588,29 +582,25 @@ const DocumentationManageContent = () => {
             >
               <p>
                 Once you and the members of your production team are happy with
-                the content of your release you should add 'release notes.
+                the content of your release, you should add release notes.
               </p>
               <p>
-                The content in the release notes should explain how your release
-                has been updated over time to users
+                The content in the release notes should explain to users how
+                your release has been updated over time.
               </p>
               <p>
-                They notes will be shown to users when they select the 'See
+                The notes will be shown to users when they click the 'See
                 updates' link under the 'About these statistics' section of your
                 live release.
-              </p>
-              <p>
-                'First published' will appear by default under 'See updates' for
-                all newly published releases.
               </p>
               <h3>Do</h3>
               <p>
                 To add release notes - add your notes into the 'Add release
-                note' text box and select the green 'Add note' button.
+                note' text box and click the green 'Add note' button.
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <h4>Add notes and select green 'Add note' button</h4>
+                  <h4>Add notes and click green 'Add note' button</h4>
                   <img
                     src={imageReleaseNote}
                     className="govuk-!-margin-bottom-9"
@@ -621,7 +611,7 @@ const DocumentationManageContent = () => {
               </ul>
               <h3>Help and support</h3>
               <p>If you have any issues adding release notes contact: </p>
-              <strong>Explore education statistics team </strong>
+              <strong>Explore education statistics team</strong>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">

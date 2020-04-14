@@ -34,7 +34,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <div className="app-content__header">
-            <span className="govuk-caption-xl">Step by step guidance</span>
+            <span className="govuk-caption-xl">Step-by-step guidance</span>
             <h1 className="govuk-heading-xl">
               Managing data blocks and creating tables and charts
             </h1>
@@ -141,12 +141,12 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     Under the ‘Choose locations’ subheading - select at least
-                    one location and select the green ‘Next step’ button.
+                    one location and click the green ‘Next step’ button.
                   </h4>
                   <p>
                     If you make a mistake and want to change your filter choice
                     - select the grey ‘Previous step’ button at the bottom of
-                    each section.{' '}
+                    each section.
                   </p>
                   <img
                     src={imageDataBlockLocation}
@@ -157,12 +157,12 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     Under the ‘Choose time period’ subheading - choose a start
-                    and end time period and select the green ‘Next step’ button.
+                    and end time period and click the green ‘Next step’ button.
                   </h4>
                   <p>
                     If you make a mistake and want to change your filter choice
                     - select the grey ‘Previous step’ button at the bottom of
-                    each section.{' '}
+                    each section.
                   </p>
                   <img
                     src={imageDataBlockTimePeriod}
@@ -176,6 +176,11 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     one checkbox from each category and select the green ‘Create
                     data block’ button.
                   </h4>
+                  <p>
+                    If you don't select a filter for a particular category,
+                    'Total' shall be automatically selected when creating your
+                    table.
+                  </p>
                   <p>
                     If you make a mistake and want to change your filter choice
                     - select the grey ‘Previous step’ button at the bottom of
@@ -223,9 +228,8 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     ‘Source’.
                   </h4>
                   <p>
-                    Your release footnotes should include details which will
-                    help tell the story of your statistics and data to
-                    non-expert users.
+                    The source you enter will appear underneath the table or
+                    chart associated with the data block.
                   </p>
                   <img
                     src={imageDataBlockSource}
@@ -236,7 +240,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     Finally, add a name for your data block into the open text
-                    field under ‘Name data block’ and then select the green
+                    field under ‘Name data block’ and then click the green
                     ‘Save’ button.
                   </h4>
                   <p>
@@ -254,8 +258,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     After saving your data block, the 'Configure content' tab
-                    will appear, this wil allow you to edit your data block and
-                    also add a chart if required.
+                    will appear, this will allow you to add a chart if required.
                   </h4>
                   <p>
                     For detailed guidance on how to configure charts within your
@@ -339,8 +342,8 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     in the data block configuration.
                   </p>
                   <p>
-                    Once you have made your changes select the 'Save' button at
-                    the bottom of the page.
+                    Once you have made your changes and recreated the table,
+                    click the 'Save' button at the bottom of the page.
                   </p>
                   <img
                     src={imageDataBlockEditTable}
@@ -355,7 +358,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   </h4>
                   <p>
                     To edit a chart, make changes to the inputs available below
-                    the chart preview.{' '}
+                    the chart preview.
                   </p>
 
                   <p>
@@ -465,7 +468,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   <h4 className="govuk-heading-s">
                     To delete any tables and charts - use the ‘View saved tables
                     and charts’ tab and select its name from the dropdown menu
-                    under ‘Select saved tables and charts.
+                    under Select saved tables and charts.
                   </h4>
                   <p>
                     Please note if you choose to delete a data block, it will

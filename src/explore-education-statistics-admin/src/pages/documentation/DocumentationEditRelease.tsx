@@ -53,7 +53,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 draft’.
               </p>
               <p>
-                However, only a ‘Responsible statistician’ can edit a release
+                However, only a ‘Responsible Statistician’ can edit a release
                 once it’s been approved for sign-off by the ‘Production team’
                 and sent for ‘Higher review’.
               </p>
@@ -68,7 +68,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <li>‘In pre-release’</li>
               </ul>
               <p>
-                If you need to edit a ‘Live’ release (ie a release which has
+                If you need to edit a ‘Live’ release (i.e. a release which has
                 been published on the service) contact:
               </p>
               <h3 className="govuk-heading-m">
@@ -91,7 +91,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   </h4>
                   <p>
                     If you need to edit a release which has been sent for
-                    ‘Higher review’ contact your ‘Responsible statistician’ or:
+                    ‘Higher review’ contact your ‘Responsible Statistician’ or:
                   </p>
                   <h4>Explore education statistics team </h4>
                   <p>
@@ -122,8 +122,8 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To view and edit a specific ‘In draft’ release - use the
-                    'View draft releases' tab and select the green ‘View and
-                    edit release’ button.
+                    'View draft releases' tab and click the green ‘View and edit
+                    release’ button.
                   </h4>
                   <img
                     src={imageReleaseDraft}
@@ -134,7 +134,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To view a specific release which has been sent for ‘Higher
-                    review’ - use the 'View scheduled releases' tab and select
+                    review’ - use the 'View scheduled releases' tab and click
                     the green ‘Preview release’ button.
                   </h4>
                   <img
@@ -144,7 +144,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   />
                   <p>
                     If you need to edit a release which has been sent for
-                    ‘Higher review’ contact your ‘Responsible statistician’ or:
+                    ‘Higher review’ contact your ‘Responsible Statistician’ or:
                   </p>
                   <h4>Explore education statistics team </h4>
                   <p>
@@ -271,8 +271,8 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               open={step === 3}
             >
               <p>
-                Anyone listed in your ‘Production team’ can update release
-                status while your release ‘In draft’.
+                Anyone listed in your ‘Production team’ can update the release
+                status while your release is ‘In draft’.
               </p>
               <p>
                 If you and the members of your ‘Production team’ are happy with
@@ -291,7 +291,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <li>‘In pre-release’</li>
               </ul>
               <p>
-                Only a ‘Responsible statistician’ can edit a release once it’s
+                Only a ‘Responsible Statistician’ can edit a release once it’s
                 been approved for sign-off by the ‘Production team’ and sent for
                 ‘Higher review’.
               </p>

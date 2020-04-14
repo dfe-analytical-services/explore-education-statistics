@@ -26,7 +26,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <div className="app-content__header">
-            <span className="govuk-caption-xl">Step by step guidance</span>
+            <span className="govuk-caption-xl">Step-by-step guidance</span>
             <h1 className="govuk-heading-xl">Creating a new publication</h1>
           </div>
           <p>
@@ -53,7 +53,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               </p>
               <h3>Do</h3>
               <p>
-                Under the 'Manage publications and releases' tab, select the
+                Under the 'Manage publications and releases' tab, click the
                 green 'Create new publication' button.
               </p>
               <img
@@ -122,7 +122,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <h3>Help and support</h3>
               <p>
                 If you can’t find the methodology you’re looking for or have any
-                questions about creating a new methodology contact:{' '}
+                questions about creating a new methodology contact:
               </p>
               <h3>Explore education statistics team </h3>
               <p>
@@ -192,8 +192,8 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4>
                     After making a selection, a summary of the contact details
-                    will appear, re-select using the step above if you have
-                    chosen an incorrect contact.
+                    will appear. If you select the wrong contact, you can select
+                    a different contact using the step above.
                   </h4>
                   <img
                     src={imageProductionTeamPublication}
@@ -203,7 +203,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4>
-                    After checking that all the details are correct, select
+                    After checking that all the details are correct, click
                     'Create publication'
                   </h4>
                 </li>
@@ -242,13 +242,13 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               open={step === 6}
             >
               <p>
-                Once you’ve created your publication you and any members of your
-                ‘Production team’ can start creating its related releases.
+                Once you’ve created your publication, you and any members of
+                your ‘Production team’ can start creating its related releases.
               </p>
               <p>
                 Under the 'Manage publications and releases' tab, select the
                 name of the publication you’ve just created which will include
-                the wording 'Create new release'.
+                the button 'Create new release'.
               </p>
               <img
                 src={imageCreateReleasePublication}

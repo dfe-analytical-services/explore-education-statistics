@@ -46,7 +46,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
           <p>
             How to manage data for and within a release - including preparing
             data and adding data, other files and footnotes.
-          </p>{' '}
+          </p>
           <StepNav>
             <StepNavItem
               stepNumber={1}
@@ -54,7 +54,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
               open={step === 1}
             >
               <p>
-                Make sure your data is in the required csv format set out in our{' '}
+                Make sure your data is in the required CSV format set out in our{' '}
                 <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
                   Underlying data standards guide
                 </a>
@@ -137,7 +137,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
             >
               <p>
                 Users will be able to access and download any data you upload to
-                your release.
+                your release. That data will:
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
@@ -151,8 +151,8 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
               </ul>
               <h3>Before you start</h3>
               <p>
-                You have to upload each data file one at a time and any data
-                file you upload will require a corresponding metadata file.
+                You have to upload each data file one at a time. Any data file
+                you upload will require a corresponding metadata file.
               </p>
               <h3>Do</h3>
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
@@ -169,7 +169,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To choose the data you want to upload from your computer -
-                    select the grey ‘Choose File’ button under ‘Upload data’.
+                    click the grey ‘Choose File’ button under ‘Upload data’.
                   </h4>
                   <img
                     src={imageDataChooseFile}
@@ -185,7 +185,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                     would be:
                   </p>
                   <ul className="govuk-list govuk-list--bullet">
-                    <li>Absence_by_characteristic.csv</li>
+                    <li>absence_by_characteristic.csv</li>
                   </ul>
                 </li>
                 <li>
@@ -208,7 +208,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                     data would be:
                   </p>
                   <ul className="govuk-list govuk-list--bullet">
-                    <li>Absence_by_characteristic.meta.csv</li>
+                    <li>absence_by_characteristic.meta.csv</li>
                   </ul>
                 </li>
                 <li>
@@ -236,7 +236,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To upload your chosen data and metadata files to your
-                    release - select the geen ‘Upload data’ at the bottom of the
+                    release - click the green ‘Upload data’ at the bottom of the
                     page.
                   </h4>
                   <p>
@@ -244,9 +244,8 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                     take some time to upload.
                   </p>
                   <p>
-                    As long as you don't close your browser or browser tab or
-                    window, you carry on creating or editing the rest of the
-                    release while your data uploads.
+                    You can carry on creating or editing the rest of the release
+                    while your data uploads.
                   </p>
                   <img
                     src={imageDataUpload}
@@ -257,7 +256,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     Once your data and metadata files have uploaded to your
-                    release their details will appear under the ‘Current data
+                    release, their details will appear under the ‘Current data
                     for this release’ section of the page.
                   </h4>
                   <img
@@ -268,7 +267,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To delete any of your data, select the 'Delete files' link.
+                    To delete any of your data, click the 'Delete files' link.
                   </h4>
                   <img
                     src={imageDataActions}
@@ -283,7 +282,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                     to any instances where this data is already being used in
                     your release.
                   </p>
-                  <p>Select the green 'Confirm' button to delete the files. </p>
+                  <p>Click the green 'Confirm' button to delete the files. </p>
                   <img
                     src={imageDataDelete}
                     className="govuk-!-width-three-quarters"
@@ -305,7 +304,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   Don’t close your browser or browser tab or window until your
-                  data has uploaded otherwise the upload will fail.
+                  data is queued, otherwise the upload will fail.
                 </li>
                 <li>
                   Don’t worry if you haven't got all the data to complete your
@@ -353,7 +352,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To add footnotes to your data - use the ‘Footnotes’ tab and
-                    select the green ‘Add footnotes’ button.
+                    click the green ‘Add footnotes’ button.
                   </h4>
                   <img
                     src={imageFootnotesTab}
@@ -421,7 +420,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To edit or delete any footnotes - select the corresponding
+                    To edit or delete any footnotes - click the corresponding
                     green ‘Edit’ or grey ‘Delete’ buttons under the ‘Actions’
                     column.
                   </h4>
@@ -433,7 +432,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To add another footnote - select the green ‘Add another
+                    To add another footnote - click the green ‘Add another
                     footnote button.
                   </h4>
                 </li>
@@ -450,8 +449,8 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 <li>Microsoft word: .doc, .docx</li>
                 <li>Excel: .xls</li>
                 <li>PDF</li>
-                <li>Open document files</li>
-                <li>Open xml formats</li>
+                <li>Open document format files</li>
+                <li>Open XML formats</li>
                 <li>Image files: .png, .jpg, .gif</li>
               </ul>
               <p>
@@ -464,8 +463,8 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4 className="govuk-heading-s">
-                    To upload any files you want to users to view within or
-                    download from your release - use the ‘File uploads’ tab.
+                    To upload files you want users to view within or download
+                    from your release - use the ‘File uploads’ tab.
                   </h4>
                   <img
                     src={imageFileTab}
@@ -476,7 +475,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To choose the file you want to upload from your computer -
-                    select the grey ‘Choose File’ button under ‘Upload file’.
+                    click the grey ‘Choose File’ button under ‘Upload file’.
                   </h4>
                   <img
                     src={imageFileUpload}
@@ -492,13 +491,13 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                     statistics would be:
                   </p>
                   <ul className="govuk-list govuk-list--bullet">
-                    <li>Complex_absence_statistics_table.png</li>
+                    <li>complex_absence_statistics_table.png</li>
                   </ul>
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
                     Add a title for your data by entering a plain English
-                    version of the file into the open text filed under ‘Add file
+                    version of the file into the open text field under ‘Add file
                     title’.
                   </h4>
                   <p>
@@ -507,7 +506,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                   </p>
                   <p className="govuk-inset-text">
                     Don’t include any symbols or file format types (for example,
-                    .png) in this title.{' '}
+                    .png) in this title.
                   </p>
                   <p>
                     You should also use this title when referring to the file
@@ -521,16 +520,16 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To upload your chosen files to your release - select the
-                    geen ‘Upload file’ at the bottom of the page.
+                    To upload your chosen files to your release - click the
+                    green ‘Upload file’ at the bottom of the page.
                   </h4>
                   <p>
                     Depending on your internet connection speed, your file may
-                    take some time to upload.{' '}
+                    take some time to upload.
                   </p>
                   <p>
                     As long as you don't close your browser or browser tab or
-                    window, you carry on creating or editing the rest of the
+                    window, you can carry on creating or editing the rest of the
                     release while your file uploads.
                   </p>
                   <img

@@ -7,7 +7,7 @@ import StepNavItem from './components/StepByStepItem';
 import imageChoosePublication from './images/guidance/guidance-publication-select.png';
 import imageCreateReleaseButton from './images/guidance/guidance-create-release-button.png';
 import imageCreateReleaseEditSummary from './images/guidance/guidance-create-release-edit-summary.png';
-import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.png';
+import imageCreateReleasePage from './images/guidance/guidance-create-release-page.png';
 import imageCreateReleaseDataTab from './images/guidance/guidance-data-tab.png';
 import imageCreateReleaseFootnotesTab from './images/guidance/guidance-footnotes-tab.png';
 import imageCreateReleaseFileTab from './images/guidance/guidance-file-tab.png';
@@ -31,12 +31,12 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <div className="app-content__header">
-            <span className="govuk-caption-xl">Step by step guidance</span>
+            <span className="govuk-caption-xl">Step-by-step guidance</span>
             <h1 className="govuk-heading-xl">Creating a new release</h1>
           </div>
           <p>
             How to create a new release - including uploading data and files and
-            creating data blocks (ie tables and charts) and content.
+            creating data blocks (i.e. tables and charts) and content.
           </p>
           <h2>Before you start</h2>
           <p>
@@ -44,7 +44,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
           </p>{' '}
           <ul className="govuk-list govuk-list--bullet">
             <li>
-              data is in the required csv format set out in our{' '}
+              data is in the required CSV format set out in our{' '}
               <a href="https://drive.google.com/file/d/15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob/view">
                 Data standards guide
               </a>
@@ -68,7 +68,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 publications.
               </p>
               <p>
-                Once you’ve created a new release you and the members of your
+                Once you’ve created a new release, you and the members of your
                 ‘Production team’ will be responsible for putting the release
                 together via the admin system.
               </p>
@@ -101,8 +101,8 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    Under the publication you’ve chosen, select the green
-                    'Create new release' button.
+                    Under the publication you’ve chosen, click the green 'Create
+                    new release' button.
                   </h4>
                   <img
                     src={imageCreateReleaseButton}
@@ -112,14 +112,38 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    Use the following tabs across the top of the page to create
-                    your release.
+                    Fill out the Create new release page.
                   </h4>
                   <img
-                    src={imageCreateReleaseNavigation}
+                    src={imageCreateReleasePage}
                     className="govuk-!-width-three-quarters"
                     alt=""
                   />
+                  <p>
+                    Select the time period and enter the year for the release.
+                    If your release is spread over two years, just enter the
+                    first year (i.e. if your release is for 2020/21 enter 2020).
+                  </p>
+                  <p>
+                    The Scheduled publish date is the date that the release will
+                    be published for the public to read.
+                  </p>
+                  <p>
+                    Entering a Next release expected date is optional. You don't
+                    need to enter a specific day - you can enter just a year, or
+                    a month and a year.
+                  </p>
+                  <p>Choose the Release type for your release.</p>
+                  <p>
+                    If you have previously created releases under the same
+                    publication, the Select template options will appear. Select
+                    "Copy existing template" if you wish to use the content
+                    sections from a previous release.
+                  </p>
+                  <p>
+                    Once you've filled in all sections, click the 'Create new
+                    release' button.
+                  </p>
                 </li>
               </ul>
               <h3>Don't</h3>
@@ -128,8 +152,8 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 to complete your release.
               </p>
               <p>
-                You can come back and add these later using the various tabs at
-                the top of the page.
+                Don't worry if you've made a mistake when creating your release.
+                You can change details about the release later.
               </p>
               <h3>Help and support</h3>
               <p>
@@ -260,9 +284,9 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To upload any files you want to users to view within or
-                    download from your release (for example, infographics or
-                    images of more complex tables) - use the ‘File uploads’ tab.
+                    To upload any files you want to users to download from your
+                    release (for example, infographics or images of more complex
+                    tables) - use the ‘File uploads’ tab.
                   </h4>
                   <img
                     src={imageCreateReleaseFileTab}
@@ -274,7 +298,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <h3>Don't</h3>
               <p>
                 Don’t upload any sensitive data or files. Only upload data and
-                files which are suitable for the public domain.
+                files that are suitable for the public domain.
               </p>
               <p>
                 Don’t worry if you haven't got all the data and files to
@@ -332,10 +356,10 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4 className="govuk-heading-s">
-                    To start the process of creating a data block so you can
-                    then create tables and charts - select the ‘Create data
-                    blocks’ tab under the main ‘Manage data blocks’ tab across
-                    the top of the page.
+                    To start the process of creating a data block (so you can
+                    then create tables and charts), select the ‘Create data
+                    blocks’ dropdown option under the main ‘Manage data blocks’
+                    tab across the top of the page.
                   </h4>
                   <img
                     src={imageCreateReleaseDatablockCreate}
@@ -345,9 +369,9 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4 className="govuk-heading-s">
-                    To view the tables and charts you’ve already created and
-                    saved for your release - use the ‘View saved tables and
-                    charts’ tab.
+                    To view the data blocks you’ve already created and saved for
+                    your release - use the top dropdown under the 'Manage data
+                    blocks' tab.
                   </h4>
                   <img
                     src={imageCreateReleaseDatablockSaved}
@@ -360,7 +384,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 Don’t worry if you haven't uploaded all the data to create the
                 data blocks, tables and charts you need to complete your
-                release.
+                release. This doesn't need to be done all at once.
               </p>
               <p>
                 You can upload more later under the ‘Manage data’ tab. For
@@ -419,7 +443,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <h3>Before you start</h3>
               <p>
                 Make sure you and your Production team have decided and
-                understand who’s responsible for managing (ie creating and
+                understand who’s responsible for managing (i.e. creating and
                 editing) the different sections of your release.
               </p>
               <h3>Do</h3>

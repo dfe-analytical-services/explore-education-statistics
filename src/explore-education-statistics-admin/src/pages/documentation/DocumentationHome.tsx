@@ -96,7 +96,7 @@ const BrowseReleasesPage = () => {
       </h3>
       <p className="govuk-caption-m govuk-!-margin-top-1">
         How to create a new release - including uploading data and files and
-        creating data blocks (ie tables and charts) and content.{' '}
+        creating data blocks (i.e. tables and charts) and content.{' '}
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
