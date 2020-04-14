@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20200320170726_AddReleaseFileTypeToReleaseFileReference")]
+    [Migration("20200406135248_AddReleaseFileTypeToReleaseFileReference")]
     partial class AddReleaseFileTypeToReleaseFileReference
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2195,8 +2195,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("Filename")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReleaseFileType")
-                        .HasColumnType("int");
+                    b.Property<string>("ReleaseFileType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");

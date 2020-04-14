@@ -2193,8 +2193,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("Filename")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReleaseFileType")
-                        .HasColumnType("int");
+                    b.Property<string>("ReleaseFileType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");
