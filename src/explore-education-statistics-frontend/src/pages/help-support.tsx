@@ -7,7 +7,7 @@ function HelpSupportPage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p>
-            Find out more about explore education statistics - including how to
+            Find out more about Explore education statistics - including how to
             use it services and get further help and support.
           </p>
           <section className="govuk-section-break--xl">

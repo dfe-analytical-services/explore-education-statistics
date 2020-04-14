@@ -41,7 +41,7 @@ const DocumentationDesignStandards = () => {
                 find out what they need to from a web page or online service.
               </p>
               <p>
-                For the explore education statistics service, this means helping
+                For the Explore education statistics service, this means helping
                 people to simply and quickly carry out the following tasks:
               </p>
               <ul className="govuk-list govuk-list--bullet">
@@ -146,7 +146,7 @@ const DocumentationDesignStandards = () => {
               </ul>
               <h3 id="quick-and-easy-steps">Quick and easy steps</h3>
               <p>
-                Creating good content for explore education statistics should
+                Creating good content for Explore education statistics should
                 mean people can take the following steps and quickly and easily
                 find the statistics and data they need:
               </p>
@@ -280,7 +280,7 @@ const DocumentationDesignStandards = () => {
                 </li>
               </ul>
               <h3 id="the-explore-education-statistics-audience">
-                The explore education statistics audience
+                The Explore education statistics audience
               </h3>
               <p>
                 Our audience is potentially anyone living in the UK who needs to
@@ -437,7 +437,7 @@ const DocumentationDesignStandards = () => {
               </p>
               <p>
                 The Style guide contains a lot of detailed information about how
-                to create consistent content for explore education statistics.
+                to create consistent content for Explore education statistics.
               </p>
               <p>
                 However, here are some of the main points which will push your
@@ -784,7 +784,7 @@ const DocumentationDesignStandards = () => {
             <AccordionSection heading="Feedback" id="feedback">
               <p>
                 This guidance pulls together all our current content design
-                guidance for explore education statistics but there are and will
+                guidance for Explore education statistics but there are and will
                 be gaps.
               </p>
               <p>
