@@ -270,19 +270,19 @@ const ManagePublicationsAndReleasesTab = ({
             {apiErrors.length > 0 ? (
               <ErrorSummary id="publications-error" errors={apiErrors} />
             ) : (
-              <>
-                {loading ? (
-                  <LoadingSpinner loading={loading} />
-                ) : (
-                  <p>
-                    You do not currently have permission to view any releases
-                    within the service, to request access contact the team{' '}
-                    <a href="mailto:explore.statistics@education.gov.uk">
-                      explore.statistics@education.gov.uk
-                    </a>
-                  </p>
-                )}
-              </>
+              <LoadingSpinner loading={loading}>
+                <h3 className="govuk-heading-s">
+                  You do not currently have permission to view any releases
+                  within the service
+                </h3>
+                <p>
+                  To request access to a release, contact your team leader or
+                  the Explore education statistics team at{' '}
+                  <a href="mailto:explore.statistics@education.gov.uk">
+                    explore.statistics@education.gov.uk
+                  </a>
+                </p>
+              </LoadingSpinner>
             )}
           </>
         )}
