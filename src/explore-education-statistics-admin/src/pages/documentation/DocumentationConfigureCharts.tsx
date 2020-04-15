@@ -56,7 +56,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <div className="app-content__header">
-            <span className="govuk-caption-xl">Step by step guidance</span>
+            <span className="govuk-caption-xl">Step-by-step guidance</span>
             <h1 className="govuk-heading-xl">Configuring charts</h1>
           </div>
           <p>How to configure charts for use within a release. </p>{' '}
@@ -71,8 +71,8 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
               </p>
               <h3>Before you start</h3>
               <p>
-                Make sure you have already created a data block on which to base
-                your chart.
+                You will need to have created a data block on which to base your
+                chart.
               </p>
 
               <p>
@@ -151,8 +151,8 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   </p>
                   <h3>Don't</h3>
                   <p>
-                    Don't worry you need to make any changes, you can come back
-                    and edit the chart at any point, by following the steps
+                    Don't worry if you need to make any changes, you can come
+                    back and edit the chart at any point, by following the steps
                     above again.
                   </p>
                 </li>
@@ -477,11 +477,6 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     limit the data shown in the chart by selecting from the
                     'Minimum' and 'Maximum' select boxes
                   </p>
-                  <p>
-                    If you want to reset to show all results set the 'Minimum'
-                    and 'Maximum' select boxes to default.
-                  </p>
-
                   <img src={imageChartXLimitData} width="300" alt="" />
                 </li>
                 <li>
@@ -490,7 +485,6 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                     A reference line can be set on the chart as shown in the
                     screenshot below.
                   </p>
-
                   <img
                     src={imageChartXRefLine}
                     className="govuk-!-width-three-quarters"
@@ -621,7 +615,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">Save chart options</h4>
                   <p>
-                    Once you are happy with your infographic, select the green
+                    Once you are happy with your infographic, click the green
                     'Save chart options' button.
                   </p>
                   <h3>Don't</h3>

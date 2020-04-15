@@ -58,21 +58,21 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 and sent for ‘Higher review’.
               </p>
               <p>
-                A release is in ‘Higher review’ once it’s been reviewed,
-                approved for sign-off and its release status updated to one of
-                the following:
+                A release should be marked as in ‘Higher review’ once it’s ready
+                to proceed to publication. All releases will have one of the
+                following statuses:
               </p>
               <ul className="govuk-list govuk-list--bullet">
-                <li>‘Ready for sign-off’</li>
-                <li>‘Approved for release’ </li>
-                <li>‘In pre-release’</li>
+                <li>'In draft'</li>
+                <li>'Awaiting higher review'</li>
+                <li>'Approved' </li>
               </ul>
               <p>
                 If you need to edit a ‘Live’ release (i.e. a release which has
                 been published on the service) contact:
               </p>
               <h3 className="govuk-heading-m">
-                Explore education statistics team{' '}
+                Explore education statistics team
               </h3>
               <p>
                 Email <br />
@@ -277,28 +277,17 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               <p>
                 If you and the members of your ‘Production team’ are happy with
                 the content of your release, discuss whether to update its
-                status to ‘Ready for sign-off’ and approve it for sign-off and
-                ‘Higher review’.
+                status to ‘Ready for higher review’.
               </p>
-              <p>
-                A release is in ‘Higher review’ once it’s been reviewed,
-                approved for sign-off and its release status updated to one of
-                the following:
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>‘Ready for sign-off’</li>
-                <li>‘Approved for release’ </li>
-                <li>‘In pre-release’</li>
-              </ul>
               <p>
                 Only a ‘Responsible Statistician’ can edit a release once it’s
-                been approved for sign-off by the ‘Production team’ and sent for
-                ‘Higher review’.
+                been approved for higher review by the ‘Production team’ and
+                sent for ‘Higher review’.
               </p>
               <p>
                 You and your ‘Production team’ need to decide who’s going to
-                update your release’s status from ‘In draft’ and approve it
-                ‘Ready for sign-off’.
+                update your release’s status from ‘In draft’ and mark it as
+                ‘Ready for higher review’.
               </p>
               <h3>Before you start</h3>
               <p>
@@ -308,21 +297,20 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>‘In draft’</li>
-                <li>‘Ready for sign-off’</li>
+                <li>‘Ready for higher review’</li>
                 <li>‘Approved for release’ </li>
-                <li>‘In pre-release’</li>
               </ul>
               <p>
-                Once your release has progressed through all of these stages it
-                will get published and have a final status of ‘Live’.
+                Once your release has progressed to Approved for release, it
+                will be automatically scheduled for release.
               </p>
               <h3>Do</h3>
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
-                    To update release status and approve your release for
-                    sign-off - use the main ‘Update release status’ tab across
-                    the top of the page,
+                    To update release status and mark it as ready for higher
+                    review - use the main ‘Update release status’ tab across the
+                    top of the page,
                   </h4>
                   <img
                     src={imageReleaseUpdateReleaseStatusBtn}
@@ -332,8 +320,8 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 </li>
                 <li>
                   <h4>
-                    Select the ‘Ready for sign-off’ radio button and then the
-                    green ‘Update’ button.
+                    Select the ‘Ready for higher review’ radio button and then
+                    the green ‘Update’ button.
                   </h4>
                   <div className="govuk-warning-text">
                     <span
