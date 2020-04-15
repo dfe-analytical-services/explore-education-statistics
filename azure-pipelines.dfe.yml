@@ -5,10 +5,10 @@ variables:
 trigger:
   branches:
     include:
-    - master
+      - master
   paths:
     exclude:
-    - infrastructure/
+      - infrastructure/
 pr: none
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
     pool:
       name: Hosted Windows 2019 with VS2019
       demands:
-      - npm
-      - azureps
+        - npm
+        - azureps
     steps:
       - task: UseDotNet@2
         displayName: 'Install .NET Core 2.1.x SDK'
@@ -113,41 +113,13 @@ jobs:
           artifactName: 'processor'
           targetPath: '$(Build.ArtifactStagingDirectory)/processor'
 
-
-
   - job: 'Admin'
     pool:
-      name: Hosted Windows 2019 with VS2019
+      vmImage: 'ubuntu-16.04'
       demands:
-      - npm
-      - azureps
+        - npm
+        - azureps
     steps:
-      - task: Npm@1
-      displayName: 'npm run ci'
-      inputs:
-        command: custom
-        verbose: false
-        customCommand: ci
-      - task: Npm@1
-        displayName: 'npm run bootstrap'
-        inputs:
-          command: custom
-          verbose: false
-          customCommand: 'run bootstrap'
-      - task: Npm@1
-        displayName: 'npm run format'
-        inputs:
-          command: custom
-          verbose: false
-          customCommand: 'run format'
-      - task: Npm@1
-        displayName: 'npm run build'
-        inputs:
-          command: custom
-          workingDir: 'src/explore-education-statistics-admin'
-          verbose: false
-          customCommand: 'run build'
-          
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'
         inputs:
@@ -172,7 +144,31 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
           arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
 
-
+      - task: Npm@1
+        displayName: 'npm run ci'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: ci
+      - task: Npm@1
+        displayName: 'npm run bootstrap'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run bootstrap'
+      - task: Npm@1
+        displayName: 'npm run format'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run format'
+      - task: Npm@1
+        displayName: 'npm run build'
+        inputs:
+          command: custom
+          workingDir: 'src/explore-education-statistics-admin'
+          verbose: false
+          customCommand: 'run build'
 
       - task: CopyFiles@2
         displayName: 'Copy files to wwwroot'
