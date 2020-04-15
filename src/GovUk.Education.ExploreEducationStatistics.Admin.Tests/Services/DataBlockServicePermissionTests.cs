@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -49,13 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void DeleteAsync()
         {
-            AssertSecurityPoliciesChecked(service => service.DeleteAsync(_dataBlock.Id), CanUpdateSpecificRelease);
+            AssertSecurityPoliciesChecked(service => service.DeleteAsync(_release.Id, _dataBlock.Id), CanUpdateSpecificRelease);
         }
         
         private void AssertSecurityPoliciesChecked<T>(
             Func<DataBlockService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (userService, persistenceHelper) = Mocks();
+            var (userService, persistenceHelper, fileStorageService) = Mocks();
 
             using (var context = DbUtils.InMemoryApplicationDbContext())
             {
@@ -67,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.SaveChanges();
                 
                 var service = new DataBlockService(context, AdminMapper(), 
-                    persistenceHelper.Object, userService.Object);
+                    persistenceHelper.Object, userService.Object, fileStorageService.Object);
 
                 PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
             }
@@ -75,7 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private (
             Mock<IUserService>, 
-            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
+            Mock<IPersistenceHelper<ContentDbContext>>,
+            Mock<IFileStorageService>) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
@@ -83,7 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             return (
                 new Mock<IUserService>(), 
-                persistenceHelper);
+                persistenceHelper,
+                new Mock<IFileStorageService>());
         }
     }
 }

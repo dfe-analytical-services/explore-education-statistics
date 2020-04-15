@@ -1,4 +1,5 @@
 import client from '@admin/services/util/service';
+import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
 
 interface GetFileResponse {
   extension: string;
@@ -12,14 +13,8 @@ interface GetFileResponse {
 }
 
 export interface DeleteDataFilePlan {
-  dependentDataBlocks: DependentDataBlock[];
+  deleteDataBlockPlan: DeleteDataBlockPlan;
   footnoteIds: string[];
-}
-
-export interface DependentDataBlock {
-  name: string;
-  contentSectionHeading?: string;
-  infographicFilenames: string[];
 }
 
 const getFileNameFromPath = (path: string) =>
