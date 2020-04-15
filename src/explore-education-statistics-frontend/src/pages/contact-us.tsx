@@ -4,7 +4,7 @@ import React from 'react';
 function ContactPage() {
   return (
     <Page
-      title="Contact explore education statistics"
+      title="Contact Explore education statistics"
       breadcrumbLabel="Contact"
     >
       <div className="govuk-grid-row">

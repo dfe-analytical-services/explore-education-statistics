@@ -3,6 +3,7 @@ import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
+import AdminDocumentationConfigureCharts from '@admin/pages/documentation/DocumentationConfigureCharts';
 import AdminDocumentationCreateNewPublication from '@admin/pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationCreateNewRelease from '@admin/pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationContentDesignStandards from '@admin/pages/documentation/DocumentationDesignStandards';
@@ -207,6 +208,12 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   documentationManageDataBlock: {
     path: '/documentation/manage-data-block',
     component: AdminDocumentationManageDataBlocks,
+    protectedAction: user => user.permissions.canAccessAnalystPages,
+    exact: true,
+  },
+  documentationConfigureCharts: {
+    path: '/documentation/configure-charts',
+    component: AdminDocumentationConfigureCharts,
     protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },
