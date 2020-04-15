@@ -1,5 +1,362 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`TimePeriodDataTable renders table with completely empty columns removed 1`] = `
+<thead>
+  <tr>
+    <td colspan="3"
+        rowspan="2"
+        class="borderBottom"
+    >
+    </td>
+    <th class="columnHeaderGroup"
+        colspan="3"
+        rowspan="1"
+        scope="colgroup"
+    >
+      First language Known or believed to be other than English
+    </th>
+    <th class="columnHeaderGroup borderRightNone"
+        colspan="1"
+        rowspan="1"
+        scope="colgroup"
+    >
+      First language Unclassified
+    </th>
+  </tr>
+  <tr>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2013/14
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2014/15
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2015/16
+    </th>
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2013/14
+    </th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        colspan="1"
+        scope="rowgroup"
+    >
+      Coventry
+    </th>
+    <th class="borderBottom"
+        rowspan="2"
+        colspan="1"
+        scope="rowgroup"
+    >
+      Special
+    </th>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      6,492
+    </td>
+    <td class="govuk-table__cell--numeric">
+      5,542
+    </td>
+    <td class="govuk-table__cell--numeric">
+      4,185
+    </td>
+    <td class="govuk-table__cell--numeric">
+      n/a
+    </td>
+  </tr>
+  <tr>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      7,280
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      6,493
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      5,142
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      n/a
+    </td>
+  </tr>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        colspan="1"
+        scope="rowgroup"
+    >
+      Croydon
+    </th>
+    <th class="borderBottom"
+        rowspan="2"
+        colspan="1"
+        scope="rowgroup"
+    >
+      Special
+    </th>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      4,179
+    </td>
+    <td class="govuk-table__cell--numeric">
+      4,809
+    </td>
+    <td class="govuk-table__cell--numeric">
+      5,322
+    </td>
+    <td class="govuk-table__cell--numeric">
+      x
+    </td>
+  </tr>
+  <tr>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      4,390
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      5,076
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      5,483
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      x
+    </td>
+  </tr>
+</tbody>
+`;
+
+exports[`TimePeriodDataTable renders table with completely empty rows removed 1`] = `
+<thead>
+  <tr>
+    <td colspan="3"
+        rowspan="2"
+        class="borderBottom"
+    >
+    </td>
+    <th class="columnHeaderGroup borderRightNone"
+        colspan="3"
+        rowspan="1"
+        scope="colgroup"
+    >
+      Special
+    </th>
+  </tr>
+  <tr>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2013/14
+    </th>
+    <th class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2014/15
+    </th>
+    <th class="govuk-table__header--numeric borderBottom borderRightNone"
+        colspan="1"
+        rowspan="1"
+        scope="col"
+    >
+      2015/16
+    </th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        colspan="1"
+        scope="rowgroup"
+    >
+      Coventry
+    </th>
+    <th class="borderBottom"
+        rowspan="2"
+        colspan="1"
+        scope="rowgroup"
+    >
+      First language Known or believed to be other than English
+    </th>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      6,492
+    </td>
+    <td class="govuk-table__cell--numeric">
+      5,542
+    </td>
+    <td class="govuk-table__cell--numeric">
+      4,185
+    </td>
+  </tr>
+  <tr>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      7,280
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      6,493
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      5,142
+    </td>
+  </tr>
+  <tr>
+    <th class="borderBottom"
+        rowspan="4"
+        colspan="1"
+        scope="rowgroup"
+    >
+      Croydon
+    </th>
+    <th class="borderBottom"
+        rowspan="2"
+        colspan="1"
+        scope="rowgroup"
+    >
+      First language Known or believed to be other than English
+    </th>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      4,179
+    </td>
+    <td class="govuk-table__cell--numeric">
+      4,809
+    </td>
+    <td class="govuk-table__cell--numeric">
+      5,322
+    </td>
+  </tr>
+  <tr>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      4,390
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      5,076
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      5,483
+    </td>
+  </tr>
+  <tr>
+    <th class="borderBottom"
+        rowspan="2"
+        colspan="1"
+        scope="rowgroup"
+    >
+      First language Unclassified
+    </th>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of authorised absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric">
+      x
+    </td>
+    <td class="govuk-table__cell--numeric">
+      n/a
+    </td>
+    <td class="govuk-table__cell--numeric">
+      n/a
+    </td>
+  </tr>
+  <tr>
+    <th class
+        rowspan="1"
+        colspan="1"
+        scope="row"
+    >
+      Number of overall absence sessions
+    </th>
+    <td class="govuk-table__cell--numeric borderBottom">
+      x
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      n/a
+    </td>
+    <td class="govuk-table__cell--numeric borderBottom">
+      n/a
+    </td>
+  </tr>
+</tbody>
+`;
+
 exports[`TimePeriodDataTable renders table with no filters 1`] = `
 <thead>
   <tr>

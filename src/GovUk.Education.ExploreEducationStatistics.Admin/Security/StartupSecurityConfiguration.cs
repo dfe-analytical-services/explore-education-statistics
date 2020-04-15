@@ -86,7 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new MakeAmendmentOfSpecificReleaseRequirement()));
 
-                
+                // does this user have permission to publish a specific Release?
+                options.AddPolicy(SecurityPolicies.CanPublishSpecificRelease.ToString(), policy => 
+                    policy.Requirements.Add(new PublishSpecificReleaseRequirement()));
+
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectDataForRelease.ToString(), policy => 
                     policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
@@ -170,6 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataForSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
 
             /**
              * Pre Release management

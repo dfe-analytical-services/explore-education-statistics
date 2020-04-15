@@ -239,7 +239,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 releaseStatuses));
                 });
         }
-        
+
+        public Task<Either<ActionResult, bool>> PublishReleaseAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
+                    .OnSuccess(async release =>
+                    {
+                        if (release.Status != ReleaseStatus.Approved)
+                        {
+                            return ValidationActionResult(ReleaseNotApproved);
+                        }
+
+                        await _publishingService.QueueValidateReleaseAsync(releaseId, true);
+
+                        return new Either<ActionResult, bool>(true);
+                    }));
+        }
+
+        public Task<Either<ActionResult, bool>> PublishReleaseContentAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
+                    .OnSuccess(async release =>
+                    {
+                        if (release.Status != ReleaseStatus.Approved)
+                        {
+                            return ValidationActionResult(ReleaseNotApproved);
+                        }
+
+                        await _publishingService.QueuePublishReleaseContentImmediateMessageAsync(releaseId);
+
+                        return new Either<ActionResult, bool>(true);
+                    }));
+        }
+
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
@@ -296,13 +332,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
                     }
-                    
+
                     release.Status = status;
                     release.InternalReleaseNote = internalReleaseNote;
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
 
-                    await _publishingService.QueueReleaseStatusAsync(releaseId);
+                    await _publishingService.QueueValidateReleaseAsync(releaseId);
 
                     return await GetReleaseSummaryAsync(releaseId);
                 });

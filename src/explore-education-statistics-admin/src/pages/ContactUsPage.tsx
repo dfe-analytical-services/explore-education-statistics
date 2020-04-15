@@ -17,7 +17,7 @@ function ContactUsPage() {
             </p>
 
             <h3 className="govuk-heading-s">
-              Explore education statistics team
+              Explore Education statistics team
             </h3>
 
             <p>

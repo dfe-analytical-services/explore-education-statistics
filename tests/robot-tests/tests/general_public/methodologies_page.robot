@@ -25,9 +25,6 @@ Validate page contents
     user opens details dropdown     Pupil absence
     user checks page contains methodology link  Pupil absence  Pupil absence in schools in England   /methodology/pupil-absence-in-schools-in-england
 
-    user opens details dropdown     School applications
-    user checks page contains methodology link  School applications   Secondary and primary schools applications and offers   /methodology/secondary-and-primary-schools-applications-and-offers
-
 Validate Related information section links exist
     [Tags]  HappyPath
     user checks page contains element   xpath://a[text()="Find statistics and data"]

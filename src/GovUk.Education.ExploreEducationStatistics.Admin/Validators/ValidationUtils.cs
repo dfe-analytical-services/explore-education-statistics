@@ -81,6 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentBlockNotAttachedToThisContentSection,
         CommentNotFound,
         UserAlreadyExists,
+        UserDoesNotExist,
+        RoleDoesNotExist,
         UnableToCancelInvite,
         InvalidEmailAddress,
         ApprovedReleaseMustHavePublishScheduledDate,
@@ -92,6 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         MethodologyOrExternalMethodologyLinkMustBeDefined,
         CannotRemoveDataFilesUntilImportComplete,
         DatafileAlreadyUploaded,
-        AllDatafilesUploadedMustBeComplete
+        AllDatafilesUploadedMustBeComplete,
+        ReleaseNotApproved
     }
 }

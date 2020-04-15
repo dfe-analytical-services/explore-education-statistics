@@ -48,20 +48,9 @@ Validate Pupil absence data downloads are available
     user checks page contains link with text and url  All files, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/ancillary/pupil-absence-in-schools-in-england_2016-17.zip
     user closes details dropdown  Pupil absence
 
-Validate Pupil and schools contains School applications and Exclusions files
+Validate Pupil and schools contains Exclusions files
     [Tags]  HappyPath   NotAgainstLocal
-    user checks accordion section contains text  Pupils and schools   School applications
     user checks accordion section contains text  Pupils and schools   Exclusions
-
-Validate School applications data downloads are available
-    [Documentation]  EES-562
-    [Tags]  HappyPath   NotAgainstLocal
-    user opens details dropdown   School applications
-    user checks details dropdown contains download link  School applications   Applications and offers by school phase, 2018
-    user checks page contains link with text and url  Applications and offers by school phase, 2018   %{DATA_API_URL}/download/secondary-and-primary-schools-applications-and-offers/2018/data/school_applications_and_offers.csv
-    user checks details dropdown contains download link  School applications   All files, 2018
-    user checks page contains link with text and url  All files, 2018   %{DATA_API_URL}/download/secondary-and-primary-schools-applications-and-offers/2018/ancillary/secondary-and-primary-schools-applications-and-offers_2018.zip
-    user closes details dropdown  School applications
 
 Validate Exclusions data downloads are available
     [Documentation]  EES-562

@@ -5,6 +5,7 @@ import {
 import { openAllParentDetails } from '@common/components/Details';
 import FormComboBox from '@common/components/form/FormComboBox';
 import { openAllParentTabSections } from '@common/components/TabsSection';
+import delay from '@common/utils/delay';
 import findAllByText from '@common/utils/dom/findAllByText';
 import findAllParents from '@common/utils/dom/findAllParents';
 import findPreviousSibling from '@common/utils/dom/findPreviousSibling';
@@ -119,38 +120,47 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
             textToHighlight={element.textContent || ''}
           />
         ),
-        scrollIntoView: () => {
+        scrollIntoView: async () => {
           openAllParentAccordionSections(element);
+
+          // Add delays as we need to allow time for the
+          // DOM to update before we do the next change.
+          await delay();
           openAllParentTabSections(element);
+
+          await delay();
           openAllParentDetails(element);
 
           this.resetSearch();
 
-          setTimeout(() => {
-            // Bit of a hack, but hopefully screen readers will
-            // still change focus to the selected element even if we
-            // proceed to remove the tabindex shortly afterwards
-            // TODO: Verify this works
-            const previousTabIndex = element.getAttribute('tabIndex');
+          await delay();
 
-            if (!previousTabIndex) {
-              element.setAttribute('tabIndex', '-1');
-            }
+          // Bit of a hack, but hopefully screen readers will
+          // still change focus to the selected element even if we
+          // proceed to remove the tabindex shortly afterwards
+          // TODO: Verify this works
+          const previousTabIndex = element.getAttribute('tabIndex');
 
-            element.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-            element.focus();
+          if (!previousTabIndex) {
+            element.setAttribute('tabIndex', '-1');
+          }
 
-            setTimeout(() => {
-              if (previousTabIndex) {
-                element.setAttribute('tabIndex', previousTabIndex);
-              } else {
-                element.removeAttribute('tabIndex');
-              }
-            }, 5000);
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
           });
+          element.focus();
+
+          // Long delay as we want to let screen reader
+          // finish reading before we actually remove
+          // the tabindex (just in case).
+          await delay(5000);
+
+          if (previousTabIndex) {
+            element.setAttribute('tabIndex', previousTabIndex);
+          } else {
+            element.removeAttribute('tabIndex');
+          }
         },
       };
     });

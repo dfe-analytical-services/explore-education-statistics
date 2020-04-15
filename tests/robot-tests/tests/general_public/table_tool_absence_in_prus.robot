@@ -53,7 +53,7 @@ Select Indicators
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
-    user waits until results table appears
+    user waits until results table appears     60
 
 Validate results table column headings
     [Tags]  HappyPath
@@ -118,7 +118,7 @@ Select indicators again
 Create table again
     [Tags]   HappyPath
     user clicks element    css:#filtersForm-submit
-    user waits until results table appears
+    user waits until results table appears    60
 
 Validate new table column headings
     [Tags]   HappyPath

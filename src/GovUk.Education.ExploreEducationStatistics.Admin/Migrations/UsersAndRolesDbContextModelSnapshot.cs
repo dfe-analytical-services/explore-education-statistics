@@ -586,6 +586,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                             ClaimType = "ApproveAllMethodologies",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -30,
+                            ClaimType = "PublishAllReleases",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         });
                 });
 

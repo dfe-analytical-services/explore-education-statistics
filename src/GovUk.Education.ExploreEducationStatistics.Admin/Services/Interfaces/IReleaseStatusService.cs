@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseStatusService
     {
-        Task<Either<ActionResult, ReleaseStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId);
+        Task<Either<ActionResult, ReleaseStatusViewModel>> GetReleaseStatusAsync(Guid releaseId);
     }
 }

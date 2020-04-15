@@ -25,11 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidateAsync(
-            ReleaseStatusMessage statusMessage)
+            ValidateReleaseMessage validateReleaseMessage)
         {
-            _logger.LogTrace($"Validating release: {statusMessage.ReleaseId}");
+            _logger.LogTrace($"Validating release: {validateReleaseMessage.ReleaseId}");
 
-            var release = await GetReleaseAsync(statusMessage.ReleaseId);
+            var release = await GetReleaseAsync(validateReleaseMessage.ReleaseId);
 
             var (approvalValid, approvalMessages) = ValidateApproval(release);
             var (scheduledPublishDateValid, scheduledPublishDateMessages) = ValidateScheduledPublishDate(release);

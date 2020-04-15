@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -10,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.QueueUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -30,16 +31,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public async Task<ReleaseStatusMessage> QueueReleaseStatusAsync(Guid releaseId)
+        public async Task QueuePublishReleaseContentImmediateMessageAsync(Guid releaseId)
+        {
+            var queue = await GetQueueReferenceAsync(_storageConnectionString, PublishReleaseContentImmediateQueue);
+            await queue.AddMessageAsync(ToCloudQueueMessage(BuildPublishReleaseContentImmediateMessage(releaseId)));
+
+            _logger.LogTrace($"Sent publish release content message for release: {releaseId}");
+        }
+
+        public async Task QueueValidateReleaseAsync(Guid releaseId, bool immediate = false)
         {
             var release = await GetRelease(releaseId);
-            var queue = await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, "releases");
-            var message = BuildReleaseStatusMessage(release);
-            await queue.AddMessageAsync(ToCloudQueueMessage(message));
+            var queue = await GetQueueReferenceAsync(_storageConnectionString, ValidateReleaseQueue);
+            await queue.AddMessageAsync(ToCloudQueueMessage(BuildValidateReleaseMessage(release, immediate)));
 
             _logger.LogTrace($"Sent release status message for release: {releaseId}");
-
-            return message;
         }
 
         private Task<Release> GetRelease(Guid releaseId)
@@ -49,12 +55,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleAsync(release => release.Id == releaseId);
         }
 
-        private static ReleaseStatusMessage BuildReleaseStatusMessage(Release release)
+        private static ValidateReleaseMessage BuildValidateReleaseMessage(Release release, bool immediate)
         {
-            return new ReleaseStatusMessage
+            return new ValidateReleaseMessage
             {
+                Immediate = immediate,
                 ReleaseId = release.Id
             };
+        }
+
+        private static PublishReleaseContentImmediateMessage BuildPublishReleaseContentImmediateMessage(Guid releaseId)
+        {
+            return new PublishReleaseContentImmediateMessage(releaseId);
         }
 
         private static CloudQueueMessage ToCloudQueueMessage(object value)

@@ -17,5 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         public string SubjectName { get; set; }
 
         public IEnumerable<TimePeriodMetaViewModel> TimePeriodRange { get; set; }
+        
+        public bool GeoJsonAvailable { get; set; }
     }
 }
