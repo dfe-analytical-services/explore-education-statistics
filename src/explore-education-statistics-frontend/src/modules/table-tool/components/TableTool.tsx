@@ -42,9 +42,9 @@ const TableToolFinalStep = ({
     setPermalinkId('');
   }, [tableHeaders, table]);
 
-  const { value: release } = useAsyncRetry(async () => {
+  const { value: pubMethodology } = useAsyncRetry(async () => {
     if (publication) {
-      return publicationService.getLatestPublicationRelease(publication.slug);
+      return publicationService.getPublicationMethodology(publication.slug);
     }
     return undefined;
   }, [publication]);
@@ -159,16 +159,16 @@ const TableToolFinalStep = ({
                   />
                 </li>
                 <li>
-                  {release?.publication?.methodology?.slug && (
+                  {pubMethodology?.methodology?.slug && (
                     <Link
-                      as={`/methodology/${release.publication.methodology.slug}`}
-                      to={`/methodology/methodology?methodologySlug=${release.publication.methodology.slug}`}
+                      as={`/methodology/${pubMethodology.methodology.slug}`}
+                      to={`/methodology/methodology?methodologySlug=${pubMethodology.methodology.slug}`}
                     >
                       Go to methodology
                     </Link>
                   )}
-                  {release?.publication?.externalMethodology?.url && (
-                    <a href={release.publication.externalMethodology.url}>
+                  {pubMethodology?.externalMethodology?.url && (
+                    <a href={pubMethodology.externalMethodology.url}>
                       Go to methodology
                     </a>
                   )}
