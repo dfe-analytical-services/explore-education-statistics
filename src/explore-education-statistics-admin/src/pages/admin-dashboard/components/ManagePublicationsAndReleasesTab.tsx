@@ -10,7 +10,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormSelect from '@common/components/form/FormSelect';
 import orderBy from 'lodash/orderBy';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -41,11 +41,6 @@ const ManagePublicationsAndReleasesTab = ({
     selectedThemeAndTopic: { theme: selectedTheme, topic: selectedTopic },
     setSelectedThemeAndTopic,
   } = useContext(ThemeAndTopicContext);
-  const [myPublications, setMyPublications] = useState<
-    AdminDashboardPublication[]
-  >();
-  const [loadingPublications, setLoadingPublications] = useState(true);
-  const [canCreatePublication, setCanCreatePublication] = useState(false);
   const { themeId, topicId } = match.params;
 
   const {
@@ -54,6 +49,23 @@ const ManagePublicationsAndReleasesTab = ({
   } = useAsyncRetry(async () => {
     return dashboardService.getMyThemesAndTopics();
   }, []);
+
+  const {
+    value = [[], false],
+    isLoading: loadingPublications,
+  } = useAsyncRetry(async () => {
+    if (selectedTopic.id) {
+      return Promise.all([
+        dashboardService.getMyPublicationsByTopic(selectedTopic.id),
+        permissionService.canCreatePublicationForTopic(selectedTopic.id),
+      ]);
+    }
+    return undefined;
+  }, [selectedTopic.id]);
+  const [myPublications, canCreatePublication] = value as [
+    AdminDashboardPublication[],
+    boolean,
+  ];
 
   useEffect(() => {
     if (themes && themes.length && !selectedTheme.id && !selectedTopic.id) {
@@ -85,27 +97,16 @@ const ManagePublicationsAndReleasesTab = ({
   ]);
 
   useEffect(() => {
-    if (selectedTopic.id) {
-      setLoadingPublications(true);
-      Promise.all([
-        dashboardService
-          .getMyPublicationsByTopic(selectedTopic.id)
-          .then(setMyPublications),
-        permissionService
-          .canCreatePublicationForTopic(selectedTopic.id)
-          .then(setCanCreatePublication),
-      ]).then(_ => {
-        setLoadingPublications(false);
-        // eslint-disable-next-line
-        history.replaceState(
-          {},
-          '',
-          generateAdminDashboardThemeTopicLink(
-            selectedTheme.id,
-            selectedTopic.id,
-          ),
-        );
-      });
+    if (selectedTheme.id && selectedTopic.id) {
+      // eslint-disable-next-line
+      history.replaceState(
+        {},
+        '',
+        generateAdminDashboardThemeTopicLink(
+          selectedTheme.id,
+          selectedTopic.id,
+        ),
+      );
     }
   }, [selectedTheme, selectedTopic]);
 
