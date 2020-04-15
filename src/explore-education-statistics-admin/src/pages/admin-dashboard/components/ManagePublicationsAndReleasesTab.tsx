@@ -31,23 +31,6 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
 
-const sortPublications = (
-  a: AdminDashboardPublication,
-  b: AdminDashboardPublication,
-) => {
-  const pubA = a.title.toUpperCase();
-  const pubB = b.title.toUpperCase();
-
-  let comparison = 0;
-  if (pubA > pubB) {
-    comparison = 1;
-  } else if (pubA < pubB) {
-    comparison = -1;
-  }
-
-  return comparison;
-};
-
 const ManagePublicationsAndReleasesTab = ({
   match,
 }: RouteComponentProps<{
@@ -176,15 +159,17 @@ const ManagePublicationsAndReleasesTab = ({
             <h3>{selectedTopic.title}</h3>
             {myPublications.length > 0 && (
               <Accordion id="publications">
-                {myPublications.sort(sortPublications).map(publication => (
-                  <AccordionSection
-                    key={publication.id}
-                    heading={publication.title}
-                    headingTag="h3"
-                  >
-                    <PublicationSummary publication={publication} />
-                  </AccordionSection>
-                ))}
+                {orderBy(myPublications, pub => pub.title.toUpperCase()).map(
+                  publication => (
+                    <AccordionSection
+                      key={publication.id}
+                      heading={publication.title}
+                      headingTag="h3"
+                    >
+                      <PublicationSummary publication={publication} />
+                    </AccordionSection>
+                  ),
+                )}
               </Accordion>
             )}
             {canCreatePublication && myPublications.length === 0 && (
