@@ -18,7 +18,7 @@ const PageHeader = ({ wide }: Props) => {
     localhost: 'dfeEnv--local',
     'admin.dev': 'dfeEnv--dev',
     'admin.test': 'dfeEnv--test',
-    'admin.pre-prod': 'dfeEnv--pre-prod',
+    'admin.pre-production': 'dfeEnv--pre-prod',
     'admin.explore': 'dfeEnv--prod',
   };
 
