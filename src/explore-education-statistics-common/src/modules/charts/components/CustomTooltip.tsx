@@ -11,25 +11,27 @@ const CustomTooltip = ({ payload, label }: TooltipProps) => {
 
       {payload && (
         <ul className={styles.itemList}>
-          {orderBy(payload, 'value').map((item, index) => {
-            return (
-              // eslint-disable-next-line react/no-array-index-key
-              <li key={index}>
-                <span
-                  className={styles.itemColour}
-                  style={{ backgroundColor: item.fill }}
-                />
+          {orderBy(payload, item => Number(item.value), ['desc']).map(
+            (item, index) => {
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <li key={index}>
+                  <span
+                    className={styles.itemColour}
+                    style={{ backgroundColor: item.fill }}
+                  />
 
-                <span>
-                  {`${item.name} : `}
+                  <span>
+                    {`${item.name} : `}
 
-                  <strong>
-                    {formatPretty(item.value.toString(), item.unit)}
-                  </strong>
-                </span>
-              </li>
-            );
-          })}
+                    <strong>
+                      {formatPretty(item.value.toString(), item.unit)}
+                    </strong>
+                  </span>
+                </li>
+              );
+            },
+          )}
         </ul>
       )}
     </div>
