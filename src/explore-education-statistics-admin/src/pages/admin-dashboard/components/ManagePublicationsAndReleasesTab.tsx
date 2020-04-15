@@ -4,35 +4,21 @@ import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/ro
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
-import {
-  AdminDashboardPublication,
-  ThemeAndTopics,
-} from '@admin/services/dashboard/types';
+import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import permissionService from '@admin/services/permissions/permissionService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import ErrorSummary, {
-  ErrorSummaryMessage,
-} from '@common/components/ErrorSummary';
 import FormSelect from '@common/components/form/FormSelect';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
   topics: IdTitlePair[];
 }
-
-const themeToThemeWithIdTitleAndTopics = (theme: ThemeAndTopics) => ({
-  id: theme.id,
-  title: theme.title,
-  topics: theme.topics.map(topic => ({
-    id: topic.id,
-    title: topic.title,
-  })),
-});
 
 const findThemeById = (
   themeId: string,
@@ -45,149 +31,106 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
 
+const sortPublications = (
+  a: AdminDashboardPublication,
+  b: AdminDashboardPublication,
+) => {
+  const pubA = a.title.toUpperCase();
+  const pubB = b.title.toUpperCase();
+
+  let comparison = 0;
+  if (pubA > pubB) {
+    comparison = 1;
+  } else if (pubA < pubB) {
+    comparison = -1;
+  }
+
+  return comparison;
+};
+
 const ManagePublicationsAndReleasesTab = ({
   match,
 }: RouteComponentProps<{
   themeId?: string;
   topicId?: string;
 }>) => {
-  const { selectedThemeAndTopic, setSelectedThemeAndTopic } = useContext(
-    ThemeAndTopicContext,
-  );
-
+  const {
+    selectedThemeAndTopic: { theme: selectedTheme, topic: selectedTopic },
+    setSelectedThemeAndTopic,
+  } = useContext(ThemeAndTopicContext);
   const [myPublications, setMyPublications] = useState<
     AdminDashboardPublication[]
   >();
-
-  const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
-
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const [apiErrors, setApiErrors] = useState<ErrorSummaryMessage[]>([]);
-
   const [canCreatePublication, setCanCreatePublication] = useState(false);
-
   const { themeId, topicId } = match.params;
 
-  const onThemeChange = (
-    newThemeId: string,
-    availableThemes: ThemeAndTopicsIdsAndTitles[],
-  ) => {
-    setSelectedThemeAndTopic({
-      theme: findThemeById(newThemeId, availableThemes),
-      topic: orderBy(
-        findThemeById(newThemeId, availableThemes).topics,
-        topic => topic.title,
-      )[0],
-    });
-  };
-
-  const onTopicChange = (
-    newTopicId: string,
-    selectedTheme: ThemeAndTopicsIdsAndTitles,
-  ) => {
-    setSelectedThemeAndTopic({
-      theme: selectedTheme,
-      topic: findTopicById(newTopicId, selectedTheme),
-    });
-  };
-
-  const sortPublications = (
-    a: AdminDashboardPublication,
-    b: AdminDashboardPublication,
-  ) => {
-    const pubA = a.title.toUpperCase();
-    const pubB = b.title.toUpperCase();
-
-    let comparison = 0;
-    if (pubA > pubB) {
-      comparison = 1;
-    } else if (pubA < pubB) {
-      comparison = -1;
-    }
-
-    return comparison;
-  };
-
-  useEffect(() => {
-    dashboardService
-      .getMyThemesAndTopics()
-      .then(themeList =>
-        setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
-      );
+  const { value: themes, isLoading } = useAsyncRetry(async () => {
+    return dashboardService.getMyThemesAndTopics();
   }, []);
 
   useEffect(() => {
-    if (themes) {
-      if (selectedThemeAndTopic.theme.id === '' && themes.length) {
-        setSelectedThemeAndTopic({
-          theme: themes[0],
-          topic: orderBy(themes[0].topics, topic => topic.title)[0],
-        });
-      }
-      if (themeId && topicId && topicId !== selectedThemeAndTopic.topic.id) {
+    if (themes && !selectedTheme.id && !selectedTopic.id) {
+      if (themeId && topicId) {
         const theme = themes.find(t => t.id === themeId);
-
         const topic = theme && theme.topics.find(t => t.id === topicId);
-
         if (theme && topic) {
           setSelectedThemeAndTopic({ theme, topic });
+          return;
         }
       }
+      const newSelectedTheme = themes[0];
+      const newSelectedTopic = orderBy(
+        themes[0].topics,
+        topic => topic.title,
+      )[0];
+      setSelectedThemeAndTopic({
+        theme: newSelectedTheme,
+        topic: newSelectedTopic,
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [themeId, themes, topicId]);
+  }, [themes]);
 
   useEffect(() => {
-    if (selectedThemeAndTopic.topic.id) {
-      setLoading(true);
+    if (selectedTopic.id) {
       Promise.all([
         dashboardService
-          .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+          .getMyPublicationsByTopic(selectedTopic.id)
           .then(setMyPublications),
         permissionService
-          .canCreatePublicationForTopic(selectedThemeAndTopic.topic.id)
+          .canCreatePublicationForTopic(selectedTopic.id)
           .then(setCanCreatePublication),
-      ])
-        .then(_ => {
-          setApiErrors([]);
-          // eslint-disable-next-line
-          history.replaceState(
-            {},
-            '',
-            generateAdminDashboardThemeTopicLink(
-              selectedThemeAndTopic.theme.id,
-              selectedThemeAndTopic.topic.id,
-            ),
-          );
-        })
-        .catch(error => {
-          setApiErrors([
-            ...apiErrors,
-            { id: error.data.traceId, message: error.data.title },
-          ]);
-        });
+      ]).then(_ => {
+        // eslint-disable-next-line
+        history.replaceState(
+          {},
+          '',
+          generateAdminDashboardThemeTopicLink(
+            selectedTheme.id,
+            selectedTopic.id,
+          ),
+        );
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedThemeAndTopic]);
+  }, [selectedTheme, selectedTopic]);
 
   return (
-    <>
-      <section>
-        <p className="govuk-body">Select publications to:</p>
-        <ul className="govuk-list--bullet">
-          <li>create new releases and methodologies</li>
-          <li>edit exiting releases and methodologies</li>
-          <li>view and sign-off releases and methodologies</li>
-        </ul>
-        <p className="govuk-bo">
-          To remove publications, releases and methodologies email{' '}
-          <a href="mailto:explore.statistics@education.gov.uk">
-            explore.statistics@education.gov.uk
-          </a>
-        </p>
+    <section>
+      <p className="govuk-body">Select publications to:</p>
+      <ul className="govuk-list--bullet">
+        <li>create new releases and methodologies</li>
+        <li>edit exiting releases and methodologies</li>
+        <li>view and sign-off releases and methodologies</li>
+      </ul>
+      <p className="govuk-bo">
+        To remove publications, releases and methodologies email{' '}
+        <a href="mailto:explore.statistics@education.gov.uk">
+          explore.statistics@education.gov.uk
+        </a>
+      </p>
 
-        {themes && selectedThemeAndTopic && myPublications ? (
+      <LoadingSpinner loading={isLoading}>
+        {themes && selectedTheme && selectedTopic && myPublications ? (
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-half">
@@ -199,13 +142,13 @@ const ManagePublicationsAndReleasesTab = ({
                     label: theme.title,
                     value: theme.id,
                   }))}
-                  value={
-                    selectedThemeAndTopic.theme
-                      ? selectedThemeAndTopic.theme.id
-                      : undefined
-                  }
+                  value={selectedTheme ? selectedTheme.id : undefined}
                   onChange={event => {
-                    onThemeChange(event.target.value, themes);
+                    const newTheme = findThemeById(event.target.value, themes);
+                    setSelectedThemeAndTopic({
+                      theme: newTheme,
+                      topic: orderBy(newTheme.topics, topic => topic.title)[0],
+                    });
                   }}
                 />
               </div>
@@ -214,27 +157,23 @@ const ManagePublicationsAndReleasesTab = ({
                   id="selectTopic"
                   label="Select topic"
                   name="selectTopic"
-                  options={selectedThemeAndTopic.theme.topics.map(topic => ({
+                  options={selectedTheme.topics.map(topic => ({
                     label: topic.title,
                     value: topic.id,
                   }))}
-                  value={
-                    selectedThemeAndTopic.topic
-                      ? selectedThemeAndTopic.topic.id
-                      : undefined
-                  }
+                  value={selectedTopic ? selectedTopic.id : undefined}
                   onChange={event => {
-                    onTopicChange(
-                      event.target.value,
-                      selectedThemeAndTopic.theme,
-                    );
+                    setSelectedThemeAndTopic({
+                      theme: selectedTheme,
+                      topic: findTopicById(event.target.value, selectedTheme),
+                    });
                   }}
                 />
               </div>
             </div>
             <hr />
-            <h2>{selectedThemeAndTopic.theme.title}</h2>
-            <h3>{selectedThemeAndTopic.topic.title}</h3>
+            <h2>{selectedTheme.title}</h2>
+            <h3>{selectedTopic.title}</h3>
             {myPublications.length > 0 && (
               <Accordion id="publications">
                 {myPublications.sort(sortPublications).map(publication => (
@@ -256,8 +195,8 @@ const ManagePublicationsAndReleasesTab = ({
             {canCreatePublication && (
               <Link
                 to={publicationRoutes.createPublication.generateLink(
-                  selectedThemeAndTopic.theme.id,
-                  selectedThemeAndTopic.topic.id,
+                  selectedTheme.id,
+                  selectedTopic.id,
                 )}
                 className="govuk-button"
               >
@@ -267,27 +206,21 @@ const ManagePublicationsAndReleasesTab = ({
           </>
         ) : (
           <>
-            {apiErrors.length > 0 ? (
-              <ErrorSummary id="publications-error" errors={apiErrors} />
-            ) : (
-              <LoadingSpinner loading={loading}>
-                <h3 className="govuk-heading-s">
-                  You do not currently have permission to view any releases
-                  within the service
-                </h3>
-                <p>
-                  To request access to a release, contact your team leader or
-                  the Explore education statistics team at{' '}
-                  <a href="mailto:explore.statistics@education.gov.uk">
-                    explore.statistics@education.gov.uk
-                  </a>
-                </p>
-              </LoadingSpinner>
-            )}
+            <h3 className="govuk-heading-s">
+              You do not currently have permission to view any releases within
+              the service
+            </h3>
+            <p>
+              To request access to a release, contact your team leader or the
+              Explore education statistics team at{' '}
+              <a href="mailto:explore.statistics@education.gov.uk">
+                explore.statistics@education.gov.uk
+              </a>
+            </p>
           </>
         )}
-      </section>
-    </>
+      </LoadingSpinner>
+    </section>
   );
 };
 
