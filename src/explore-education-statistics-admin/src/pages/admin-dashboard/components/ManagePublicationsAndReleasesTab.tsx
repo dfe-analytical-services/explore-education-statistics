@@ -75,7 +75,14 @@ const ManagePublicationsAndReleasesTab = ({
         topic: newSelectedTopic,
       });
     }
-  }, [themes]);
+  }, [
+    themes,
+    selectedTheme.id,
+    selectedTopic.id,
+    themeId,
+    topicId,
+    setSelectedThemeAndTopic,
+  ]);
 
   useEffect(() => {
     if (selectedTopic.id) {
@@ -100,7 +107,6 @@ const ManagePublicationsAndReleasesTab = ({
         );
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTheme, selectedTopic]);
 
   return (
