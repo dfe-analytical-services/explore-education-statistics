@@ -1,0 +1,59 @@
+@import '../styles/govuk-base';
+
+// Setting page header colours based on environment
+$envs: (
+  local: (
+    govuk-colour('orange'),
+    govuk-colour('white'),
+    'Local development',
+  ),
+  dev: (
+    govuk-colour('light-green'),
+    govuk-colour('white'),
+    'Development',
+  ),
+  test: (
+    govuk-colour('yellow'),
+    govuk-colour('black'),
+    'Test',
+  ),
+  pre-prod: (
+    govuk-colour('red'),
+    govuk-colour('white'),
+    'Pre-production',
+  ),
+  prod: (
+    govuk-colour('red'),
+    govuk-colour('white'),
+    'Production',
+  ),
+);
+
+@each $env, $item in $envs {
+  $colour: nth($item, 1);
+  $text-colour: nth($item, 2);
+  $title: nth($item, 3);
+
+  .dfeEnv--#{$env} {
+    :global(.govuk-header__container) {
+      border-color: $colour;
+    }
+    :global(.govuk-header__logotype) {
+      align-items: center;
+      display: flex;
+    }
+    :global(.govuk-header__logotype::after) {
+      background-color: $colour;
+      color: $text-colour;
+      content: $title;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-left: 1rem;
+      padding: 0.25rem 0.4rem;
+      text-transform: uppercase;
+    }
+    :global(.govuk-header__logotype-text) {
+      margin-left: 0.5rem;
+    }
+  }
+}
