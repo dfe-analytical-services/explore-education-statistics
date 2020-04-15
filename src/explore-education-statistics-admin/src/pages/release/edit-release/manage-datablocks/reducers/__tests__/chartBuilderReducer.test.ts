@@ -1,15 +1,17 @@
 import {
   AxisConfiguration,
   AxisType,
-  ChartDataSet,
   ChartDefinition,
 } from '@common/modules/charts/types/chart';
+import {
+  DataSet,
+  DataSetAndConfiguration,
+} from '@common/modules/charts/types/dataSet';
 import produce from 'immer';
 import {
   ChartBuilderActions,
   chartBuilderReducer,
   ChartBuilderState,
-  ChartDataSetAndConfiguration,
   ChartOptions,
 } from '../chartBuilderReducer';
 
@@ -300,7 +302,7 @@ describe('chartBuilderReducer', () => {
       // Need to spread as there's a weird Jest bug
       // when comparing read-only objects
       // See: https://github.com/facebook/jest/issues/9531
-      expect(nextState.axes.major?.dataSets).toEqual<ChartDataSet[]>([
+      expect(nextState.axes.major?.dataSets).toEqual<DataSet[]>([
         {
           filters: ['filter-1', 'filter-2'],
           indicator: 'indicator-1',
@@ -333,7 +335,7 @@ describe('chartBuilderReducer', () => {
       // Need to spread as there's a weird Jest bug
       // when comparing read-only objects
       // See: https://github.com/facebook/jest/issues/9531
-      expect(nextState.axes.minor?.dataSets).toEqual<ChartDataSet[]>([]);
+      expect(nextState.axes.minor?.dataSets).toEqual<DataSet[]>([]);
     });
   });
 
@@ -668,7 +670,7 @@ describe('chartBuilderReducer', () => {
       } as ChartBuilderActions);
 
       expect(nextState.dataSetAndConfiguration).toEqual<
-        ChartDataSetAndConfiguration[]
+        DataSetAndConfiguration[]
       >([
         {
           dataSet: {

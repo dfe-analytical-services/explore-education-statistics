@@ -13,9 +13,9 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import dataBlockService, {
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import tableBuilderService, {
+  TableDataResponse,
+} from '@common/services/tableBuilderService';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
@@ -28,7 +28,7 @@ export interface ReleaseManageDataBlocksPageParams {
 
 interface SelectedDataBlock {
   dataBlock: ReleaseDataBlock;
-  response: DataBlockResponse;
+  response: TableDataResponse;
 }
 
 interface DeleteDataBlock {
@@ -98,8 +98,8 @@ const ReleaseManageDataBlocksPage = ({
       return;
     }
 
-    dataBlockService
-      .getDataBlockForSubject(dataBlock.dataBlockRequest)
+    tableBuilderService
+      .getTableData(dataBlock.dataBlockRequest)
       .then(response => {
         if (response) {
           setSelectedDataBlock({

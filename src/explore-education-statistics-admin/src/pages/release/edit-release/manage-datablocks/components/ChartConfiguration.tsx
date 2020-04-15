@@ -10,10 +10,8 @@ import {
   Formik,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
-import {
-  ChartDefinition,
-  ChartMetaData,
-} from '@common/modules/charts/types/chart';
+import { ChartDefinition } from '@common/modules/charts/types/chart';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import React, { useCallback } from 'react';
@@ -26,7 +24,7 @@ interface Props {
   selectedChartType: ChartDefinition;
   chartOptions: ChartOptions;
   releaseId: string;
-  meta: ChartMetaData;
+  meta: FullTableMeta;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptionsChangeValue) => void;
   onSubmit: (chartOptions: ChartOptions) => void;

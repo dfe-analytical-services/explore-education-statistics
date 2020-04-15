@@ -9,17 +9,17 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartSymbol,
-  DataSetConfiguration,
   LineStyle,
 } from '@common/modules/charts/types/chart';
+import { DeprecatedDataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { colours, symbols } from '@common/modules/charts/util/chartUtils';
 import React, { useState } from 'react';
 
 interface Props {
-  configuration: DataSetConfiguration;
+  configuration: DeprecatedDataSetConfiguration;
   capabilities: ChartCapabilities;
   id: string;
-  onConfigurationChange?: (value: DataSetConfiguration) => void;
+  onConfigurationChange?: (value: DeprecatedDataSetConfiguration) => void;
 }
 
 const colourOptions: SelectOption[] = colours.map(color => {
@@ -53,9 +53,11 @@ const ChartDataConfiguration = ({
   id,
   onConfigurationChange,
 }: Props) => {
-  const [config, setConfig] = useState<DataSetConfiguration>(configuration);
+  const [config, setConfig] = useState<DeprecatedDataSetConfiguration>(
+    configuration,
+  );
 
-  const updateConfig = (newConfig: DataSetConfiguration) => {
+  const updateConfig = (newConfig: DeprecatedDataSetConfiguration) => {
     setConfig(newConfig);
     if (onConfigurationChange) onConfigurationChange(newConfig);
   };

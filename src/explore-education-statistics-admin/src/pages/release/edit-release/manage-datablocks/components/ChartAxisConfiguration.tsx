@@ -17,17 +17,17 @@ import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   AxisConfiguration,
   AxisGroupBy,
+  AxisType,
   ChartCapabilities,
-  ChartDataSet,
-  ChartMetaData,
-  DataSetConfiguration,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import {
-  ChartData,
-  createSortedAndMappedDataForAxis,
-} from '@common/modules/charts/util/chartUtils';
-import { DataBlockData } from '@common/services/dataBlockService';
+  DataSet,
+  DeprecatedDataSetConfiguration,
+} from '@common/modules/charts/types/dataSet';
+import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
@@ -39,12 +39,13 @@ type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
 interface Props {
   id: string;
   defaultDataType?: AxisGroupBy;
+  type: AxisType;
   configuration: AxisConfiguration;
-  data: DataBlockData;
-  meta: ChartMetaData;
-  labels?: Dictionary<DataSetConfiguration>;
+  data: TableDataResult[];
+  meta: FullTableMeta;
+  labels?: Dictionary<DeprecatedDataSetConfiguration>;
   capabilities: ChartCapabilities;
-  dataSets: ChartDataSet[];
+  dataSets: DataSet[];
   onChange: (configuration: AxisConfigurationChangeValue) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -54,6 +55,7 @@ const ChartAxisConfiguration = ({
   configuration,
   data,
   meta,
+  type,
   labels = {},
   capabilities,
   dataSets = [],
@@ -74,18 +76,21 @@ const ChartAxisConfiguration = ({
   }, [labels]);
 
   const limitOptions = useMemo<SelectOption[]>(() => {
-    const configurationWithDataSet: AxisConfiguration = {
+    if (type !== 'major') {
+      return [];
+    }
+
+    const configurationWithDataSets: AxisConfiguration = {
       ...configuration,
       min: 0,
       max: undefined,
       dataSets,
     };
 
-    const chartData: ChartData[] = createSortedAndMappedDataForAxis(
-      configurationWithDataSet,
-      data.result,
+    const dataSetCategories = createDataSetCategories(
+      configurationWithDataSets,
+      data,
       meta,
-      labels,
     );
 
     return [
@@ -93,12 +98,12 @@ const ChartAxisConfiguration = ({
         label: 'Default',
         value: '',
       },
-      ...chartData.map(({ name }, index) => ({
-        label: name,
+      ...dataSetCategories.map(({ filter }, index) => ({
+        label: filter.label,
         value: `${index}`,
       })),
     ];
-  }, [configuration, data, dataSets, labels, meta]);
+  }, [configuration, data, dataSets, meta]);
 
   const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
     position: '',
@@ -107,13 +112,31 @@ const ChartAxisConfiguration = ({
 
   const referenceOptions = useMemo<SelectOption[]>(() => {
     if (configuration.groupBy) {
-      return [
-        { label: 'Select', value: '' },
-        ...Object.values(meta[configuration.groupBy]).map(({ label }) => ({
-          label,
-          value: label,
-        })),
-      ];
+      const options: SelectOption[] = [{ label: 'Select', value: '' }];
+
+      switch (configuration.groupBy) {
+        case 'filters':
+          options.push(...Object.values(meta.filters).flat());
+          break;
+        case 'indicators':
+          options.push(...meta.indicators);
+          break;
+        case 'locations':
+          options.push(...meta.locations);
+          break;
+        case 'timePeriod':
+          options.push(
+            ...meta.timePeriodRange.map(timePeriod => ({
+              value: `${timePeriod.year}_${timePeriod.code}`,
+              label: timePeriod.label,
+            })),
+          );
+          break;
+        default:
+          break;
+      }
+
+      return options;
     }
     return [];
   }, [configuration.groupBy, meta]);

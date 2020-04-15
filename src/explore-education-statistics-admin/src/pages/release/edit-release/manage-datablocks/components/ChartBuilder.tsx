@@ -28,18 +28,15 @@ import {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import {
-  AxesConfiguration,
   AxisType,
   ChartDefinition,
-  ChartMetaData,
   ChartProps,
-  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
+import { DeprecatedDataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
-import {
-  DataBlockRerequest,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { DataBlockRerequest } from '@common/services/dataBlockService';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import React, { useCallback, useMemo } from 'react';
@@ -51,47 +48,9 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-function getReduceMetaDataForAxis(
-  data: DataBlockResponse,
-  metaData: ChartMetaData,
-) {
-  return (
-    items: Dictionary<DataSetConfiguration>,
-    groupName?: string,
-  ): Dictionary<DataSetConfiguration> => {
-    if (groupName === 'timePeriod') {
-      return {
-        ...items,
-        ...data.result.reduce<Dictionary<DataSetConfiguration>>(
-          (moreItems, { timePeriod }) => ({
-            ...moreItems,
-            [timePeriod]: metaData.timePeriod[timePeriod],
-          }),
-          {},
-        ),
-      };
-    }
-    return items;
-  };
-}
-
-function generateAxesMetaData(
-  axes: AxesConfiguration,
-  data: DataBlockResponse,
-  metaData: ChartMetaData,
-) {
-  return Object.values(axes as Required<AxesConfiguration>).reduce(
-    (allValues, axis) => ({
-      ...allValues,
-      ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data, metaData), {}),
-    }),
-    {},
-  );
-}
-
 interface Props {
-  data: DataBlockResponse;
-  meta: ChartMetaData;
+  data: TableDataResult[];
+  meta: FullTableMeta;
   releaseId: string;
   initialConfiguration?: Chart;
   onChartSave?: (chart: Chart) => void;
@@ -120,19 +79,16 @@ const ChartBuilder = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
-  const labels: Dictionary<DataSetConfiguration> = useMemo(
-    () => ({
-      ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-        (acc, { configuration }) => {
-          acc[configuration.value] = configuration;
+  const labels: Dictionary<DeprecatedDataSetConfiguration> = useMemo(
+    () =>
+      dataSetAndConfiguration.reduce<
+        Dictionary<DeprecatedDataSetConfiguration>
+      >((acc, { configuration }) => {
+        acc[configuration.value] = configuration;
 
-          return acc;
-        },
-        {},
-      ),
-      ...generateAxesMetaData(axes, data, meta),
-    }),
-    [axes, data, dataSetAndConfiguration, meta],
+        return acc;
+      }, {}),
+    [dataSetAndConfiguration],
   );
 
   const chartProps = useMemo<ChartRendererProps | undefined>(() => {
@@ -209,7 +165,7 @@ const ChartBuilder = ({
       <ChartTypeSelector
         chartDefinitions={chartDefinitions}
         selectedChartDefinition={definition}
-        geoJsonAvailable={data.metaData.geoJsonAvailable}
+        geoJsonAvailable={meta.geoJsonAvailable}
         onSelectChart={actions.updateChartDefinition}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
@@ -294,6 +250,7 @@ const ChartBuilder = ({
               >
                 <ChartAxisConfiguration
                   id={key}
+                  type={key as AxisType}
                   configuration={axisConfiguration}
                   capabilities={definition.capabilities}
                   data={data}

@@ -1,17 +1,20 @@
+import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
   AxisConfiguration,
   ChartDefinition,
   RenderLegend,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import createDataSetCategories, {
+  toChartData,
+} from '@common/modules/charts/util/createDataSetCategories';
 import {
-  ChartData,
-  generateMajorAxis,
-  generateMinorAxis,
-  getKeysForChart,
-  populateDefaultChartProps,
-} from '@common/modules/charts/util/chartUtils';
-import { createChartData } from '@common/modules/charts/util/createChartData';
+  getMajorAxisDomainTicks,
+  getMinorAxisDomainTicks,
+} from '@common/modules/charts/util/domainTicks';
+import expandDataSet from '@common/modules/charts/util/expandDataSet';
+import getCategoryDataSetConfigurations from '@common/modules/charts/util/getCategoryDataSetConfigurations';
 import parseNumber from '@common/utils/number/parseNumber';
 import React, { memo } from 'react';
 import {
@@ -53,17 +56,16 @@ const HorizontalBarBlock = ({
   )
     return <div>Unable to render chart, chart incorrectly configured</div>;
 
-  const chartData: ChartData[] = createChartData(
+  const dataSetCategories: DataSetCategory[] = createDataSetCategories(
     axes.major,
     data,
     meta,
-    labels,
   );
 
-  const keysForChart = getKeysForChart(chartData);
+  const chartData = dataSetCategories.map(toChartData);
 
-  const minorDomainTicks = generateMinorAxis(chartData, axes.minor);
-  const majorDomainTicks = generateMajorAxis(chartData, axes.major);
+  const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
+  const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
 
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
@@ -82,37 +84,43 @@ const HorizontalBarBlock = ({
         />
 
         <XAxis
+          {...minorDomainTicks}
           type="number"
-          dataKey="value"
           hide={!axes.minor.visible}
           unit={axes.minor.unit}
-          scale="auto"
-          {...minorDomainTicks}
           height={parseNumber(axes.minor.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
 
         <YAxis
+          {...majorDomainTicks}
           type="category"
           dataKey="name"
           hide={!axes.major.visible}
           unit={axes.major.unit}
-          scale="auto"
-          {...majorDomainTicks}
           width={parseNumber(axes.major.size)}
         />
 
-        <Tooltip cursor={false} />
+        <Tooltip content={CustomTooltip} wrapperStyle={{ zIndex: 1000 }} />
 
         {legend && legend !== 'none' && (
           <Legend content={renderLegend} align="left" layout="vertical" />
         )}
 
-        {keysForChart.map(name => (
+        {getCategoryDataSetConfigurations(
+          dataSetCategories,
+          labels,
+          axes.major,
+          meta,
+        ).map(config => (
           <Bar
-            key={name}
-            {...populateDefaultChartProps(name, labels[name])}
+            key={config.dataKey}
+            dataKey={config.dataKey}
+            isAnimationActive={false}
+            name={config.label}
+            fill={config.colour}
+            unit={config.dataSet.indicator.unit}
             stackId={stacked ? 'a' : undefined}
           />
         ))}

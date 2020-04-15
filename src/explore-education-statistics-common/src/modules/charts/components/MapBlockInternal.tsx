@@ -4,18 +4,20 @@ import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import {
   AxisConfiguration,
   AxisGroupBy,
-  ChartDataSet,
   ChartProps,
-  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
-import { ChartData } from '@common/modules/charts/util/chartUtils';
-import { createChartData } from '@common/modules/charts/util/createChartData';
-import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
-import stylesIndicators from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import {
+  DataSet,
+  DataSetCategory,
+  DeprecatedDataSetConfiguration,
+} from '@common/modules/charts/types/dataSet';
+import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
+import { generateDeprecatedDataSetKey } from '@common/modules/charts/util/deprecatedDataSetKey';
+import stylesIndicators from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import {
+  GeoJsonFeature,
   GeoJsonFeatureProperties,
-  TableDataResult,
-  TableDataSubjectMeta,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
@@ -69,63 +71,45 @@ interface MapClickEvent extends LeafletMouseEvent {
   };
 }
 
-function getLocationsForDataSet(
-  data: TableDataResult[],
-  meta: TableDataSubjectMeta,
-  chartData: ChartData[],
-) {
-  const allLocationIds = chartData.map(({ __name }) => __name);
-
-  return [
-    { label: 'Select...', value: '' },
-    ...allLocationIds.reduce(
-      (locations: { label: string; value: string }[], next) => {
-        const { label, value } = (meta.locations || {})[next];
-
-        return [...locations, { label, value }];
-      },
-      [],
-    ),
-    /*
-      .sort((a, b) => {
-        if (a.label < b.label) return -1;
-        if (a.label > b.label) return 1;
-        return 0;
-      }),
-       */
-  ];
+interface MapDataSetCategory extends DataSetCategory {
+  geoJson: GeoJsonFeature[];
 }
 
 function getGeometryForOptions(
-  meta: TableDataSubjectMeta,
-  selectedDataSet: DataSetConfiguration,
-  sourceData: ChartData[],
+  meta: FullTableMeta,
+  selectedDataSet: DeprecatedDataSetConfiguration,
+  mapData: MapDataSetCategory[],
   min: number,
   scale: number,
 ): FeatureCollection<Geometry, GeoJsonFeatureProperties> {
   return {
     type: 'FeatureCollection',
-    features: sourceData.map(({ __name: id, name: _, data, ...measures }) => {
-      return {
-        ...meta.locations[id].geoJson[0],
-        id: meta.locations[id].geoJson[0].properties.code,
-        properties: {
-          ...meta.locations[id].geoJson[0].properties,
-          measures,
-          color: selectedDataSet.colour,
-          data: Number(data),
-          scaledData: (Number(data) - min) * scale,
-        },
-      };
-    }),
+    features: mapData
+      .map(({ dataSets, geoJson }) => {
+        return {
+          ...geoJson[0],
+          id: geoJson[0].properties.code,
+          properties: {
+            ...geoJson[0].properties,
+            measures: dataSets,
+            color: selectedDataSet.colour,
+            data: Number(dataSets[selectedDataSet.value]),
+            scaledData: (Number(dataSets[selectedDataSet.value]) - min) * scale,
+          },
+        };
+      })
+      .filter(Boolean),
   };
 }
 
-function calculateMinAndScaleForSourceData(sourceData: ChartData[]) {
-  const { min, max } = sourceData.reduce(
+function calculateMinAndScaleForSourceData(
+  mapData: MapDataSetCategory[],
+  selectedDataSet: string,
+) {
+  const { min, max } = mapData.reduce(
     // eslint-disable-next-line no-shadow
-    ({ min, max }, { data }) => {
-      const dataVal = Number(data);
+    ({ min, max }, category) => {
+      const dataVal = Number(category.dataSets[selectedDataSet]);
       return {
         min: dataVal < min ? dataVal : min,
         max: dataVal > max ? dataVal : max,
@@ -145,20 +129,14 @@ function calculateMinAndScaleForSourceData(sourceData: ChartData[]) {
 }
 
 function generateGeometryAndLegendForSelectedOptions(
-  meta: TableDataSubjectMeta,
-  labels: Dictionary<DataSetConfiguration>,
-  chartData: ChartData[],
+  meta: FullTableMeta,
+  labels: Dictionary<DeprecatedDataSetConfiguration>,
+  dataSetCategories: MapDataSetCategory[],
   selectedDataSet: string,
 ) {
-  const sourceData = chartData
-    .map<ChartData>(entry => ({ ...entry, data: entry[selectedDataSet] }))
-    .filter(
-      ({ data, __name: id }) =>
-        data !== undefined && meta.locations[id] && meta.locations[id].geoJson,
-    );
-
   const { min, max, range, scale } = calculateMinAndScaleForSourceData(
-    sourceData,
+    dataSetCategories,
+    selectedDataSet,
   );
 
   let fixedScale = Math.log10((max - min) / 5);
@@ -186,7 +164,7 @@ function generateGeometryAndLegendForSelectedOptions(
   const geometry = getGeometryForOptions(
     meta,
     labels[selectedDataSet],
-    sourceData,
+    dataSetCategories,
     min,
     scale,
   );
@@ -271,12 +249,12 @@ function useCallbackRef<T extends (...args: never[]) => unknown>(
 }
 
 function generateDataOptions(
-  dataSets: ChartDataSet[],
-  labels: Dictionary<DataSetConfiguration>,
+  dataSets: DataSet[],
+  labels: Dictionary<DeprecatedDataSetConfiguration>,
   groupBy?: AxisGroupBy,
 ) {
   return dataSets.map(dataSet => {
-    const dataKey = generateDataSetKey(dataSet, groupBy);
+    const dataKey = generateDeprecatedDataSetKey(dataSet, groupBy);
     return { ...labels[dataKey], value: dataKey };
   });
 }
@@ -315,7 +293,9 @@ export const MapBlockInternal = ({
 
   const [results, setResults] = useState<IdValue[]>([]);
 
-  const [chartData, setChartData] = useState<ChartData[]>();
+  const [dataSetCategories, setDataSetCategories] = useState<
+    MapDataSetCategory[]
+  >([]);
 
   // enforce that the Map only responds to being grouped by locations
   const [axisMajor, setAxisMajor] = useState<AxisConfiguration>({
@@ -362,18 +342,29 @@ export const MapBlockInternal = ({
 
   // initialise on prop changes
   useEffect(() => {
-    const generatedChartData = createChartData(
+    const categories: MapDataSetCategory[] = createDataSetCategories(
       axisMajor,
       data,
       meta,
-      labels,
-    ).filter(
-      ({ __name: id }) => meta.locations[id] && meta.locations[id].geoJson,
-    );
+    )
+      .map(category => {
+        return {
+          ...category,
+          geoJson: meta.locations.find(
+            location => location.id === category.filter.id,
+          )?.geoJson as GeoJsonFeature[],
+        };
+      })
+      .filter(category => !!category?.geoJson?.length);
 
-    setChartData(generatedChartData);
-
-    setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
+    setDataSetCategories(categories);
+    setMajorOptions([
+      { label: 'Select...', value: '' },
+      ...categories.map(dataSetCategory => ({
+        label: dataSetCategory.filter.label,
+        value: dataSetCategory.filter.id,
+      })),
+    ]);
   }, [data, axisMajor, meta, labels]);
 
   useEffect(() => {
@@ -382,7 +373,7 @@ export const MapBlockInternal = ({
       labels[selectedDataSetKey] === undefined
     ) {
       setSelectedDataSetKey(
-        generateDataSetKey(axisMajor.dataSets[0], axisMajor.groupBy),
+        generateDeprecatedDataSetKey(axisMajor.dataSets[0], axisMajor.groupBy),
       );
     }
   }, [axisMajor.dataSets, axisMajor.groupBy, labels, selectedDataSetKey]);
@@ -404,14 +395,18 @@ export const MapBlockInternal = ({
 
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
-    if (chartData && selectedDataSetKey && labels[selectedDataSetKey]) {
+    if (
+      dataSetCategories.length &&
+      selectedDataSetKey &&
+      labels[selectedDataSetKey]
+    ) {
       const {
         geometry: newGeometry,
         legend: newLegend,
       } = generateGeometryAndLegendForSelectedOptions(
         meta,
         labels,
-        chartData,
+        dataSetCategories,
         selectedDataSetKey,
       );
 
@@ -420,7 +415,7 @@ export const MapBlockInternal = ({
         setLegend(newLegend);
       }
     }
-  }, [chartData, meta, labels, selectedDataSetKey]);
+  }, [dataSetCategories, meta, labels, selectedDataSetKey]);
 
   // callbacks for the Leaflet element
   const onEachFeatureCallback = useCallbackRef(
@@ -451,9 +446,11 @@ export const MapBlockInternal = ({
             );
 
           if (feature.id) {
-            content.unshift(
-              `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
-            );
+            const label =
+              meta.locations.find(location => location.id === feature.id)
+                ?.label ?? '';
+
+            content.unshift(`<strong>${label}</strong>`);
           }
 
           return content.join('<br />');

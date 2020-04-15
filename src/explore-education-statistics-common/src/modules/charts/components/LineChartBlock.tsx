@@ -6,14 +6,14 @@ import {
   ChartSymbol,
   RenderLegend,
 } from '@common/modules/charts/types/chart';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import createDataSetCategories, {
+  toChartData,
+} from '@common/modules/charts/util/createDataSetCategories';
 import {
-  ChartData,
-  generateMajorAxis,
-  generateMinorAxis,
-  getKeysForChart,
-  populateDefaultChartProps,
-} from '@common/modules/charts/util/chartUtils';
-import { createChartData } from '@common/modules/charts/util/createChartData';
+  getMajorAxisDomainTicks,
+  getMinorAxisDomainTicks,
+} from '@common/modules/charts/util/domainTicks';
 import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 
@@ -32,27 +32,31 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import getCategoryDataSetConfigurations from '../util/getCategoryDataSetConfigurations';
 
-const LineStyles: Dictionary<string> = {
+const lineStyles: Dictionary<string> = {
   solid: '',
   dashed: '5 5',
   dotted: '2 2',
 };
 
-// eslint-disable-next-line react/display-name
-const generateDot = (symbol: string | undefined) => (props: SymbolsProps) => {
-  // eslint-disable-line react/display-name
-
-  if (symbol === 'none' || symbol === undefined || symbol === '')
+const getDot = (symbol: ChartSymbol | 'none' = 'circle') => (
+  props: SymbolsProps,
+) => {
+  if (symbol === 'none') {
     return undefined;
+  }
 
-  const chartSymbol: ChartSymbol = symbol as ChartSymbol;
-
-  return <Symbols {...props} type={chartSymbol} />;
+  return <Symbols {...props} type={symbol} />;
 };
 
-const generateLegendType = (symbol: LegendType | undefined): LegendType => {
-  if (symbol === 'none' || symbol === undefined) return 'line';
+const getLegendType = (
+  symbol: LegendType | undefined = 'square',
+): LegendType | undefined => {
+  if (symbol === 'none') {
+    return undefined;
+  }
+
   return symbol;
 };
 
@@ -82,17 +86,16 @@ const LineChartBlock = ({
   )
     return <div>Unable to render chart, chart incorrectly configured</div>;
 
-  const chartData: ChartData[] = createChartData(
+  const dataSetCategories: DataSetCategory[] = createDataSetCategories(
     axes.major,
     data,
     meta,
-    labels,
   );
 
-  const keysForChart = getKeysForChart(chartData);
+  const chartData = dataSetCategories.map(toChartData);
 
-  const minorDomainTicks = generateMinorAxis(chartData, axes.minor);
-  const majorDomainTicks = generateMajorAxis(chartData, axes.major);
+  const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
+  const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
 
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
@@ -115,40 +118,43 @@ const LineChartBlock = ({
         />
 
         <YAxis
+          {...minorDomainTicks}
           type="number"
-          dataKey="value"
           hide={!axes.minor.visible}
           unit={axes.minor.unit}
-          scale="auto"
-          {...minorDomainTicks}
           width={parseNumber(axes.minor.size)}
         />
 
         <XAxis
+          {...majorDomainTicks}
           type="category"
           dataKey="name"
           hide={!axes.major.visible}
           unit={axes.major.unit}
-          scale="auto"
-          {...majorDomainTicks}
           height={parseNumber(axes.major.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
         />
 
-        {keysForChart.map(name => (
+        {getCategoryDataSetConfigurations(
+          dataSetCategories,
+          labels,
+          axes.major,
+          meta,
+        ).map(config => (
           <Line
-            key={name}
-            {...populateDefaultChartProps(name, labels[name])}
+            key={config.dataKey}
+            dataKey={config.dataKey}
+            isAnimationActive={false}
+            name={config.label}
+            stroke={config.colour}
+            fill={config.colour}
+            unit={config.dataSet.indicator.unit}
             type="linear"
-            legendType={generateLegendType(labels[name] && labels[name].symbol)}
-            dot={generateDot(labels[name] && labels[name].symbol)}
+            legendType={getLegendType(config.symbol)}
+            dot={getDot(config.symbol)}
             strokeWidth="2"
-            strokeDasharray={
-              labels[name] &&
-              labels[name].lineStyle &&
-              LineStyles[labels[name].lineStyle || 'solid']
-            }
+            strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
           />
         ))}
 

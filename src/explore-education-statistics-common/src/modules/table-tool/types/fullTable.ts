@@ -4,7 +4,10 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import { TableDataResult } from '@common/services/tableBuilderService';
+import {
+  BoundaryLevel,
+  TableDataResult,
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 
 export interface FullTableMeta {
@@ -17,6 +20,7 @@ export interface FullTableMeta {
     options: CategoryFilter[];
   }>;
   indicators: Indicator[];
+  boundaryLevels: BoundaryLevel[];
   footnotes: {
     id: string;
     label: string;

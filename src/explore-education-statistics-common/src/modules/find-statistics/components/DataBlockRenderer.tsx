@@ -3,11 +3,10 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
-import useDataBlockQuery from '@common/modules/find-statistics/hooks/useDataBlockQuery';
+import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
 import { DataBlock } from '@common/services/types/blocks';
 import React, { MouseEvent, ReactNode } from 'react';
 
@@ -40,18 +39,18 @@ const DataBlockRenderer = ({
   id,
   onToggle,
 }: DataBlockRendererProps) => {
-  const { value: dataBlockResponse, isLoading } = useDataBlockQuery(dataBlock);
+  const { value: fullTable, isLoading } = useTableQuery(
+    dataBlock?.dataBlockRequest,
+  );
 
   return (
     <LoadingSpinner loading={isLoading}>
       <Tabs id={id} onToggle={onToggle}>
         {firstTabs}
 
-        {dataBlock?.tables?.length && dataBlockResponse && (
+        {dataBlock?.tables?.length && fullTable && (
           <TabsSection id={`${id}-tables`} title="Table">
             {dataBlock?.tables.map((table, index) => {
-              const fullTable = mapFullTable(dataBlockResponse);
-
               return (
                 <TimePeriodDataTable
                   key={index}
@@ -74,7 +73,7 @@ const DataBlockRenderer = ({
           </TabsSection>
         )}
 
-        {dataBlock?.charts?.length && dataBlockResponse && (
+        {dataBlock?.charts?.length && fullTable && (
           <TabsSection id={`${id}-charts`} title="Chart">
             <a
               className="govuk-visually-hidden"
@@ -94,8 +93,8 @@ const DataBlockRenderer = ({
                   <ChartRenderer
                     {...chart}
                     key={key}
-                    data={dataBlockResponse?.results}
-                    meta={dataBlockResponse?.subjectMeta}
+                    data={fullTable?.results}
+                    meta={fullTable?.subjectMeta}
                     source={dataBlock?.source}
                     getInfographic={getInfographic}
                   />
@@ -106,8 +105,8 @@ const DataBlockRenderer = ({
                 <ChartRenderer
                   {...chart}
                   key={key}
-                  data={dataBlockResponse?.results}
-                  meta={dataBlockResponse?.subjectMeta}
+                  data={fullTable?.results}
+                  meta={fullTable?.subjectMeta}
                   source={dataBlock?.source}
                 />
               );

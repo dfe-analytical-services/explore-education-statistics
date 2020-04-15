@@ -24,7 +24,16 @@ export abstract class Filter {
     this.group = group;
   }
 
-  public get id() {
+  /**
+   * Get an identifier that guarantees
+   * uniqueness for the filter somehow.
+   *
+   * This is unlike {@property value} where
+   * duplicates are allowed (e.g. locations),
+   * making it potentially unsafe for equality
+   * checks with other filters of the same type.
+   */
+  public get id(): string {
     return this.value;
   }
 }
@@ -47,6 +56,11 @@ export class CategoryFilter extends Filter {
   }
 }
 
+export interface LocationCompositeId {
+  level: string;
+  value: string;
+}
+
 export class LocationFilter extends Filter {
   public readonly level: string;
 
@@ -65,8 +79,28 @@ export class LocationFilter extends Filter {
     this.geoJson = geoJson;
   }
 
-  public get id() {
-    return `${this.level}_${this.value}`;
+  public static createId(params: { value: string; level: string }): string {
+    return JSON.stringify(params);
+  }
+
+  public static parseCompositeId(id: string): LocationCompositeId {
+    const { level, value } = JSON.parse(id);
+
+    if (typeof level !== 'string' || typeof value !== 'string') {
+      throw new Error(`Could not parse invalid location composite id: ${id}`);
+    }
+
+    return {
+      level,
+      value,
+    };
+  }
+
+  public get id(): string {
+    return LocationFilter.createId({
+      value: this.value,
+      level: this.level,
+    });
   }
 }
 

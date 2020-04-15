@@ -3,14 +3,13 @@ import {
   AxesConfiguration,
   AxisConfiguration,
   AxisType,
-  ChartDataSet,
   ChartDefinition,
   ChartDefinitionAxis,
   ChartDefinitionOptions,
   chartDefinitions,
-  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
-import { generateKeyFromDataSet } from '@common/modules/charts/util/chartUtils';
+import { DataSetAndConfiguration } from '@common/modules/charts/types/dataSet';
+import { generateDeprecatedDataSetKey } from '@common/modules/charts/util/deprecatedDataSetKey';
 import { Chart } from '@common/services/types/blocks';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
@@ -21,15 +20,10 @@ export interface ChartOptions extends ChartDefinitionOptions {
   geographicId?: string;
 }
 
-export interface ChartDataSetAndConfiguration {
-  dataSet: ChartDataSet;
-  configuration: DataSetConfiguration;
-}
-
 export interface ChartBuilderState {
   definition?: ChartDefinition;
   options: ChartOptions;
-  dataSetAndConfiguration: ChartDataSetAndConfiguration[];
+  dataSetAndConfiguration: DataSetAndConfiguration[];
   axes: AxesConfiguration;
   isValid?: boolean;
   chartProps?: ChartRendererProps;
@@ -42,12 +36,12 @@ export type ChartBuilderActions =
     }
   | {
       type: 'ADD_DATA_SET';
-      payload: ChartDataSetAndConfiguration;
+      payload: DataSetAndConfiguration;
     }
   | { type: 'REMOVE_DATA_SET'; payload: number }
   | {
       type: 'UPDATE_DATA_SETS';
-      payload: ChartDataSetAndConfiguration[];
+      payload: DataSetAndConfiguration[];
     }
   | {
       type: 'UPDATE_CHART_OPTIONS';
@@ -212,7 +206,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       dataSetAndConfiguration: [],
     },
     initial => {
-      let dataSetAndConfiguration: ChartDataSetAndConfiguration[] = [];
+      let dataSetAndConfiguration: DataSetAndConfiguration[] = [];
 
       if (
         initialConfiguration?.axes?.major?.dataSets &&
@@ -220,7 +214,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       ) {
         dataSetAndConfiguration = initialConfiguration.axes.major.dataSets
           .map(dataSet => {
-            const key = generateKeyFromDataSet(dataSet);
+            const key = generateDeprecatedDataSetKey(dataSet);
             const configuration = initialConfiguration.labels[key];
 
             return {
@@ -237,7 +231,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
           })
           .filter(
             dsc => typeof dsc.configuration !== 'undefined',
-          ) as ChartDataSetAndConfiguration[];
+          ) as DataSetAndConfiguration[];
       }
 
       return {
@@ -248,7 +242,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const addDataSet = useCallback(
-    (addedData: ChartDataSetAndConfiguration) => {
+    (addedData: DataSetAndConfiguration) => {
       dispatch({
         type: 'ADD_DATA_SET',
         payload: addedData,
@@ -258,7 +252,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const removeDataSet = useCallback(
-    (removedData: ChartDataSetAndConfiguration, index: number) => {
+    (removedData: DataSetAndConfiguration, index: number) => {
       dispatch({
         type: 'REMOVE_DATA_SET',
         payload: index,
@@ -268,7 +262,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const updateDataSet = useCallback(
-    (newData: ChartDataSetAndConfiguration[]) => {
+    (newData: DataSetAndConfiguration[]) => {
       dispatch({
         type: 'UPDATE_DATA_SETS',
         payload: newData,

@@ -57,7 +57,9 @@ function ChartRenderer({ title, source, ...props }: ChartRendererProps) {
       // Need to do a deep comparison of the props to
       // avoid falling into an infinite rendering loop.
       if (JSON.stringify(legendProps) !== JSON.stringify(nextLegendProps)) {
-        setLegendProps(nextLegendProps);
+        setTimeout(() => {
+          setLegendProps(nextLegendProps);
+        });
       }
 
       return null;
@@ -81,9 +83,6 @@ function ChartRenderer({ title, source, ...props }: ChartRendererProps) {
         return <p>Unable to render invalid chart type</p>;
     }
   }, [props, renderLegend]);
-
-  // TODO : Temporary sort on the results to get them in date order
-  // data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
 
   if (data && meta && data.length > 0) {
     return (

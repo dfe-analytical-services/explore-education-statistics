@@ -3,12 +3,12 @@ import { infographicBlockDefinition } from '@common/modules/charts/components/In
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
-import { DataBlockLocation } from '@common/services/dataBlockService';
 import {
-  TableDataResult,
-  TableDataSubjectMeta,
-} from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types';
+  DataSet,
+  DataSetConfiguration,
+} from '@common/modules/charts/types/dataSet';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import { ReactNode } from 'react';
 import { LegendProps, PositionType } from 'recharts';
 
@@ -18,13 +18,6 @@ export type ChartType =
   | 'horizontalbar'
   | 'map'
   | 'infographic';
-
-export interface ChartDataSet {
-  indicator: string;
-  filters: string[];
-  location?: DataBlockLocation;
-  timePeriod?: string;
-}
 
 export type ChartSymbol =
   | 'circle'
@@ -37,23 +30,10 @@ export type ChartSymbol =
 
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 
-export interface LabelConfiguration {
-  label: string;
-}
-
-export interface DataSetConfiguration extends LabelConfiguration {
-  value: string;
-  name?: string;
-  unit?: string;
-  decimalPlaces?: number;
-  colour?: string;
-  symbol?: ChartSymbol;
-  lineStyle?: LineStyle;
-}
-
 export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 export type AxisType = 'major' | 'minor';
 export type LabelPosition = 'axis' | 'graph' | PositionType;
+export type TickConfig = 'default' | 'startEnd' | 'custom';
 
 export interface ReferenceLine {
   label: string;
@@ -65,20 +45,16 @@ export interface AxisConfiguration {
   groupBy?: AxisGroupBy;
   sortBy?: string;
   sortAsc?: boolean;
-  dataSets: ChartDataSet[];
-
+  dataSets: DataSet[];
   referenceLines?: ReferenceLine[];
-
   visible: boolean;
   unit?: string;
   showGrid?: boolean;
   labelPosition?: LabelPosition;
   size?: number;
-
   min?: number;
   max?: number;
-
-  tickConfig?: 'default' | 'startEnd' | 'custom';
+  tickConfig?: TickConfig;
   tickSpacing?: number;
 }
 
@@ -88,11 +64,11 @@ export type AxesConfiguration = {
 
 export interface ChartProps {
   data: TableDataResult[];
-  meta: TableDataSubjectMeta;
+  meta: FullTableMeta;
   title?: string;
   height: number;
   width?: number;
-  labels: Dictionary<DataSetConfiguration>;
+  labels: DataSetConfiguration[];
   axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
 }

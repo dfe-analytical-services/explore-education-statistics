@@ -1,24 +1,23 @@
 import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
-import { ChartDataSetAndConfiguration } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect, Formik } from '@common/components/form';
 import {
   ChartCapabilities,
   ChartDefinition,
-  ChartMetaData,
-  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import {
-  colours,
-  generateKeyFromDataSet,
-  pairFiltersByValue,
-  symbols,
-} from '@common/modules/charts/util/chartUtils';
-import { FilterOption } from '@common/modules/table-tool/services/tableBuilderService';
+  DataSetAndConfiguration,
+  DeprecatedDataSetConfiguration,
+} from '@common/modules/charts/types/dataSet';
+import { colours, symbols } from '@common/modules/charts/util/chartUtils';
+import { generateDeprecatedDataSetKey } from '@common/modules/charts/util/deprecatedDataSetKey';
+import { CategoryFilter } from '@common/modules/table-tool/types/filters';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import difference from 'lodash/difference';
+import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import React, { useMemo, useState } from 'react';
 import styles from './ChartDataSelector.module.scss';
@@ -33,14 +32,14 @@ export interface SelectedData {
     indicator: string;
     filters: string[];
   };
-  configuration: DataSetConfiguration;
+  configuration: DeprecatedDataSetConfiguration;
 }
 
 interface Props {
   canSaveChart?: boolean;
   chartType: ChartDefinition;
-  selectedData?: ChartDataSetAndConfiguration[];
-  meta: ChartMetaData;
+  selectedData?: DataSetAndConfiguration[];
+  meta: FullTableMeta;
   capabilities: ChartCapabilities;
   onDataAdded?: (data: SelectedData) => void;
   onDataRemoved?: (data: SelectedData, index: number) => void;
@@ -71,12 +70,12 @@ const ChartDataSelector = ({
     [meta.indicators],
   );
 
-  const filtersByValue: Dictionary<FilterOption> = useMemo(
-    () => pairFiltersByValue(meta.filters),
+  const filtersByValue: Dictionary<CategoryFilter> = useMemo(
+    () => keyBy(Object.values(meta.filters).flat(), filter => filter.value),
     [meta.filters],
   );
 
-  const [chartData, setChartData] = useState<ChartDataSetAndConfiguration[]>([
+  const [chartData, setChartData] = useState<DataSetAndConfiguration[]>([
     ...selectedData,
   ]);
 
@@ -100,8 +99,8 @@ const ChartDataSelector = ({
       validationSchema={Yup.object<FormValues>({
         indicator: Yup.string().required('Select an indicator'),
         filters: Yup.object(
-          mapValues(meta.filters, filter =>
-            Yup.string().required(`Select a ${filter.legend.toLowerCase()}`),
+          mapValues(meta.filters, (filter, category) =>
+            Yup.string().required(`Select a ${category.toLowerCase()}`),
           ),
         ),
       })}
@@ -121,7 +120,10 @@ const ChartDataSelector = ({
           );
         }
 
-        const name = `${meta.indicators[indicator].label}${
+        const matchingIndicator = meta.indicators.find(
+          i => i.value === indicator,
+        );
+        const name = `${matchingIndicator?.label}${
           filterOptions.length
             ? ` (${filterOptions
                 .map(filter => filtersByValue[filter].label)
@@ -138,11 +140,11 @@ const ChartDataSelector = ({
           dataSet,
           configuration: {
             name,
-            value: generateKeyFromDataSet(dataSet),
+            value: generateDeprecatedDataSetKey(dataSet),
             label: name,
             colour: colours[chartData.length % colours.length],
             symbol: symbols[chartData.length % symbols.length],
-            unit: meta.indicators[indicator].unit || '',
+            unit: matchingIndicator?.unit || '',
           },
         };
 
@@ -158,21 +160,19 @@ const ChartDataSelector = ({
         <>
           <Form {...form} id={formId} showSubmitError>
             <div className="govuk-grid-row">
-              {Object.entries(meta.filters).map(([filterKey, filter]) => (
-                <div className="govuk-grid-column-one-third" key={filterKey}>
+              {Object.entries(meta.filters).map(([categoryName, filters]) => (
+                <div className="govuk-grid-column-one-third" key={categoryName}>
                   <FormFieldSelect
-                    id={`${formId}-filters-${filterKey}`}
-                    name={`filters.${filterKey}`}
-                    label={filter.legend}
+                    id={`${formId}-filters-${categoryName}`}
+                    name={`filters.${categoryName}`}
+                    label={categoryName}
                     className="govuk-!-width-full"
                     options={[
                       {
-                        label: `Select ${filter.legend.toLowerCase()}...`,
+                        label: `Select ${categoryName.toLowerCase()}...`,
                         value: '',
                       },
-                      ...Object.values(filter.options).flatMap(
-                        opt => opt.options,
-                      ),
+                      ...filters,
                     ]}
                     order={[]}
                   />
@@ -221,7 +221,12 @@ const ChartDataSelector = ({
                       )}
 
                       <div className={styles.selectedDataIndicator}>
-                        {meta.indicators[selected.dataSet.indicator].label}
+                        {
+                          meta.indicators.find(
+                            indicator =>
+                              indicator.value === selected.dataSet.indicator,
+                          )?.label
+                        }
                       </div>
 
                       <div className={styles.selectedDataAction}>
@@ -244,7 +249,7 @@ const ChartDataSelector = ({
                           capabilities={capabilities}
                           id={`${formId}-chartDataConfiguration-${index}`}
                           onConfigurationChange={(
-                            value: DataSetConfiguration,
+                            value: DeprecatedDataSetConfiguration,
                           ) => {
                             const newData = [...chartData];
 
