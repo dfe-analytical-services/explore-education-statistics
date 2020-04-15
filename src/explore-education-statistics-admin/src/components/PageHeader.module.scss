@@ -1,15 +1,5 @@
 @import '../styles/govuk-base';
 
-.nextPrevious {
-  text-decoration: none;
-}
-
-.nextPreviousSmall {
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 // Setting page header colours based on environment
 $envs: (
   local: (

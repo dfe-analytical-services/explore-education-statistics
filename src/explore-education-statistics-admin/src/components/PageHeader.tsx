@@ -5,6 +5,7 @@ import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import React from 'react';
+import styles from './PageHeader.module.scss';
 
 interface Props {
   wide?: boolean;
@@ -28,18 +29,12 @@ const PageHeader = ({ wide }: Props) => {
     let envClass = '';
     let env = '';
     for (let i = 0; i < arrEnvs.length; i += 1) {
-      env = arrEnvs[i].replace('.', '-');
       if (url.indexOf(arrEnvs[i]) > 0) {
-        if (env === 'localhost:5021') {
-          envClass = 'dfe-env-local';
-        } else {
-          envClass = `dfe-env-${env}`;
-        }
-
-        console.log(env);
+        env = arrEnvs[i].replace('.', '-');
+        envClass =
+          env === 'localhost:5021' ? 'dfeEnv--local' : `dfeEnv--${env}`;
       }
     }
-
     return envClass;
   }
 
@@ -52,7 +47,7 @@ const PageHeader = ({ wide }: Props) => {
       </a>
 
       <header
-        className={classNames('govuk-header', envClassName)}
+        className={classNames('govuk-header', styles[envClassName])}
         role="banner"
         data-module="header"
       >
