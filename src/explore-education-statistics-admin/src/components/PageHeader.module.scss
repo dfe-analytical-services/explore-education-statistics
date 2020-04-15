@@ -7,22 +7,22 @@ $envs: (
     govuk-colour('white'),
     'Local development',
   ),
-  admin-dev: (
+  dev: (
     govuk-colour('light-green'),
     govuk-colour('white'),
     'Development',
   ),
-  admin-test: (
+  test: (
     govuk-colour('yellow'),
     govuk-colour('black'),
     'Test',
   ),
-  admin-pre-prod: (
+  pre-prod: (
     govuk-colour('red'),
     govuk-colour('white'),
     'Pre-production',
   ),
-  admin-explore: (
+  prod: (
     govuk-colour('red'),
     govuk-colour('white'),
     'Production',

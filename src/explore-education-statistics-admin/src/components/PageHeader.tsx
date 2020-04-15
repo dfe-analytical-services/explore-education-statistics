@@ -14,31 +14,19 @@ interface Props {
 const PageHeader = ({ wide }: Props) => {
   const { user } = useAuthContext();
 
-  let envClassName = '';
+  const envs = {
+    localhost: 'dfeEnv--local',
+    'admin.dev': 'dfeEnv--dev',
+    'admin.test': 'dfeEnv--test',
+    'admin.pre-prod': 'dfeEnv--pre-prod',
+    'admin.explore': 'dfeEnv--prod',
+  };
 
-  const envs: string[] = [
-    'localhost:5021',
-    'admin.dev',
-    'admin.test',
-    'admin.pre-prod',
-    'admin.explore',
-  ];
+  const matchingEnv = Object.keys(envs).find(env =>
+    window.location.href.includes(env),
+  );
 
-  function checkURL(arrEnvs: string[]) {
-    const url = window.location.href;
-    let envClass = '';
-    let env = '';
-    for (let i = 0; i < arrEnvs.length; i += 1) {
-      if (url.indexOf(arrEnvs[i]) > 0) {
-        env = arrEnvs[i].replace('.', '-');
-        envClass =
-          env === 'localhost:5021' ? 'dfeEnv--local' : `dfeEnv--${env}`;
-      }
-    }
-    return envClass;
-  }
-
-  envClassName = checkURL(envs);
+  const envClassName = envs[matchingEnv as keyof typeof envs] ?? envs.localhost;
 
   return (
     <>
