@@ -44,15 +44,19 @@ const ManagePublicationsAndReleasesTab = ({
   const [myPublications, setMyPublications] = useState<
     AdminDashboardPublication[]
   >();
+  const [loadingPublications, setLoadingPublications] = useState(true);
   const [canCreatePublication, setCanCreatePublication] = useState(false);
   const { themeId, topicId } = match.params;
 
-  const { value: themes, isLoading } = useAsyncRetry(async () => {
+  const {
+    value: themes,
+    isLoading: loadingThemes,
+  } = useAsyncRetry(async () => {
     return dashboardService.getMyThemesAndTopics();
   }, []);
 
   useEffect(() => {
-    if (themes && !selectedTheme.id && !selectedTopic.id) {
+    if (themes && themes.length && !selectedTheme.id && !selectedTopic.id) {
       if (themeId && topicId) {
         const theme = themes.find(t => t.id === themeId);
         const topic = theme && theme.topics.find(t => t.id === topicId);
@@ -75,6 +79,7 @@ const ManagePublicationsAndReleasesTab = ({
 
   useEffect(() => {
     if (selectedTopic.id) {
+      setLoadingPublications(true);
       Promise.all([
         dashboardService
           .getMyPublicationsByTopic(selectedTopic.id)
@@ -83,6 +88,7 @@ const ManagePublicationsAndReleasesTab = ({
           .canCreatePublicationForTopic(selectedTopic.id)
           .then(setCanCreatePublication),
       ]).then(_ => {
+        setLoadingPublications(false);
         // eslint-disable-next-line
         history.replaceState(
           {},
@@ -112,8 +118,8 @@ const ManagePublicationsAndReleasesTab = ({
         </a>
       </p>
 
-      <LoadingSpinner loading={isLoading}>
-        {themes && selectedTheme && selectedTopic && myPublications ? (
+      <LoadingSpinner loading={loadingThemes}>
+        {themes && themes.length && selectedTheme && selectedTopic ? (
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-half">
@@ -157,37 +163,41 @@ const ManagePublicationsAndReleasesTab = ({
             <hr />
             <h2>{selectedTheme.title}</h2>
             <h3>{selectedTopic.title}</h3>
-            {myPublications.length > 0 && (
-              <Accordion id="publications">
-                {orderBy(myPublications, pub => pub.title.toUpperCase()).map(
-                  publication => (
-                    <AccordionSection
-                      key={publication.id}
-                      heading={publication.title}
-                      headingTag="h3"
-                    >
-                      <PublicationSummary publication={publication} />
-                    </AccordionSection>
-                  ),
+            <LoadingSpinner loading={loadingPublications}>
+              {myPublications && myPublications.length > 0 && (
+                <Accordion id="publications">
+                  {orderBy(myPublications, pub => pub.title.toUpperCase()).map(
+                    publication => (
+                      <AccordionSection
+                        key={publication.id}
+                        heading={publication.title}
+                        headingTag="h3"
+                      >
+                        <PublicationSummary publication={publication} />
+                      </AccordionSection>
+                    ),
+                  )}
+                </Accordion>
+              )}
+              {canCreatePublication &&
+                myPublications &&
+                myPublications.length === 0 && (
+                  <div className="govuk-inset-text">
+                    You have not yet created any publications
+                  </div>
                 )}
-              </Accordion>
-            )}
-            {canCreatePublication && myPublications.length === 0 && (
-              <div className="govuk-inset-text">
-                You have not yet created any publications
-              </div>
-            )}
-            {canCreatePublication && (
-              <Link
-                to={publicationRoutes.createPublication.generateLink(
-                  selectedTheme.id,
-                  selectedTopic.id,
-                )}
-                className="govuk-button"
-              >
-                Create new publication
-              </Link>
-            )}
+              {canCreatePublication && (
+                <Link
+                  to={publicationRoutes.createPublication.generateLink(
+                    selectedTheme.id,
+                    selectedTopic.id,
+                  )}
+                  className="govuk-button"
+                >
+                  Create new publication
+                </Link>
+              )}
+            </LoadingSpinner>
           </>
         ) : (
           <>
