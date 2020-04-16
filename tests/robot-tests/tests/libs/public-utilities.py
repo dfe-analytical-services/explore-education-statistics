@@ -141,7 +141,7 @@ def user_clicks_methodology_link(topic, methodology):
 
 # Table tool
 def user_checks_generated_permalink_is_valid():
-    elem = sl.driver.find_element_by_css_selector('[class^="dfe-LinkContainer-module__linkSelect"]')
+    elem = sl.driver.find_element_by_css_selector('[data-testid="permalink-generated-url"]')
     url_without_http = re.sub(r'https?://', '', os.environ['PUBLIC_URL'])
     url_without_basic_auth = re.sub(r'.*@', '', url_without_http)
     if not elem.text.startswith(f"{url_without_basic_auth}/data-tables/permalink/"):
