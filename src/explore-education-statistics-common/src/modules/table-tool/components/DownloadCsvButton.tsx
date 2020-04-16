@@ -23,17 +23,19 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
   const filters = transformTableMetaFiltersToCategoryFilters(metaFilters);
 
   const filterColumns = Object.entries(metaFilters).map(
-    ([key]) => metaFilters[key].legend,
+    ([key]) => metaFilters[key].name,
   );
 
   const indicatorColumns = indicators.map(indicator => {
     const unit = indicator.unit ? ` (${indicator.unit})` : '';
-    return `${indicator.label}${unit}`;
+    return `${indicator.name}${unit}`;
   });
 
   const columns = [
-    'Location',
-    'Time period',
+    'location',
+    'location_code',
+    'geographic_level',
+    'time_period',
     ...filterColumns,
     ...indicatorColumns,
   ];
@@ -70,7 +72,14 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
       return matchingResult.measures[indicator.value] ?? 'n/a';
     });
 
-    return [...row.map(column => column.label), ...indicatorCells];
+    return [
+      location.label,
+      location.value,
+      location.level,
+      timePeriod.label.replace(/\//g, ''),
+      ...filterOptions.map(column => column.label),
+      ...indicatorCells,
+    ];
   });
 
   return [columns, ...rows];

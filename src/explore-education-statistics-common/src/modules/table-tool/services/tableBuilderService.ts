@@ -10,6 +10,7 @@ export interface FilterOption {
 
 export interface IndicatorOption extends FilterOption {
   unit: string;
+  name: string;
 }
 
 export interface TimePeriodOption {
@@ -185,6 +186,7 @@ interface UnmappedFullTableSubjectMeta {
   locations: { label: string; value: string; level: string }[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{
+    name: string;
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;

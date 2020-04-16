@@ -54,9 +54,18 @@ export class LocationFilter extends Filter {
 export class Indicator extends Filter {
   public readonly unit: string;
 
-  public constructor({ value, label, unit, filterGroup }: IndicatorOption) {
+  public readonly name: string;
+
+  public constructor({
+    value,
+    label,
+    unit,
+    filterGroup,
+    name,
+  }: IndicatorOption) {
     super({ value, label, filterGroup });
     this.unit = unit;
+    this.name = name;
   }
 }
 
