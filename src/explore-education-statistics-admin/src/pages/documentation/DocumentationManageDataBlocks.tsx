@@ -392,7 +392,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 </a>
               </p>
             </StepNavItem>
-            {/*<StepNavItem
+            {/* <StepNavItem
               stepNumber={4}
               stepHeading="Use permalinks"
               open={step === 4}
