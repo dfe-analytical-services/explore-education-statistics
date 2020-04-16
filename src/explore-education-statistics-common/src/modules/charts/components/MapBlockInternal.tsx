@@ -445,7 +445,7 @@ export const MapBlockInternal = ({
         if (feature.properties) {
           const content = Object.entries(feature.properties.measures)
             .map(([id, value]) => ({
-              ...(labels[id] || { label: '', unit: '', decimalPlaces: 0 }),
+              ...(labels[id] || { label: '', unit: '', decimalPlaces: 2 }),
               value,
             }))
             .map(
