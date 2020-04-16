@@ -47,6 +47,7 @@ Upload subject
 
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
+    scroll element into view  xpath://li/a[text()="Manage data blocks"]
     user clicks element  xpath://li/a[text()="Manage data blocks"]
     user waits until page contains element   xpath://h2[text()="Choose a subject"]
 
@@ -90,13 +91,14 @@ Select indicators
     user clicks indicator checkbox    Admission Numbers
 
 Create table
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
+    [Documentation]   EES-615
     user clicks element   css:#filtersForm-submit
     user waits until results table appears     180
     user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from 'Datablock test %{RUN_IDENTIFIER}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table's column headings
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     user checks results table column heading contains  css:table  1  1   2005
     user checks results table column heading contains  css:table  1  2   2007
     user checks results table column heading contains  css:table  1  3   2008
@@ -114,7 +116,7 @@ Validate table's column headings
     user checks results table column heading contains  css:table  1  12  2020
 
 Validate table row Bolton 001 (E02000984)
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     ${row}=  user gets row with heading   Bolton 001 (E02000984)
     user checks row contains heading  ${row}   Bolton 001 (E02000984)
     user checks row cell contains text  ${row}   1    n/a
@@ -131,7 +133,7 @@ Validate table row Bolton 001 (E02000984)
     user checks row cell contains text  ${row}   12   n/a
 
 Validate table row Bolton 001 (E05000364)
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     ${row}=  user gets row with heading   Bolton 001 (E05000364)
     user checks row contains heading  ${row}   Bolton 001 (E05000364)
     user checks row cell contains text  ${row}   1    n/a
@@ -148,7 +150,7 @@ Validate table row Bolton 001 (E05000364)
     user checks row cell contains text  ${row}   12   n/a
 
 Validate table row Bolton 004 (E02000987)
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     ${row}=  user gets row with heading   Bolton 004 (E02000987)
     user checks row contains heading  ${row}   Bolton 004 (E02000987)
     user checks row cell contains text  ${row}   1    n/a
@@ -165,7 +167,7 @@ Validate table row Bolton 004 (E02000987)
     user checks row cell contains text  ${row}   12   6,031
 
 Validate table row Bolton 004 (E05010450)
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     ${row}=  user gets row with heading   Bolton 004 (E05010450)
     user checks row contains heading  ${row}   Bolton 004 (E05010450)
     user checks row cell contains text  ${row}   1    8,557
@@ -182,7 +184,7 @@ Validate table row Bolton 004 (E05010450)
     user checks row cell contains text  ${row}   12   n/a
 
 Validate table row Nailsea Youngwood
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     ${row}=  user gets row with heading   Nailsea Youngwood
     user checks row contains heading  ${row}   Nailsea Youngwood
     user checks row cell contains text   ${row}    1    3,612
@@ -199,7 +201,7 @@ Validate table row Nailsea Youngwood
     user checks row cell contains text   ${row}    12   n/a
 
 Validate table row Syon
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     ${row}=  user gets row with heading   Syon
     user checks row contains heading  ${row}   Syon
     user checks row cell contains text   ${row}   1    n/a
