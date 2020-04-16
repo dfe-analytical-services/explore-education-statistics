@@ -26,10 +26,7 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
     ([key]) => metaFilters[key].name,
   );
 
-  const indicatorColumns = indicators.map(indicator => {
-    const unit = indicator.unit ? ` (${indicator.unit})` : '';
-    return `${indicator.name}${unit}`;
-  });
+  const indicatorColumns = indicators.map(indicator => indicator.name);
 
   const columns = [
     'location',

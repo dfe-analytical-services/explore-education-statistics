@@ -82,7 +82,7 @@ Object {
       },
       "G1": Object {
         "t": "s",
-        "v": "sess_authorised_percent (%)",
+        "v": "sess_authorised_percent",
       },
       "G2": Object {
         "t": "s",
@@ -117,7 +117,7 @@ Array [
     "geographic_level",
     "time_period",
     "characteristic",
-    "sess_authorised_percent (%)",
+    "sess_authorised_percent",
     "sess_authorised",
   ],
   Array [
@@ -141,7 +141,7 @@ Array [
     "time_period",
     "characteristic",
     "school_type",
-    "sess_authorised_percent (%)",
+    "sess_authorised_percent",
     "sess_authorised",
   ],
   Array [
@@ -175,7 +175,7 @@ Array [
     "geographic_level",
     "time_period",
     "characteristic",
-    "sess_authorised_percent (%)",
+    "sess_authorised_percent",
     "sess_authorised",
   ],
   Array [
@@ -198,7 +198,7 @@ Array [
     "geographic_level",
     "time_period",
     "characteristic",
-    "sess_authorised_percent (%)",
+    "sess_authorised_percent",
     "sess_authorised",
   ],
   Array [
@@ -222,7 +222,7 @@ Array [
     "time_period",
     "characteristic",
     "school_type",
-    "sess_authorised_percent (%)",
+    "sess_authorised_percent",
     "sess_authorised",
   ],
   Array [
@@ -256,7 +256,7 @@ Array [
     "geographic_level",
     "time_period",
     "characteristic",
-    "sess_authorised_percent (%)",
+    "sess_authorised_percent",
     "sess_authorised",
   ],
   Array [
