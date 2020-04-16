@@ -76,7 +76,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 have any issues or questions about creating a new publication
                 contact:
               </p>
-              <h4>Explore education statistics team </h4>
+              <h4>Explore education statistics team</h4>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">
@@ -102,7 +102,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 publications.
               </p>
               <p>
-                Once you’ve created a new release you and the members of your
+                Once you’ve created a new release, you and the members of your
                 ‘Production team’ will be responsible for putting the release
                 together via the admin system.
               </p>
@@ -146,8 +146,8 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               </ul>
               <h3>Don't</h3>
               <p>
-                Don’t worry if you haven't got all the data, files and content
-                to complete your release.{' '}
+                Worry if you haven't got all the data, files and content to
+                complete your release.
               </p>
               <p>
                 You can come back and add these later using the various tabs at
@@ -185,10 +185,6 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               stepHeading="Add and create a methodology"
               open={step === 3}
             >
-              <p>
-                You’ll need to link your publication to a methodology before it
-                goes live.
-              </p>
               <h3>Help and support</h3>
               <p>
                 If you can’t find the methodology you’re looking for or have any
@@ -262,22 +258,17 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 draft’.
               </p>
               <p>
-                However, only a ‘Responsible statistician’ can edit a release
-                once it’s been approved for sign-off by the ‘Production team’
-                and sent for ‘Higher review’.
+                However, only a ‘Responsible Statistician’ can edit a release
+                once it’s status has been set to ‘Ready for higher review’.
               </p>
-              <p>
-                A release is in ‘Higher review’ once it’s been reviewed,
-                approved for sign-off and its release status updated to one of
-                the following:
-              </p>
+              <p>A release can have a status of the following:</p>
               <ul className="govuk-list govuk-list--bullet">
-                <li>‘Ready for sign-off’</li>
-                <li>‘Approved for release’</li>
-                <li>‘In pre-release’</li>
+                <li>‘In draft’</li>
+                <li>‘Ready for higher review’</li>
+                <li>‘Approved for publication’</li>
               </ul>
               <p>
-                If you need to edit a ‘Live’ release (ie a release which has
+                If you need to edit a ‘Live’ release (i.e. a release which has
                 been published on the service) contact:{' '}
               </p>
               <h4>Explore education statistics team </h4>
@@ -297,7 +288,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   </h4>
                   <p>
                     If you need to edit a release which has been sent for
-                    ‘Higher review’ contact your ‘Responsible statistician’ or:
+                    ‘Higher review’ contact your ‘Responsible Statistician’ or:
                   </p>
                   <h4>Explore education statistics team </h4>
                   <p>
@@ -350,7 +341,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   />
                   <p>
                     If you need to edit a release which has been sent for
-                    ‘Higher review’ contact your ‘Responsible statistician’ or:
+                    ‘Higher review’ contact your ‘Responsible Statistician’ or:
                   </p>
                   <h5>Explore education statistics team </h5>
                   <p>
@@ -434,26 +425,13 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                     className="govuk-!-width-three-quarters"
                   />
                 </li>
-                <li>
-                  <h4>
-                    If you have access to a long list of publications, first
-                    find the publication and then the related methodology you
-                    want to view or edit using the ‘Select theme’ and ‘Select
-                    topic’ dropdowns.
-                  </h4>
-                  <img
-                    src={imagePublicationSelectTheme}
-                    alt="Select theme and topic to show relevant publications"
-                    className="govuk-!-width-three-quarters"
-                  />
-                </li>
               </ul>
               <h3>Help and support</h3>
               <p>
                 If you can’t find the methodology you’re looking to view or edit
                 contact:
               </p>
-              <h4>Explore education statistics team </h4>
+              <h4>Explore education statistics team</h4>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">

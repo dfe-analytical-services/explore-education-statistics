@@ -18,6 +18,7 @@ import dataBlockService, {
 } from '@common/services/dataBlockService';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
 
 export interface ReleaseManageDataBlocksPageParams {
   publicationId: string;
@@ -28,6 +29,11 @@ export interface ReleaseManageDataBlocksPageParams {
 interface SelectedDataBlock {
   dataBlock: ReleaseDataBlock;
   response: DataBlockResponse;
+}
+
+interface DeleteDataBlock {
+  plan: DeleteDataBlockPlan;
+  block: ReleaseDataBlock;
 }
 
 const emptyDataBlocks: ReleaseDataBlock[] = [];
@@ -46,7 +52,7 @@ const ReleaseManageDataBlocksPage = ({
   const [selectedDataBlock, setSelectedDataBlock] = useState<
     SelectedDataBlock
   >();
-  const [deleteDataBlock, setDeleteDataBlock] = useState<ReleaseDataBlock>();
+  const [deleteDataBlock, setDeleteDataBlock] = useState<DeleteDataBlock>();
 
   const {
     value: dataBlocks = emptyDataBlocks,
@@ -115,12 +121,12 @@ const ReleaseManageDataBlocksPage = ({
   ]);
 
   const onDeleteDataBlock = useCallback(
-    (dataBlock: SavedDataBlock) => {
+    (dataBlock: DeleteDataBlock) => {
       setDeleteDataBlock(undefined);
 
-      if (dataBlock.id) {
+      if (dataBlock.block) {
         dataBlocksService
-          .deleteDataBlock(dataBlock.id)
+          .deleteDataBlock(releaseId, dataBlock.block.id)
           .then(fetchDataBlocks)
           .then(() =>
             history.push(
@@ -250,7 +256,17 @@ const ReleaseManageDataBlocksPage = ({
                     <Button
                       type="button"
                       onClick={() =>
-                        setDeleteDataBlock(selectedDataBlock.dataBlock)
+                        dataBlocksService
+                          .getDeleteBlockPlan(
+                            releaseId,
+                            selectedDataBlock.dataBlock.id,
+                          )
+                          .then(plan => {
+                            setDeleteDataBlock({
+                              plan,
+                              block: selectedDataBlock.dataBlock,
+                            });
+                          })
                       }
                     >
                       Delete this data block
@@ -269,6 +285,33 @@ const ReleaseManageDataBlocksPage = ({
                 onCancel={() => setDeleteDataBlock(undefined)}
               >
                 <p>Are you sure you wish to delete this data block?</p>
+                {deleteDataBlock && (
+                  <ul>
+                    {deleteDataBlock.plan.dependentDataBlocks.map(block => (
+                      <li key={block.name}>
+                        <p>{block.name}</p>
+                        {block.contentSectionHeading && (
+                          <p>
+                            {`It will be removed from the "${block.contentSectionHeading}" content section.`}
+                          </p>
+                        )}
+                        {block.infographicFilenames.length > 0 && (
+                          <p>
+                            The following infographic files will also be
+                            removed:
+                            <ul>
+                              {block.infographicFilenames.map(filename => (
+                                <li key={filename}>
+                                  <p>{filename}</p>
+                                </li>
+                              ))}
+                            </ul>
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </ModalConfirm>
 
               <div style={{ overflow: 'hidden' }}>

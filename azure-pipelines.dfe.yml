@@ -5,10 +5,10 @@ variables:
 trigger:
   branches:
     include:
-    - master
+      - master
   paths:
     exclude:
-    - infrastructure/
+      - infrastructure/
 pr: none
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
     pool:
       name: Hosted Windows 2019 with VS2019
       demands:
-      - npm
-      - azureps
+        - npm
+        - azureps
     steps:
       - task: UseDotNet@2
         displayName: 'Install .NET Core 2.1.x SDK'
@@ -113,14 +113,12 @@ jobs:
           artifactName: 'processor'
           targetPath: '$(Build.ArtifactStagingDirectory)/processor'
 
-
-
   - job: 'Admin'
     pool:
-      name: Hosted Windows 2019 with VS2019
+      vmImage: 'ubuntu-16.04'
       demands:
-      - npm
-      - azureps
+        - npm
+        - azureps
     steps:
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'

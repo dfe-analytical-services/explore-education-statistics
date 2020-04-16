@@ -9,7 +9,7 @@ function PrivacyNoticePage() {
           <section>
             <h2 className="govuk-heading-m">Who we are</h2>
             <p>
-              The explore education statistics service is operated by the
+              The Explore education statistics service is operated by the
               Department for Education (DfE).
             </p>
             <p>
@@ -22,7 +22,7 @@ function PrivacyNoticePage() {
             <h2 className="govuk-heading-m">How we'll use your information</h2>
             <p>
               We receive your personal data when you sign up and subscribe to
-              receive notifications about the explore education statistics
+              receive notifications about the Explore education statistics
               service.
             </p>
             <p>
@@ -196,7 +196,7 @@ function PrivacyNoticePage() {
             <h2 className="govuk-heading-m">Contact information</h2>
             <p>
               If you have any questions about how your personal information will
-              be used contact the explore education statistics service at
+              be used contact the Explore education statistics service at
               <a href="mailto:explore.statistics@education.gov.uk">
                 explore.statistics@education.gov.uk
               </a>{' '}

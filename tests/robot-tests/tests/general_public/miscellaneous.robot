@@ -100,7 +100,7 @@ Validate Privacy notice page
     [Tags]  HappyPath
     user clicks link   Privacy notice
     user waits until page contains heading  Privacy notice
-    user waits until page contains  The explore education statistics service is operated by the Department for Education
+    user waits until page contains  The Explore education statistics service is operated by the Department for Education
 
     user checks url contains  %{PUBLIC_URL}/privacy-notice
 
@@ -111,7 +111,7 @@ Validate Privacy notice page
 Validate Contact page
     [Tags]  HappyPath
     user clicks link    Contact us
-    user waits until page contains  Contact explore education statistics
+    user waits until page contains  Contact Explore education statistics
     user waits until page contains  General enquiries
     user waits until page contains  explore.statistics@education.gov.uk
     user waits until page contains  DfE Head of Profession for Statistics
@@ -126,7 +126,7 @@ Validate Contact page
 Validate Accessibility statement page
     [Tags]  HappyPath
     user clicks link  Accessibility statement
-    user waits until page contains heading  Accessibility statement for explore education statistics
+    user waits until page contains heading  Accessibility statement for Explore education statistics
     user checks page contains heading 2  What we’re doing to improve accessibility
 
     user checks url contains  %{PUBLIC_URL}/accessibility-statement

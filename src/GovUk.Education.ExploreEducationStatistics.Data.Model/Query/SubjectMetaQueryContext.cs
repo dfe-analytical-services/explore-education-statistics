@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
         public IEnumerable<string> PlanningArea { get; set; }
-        public bool IncludeGeoJson { get; set; }
+        public bool? IncludeGeoJson { get; set; }
 
         public static SubjectMetaQueryContext FromObservationQueryContext(
             ObservationQueryContext observationQueryContext)

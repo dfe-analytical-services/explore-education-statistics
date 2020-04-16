@@ -37,8 +37,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
 
-        public TableBuilderSubjectMetaService(IFilterService filterService,
+        public TableBuilderSubjectMetaService(IBoundaryLevelService boundaryLevelService,
+            IFilterService filterService,
             IFilterItemService filterItemService,
+            IGeoJsonService geoJsonService,
             IIndicatorGroupService indicatorGroupService,
             ILocationService locationService,
             ILogger<TableBuilderSubjectMetaService> logger,
@@ -46,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
-            IUserService userService) : base(filterItemService)
+            IUserService userService) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
             _filterService = filterService;
             _filterItemService = filterItemService;
@@ -168,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             );
         }
 
-        private Dictionary<string, TableBuilderObservationalUnitsMetaViewModel> BuildObservationalUnitsViewModels(
+        private static Dictionary<string, TableBuilderObservationalUnitsMetaViewModel> BuildObservationalUnitsViewModels(
             Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
         {
             var viewModels = observationalUnits.ToDictionary(
