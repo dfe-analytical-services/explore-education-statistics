@@ -37,7 +37,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
       sectionId: release.headlinesSection.id,
       sectionKey: 'headlinesSection',
       block: {
-        type: 'MarkDownBlock',
+        type: 'HtmlBlock',
         order: 0,
         body: '',
       },

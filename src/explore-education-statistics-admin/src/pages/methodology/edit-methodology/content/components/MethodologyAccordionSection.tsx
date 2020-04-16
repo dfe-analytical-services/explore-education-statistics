@@ -48,7 +48,7 @@ const MethodologyAccordionSection = ({
       methodologyId,
       sectionId,
       block: {
-        type: 'MarkDownBlock',
+        type: 'HtmlBlock',
         order: sectionContent.length,
         body: '',
       },

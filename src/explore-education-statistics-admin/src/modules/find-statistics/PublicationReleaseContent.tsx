@@ -50,7 +50,7 @@ const PublicationReleaseContent = () => {
         sectionId: release.summarySection.id,
         sectionKey: 'summarySection',
         block: {
-          type: 'MarkDownBlock',
+          type: 'HtmlBlock',
           order: 0,
           body: '',
         },
