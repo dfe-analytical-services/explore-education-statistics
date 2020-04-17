@@ -486,6 +486,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 section.Content = new List<IContentBlock>();
             }
 
+            // No longer supporting the creation of new MarkDownBlocks
+            if (newContentBlock.Type == ContentBlockType.MarkDownBlock.ToString())
+            {
+                newContentBlock.Type = ContentBlockType.HtmlBlock.ToString();
+            }
+
             var orderForNewBlock = OrderValueForNewlyAddedContentBlock(order, section);
 
             section.Content
@@ -544,6 +550,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             string body)
         {
             blockToUpdate.Body = body;
+
+            // Convert all MarkDownBlocks to HtmlBlocks
+            blockToUpdate.Type = ContentBlockType.HtmlBlock.ToString();
+
             return await SaveContentBlock(blockToUpdate);
         }
 

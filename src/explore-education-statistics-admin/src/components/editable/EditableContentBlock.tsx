@@ -2,7 +2,6 @@ import SanitizeHtml from '@common/components/SanitizeHtml';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import FormEditor, { FormEditorProps } from '@admin/components/form/FormEditor';
 import toHtml from '@admin/utils/markdown/toHtml';
-import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
@@ -41,14 +40,12 @@ const EditableContentBlock = ({
   const handleSave = useCallback(() => {
     toggleEditing.off();
 
-    let nextValue = content;
+    // No need to handle useMarkdown case
+    // as Admin API now converts MarkDownBlocks
+    // to HtmlBlocks
 
-    if (useMarkdown) {
-      nextValue = toMarkdown(nextValue);
-    }
-
-    onSave(nextValue);
-  }, [onSave, content, toggleEditing, useMarkdown]);
+    onSave(content);
+  }, [onSave, content, toggleEditing]);
 
   const handleCancel = useCallback(() => {
     toggleEditing.off();
