@@ -11,6 +11,7 @@ export interface FilterOption {
 export interface IndicatorOption extends FilterOption {
   unit: string;
   name: string;
+  decimalPlaces?: number;
 }
 
 export interface TimePeriodOption {
@@ -63,6 +64,7 @@ export interface PublicationSubjectMeta {
     hint?: string;
     options: GroupedFilterOptions;
     totalValue?: string;
+    name: string;
   }>;
   indicators: Dictionary<{
     label: string;

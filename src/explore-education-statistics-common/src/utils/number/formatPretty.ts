@@ -12,7 +12,7 @@
 export default function formatPretty(
   value: string | number,
   unit?: string,
-  maxDecimals = 2,
+  decimalPlaces = 2,
 ): string {
   let formattedValue;
   if (typeof value === 'string') {
@@ -23,22 +23,21 @@ export default function formatPretty(
     }
 
     const decimals = value.split('.')[1];
-    const decimalPlaces = decimals ? decimals.length : 0;
+    const dps = decimals ? decimals.length : 0;
 
-    if (decimalPlaces > 0) {
+    if (dps > 0) {
       formattedValue = numberValue.toLocaleString('en-GB', {
-        maximumFractionDigits: maxDecimals,
-        minimumFractionDigits:
-          decimalPlaces > maxDecimals ? maxDecimals : decimalPlaces,
+        maximumFractionDigits: decimalPlaces,
+        minimumFractionDigits: dps > decimalPlaces ? decimalPlaces : dps,
       });
     } else {
       formattedValue = Number(value).toLocaleString('en-GB', {
-        maximumFractionDigits: maxDecimals,
+        maximumFractionDigits: decimalPlaces,
       });
     }
   } else {
     formattedValue = value.toLocaleString('en-GB', {
-      maximumFractionDigits: maxDecimals,
+      maximumFractionDigits: decimalPlaces,
     });
   }
   if (unit) {

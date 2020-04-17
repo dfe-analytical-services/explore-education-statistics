@@ -6,5 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         public string Unit { get; set; }
         public string Value { get; set; }
         public string Name { get; set; }
+        public string DecimalPlaces { get; set; }
     }
 }

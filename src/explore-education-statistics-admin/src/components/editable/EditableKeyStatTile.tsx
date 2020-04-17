@@ -68,6 +68,7 @@ const EditableKeyStatTile = ({
               value: formatPretty(
                 newResponse.result[0].measures[indicatorKey],
                 theIndicator.unit,
+                theIndicator.decimalPlaces,
               ),
             });
           }
