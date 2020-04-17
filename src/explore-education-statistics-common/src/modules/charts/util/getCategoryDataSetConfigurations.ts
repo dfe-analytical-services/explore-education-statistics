@@ -5,14 +5,13 @@ import {
   ExpandedDataSet,
 } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
-import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import generateDefaultDataSetLabel from '@common/modules/charts/util/generateDefaultDataSetLabel';
 import {
   Filter,
   LocationFilter,
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import { Pair, OmitStrict } from '@common/types';
+import { OmitStrict, Pair } from '@common/types';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import { maxBy } from 'lodash';
 import uniqBy from 'lodash/uniqBy';
@@ -34,8 +33,10 @@ export default function getCategoryDataSetConfigurations(
   axisConfiguration: AxisConfiguration,
   meta: FullTableMeta,
 ): CategoryDataSetConfiguration[] {
-  const dataSets = chartCategories.flatMap(category =>
-    Object.values(category.dataSets).map(({ dataSet }) => {
+  const dataSets = chartCategories.flatMap(category => {
+    return Object.entries(category.dataSets).map(([dataSetKey]) => {
+      const dataSet = JSON.parse(dataSetKey);
+
       // Label configurations may have missing details like
       // location/time period. We sort these configurations
       // by how well they match the data set so that we can
@@ -86,10 +87,10 @@ export default function getCategoryDataSetConfigurations(
               ),
         dataSet: expandedDataSet,
         filter: category.filter,
-        dataKey: generateDataSetKey(dataSet, axisConfiguration.groupBy),
+        dataKey: dataSetKey,
       } as CategoryDataSetConfiguration;
-    }),
-  );
+    });
+  });
 
   return uniqBy(dataSets, dataSet => dataSet.dataKey);
 }

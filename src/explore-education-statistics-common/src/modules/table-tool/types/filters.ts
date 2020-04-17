@@ -80,7 +80,10 @@ export class LocationFilter extends Filter {
   }
 
   public static createId(params: { value: string; level: string }): string {
-    return JSON.stringify(params);
+    return JSON.stringify({
+      level: params.level,
+      value: params.value,
+    });
   }
 
   public static parseCompositeId(id: string): LocationCompositeId {
