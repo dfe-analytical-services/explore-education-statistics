@@ -15,7 +15,7 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
@@ -32,6 +32,10 @@ const PublicationReleaseContent = () => {
   const [summarySectionBlocks, setSummarySectionBlocks] = useState<
     EditableBlock[]
   >(release.summarySection.content);
+
+  useEffect(() => {
+    setSummarySectionBlocks(release.summarySection.content);
+  }, [release.summarySection.content]);
 
   const releaseCount = useMemo(() => {
     if (release) {

@@ -9,7 +9,7 @@ import {
 import Button from '@common/components/Button';
 import TabsSection from '@common/components/TabsSection';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
 import KeyStatistics from './KeyStatistics';
 
@@ -28,6 +28,10 @@ const ReleaseHeadlines = ({ release }: Props) => {
   const [headlineBlocks, setHeadlineBlocks] = useState<EditableBlock[]>(
     release.headlinesSection.content,
   );
+
+  useEffect(() => {
+    setHeadlineBlocks(release.headlinesSection.content);
+  }, [release.headlinesSection.content]);
 
   const getChartFile = useGetChartFile(release.id);
 
