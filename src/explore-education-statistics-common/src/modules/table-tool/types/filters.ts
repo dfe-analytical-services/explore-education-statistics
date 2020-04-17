@@ -56,6 +56,8 @@ export class Indicator extends Filter {
 
   public readonly decimalPlaces?: number;
 
+  public readonly name: string;
+
   public constructor({
     value,
     label,

@@ -64,6 +64,7 @@ export interface PublicationSubjectMeta {
     hint?: string;
     options: GroupedFilterOptions;
     totalValue?: string;
+    name: string;
   }>;
   indicators: Dictionary<{
     label: string;
