@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/public-common.robot
 
-Force Tags  GeneralPublic  Local  Dev  Test
+Force Tags  GeneralPublic  Local  Dev  Test  Preprod
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -67,6 +67,7 @@ Create table
     user clicks element     css:#filtersForm-submit
     # Extra timeout until EES-234
     user waits until results table appears    60
+    user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing 'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England' in Bury, Sheffield and York between 2006/07 and 2008/09"]
 
 Validate results table column headings
     [Tags]  HappyPath

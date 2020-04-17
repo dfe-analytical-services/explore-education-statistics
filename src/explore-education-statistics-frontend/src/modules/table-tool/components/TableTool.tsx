@@ -95,6 +95,7 @@ const TableToolFinalStep = ({
                     <div>Generated permanent link:</div>
                     <LinkContainer
                       url={`${window.location.host}/data-tables/permalink/${permalinkId}`}
+                      datatestid="permalink-generated-url"
                     />
                     <div>
                       <a

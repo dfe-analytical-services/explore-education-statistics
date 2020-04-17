@@ -61,10 +61,12 @@ export class Indicator extends Filter {
     label,
     unit,
     filterGroup,
+    name,
     decimalPlaces,
   }: IndicatorOption) {
     super({ value, label, filterGroup });
     this.unit = unit;
+    this.name = name;
     this.decimalPlaces = decimalPlaces;
   }
 }
