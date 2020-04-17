@@ -11,35 +11,29 @@ import {
   ChartSymbol,
   LineStyle,
 } from '@common/modules/charts/types/chart';
-import { DeprecatedDataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { colours, symbols } from '@common/modules/charts/util/chartUtils';
 import React, { useState } from 'react';
 
 interface Props {
-  configuration: DeprecatedDataSetConfiguration;
+  configuration: DataSetConfiguration;
   capabilities: ChartCapabilities;
   id: string;
-  onConfigurationChange?: (value: DeprecatedDataSetConfiguration) => void;
+  onConfigurationChange?: (value: DataSetConfiguration) => void;
 }
 
 const colourOptions: SelectOption[] = colours.map(color => {
   return {
     label: color,
     value: color,
-    style: { backgroundColor: `${color}` },
+    style: { backgroundColor: color },
   };
 });
 
-const symbolOptions: SelectOption[] = [
-  {
-    label: 'none',
-    value: '',
-  },
-  ...symbols.map<SelectOption>(symbol => ({
-    label: symbol,
-    value: symbol,
-  })),
-];
+const symbolOptions: SelectOption[] = symbols.map<SelectOption>(symbol => ({
+  label: symbol,
+  value: symbol,
+}));
 
 const lineStyleOptions: SelectOption[] = [
   { label: 'Solid', value: 'solid' },
@@ -53,33 +47,30 @@ const ChartDataConfiguration = ({
   id,
   onConfigurationChange,
 }: Props) => {
-  const [config, setConfig] = useState<DeprecatedDataSetConfiguration>(
-    configuration,
-  );
-
-  const updateConfig = (newConfig: DeprecatedDataSetConfiguration) => {
-    setConfig(newConfig);
-    if (onConfigurationChange) onConfigurationChange(newConfig);
+  const updateConfig = (newConfig: DataSetConfiguration) => {
+    if (onConfigurationChange) {
+      onConfigurationChange(newConfig);
+    }
   };
 
   return (
     <div className={styles.chartDataConfiguration}>
-      <datalist id="chartdataconfiguration_colours">
+      <datalist id={`${id}-colours`}>
         {colourOptions.map(({ value }) => (
           <option key={value} value={value} />
         ))}
       </datalist>
-      <FormFieldset id={configuration.value} legend="" legendHidden>
+      <FormFieldset id={id} legend="" legendHidden>
         <div className={styles.chartDataLabelConfiguration}>
           <div className={styles.chartDataItem}>
             <FormTextInput
               id={`${id}-label`}
               name="label"
-              value={config.label}
+              value={configuration.label}
               label="Label"
               onChange={e =>
                 updateConfig({
-                  ...config,
+                  ...configuration,
                   label: e.target.value,
                 })
               }
@@ -93,13 +84,13 @@ const ChartDataConfiguration = ({
               label="Colour"
               type="color"
               value={configuration.colour}
+              list={`${id}-colours`}
               onChange={e =>
                 updateConfig({
-                  ...config,
+                  ...configuration,
                   colour: e.target.value,
                 })
               }
-              list="chartdataconfiguration_colours"
             />
           </div>
 
@@ -110,13 +101,14 @@ const ChartDataConfiguration = ({
                 name="symbol"
                 label="Symbol"
                 value={configuration.symbol}
+                placeholder="none"
+                options={symbolOptions}
                 onChange={e =>
                   updateConfig({
-                    ...config,
+                    ...configuration,
                     symbol: e.target.value as ChartSymbol,
                   })
                 }
-                options={symbolOptions}
               />
             </div>
           )}
@@ -129,13 +121,13 @@ const ChartDataConfiguration = ({
                 label="Style"
                 value={configuration.lineStyle}
                 order={[]}
+                options={lineStyleOptions}
                 onChange={e =>
                   updateConfig({
-                    ...config,
+                    ...configuration,
                     lineStyle: e.target.value as LineStyle,
                   })
                 }
-                options={lineStyleOptions}
               />
             </div>
           )}

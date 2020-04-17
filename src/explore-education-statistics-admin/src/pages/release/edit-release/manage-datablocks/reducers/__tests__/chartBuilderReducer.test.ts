@@ -5,7 +5,7 @@ import {
 } from '@common/modules/charts/types/chart';
 import {
   DataSet,
-  DataSetAndConfiguration,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/dataSet';
 import produce from 'immer';
 import {
@@ -65,7 +65,7 @@ describe('chartBuilderReducer', () => {
   describe('UPDATE_CHART_DEFINITION', () => {
     const initialState: ChartBuilderState = {
       axes: {},
-      dataSetAndConfiguration: [],
+      dataSets: [],
       options: {
         height: 300,
       },
@@ -157,7 +157,7 @@ describe('chartBuilderReducer', () => {
       // Need to spread as there's a weird Jest bug
       // when comparing read-only objects
       // See: https://github.com/facebook/jest/issues/9531
-      expect({ ...nextState.axes.major }).toEqual<AxisConfiguration>({
+      expect(nextState.axes.major).toEqual<AxisConfiguration>({
         dataSets: [],
         groupBy: 'timePeriod',
         min: 0,
@@ -280,12 +280,9 @@ describe('chartBuilderReducer', () => {
     test('adds `axes.dataSets` if the definition has a major axis', () => {
       const initialStateWithDataSets: ChartBuilderState = {
         ...initialState,
-        dataSetAndConfiguration: [
+        dataSets: [
           {
-            configuration: {
-              value: '1',
-              label: 'Data set 1',
-            },
+            label: 'Data set 1',
             dataSet: {
               filters: ['filter-1', 'filter-2'],
               indicator: 'indicator-1',
@@ -313,12 +310,9 @@ describe('chartBuilderReducer', () => {
     test('does not add `axes.dataSets` for minor axis', () => {
       const initialStateWithDataSets: ChartBuilderState = {
         ...initialState,
-        dataSetAndConfiguration: [
+        dataSets: [
           {
-            configuration: {
-              value: '1',
-              label: 'Data set 1',
-            },
+            label: 'Data set 1',
             dataSet: {
               filters: ['filter-1', 'filter-2'],
               indicator: 'indicator-1',
@@ -348,7 +342,7 @@ describe('chartBuilderReducer', () => {
           visible: true,
         },
       },
-      dataSetAndConfiguration: [],
+      dataSets: [],
       definition: testChartDefinition,
       options: {
         height: 300,
@@ -429,12 +423,9 @@ describe('chartBuilderReducer', () => {
     test('updates `axes.dataSets` property with `dataSetsAndConfiguration` state', () => {
       const initialStateWithDataSets: ChartBuilderState = {
         ...initialState,
-        dataSetAndConfiguration: [
+        dataSets: [
           {
-            configuration: {
-              value: '1',
-              label: 'Data set 1',
-            },
+            label: 'Data set 1',
             dataSet: {
               filters: ['filter-1', 'filter-2'],
               indicator: 'indicator-1',
@@ -461,12 +452,9 @@ describe('chartBuilderReducer', () => {
     test('does not update `axes.dataSets` for minor axis', () => {
       const initialStateWithDataSets: ChartBuilderState = {
         ...initialState,
-        dataSetAndConfiguration: [
+        dataSets: [
           {
-            configuration: {
-              value: '1',
-              label: 'Data set 1',
-            },
+            label: 'Data set 1',
             dataSet: {
               filters: ['filter-1', 'filter-2'],
               indicator: 'indicator-1',
@@ -521,7 +509,7 @@ describe('chartBuilderReducer', () => {
   describe('UPDATE_CHART_OPTIONS', () => {
     const initialState: ChartBuilderState = {
       axes: {},
-      dataSetAndConfiguration: [],
+      dataSets: [],
       definition: testChartDefinition,
       options: {
         height: 300,
@@ -636,16 +624,13 @@ describe('chartBuilderReducer', () => {
   describe('ADD_DATA_SET', () => {
     const initialState: ChartBuilderState = {
       axes: {},
-      dataSetAndConfiguration: [
+      dataSets: [
         {
           dataSet: {
             indicator: 'indicator-1',
             filters: ['filter-1'],
           },
-          configuration: {
-            label: 'Label 1',
-            value: 'value-1',
-          },
+          label: 'Label 1',
         },
       ],
       definition: testChartDefinition,
@@ -662,35 +647,24 @@ describe('chartBuilderReducer', () => {
             indicator: 'indicator-2',
             filters: ['filter-2'],
           },
-          configuration: {
-            label: 'Label 2',
-            value: 'value-2',
-          },
+          label: 'Label 2',
         },
       } as ChartBuilderActions);
 
-      expect(nextState.dataSetAndConfiguration).toEqual<
-        DataSetAndConfiguration[]
-      >([
+      expect(nextState.dataSets).toEqual<DataSetConfiguration[]>([
         {
           dataSet: {
             indicator: 'indicator-1',
             filters: ['filter-1'],
           },
-          configuration: {
-            label: 'Label 1',
-            value: 'value-1',
-          },
+          label: 'Label 1',
         },
         {
           dataSet: {
             indicator: 'indicator-2',
             filters: ['filter-2'],
           },
-          configuration: {
-            label: 'Label 2',
-            value: 'value-2',
-          },
+          label: 'Label 2',
         },
       ]);
     });
@@ -699,26 +673,20 @@ describe('chartBuilderReducer', () => {
   describe('REMOVE_DATA_SET', () => {
     const initialState: ChartBuilderState = {
       axes: {},
-      dataSetAndConfiguration: [
+      dataSets: [
         {
           dataSet: {
             indicator: 'indicator-1',
             filters: ['filter-1'],
           },
-          configuration: {
-            label: 'Label 1',
-            value: 'value-1',
-          },
+          label: 'Label 1',
         },
         {
           dataSet: {
             indicator: 'indicator-2',
             filters: ['filter-2'],
           },
-          configuration: {
-            label: 'Label 2',
-            value: 'value-2',
-          },
+          label: 'Label 2',
         },
       ],
       definition: testChartDefinition,
@@ -733,16 +701,13 @@ describe('chartBuilderReducer', () => {
         payload: 1,
       } as ChartBuilderActions);
 
-      expect(nextState.dataSetAndConfiguration).toEqual([
+      expect(nextState.dataSets).toEqual<DataSetConfiguration[]>([
         {
           dataSet: {
             indicator: 'indicator-1',
             filters: ['filter-1'],
           },
-          configuration: {
-            label: 'Label 1',
-            value: 'value-1',
-          },
+          label: 'Label 1',
         },
       ]);
     });
@@ -751,26 +716,20 @@ describe('chartBuilderReducer', () => {
   describe('UPDATE_DATA_SETS', () => {
     const initialState: ChartBuilderState = {
       axes: {},
-      dataSetAndConfiguration: [
+      dataSets: [
         {
           dataSet: {
             indicator: 'indicator-1',
             filters: ['filter-1'],
           },
-          configuration: {
-            label: 'Label 1',
-            value: 'value-1',
-          },
+          label: 'Label 1',
         },
         {
           dataSet: {
             indicator: 'indicator-2',
             filters: ['filter-2'],
           },
-          configuration: {
-            label: 'Label 2',
-            value: 'value-2',
-          },
+          label: 'Label 2',
         },
       ],
       definition: testChartDefinition,
@@ -780,16 +739,13 @@ describe('chartBuilderReducer', () => {
     };
 
     test('replaces `dataSetAndConfiguration` with payload', () => {
-      const payload = [
+      const payload: DataSetConfiguration[] = [
         {
           dataSet: {
             indicator: 'indicator-3',
             filters: ['filter-3'],
           },
-          configuration: {
-            label: 'Label 3',
-            value: 'value-3',
-          },
+          label: 'Label 3',
         },
       ];
 
@@ -798,7 +754,7 @@ describe('chartBuilderReducer', () => {
         payload,
       } as ChartBuilderActions);
 
-      expect(nextState.dataSetAndConfiguration).toEqual(payload);
+      expect(nextState.dataSets).toEqual(payload);
     });
   });
 });

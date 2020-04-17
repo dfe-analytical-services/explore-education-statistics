@@ -8,8 +8,9 @@ import {
   ChartDefinitionOptions,
   chartDefinitions,
 } from '@common/modules/charts/types/chart';
-import { DataSetAndConfiguration } from '@common/modules/charts/types/dataSet';
-import { generateDeprecatedDataSetKey } from '@common/modules/charts/util/deprecatedDataSetKey';
+import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Chart } from '@common/services/types/blocks';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
@@ -23,7 +24,7 @@ export interface ChartOptions extends ChartDefinitionOptions {
 export interface ChartBuilderState {
   definition?: ChartDefinition;
   options: ChartOptions;
-  dataSetAndConfiguration: DataSetAndConfiguration[];
+  dataSets: DataSetConfiguration[];
   axes: AxesConfiguration;
   isValid?: boolean;
   chartProps?: ChartRendererProps;
@@ -36,12 +37,12 @@ export type ChartBuilderActions =
     }
   | {
       type: 'ADD_DATA_SET';
-      payload: DataSetAndConfiguration;
+      payload: DataSetConfiguration;
     }
   | { type: 'REMOVE_DATA_SET'; payload: number }
   | {
       type: 'UPDATE_DATA_SETS';
-      payload: DataSetAndConfiguration[];
+      payload: DataSetConfiguration[];
     }
   | {
       type: 'UPDATE_CHART_OPTIONS';
@@ -144,7 +145,7 @@ export const chartBuilderReducer: Reducer<
       break;
     }
     case 'ADD_DATA_SET': {
-      draft.dataSetAndConfiguration.push(action.payload);
+      draft.dataSets.push(action.payload);
 
       if (typeof draft.isValid === 'undefined') {
         draft.isValid = true;
@@ -153,19 +154,19 @@ export const chartBuilderReducer: Reducer<
       break;
     }
     case 'REMOVE_DATA_SET': {
-      draft.dataSetAndConfiguration.splice(action.payload, 1);
+      draft.dataSets.splice(action.payload, 1);
 
       if (typeof draft.isValid === 'undefined') {
-        draft.isValid = draft.dataSetAndConfiguration.length > 0;
+        draft.isValid = draft.dataSets.length > 0;
       }
 
       break;
     }
     case 'UPDATE_DATA_SETS': {
-      draft.dataSetAndConfiguration = action.payload;
+      draft.dataSets = action.payload;
 
       if (typeof draft.isValid === 'undefined') {
-        draft.isValid = draft.dataSetAndConfiguration.length > 0;
+        draft.isValid = draft.dataSets.length > 0;
       }
 
       break;
@@ -177,16 +178,21 @@ export const chartBuilderReducer: Reducer<
       break;
   }
 
-  Object.values(draft.axes as Required<AxesConfiguration>).forEach(axis => {
-    // eslint-disable-next-line no-param-reassign
-    axis.dataSets =
-      axis.type === 'major'
-        ? draft.dataSetAndConfiguration.map(dsc => dsc.dataSet)
-        : [];
-  });
+  if (draft.axes.major) {
+    draft.axes.major.dataSets = draft.dataSets.map(
+      dataSetConfig => dataSetConfig.dataSet,
+    );
+  }
+
+  if (draft.axes.minor) {
+    draft.axes.minor.dataSets = [];
+  }
 };
 
-export function useChartBuilderReducer(initialConfiguration?: Chart) {
+export function useChartBuilderReducer(
+  meta: FullTableMeta,
+  initialConfiguration?: Chart,
+) {
   const [state, dispatch] = useImmerReducer<
     ChartBuilderState,
     ChartBuilderActions
@@ -203,46 +209,30 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
         height: 300,
         title: '',
       },
-      dataSetAndConfiguration: [],
+      dataSets: [],
     },
     initial => {
-      let dataSetAndConfiguration: DataSetAndConfiguration[] = [];
+      let dataSets: DataSetConfiguration[] = [];
 
       if (
         initialConfiguration?.axes?.major?.dataSets &&
         initialConfiguration?.labels
       ) {
-        dataSetAndConfiguration = initialConfiguration.axes.major.dataSets
-          .map(dataSet => {
-            const key = generateDeprecatedDataSetKey(dataSet);
-            const configuration = initialConfiguration.labels[key];
-
-            return {
-              dataSet,
-              // Set the value to the key as it doesn't
-              // always exist (e.g. for seed data)
-              configuration: configuration
-                ? {
-                    ...configuration,
-                    value: configuration.value ?? key,
-                  }
-                : undefined,
-            };
-          })
-          .filter(
-            dsc => typeof dsc.configuration !== 'undefined',
-          ) as DataSetAndConfiguration[];
+        dataSets = getLabelDataSetConfigurations(
+          initialConfiguration.labels,
+          initialConfiguration.axes.major.dataSets,
+        );
       }
 
       return {
         ...initial,
-        dataSetAndConfiguration,
+        dataSets,
       };
     },
   );
 
   const addDataSet = useCallback(
-    (addedData: DataSetAndConfiguration) => {
+    (addedData: DataSetConfiguration) => {
       dispatch({
         type: 'ADD_DATA_SET',
         payload: addedData,
@@ -252,7 +242,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const removeDataSet = useCallback(
-    (removedData: DataSetAndConfiguration, index: number) => {
+    (removedData: DataSetConfiguration, index: number) => {
       dispatch({
         type: 'REMOVE_DATA_SET',
         payload: index,
@@ -262,7 +252,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const updateDataSet = useCallback(
-    (newData: DataSetAndConfiguration[]) => {
+    (newData: DataSetConfiguration[]) => {
       dispatch({
         type: 'UPDATE_DATA_SETS',
         payload: newData,

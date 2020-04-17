@@ -3,6 +3,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
+import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
 import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
@@ -88,11 +89,17 @@ const DataBlockRenderer = ({
             {dataBlock?.charts.map((chart, index) => {
               const key = index;
 
+              const labels = getLabelDataSetConfigurations(
+                chart.labels,
+                chart.axes?.major?.dataSets ?? [],
+              );
+
               if (chart.type === 'infographic') {
                 return (
                   <ChartRenderer
                     {...chart}
                     key={key}
+                    labels={labels}
                     data={fullTable?.results}
                     meta={fullTable?.subjectMeta}
                     source={dataBlock?.source}
@@ -105,6 +112,7 @@ const DataBlockRenderer = ({
                 <ChartRenderer
                   {...chart}
                   key={key}
+                  labels={labels}
                   data={fullTable?.results}
                   meta={fullTable?.subjectMeta}
                   source={dataBlock?.source}

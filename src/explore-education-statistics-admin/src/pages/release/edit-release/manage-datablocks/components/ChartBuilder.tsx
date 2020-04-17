@@ -32,13 +32,12 @@ import {
   ChartDefinition,
   ChartProps,
 } from '@common/modules/charts/types/chart';
-import { DeprecatedDataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { DataBlockRerequest } from '@common/services/dataBlockService';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
-import { Dictionary } from '@common/types';
+import { Chart, DeprecatedChartLabels } from '@common/services/types/blocks';
 import React, { useCallback, useMemo } from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
@@ -66,30 +65,13 @@ const ChartBuilder = ({
   onRequiresDataUpdate,
 }: Props) => {
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
+    meta,
     initialConfiguration,
   );
 
-  const {
-    axes,
-    definition,
-    options,
-    dataSetAndConfiguration,
-    isValid,
-  } = chartBuilderState;
+  const { axes, definition, options, dataSets, isValid } = chartBuilderState;
 
   const getChartFile = useGetChartFile(releaseId);
-
-  const labels: Dictionary<DeprecatedDataSetConfiguration> = useMemo(
-    () =>
-      dataSetAndConfiguration.reduce<
-        Dictionary<DeprecatedDataSetConfiguration>
-      >((acc, { configuration }) => {
-        acc[configuration.value] = configuration;
-
-        return acc;
-      }, {}),
-    [dataSetAndConfiguration],
-  );
 
   const chartProps = useMemo<ChartRendererProps | undefined>(() => {
     if (!definition) {
@@ -101,14 +83,14 @@ const ChartBuilder = ({
       data,
       axes,
       meta,
-      labels,
+      labels: dataSets,
     };
 
     switch (definition.type) {
       case 'infographic':
         return {
           ...baseProps,
-          labels: {},
+          labels: [],
           type: 'infographic',
           fileId: options.fileId ?? '',
           getInfographic: getChartFile,
@@ -136,7 +118,7 @@ const ChartBuilder = ({
       default:
         return undefined;
     }
-  }, [axes, data, definition, getChartFile, labels, meta, options]);
+  }, [axes, data, definition, getChartFile, dataSets, meta, options]);
 
   const handleBoundaryLevelChange = useCallback(
     (boundaryLevel: string) => {
@@ -151,12 +133,27 @@ const ChartBuilder = ({
   );
 
   const handleChartSave = useCallback(async () => {
-    if (!isChartRenderable(chartProps) && !isValid) {
+    if (chartProps && !isChartRenderable(chartProps) && !isValid) {
       return;
     }
 
     if (onChartSave) {
-      await onChartSave(chartProps as ChartRendererProps);
+      await onChartSave({
+        ...chartProps,
+        labels: chartProps?.labels.reduce<DeprecatedChartLabels>(
+          (acc, { dataSet, ...labelConfig }) => {
+            const key = generateDataSetKey(dataSet);
+
+            acc[key] = {
+              ...labelConfig,
+              value: key,
+            };
+
+            return acc;
+          },
+          {},
+        ),
+      } as Chart);
     }
   }, [chartProps, isValid, onChartSave]);
 
@@ -206,7 +203,7 @@ const ChartBuilder = ({
               <ChartDataSelector
                 canSaveChart={isValid}
                 meta={meta}
-                selectedData={dataSetAndConfiguration}
+                dataSets={dataSets}
                 chartType={definition}
                 capabilities={definition.capabilities}
                 onDataAdded={actions.addDataSet}

@@ -23,12 +23,11 @@ import {
 } from '@common/modules/charts/types/chart';
 import {
   DataSet,
-  DeprecatedDataSetConfiguration,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -43,7 +42,7 @@ interface Props {
   configuration: AxisConfiguration;
   data: TableDataResult[];
   meta: FullTableMeta;
-  labels?: Dictionary<DeprecatedDataSetConfiguration>;
+  labels?: DataSetConfiguration[];
   capabilities: ChartCapabilities;
   dataSets: DataSet[];
   onChange: (configuration: AxisConfigurationChangeValue) => void;
@@ -56,7 +55,7 @@ const ChartAxisConfiguration = ({
   data,
   meta,
   type,
-  labels = {},
+  labels = [],
   capabilities,
   dataSets = [],
   onChange,
@@ -68,9 +67,9 @@ const ChartAxisConfiguration = ({
         label: 'Default',
         value: 'name',
       },
-      ...Object.values(labels).map<SelectOption>(config => ({
+      ...labels.map<SelectOption>(config => ({
         label: config.label,
-        value: config.value,
+        value: JSON.stringify(config.dataSet),
       })),
     ];
   }, [labels]);
