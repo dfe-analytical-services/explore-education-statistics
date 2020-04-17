@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteDataFilesAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.DeleteDataFilesAsync(_release.Id, "", ""),  
+                    service.RemoveDataFileReleaseLinkAsync(_release.Id, "", ""),  
                 _release,
                 CanUpdateSpecificRelease);
         }

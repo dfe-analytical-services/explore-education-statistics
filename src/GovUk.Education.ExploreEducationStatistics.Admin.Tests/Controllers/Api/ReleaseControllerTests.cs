@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(service => service.DeleteDataFilesAsync(_releaseId, "datafilename", "subject title"))
+                .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(new List<FileInfo>());
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(service => service.DeleteDataFilesAsync(_releaseId, "datafilename", "subject title"))
+                .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
             var controller = ReleasesControllerWithMocks(mocks);
 

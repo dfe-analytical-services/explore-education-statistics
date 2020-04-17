@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteDataFileAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.DeleteDataFileAsync(
+                    service.RemoveDataFileReleaseLinkAsync(
                         _release.Id, 
                         ""
                         ), 

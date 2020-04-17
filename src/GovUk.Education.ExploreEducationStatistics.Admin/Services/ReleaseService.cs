@@ -129,14 +129,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var roles = await _context
-                        .UserReleaseRoles
-                        .Where(r => r.ReleaseId == releaseId)
-                        .ToListAsync();
+                            .UserReleaseRoles
+                            .Where(r => r.ReleaseId == releaseId)
+                            .ToListAsync();
 
                     var invites = await _context
-                        .UserReleaseInvites
-                        .Where(r => r.ReleaseId == releaseId)
-                        .ToListAsync();
+                            .UserReleaseInvites
+                            .Where(r => r.ReleaseId == releaseId)
+                            .ToListAsync();
                     
                     release.SoftDeleted = true;
                     roles.ForEach(r => r.SoftDeleted = true);
@@ -413,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> RemoveDataFileReleaseLinkAsync(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -422,17 +422,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileName, subjectTitle))
                 .OnSuccess(async deletePlan =>
                 {
-                    await _subjectService.DeleteAsync(deletePlan.SubjectId);
                     await DeleteDependentDataBlocks(deletePlan);
-                    await DeleteChartFiles(deletePlan);
+                    await RemoveChartFileReleaseLinks(deletePlan);
+                    await _subjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
 
                     return await _fileStorageService
-                        .DeleteDataFileAsync(releaseId, fileName)
-                        .OnSuccessDo(async () =>
-                        {
-                            await _tableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
-                        });
+                        .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
+                        .OnSuccessDo(() => RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
+        }
+
+        private async Task<bool> RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
+        {
+            if (!_subjectService.Exists(deletePlan.SubjectId))
+            {
+                return await _tableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
+            }
+
+            return false;
         }
 
         public async Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName)
@@ -442,10 +449,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var fileLink = await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(_context
+                    var fileLink = _context
                             .ReleaseFiles
-                            .Include(f => f.ReleaseFileReference), f =>
-                            f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
+                            .Include(f => f.ReleaseFileReference)
+                            .First(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
 
                     if (fileLink == null)
                     {
@@ -481,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
-        private async Task DeleteChartFiles(DeleteDataFilePlan deletePlan)
+        private async Task RemoveChartFileReleaseLinks(DeleteDataFilePlan deletePlan)
         {
             var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
                 block.InfographicFilenames.Select(chartFilename =>
@@ -506,9 +513,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string fileName)
+        private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string dataFileName)
         {
-            var importFinished = await _importStatusService.IsImportFinished(releaseId.ToString(), fileName);
+            var releaseFileReference = _context
+                .ReleaseFiles
+                .Include(r => r.ReleaseFileReference)
+                .Where(r => r.ReleaseId == releaseId && r.ReleaseFileReference.Filename == dataFileName)
+                .Select(r => r.ReleaseFileReference)
+                .First();
+                
+            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId.ToString(), dataFileName);
             
             if (!importFinished)
             {

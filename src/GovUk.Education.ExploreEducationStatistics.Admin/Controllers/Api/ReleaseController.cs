@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _releaseService
-                .DeleteDataFilesAsync(releaseId, fileName, subjectTitle)
+                .RemoveDataFileReleaseLinkAsync(releaseId, fileName, subjectTitle)
                 .HandleFailuresOrOk();
         }
 

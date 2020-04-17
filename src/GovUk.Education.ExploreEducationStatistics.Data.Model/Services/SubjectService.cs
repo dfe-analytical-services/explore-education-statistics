@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         
         public bool Exists(Guid releaseId, string name)
         {
-            return _context.Subject.Any(x => x.ReleaseId == releaseId && x.Name == name);
+            return GetAsync(releaseId, name).Result != null;
         }
 
         public async Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(Guid subjectId)
@@ -64,36 +64,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .ToList();
         }
 
-        public async Task<bool> DeleteAsync(Guid subjectId)
+        public async Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, Guid subjectId)
         {
-            var subject = await _context
-                .Subject
-                .FirstOrDefaultAsync(s => s.Id == subjectId);
-                
-            if (subject != null)
-            {
-                var orphanFootnotes = await GetFootnotesOnlyForSubjectAsync(subjectId);
+            var releaseSubjectLinkToRemove = await _context
+                .ReleaseSubject
+                .FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.SubjectId == subjectId);
 
-                _context.Subject.Remove(subject);
-                _context.Footnote.RemoveRange(orphanFootnotes);
-                
-                await _context.SaveChangesAsync();
-                return true;
+            if (releaseSubjectLinkToRemove == null)
+            {
+                return false;
             }
-            return false;
+            
+            var numberOfReleaseSubjectLinks = _context
+                .ReleaseSubject
+                .Count(s => s.SubjectId == subjectId);
+
+            _context.ReleaseSubject.Remove(releaseSubjectLinkToRemove);
+            
+            if (numberOfReleaseSubjectLinks == 1)
+            {
+                var subject = await _context
+                    .Subject
+                    .FirstOrDefaultAsync(s => s.Id == subjectId);
+            
+                if (subject != null)
+                {
+                    var orphanFootnotes = await GetFootnotesOnlyForSubjectAsync(subjectId);
+
+                    _context.Subject.Remove(subject);
+                    _context.Footnote.RemoveRange(orphanFootnotes);
+                }    
+            }
+        
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task<bool> DeleteAsync(Guid releaseId, string name)
+        public async Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, string name)
         {
             var subject = await GetAsync(releaseId, name);
-            return await DeleteAsync(subject.Id);
+            return await RemoveReleaseSubjectLinkAsync(releaseId, subject.Id);
         }
         
         public async Task<Subject> GetAsync(Guid releaseId, string name)
         {
             return await _context
-                .Subject
-                .FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
+                .ReleaseSubject
+                .Include(r => r.Subject)
+                .Where(r => r.ReleaseId == releaseId && r.Subject.Name == name)
+                .Select(r => r.Subject)
+                .FirstOrDefaultAsync();
         }
 
         private static bool FootnoteLinkedToNoOtherSubject(Guid subjectId, Footnote f)

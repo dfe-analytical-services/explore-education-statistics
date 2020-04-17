@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> DeleteDataFileAsync(Guid releaseId,
+        public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> RemoveDataFileReleaseLinkAsync(Guid releaseId,
             string dataFileName)
         {
             return _persistenceHelper
@@ -152,19 +152,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> CheckFileDeletionWillOrphanFileAsync(Guid releaseId, string filename, ReleaseFileTypes type)
         {
-            var fileReference = await _context
-                .ReleaseFiles
-                .Include(f => f.ReleaseFileReference)
-                .SingleAsync(f =>
-                    f.ReleaseId == releaseId
-                    && f.ReleaseFileReference.Filename == filename
-                    && f.ReleaseFileReference.ReleaseFileType == type);
+            var fileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
 
-            var fileReferenceUsages = await _context
+            var otherFileReferences = await _context
                 .ReleaseFiles
-                .CountAsync(f => f.ReleaseFileReferenceId == fileReference.Id);
+                .CountAsync(f => f.ReleaseFileReferenceId == fileLink.ReleaseFileReferenceId && f.Id != fileLink.Id);
 
-            return fileReferenceUsages > 1;
+            return otherFileReferences == 0;
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadFilesAsync(Guid releaseId,
@@ -330,8 +324,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
+                    var fileLink = await GetReleaseFileLinkAsync(releaseId, fileName, type);
+                    
                     var blobContainer = await GetCloudBlobContainer();
-                    var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type == ReleaseFileTypes.Metadata ? ReleaseFileTypes.Data : type, fileName));
+                    var blob = blobContainer.GetBlockBlobReference(AdminReleasePathWithFileReference(fileLink.ReleaseFileReference));
 
                     if (!blob.Exists())
                     {
@@ -460,23 +456,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, bool>> DeleteFileLink(Guid releaseId, string filename, ReleaseFileTypes type)
         {
-            var fileLink = await _context
-                .ReleaseFiles
-                .Include(f => f.ReleaseFileReference)
-                .Where(f => 
-                    f.ReleaseId == releaseId 
-                    && f.ReleaseFileReference.ReleaseFileType == type 
-                    && f.ReleaseFileReference.Filename == filename)
-                .FirstOrDefaultAsync();
+            var fileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
 
             _context.ReleaseFiles.Remove(fileLink);
             await _context.SaveChangesAsync();
             return true;
         }
 
-        private async Task<Either<ActionResult, bool>> DeleteFileReference(Guid releaseId, string filename, ReleaseFileTypes type)
+        private async Task<ReleaseFile> GetReleaseFileLinkAsync(Guid releaseId, string filename, ReleaseFileTypes type)
         {
-            var fileLink = await _context
+            return await _context
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
                 .Where(f => 
@@ -484,6 +473,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && f.ReleaseFileReference.ReleaseFileType == type 
                     && f.ReleaseFileReference.Filename == filename)
                 .FirstOrDefaultAsync();
+        }
+
+        private async Task<Either<ActionResult, bool>> DeleteFileReference(Guid releaseId, string filename, ReleaseFileTypes type)
+        {
+            var fileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
 
             _context.ReleaseFileReferences.Remove(fileLink.ReleaseFileReference);
             await _context.SaveChangesAsync();
