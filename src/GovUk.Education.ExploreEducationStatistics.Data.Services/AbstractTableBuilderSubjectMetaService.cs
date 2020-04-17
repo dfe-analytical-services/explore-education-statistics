@@ -39,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     {
                         Hint = itemsGroupedByFilter.Key.Hint,
                         Legend = itemsGroupedByFilter.Key.Label,
+                        Name = itemsGroupedByFilter.Key.Name,
                         Options = itemsGroupedByFilter
                             .GroupBy(item => item.FilterGroup, item => item, FilterGroup.IdComparer)
                             .ToDictionary(

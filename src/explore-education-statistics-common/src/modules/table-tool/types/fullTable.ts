@@ -12,6 +12,7 @@ export interface FullTableMeta {
   locations: LocationFilter[];
   timePeriodRange: TimePeriodFilter[];
   filters: Dictionary<{
+    name: string;
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;
