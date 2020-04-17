@@ -1,9 +1,20 @@
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+import { DeprecatedDataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
-import { OmitStrict } from '@common/types';
+import { Dictionary, OmitStrict } from '@common/types';
 
-export type Chart = OmitStrict<ChartRendererProps, 'data' | 'meta'>;
+/**
+ * @deprecated
+ */
+export type DeprecatedChartLabels = Dictionary<DeprecatedDataSetConfiguration>;
+
+export type Chart = OmitStrict<
+  ChartRendererProps,
+  'data' | 'meta' | 'labels'
+> & {
+  labels: DeprecatedChartLabels;
+};
 
 export interface Table {
   indicators: string[];
