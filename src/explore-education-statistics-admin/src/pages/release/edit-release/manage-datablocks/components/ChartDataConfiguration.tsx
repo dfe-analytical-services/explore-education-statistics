@@ -4,22 +4,21 @@ import {
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartSymbol,
   LineStyle,
 } from '@common/modules/charts/types/chart';
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSetConfigurationOptions } from '@common/modules/charts/types/dataSet';
 import { colours, symbols } from '@common/modules/charts/util/chartUtils';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface Props {
-  configuration: DataSetConfiguration;
+  configuration: DataSetConfigurationOptions;
   capabilities: ChartCapabilities;
   id: string;
-  onConfigurationChange?: (value: DataSetConfiguration) => void;
+  onConfigurationChange?: (value: DataSetConfigurationOptions) => void;
 }
 
 const colourOptions: SelectOption[] = colours.map(color => {
@@ -47,7 +46,7 @@ const ChartDataConfiguration = ({
   id,
   onConfigurationChange,
 }: Props) => {
-  const updateConfig = (newConfig: DataSetConfiguration) => {
+  const updateConfig = (newConfig: DataSetConfigurationOptions) => {
     if (onConfigurationChange) {
       onConfigurationChange(newConfig);
     }

@@ -35,7 +35,7 @@ export interface ExpandedDataSet {
 export interface DataSetCategory {
   filter: Filter;
   dataSets: Dictionary<{
-    dataSet: DataSet;
+    dataSet: DataSetConfiguration;
     value: number;
   }>;
 }
@@ -50,14 +50,19 @@ export interface DeprecatedDataSetConfiguration {
   label: string;
   value: string;
   colour?: string;
+  unit?: string;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
 }
 
-export interface DataSetConfiguration {
-  dataSet: DataSet;
+export interface DataSetConfigurationOptions {
   label: string;
   colour?: string;
+  unit?: string;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
+}
+
+export interface DataSetConfiguration extends DataSet {
+  config: DataSetConfigurationOptions;
 }

@@ -24,7 +24,6 @@ export interface ChartOptions extends ChartDefinitionOptions {
 export interface ChartBuilderState {
   definition?: ChartDefinition;
   options: ChartOptions;
-  dataSets: DataSetConfiguration[];
   axes: AxesConfiguration;
   isValid?: boolean;
   chartProps?: ChartRendererProps;
@@ -62,6 +61,7 @@ const defaultOptions: Partial<ChartOptions> = {
 };
 
 const defaultAxisOptions: Partial<AxisConfiguration> = {
+  dataSets: [],
   min: 0,
   referenceLines: [],
   showGrid: true,
@@ -145,7 +145,9 @@ export const chartBuilderReducer: Reducer<
       break;
     }
     case 'ADD_DATA_SET': {
-      draft.dataSets.push(action.payload);
+      if (draft.axes.major) {
+        draft.axes.major.dataSets.push(action.payload);
+      }
 
       if (typeof draft.isValid === 'undefined') {
         draft.isValid = true;
@@ -154,19 +156,23 @@ export const chartBuilderReducer: Reducer<
       break;
     }
     case 'REMOVE_DATA_SET': {
-      draft.dataSets.splice(action.payload, 1);
+      if (draft.axes.major) {
+        draft.axes.major.dataSets.splice(action.payload, 1);
 
-      if (typeof draft.isValid === 'undefined') {
-        draft.isValid = draft.dataSets.length > 0;
+        if (typeof draft.isValid === 'undefined') {
+          draft.isValid = draft.axes.major.dataSets.length > 0;
+        }
       }
 
       break;
     }
     case 'UPDATE_DATA_SETS': {
-      draft.dataSets = action.payload;
+      if (draft.axes.major) {
+        draft.axes.major.dataSets = action.payload;
 
-      if (typeof draft.isValid === 'undefined') {
-        draft.isValid = draft.dataSets.length > 0;
+        if (typeof draft.isValid === 'undefined') {
+          draft.isValid = draft.axes.major.dataSets.length > 0;
+        }
       }
 
       break;
@@ -176,16 +182,6 @@ export const chartBuilderReducer: Reducer<
       break;
     default:
       break;
-  }
-
-  if (draft.axes.major) {
-    draft.axes.major.dataSets = draft.dataSets.map(
-      dataSetConfig => dataSetConfig.dataSet,
-    );
-  }
-
-  if (draft.axes.minor) {
-    draft.axes.minor.dataSets = [];
   }
 };
 
@@ -199,7 +195,7 @@ export function useChartBuilderReducer(
   >(
     chartBuilderReducer,
     {
-      axes: initialConfiguration?.axes ?? {},
+      axes: {},
       definition: initialConfiguration
         ? chartDefinitions.find(
             ({ type }) => type === initialConfiguration.type,
@@ -209,24 +205,27 @@ export function useChartBuilderReducer(
         height: 300,
         title: '',
       },
-      dataSets: [],
     },
-    initial => {
-      let dataSets: DataSetConfiguration[] = [];
+    initialState => {
+      if (!initialConfiguration) {
+        return initialState;
+      }
+
+      const axes = { ...initialConfiguration.axes } as AxesConfiguration;
 
       if (
-        initialConfiguration?.axes?.major?.dataSets &&
-        initialConfiguration?.labels
+        axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
+        initialConfiguration.labels
       ) {
-        dataSets = getLabelDataSetConfigurations(
+        axes.major.dataSets = getLabelDataSetConfigurations(
           initialConfiguration.labels,
-          initialConfiguration.axes.major.dataSets,
+          axes.major.dataSets,
         );
       }
 
       return {
-        ...initial,
-        dataSets,
+        ...initialState,
+        axes,
       };
     },
   );

@@ -3,6 +3,7 @@ import {
   ChartData,
   DataSet,
   DataSetCategory,
+  DataSetConfiguration,
 } from '@common/modules/charts/types/dataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import {
@@ -29,8 +30,8 @@ import orderBy from 'lodash/orderBy';
  * that the user defined in their configuration.
  */
 interface ChildDataSet {
-  dataSet: DataSet;
-  parent: DataSet;
+  dataSet: DataSetConfiguration;
+  parent: DataSetConfiguration;
 }
 
 function dedupeDataSets(dataSets: ChildDataSet[]): ChildDataSet[] {

@@ -8,6 +8,8 @@ import { DeprecatedChartLabels } from '@common/services/types/blocks';
 
 /**
  * Combine {@param labels} to matching {@param dataSets}.
+ * In the future, we won't need this function as {@param labels}
+ * will be removed from chart data structures completely.
  */
 export default function getLabelDataSetConfigurations(
   labels: DeprecatedChartLabels,
@@ -32,8 +34,8 @@ export default function getLabelDataSetConfigurations(
       }
 
       return {
-        ...(configuration ?? {}),
-        dataSet,
+        ...dataSet,
+        config: configuration ?? {},
       };
     })
     .filter(

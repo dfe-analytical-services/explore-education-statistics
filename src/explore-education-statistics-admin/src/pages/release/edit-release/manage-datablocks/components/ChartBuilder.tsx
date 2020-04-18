@@ -32,12 +32,11 @@ import {
   ChartDefinition,
   ChartProps,
 } from '@common/modules/charts/types/chart';
-import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { DataBlockRerequest } from '@common/services/dataBlockService';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { Chart, DeprecatedChartLabels } from '@common/services/types/blocks';
+import { Chart } from '@common/services/types/blocks';
 import React, { useCallback, useMemo } from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
@@ -69,7 +68,7 @@ const ChartBuilder = ({
     initialConfiguration,
   );
 
-  const { axes, definition, options, dataSets, isValid } = chartBuilderState;
+  const { axes, definition, options, isValid } = chartBuilderState;
 
   const getChartFile = useGetChartFile(releaseId);
 
@@ -83,7 +82,6 @@ const ChartBuilder = ({
       data,
       axes,
       meta,
-      labels: dataSets,
     };
 
     switch (definition.type) {
@@ -118,7 +116,7 @@ const ChartBuilder = ({
       default:
         return undefined;
     }
-  }, [axes, data, definition, getChartFile, dataSets, meta, options]);
+  }, [axes, data, definition, getChartFile, meta, options]);
 
   const handleBoundaryLevelChange = useCallback(
     (boundaryLevel: string) => {
@@ -138,21 +136,10 @@ const ChartBuilder = ({
     }
 
     if (onChartSave) {
+      // We don't want to persist data set labels
+      // anymore in the deprecated format.
       await onChartSave({
-        ...chartProps,
-        labels: chartProps?.labels.reduce<DeprecatedChartLabels>(
-          (acc, { dataSet, ...labelConfig }) => {
-            const key = generateDataSetKey(dataSet);
-
-            acc[key] = {
-              ...labelConfig,
-              value: key,
-            };
-
-            return acc;
-          },
-          {},
-        ),
+        labels: undefined,
       } as Chart);
     }
   }, [chartProps, isValid, onChartSave]);
@@ -203,7 +190,7 @@ const ChartBuilder = ({
               <ChartDataSelector
                 canSaveChart={isValid}
                 meta={meta}
-                dataSets={dataSets}
+                dataSets={axes.major?.dataSets}
                 chartType={definition}
                 capabilities={definition.capabilities}
                 onDataAdded={actions.addDataSet}
@@ -252,7 +239,6 @@ const ChartBuilder = ({
                   capabilities={definition.capabilities}
                   data={data}
                   meta={meta}
-                  labels={chartProps?.labels}
                   dataSets={axisConfiguration?.dataSets}
                   onChange={actions.updateChartAxis}
                   onSubmit={handleChartSave}

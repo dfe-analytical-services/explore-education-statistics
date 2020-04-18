@@ -119,7 +119,7 @@ const ChartDataSelector = ({
           : undefined;
 
         if (
-          dataSetConfigs.find(({ dataSet }) => {
+          dataSetConfigs.find(dataSet => {
             return (
               dataSet.indicator === indicator &&
               difference(dataSet.filters, filters).length === 0 &&
@@ -145,17 +145,19 @@ const ChartDataSelector = ({
 
         const label = generateDefaultDataSetLabel(expandedDataSet);
 
-        const newDataSet: DataSetConfiguration = {
-          dataSet,
-          label,
-          colour: colours[dataSetConfigs.length % colours.length],
-          symbol: symbols[dataSetConfigs.length % symbols.length],
+        const newDataSetConfig: DataSetConfiguration = {
+          ...dataSet,
+          config: {
+            label,
+            colour: colours[dataSetConfigs.length % colours.length],
+            symbol: symbols[dataSetConfigs.length % symbols.length],
+          },
         };
 
-        setDataSetConfigs([...dataSetConfigs, newDataSet]);
+        setDataSetConfigs([...dataSetConfigs, newDataSetConfig]);
 
         if (onDataAdded) {
-          onDataAdded(newDataSet);
+          onDataAdded(newDataSetConfig);
         }
 
         form.resetForm();
@@ -233,18 +235,18 @@ const ChartDataSelector = ({
             <>
               <hr />
 
-              {dataSetConfigs.map((config, index) => {
-                const expandedDataSet = expandDataSet(config.dataSet, meta);
+              {dataSetConfigs.map((dataSet, index) => {
+                const expandedDataSet = expandDataSet(dataSet, meta);
                 const label = generateDefaultDataSetLabel(expandedDataSet);
 
                 return (
-                  <React.Fragment key={JSON.stringify(config.dataSet)}>
+                  <React.Fragment key={JSON.stringify(dataSet)}>
                     <ul className={styles.dataSets}>
                       <li>
                         <div className={styles.dataSetRow}>
                           <span>{label}</span>
                           <Button
-                            onClick={() => removeSelected(config, index)}
+                            onClick={() => removeSelected(dataSet, index)}
                             className="govuk-!-margin-bottom-0 govuk-button--secondary"
                           >
                             Remove
@@ -256,7 +258,7 @@ const ChartDataSelector = ({
                             className="govuk-!-margin-bottom-3 govuk-body-s"
                           >
                             <ChartDataConfiguration
-                              configuration={config}
+                              configuration={dataSet.config}
                               capabilities={capabilities}
                               id={`${formId}-chartDataConfiguration-${index}`}
                               onConfigurationChange={updateDataSetConfig => {

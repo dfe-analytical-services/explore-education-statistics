@@ -21,6 +21,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  Line,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -40,7 +41,6 @@ const VerticalBarBlock = ({
   meta,
   height,
   width,
-  labels,
   axes,
   stacked,
   legend,
@@ -107,17 +107,16 @@ const VerticalBarBlock = ({
 
         {getCategoryDataSetConfigurations(
           dataSetCategories,
-          labels,
           axes.major,
           meta,
-        ).map(config => (
+        ).map(({ config, dataKey, dataSet }) => (
           <Bar
-            key={config.dataKey}
-            dataKey={config.dataKey}
+            key={dataKey}
+            dataKey={dataKey}
             isAnimationActive={false}
             name={config.label}
             fill={config.colour}
-            unit={config.dataSet.indicator.unit}
+            unit={dataSet.indicator.unit}
             stackId={stacked ? 'a' : undefined}
           />
         ))}

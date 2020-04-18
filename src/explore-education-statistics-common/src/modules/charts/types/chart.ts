@@ -45,7 +45,7 @@ export interface AxisConfiguration {
   groupBy?: AxisGroupBy;
   sortBy?: string;
   sortAsc?: boolean;
-  dataSets: DataSet[];
+  dataSets: DataSetConfiguration[];
   referenceLines?: ReferenceLine[];
   visible: boolean;
   unit?: string;
@@ -68,7 +68,6 @@ export interface ChartProps {
   title?: string;
   height: number;
   width?: number;
-  labels: DataSetConfiguration[];
   axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
 }

@@ -42,7 +42,6 @@ const HorizontalBarBlock = ({
   height,
   width,
   stacked = false,
-  labels,
   axes,
   legend,
   renderLegend,
@@ -110,17 +109,16 @@ const HorizontalBarBlock = ({
 
         {getCategoryDataSetConfigurations(
           dataSetCategories,
-          labels,
           axes.major,
           meta,
-        ).map(config => (
+        ).map(({ config, dataKey, dataSet }) => (
           <Bar
-            key={config.dataKey}
-            dataKey={config.dataKey}
+            key={dataKey}
+            dataKey={dataKey}
             isAnimationActive={false}
             name={config.label}
             fill={config.colour}
-            unit={config.dataSet.indicator.unit}
+            unit={dataSet.indicator.unit}
             stackId={stacked ? 'a' : undefined}
           />
         ))}

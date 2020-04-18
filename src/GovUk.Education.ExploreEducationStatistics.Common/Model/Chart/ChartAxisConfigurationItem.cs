@@ -62,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public List<Guid> Filters;
         public ChartDataLocation Location;
         public string? TimePeriod;
+        public ChartConfiguration Config;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]

@@ -21,11 +21,9 @@ import {
   ChartCapabilities,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
-import {
-  DataSet,
-  DataSetConfiguration,
-} from '@common/modules/charts/types/dataSet';
+import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -42,9 +40,8 @@ interface Props {
   configuration: AxisConfiguration;
   data: TableDataResult[];
   meta: FullTableMeta;
-  labels?: DataSetConfiguration[];
   capabilities: ChartCapabilities;
-  dataSets: DataSet[];
+  dataSets: DataSetConfiguration[];
   onChange: (configuration: AxisConfigurationChangeValue) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -55,7 +52,6 @@ const ChartAxisConfiguration = ({
   data,
   meta,
   type,
-  labels = [],
   capabilities,
   dataSets = [],
   onChange,
@@ -67,12 +63,12 @@ const ChartAxisConfiguration = ({
         label: 'Default',
         value: 'name',
       },
-      ...labels.map<SelectOption>(config => ({
-        label: config.label,
-        value: JSON.stringify(config.dataSet),
+      ...dataSets.map<SelectOption>(dataSet => ({
+        label: dataSet.config.label,
+        value: generateDataSetKey(dataSet),
       })),
     ];
-  }, [labels]);
+  }, [dataSets]);
 
   const limitOptions = useMemo<SelectOption[]>(() => {
     if (type !== 'major') {

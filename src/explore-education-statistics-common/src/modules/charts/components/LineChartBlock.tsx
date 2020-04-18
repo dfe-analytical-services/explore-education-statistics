@@ -72,7 +72,6 @@ const LineChartBlock = ({
   meta,
   height,
   axes,
-  labels,
   legend,
   width,
   renderLegend,
@@ -138,18 +137,17 @@ const LineChartBlock = ({
 
         {getCategoryDataSetConfigurations(
           dataSetCategories,
-          labels,
           axes.major,
           meta,
-        ).map(config => (
+        ).map(({ config, dataKey, dataSet }) => (
           <Line
-            key={config.dataKey}
-            dataKey={config.dataKey}
+            key={dataKey}
+            dataKey={dataKey}
             isAnimationActive={false}
             name={config.label}
             stroke={config.colour}
             fill={config.colour}
-            unit={config.dataSet.indicator.unit}
+            unit={dataSet.indicator.unit}
             type="linear"
             legendType={getLegendType(config.symbol)}
             dot={getDot(config.symbol)}
