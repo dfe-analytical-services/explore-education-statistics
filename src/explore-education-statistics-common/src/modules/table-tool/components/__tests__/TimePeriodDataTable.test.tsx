@@ -229,6 +229,7 @@ describe('TimePeriodDataTable', () => {
             totalValue: '',
             hint: 'Filter by pupil characteristic',
             legend: 'Characteristic',
+            name: 'characteristic',
             options: {
               EthnicGroupMajor: {
                 label: 'Ethnic group major',
@@ -248,6 +249,7 @@ describe('TimePeriodDataTable', () => {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
             label: 'Authorised absence rate',
             unit: '%',
+            name: 'sess_authorised_percent',
             decimalPlaces: 3,
           },
         ],
@@ -337,6 +339,7 @@ describe('TimePeriodDataTable', () => {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
             label: 'Authorised absence rate',
             unit: '%',
+            name: 'sess_authorised_percent',
             decimalPlaces: 2,
           },
         ],
@@ -418,6 +421,7 @@ describe('TimePeriodDataTable', () => {
           {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
             label: 'Authorised absence rate',
+            name: 'sess_authorised_percent',
             unit: '%',
           },
         ],
