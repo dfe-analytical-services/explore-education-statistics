@@ -3,6 +3,7 @@ import {
   TickConfig,
 } from '@common/modules/charts/types/chart';
 import { ChartData } from '@common/modules/charts/types/dataSet';
+import getMinMax from '@common/utils/number/getMinMax';
 import parseNumber from '@common/utils/number/parseNumber';
 import omit from 'lodash/omit';
 import { AxisDomain } from 'recharts';
@@ -10,34 +11,6 @@ import { AxisDomain } from 'recharts';
 interface DomainTicks {
   domain?: [AxisDomain, AxisDomain];
   ticks?: (string | number)[];
-}
-
-function calculateMinMax(chartData: ChartData[]) {
-  const minMax = chartData
-    .flatMap(item => Object.values(omit(item, ['name'])) as number[])
-    .reduce<{ min: number; max: number }>(
-      (acc, value) => {
-        if (value < acc.min) {
-          acc.min = value;
-        }
-
-        if (value > acc.max) {
-          acc.max = value;
-        }
-
-        return acc;
-      },
-      {
-        min: +Infinity,
-        max: -Infinity,
-      },
-    );
-
-  if (!Number.isFinite(minMax.min) || !Number.isFinite(minMax.max)) {
-    throw new Error('Could not calculate non-infinite min/max.');
-  }
-
-  return minMax;
 }
 
 function getNiceMaxValue(maxValue: number): number {
@@ -155,7 +128,9 @@ export function getMinorAxisDomainTicks(
     return {};
   }
 
-  const { min, max } = calculateMinMax(chartData);
+  const { min = 0, max = 0 } = getMinMax(
+    chartData.flatMap(item => Object.values(omit(item, ['name'])) as number[]),
+  );
 
   const axisMin = parseNumber(axis.min) ?? min;
   const axisMax = parseNumber(axis.max) ?? getNiceMaxValue(max);
