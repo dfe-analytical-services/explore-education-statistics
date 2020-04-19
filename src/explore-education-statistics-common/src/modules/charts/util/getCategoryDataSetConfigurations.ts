@@ -16,6 +16,7 @@ export interface CategoryDataSetConfiguration {
   config: DataSetConfigurationOptions;
   dataKey: string;
   dataSet: ExpandedDataSet;
+  value: number;
 }
 
 /**
@@ -38,6 +39,7 @@ export default function getCategoryDataSetConfigurations(
         return {
           ...fullDataSet,
           dataSet: expandedDataSet,
+          value: dataSetConfig.value,
           config: {
             ...config,
             // Data sets needs to match exactly otherwise
