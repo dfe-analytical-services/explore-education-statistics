@@ -2,14 +2,11 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import {
-  EditableBlock,
-  EditableRelease,
-} from '@admin/services/publicationService';
+import { EditableRelease } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import TabsSection from '@common/components/TabsSection';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
 import KeyStatistics from './KeyStatistics';
 
@@ -24,14 +21,6 @@ const ReleaseHeadlines = ({ release }: Props) => {
     deleteContentSectionBlock,
     updateContentSectionBlock,
   } = useReleaseActions();
-
-  const [headlineBlocks, setHeadlineBlocks] = useState<EditableBlock[]>(
-    release.headlinesSection.content,
-  );
-
-  useEffect(() => {
-    setHeadlineBlocks(release.headlinesSection.content);
-  }, [release.headlinesSection.content]);
 
   const getChartFile = useGetChartFile(release.id);
 
@@ -98,10 +87,9 @@ const ReleaseHeadlines = ({ release }: Props) => {
               <EditableSectionBlocks
                 allowComments
                 sectionId={release.headlinesSection.id}
-                content={headlineBlocks}
+                content={release.headlinesSection.content}
                 onBlockContentSave={headlinesBlockUpdate}
                 onBlockDelete={headlinesBlockDelete}
-                onBlocksChange={setHeadlineBlocks}
               />
 
               {release.headlinesSection.content?.length === 0 && (
