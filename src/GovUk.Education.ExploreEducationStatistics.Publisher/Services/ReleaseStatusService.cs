@@ -36,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
-            var releaseStatus = new ReleaseStatus(release.Publication.Slug, release.PublishScheduled, release.Id,
+            var publish = immediate ? null : release.PublishScheduled;
+            var releaseStatus = new ReleaseStatus(release.Publication.Slug, publish, release.Id,
                 release.Slug, state, immediate, logMessages);
             var tableResult = await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
             return tableResult.Result as ReleaseStatus;
