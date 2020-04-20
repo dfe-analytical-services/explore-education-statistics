@@ -46,14 +46,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 ""contactTelNo"": ""string""
               },
               ""externalMethodology"": {
-                ""title"": ""string"",
-                ""url"": ""string""
+                ""title"": ""externalMethodologyTitle"",
+                ""url"": ""externalMethodologyUrl""
               },
               ""methodology"": {
                 ""id"": ""d18931ca-a801-4184-b43a-f48d95c23d2a"",
-                ""slug"": ""string"",
-                ""summary"": ""string"",
-                ""title"": ""string""
+                ""slug"": ""methodologySlug"",
+                ""summary"": ""methodologySummary"",
+                ""title"": ""methodologyTitle""
               }
             }";
 
@@ -126,6 +126,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var fileStorageService = new Mock<IFileStorageService>();
             var controller = new PublicationController(fileStorageService.Object);
             var result = controller.GetPublicationTitle("missing-publication");
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
+        }
+
+        [Fact]
+        public void Get_PublicationMethodology_Returns_Ok()
+        {
+            var fileStorageService = new Mock<IFileStorageService>();
+            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/publication.json"))
+                .ReturnsAsync(PublicationJson);
+
+            var controller = new PublicationController(fileStorageService.Object);
+
+            var publicationMethodologyViewModel = controller.GetPublicationMethodology("publication-a").Result.Value;
+            Assert.Equal("externalMethodologyTitle", publicationMethodologyViewModel.ExternalMethodology.Title);
+            Assert.Equal("externalMethodologyUrl", publicationMethodologyViewModel.ExternalMethodology.Url);
+            Assert.Equal(new Guid("d18931ca-a801-4184-b43a-f48d95c23d2a"), publicationMethodologyViewModel.Methodology.Id);
+            Assert.Equal("methodologySlug", publicationMethodologyViewModel.Methodology.Slug);
+            Assert.Equal("methodologySummary", publicationMethodologyViewModel.Methodology.Summary);
+            Assert.Equal("methodologyTitle", publicationMethodologyViewModel.Methodology.Title);
+        }
+
+        [Fact]
+        public void Get_PublicationMethodology_Returns_NotFound()
+        {
+            var fileStorageService = new Mock<IFileStorageService>();
+            var controller = new PublicationController(fileStorageService.Object);
+            var result = controller.GetPublicationMethodology("missing-publication");
             Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
         }
     }

@@ -33,5 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             return await this.JsonContentResultAsync<PublicationTitleViewModel>(() =>
                 _fileStorageService.DownloadTextAsync(PublicContentPublicationPath(slug)), NotFound());
         }
+
+        [HttpGet("publication/{slug}/methodology")]
+        public async Task<ActionResult<PublicationMethodologyViewModel>> GetPublicationMethodology(string slug)
+        {
+            return await this.JsonContentResultAsync<PublicationMethodologyViewModel>(() =>
+                _fileStorageService.DownloadTextAsync(PublicContentPublicationPath(slug)), NotFound());
+        }
     }
 }

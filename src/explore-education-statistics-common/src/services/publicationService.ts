@@ -4,6 +4,18 @@ import { contentApi } from './api';
 
 export type ReleaseStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 
+export interface Methodology {
+  id: string;
+  slug: string;
+  summary: string;
+  title: string;
+}
+
+export interface ExternalMethodology {
+  title: string;
+  url: string;
+}
+
 export interface Publication {
   id: string;
   slug: string;
@@ -28,16 +40,8 @@ export interface Publication {
     };
   };
   contact: PublicationContact;
-  methodology?: {
-    id: string;
-    slug: string;
-    summary: string;
-    title: string;
-  };
-  externalMethodology?: {
-    title: string;
-    url: string;
-  };
+  methodology?: Methodology;
+  externalMethodology?: ExternalMethodology;
 }
 
 export interface PublicationContact {
@@ -50,6 +54,11 @@ export interface PublicationContact {
 export interface PublicationTitle {
   id: string;
   title: string;
+}
+
+export interface PublicationMethodology {
+  methodology?: Methodology;
+  externalMethodology?: ExternalMethodology;
 }
 
 export interface BasicLink {
@@ -125,6 +134,11 @@ export interface Release<
 export default {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
     return contentApi.get(`content/publication/${publicationSlug}/title`);
+  },
+  getPublicationMethodology(
+    publicationSlug: string,
+  ): Promise<PublicationMethodology> {
+    return contentApi.get(`content/publication/${publicationSlug}/methodology`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`content/publication/${publicationSlug}/latest`);
