@@ -26,28 +26,17 @@ describe('DownloadCsvButton', () => {
     subjectName: '',
     footnotes: [],
     filters: {
-<<<<<<< HEAD
-      characteristics: {
+      Characteristic: {
         name: 'characteristic',
-        legend: 'Characteristics',
-        hint: '',
-        options: {
-          gender: {
-            label: 'Gender',
-            options: [{ label: 'Female', value: 'gender_female' }],
-          },
-        },
+        options: [
+          new CategoryFilter({
+            value: 'gender_female',
+            label: 'Female',
+            group: 'Gender',
+            category: 'Characteristic',
+          }),
+        ],
       },
-=======
-      Characteristics: [
-        new CategoryFilter({
-          value: 'gender_female',
-          label: 'Female',
-          group: 'Gender',
-          category: 'Characteristics',
-        }),
-      ],
->>>>>>> EESB-444 Improve mapped FullTable type
     },
     indicators: [
       new Indicator({
@@ -84,41 +73,21 @@ describe('DownloadCsvButton', () => {
             ...basicSubjectMeta,
             filters: {
               ...basicSubjectMeta.filters,
-<<<<<<< HEAD
-              schoolType: {
+              'School Type': {
                 name: 'school_type',
-                legend: 'School type',
-                hint: '',
-                options: {
-                  default: {
-                    label: '',
-                    options: [
-                      {
-                        label: 'State-funded-primary',
-                        value: 'school_primary',
-                      },
-                      {
-                        label: 'State-funded secondary',
-                        value: 'school_secondary',
-                      },
-                    ],
-                  },
-                },
+                options: [
+                  new CategoryFilter({
+                    value: 'school_primary',
+                    label: 'State-funded primary',
+                    category: 'School Type',
+                  }),
+                  new CategoryFilter({
+                    value: 'school_secondary',
+                    label: 'State-funded secondary',
+                    category: 'School Type',
+                  }),
+                ],
               },
-=======
-              'School Type': [
-                new CategoryFilter({
-                  value: 'school_primary',
-                  label: 'State-funded primary',
-                  category: 'School Type',
-                }),
-                new CategoryFilter({
-                  value: 'school_secondary',
-                  label: 'State-funded secondary',
-                  category: 'School Type',
-                }),
-              ],
->>>>>>> EESB-444 Improve mapped FullTable type
             },
           },
           results: [
@@ -175,41 +144,21 @@ describe('DownloadCsvButton', () => {
           ...basicSubjectMeta,
           filters: {
             ...basicSubjectMeta.filters,
-<<<<<<< HEAD
-            schoolType: {
+            'School Type': {
               name: 'school_type',
-              legend: 'School type',
-              hint: '',
-              options: {
-                default: {
-                  label: '',
-                  options: [
-                    {
-                      label: 'State-funded-primary',
-                      value: 'school_primary',
-                    },
-                    {
-                      label: 'State-funded secondary',
-                      value: 'school_secondary',
-                    },
-                  ],
-                },
-              },
+              options: [
+                new CategoryFilter({
+                  value: 'school_primary',
+                  label: 'State-funded primary',
+                  category: 'School Type',
+                }),
+                new CategoryFilter({
+                  value: 'school_secondary',
+                  label: 'State-funded secondary',
+                  category: 'School Type',
+                }),
+              ],
             },
-=======
-            'School Type': [
-              new CategoryFilter({
-                value: 'school_primary',
-                label: 'State-funded primary',
-                category: 'School Type',
-              }),
-              new CategoryFilter({
-                value: 'school_secondary',
-                label: 'State-funded secondary',
-                category: 'School Type',
-              }),
-            ],
->>>>>>> EESB-444 Improve mapped FullTable type
           },
         },
         results: [
@@ -267,41 +216,21 @@ describe('DownloadCsvButton', () => {
           ...basicSubjectMeta,
           filters: {
             ...basicSubjectMeta.filters,
-<<<<<<< HEAD
-            schoolType: {
+            'School Type': {
               name: 'school_type',
-              legend: 'School type',
-              hint: '',
-              options: {
-                default: {
-                  label: '',
-                  options: [
-                    {
-                      label: 'State-funded-primary',
-                      value: 'school_primary',
-                    },
-                    {
-                      label: 'State-funded secondary',
-                      value: 'school_secondary',
-                    },
-                  ],
-                },
-              },
+              options: [
+                new CategoryFilter({
+                  value: 'school_primary',
+                  label: 'State-funded primary',
+                  category: 'School Type',
+                }),
+                new CategoryFilter({
+                  value: 'school_secondary',
+                  label: 'State-funded secondary',
+                  category: 'School Type',
+                }),
+              ],
             },
-=======
-            'School Type': [
-              new CategoryFilter({
-                value: 'school_primary',
-                label: 'State-funded primary',
-                category: 'School Type',
-              }),
-              new CategoryFilter({
-                value: 'school_secondary',
-                label: 'State-funded secondary',
-                category: 'School Type',
-              }),
-            ],
->>>>>>> EESB-444 Improve mapped FullTable type
           },
         },
         results: [

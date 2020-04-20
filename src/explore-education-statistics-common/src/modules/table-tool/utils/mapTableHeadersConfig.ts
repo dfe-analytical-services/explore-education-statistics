@@ -53,7 +53,9 @@ export default function mapTableHeadersConfig(
 
   // rowGroups/columnGroups can only be filters and locations
   const locationAndFilterGroups: (LocationFilter | CategoryFilter)[][] = [
-    ...Object.values(fullTableSubjectMeta.filters),
+    ...Object.values(fullTableSubjectMeta.filters).map(
+      filters => filters.options,
+    ),
     fullTableSubjectMeta.locations,
   ];
 

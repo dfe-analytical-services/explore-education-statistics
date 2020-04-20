@@ -4,15 +4,16 @@ import {
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import { Dictionary } from '@common/types';
 import sortBy from 'lodash/sortBy';
 
 const removeSiblinglessTotalRows = (
-  filters: Dictionary<CategoryFilter[]>,
+  filters: FullTableMeta['filters'],
 ): CategoryFilter[][] => {
-  return Object.values(filters).filter(filter => {
-    return filter.length > 1 || !filter[0].isTotal;
-  });
+  return Object.values(filters)
+    .map(filterGroup => filterGroup.options)
+    .filter(filterGroup => {
+      return filterGroup.length > 1 || !filterGroup[0].isTotal;
+    });
 };
 
 const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {

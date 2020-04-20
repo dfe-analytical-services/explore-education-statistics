@@ -85,7 +85,7 @@ const ChartDataSelector = ({
     <Formik<FormValues>
       initialValues={{
         filters: mapValues(meta.filters, filterGroup =>
-          filterGroup.length === 1 ? filterGroup[0].value : '',
+          filterGroup.options.length === 1 ? filterGroup.options[0].value : '',
         ),
         indicator: meta.indicators.length === 1 ? meta.indicators[0].value : '',
         location: meta.locations.length === 1 ? meta.locations[0].id : '',
@@ -167,7 +167,7 @@ const ChartDataSelector = ({
           <Form {...form} id={formId} showSubmitError>
             <div className={styles.formSelectRow}>
               {Object.entries(meta.filters)
-                .filter(([, filters]) => filters.length > 1)
+                .filter(([, filters]) => filters.options.length > 1)
                 .map(([categoryName, filters]) => (
                   <FormFieldSelect
                     key={categoryName}
@@ -177,11 +177,11 @@ const ChartDataSelector = ({
                     groupClass={styles.formSelectGroup}
                     className="govuk-!-width-full"
                     placeholder={
-                      filters.length > 1
+                      filters.options.length > 1
                         ? `Select ${categoryName.toLowerCase()}`
                         : undefined
                     }
-                    options={filters}
+                    options={filters.options}
                   />
                 ))}
 

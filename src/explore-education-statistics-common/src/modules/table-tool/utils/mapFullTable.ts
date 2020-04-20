@@ -1,12 +1,14 @@
-import { TableDataResponse } from '@common/services/tableBuilderService';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { Dictionary } from '@common/types';
+import {
+  FullTable,
+  FullTableMeta,
+} from '@common/modules/table-tool/types/fullTable';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 
 export default function mapFullTable(
   unmappedFullTable: TableDataResponse,
@@ -18,10 +20,11 @@ export default function mapFullTable(
   };
 
   const filters = Object.values(unmappedFullTable.subjectMeta.filters).reduce<
-    Dictionary<CategoryFilter[]>
+    FullTableMeta['filters']
   >((acc, category) => {
-    acc[category.legend] = Object.values(category.options).flatMap(
-      filterGroup =>
+    acc[category.legend] = {
+      name: category.name,
+      options: Object.values(category.options).flatMap(filterGroup =>
         filterGroup.options.map(
           option =>
             new CategoryFilter({
@@ -31,7 +34,8 @@ export default function mapFullTable(
               isTotal: category.totalValue === option.value,
             }),
         ),
-    );
+      ),
+    };
 
     return acc;
   }, {});

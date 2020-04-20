@@ -88,16 +88,10 @@ const ChartAxisConfiguration = ({
       meta,
     );
 
-    return [
-      {
-        label: 'Default',
-        value: '',
-      },
-      ...dataSetCategories.map(({ filter }, index) => ({
-        label: filter.label,
-        value: `${index}`,
-      })),
-    ];
+    return dataSetCategories.map(({ filter }, index) => ({
+      label: filter.label,
+      value: index.toString(),
+    }));
   }, [configuration, data, dataSets, meta, type]);
 
   const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
@@ -344,15 +338,15 @@ const ChartAxisConfiguration = ({
                   id={`${id}-majorMin`}
                   label="Minimum"
                   name="min"
+                  placeholder="Default"
                   options={limitOptions}
-                  order={[]}
                 />
                 <FormFieldSelect<AxisConfiguration>
                   id={`${id}-majorMax`}
                   label="Maximum"
                   name="max"
+                  placeholder="Default"
                   options={limitOptions}
-                  order={[]}
                 />
               </FormFieldset>
             </>
