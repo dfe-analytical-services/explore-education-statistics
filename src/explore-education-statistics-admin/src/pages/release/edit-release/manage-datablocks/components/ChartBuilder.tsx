@@ -37,6 +37,7 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { DataBlockRerequest } from '@common/services/dataBlockService';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
+import omit from 'lodash/omit';
 import React, { useCallback, useMemo } from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
@@ -138,9 +139,7 @@ const ChartBuilder = ({
     if (onChartSave) {
       // We don't want to persist data set labels
       // anymore in the deprecated format.
-      await onChartSave({
-        labels: undefined,
-      } as Chart);
+      await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
     }
   }, [chartProps, isValid, onChartSave]);
 
