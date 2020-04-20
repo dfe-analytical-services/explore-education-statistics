@@ -80,9 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     stageFilter);
             }
 
-            var query = new TableQuery<ReleaseStatus>().Where(filter)
-                .OrderByDesc(nameof(ReleaseStatus.Created));
-            
+            var query = new TableQuery<ReleaseStatus>().Where(filter);
             return _tableStorageService.ExecuteQueryAsync(TableName, query);
         }
 
@@ -90,11 +88,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var query = new TableQuery<ReleaseStatus>()
                 .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
-                    QueryComparisons.Equal, releaseId.ToString()))
-                .OrderByDesc(nameof(ReleaseStatus.Created));
+                    QueryComparisons.Equal, releaseId.ToString()));
 
             var result = await _tableStorageService.ExecuteQueryAsync(TableName, query);
-            return result.FirstOrDefault();
+            return result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
         }
 
         public async Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId)
