@@ -10,6 +10,7 @@ export const testData1 = {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             EthnicGroupMajor: {
               label: 'Ethnic group major',
@@ -30,6 +31,7 @@ export const testData1 = {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
@@ -54,11 +56,15 @@ export const testData1 = {
           value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
           label: 'Number of authorised absence sessions',
           unit: '',
+          name: 'sess_authorised',
+          decimalPlaces: 2,
         },
         {
           value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
           label: 'Number of overall absence sessions',
           unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
         },
       ],
       locations: [
@@ -401,6 +407,7 @@ export const testData2 = {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             EthnicGroupMajor: {
               label: 'Ethnic group major',
@@ -421,6 +428,7 @@ export const testData2 = {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
@@ -445,6 +453,8 @@ export const testData2 = {
           value: 'f9ae4976-7cd3-4718-834a-09349b6eb377',
           label: 'Authorised absence rate',
           unit: '%',
+          name: 'sess_authorised_percent',
+          decimalPlaces: 2,
         },
       ],
       locations: [
@@ -735,6 +745,7 @@ export const testData3 = {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             EthnicGroupMajor: {
               label: 'Ethnic group major',
@@ -755,6 +766,7 @@ export const testData3 = {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
@@ -779,6 +791,8 @@ export const testData3 = {
           value: 'f9ae4976-7cd3-4718-834a-09349b6eb377',
           label: 'Authorised absence rate',
           unit: '%',
+          name: 'sess_authorised_percent',
+          decimalPlaces: 2,
         },
       ],
       locations: [
@@ -954,16 +968,22 @@ export const testDataNoFilters = {
           value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
           label: 'Number of overall absence sessions',
           unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
         },
         {
           value: 'd1c4a0be-8756-470d-2b51-08d78f6f2b08',
           label: 'Number of authorised absence sessions',
           unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
         },
         {
           value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
           label: 'Authorised absence rate',
           unit: '%',
+          name: 'sess_authorised_percent',
+          decimalPlaces: 2,
         },
       ],
       locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
@@ -1045,6 +1065,7 @@ export const testDataFiltersWithNoResults = {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             FirstLanguage: {
               label: 'First language',
@@ -1066,6 +1087,7 @@ export const testDataFiltersWithNoResults = {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
@@ -1085,11 +1107,15 @@ export const testDataFiltersWithNoResults = {
           value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
           label: 'Number of authorised absence sessions',
           unit: '',
+          name: 'sess_authorised',
+          decimalPlaces: 2,
         },
         {
           value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
           label: 'Number of overall absence sessions',
           unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
         },
       ],
       locations: [
