@@ -89,8 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             return NotFound();
         }
         
-        [HttpGet("bau/users/pending")]
-        public async Task<ActionResult<List<UserViewModel>>> GetPendingUsers()
+        [HttpGet("bau/users/invite")]
+        public async Task<ActionResult<List<UserViewModel>>> GetInvitedUsers()
         {
             var users = await _userManagementService.ListPendingAsync();
 

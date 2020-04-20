@@ -21,7 +21,7 @@ const PendingInvitesPage = () => {
     setIsLoading(true);
     withoutErrorHandling(() =>
       userService
-        .getPendingInvites()
+        .getInvitedUsers()
         .then(updatedInvites => {
           setModel({
             users: updatedInvites,

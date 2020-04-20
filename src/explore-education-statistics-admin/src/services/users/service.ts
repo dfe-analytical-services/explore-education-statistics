@@ -11,7 +11,7 @@ export interface UsersService {
   getUser(userId: string): Promise<UserStatus>;
   getUsers(): Promise<UserStatus[]>;
   getPreReleaseUsers(): Promise<UserStatus[]>;
-  getPendingInvites(): Promise<UserStatus[]>;
+  getInvitedUsers(): Promise<UserStatus[]>;
   inviteUser: (invite: UserInvite) => Promise<boolean>;
   cancelInvite: (email: string) => Promise<boolean>;
   updateUser: (user: UserUpdate) => Promise<boolean>;
@@ -30,8 +30,8 @@ const service: UsersService = {
   getPreReleaseUsers(): Promise<UserStatus[]> {
     return client.get<UserStatus[]>('/bau/users/pre-release');
   },
-  getPendingInvites(): Promise<UserStatus[]> {
-    return client.get<UserStatus[]>('/bau/users/pending');
+  getInvitedUsers(): Promise<UserStatus[]> {
+    return client.get<UserStatus[]>('/bau/users/invite');
   },
   inviteUser(invite: UserInvite): Promise<boolean> {
     return client.post(`/bau/users/invite`, invite);
