@@ -20,5 +20,5 @@ export default function useTableQuery(
       const response = await tableBuilderService.getTableData(query);
       return mapFullTable(response);
     });
-  }, [query]);
+  }, [JSON.stringify(query)]);
 }

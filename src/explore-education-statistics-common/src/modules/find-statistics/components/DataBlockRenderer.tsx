@@ -20,7 +20,7 @@ export interface DataQuery {
 
 export interface DataBlockRendererProps {
   additionalTabContent?: ReactNode;
-  dataBlock?: DataBlock;
+  dataBlock: DataBlock;
   firstTabs?: ReactNode;
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
@@ -41,9 +41,12 @@ const DataBlockRenderer = ({
   id,
   onToggle,
 }: DataBlockRendererProps) => {
-  const { value: fullTable, isLoading } = useTableQuery(
-    dataBlock?.dataBlockRequest,
-  );
+  const { value: fullTable, isLoading } = useTableQuery({
+    ...dataBlock.dataBlockRequest,
+    includeGeoJson:
+      dataBlock.dataBlockRequest.includeGeoJson &&
+      dataBlock.charts.some(chart => chart.type === 'map'),
+  });
 
   return (
     <LoadingSpinner loading={isLoading}>
