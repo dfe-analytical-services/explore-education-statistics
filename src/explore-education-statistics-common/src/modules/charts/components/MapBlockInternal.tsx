@@ -1,5 +1,6 @@
 import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
+import useCallbackRef from '@common/hooks/useCallbackRef';
 import useIntersectionObserver from '@common/hooks/useIntersectionObserver';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import {
@@ -26,7 +27,13 @@ import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import times from 'lodash/times';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 import orderBy from 'lodash/orderBy';
 
@@ -289,44 +296,76 @@ export const MapBlockInternal = ({
     }
   }, [geometry]);
 
-  const updateSelectedFeature = (feature: MapFeature) => {
-    if (selectedFeature) {
-      const element = selectedFeature?.properties.layer?.getElement();
+  const updateSelectedFeature = useCallback(
+    (feature: MapFeature) => {
+      if (selectedFeature) {
+        const element = selectedFeature?.properties.layer?.getElement();
+
+        if (element) {
+          element.classList.remove(styles.selected);
+        }
+      }
+
+      setSelectedFeature(feature);
+
+      const { layer } = feature.properties;
+
+      if (!layer) {
+        return;
+      }
+
+      layer.bringToFront();
+
+      const element = layer.getElement();
 
       if (element) {
-        element.classList.remove(styles.selected);
+        element.classList.add(styles.selected);
       }
-    }
 
-    setSelectedFeature(feature);
+      if (mapRef.current) {
+        // Centers the feature on the map
+        mapRef.current.leafletElement.fitBounds(layer.getBounds());
+      }
+    },
+    [selectedFeature],
+  );
 
-    const { layer } = feature.properties;
+  // We have to assign our `onEachFeature` callback to a ref
+  // as `onEachFeature` forms an internal closure which
+  // prevents us from updating the callback's dependencies.
+  // This would otherwise lead to stale state and most likely
+  // result in the callback throwing null pointer errors.
+  const onEachFeature = useCallbackRef(
+    (feature: MapFeature, featureLayer: Layer) => {
+      if (feature.properties) {
+        // eslint-disable-next-line no-param-reassign
+        feature.properties.layer = featureLayer as MapFeatureProperties['layer'];
+      }
 
-    if (!layer) {
-      return;
-    }
+      featureLayer.bindTooltip(() => {
+        if (feature.properties) {
+          const content = [
+            `<strong>${feature.properties.name}</strong>`,
+            ...Object.entries(feature.properties.dataSets).map(
+              ([dataSetKey, dataSet]) => {
+                const dataSetConfig = dataSetConfigurations[dataSetKey];
 
-    layer.bringToFront();
+                return `${dataSetConfig.config.label} : ${formatPretty(
+                  dataSet.value,
+                  dataSetConfig.dataSet.indicator.unit,
+                )}`;
+              },
+            ),
+          ];
 
-    const element = layer.getElement();
+          return content.join('<br />');
+        }
 
-    if (element) {
-      element.classList.add(styles.selected);
-    }
-
-    if (mapRef.current) {
-      // Centers the feature on the map
-      mapRef.current.leafletElement.fitBounds(layer.getBounds());
-    }
-  };
-
-  const handleFeatureClick = (e: MapClickEvent) => {
-    const { feature } = e.sourceTarget;
-
-    if (feature.properties && feature.id) {
-      updateSelectedFeature(feature);
-    }
-  };
+        return '';
+      });
+    },
+    [dataSetConfigurations],
+  );
 
   if (
     data === undefined ||
@@ -401,36 +440,10 @@ export const MapBlockInternal = ({
                 <GeoJSON
                   ref={geometryRef}
                   data={geometry}
-                  onEachFeature={(feature: MapFeature, featureLayer: Layer) => {
-                    if (feature.properties) {
-                      // eslint-disable-next-line no-param-reassign
-                      feature.properties.layer = featureLayer as MapFeatureProperties['layer'];
+                  onEachFeature={(...params) => {
+                    if (onEachFeature.current) {
+                      onEachFeature.current(...params);
                     }
-
-                    featureLayer.bindTooltip(() => {
-                      if (feature.properties) {
-                        const content = [
-                          `<strong>${feature.properties.name}</strong>`,
-                          ...Object.entries(feature.properties.dataSets).map(
-                            ([dataSetKey, dataSet]) => {
-                              const dataSetConfig =
-                                dataSetConfigurations[dataSetKey];
-
-                              return `${
-                                dataSetConfig.config.label
-                              } : ${formatPretty(
-                                dataSet.value,
-                                dataSetConfig.dataSet.indicator.unit,
-                              )}`;
-                            },
-                          ),
-                        ];
-
-                        return content.join('<br />');
-                      }
-
-                      return '';
-                    });
                   }}
                   style={(feature?: MapFeature): PathOptions => {
                     if (!feature) {
@@ -441,7 +454,13 @@ export const MapBlockInternal = ({
                       fillColor: calculateColour(feature.properties),
                     };
                   }}
-                  onclick={handleFeatureClick}
+                  onclick={e => {
+                    const { feature } = e.sourceTarget;
+
+                    if (feature.properties && feature.id) {
+                      updateSelectedFeature(feature);
+                    }
+                  }}
                 />
               )}
             </Map>
