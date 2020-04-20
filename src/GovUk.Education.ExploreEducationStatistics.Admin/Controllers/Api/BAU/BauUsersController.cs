@@ -88,48 +88,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
-        
-        [HttpGet("bau/users/invite")]
-        public async Task<ActionResult<List<UserViewModel>>> GetInvitedUsers()
-        {
-            var users = await _userManagementService.ListPendingAsync();
-
-            if (users.Any())
-            {
-                return Ok(users);
-            }
-
-            return NotFound();
-        }
-        
-        [HttpPost("bau/users/invite")]
-        public async Task<ActionResult> InviteUser(UserInviteViewModel userInviteViewModel)
-        {
-            var invite = await _userManagementService.InviteAsync(userInviteViewModel.Email, User.Identity.Name, userInviteViewModel.RoleId);
-
-            if (invite)
-            {
-                return Ok();
-            }
-
-            AddErrors(ModelState, ValidationResult(UserAlreadyExists));
-            
-            return ValidationProblem(new ValidationProblemDetails(ModelState));
-        }
-        
-        [HttpDelete("bau/users/invite/{email}")]
-        public async Task<ActionResult> InviteUser(string email)
-        {
-            var invite = await _userManagementService.CancelInviteAsync(email);
-
-            if (invite)
-            {
-                return Ok();
-            }
-
-            AddErrors(ModelState, ValidationResult(UnableToCancelInvite));
-            
-            return ValidationProblem(new ValidationProblemDetails(ModelState));
-        }
     }
 }
