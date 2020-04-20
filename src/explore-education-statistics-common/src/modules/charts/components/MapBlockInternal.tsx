@@ -28,6 +28,7 @@ import keyBy from 'lodash/keyBy';
 import times from 'lodash/times';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
+import orderBy from 'lodash/orderBy';
 
 interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -191,17 +192,23 @@ export const MapBlockInternal = ({
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
-    return Object.values(dataSetConfigurations).map(dataSet => ({
-      label: dataSet.config.label,
-      value: dataSet.dataKey,
-    }));
+    return orderBy(
+      Object.values(dataSetConfigurations).map(dataSet => ({
+        label: dataSet.config.label,
+        value: dataSet.dataKey,
+      })),
+      ['label'],
+    );
   }, [dataSetConfigurations]);
 
   const locationOptions = useMemo(() => {
-    return dataSetCategories.map(dataSetCategory => ({
-      label: dataSetCategory.filter.label,
-      value: dataSetCategory.filter.id,
-    }));
+    return orderBy(
+      dataSetCategories.map(dataSetCategory => ({
+        label: dataSetCategory.filter.label,
+        value: dataSetCategory.filter.id,
+      })),
+      ['label'],
+    );
   }, [dataSetCategories]);
 
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(
@@ -347,6 +354,7 @@ export const MapBlockInternal = ({
                 value={selectedDataSetKey}
                 onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
                 options={dataSetOptions}
+                order={FormSelect.unordered}
               />
             </FormGroup>
 
@@ -358,6 +366,7 @@ export const MapBlockInternal = ({
                 value={selectedFeature?.id}
                 placeholder="Select location"
                 options={locationOptions}
+                order={FormSelect.unordered}
                 onChange={e => {
                   const feature = geometry?.features.find(
                     feat => feat.id === e.currentTarget.value,

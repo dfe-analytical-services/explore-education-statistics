@@ -104,4 +104,6 @@ const FormSelect = ({
   );
 };
 
+FormSelect.unordered = [] as [];
+
 export default FormSelect;
