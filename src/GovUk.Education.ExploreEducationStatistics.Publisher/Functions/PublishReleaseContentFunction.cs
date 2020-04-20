@@ -82,21 +82,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
         {
-            var dateQuery = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
+            var dateFilter = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
                 QueryComparisons.LessThan, DateTime.Today.AddDays(1));
-            var contentStageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.ContentStage),
+            var contentStageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.ContentStage),
                 QueryComparisons.Equal, ReleaseStatusContentStage.Complete.ToString());
-            var dataStageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.DataStage),
+            var dataStageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.DataStage),
                 QueryComparisons.Equal, ReleaseStatusDataStage.Complete.ToString());
-            var publishingStageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PublishingStage),
+            var publishingStageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PublishingStage),
                 QueryComparisons.Equal, Scheduled.ToString());
 
-            var stageQuery = TableQuery.CombineFilters(
-                TableQuery.CombineFilters(contentStageQuery, TableOperators.And, dataStageQuery),
-                TableOperators.And, publishingStageQuery);
-            var combinedQuery = TableQuery.CombineFilters(dateQuery, TableOperators.And, stageQuery);
+            var stageFilter = TableQuery.CombineFilters(
+                TableQuery.CombineFilters(contentStageFilter, TableOperators.And, dataStageFilter),
+                TableOperators.And, publishingStageFilter);
+            var combinedFilter = TableQuery.CombineFilters(dateFilter, TableOperators.And, stageFilter);
 
-            return await _releaseStatusService.ExecuteQueryAsync(new TableQuery<ReleaseStatus>().Where(combinedQuery));
+            return await _releaseStatusService.ExecuteQueryAsync(new TableQuery<ReleaseStatus>().Where(combinedFilter));
         }
 
         private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, ReleaseStatusPublishingStage stage,

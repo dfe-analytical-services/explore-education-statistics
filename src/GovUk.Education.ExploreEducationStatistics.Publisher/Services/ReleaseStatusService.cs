@@ -65,6 +65,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return tableResult.Result as ReleaseStatus;
         }
 
+        public Task<IEnumerable<ReleaseStatus>> GetAllAsync(Guid releaseId, ReleaseStatusOverallStage? overallStage)
+        {
+            var filter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+                    QueryComparisons.Equal, releaseId.ToString());
+
+            if (overallStage.HasValue)
+            {
+                var stageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.OverallStage),
+                    QueryComparisons.Equal, overallStage.Value.ToString());
+                
+                filter = TableQuery.CombineFilters(filter, TableOperators.And,
+                    stageFilter);
+            }
+
+            var query = new TableQuery<ReleaseStatus>().Where(filter)
+                .OrderByDesc(nameof(ReleaseStatus.Created));
+            
+            return _tableStorageService.ExecuteQueryAsync(TableName, query);
+        }
+
         public async Task<ReleaseStatus> GetLatestAsync(Guid releaseId)
         {
             var query = new TableQuery<ReleaseStatus>()

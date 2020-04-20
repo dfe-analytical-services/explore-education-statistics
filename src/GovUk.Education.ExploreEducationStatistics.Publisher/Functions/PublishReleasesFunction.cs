@@ -47,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 foreach (var (releaseId, releaseStatusId) in scheduled)
                 {
-                    await _releaseStatusService.UpdateStateAsync(releaseId, releaseStatusId, ScheduledReleaseStartedState);
+                    await _releaseStatusService.UpdateStateAsync(releaseId, releaseStatusId,
+                        ScheduledReleaseStartedState);
                 }
 
                 await _queueService.QueuePublishReleaseFilesMessageAsync(scheduled);
@@ -57,13 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
         {
-            var dateQuery = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
+            var dateFilter = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
                 QueryComparisons.LessThan, DateTime.Today.AddDays(1));
-            var stageQuery = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.OverallStage),
+            var stageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.OverallStage),
                 QueryComparisons.Equal,
                 ReleaseStatusOverallStage.Scheduled.ToString());
-            var query = new TableQuery<ReleaseStatus>().Where(TableQuery.CombineFilters(dateQuery, TableOperators.And,
-                stageQuery));
+            var combinedFilter = TableQuery.CombineFilters(dateFilter, TableOperators.And, stageFilter);
+            var query = new TableQuery<ReleaseStatus>().Where(combinedFilter);
 
             return await _releaseStatusService.ExecuteQueryAsync(query);
         }

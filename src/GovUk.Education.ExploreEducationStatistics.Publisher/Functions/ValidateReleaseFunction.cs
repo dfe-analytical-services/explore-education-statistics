@@ -40,11 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             await ValidateReleaseAsync(message, async () =>
             {
-                // TODO BAU-563 fail is there is already a run that is Started
                 // TODO BAU-562 cancel an existing run that is already Scheduled
                 if (message.Immediate)
                 {
-                    // TODO BAU-563 fail if the staging directory already exists
                     var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
                     await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId, releaseStatus.Id);
                 }

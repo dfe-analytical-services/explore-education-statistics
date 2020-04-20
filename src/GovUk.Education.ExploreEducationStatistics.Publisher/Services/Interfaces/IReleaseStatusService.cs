@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<ReleaseStatus> GetAsync(Guid releaseId, Guid releaseStatusId);
 
+        Task<IEnumerable<ReleaseStatus>> GetAllAsync(Guid releaseId, ReleaseStatusOverallStage? overallStage);
+
         Task<ReleaseStatus> GetLatestAsync(Guid releaseId);
 
         Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId);
