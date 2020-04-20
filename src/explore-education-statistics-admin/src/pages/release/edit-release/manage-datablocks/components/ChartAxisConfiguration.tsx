@@ -98,7 +98,7 @@ const ChartAxisConfiguration = ({
         value: `${index}`,
       })),
     ];
-  }, [configuration, data, dataSets, meta]);
+  }, [configuration, data, dataSets, meta, type]);
 
   const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
     position: '',
