@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         bool Exists(Guid releaseId, string name);
 
-        Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, string name);
+        Task<Publication> GetPublicationForSubjectAsync(Guid subjectId);
 
         Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, Guid subjectId);
 

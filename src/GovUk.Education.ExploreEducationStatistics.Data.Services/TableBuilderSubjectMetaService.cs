@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
@@ -62,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public Task<Either<ActionResult, TableBuilderSubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(subjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(subject => new TableBuilderSubjectMetaViewModel
                 {
@@ -76,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public Task<Either<ActionResult, TableBuilderSubjectMetaViewModel>> GetSubjectMeta(
             SubjectMetaQueryContext query)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(subject =>
                 {
@@ -217,17 +216,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            if (await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+            if (await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;
             }
 
             return new ForbidResult();
-        }
-
-        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
-        {
-            return queryable.Include(subject => subject.Release);
         }
     }
 }

@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             footnoteService.Setup(s => s.DeleteFootnote(FootnoteId)).Returns(deleteFootnoteResult);
 
             var subjects = subjectIds.Select(id => new IdLabel(id, $"Subject {id}")).ToList();
-            releaseMetaService.Setup(s => s.GetSubjects(ReleaseId)).Returns(subjects);
+            releaseMetaService.Setup(s => s.GetSubjectsAsync(ReleaseId)).ReturnsAsync(subjects);
 
             filterService.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds))).Returns(
                 new List<Filter>

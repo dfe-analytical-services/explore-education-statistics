@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -38,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public override Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             ObservationQueryContext queryContext)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(_ =>
                 {
@@ -66,17 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
             if (_subjectService.IsSubjectForLatestPublishedRelease(subject.Id) ||
-                await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+                await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;
             }
 
             return new ForbidResult();
-        }
-        
-        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
-        {
-            return queryable.Include(subject => subject.Release);
         }
     }
 }

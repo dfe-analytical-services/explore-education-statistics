@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Release
                 .First(r => r.Id == amendment.OriginalId);
 
-            // TODO - this is currently only possible if a Live release was available
+            // TODO BAU-384 - this is currently only possible if a Live release was available
             // without any subjects uploaded for it.  Does this check need to remain?
             if (statsRelease != null)
             {

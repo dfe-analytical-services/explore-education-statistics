@@ -69,18 +69,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private PermalinkViewModel BuildViewModel(Permalink permalink)
         {
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
-            viewModel.Query.PublicationId = GetPublicationId(permalink);
+            viewModel.Query.PublicationId =
+                _subjectService.GetPublicationForSubjectAsync(permalink.Query.SubjectId).Result.Id;
             return viewModel;
-        }
-
-        private Guid GetPublicationId(Permalink permalink)
-        {
-            var subject = _subjectService.Find(permalink.Query.SubjectId,
-                new List<Expression<Func<Subject, object>>>
-                {
-                    s => s.Release
-                });
-            return subject.Release.PublicationId;
         }
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -22,12 +21,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public bool IsSubjectForLatestPublishedRelease(Guid subjectId)
         {
-            var subject = Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
-            if (subject == null)
+            var publicationId = GetPublicationForSubjectAsync(subjectId).Result.Id;
+            var latestRelease = _releaseService.GetLatestPublishedRelease(publicationId);
+
+            if (!latestRelease.HasValue)
             {
-                throw new ArgumentException("Subject does not exist", nameof(subjectId));
+                return false;
             }
-            return _releaseService.GetLatestPublishedRelease(subject.Release.PublicationId).Equals(subject.ReleaseId);
+            
+            return _context
+                .ReleaseSubject
+                .Any(r => r.ReleaseId == latestRelease.Value && r.SubjectId == subjectId);
         }
         
         public bool Exists(Guid releaseId, string name)
@@ -37,12 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public async Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(Guid subjectId)
         {
-            var releaseId = _context
-                .Subject
-                .First(s => s.Id == subjectId)
-                .ReleaseId;
-
-            var releaseFootnotes = await _context
+            var footnotesLinkedToSubject = await _context
                 .Footnote
                 .Include(f => f.Filters)
                 .Include(f => f.FilterGroups)
@@ -56,10 +55,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .ThenInclude(i => i.Indicator)
                 .ThenInclude(i => i.IndicatorGroup)
                 .Include(f => f.Subjects)
-                .Where(f => f.ReleaseId == releaseId)
+                .Where(footnote => 
+                    footnote.Subjects.Select(s => s.SubjectId).Contains(subjectId)
+                    || footnote.Filters.Select(filterFootnote => filterFootnote.Filter.SubjectId).Contains(subjectId)
+                    || footnote.FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroup.Filter.SubjectId).Contains(subjectId)
+                    || footnote.FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId).Contains(subjectId)
+                    || footnote.Indicators.Select(indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroup.SubjectId).Contains(subjectId)
+                )
                 .ToListAsync();
              
-            return releaseFootnotes
+            return footnotesLinkedToSubject
                 .Where(f => FootnoteLinkedToNoOtherSubject(subjectId, f))
                 .ToList();
         }
@@ -100,12 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return true;
         }
 
-        public async Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, string name)
-        {
-            var subject = await GetAsync(releaseId, name);
-            return await RemoveReleaseSubjectLinkAsync(releaseId, subject.Id);
-        }
-        
         public async Task<Subject> GetAsync(Guid releaseId, string name)
         {
             return await _context
@@ -114,6 +113,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Where(r => r.ReleaseId == releaseId && r.Subject.Name == name)
                 .Select(r => r.Subject)
                 .FirstOrDefaultAsync();
+        }
+
+        public Task<Publication> GetPublicationForSubjectAsync(Guid subjectId)
+        {
+            return _context
+                .ReleaseSubject
+                .Include(r => r.Release)
+                .ThenInclude(r => r.Publication)
+                .Where(r => r.SubjectId == subjectId)
+                .Select(r => r.Release.Publication)
+                .FirstAsync();
         }
 
         private static bool FootnoteLinkedToNoOtherSubject(Guid subjectId, Footnote f)

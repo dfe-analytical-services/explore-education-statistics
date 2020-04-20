@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public override Task<Either<ActionResult, ResultWithMetaViewModel>> Query(ObservationQueryContext queryContext)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(_ =>
                 {
@@ -61,17 +61,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            if (await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+            if (await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;
             }
 
             return new ForbidResult();
-        }
-        
-        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
-        {
-            return queryable.Include(subject => subject.Release);
         }
     }
 }

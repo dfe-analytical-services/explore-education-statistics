@@ -34,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly IFootnoteService _footnoteService;
         private readonly IUserService _userService;
+        private readonly ISubjectService _subjectService;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
@@ -47,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ITimePeriodService timePeriodService,
             IFootnoteService footnoteService,
             IUserService userService,
+            ISubjectService subjectService,
             ILogger<SubjectMetaService> logger
         ) : base(filterItemService)
         {
@@ -59,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _timePeriodService = timePeriodService;
             _footnoteService = footnoteService;
             _userService = userService;
+            _subjectService = subjectService;
             _logger = logger;
         }
 
@@ -66,9 +69,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             SubjectMetaQueryContext query,
             IQueryable<Observation> observations)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(subject =>
+                .OnSuccess(async subject =>
                 {
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
@@ -110,13 +113,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
+                    var publication = await _subjectService.GetPublicationForSubjectAsync(subject.Id);
+
                     return new SubjectMetaViewModel
                     {
                         Filters = filters,
                         Indicators = indicators,
                         Locations = locations,
                         BoundaryLevels = boundaryLevels,
-                        PublicationName = subject.Release.Publication.Title,
+                        PublicationName = publication.Title,
                         SubjectName = subject.Name,
                         TimePeriod = timePeriod,
                         Footnotes = footnotes,
@@ -232,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            if (await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+            if (await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;
             }
@@ -254,12 +259,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static dynamic DeserializeGeoJson(GeoJson geoJson)
         {
             return geoJson == null ? null : JsonConvert.DeserializeObject(geoJson.Value);
-        }
-
-        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
-        {
-            return queryable.Include(subject => subject.Release)
-                .ThenInclude(release => release.Publication);
         }
     }
 }

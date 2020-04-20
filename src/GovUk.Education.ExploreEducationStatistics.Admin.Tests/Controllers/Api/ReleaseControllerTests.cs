@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -156,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var mocks = Mocks();
             
-            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data))
+            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -297,14 +296,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IImportStatusService> ImportStatusService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager) Mocks()
         {
             return (new Mock<IImportService>(),
                     new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
-                    new Mock<IImportStatusService>(),
                     new Mock<IReleaseStatusService>(),
                     MockUserManager(Users)
                 );
@@ -314,7 +311,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IImportStatusService> ImportStatusService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager) mocks)
         {
@@ -322,7 +318,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.ImportService.Object,
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
-                mocks.ImportStatusService.Object,
                 mocks.ReleaseStatusService.Object,
                 mocks.UserManager.Object);
         }

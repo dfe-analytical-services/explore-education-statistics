@@ -63,19 +63,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var subject = new Subject
                 {
-                    Id = Guid.NewGuid(),
-                    ReleaseId = release.Id
+                    Id = Guid.NewGuid()
+                };
+
+                var releaseSubjectLink = new ReleaseSubject
+                {
+                    ReleaseId = release.Id,
+                    SubjectId = subject.Id
                 };
 
                 context.Add(release);
                 context.Add(subject);
+                context.Add(releaseSubjectLink);
 
                 context.SaveChanges();
 
                 var (filterService, filterItemService, indicatorGroupService, locationService,
                     observationService, timePeriodService, userService) = Mocks();
 
-                userService.Setup(s => s.MatchesPolicy(release, CanViewSubjectDataForRelease)).ReturnsAsync(false);
+                userService.Setup(s => s.MatchesPolicy(release, CanViewSubjectData)).ReturnsAsync(false);
 
                 var service = new TableBuilderSubjectMetaService(filterService.Object,
                     filterItemService.Object,

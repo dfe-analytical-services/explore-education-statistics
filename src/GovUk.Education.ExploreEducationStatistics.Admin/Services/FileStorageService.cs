@@ -284,38 +284,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return AdminReleasePath(fileReference.ReleaseId, fileReference.ReleaseFileType, fileReference.Filename);
         }
 
-        public Task<Either<ActionResult, Release>> CopyReleaseFilesAsync(Guid originalReleaseId, Guid newReleaseId, ReleaseFileTypes type)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(originalReleaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ => _persistenceHelper.CheckEntityExists<Release>(newReleaseId))
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async newRelease =>
-                {
-                    var blobContainer = await GetCloudBlobContainer();
-
-                    var originalBlobs = blobContainer
-                        .ListBlobs(AdminReleaseDirectoryPath(originalReleaseId, type), true, BlobListingDetails.Metadata)
-                        .Where(blob => !IsBatchedDataFile(blob, originalReleaseId))
-                        .OfType<CloudBlockBlob>()
-                        .ToList();
-
-                    var copyJobs = originalBlobs
-                        .Select(blob =>
-                        {
-                            var originalFilename = blob.Name.Substring(blob.Name.LastIndexOf('/') + 1);
-                            var blobCopy = blobContainer
-                                .GetBlockBlobReference(AdminReleasePath(newReleaseId, type, originalFilename));
-                            return blobCopy.StartCopyAsync(blob);
-                        });
-
-                    await Task.WhenAll(copyJobs);
-                    
-                    return newRelease;
-                });
-        }
-
         public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {

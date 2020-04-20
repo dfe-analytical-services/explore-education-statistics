@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                     policy.Requirements.Add(new DeleteSpecificReleaseRequirement()));
                 
                 // does this user have permission to view the subject data of a specific Release?
-                options.AddPolicy(DataSecurityPolicies.CanViewSubjectDataForRelease.ToString(), policy => 
+                options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy => 
                     policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
 
                 /**

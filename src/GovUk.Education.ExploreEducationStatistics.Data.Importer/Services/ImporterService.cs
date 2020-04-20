@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
@@ -21,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
-        private readonly ILogger<ImporterService> _logger;
 
         private enum Columns
         {
@@ -103,13 +101,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public ImporterService(
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
-            IImporterMetaService importerMetaService,
-            ILogger<ImporterService> logger)
+            IImporterMetaService importerMetaService)
         {
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
-            _logger = logger;
         }
 
         public void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context)
@@ -122,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
         }
 
-        public void ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows, SubjectMeta subjectMeta, Subject subject, StatisticsDbContext context)
+        public void ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows, SubjectMeta subjectMeta, StatisticsDbContext context)
         {
             // Clearing the caches is required here as the seeder shares the cache with all subjects
             _importerFilterService.ClearCache();

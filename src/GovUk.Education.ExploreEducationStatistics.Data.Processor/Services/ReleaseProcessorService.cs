@@ -77,27 +77,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private Subject RemoveAndCreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext context)
         {
-            var subject = context.Subject
-                .FirstOrDefault(s => s.Name.Equals(name) && s.ReleaseId == release.Id);
+            var existingReleaseSubjectLinks = context
+                .ReleaseSubject
+                .Include(r => r.Subject)
+                .Where(r => r.Subject.Name == name && r.ReleaseId == release.Id)
+                .ToList();
+                
+            var existingSubject = existingReleaseSubjectLinks.FirstOrDefault()?.Subject;
 
             // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
-
-            if (subject != null)
+            if (existingSubject != null)
             {
-                context.Subject.Remove(subject);
+                context.Subject.Remove(existingSubject);
+                context.ReleaseSubject.RemoveRange(existingReleaseSubjectLinks);
                 context.SaveChanges();
             }
 
-            subject = context.Subject.Add(new Subject
+            var newSubject = context.Subject.Add(new Subject
                 {
                     Id = subjectId,
-                    Name = name,
-                    Release = release
+                    Name = name
                 }
             ).Entity;
             
+            // reinstate any Release-to-Subject links
+            var newReleaseSubjectLinks = existingReleaseSubjectLinks.Select(r => new ReleaseSubject
+            {
+                ReleaseId = r.ReleaseId,
+                SubjectId = newSubject.Id
+            });
+            
+            context.ReleaseSubject.AddRange(newReleaseSubjectLinks);
+            
             context.SaveChanges();
-            return subject;
+            return existingSubject;
         }
 
         private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext context)

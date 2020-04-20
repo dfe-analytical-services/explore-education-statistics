@@ -59,19 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 var viewModel = _mapper.Map<FastTrackViewModel>(fastTrack);
                 viewModel.FullTable = result;
-                viewModel.Query.PublicationId = GetPublicationId(fastTrack);
+                viewModel.Query.PublicationId = 
+                    _subjectService.GetPublicationForSubjectAsync(fastTrack.Query.SubjectId).Result.Id;
                 return viewModel;
             });
-        }
-
-        private Guid GetPublicationId(FastTrack fastTrack)
-        {
-            var subject = _subjectService.Find(fastTrack.Query.SubjectId,
-                new List<Expression<Func<Subject, object>>>
-                {
-                    s => s.Release
-                });
-            return subject.Release.PublicationId;
         }
     }
 }

@@ -9,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,8 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -27,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
        [Fact]
        public void CreateReleaseAmendmentAsync()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, _) = Mocks();
 
             var releaseId = Guid.NewGuid();
             var releaseType = new ReleaseType
@@ -311,15 +315,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ReleaseFileReferenceId = dataFileReference2.Id
                 }
             };
-
-            using (var context = InMemoryApplicationDbContext("CreateReleaseAmendment"))
+            
+            var subject1 = new Subject
             {
-                context.AddRange(new List<ReleaseType>
+                Id = Guid.NewGuid(),
+                Name = "Subject 1",
+                ReleaseId = release.Id
+            };
+            
+            var subject2 = new Subject
+            {
+                Id = Guid.NewGuid(),
+                Name = "Subject 2",
+                ReleaseId = release.Id
+            };
+
+            using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
+            {
+                contentDbContext.AddRange(new List<ReleaseType>
                 {
                     releaseType
                 });
 
-                context.Add(new Publication
+                contentDbContext.Add(new Publication
                 {
                     Id = publicationId,
                     Releases = new List<Release>
@@ -328,55 +346,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-                context.Add(createdBy);
-                context.Add(new User
+                contentDbContext.Add(createdBy);
+                contentDbContext.Add(new User
                 {
                     Id = _userId
                 });
-                context.AddRange(userReleaseRoles);
-                context.AddRange(releaseFiles);
+                contentDbContext.AddRange(userReleaseRoles);
+                contentDbContext.AddRange(releaseFiles);
 
-                context.SaveChanges();
+                contentDbContext.SaveChanges();
+            }
+
+            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment2"))
+            {
+                statisticsDbContext.Release.Add(new Data.Model.Release
+                {
+                    Id = release.Id,
+                    PublicationId = release.PublicationId,
+                    Published = release.Published,
+                    Slug = release.Slug,
+                    Year = release.Year,
+                    TimeIdentifier = release.TimePeriodCoverage
+                });
+
+                statisticsDbContext.Subject.AddRange(subject1, subject2);
+                
+                statisticsDbContext.ReleaseSubject.AddRange(
+                    new ReleaseSubject
+                    {
+                        ReleaseId = releaseId,
+                        SubjectId = subject1.Id
+                    },
+                    new ReleaseSubject
+                    {
+                        ReleaseId = releaseId,
+                        SubjectId = subject2.Id
+                    }
+                );
+
+                statisticsDbContext.SaveChanges();
             }
 
             var newReleaseId = Guid.Empty;
             
-            using (var context = InMemoryApplicationDbContext("CreateReleaseAmendment"))
+            using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
             {
-                var newReleaseIdCapture = new CaptureMatch<Guid>(id => newReleaseId = id, id => id != null);
+                using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment2"))
+                {
+                    var releaseService = new ReleaseService(contentDbContext, AdminMapper(),
+                        publishingService.Object, new PersistenceHelper<ContentDbContext>(contentDbContext),
+                        userService.Object,
+                        repository.Object,
+                        subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                        importStatusService.Object, footnoteService.Object, statisticsDbContext);
 
-                fileStorageService
-                    .Setup(s => s.CopyReleaseFilesAsync(releaseId, Capture.With(newReleaseIdCapture),
-                        ReleaseFileTypes.Ancillary))
-                    .ReturnsAsync(() =>
-                    {
-                        var newRelease = context.Releases.FirstOrDefault(r => r.Id == newReleaseId);
-                        return new Either<ActionResult, Release>(newRelease);
-                    });
-
-                fileStorageService
-                    .Setup(s => s.CopyReleaseFilesAsync(releaseId, Capture.With(newReleaseIdCapture),
-                        ReleaseFileTypes.Chart))
-                    .ReturnsAsync(() =>
-                    {
-                        var newRelease = context.Releases.FirstOrDefault(r => r.Id == newReleaseId);
-                        return new Either<ActionResult, Release>(newRelease);
-                    });
-
-                var releaseService = new ReleaseService(context, AdminMapper(),
-                    publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object,
-                    repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
-                    importStatusService.Object, footnoteService.Object);
-
-                // Method under test 
-                var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
-                Assert.Equal(newReleaseId, amendmentViewModel.Id);
+                    // Method under test 
+                    var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
+                    Assert.NotEqual(release.Id, amendmentViewModel.Id);
+                    Assert.NotEqual(Guid.Empty, amendmentViewModel.Id);
+                    newReleaseId = amendmentViewModel.Id;
+                }
             }
             
-            using (var context = InMemoryApplicationDbContext("CreateReleaseAmendment"))
+            using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
             {
-                var amendment = context
+                var amendment = contentDbContext
                     .Releases
                     .Include(r => r.Original)
                     .Include(r => r.Type)
@@ -454,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotEqual(dataBlock2.Id, amendmentContentBlock2.Id);
                 Assert.Equal((amendmentContentBlock2 as DataBlock).Name, dataBlock2.Name);
 
-                var amendmentReleaseRoles = context
+                var amendmentReleaseRoles = contentDbContext
                     .UserReleaseRoles
                     .Where(r => r.ReleaseId == amendment.Id)
                     .ToList();
@@ -467,7 +501,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotEqual(contributorReleaseRole.Id, contributorAmendmentRole.Id);
                 AssertAmendedReleaseRoleCorrect(contributorReleaseRole, contributorAmendmentRole, amendment);
 
-                var amendmentDataFiles = context
+                var amendmentDataFiles = contentDbContext
                     .ReleaseFiles
                     .Include(f => f.ReleaseFileReference)
                     .Where(f => f.ReleaseId == amendment.Id)
@@ -487,7 +521,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(amendment.Amendment);
             }
-        }
+
+            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment2"))
+            {
+                var releaseSubjectLinks = statisticsDbContext
+                    .ReleaseSubject
+                    .Where(r => r.ReleaseId == newReleaseId)
+                    .ToList();
+                
+                Assert.Equal(2, releaseSubjectLinks.Count);
+                Assert.Contains(subject1.Id, releaseSubjectLinks.Select(r => r.SubjectId));
+                Assert.Contains(subject2.Id, releaseSubjectLinks.Select(r => r.SubjectId));
+            }
+       }
 
        private static void AssertAmendedBasicLinkCorrect(BasicLink amended, BasicLink original)
        {
@@ -575,7 +621,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ITableStorageService>,
             Mock<IFileStorageService>,
             Mock<IImportStatusService>,
-            Mock<IFootnoteService>) Mocks()
+            Mock<IFootnoteService>,
+            Mock<StatisticsDbContext>) Mocks()
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
@@ -596,7 +643,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<ITableStorageService>(), 
                 new Mock<IFileStorageService>(),
                 new Mock<IImportStatusService>(),
-                new Mock<IFootnoteService>());
+                new Mock<IFootnoteService>(),
+                new Mock<StatisticsDbContext>());
         }
     }
 }
