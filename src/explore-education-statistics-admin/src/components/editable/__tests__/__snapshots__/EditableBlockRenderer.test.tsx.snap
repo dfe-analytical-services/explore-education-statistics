@@ -8,9 +8,11 @@ exports[`EditableBlockRenderer MarkDownBlock renders editable version correctly 
            role="button"
            tabindex="0"
       >
-        <p>
-          test
-        </p>
+        <div>
+          <p>
+            test
+          </p>
+        </div>
       </div>
     </div>
   </div>

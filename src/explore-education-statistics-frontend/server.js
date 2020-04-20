@@ -137,10 +137,9 @@ async function startServer(port = process.env.PORT || 3000) {
     });
   });
 
-  server.get('/methodology/:publication/:release?', (req, res) => {
+  server.get('/methodology/:methodologySlug', (req, res) => {
     return app.render(req, res, '/methodology/methodology', {
-      publication: req.params.publication,
-      release: req.params.release,
+      methodologySlug: req.params.methodologySlug,
     });
   });
 

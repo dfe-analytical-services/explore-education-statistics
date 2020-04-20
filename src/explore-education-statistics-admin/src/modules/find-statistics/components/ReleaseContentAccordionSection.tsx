@@ -51,7 +51,7 @@ const ReleaseContentAccordionSection = ({
       sectionId,
       sectionKey: 'content',
       block: {
-        type: 'MarkDownBlock',
+        type: 'HtmlBlock',
         order: sectionContent.length,
         body: '',
       },

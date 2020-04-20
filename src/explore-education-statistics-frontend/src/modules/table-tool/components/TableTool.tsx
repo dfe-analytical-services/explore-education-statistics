@@ -17,6 +17,8 @@ import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeader
 import { OmitStrict } from '@common/types';
 import Link from '@frontend/components/Link';
 import React, { useEffect, useRef, useState } from 'react';
+import publicationService from '@common/services/publicationService';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 
 const TableToolFinalStep = ({
   table,
@@ -39,6 +41,13 @@ const TableToolFinalStep = ({
     setCurrentTableHeaders(tableHeaders);
     setPermalinkId('');
   }, [tableHeaders, table]);
+
+  const { value: pubMethodology } = useAsyncRetry(async () => {
+    if (publication) {
+      return publicationService.getPublicationMethodology(publication.slug);
+    }
+    return undefined;
+  }, [publication]);
 
   const handlePermalinkClick = async () => {
     if (!currentTableHeaders || !query) {
@@ -150,12 +159,19 @@ const TableToolFinalStep = ({
                   />
                 </li>
                 <li>
-                  <Link
-                    as={`/methodology/${publication.slug}`}
-                    to={`/methodology/methodology?publication=${publication.slug}`}
-                  >
-                    Go to methodology
-                  </Link>
+                  {pubMethodology?.methodology?.slug && (
+                    <Link
+                      as={`/methodology/${pubMethodology.methodology.slug}`}
+                      to={`/methodology/methodology?methodologySlug=${pubMethodology.methodology.slug}`}
+                    >
+                      Go to methodology
+                    </Link>
+                  )}
+                  {pubMethodology?.externalMethodology?.url && (
+                    <a href={pubMethodology.externalMethodology.url}>
+                      Go to methodology
+                    </a>
+                  )}
                 </li>
               </ul>
             )}
