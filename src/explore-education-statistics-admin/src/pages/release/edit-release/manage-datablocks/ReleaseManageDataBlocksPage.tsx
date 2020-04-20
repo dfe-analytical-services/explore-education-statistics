@@ -99,7 +99,10 @@ const ReleaseManageDataBlocksPage = ({
     }
 
     tableBuilderService
-      .getTableData(dataBlock.dataBlockRequest)
+      .getTableData({
+        ...dataBlock.dataBlockRequest,
+        includeGeoJson: true,
+      })
       .then(response => {
         if (response) {
           setSelectedDataBlock({
