@@ -12,25 +12,28 @@ import getCategoryDataSetConfigurations, {
   CategoryDataSetConfiguration,
 } from '@common/modules/charts/util/getCategoryDataSetConfigurations';
 import stylesIndicators from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import {
   GeoJsonFeature,
   GeoJsonFeatureProperties,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
+import generateHslColour from '@common/utils/colour/generateHslColour';
+import lighten from '@common/utils/colour/lighten';
 import formatPretty from '@common/utils/number/formatPretty';
+import getMinMax from '@common/utils/number/getMinMax';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
+import times from 'lodash/times';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 
 interface MapFeatureProperties extends GeoJsonFeatureProperties {
+  colour: string;
   data: number;
-  scaledData: number;
   dataSets: DataSetCategory['dataSets'];
-  color?: string;
+  scaledData: number;
   layer?: Layer & Path & Polyline;
 }
 
@@ -39,10 +42,9 @@ export type MapFeature = Feature<Geometry, MapFeatureProperties>;
 type MapFeatureCollection = FeatureCollection<Geometry, MapFeatureProperties>;
 
 interface LegendEntry {
-  minValue: number;
+  colour: string;
   min: string;
   max: string;
-  idx: number;
 }
 
 interface MapClickEvent extends LeafletMouseEvent {
@@ -56,68 +58,60 @@ interface MapDataSetCategory extends DataSetCategory {
   geoJson: GeoJsonFeature;
 }
 
-function calculateMinAndScaleForSourceData(
-  mapData: MapDataSetCategory[],
-  selectedDataSetKey: string,
-) {
-  const minMax = mapData.reduce(
-    ({ min, max }, category) => {
-      const { value } = category.dataSets[selectedDataSetKey];
-      return {
-        min: value < min ? value : min,
-        max: value > max ? value : max,
-      };
-    },
-    { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
-  );
-
-  const { min, max } = minMax;
-
-  if (min === max) {
-    return { min, max: min, scale: 0, range: 1 };
-  }
-
-  const range = Math.abs(max - min);
-  const scale = 1 / range;
-
-  return { min, max, range, scale };
+function calculateColour({
+  scaledData,
+  colour,
+}: {
+  scaledData: number;
+  colour: string;
+}) {
+  return lighten(colour, 90 - (scaledData / 0.2) * 30);
 }
 
-function generateGeometryAndLegendForSelectedOptions(
-  selectedDataSetKey: string,
-  dataSetConfigurationsByKey: Dictionary<CategoryDataSetConfiguration>,
-  meta: FullTableMeta,
+function generateGeometryAndLegend(
+  selectedDataSetConfiguration: CategoryDataSetConfiguration,
   dataSetCategories: MapDataSetCategory[],
 ): {
   geometry: MapFeatureCollection;
   legend: LegendEntry[];
 } {
-  const { min, max, range, scale } = calculateMinAndScaleForSourceData(
-    dataSetCategories,
-    selectedDataSetKey,
+  const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
+
+  const { min = 0, max = 0 } = getMinMax(
+    dataSetCategories.map(
+      category => category.dataSets[selectedDataSetKey].value,
+    ),
   );
 
-  let fixedScale = Math.log10((max - min) / 5);
+  const range = max - min;
 
-  let numberFormatter: (n: number) => string;
-  if (fixedScale < 0 && Number.isFinite(fixedScale)) {
-    fixedScale = -Math.floor(fixedScale);
-    numberFormatter = n => n.toFixed(fixedScale);
-  } else {
-    numberFormatter = n =>
-      n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  }
+  const colour =
+    selectedDataSetConfiguration.config.colour ??
+    generateHslColour(selectedDataSetConfiguration.dataKey);
 
-  const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
-    const i = idx / 4;
+  const {
+    unit,
+    decimalPlaces,
+  } = selectedDataSetConfiguration.dataSet.indicator;
 
-    return {
-      minValue: i,
-      min: numberFormatter(min + i * range),
-      max: numberFormatter(min + (i + 0.25) * range),
-      idx,
-    };
-  });
+  const legend: LegendEntry[] =
+    range > 0
+      ? times(5, idx => {
+          const i = idx / 4;
+
+          return {
+            colour: calculateColour({ scaledData: i, colour }),
+            min: formatPretty(min + i * range, unit, decimalPlaces),
+            max: formatPretty(min + (i + 0.25) * range, unit, decimalPlaces),
+          };
+        })
+      : [
+          {
+            colour,
+            min: formatPretty(min, unit, decimalPlaces),
+            max: formatPretty(max, unit, decimalPlaces),
+          },
+        ];
 
   const geometry: FeatureCollection<Geometry, MapFeatureProperties> = {
     type: 'FeatureCollection',
@@ -130,28 +124,15 @@ function generateGeometryAndLegendForSelectedOptions(
         properties: {
           ...geoJson.properties,
           dataSets,
-          color: dataSetConfigurationsByKey[selectedDataSetKey]?.config?.colour,
+          colour,
           data,
-          scaledData: (data - min) * scale,
+          scaledData: (data - min) / range,
         },
       };
     }),
   };
 
   return { geometry, legend };
-}
-
-function calculateColour({ scaledData = 1.0, color = '#ff0000' }) {
-  const rescale = 1 - (scaledData * 0.75 + 0.25);
-
-  return [
-    '#',
-    ...(color.substr(1).match(/.{2}/g) || ['0', '0', 'ff']).map(subColour =>
-      `0${Math.floor(Number.parseInt(subColour, 16) * rescale).toString(
-        16,
-      )}`.substr(-2),
-    ),
-  ].join('');
 }
 
 export interface MapBlockInternalProps extends ChartProps {
@@ -271,10 +252,8 @@ export const MapBlockInternal = ({
       const {
         geometry: newGeometry,
         legend: newLegend,
-      } = generateGeometryAndLegendForSelectedOptions(
-        selectedDataSetKey,
-        dataSetConfigurations,
-        meta,
+      } = generateGeometryAndLegend(
+        selectedDataSetConfiguration,
         dataSetCategories,
       );
 
@@ -283,7 +262,13 @@ export const MapBlockInternal = ({
         setLegend(newLegend);
       }
     }
-  }, [dataSetCategories, dataSetConfigurations, meta, selectedDataSetKey]);
+  }, [
+    dataSetCategories,
+    dataSetConfigurations,
+    meta,
+    selectedDataSetConfiguration,
+    selectedDataSetKey,
+  ]);
 
   // Reset the GeoJson layer if the geometry is changed,
   // updating the component doesn't do it once it's rendered
@@ -346,14 +331,14 @@ export const MapBlockInternal = ({
 
   return (
     <>
-      <form>
+      <form className="govuk-!-margin-bottom-2">
         <FormFieldset
           id="data-and-location"
           legend="Select data and location to view indicators"
           legendHidden
         >
-          <div className={styles.mapContainer}>
-            <FormGroup className={styles.mapIndicator}>
+          <div className="govuk-grid-row">
+            <FormGroup className="govuk-grid-column-two-thirds">
               <FormSelect
                 name="selectedIndicator"
                 id="selectedIndicator"
@@ -365,7 +350,7 @@ export const MapBlockInternal = ({
               />
             </FormGroup>
 
-            <FormGroup className={styles.mapLocation}>
+            <FormGroup className="govuk-grid-column-one-third">
               <FormSelect
                 name="selectedLocation"
                 id="selectedLocation"
@@ -387,8 +372,9 @@ export const MapBlockInternal = ({
           </div>
         </FormFieldset>
       </form>
-      <div className={styles.mapContainer} ref={container}>
-        <div className={styles.mapView}>
+
+      <div className="govuk-grid-row govuk-!-margin-bottom-4" ref={container}>
+        <div className="govuk-grid-column-two-thirds">
           {ukGeometry && (
             <Map
               ref={mapRef}
@@ -452,41 +438,27 @@ export const MapBlockInternal = ({
             </Map>
           )}
         </div>
-        <div className={styles.mapControls} aria-live="assertive">
-          {selectedDataSetKey && selectedDataSetConfiguration && (
-            <div className={styles.mapKey}>
-              <h3 className="govuk-heading-s">
-                Key to {selectedDataSetConfiguration?.config?.label}
-              </h3>
-              <dl className="govuk-list">
-                {legend?.map(({ min, max, idx, minValue }) => (
-                  <dd className={styles.legend} key={idx}>
-                    <span
-                      className={styles[`rate${idx}`]}
-                      style={{
-                        backgroundColor: calculateColour({
-                          scaledData: minValue,
-                          color: selectedDataSetConfiguration?.config?.colour,
-                        }),
-                      }}
-                    >
-                      &nbsp;
-                    </span>
-                    {` ${formatPretty(
-                      min,
-                      selectedDataSetConfiguration?.config?.unit,
-                      selectedDataSetConfiguration?.config.decimalPlaces,
-                    )} to ${formatPretty(
-                      max,
-                      selectedDataSetConfiguration?.config?.unit,
-                      selectedDataSetConfiguration?.config.decimalPlaces,
-                    )}`}
-                  </dd>
-                ))}
-              </dl>
-            </div>
-          )}
-        </div>
+        {selectedDataSetConfiguration && (
+          <div className="govuk-grid-column-one-third" aria-live="assertive">
+            <h3 className="govuk-heading-s">
+              Key to {selectedDataSetConfiguration?.config?.label}
+            </h3>
+            <ul className="govuk-list">
+              {legend.map(({ min, max, colour }, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <li className={styles.legend} key={index}>
+                  <span
+                    className={styles.legendIcon}
+                    style={{
+                      backgroundColor: colour,
+                    }}
+                  />
+                  {`${min} to ${max}`}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {selectedDataSetConfiguration && selectedFeature && (
@@ -495,15 +467,18 @@ export const MapBlockInternal = ({
             {selectedFeature?.properties.name}
           </h3>
 
-          {selectedFeature?.properties?.dataSets && (
+          {selectedFeature?.properties?.dataSets && selectedDataSetKey && (
             <div className={stylesIndicators.keyStatsContainer}>
-              {Object.keys(selectedFeature?.properties.dataSets).map(
-                dataSetKey => {
+              {Object.entries(selectedFeature?.properties.dataSets).map(
+                ([dataSetKey, dataSet]) => {
+                  if (!dataSetConfigurations[dataSetKey]) {
+                    return null;
+                  }
+
                   const {
                     config,
-                    dataSet,
-                    value,
-                  } = selectedDataSetConfiguration;
+                    dataSet: expandedDataSet,
+                  } = dataSetConfigurations[dataSetKey];
 
                   return (
                     <div
@@ -517,7 +492,10 @@ export const MapBlockInternal = ({
                           aria-label={config.label}
                         >
                           <span>
-                            {formatPretty(value, dataSet.indicator.unit)}
+                            {formatPretty(
+                              dataSet.value,
+                              expandedDataSet.indicator.unit,
+                            )}
                           </span>
                         </p>
                       </div>
