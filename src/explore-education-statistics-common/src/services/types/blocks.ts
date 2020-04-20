@@ -25,17 +25,17 @@ export interface BaseBlock {
   type: BlockType;
 }
 
+/**
+ * Some seeded data may come in the form of markdown blocks,
+ * so we need to potentially read and render these blocks.
+ * However, we should NOT be using these in a writeable way.
+ * @deprecated
+ */
 export interface MarkdownBlock extends BaseBlock {
   type: 'MarkDownBlock';
   body: string;
 }
 
-/**
- * Some seeded data may come in the form of HTML blocks,
- * so we need to potentially read and render these blocks.
- * However, we should NOT be using these in a writeable way.
- * @deprecated
- */
 export interface HtmlBlock extends BaseBlock {
   type: 'HtmlBlock';
   body: string;
