@@ -1,9 +1,14 @@
 import {
-  testChartPropsWithData1,
-  testChartPropsWithMultipleData,
-  testDataBlockResponse,
-} from '@common/modules/charts/components/__tests__/__data__/testBlockData';
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+  testChartConfiguration,
+  testChartTableData,
+  testDeprecatedChartConfiguration,
+} from '@common/modules/charts/components/__tests__/__data__/testChartData';
+import {
+  testMapConfiguration,
+  testMapTableData,
+} from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import {
   Chart,
@@ -14,7 +19,7 @@ import { render, wait } from '@testing-library/react';
 import React from 'react';
 import DataBlockRenderer from '../DataBlockRenderer';
 
-jest.mock('@common/services/dataBlockService');
+jest.mock('@common/services/tableBuilderService');
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -34,20 +39,25 @@ describe('DataBlockRenderer', () => {
       subjectId: '1',
       geographicLevel: 'country',
       timePeriod: {
-        startYear: 2014,
-        startCode: 'HT6',
-        endYear: 2015,
-        endCode: 'HT6',
+        startYear: 2012,
+        startCode: 'AY',
+        endYear: 2016,
+        endCode: 'AY',
       },
-      filters: ['1', '2'],
-      indicators: ['23', '26', '28'],
+      filters: ['characteristic-total', 'school-type-total'],
+      indicators: [
+        'authorised-absence-rate',
+        'unauthorised-absence-rate',
+        'overall-absence-rate',
+      ],
     },
     charts: [],
     tables: [],
   };
-  test('renders horizontal chart', async () => {
+
+  test('renders line chart', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      () => Promise.resolve(testDataBlockResponse),
+      () => Promise.resolve(testChartTableData),
     );
 
     const { container } = render(
@@ -55,9 +65,37 @@ describe('DataBlockRenderer', () => {
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
+          charts: [testChartConfiguration],
+        }}
+      />,
+    );
+
+    await wait();
+
+    expect(getDataBlockForSubject).toBeCalledWith(
+      testDataBlock.dataBlockRequest,
+    );
+
+    expect(
+      container.querySelectorAll('section.govuk-tabs__panel'),
+    ).toHaveLength(1);
+
+    expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
+  });
+
+  test('renders horizontal chart', async () => {
+    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
+      () => Promise.resolve(testChartTableData),
+    );
+
+    const { container } = render(
+      <DataBlockRenderer
+        id="test-block"
+        dataBlock={{
+          ...testDataBlock,
           charts: [
             {
-              ...testChartPropsWithData1,
+              ...testChartConfiguration,
               type: 'horizontalbar',
             } as Chart,
           ],
@@ -81,18 +119,18 @@ describe('DataBlockRenderer', () => {
   test('renders vertical chart', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testDataBlockResponse);
+        return Promise.resolve(testChartTableData);
       },
     );
 
     const { container } = render(
       <DataBlockRenderer
-        id="test-datablock"
+        id="test-block"
         dataBlock={{
           ...testDataBlock,
           charts: [
             {
-              ...testChartPropsWithData1,
+              ...testChartConfiguration,
               type: 'verticalbar',
             } as Chart,
           ],
@@ -116,38 +154,25 @@ describe('DataBlockRenderer', () => {
   test('renders table', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testDataBlockResponse);
+        return Promise.resolve(testChartTableData);
       },
     );
 
+    const fullTable = mapFullTable(testChartTableData);
+
     const { container } = render(
       <DataBlockRenderer
-        id="test-datablock"
+        id="test-block"
         dataBlock={{
           ...testDataBlock,
           tables: [
             {
-              tableHeaders: {
-                rowGroups: [],
-                columnGroups: [],
-                rows: [
-                  {
-                    value: '23',
-                    label: 'Unauthorised absence rate',
-                  },
-                ],
-                columns: [
-                  {
-                    value: '2014_HT6',
-                    label: '2014/15',
-                  },
-                  {
-                    value: '2015_HT6',
-                    label: '2015/16',
-                  },
-                ],
-              },
-              indicators: ['23'],
+              tableHeaders: getDefaultTableHeaderConfig(fullTable.subjectMeta),
+              indicators: [
+                'authorised-absence-rate',
+                'unauthorised-absence-rate',
+                'overall-absence-rate',
+              ],
             },
           ],
         }}
@@ -163,24 +188,19 @@ describe('DataBlockRenderer', () => {
     expect(container.querySelector('table')).toMatchSnapshot();
   });
 
-  test('renders map instead of chart', async () => {
+  test('renders map', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
       (_: DataBlockRequest) => {
-        return Promise.resolve(testDataBlockResponse);
+        return Promise.resolve(testMapTableData);
       },
     );
 
     const { container } = render(
       <DataBlockRenderer
-        id="test-datablock"
+        id="test-block"
         dataBlock={{
           ...testDataBlock,
-          charts: [
-            {
-              ...testChartPropsWithMultipleData,
-              type: 'map',
-            } as ChartRendererProps,
-          ],
+          charts: [testMapConfiguration],
         }}
       />,
     );
@@ -191,6 +211,39 @@ describe('DataBlockRenderer', () => {
       testDataBlock.dataBlockRequest,
     );
 
-    expect(container.querySelector('#test-datablock-charts')).toMatchSnapshot();
+    expect(container.querySelector('.leaflet-container')).toMatchSnapshot();
+  });
+
+  test('can render line chart with deprecated `labels` for data sets', async () => {
+    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
+      () => Promise.resolve(testChartTableData),
+    );
+
+    const { container } = render(
+      <DataBlockRenderer
+        id="test-datablock"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [testDeprecatedChartConfiguration],
+        }}
+      />,
+    );
+
+    await wait();
+
+    expect(getDataBlockForSubject).toBeCalledWith(
+      testDataBlock.dataBlockRequest,
+    );
+
+    expect(
+      container.querySelectorAll('section.govuk-tabs__panel'),
+    ).toHaveLength(1);
+
+    expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
+
+    const legendItems = container.querySelectorAll('.recharts-legend-item');
+    expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
+    expect(legendItems[1]).toHaveTextContent('Overall absence rate');
+    expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
   });
 });

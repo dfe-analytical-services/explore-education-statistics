@@ -1,21 +1,30 @@
-import { testChartPropsWithData1 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import {
+  testChartConfiguration,
+  testChartTableData,
+} from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import {
-  TableDataResult,
-  TableDataSubjectMeta,
-} from '@common/services/tableBuilderService';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import { render } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props: LineChartProps = testChartPropsWithData1 as LineChartProps;
-const { axes } = props;
-
 describe('LineChartBlock', () => {
+  const fullTable = mapFullTable(testChartTableData);
+  const props: LineChartProps = {
+    ...testChartConfiguration,
+    axes: testChartConfiguration.axes as LineChartProps['axes'],
+    meta: fullTable.subjectMeta,
+    data: fullTable.results,
+  };
+
+  const { axes } = props;
+
   test('renders basic chart correctly', () => {
     const { container } = render(<LineChartBlock {...props} />);
 
@@ -42,8 +51,8 @@ describe('LineChartBlock', () => {
     expect(
       container.querySelector('.recharts-default-legend'),
     ).toBeInTheDocument();
-    const legendItems = container.querySelectorAll('.recharts-legend-item');
 
+    const legendItems = container.querySelectorAll('.recharts-legend-item');
     expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
     expect(legendItems[1]).toHaveTextContent('Overall absence rate');
     expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
@@ -129,10 +138,25 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        labels={{
-          '23_1_2_____': {
-            ...props.labels['23_1_2_____'],
-            lineStyle: 'dashed',
+        axes={{
+          ...axes,
+          major: {
+            ...axes.major,
+            dataSets: [
+              {
+                indicator: 'unauthorised-absence-rate',
+                filters: ['characteristic-total', 'school-type-total'],
+                config: {
+                  label: 'Unauthorised absence rate',
+                  unit: '%',
+                  colour: '#4763a5',
+                  symbol: 'circle',
+                  lineStyle: 'dashed',
+                },
+              },
+              props.axes.major.dataSets[1],
+              props.axes.major.dataSets[2],
+            ],
           },
         }}
       />,
@@ -147,10 +171,25 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        labels={{
-          '23_1_2_____': {
-            ...props.labels['23_1_2_____'],
-            lineStyle: 'dotted',
+        axes={{
+          ...axes,
+          major: {
+            ...axes.major,
+            dataSets: [
+              {
+                indicator: 'unauthorised-absence-rate',
+                filters: ['characteristic-total', 'school-type-total'],
+                config: {
+                  label: 'Unauthorised absence rate',
+                  unit: '%',
+                  colour: '#4763a5',
+                  symbol: 'circle',
+                  lineStyle: 'dotted',
+                },
+              },
+              props.axes.major.dataSets[1],
+              props.axes.major.dataSets[2],
+            ],
           },
         }}
       />,
@@ -215,14 +254,13 @@ describe('LineChartBlock', () => {
 
   test('dies gracefully with bad data', () => {
     const invalidData = (undefined as unknown) as TableDataResult[];
-    const invalidMeta = (undefined as unknown) as TableDataSubjectMeta;
+    const invalidMeta = (undefined as unknown) as FullTableMeta;
     const invalidAxes = (undefined as unknown) as LineChartProps['axes'];
 
     const { container } = render(
       <LineChartBlock
         height={300}
         data={invalidData}
-        labels={{}}
         meta={invalidMeta}
         axes={invalidAxes}
       />,
@@ -271,72 +309,55 @@ describe('LineChartBlock', () => {
   });
 
   test('can limit range of minor ticks to default', () => {
-    const propsWithTicks: LineChartProps = {
-      ...props,
-      axes: {
-        major: props.axes.major,
-        minor: {
-          ...props.axes.minor,
-          tickConfig: 'default',
-        },
-      },
-    };
+    const { container } = render(
+      <LineChartBlock
+        {...props}
+        axes={{
+          major: props.axes.major,
+          minor: {
+            ...props.axes.minor,
+            tickConfig: 'default',
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<LineChartBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'y', '-3', '3', '9', '20');
+    expectTicks(container, 'y', '0', '2', '4', '6');
   });
 
   test('can limit range of minor ticks to start and end', () => {
-    const propsWithTicks: LineChartProps = {
-      ...props,
-      axes: {
-        major: props.axes.major,
-        minor: {
-          ...props.axes.minor,
-          tickConfig: 'startEnd',
-        },
-      },
-    };
+    const { container } = render(
+      <LineChartBlock
+        {...props}
+        axes={{
+          major: props.axes.major,
+          minor: {
+            ...props.axes.minor,
+            tickConfig: 'startEnd',
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<LineChartBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'y', '-3', '20');
+    expectTicks(container, 'y', '0', '6');
   });
 
   test('can limit range of minor ticks to custom', () => {
-    const propsWithTicks: LineChartProps = {
-      ...props,
-      axes: {
-        major: props.axes.major,
-        minor: {
-          ...props.axes.minor,
-          tickConfig: 'custom',
-          tickSpacing: 1,
-        },
-      },
-    };
-
-    const { container } = render(<LineChartBlock {...propsWithTicks} />);
-
-    expectTicks(
-      container,
-      'y',
-      '-3',
-      '-2',
-      '-1',
-      '0',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '10',
+    const { container } = render(
+      <LineChartBlock
+        {...props}
+        axes={{
+          major: props.axes.major,
+          minor: {
+            ...props.axes.minor,
+            tickConfig: 'custom',
+            tickSpacing: 1,
+          },
+        }}
+      />,
     );
+
+    expectTicks(container, 'y', '0', '1', '2', '3', '4', '5', '6');
   });
 
   test('can limit range of major ticks to default', () => {
@@ -353,27 +374,35 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<LineChartBlock {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(
+      container,
+      'x',
+      '2012/13',
+      '2013/14',
+      '2014/15',
+      '2015/16',
+      '2016/17',
+    );
   });
 
   test('can limit range of major ticks to start and end', () => {
-    const propsWithTicks: LineChartProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          tickConfig: 'startEnd',
-        },
-      },
-    };
+    const { container } = render(
+      <LineChartBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            tickConfig: 'startEnd',
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<LineChartBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'x', '2012/13', '2016/17');
   });
 
-  test('can limit range of minor ticks to custom', () => {
+  test('can limit range of major ticks to custom', () => {
     const propsWithTicks: LineChartProps = {
       ...props,
       axes: {
@@ -388,62 +417,78 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<LineChartBlock {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(container, 'x', '2012/13', '2014/15', '2016/17');
   });
 
   test('can sort by name', () => {
-    const propsWithTicks: LineChartProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          sortBy: 'name',
-          sortAsc: true,
-        },
-      },
-    };
+    const { container } = render(
+      <LineChartBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            sortBy: 'name',
+            sortAsc: true,
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<LineChartBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'x', '2014/15', '2015/16');
+    expectTicks(
+      container,
+      'x',
+      '2012/13',
+      '2013/14',
+      '2014/15',
+      '2015/16',
+      '2016/17',
+    );
   });
 
   test('can sort by name descending', () => {
-    const propsWithTicks: LineChartProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          sortBy: 'name',
-          sortAsc: false,
-        },
-      },
-    };
+    const { container } = render(
+      <LineChartBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            sortBy: 'name',
+            sortAsc: false,
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<LineChartBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'x', '2015/16', '2014/15');
+    expectTicks(
+      container,
+      'x',
+      '2016/17',
+      '2015/16',
+      '2014/15',
+      '2013/14',
+      '2012/13',
+    );
   });
 
   test('can filter a data range', () => {
-    const propsWithTicks: LineChartProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          sortBy: 'name',
-          sortAsc: true,
-          min: 0,
-          max: 1,
-        },
-      },
-    };
+    const { container } = render(
+      <LineChartBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            sortBy: 'name',
+            sortAsc: true,
+            min: 0,
+            max: 1,
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<LineChartBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'x', '2014/15');
+    expectTicks(container, 'x', '2012/13', '2013/14');
   });
 });

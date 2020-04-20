@@ -13,6 +13,7 @@ describe('generateDefaultDataSetLabel', () => {
       label: 'Indicator 1',
       value: 'indicator-1',
       unit: '',
+      name: 'indicator',
     }),
     filters: [
       new CategoryFilter({

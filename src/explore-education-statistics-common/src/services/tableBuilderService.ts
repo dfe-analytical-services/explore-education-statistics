@@ -146,6 +146,7 @@ export type TableDataQuery = {
   timePeriod?: TimePeriodQuery;
   geographicLevel?: string;
   includeGeoJson?: boolean;
+  boundaryLevel?: number;
 } & PartialRecord<LocationLevelKeys, string[]>;
 
 export interface TableDataSubjectMeta {

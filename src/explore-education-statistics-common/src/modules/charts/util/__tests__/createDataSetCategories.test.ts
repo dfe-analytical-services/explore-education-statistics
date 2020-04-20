@@ -14,17 +14,18 @@ describe('createDataSetCategories', () => {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             Gender: {
               label: 'Gender',
               options: [
                 {
                   label: 'Gender female',
-                  value: 'filter-1',
+                  value: 'gender-female',
                 },
                 {
                   label: 'Gender male',
-                  value: 'filter-3',
+                  value: 'gender-male',
                 },
               ],
             },
@@ -34,13 +35,14 @@ describe('createDataSetCategories', () => {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
               options: [
                 {
                   label: 'State-funded primary',
-                  value: 'filter-2',
+                  value: 'state-funded-primary',
                 },
               ],
             },
@@ -52,7 +54,8 @@ describe('createDataSetCategories', () => {
         {
           label: 'Fixed period exclusion rate',
           unit: '%',
-          value: 'indicator-1',
+          value: 'exclusion-rate',
+          name: 'exclusion_rate',
         },
       ],
       locations: [
@@ -89,59 +92,59 @@ describe('createDataSetCategories', () => {
     },
     results: [
       {
-        filters: ['filter-1', 'filter-2'],
+        filters: ['gender-female', 'state-funded-primary'],
         geographicLevel: 'Country',
         location: { country: { code: 'E92000001', name: 'England' } },
-        measures: { 'indicator-1': '0.29' },
+        measures: { 'exclusion-rate': '0.29' },
         timePeriod: '2015_AY',
       },
       {
-        filters: ['filter-1', 'filter-2'],
+        filters: ['gender-female', 'state-funded-primary'],
         geographicLevel: 'Country',
         location: { country: { code: 'E92000001', name: 'England' } },
-        measures: { 'indicator-1': '0.25' },
+        measures: { 'exclusion-rate': '0.25' },
         timePeriod: '2014_AY',
       },
       {
-        filters: ['filter-2', 'filter-3'],
+        filters: ['state-funded-primary', 'gender-male'],
         geographicLevel: 'Country',
         location: { country: { code: 'E92000001', name: 'England' } },
-        measures: { 'indicator-1': '1.54' },
+        measures: { 'exclusion-rate': '1.54' },
         timePeriod: '2012_AY',
       },
       {
-        filters: ['filter-2', 'filter-3'],
+        filters: ['state-funded-primary', 'gender-male'],
         geographicLevel: 'Country',
         location: { country: { code: 'E92000001', name: 'England' } },
-        measures: { 'indicator-1': '1.78' },
+        measures: { 'exclusion-rate': '1.78' },
         timePeriod: '2013_AY',
       },
       {
-        filters: ['filter-1', 'filter-2'],
+        filters: ['gender-female', 'state-funded-primary'],
         geographicLevel: 'Country',
         location: { country: { code: 'E92000001', name: 'England' } },
-        measures: { 'indicator-1': '0.22' },
+        measures: { 'exclusion-rate': '0.22' },
         timePeriod: '2013_AY',
       },
       {
-        filters: ['filter-1', 'filter-2'],
+        filters: ['gender-female', 'state-funded-primary'],
         geographicLevel: 'Country',
         location: { country: { code: 'E92000001', name: 'England' } },
-        measures: { 'indicator-1': '0.19' },
+        measures: { 'exclusion-rate': '0.19' },
         timePeriod: '2012_AY',
       },
       {
-        filters: ['filter-2', 'filter-3'],
+        filters: ['state-funded-primary', 'gender-male'],
         geographicLevel: 'Country',
         location: { country: { code: 'E92000001', name: 'England' } },
-        measures: { 'indicator-1': '1.92' },
+        measures: { 'exclusion-rate': '1.92' },
         timePeriod: '2014_AY',
       },
       {
-        filters: ['filter-2', 'filter-3'],
+        filters: ['state-funded-primary', 'gender-male'],
         geographicLevel: 'Country',
         location: { country: { code: 'E92000001', name: 'England' } },
-        measures: { 'indicator-1': '2.09' },
+        measures: { 'exclusion-rate': '2.09' },
         timePeriod: '2015_AY',
       },
     ],
@@ -155,12 +158,18 @@ describe('createDataSetCategories', () => {
       sortAsc: true,
       dataSets: [
         {
-          indicator: 'indicator-1',
-          filters: ['filter-1', 'filter-2'],
+          indicator: 'exclusion-rate',
+          filters: ['gender-female', 'state-funded-primary'],
+          config: {
+            label: 'Test label 1',
+          },
         },
         {
-          indicator: 'indicator-1',
-          filters: ['filter-3', 'filter-2'],
+          indicator: 'exclusion-rate',
+          filters: ['gender-male', 'state-funded-primary'],
+          config: {
+            label: 'Test label 2',
+          },
         },
       ],
       referenceLines: [],
@@ -218,12 +227,18 @@ describe('createDataSetCategories', () => {
       sortAsc: true,
       dataSets: [
         {
-          indicator: 'indicator-1',
-          filters: ['filter-1', 'filter-2'],
+          indicator: 'exclusion-rate',
+          filters: ['gender-female', 'state-funded-primary'],
+          config: {
+            label: 'Test label 1',
+          },
         },
         {
-          indicator: 'indicator-1',
-          filters: ['filter-3', 'filter-2'],
+          indicator: 'exclusion-rate',
+          filters: ['gender-male', 'state-funded-primary'],
+          config: {
+            label: 'Test label 2',
+          },
         },
       ],
       referenceLines: [],
@@ -266,12 +281,18 @@ describe('createDataSetCategories', () => {
       sortAsc: true,
       dataSets: [
         {
-          indicator: 'indicator-1',
-          filters: ['filter-1', 'filter-2'],
+          indicator: 'exclusion-rate',
+          filters: ['gender-female', 'state-funded-primary'],
+          config: {
+            label: 'Test label 1',
+          },
         },
         {
-          indicator: 'indicator-1',
-          filters: ['filter-3', 'filter-2'],
+          indicator: 'exclusion-rate',
+          filters: ['gender-male', 'state-funded-primary'],
+          config: {
+            label: 'Test label 2',
+          },
         },
       ],
       referenceLines: [],
@@ -316,12 +337,18 @@ describe('createDataSetCategories', () => {
       sortAsc: true,
       dataSets: [
         {
-          indicator: 'indicator-1',
-          filters: ['filter-1', 'filter-2'],
+          indicator: 'exclusion-rate',
+          filters: ['gender-female', 'state-funded-primary'],
+          config: {
+            label: 'Test label 1',
+          },
         },
         {
-          indicator: 'indicator-1',
-          filters: ['filter-3', 'filter-2'],
+          indicator: 'exclusion-rate',
+          filters: ['gender-male', 'state-funded-primary'],
+          config: {
+            label: 'Test label 2',
+          },
         },
       ],
       referenceLines: [],
@@ -361,11 +388,15 @@ describe('createDataSetCategories', () => {
     expect(dataSetCategories[2].filter.label).toBe('State-funded primary');
 
     const dataSet3 = Object.values(dataSetCategories[2].dataSets);
-    expect(dataSet3).toHaveLength(4);
-    expect(dataSet3[0].value).toBe(1.54);
-    expect(dataSet3[1].value).toBe(1.78);
-    expect(dataSet3[2].value).toBe(1.92);
-    expect(dataSet3[3].value).toBe(2.09);
+    expect(dataSet3).toHaveLength(8);
+    expect(dataSet3[0].value).toBe(0.19);
+    expect(dataSet3[1].value).toBe(0.22);
+    expect(dataSet3[2].value).toBe(0.25);
+    expect(dataSet3[3].value).toBe(0.29);
+    expect(dataSet3[4].value).toBe(1.54);
+    expect(dataSet3[5].value).toBe(1.78);
+    expect(dataSet3[6].value).toBe(1.92);
+    expect(dataSet3[7].value).toBe(2.09);
 
     expect(dataSetCategories).toMatchSnapshot();
   });

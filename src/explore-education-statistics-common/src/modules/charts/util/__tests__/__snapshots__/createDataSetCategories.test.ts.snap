@@ -4,143 +4,75 @@ exports[`createDataSetCategories returns chart data categorised by filters 1`] =
 Array [
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
-          },
+          "timePeriod": "2012_AY",
         },
         "value": 0.19,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 0.22,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 0.25,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 0.29,
       },
@@ -150,148 +82,80 @@ Array [
       "group": "Gender",
       "isTotal": false,
       "label": "Gender female",
-      "value": "filter-1",
+      "value": "gender-female",
     },
   },
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
-          },
+          "timePeriod": "2012_AY",
         },
         "value": 1.54,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 1.78,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 1.92,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 2.09,
       },
@@ -301,148 +165,152 @@ Array [
       "group": "Gender",
       "isTotal": false,
       "label": "Gender male",
-      "value": "filter-3",
+      "value": "gender-male",
     },
   },
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
+          "timePeriod": "2012_AY",
+        },
+        "value": 0.19,
+      },
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
+        "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
           },
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
+          },
+          "timePeriod": "2013_AY",
+        },
+        "value": 0.22,
+      },
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
+        "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
+          },
+          "timePeriod": "2014_AY",
+        },
+        "value": 0.25,
+      },
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
+        "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
+          },
+          "timePeriod": "2015_AY",
+        },
+        "value": 0.29,
+      },
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
+        "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
+          },
+          "timePeriod": "2012_AY",
         },
         "value": 1.54,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 1.78,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 1.92,
       },
-      "{\\"filters\\":[],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 2.09,
       },
@@ -452,7 +320,7 @@ Array [
       "group": "Default",
       "isTotal": false,
       "label": "State-funded primary",
-      "value": "filter-2",
+      "value": "state-funded-primary",
     },
   },
 ]
@@ -462,340 +330,158 @@ exports[`createDataSetCategories returns chart data categorised by indicators 1`
 Array [
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\",\\"location\\":\\"country_E92000001\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 1",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
-          },
+          "timePeriod": "2012_AY",
         },
         "value": 0.19,
       },
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\",\\"location\\":\\"country_E92000001\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 1",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 0.22,
       },
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\",\\"location\\":\\"country_E92000001\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 1",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 0.25,
       },
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\",\\"location\\":\\"country_E92000001\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 1",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 0.29,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\",\\"location\\":\\"country_E92000001\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 2",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
-          },
+          "timePeriod": "2012_AY",
         },
         "value": 1.54,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\",\\"location\\":\\"country_E92000001\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 2",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 1.78,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\",\\"location\\":\\"country_E92000001\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 2",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 1.92,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\",\\"location\\":\\"country_E92000001\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 2",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 2.09,
       },
     },
     "filter": Indicator {
+      "decimalPlaces": undefined,
       "group": undefined,
       "label": "Fixed period exclusion rate",
+      "name": "exclusion_rate",
       "unit": "%",
-      "value": "indicator-1",
+      "value": "exclusion-rate",
     },
   },
 ]
@@ -805,331 +491,147 @@ exports[`createDataSetCategories returns chart data categorised by locations 1`]
 Array [
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 1",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
-          },
+          "timePeriod": "2012_AY",
         },
         "value": 0.19,
       },
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 1",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 0.22,
       },
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 1",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 0.25,
       },
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 1",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-female",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 0.29,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 2",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
-          },
+          "timePeriod": "2012_AY",
         },
         "value": 1.54,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 2",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 1.78,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 2",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 1.92,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
-          "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
-          ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "config": Object {
+            "label": "Test label 2",
           },
-          "location": LocationFilter {
-            "geoJson": Array [],
-            "group": undefined,
-            "label": "England",
+          "filters": Array [
+            "gender-male",
+            "state-funded-primary",
+          ],
+          "indicator": "exclusion-rate",
+          "location": Object {
             "level": "country",
             "value": "E92000001",
           },
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 2.09,
       },
@@ -1149,73 +651,39 @@ exports[`createDataSetCategories returns chart data categorised by time periods 
 Array [
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"}}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
-          },
+          "timePeriod": "2012_AY",
         },
         "value": 0.19,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"}}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2012/13",
-            "value": "2012_AY",
-            "year": 2012,
-          },
+          "timePeriod": "2012_AY",
         },
         "value": 1.54,
       },
@@ -1230,73 +698,39 @@ Array [
   },
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"}}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 0.22,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"}}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2013/14",
-            "value": "2013_AY",
-            "year": 2013,
-          },
+          "timePeriod": "2013_AY",
         },
         "value": 1.78,
       },
@@ -1311,73 +745,39 @@ Array [
   },
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"}}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 0.25,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"}}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2014/15",
-            "value": "2014_AY",
-            "year": 2014,
-          },
+          "timePeriod": "2014_AY",
         },
         "value": 1.92,
       },
@@ -1392,73 +792,39 @@ Array [
   },
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[\\"filter-1\\",\\"filter-2\\"],\\"indicator\\":\\"indicator-1\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"}}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 1",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender female",
-              "value": "filter-1",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-female",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 0.29,
       },
-      "{\\"filters\\":[\\"filter-2\\",\\"filter-3\\"],\\"indicator\\":\\"indicator-1\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"}}": Object {
         "dataSet": Object {
+          "config": Object {
+            "label": "Test label 2",
+          },
           "filters": Array [
-            CategoryFilter {
-              "category": "Characteristic",
-              "group": "Gender",
-              "isTotal": false,
-              "label": "Gender male",
-              "value": "filter-3",
-            },
-            CategoryFilter {
-              "category": "School type",
-              "group": "Default",
-              "isTotal": false,
-              "label": "State-funded primary",
-              "value": "filter-2",
-            },
+            "gender-male",
+            "state-funded-primary",
           ],
-          "indicator": Indicator {
-            "group": undefined,
-            "label": "Fixed period exclusion rate",
-            "unit": "%",
-            "value": "indicator-1",
+          "indicator": "exclusion-rate",
+          "location": Object {
+            "level": "country",
+            "value": "E92000001",
           },
-          "location": undefined,
-          "timePeriod": TimePeriodFilter {
-            "code": "AY",
-            "group": undefined,
-            "label": "2015/16",
-            "value": "2015_AY",
-            "year": 2015,
-          },
+          "timePeriod": "2015_AY",
         },
         "value": 2.09,
       },

@@ -145,7 +145,9 @@ function getCategoryFilters(
 
   switch (axisGroupBy) {
     case 'filters':
-      filters = Object.values(meta.filters).flat();
+      filters = Object.values(meta.filters).flatMap(
+        filterGroup => filterGroup.options,
+      );
       break;
     case 'timePeriod':
       filters = meta.timePeriodRange;
@@ -267,6 +269,10 @@ function sortDataSetCategories(
   return orderBy(
     dataSetCategories,
     data => {
+      if (sortBy === 'name') {
+        return data.filter.label;
+      }
+
       return parseNumber(data.dataSets[sortBy]) ?? 0;
     },
     [sortAsc ? 'asc' : 'desc'],
@@ -372,7 +378,7 @@ export default function createDataSetCategories(
 
   return sortDataSetCategories(dataSetCategories, axisConfiguration).slice(
     axisConfiguration.min ?? 0,
-    axisConfiguration.max ?? dataSetCategories.length,
+    (axisConfiguration.max ?? dataSetCategories.length) + 1,
   );
 }
 

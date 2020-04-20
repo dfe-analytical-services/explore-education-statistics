@@ -472,11 +472,15 @@ export const MapBlockInternal = ({
               Key to {selectedDataSetConfiguration?.config?.label}
             </h3>
             <ul className="govuk-list">
-              {legend.map(({ min, max, colour }, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <li className={styles.legend} key={index}>
+              {legend.map(({ min, max, colour }) => (
+                <li
+                  key={`${min}-${max}-${colour}`}
+                  className={styles.legend}
+                  data-testid="mapLegendItem"
+                >
                   <span
                     className={styles.legendIcon}
+                    data-testid="mapLegendItem-colour"
                     style={{
                       backgroundColor: colour,
                     }}
@@ -496,7 +500,7 @@ export const MapBlockInternal = ({
           </h3>
 
           {selectedFeature?.properties?.dataSets && selectedDataSetKey && (
-            <div className={stylesIndicators.keyStatsContainer}>
+            <dl className={stylesIndicators.keyStatsContainer}>
               {Object.entries(selectedFeature?.properties.dataSets).map(
                 ([dataSetKey, dataSet]) => {
                   if (!dataSetConfigurations[dataSetKey]) {
@@ -513,25 +517,27 @@ export const MapBlockInternal = ({
                       key={dataSetKey}
                       className={stylesIndicators.keyStatTile}
                     >
-                      <div className={stylesIndicators.keyStat}>
-                        <h4 className="govuk-heading-s">{config.label}</h4>
-                        <p
+                      <div
+                        className={stylesIndicators.keyStat}
+                        data-testid="indicatorTile"
+                      >
+                        <dt className="govuk-heading-s">{config.label}</dt>
+
+                        <dd
                           className="govuk-heading-xl govuk-!-margin-bottom-2"
                           aria-label={config.label}
                         >
-                          <span>
-                            {formatPretty(
-                              dataSet.value,
-                              expandedDataSet.indicator.unit,
-                            )}
-                          </span>
-                        </p>
+                          {formatPretty(
+                            dataSet.value,
+                            expandedDataSet.indicator.unit,
+                          )}
+                        </dd>
                       </div>
                     </div>
                   );
                 },
               )}
-            </div>
+            </dl>
           )}
         </>
       )}

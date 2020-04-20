@@ -21,7 +21,6 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  Line,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
