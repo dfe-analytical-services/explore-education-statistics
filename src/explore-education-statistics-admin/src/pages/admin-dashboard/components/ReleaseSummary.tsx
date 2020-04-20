@@ -16,7 +16,7 @@ import {
 import React, { ReactNode } from 'react';
 import LazyLoad from 'react-lazyload';
 
-export interface Props {
+interface Props {
   release: AdminDashboardRelease;
   actions: ReactNode;
   secondaryActions?: ReactNode;
@@ -55,13 +55,14 @@ const ReleaseSummary = ({
             {release.published || release.publishScheduled}
           </FormattedDate>
         </SummaryListItem>
-        <SummaryListItem term="Next release date">
-          {dayMonthYearIsComplete(release.nextReleaseDate) && (
+
+        {dayMonthYearIsComplete(release.nextReleaseDate) && (
+          <SummaryListItem term="Next release date">
             <FormattedDate>
               {dayMonthYearToDate(release.nextReleaseDate)}
             </FormattedDate>
-          )}
-        </SummaryListItem>
+          </SummaryListItem>
+        )}
         {release.status === 'Approved' && (
           <SummaryListItem term="Release process status">
             <ReleaseServiceStatus releaseId={release.id} />

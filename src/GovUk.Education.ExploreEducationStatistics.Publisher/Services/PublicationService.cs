@@ -87,21 +87,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Summary = topic.Summary,
                 Publications = topic.Publications
                     .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
-                    .Select(BuildPublicationNode)
+                    .Select(publication => BuildPublicationNode(publication, includedReleaseIds))
                     .OrderBy(publication => publication.Title)
                     .ToList()
             };
         }
 
-        private static PublicationTreeNode BuildPublicationNode(Publication publication)
+        private static PublicationTreeNode BuildPublicationNode(Publication publication,
+            IEnumerable<Guid> includedReleaseIds)
         {
+            // Ignore any legacyPublicationUrl once the Publication has Releases
+            var legacyPublicationUrlIgnored =
+                publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
+            var legacyPublicationUrl =
+                legacyPublicationUrlIgnored ? null : publication.LegacyPublicationUrl?.ToString();
+
             return new PublicationTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,
                 Summary = publication.Summary,
                 Slug = publication.Slug,
-                LegacyPublicationUrl = publication.LegacyPublicationUrl?.ToString()
+                LegacyPublicationUrl = legacyPublicationUrl
             };
         }
 
@@ -112,8 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds))
-                .OrderBy(release => release.Year)
-                .ThenBy(release => release.TimePeriodCoverage);
+                .OrderByDescending(release => release.Year)
+                .ThenByDescending(release => release.TimePeriodCoverage);
             return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
         }
 

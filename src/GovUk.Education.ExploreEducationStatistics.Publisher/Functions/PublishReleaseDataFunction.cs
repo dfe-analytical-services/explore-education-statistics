@@ -10,26 +10,35 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Stage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusDataStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
+    // ReSharper disable once UnusedType.Global
     public class PublishReleaseDataFunction
     {
         private readonly IConfiguration _configuration;
+        private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
 
-        public const string QueueName = "publish-release-data";
-
-        public PublishReleaseDataFunction(IConfiguration configuration, IReleaseStatusService releaseStatusService)
+        public PublishReleaseDataFunction(IConfiguration configuration,
+            IQueueService queueService,
+            IReleaseStatusService releaseStatusService)
         {
             _configuration = configuration;
+            _queueService = queueService;
             _releaseStatusService = releaseStatusService;
         }
 
+        /**
+         * Azure function which publishes the statistics data for a Release by triggering an ADF Pipeline to copy it between databases.
+         * Triggers publishing content for the Release if publishing is immediate and the function is running locally where the ADF Pipeline is skipped.
+         */
         [FunctionName("PublishReleaseData")]
+        // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseData(
-            [QueueTrigger(QueueName)] PublishReleaseDataMessage message,
+            [QueueTrigger(PublishReleaseDataQueue)] PublishReleaseDataMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -37,7 +46,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             if (IsDevelopment())
             {
-                // Skip Data Factory
+                // Skip the ADF Pipeline which doesn't run locally
+                // If the Release is immediate then trigger publishing the content
+                // This usually happens when the ADF Pipeline is complete
+                if (await _releaseStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
+                {
+                    await _queueService.QueuePublishReleaseContentImmediateMessageAsync(message.ReleaseId,
+                        message.ReleaseStatusId);
+                }
+
                 await UpdateStage(message, Complete);
             }
             else
@@ -59,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task UpdateStage(PublishReleaseDataMessage message, Stage stage,
+        private async Task UpdateStage(PublishReleaseDataMessage message, ReleaseStatusDataStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
             await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage,

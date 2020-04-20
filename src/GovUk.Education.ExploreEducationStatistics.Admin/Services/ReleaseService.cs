@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -39,10 +40,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
         private readonly ISubjectService _subjectService;
-        private readonly ITableStorageService _tableStorageService;
+        private readonly ITableStorageService _coreTableStorageService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
+        private readonly IDataBlockService _dataBlockService;
 
         // TODO PP-318 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -54,10 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService, 
             IReleaseRepository repository, 
             ISubjectService subjectService,
-            ITableStorageService tableStorageService, 
+            ITableStorageService coreTableStorageService, 
             IFileStorageService fileStorageService, 
             IImportStatusService importStatusService,
-	    IFootnoteService footnoteService)
+	        IFootnoteService footnoteService,
+            IDataBlockService dataBlockService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -66,10 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _repository = repository;
             _subjectService = subjectService;
-            _tableStorageService = tableStorageService;
+            _coreTableStorageService = coreTableStorageService;
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
             _footnoteService = footnoteService;
+            _dataBlockService = dataBlockService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
@@ -234,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     release.Slug = request.Slug;
                     release.TypeId = request.TypeId;
-                    release.PublishScheduled = request.PublishScheduled;
+                    release.PublishScheduled = request.PublishScheduled?.Date;
                     release.ReleaseName = request.ReleaseName;
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
@@ -277,7 +281,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 releaseStatuses));
                 });
         }
-        
+
+        public Task<Either<ActionResult, bool>> PublishReleaseAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
+                    .OnSuccess(async release =>
+                    {
+                        if (release.Status != ReleaseStatus.Approved)
+                        {
+                            return ValidationActionResult(ReleaseNotApproved);
+                        }
+
+                        await _publishingService.QueueValidateReleaseAsync(releaseId, true);
+
+                        return new Either<ActionResult, bool>(true);
+                    }));
+        }
+
+        public Task<Either<ActionResult, bool>> PublishReleaseContentAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
+                    .OnSuccess(async release =>
+                    {
+                        if (release.Status != ReleaseStatus.Approved)
+                        {
+                            return ValidationActionResult(ReleaseNotApproved);
+                        }
+
+                        await _publishingService.QueuePublishReleaseContentImmediateMessageAsync(releaseId);
+
+                        return new Either<ActionResult, bool>(true);
+                    }));
+        }
+
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
@@ -327,19 +367,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
-                .OnSuccess(async release => {
-
+                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, status))
+                .OnSuccess(async release =>
+                {
                     if (status == ReleaseStatus.Approved && !release.PublishScheduled.HasValue)
                     {
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
                     }
-                    
+
                     release.Status = status;
                     release.InternalReleaseNote = internalReleaseNote;
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
 
-                    await _publishingService.QueueReleaseStatusAsync(releaseId);
+                    await _publishingService.QueueValidateReleaseAsync(releaseId);
 
                     return await GetReleaseSummaryAsync(releaseId);
                 });
@@ -355,7 +396,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async footnotes =>
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var dependentDataBlocks = subject == null ? new List<DataBlock>() : GetDependentDataBlocks(releaseId, subject.Id);
                     var orphanFootnotes = subject == null ? new List<Footnote>() : await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
                     
                     return new DeleteDataFilePlan
@@ -364,48 +404,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         
                         SubjectId = subject?.Id ?? Guid.Empty,
                         
-                        TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName, 0, null),
+                        TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName),
                         
-                        DependentDataBlocks = dependentDataBlocks.
-                            Select(block => new DependentDataBlock
-                            {
-                                Id = block.Id,
-                                Name = block.Name,
-                                ContentSectionHeading = GetContentSectionHeading(block),
-                                InfographicFilenames = block
-                                   .Charts
-                                   .Where(chart => chart.Type == ChartType.infographic.ToString())
-                                   .Cast<InfographicChart>()
-                                   .Select(chart => chart.FileId)
-                                   .ToList(),
-                            })
-                            .ToList(),
+                        DeleteDataBlockPlan = _dataBlockService.GetDeleteDataBlockPlan(releaseId, subject),
                         
                         FootnoteIds = orphanFootnotes
                            .Select(footnote => footnote.Id)
                            .ToList()
                      };
                 });
-        }
-
-        private string GetContentSectionHeading(DataBlock block)
-        {
-            var section = block.ContentSection;
-
-            if (section == null)
-            {
-                return null;
-            }
-
-            switch (block.ContentSection.Type)
-            {
-                case ContentSectionType.Generic: return section.Heading;
-                case ContentSectionType.ReleaseSummary: return "Release Summary";
-                case ContentSectionType.Headlines: return "Headlines";
-                case ContentSectionType.KeyStatistics: return "Key Statistics";
-                case ContentSectionType.KeyStatisticsSecondary: return "Key Statistics";
-                default: return block.ContentSection.Type.ToString();
-            }
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
@@ -418,41 +425,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async deletePlan =>
                 {
                     await _subjectService.DeleteAsync(deletePlan.SubjectId);
-                    await DeleteDependentDataBlocks(deletePlan);
-                    await DeleteChartFiles(deletePlan);
+                    await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
 
                     return await _fileStorageService
                         .DeleteDataFileAsync(releaseId, fileName)
                         .OnSuccessDo(async () =>
                         {
-                            await _tableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
+                            await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
                         });
                 });
-        }
-
-        private async Task DeleteChartFiles(DeleteDataFilePlan deletePlan)
-        {
-            var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
-                block.InfographicFilenames.Select(chartFilename =>
-                    _fileStorageService.DeleteFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
-                )
-            );
-            
-            await Task.WhenAll(deletes);
-        }
-
-        private async Task DeleteDependentDataBlocks(DeleteDataFilePlan deletePlan)
-        {
-            var blockIdsToDelete = deletePlan
-                .DependentDataBlocks
-                .Select(block => block.Id);
-            
-            var dependentDataBlocks = _context
-                .DataBlocks
-                .Where(block => blockIdsToDelete.Contains(block.Id));
-            
-            _context.ContentBlocks.RemoveRange(dependentDataBlocks);
-            await _context.SaveChangesAsync();
         }
 
         private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string fileName)
@@ -466,20 +447,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return true;
         }
-
-        private List<DataBlock> GetDependentDataBlocks(Guid releaseId, Guid subjectId)
+        
+        private async Task<Either<ActionResult,bool>> CheckAllDatafilesUploadedComplete(Guid releaseId, ReleaseStatus status)
         {
-            return _context
-                .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
-                .ThenInclude(block => block.ContentSection)
-                .Where(join => join.ReleaseId == releaseId)
-                .ToList()
-                .Select(join => join.ContentBlock)
-                .Where(block => block.GetType() == typeof(DataBlock))
-                .Cast<DataBlock>()
-                .Where(block => block.DataBlockRequest.SubjectId == subjectId)
-                .ToList();
+            if (status == ReleaseStatus.Approved)
+            {
+                var filters = TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterCondition("PartitionKey", 
+                        QueryComparisons.Equal, releaseId.ToString())
+                    , TableOperators.And, 
+                    TableQuery.GenerateFilterCondition("Status", 
+                        QueryComparisons.NotEqual, IStatus.COMPLETE.ToString()));
+                
+                var query = new TableQuery<DatafileImport>().Where(filters);
+                var cloudTable = await _coreTableStorageService.GetTableAsync("imports", true);
+                var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
+                if (results.Results.Count != 0)
+                {
+                    return ValidationActionResult(AllDatafilesUploadedMustBeComplete);
+                }
+            }
+            return true;
         }
 
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
@@ -522,20 +510,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         [JsonIgnore]
         public DatafileImport TableStorageItem { get; set; }
         
-        public List<DependentDataBlock> DependentDataBlocks { get; set; }
+        public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; }
         
         public List<Guid> FootnoteIds { get; set; }
-    }
-
-    public class DependentDataBlock
-    {
-        [JsonIgnore]
-        public Guid Id { get; set; }
-        
-        public string Name { get; set; }
-        
-        public string? ContentSectionHeading { get; set; }
-        
-        public List<string> InfographicFilenames { get; set; }
     }
 }

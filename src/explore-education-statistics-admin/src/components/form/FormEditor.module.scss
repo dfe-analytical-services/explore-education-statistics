@@ -1,0 +1,14 @@
+@import 'src/styles/govuk-base';
+
+.editor {
+  background: govuk-colour('light-grey');
+  margin-bottom: govuk-spacing(2);
+
+  :global(.ck.ck-editor) {
+    border: 2px solid govuk-colour('black');
+  }
+
+  :global(.ck-focused) {
+    border-color: $govuk-input-border-colour !important;
+  }
+}

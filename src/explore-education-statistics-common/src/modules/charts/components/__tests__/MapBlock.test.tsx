@@ -1,12 +1,11 @@
 import { testChartPropsWithMultipleData } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
 import { testMapBlockPropsWithSmallerDataSets } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
-import MapBlock, {
-  MapBlockProps,
-} from '@common/modules/charts/components/MapBlock';
+import MapBlock from '@common/modules/charts/components/MapBlock';
+import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
 import { render, wait } from '@testing-library/react';
 import React from 'react';
 
-const chartProps: MapBlockProps = testChartPropsWithMultipleData as MapBlockProps;
+const chartProps: MapBlockInternalProps = testChartPropsWithMultipleData as MapBlockInternalProps;
 
 describe('MapBlock', () => {
   test('renders', async () => {

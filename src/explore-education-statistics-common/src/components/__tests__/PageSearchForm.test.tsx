@@ -3,8 +3,8 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React from 'react';
 import { fireEvent, render, wait } from '@testing-library/react';
+import React from 'react';
 import PageSearchForm from '../PageSearchForm';
 
 const labelText = 'Find on this page';
@@ -503,17 +503,19 @@ describe('PageSearchForm', () => {
 
     jest.runOnlyPendingTimers();
 
+    jest.useRealTimers();
+
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    jest.runOnlyPendingTimers();
+    await wait(() => {
+      const target = container.querySelector('#target');
 
-    const target = container.querySelector('#target');
-
-    expect(target).toHaveFocus();
-    expect(target).toHaveScrolledIntoView();
+      expect(target).toHaveFocus();
+      expect(target).toHaveScrolledIntoView();
+    });
   });
 
-  test('pressing Enter on result scrolls and focuses the element', () => {
+  test('pressing Enter on result scrolls and focuses the element', async () => {
     jest.useFakeTimers();
 
     const { container, getByLabelText } = render(
@@ -533,17 +535,19 @@ describe('PageSearchForm', () => {
 
     jest.runOnlyPendingTimers();
 
+    jest.useRealTimers();
+
     const listBox = container.querySelector('[role="listbox"]') as HTMLElement;
 
     fireEvent.keyDown(listBox, { key: 'ArrowDown' });
     fireEvent.keyDown(listBox, { key: 'Enter' });
 
-    jest.runOnlyPendingTimers();
+    await wait(() => {
+      const target = container.querySelector('#target');
 
-    const target = container.querySelector('#target');
-
-    expect(target).toHaveFocus();
-    expect(target).toHaveScrolledIntoView();
+      expect(target).toHaveFocus();
+      expect(target).toHaveScrolledIntoView();
+    });
   });
 
   test('opens parent accordion of selected result', async () => {
@@ -611,11 +615,13 @@ describe('PageSearchForm', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
 
+    jest.useRealTimers();
+
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    jest.runOnlyPendingTimers();
-
-    expect(summary).toHaveAttribute('aria-expanded', 'true');
+    await wait(() => {
+      expect(summary).toHaveAttribute('aria-expanded', 'true');
+    });
   });
 
   test('opens parent tab section of selected result', async () => {
@@ -654,12 +660,14 @@ describe('PageSearchForm', () => {
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
 
+    jest.useRealTimers();
+
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    jest.runOnlyPendingTimers();
-
-    expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
-    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await wait(() => {
+      expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
+      expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    });
   });
 
   test('opens nested sections of selected result', async () => {
@@ -702,12 +710,14 @@ describe('PageSearchForm', () => {
     const tabs = container.querySelectorAll('[role="tab"]');
     const summary = container.querySelector('summary');
 
+    jest.useRealTimers();
+
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    jest.runOnlyPendingTimers();
-
-    expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
-    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
-    expect(summary).toHaveAttribute('aria-expanded', 'true');
+    await wait(() => {
+      expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
+      expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+      expect(summary).toHaveAttribute('aria-expanded', 'true');
+    });
   });
 });

@@ -1,4 +1,5 @@
-import { ContentBlock, Publication } from '@common/services/publicationService';
+import { Publication } from '@common/services/publicationService';
+import { ContentBlock } from '@common/services/types/blocks';
 import { contentApi } from './api';
 
 export interface Topic {
@@ -44,7 +45,7 @@ export default {
   getMethodologies(): Promise<Theme[]> {
     return contentApi.get(`Methodology/tree`);
   },
-  getMethodology(publicationSlug: string): Promise<Methodology> {
-    return contentApi.get(`Methodology/${publicationSlug}`);
+  getMethodology(methodologySlug: string): Promise<Methodology> {
+    return contentApi.get(`Methodology/${methodologySlug}`);
   },
 };

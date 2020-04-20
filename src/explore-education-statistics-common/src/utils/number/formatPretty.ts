@@ -11,8 +11,10 @@
  */
 export default function formatPretty(
   value: string | number,
-  maxDecimals = 2,
+  unit?: string,
+  decimalPlaces = 2,
 ): string {
+  let formattedValue;
   if (typeof value === 'string') {
     const numberValue = Number(value);
 
@@ -21,22 +23,27 @@ export default function formatPretty(
     }
 
     const decimals = value.split('.')[1];
-    const decimalPlaces = decimals ? decimals.length : 0;
+    const dps = decimals ? decimals.length : 0;
 
-    if (decimalPlaces > 0) {
-      return numberValue.toLocaleString('en-GB', {
-        maximumFractionDigits: maxDecimals,
-        minimumFractionDigits:
-          decimalPlaces > maxDecimals ? maxDecimals : decimalPlaces,
+    if (dps > 0) {
+      formattedValue = numberValue.toLocaleString('en-GB', {
+        maximumFractionDigits: decimalPlaces,
+        minimumFractionDigits: dps > decimalPlaces ? decimalPlaces : dps,
+      });
+    } else {
+      formattedValue = Number(value).toLocaleString('en-GB', {
+        maximumFractionDigits: decimalPlaces,
       });
     }
-
-    return Number(value).toLocaleString('en-GB', {
-      maximumFractionDigits: maxDecimals,
+  } else {
+    formattedValue = value.toLocaleString('en-GB', {
+      maximumFractionDigits: decimalPlaces,
     });
   }
-
-  return value.toLocaleString('en-GB', {
-    maximumFractionDigits: maxDecimals,
-  });
+  if (unit) {
+    return unit === '£'
+      ? `${unit}${formattedValue}`
+      : `${formattedValue}${unit}`;
+  }
+  return formattedValue;
 }

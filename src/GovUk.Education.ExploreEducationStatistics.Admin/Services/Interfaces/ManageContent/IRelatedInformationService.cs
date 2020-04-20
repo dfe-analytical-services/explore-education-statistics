@@ -10,12 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IRelatedInformationService
     {
-        Task<Either<ActionResult, List<BasicLink>>> GetRelatedInformationAsync(Guid releaseId);
+        Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseId);
         
-        Task<Either<ActionResult, List<BasicLink>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request);
+        Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request);
         
-        Task<Either<ActionResult, List<BasicLink>>> UpdateRelatedInformationAsync(Guid releaseId, Guid relatedInformationId, CreateUpdateLinkRequest request);
+        Task<Either<ActionResult, List<Link>>> UpdateRelatedInformationAsync(Guid releaseId, Guid relatedInformationId, CreateUpdateLinkRequest request);
 
-        Task<Either<ActionResult, List<BasicLink>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId);
+        Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId);
     }
 }

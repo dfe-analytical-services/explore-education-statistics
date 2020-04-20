@@ -1,0 +1,18 @@
+.tabs {
+  @media print {
+    :global(.govuk-tabs__list) {
+      list-style: none;
+    }
+
+    :global(.govuk-tabs__list-item) {
+      display: block;
+    }
+
+    :global(.govuk-tabs__tab) {
+      background: none !important;
+      border: 0 !important;
+      color: govuk-colour('black') !important;
+      float: none !important;
+    }
+  }
+}

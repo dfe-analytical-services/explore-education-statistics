@@ -10,6 +10,8 @@ export interface FilterOption {
 
 export interface IndicatorOption extends FilterOption {
   unit: string;
+  name: string;
+  decimalPlaces?: number;
 }
 
 export interface TimePeriodOption {
@@ -62,6 +64,7 @@ export interface PublicationSubjectMeta {
     hint?: string;
     options: GroupedFilterOptions;
     totalValue?: string;
+    name: string;
   }>;
   indicators: Dictionary<{
     label: string;
@@ -185,6 +188,7 @@ interface UnmappedFullTableSubjectMeta {
   locations: { label: string; value: string; level: string }[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{
+    name: string;
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -60,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             {
                 app.UseDeveloperExceptionPage();
                 
-                GenerateReleaseContent();
+                PublishAllContent();
             }
             else
             {
@@ -68,38 +69,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
+            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
-                c.RoutePrefix = "docs";
-            });
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
+                    c.RoutePrefix = "docs";
+                });
+
+                var option = new RewriteOptions();
+                option.AddRedirect("^$", "docs");
+                app.UseRewriter(option);
+            }
 
             app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
-
-            var option = new RewriteOptions();
-            option.AddRedirect("^$", "docs");
-            app.UseRewriter(option);
         }
         
         /**
-         * Add a message to the queue to generate all content.
-         * TODO EES-861 This should only be used in development!
+         * Add a message to the queue to publish all content.
+         * This should only be used in development!
          */
-        private void GenerateReleaseContent()
+        private void PublishAllContent()
         {
-            const string queueName = "generate-all-content";
+            const string queueName = PublishAllContentQueue;
             try
             {
                 var storageConnectionString = Configuration.GetConnectionString("PublisherStorage");
                 var queue = QueueUtils.GetQueueReference(storageConnectionString, queueName);
 
-                var message = new GenerateAllContentMessage();
+                var message = new PublishAllContentMessage();
                 queue.AddMessage(ToCloudQueueMessage(message));
                 
                 _logger.LogInformation($"Message added to {queueName} queue");

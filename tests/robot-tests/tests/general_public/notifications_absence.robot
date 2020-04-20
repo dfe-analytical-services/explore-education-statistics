@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/common.robot
 
-Force Tags  GeneralPublic  Dev  Test  Prod
+Force Tags  GeneralPublic  Dev  Test  Preprod  Prod
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser

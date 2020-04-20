@@ -12,6 +12,7 @@ import {
   LabelValueMetadata,
   LabelValueUnitMetadata,
 } from '@common/services/dataBlockService';
+import { Footnote } from '@common/services/types/footnotes';
 import { Dictionary } from '@common/types';
 import { ReactNode } from 'react';
 import { LegendProps, PositionType } from 'recharts';
@@ -49,6 +50,7 @@ export interface DataSetConfiguration extends LabelConfiguration {
   value: string;
   name?: string;
   unit?: string;
+  decimalPlaces?: number;
   colour?: string;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
@@ -90,6 +92,7 @@ export type AxesConfiguration = {
 };
 
 export interface ChartMetaData {
+  footnotes: Footnote[];
   filters: PublicationSubjectMeta['filters'];
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
@@ -106,6 +109,9 @@ export interface ChartProps {
   labels: Dictionary<DataSetConfiguration>;
   axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
+}
+
+export interface RenderLegend {
   /**
    * Callback to enable us to render legends outside
    * of the chart container.

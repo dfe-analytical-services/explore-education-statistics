@@ -173,8 +173,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return await _fileStorageService
                 .UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
-                // add message to queue to process these files
-                .OnSuccessDo(() => _importService.Import(file.FileName, releaseId, file))
                 .HandleFailuresOrOk();
         }
 

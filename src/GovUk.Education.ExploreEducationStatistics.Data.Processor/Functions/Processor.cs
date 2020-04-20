@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                     return true;
                 })
-                .OnFailure(async errors =>
+                .OnFailureSucceedWith(async errors =>
                 {
                     await _batchService.FailImport(
                         message.Release.Id.ToString(),

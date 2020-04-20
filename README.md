@@ -75,7 +75,6 @@ for development, specifically the table storage component which is not supported
    - [Docker and Docker Compose](https://docs.docker.com/)
 
 
-
 ### Running the backend
 
 1. Add the following to your `hosts` file:

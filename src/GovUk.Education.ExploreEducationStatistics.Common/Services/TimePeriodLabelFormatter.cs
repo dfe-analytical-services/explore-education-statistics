@@ -73,11 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return FormatterFor(timeIdentifier).FormatInternal(year, timeIdentifier); 
         }
         
-        public static string FormatLabel(TimeIdentifier timeIdentifier)
-        {
-            return FormatterFor(timeIdentifier).FormatLabelInternal(timeIdentifier);
-        }
-        
         public static string FormatYear(string year, TimeIdentifier timeIdentifier)
         {
             return FormatterFor(timeIdentifier).FormatYearInternal(year);

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using WindowsAzure.Table.Extensions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -23,37 +22,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private const string TableName = "ReleaseStatus";
 
         private readonly IMapper _mapper;
-        private readonly ITableStorageService _tableStorageService;
+        private readonly ITableStorageService _publisherTableStorageService;
         private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
         public ReleaseStatusService(IMapper mapper, IUserService userService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper, ITableStorageService tableStorageService)
+            IPersistenceHelper<ContentDbContext> persistenceHelper, ITableStorageService publisherTableStorageService)
         {
             _mapper = mapper;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
-            _tableStorageService = tableStorageService;
+            _publisherTableStorageService = publisherTableStorageService;
         }
 
-        public async Task<Either<ActionResult, ReleaseStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
+        public async Task<Either<ActionResult, ReleaseStatusViewModel>> GetReleaseStatusAsync(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var table = await GetTableAsync();
-                    var query = table.CreateQuery<ReleaseStatus>()
-                        .Where(releaseStatus => releaseStatus.PartitionKey.Equals(releaseId.ToString()));
-                    var result = await query.FirstOrDefaultAsync();
-                    return _mapper.Map<ReleaseStatusViewModel>(result);
-                });
-        }
+                    var query = new TableQuery<ReleaseStatus>()
+                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+                            QueryComparisons.Equal, releaseId.ToString()))
+                        .OrderByDesc(nameof(ReleaseStatus.Created));
 
-        private async Task<CloudTable> GetTableAsync()
-        {
-            return await _tableStorageService.GetTableAsync(TableName);
+                    var result = await _publisherTableStorageService.ExecuteQueryAsync(TableName, query);
+                    return _mapper.Map<ReleaseStatusViewModel>(result.FirstOrDefault());
+                });
         }
     }
 }

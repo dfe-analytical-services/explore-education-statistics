@@ -12,10 +12,14 @@ export abstract class Filter {
 
   public readonly filterGroup?: string;
 
-  public constructor({ value, label, filterGroup }: FilterOption) {
+  protected constructor({ value, label, filterGroup }: FilterOption) {
     this.value = value;
     this.label = label;
     this.filterGroup = filterGroup;
+  }
+
+  public get id() {
+    return this.value;
   }
 }
 
@@ -41,14 +45,31 @@ export class LocationFilter extends Filter {
     super({ value, label, filterGroup });
     this.level = camelCase(level);
   }
+
+  public get id() {
+    return `${this.level}_${this.value}`;
+  }
 }
 
 export class Indicator extends Filter {
   public readonly unit: string;
 
-  public constructor({ value, label, unit, filterGroup }: IndicatorOption) {
+  public readonly decimalPlaces?: number;
+
+  public readonly name: string;
+
+  public constructor({
+    value,
+    label,
+    unit,
+    filterGroup,
+    name,
+    decimalPlaces,
+  }: IndicatorOption) {
     super({ value, label, filterGroup });
     this.unit = unit;
+    this.name = name;
+    this.decimalPlaces = decimalPlaces;
   }
 }
 

@@ -1,88 +1,129 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { ChartMetaData } from '@common/modules/charts/types/chart';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
+import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
+import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { parseMetaData } from '@common/modules/charts/util/chartUtils';
-import DataBlockService, {
-  DataBlock,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
-import React, { useEffect, useState } from 'react';
-import ChartRenderer, {
-  ChartRendererProps,
-} from '@common/modules/charts/components/ChartRenderer';
-import TimePeriodDataTableRenderer from './TimePeriodDataTableRenderer';
+import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
+import useDataBlockQuery from '@common/modules/find-statistics/hooks/useDataBlockQuery';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/tableHeaders';
+import { DataBlock } from '@common/services/types/blocks';
+import React, { MouseEvent, ReactNode } from 'react';
 
-interface DataBlockWithOptionalResponse extends DataBlock {
-  dataBlockResponse?: DataBlockResponse;
+export interface DataQuery {
+  method: string;
+  path: string;
+  body: string;
 }
 
-interface Props {
-  datablock: DataBlockWithOptionalResponse;
-  renderType: 'table' | 'chart';
+export interface DataBlockRendererProps {
+  additionalTabContent?: ReactNode;
+  dataBlock?: DataBlock;
+  firstTabs?: ReactNode;
+  lastTabs?: ReactNode;
+  getInfographic?: GetInfographic;
+  id: string;
+  onToggle?: (section: { id: string; title: string }) => void;
+  onSummaryDetailsToggle?: (
+    isOpened: boolean,
+    event: MouseEvent<HTMLElement>,
+  ) => void;
 }
 
-/**
- * Component that takes a **datablock** (with optional **datablock**.dataBlockResponse)
- * and a **renderType** to handle rendering of tables/charts from datablock data.
- *
- * The component will handle the gathering of the datablockResponse if it was not provided.
- *
- * Acts as a _"shim"_ component to gather and transform datablock props into properties expected by the data/UI rendering components
- */
-const DataBlockRenderer = ({ datablock, renderType }: Props) => {
-  const [dataBlockResponse, setDataBlockResponse] = useState<
-    DataBlockResponse | undefined
-  >(datablock.dataBlockResponse);
-  const [error, setError] = useState<string>('');
+const DataBlockRenderer = ({
+  additionalTabContent,
+  dataBlock,
+  firstTabs,
+  lastTabs,
+  getInfographic,
+  id,
+  onToggle,
+}: DataBlockRendererProps) => {
+  const { value: dataBlockResponse, isLoading } = useDataBlockQuery(dataBlock);
 
-  useEffect(() => {
-    if (!dataBlockResponse) {
-      DataBlockService.getDataBlockForSubject(datablock.dataBlockRequest)
-        .then(setDataBlockResponse)
-        .catch(() => {
-          setDataBlockResponse(undefined);
-          setError('Unable to get data reponse from the server');
-        });
-    }
-  }, [datablock, dataBlockResponse]);
+  return (
+    <LoadingSpinner loading={isLoading}>
+      <Tabs id={id} onToggle={onToggle}>
+        {firstTabs}
 
-  if (!dataBlockResponse && !!error) {
-    return <>{error}</>;
-  }
-  if (!dataBlockResponse) {
-    return <LoadingSpinner text="Loading data" />;
-  }
-  if (renderType === 'table')
-    return (
-      <>
-        <TimePeriodDataTableRenderer
-          heading={datablock.heading}
-          response={dataBlockResponse}
-          tableHeaders={
-            datablock.tables &&
-            datablock.tables[0] &&
-            datablock.tables[0].tableHeaders
-          }
-        />
-      </>
-    );
-  if (renderType === 'chart') {
-    // There is a presumption that the configuration from the API is valid.
-    // The data coming from the API is required to be optional for the ChartRenderer
-    // But the data for the charts is required. The charts have validation that
-    // prevent them from attempting to render.
-    // @ts-ignore
-    const chartRendererProps: ChartRendererProps = {
-      data: dataBlockResponse,
-      meta: parseMetaData(dataBlockResponse.metaData) as ChartMetaData,
-      ...(datablock.charts && datablock.charts[0]),
-    };
-    return (
-      <>
-        <ChartRenderer {...chartRendererProps} />
-      </>
-    );
-  }
-  return null;
+        {dataBlock?.tables?.length && dataBlockResponse && (
+          <TabsSection id={`${id}-tables`} title="Table">
+            {dataBlock?.tables.map((table, index) => {
+              const fullTable = mapDataBlockResponseToFullTable(
+                dataBlockResponse,
+              );
+
+              return (
+                <TimePeriodDataTable
+                  key={index}
+                  fullTable={fullTable}
+                  captionTitle={dataBlock?.heading}
+                  source={dataBlock?.source}
+                  tableHeadersConfig={
+                    table.tableHeaders
+                      ? mapTableHeadersConfig(
+                          table.tableHeaders,
+                          fullTable.subjectMeta,
+                        )
+                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                  }
+                />
+              );
+            })}
+
+            {additionalTabContent}
+          </TabsSection>
+        )}
+
+        {dataBlock?.charts?.length && dataBlockResponse && (
+          <TabsSection id={`${id}-charts`} title="Chart">
+            <a
+              className="govuk-visually-hidden"
+              href={`#${id}-tables`}
+              aria-live="assertive"
+            >
+              If you are using a keyboard or a screen reader you may wish to
+              view the accessible table instead. Press enter to switch to the
+              data tables tab.
+            </a>
+
+            {dataBlock?.charts.map((chart, index) => {
+              const key = index;
+
+              if (chart.type === 'infographic') {
+                return (
+                  <ChartRenderer
+                    {...chart}
+                    key={key}
+                    data={dataBlockResponse}
+                    meta={parseMetaData(dataBlockResponse.metaData)}
+                    source={dataBlock?.source}
+                    getInfographic={getInfographic}
+                  />
+                );
+              }
+
+              return (
+                <ChartRenderer
+                  {...chart}
+                  key={key}
+                  data={dataBlockResponse}
+                  meta={parseMetaData(dataBlockResponse.metaData)}
+                  source={dataBlock?.source}
+                />
+              );
+            })}
+
+            {additionalTabContent}
+          </TabsSection>
+        )}
+
+        {lastTabs}
+      </Tabs>
+    </LoadingSpinner>
+  );
 };
 
 export default DataBlockRenderer;

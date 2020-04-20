@@ -349,6 +349,7 @@ const metaData: DataBlockMetadata = {
       totalValue: '',
       legend: '',
       hint: '',
+      name: '',
       options: {
         test: {
           label: 'test',
@@ -371,16 +372,19 @@ const metaData: DataBlockMetadata = {
       label: 'Unauthorised absence rate',
       unit: '%',
       value: '23',
+      name: 'sess_unauthorised_percent',
     },
     '26': {
       label: 'Overall absence rate',
       unit: '%',
       value: '26',
+      name: 'sess_overall_percent',
     },
     '28': {
       label: 'Authorised absence rate',
       unit: '%',
       value: '28',
+      name: 'sess_authorised_percent',
     },
   },
   timePeriod: {
@@ -411,7 +415,7 @@ const metaData: DataBlockMetadata = {
   },
 };
 
-const chartMetaData: ChartMetaData = parseMetaData(metaData) as ChartMetaData;
+const chartMetaData: ChartMetaData = parseMetaData(metaData);
 
 export const testChartPropsWithData1: ChartProps = {
   data,

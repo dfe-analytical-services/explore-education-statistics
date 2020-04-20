@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/public-common.robot
 
-Force Tags  GeneralPublic  Local  Dev  Test
+Force Tags  GeneralPublic  Local  Dev  Test  Preprod
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -53,7 +53,8 @@ Select Indicators
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
-    user waits until results table appears
+    user waits until results table appears     60
+    user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Number of schools for 'Absence in prus' from 'Pupil absence in schools in England' in England between 2013/14 and 2016/17"]
 
 Validate results table column headings
     [Tags]  HappyPath
@@ -118,7 +119,8 @@ Select indicators again
 Create table again
     [Tags]   HappyPath
     user clicks element    css:#filtersForm-submit
-    user waits until results table appears
+    user waits until results table appears    60
+    user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing 'Absence in prus' from 'Pupil absence in schools in England' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
 
 Validate new table column headings
     [Tags]   HappyPath

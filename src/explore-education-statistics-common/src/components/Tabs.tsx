@@ -10,6 +10,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import styles from './Tabs.module.scss';
 import TabsSection, { TabsSectionProps } from './TabsSection';
 
 interface Props {
@@ -66,7 +67,7 @@ const Tabs = ({ children, id, onToggle }: Props) => {
   }, []);
 
   return (
-    <div className="govuk-tabs">
+    <div className={classNames('govuk-tabs', styles.tabs)}>
       <ul className="govuk-tabs__list" role="tablist">
         {sections.map(({ props }, index) => {
           const sectionId = props.id || `${id}-${index + 1}`;

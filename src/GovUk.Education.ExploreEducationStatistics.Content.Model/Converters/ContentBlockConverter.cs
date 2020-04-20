@@ -29,9 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
                 case "MarkDownBlock":
                     contentBlock = new MarkDownBlock();
                     break;
-                case "InsetTextBlock":
-                    contentBlock = new InsetTextBlock();
-                    break;
                 case "DataBlock":
                     contentBlock = new DataBlock();
                     break;

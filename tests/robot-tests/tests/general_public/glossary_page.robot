@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/common.robot
 
-Force Tags  GeneralPublic  Local  Dev  Test  Prod
+Force Tags  GeneralPublic  Local  Dev  Test  Preprod  Prod
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -27,9 +27,10 @@ Validate glossary accordion sections
 
 Search for Pupil referral unit
     [Tags]  HappyPath
-    user clicks element   css:#pageSearchForm-input
     user verifies accordion is closed  P
 
+    user clicks element   css:#pageSearchForm-input
+    element should be focused  css:#pageSearchForm-input
     user presses keys  Pupil referral unit
     user checks element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
     user clicks element   css:#pageSearchForm-option-0

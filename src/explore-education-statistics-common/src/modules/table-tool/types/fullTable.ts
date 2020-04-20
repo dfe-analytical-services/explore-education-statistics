@@ -12,6 +12,7 @@ export interface FullTableMeta {
   locations: LocationFilter[];
   timePeriodRange: TimePeriodFilter[];
   filters: Dictionary<{
+    name: string;
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;
@@ -25,17 +26,19 @@ export interface FullTableMeta {
   geoJsonAvailable: boolean;
 }
 
+export interface FullTableResult {
+  filters: string[];
+  geographicLevel: string;
+  location: Dictionary<{
+    code: string;
+    name: string;
+  }>;
+  measures: Dictionary<string>;
+  timePeriod: string;
+}
+
 export interface FullTable {
   title?: string;
   subjectMeta: FullTableMeta;
-  results: {
-    filters: string[];
-    geographicLevel: string;
-    location: Dictionary<{
-      code: string;
-      name: string;
-    }>;
-    measures: Dictionary<string>;
-    timePeriod: string;
-  }[];
+  results: FullTableResult[];
 }

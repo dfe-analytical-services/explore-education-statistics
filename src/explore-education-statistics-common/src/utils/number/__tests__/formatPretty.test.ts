@@ -7,16 +7,16 @@ describe('formatPretty', () => {
 
   test('returns formatted string rounded down from float', () => {
     expect(formatPretty(150000000.1234)).toBe('150,000,000.12');
-    expect(formatPretty(150000000.1234, 3)).toBe('150,000,000.123');
-    expect(formatPretty(150000000.1234, 4)).toBe('150,000,000.1234');
-    expect(formatPretty(150000000.12344, 4)).toBe('150,000,000.1234');
+    expect(formatPretty(150000000.1234, '', 3)).toBe('150,000,000.123');
+    expect(formatPretty(150000000.1234, '', 4)).toBe('150,000,000.1234');
+    expect(formatPretty(150000000.12344, '', 4)).toBe('150,000,000.1234');
   });
 
   test('returns formatted string rounded up from float', () => {
     expect(formatPretty(150000000.2567)).toBe('150,000,000.26');
-    expect(formatPretty(150000000.2567, 3)).toBe('150,000,000.257');
-    expect(formatPretty(150000000.2567, 4)).toBe('150,000,000.2567');
-    expect(formatPretty(150000000.25678, 4)).toBe('150,000,000.2568');
+    expect(formatPretty(150000000.2567, '', 3)).toBe('150,000,000.257');
+    expect(formatPretty(150000000.2567, '', 4)).toBe('150,000,000.2567');
+    expect(formatPretty(150000000.25678, '', 4)).toBe('150,000,000.2568');
   });
 
   test('returns formatted string from string containing integer', () => {
@@ -29,9 +29,9 @@ describe('formatPretty', () => {
 
   test('returns formatted string rounded up from string containing float', () => {
     expect(formatPretty('150000000.2567')).toBe('150,000,000.26');
-    expect(formatPretty('150000000.2567', 3)).toBe('150,000,000.257');
-    expect(formatPretty('150000000.2567', 4)).toBe('150,000,000.2567');
-    expect(formatPretty('150000000.25678', 4)).toBe('150,000,000.2568');
+    expect(formatPretty('150000000.2567', '', 3)).toBe('150,000,000.257');
+    expect(formatPretty('150000000.2567', '', 4)).toBe('150,000,000.2567');
+    expect(formatPretty('150000000.25678', '', 4)).toBe('150,000,000.2568');
   });
 
   test('returns formatted string from string containing trailing zeroes', () => {
@@ -47,5 +47,11 @@ describe('formatPretty', () => {
     expect(formatPretty('150000000.11')).toBe('150,000,000.11');
     expect(formatPretty('150000000.110')).toBe('150,000,000.11');
     expect(formatPretty('150000000.1100')).toBe('150,000,000.11');
+  });
+
+  test('returns formatted string with correctly formatted indicator', () => {
+    expect(formatPretty(150000000.1234, '£', 2)).toBe('£150,000,000.12');
+    expect(formatPretty(150000000.1234, '', 4)).toBe('150,000,000.1234');
+    expect(formatPretty(15.1234, '%', 2)).toBe('15.12%');
   });
 });

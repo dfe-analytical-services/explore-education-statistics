@@ -1,5 +1,6 @@
-import React from 'react';
+import Header from '@common/modules/table-tool/components/utils/Header';
 import { render } from '@testing-library/react';
+import React from 'react';
 import FixedMultiHeaderDataTable from '../FixedMultiHeaderDataTable';
 
 describe('FixedMultiHeaderDataTable', () => {
@@ -8,12 +9,14 @@ describe('FixedMultiHeaderDataTable', () => {
       <FixedMultiHeaderDataTable
         caption="Test table"
         columnHeaders={[
-          { headers: [{ text: 'Col group A' }, { text: 'Col group B' }] },
-          { headers: [{ text: 'Col group C' }, { text: 'Col group D' }] },
+          new Header('A', 'Col group A')
+            .addChild(new Header('C', 'Col C'))
+            .addChild(new Header('D', 'Col D')),
+          new Header('B', 'Col group B')
+            .addChild(new Header('C', 'Col C'))
+            .addChild(new Header('D', 'Col D')),
         ]}
-        rowHeaders={[
-          { headers: [{ text: 'Row group A' }, { text: 'Row group B' }] },
-        ]}
+        rowHeaders={[new Header('A', 'Row A'), new Header('B', 'Row B')]}
         rows={[
           ['1', '2', '3', '4'],
           ['5', '6', '7', '8'],

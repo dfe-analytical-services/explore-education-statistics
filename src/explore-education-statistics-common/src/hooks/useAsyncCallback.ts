@@ -6,7 +6,7 @@ export interface AsyncState<T> {
   error?: Error;
 }
 
-export interface AsyncStateReturn<T> extends AsyncState<T> {
+export interface AsyncCallbackState<T> extends AsyncState<T> {
   setLoading: (loading: boolean) => void;
   setValue: (value: T) => void;
   setError: (error: Error) => void;
@@ -24,7 +24,7 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
   initialState: AsyncState<Value> = {
     isLoading: true,
   },
-): [AsyncStateReturn<Value>, AsyncCallback<Args>] {
+): [AsyncCallbackState<Value>, AsyncCallback<Args>] {
   const previousCall = useRef(0);
   const [state, setState] = useState<AsyncState<Value>>(initialState);
 
@@ -61,7 +61,7 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
-  const stateReturn: AsyncStateReturn<Value> = useMemo(() => {
+  const stateReturn: AsyncCallbackState<Value> = useMemo(() => {
     return {
       ...state,
       setLoading: isLoading =>

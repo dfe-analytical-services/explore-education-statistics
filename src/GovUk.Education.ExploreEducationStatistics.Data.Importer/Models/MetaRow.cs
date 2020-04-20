@@ -11,5 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Models
         public string FilterHint { get; set; }
         public string IndicatorGrouping { get; set; }
         public Unit IndicatorUnit { get; set; }
+        public int? DecimalPlaces { get; set; }
     }
 }

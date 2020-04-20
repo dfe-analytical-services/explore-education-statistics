@@ -16,6 +16,7 @@ const responseData: DataBlockResponse = {
         totalValue: '',
         legend: '',
         hint: '',
+        name: '',
         options: {
           test: {
             label: 'test',
@@ -46,21 +47,25 @@ const responseData: DataBlockResponse = {
         label: 'Unauthorised absence rate',
         unit: '%',
         value: '23',
+        name: 'sess_unauthorised_percent',
       },
       '26': {
         label: 'Overall absence rate',
         unit: '%',
         value: '26',
+        name: 'sess_overall_percent',
       },
       '28': {
         label: 'Authorised absence rate',
         unit: '%',
         value: '28',
+        name: 'sess_authorised_percent',
       },
       '99': {
         label: 'Fake data',
         unit: '%',
         value: '99',
+        name: '',
       },
     },
     locations: {
