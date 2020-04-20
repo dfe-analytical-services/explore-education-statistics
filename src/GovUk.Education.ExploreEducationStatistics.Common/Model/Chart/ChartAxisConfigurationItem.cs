@@ -20,8 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public string SortBy;
         public bool SortAsc = true;
 
-        public List<ChartDataSet> DataSets;
-        public List<ReferenceLine> ReferenceLines;
+        public List<ChartDataSet> DataSets = new List<ChartDataSet>();
+        public List<ReferenceLine> ReferenceLines = new List<ReferenceLine>();
         public bool Visible = true;
         public string Title;
         public string Unit;
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     public class ChartDataSet
     {
         public Guid Indicator;
-        public List<Guid> Filters;
+        public List<Guid> Filters = new List<Guid>();
         public ChartDataLocation Location;
         public string? TimePeriod;
         public ChartConfiguration Config;

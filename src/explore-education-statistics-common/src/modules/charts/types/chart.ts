@@ -46,7 +46,7 @@ export interface AxisConfiguration {
   sortBy?: string;
   sortAsc?: boolean;
   dataSets: DataSetConfiguration[];
-  referenceLines?: ReferenceLine[];
+  referenceLines: ReferenceLine[];
   visible: boolean;
   unit?: string;
   showGrid?: boolean;
@@ -54,6 +54,7 @@ export interface AxisConfiguration {
   size?: number;
   min?: number;
   max?: number;
+  title?: string;
   tickConfig?: TickConfig;
   tickSpacing?: number;
 }
