@@ -1,23 +1,32 @@
-import { AxisGroupBy } from '@common/modules/charts/types/chart';
 import { ExpandedDataSet } from '@common/modules/charts/types/dataSet';
+import {
+  CategoryFilter,
+  Filter,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/table-tool/types/filters';
 import compact from 'lodash/compact';
 
 /**
  * Create a default label for a {@param dataSet}
- * that excludes the {@param excludeGroup} filters from
+ * that excludes the {@param excludeFilter} from
  * the label (this is redundant as the label's
  * data set is already categorised).
  */
 export default function generateDefaultDataSetLabel(
   dataSet: ExpandedDataSet,
-  excludeGroup?: AxisGroupBy,
+  excludeFilter?: Filter,
 ): string {
   const filterLabels = compact([
-    ...(excludeGroup !== 'filters'
+    ...(!(excludeFilter instanceof CategoryFilter)
       ? dataSet.filters.filter(filter => !filter.isTotal)
-      : []),
-    excludeGroup !== 'locations' ? dataSet.location : undefined,
-    excludeGroup !== 'timePeriod' ? dataSet.timePeriod : undefined,
+      : dataSet.filters.filter(
+          filter => filter.value !== excludeFilter.value && !filter.isTotal,
+        )),
+    !(excludeFilter instanceof LocationFilter) ? dataSet.location : undefined,
+    !(excludeFilter instanceof TimePeriodFilter)
+      ? dataSet.timePeriod
+      : undefined,
   ]).map(filter => filter.label);
 
   return `${dataSet.indicator.label}${

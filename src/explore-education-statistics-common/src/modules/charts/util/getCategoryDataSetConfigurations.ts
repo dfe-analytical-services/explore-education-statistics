@@ -50,10 +50,7 @@ export default function getCategoryDataSetConfigurations(
           // we can get confusing duplicate labels.
           label: isEqual(dataSet, fullDataSet)
             ? config.label
-            : generateDefaultDataSetLabel(
-                expandedDataSet,
-                axisConfiguration.groupBy,
-              ),
+            : generateDefaultDataSetLabel(expandedDataSet, category.filter),
         },
         category: category.filter,
         dataKey: dataSetKey,
