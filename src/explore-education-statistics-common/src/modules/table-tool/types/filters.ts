@@ -135,10 +135,18 @@ export class TimePeriodFilter extends Filter {
 
   public readonly code: string;
 
-  public constructor({ year, code, label }: TimePeriodOption) {
+  public readonly order: number;
+
+  public constructor({
+    year,
+    code,
+    label,
+    order,
+  }: TimePeriodOption & { order: number }) {
     super({ label, value: `${year}_${code}` });
 
     this.code = code;
     this.year = year;
+    this.order = order;
   }
 }

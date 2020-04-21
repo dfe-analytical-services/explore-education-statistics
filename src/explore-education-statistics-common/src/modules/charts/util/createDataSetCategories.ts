@@ -270,6 +270,10 @@ function sortDataSetCategories(
     dataSetCategories,
     data => {
       if (sortBy === 'name') {
+        if (data.filter instanceof TimePeriodFilter) {
+          return data.filter.order;
+        }
+
         return data.filter.label;
       }
 

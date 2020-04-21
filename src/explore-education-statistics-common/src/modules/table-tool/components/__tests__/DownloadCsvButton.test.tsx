@@ -60,7 +60,12 @@ describe('DownloadCsvButton', () => {
       }),
     ],
     timePeriodRange: [
-      new TimePeriodFilter({ code: 'AY', year: 2015, label: '2015/16' }),
+      new TimePeriodFilter({
+        code: 'AY',
+        year: 2015,
+        label: '2015/16',
+        order: 0,
+      }),
     ],
   };
 

@@ -30,7 +30,7 @@ const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
     columnGroups: sortedFilters.slice(0, halfwayIndex),
     rowGroups: sortedFilters.slice(halfwayIndex),
     columns: timePeriodRange.map(
-      timePeriod => new TimePeriodFilter(timePeriod),
+      (timePeriod, order) => new TimePeriodFilter({ ...timePeriod, order }),
     ),
     rows: sortBy(
       indicators.map(i => new Indicator(i)),

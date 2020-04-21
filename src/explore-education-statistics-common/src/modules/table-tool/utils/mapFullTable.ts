@@ -52,7 +52,7 @@ export default function mapFullTable(
         location => new LocationFilter(location),
       ),
       timePeriodRange: subjectMeta.timePeriodRange.map(
-        timePeriod => new TimePeriodFilter(timePeriod),
+        (timePeriod, order) => new TimePeriodFilter({ ...timePeriod, order }),
       ),
     },
   };

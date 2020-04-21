@@ -144,6 +144,7 @@ describe('expandDataSet', () => {
         code: 'AY',
         label: '2014/15',
         year: 2014,
+        order: 0,
       }),
       location: new LocationFilter({
         level: 'localAuthority',

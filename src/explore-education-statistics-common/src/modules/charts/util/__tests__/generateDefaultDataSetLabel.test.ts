@@ -31,6 +31,7 @@ describe('generateDefaultDataSetLabel', () => {
       year: 2020,
       label: '2020/21',
       code: 'AY',
+      order: 0,
     }),
     location: new LocationFilter({
       label: 'Location 1',

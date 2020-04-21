@@ -200,11 +200,13 @@ describe('mapTableHeadersConfig', () => {
         year: 2014,
         code: 'AY',
         label: '2014/15',
+        order: 0,
       }),
       new TimePeriodFilter({
         year: 2015,
         code: 'AY',
         label: '2015/16',
+        order: 1,
       }),
     ]);
     expect(headers.rows).toEqual([
