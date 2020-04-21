@@ -25,6 +25,7 @@ describe('DownloadCsvButton', () => {
     publicationName: '',
     subjectName: '',
     footnotes: [],
+    boundaryLevels: [],
     filters: {
       Characteristic: {
         name: 'characteristic',
