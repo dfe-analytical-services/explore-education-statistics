@@ -55,13 +55,17 @@ const ChartAxisConfiguration = ({
   onSubmit,
 }: Props) => {
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
-    const configurationWithDataSets: AxisConfiguration = {
+    if (configuration.type === 'minor') {
+      return [];
+    }
+
+    const config: AxisConfiguration = {
       ...configuration,
       min: 0,
       max: undefined,
     };
 
-    return createDataSetCategories(configurationWithDataSets, data, meta);
+    return createDataSetCategories(config, data, meta);
   }, [configuration, data, meta]);
 
   // TODO: Figure out how we should sort data
