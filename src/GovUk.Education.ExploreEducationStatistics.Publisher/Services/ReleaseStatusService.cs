@@ -36,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
-            var releaseStatus = new ReleaseStatus(release.Publication.Slug, release.PublishScheduled, release.Id,
+            var publish = immediate ? null : release.PublishScheduled;
+            var releaseStatus = new ReleaseStatus(release.Publication.Slug, publish, release.Id,
                 release.Slug, state, immediate, logMessages);
             var tableResult = await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
             return tableResult.Result as ReleaseStatus;
@@ -65,15 +66,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return tableResult.Result as ReleaseStatus;
         }
 
+        public Task<IEnumerable<ReleaseStatus>> GetAllAsync(Guid releaseId, ReleaseStatusOverallStage? overallStage)
+        {
+            var filter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
+                    QueryComparisons.Equal, releaseId.ToString());
+
+            if (overallStage.HasValue)
+            {
+                var stageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.OverallStage),
+                    QueryComparisons.Equal, overallStage.Value.ToString());
+                
+                filter = TableQuery.CombineFilters(filter, TableOperators.And,
+                    stageFilter);
+            }
+
+            var query = new TableQuery<ReleaseStatus>().Where(filter);
+            return _tableStorageService.ExecuteQueryAsync(TableName, query);
+        }
+
         public async Task<ReleaseStatus> GetLatestAsync(Guid releaseId)
         {
             var query = new TableQuery<ReleaseStatus>()
                 .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
-                    QueryComparisons.Equal, releaseId.ToString()))
-                .OrderByDesc(nameof(ReleaseStatus.Created));
+                    QueryComparisons.Equal, releaseId.ToString()));
 
             var result = await _tableStorageService.ExecuteQueryAsync(TableName, query);
-            return result.FirstOrDefault();
+            return result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
         }
 
         public async Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId)
