@@ -16,6 +16,12 @@ export default function generateDataSetKey(
   dataSet: DataSet,
   excludeGroup?: AxisGroupBy,
 ): string {
+  const filters =
+    excludeGroup !== 'filters' ? [...dataSet.filters].sort() : undefined;
+
+  const indicator =
+    excludeGroup !== 'indicators' ? dataSet.indicator : undefined;
+
   const location =
     excludeGroup !== 'locations' && dataSet.location
       ? {
@@ -28,8 +34,8 @@ export default function generateDataSetKey(
     excludeGroup !== 'timePeriod' ? dataSet.timePeriod : undefined;
 
   return JSON.stringify({
-    filters: [...dataSet.filters].sort(),
-    indicator: dataSet.indicator,
+    filters,
+    indicator,
     location,
     timePeriod,
   });

@@ -28,12 +28,11 @@ describe('generateDataSetKey', () => {
     );
   });
 
-  test('providing a `groupBy` param of `filters` does not exclude the filters from the key', () => {
+  test('providing a `groupBy` param of `filters` excludes the filters from the key', () => {
     const key = generateDataSetKey(testDataSet, 'filters');
 
     expect(key).toBe(
       JSON.stringify({
-        filters: ['filter-1', 'filter-2'],
         indicator: 'indicator-1',
         location: {
           level: 'country',
@@ -56,7 +55,7 @@ describe('generateDataSetKey', () => {
     );
   });
 
-  test('providing a `groupBy` param of `timePeriod` excdlues the time period from the key', () => {
+  test('providing a `groupBy` param of `timePeriod` excludes the time period from the key', () => {
     const key = generateDataSetKey(testDataSet, 'timePeriod');
 
     expect(key).toBe(
@@ -71,13 +70,12 @@ describe('generateDataSetKey', () => {
     );
   });
 
-  test('providing a `groupBy` param of `indicators` does not exclude it from the key', () => {
+  test('providing a `groupBy` param of `indicators` excludes the indicator from the key', () => {
     const key = generateDataSetKey(testDataSet, 'indicators');
 
     expect(key).toBe(
       JSON.stringify({
         filters: ['filter-1', 'filter-2'],
-        indicator: 'indicator-1',
         location: {
           level: 'country',
           value: 'location-1',
