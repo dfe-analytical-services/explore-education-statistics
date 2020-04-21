@@ -26,7 +26,8 @@ type OverallStage =
   | 'Failed'
   | 'Invalid'
   | 'Scheduled'
-  | 'Started';
+  | 'Started'
+  | 'Superseded';
 
 type TaskStage =
   | 'Validating'

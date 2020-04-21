@@ -31,7 +31,7 @@
                 ReleaseStatusDataStage.NotStarted,
                 ReleaseStatusPublishingStage.Scheduled,
                 ReleaseStatusOverallStage.Started);
-        
+
         /**
          * State used when the process of publishing an immediate Release has started
          */
@@ -41,5 +41,15 @@
                 ReleaseStatusDataStage.NotStarted,
                 ReleaseStatusPublishingStage.NotStarted,
                 ReleaseStatusOverallStage.Started);
+
+        /**
+         * State used when a newer request to publish a Release supersedes one already scheduled
+         */
+        public static readonly ReleaseStatusState SupersededState =
+            new ReleaseStatusState(ReleaseStatusContentStage.Cancelled,
+                ReleaseStatusFilesStage.Cancelled,
+                ReleaseStatusDataStage.Cancelled,
+                ReleaseStatusPublishingStage.Cancelled,
+                ReleaseStatusOverallStage.Superseded);
     }
 }

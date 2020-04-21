@@ -40,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             await ValidateReleaseAsync(message, async () =>
             {
-                // TODO BAU-562 cancel an existing run that is already Scheduled
+                await MarkScheduledReleaseStatusAsSuperseded(message);
+
                 if (message.Immediate)
                 {
                     var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
@@ -64,6 +65,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleaseStatusState state, IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             return await _releaseStatusService.CreateAsync(message.ReleaseId, state, message.Immediate, logMessages);
+        }
+
+        private async Task MarkScheduledReleaseStatusAsSuperseded(ValidateReleaseMessage message)
+        {
+            // There may be an existing scheduled ReleaseStatus entry if this release has been validated before
+            // If so, mark it as superseded
+            var scheduled =
+                await _releaseStatusService.GetAllAsync(message.ReleaseId, ReleaseStatusOverallStage.Scheduled);
+            foreach (var releaseStatus in scheduled)
+            {
+                await _releaseStatusService.UpdateStateAsync(message.ReleaseId, releaseStatus.Id, SupersededState);
+            }
         }
     }
 }
