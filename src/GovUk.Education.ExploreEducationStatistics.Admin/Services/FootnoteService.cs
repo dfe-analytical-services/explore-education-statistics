@@ -143,6 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => DbSet()
                     .Where(footnote =>
+                        footnote.ReleaseId == releaseId &&
                         (!footnote.Subjects.Any() ||
                          footnote.Subjects.Any(subjectFootnote => subjectFootnote.Subject.ReleaseId == releaseId))
                         && (!footnote.Filters.Any() || footnote.Filters.Any(filterFootnote =>
