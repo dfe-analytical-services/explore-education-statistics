@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -22,6 +24,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             _userManagementService = userManagementService;
         }
 
+        [HttpGet("bau/users")]
+        public async Task<ActionResult<List<UserViewModel>>> GetUserList()
+        {
+            var users = await _userManagementService.ListAsync();
+
+            if (users.Any())
+            {
+                return Ok(users);
+            }
+
+            return NotFound();
+        }
+        
         [HttpGet("bau/users/{userId}")]
         public async Task<ActionResult<UserViewModel>> GetUser(string userId)
         {
@@ -50,10 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
         
-        [HttpGet("bau/users")]
-        public async Task<ActionResult<List<UserViewModel>>> GetUserList()
+        
+        
+        [HttpGet("bau/users/pre-release")]
+        public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
         {
-            var users = await _userManagementService.ListAsync();
+            var users = await _userManagementService.ListPreReleaseUsersAsync();
 
             if (users.Any())
             {
@@ -76,17 +93,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             return NotFound();
         }
         
-        [HttpGet("bau/users/pre-release")]
-        public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
+        /// <summary>
+        /// Provides a list of release roles that are avaliable within the service
+        /// </summary>
+        /// <returns>Name and value representation of the enum</returns>
+        [HttpGet("bau/users/release-roles")]
+        public ActionResult<List<EnumExtensions.EnumValue>> GetReleaseRolesList()
         {
-            var users = await _userManagementService.ListPreReleaseUsersAsync();
+            var values = EnumExtensions.GetValues<ReleaseRole>();;
 
-            if (users.Any())
+            if (values.Any())
             {
-                return Ok(users);
+                return Ok(values);
             }
 
             return NotFound();
         }
+        
+        
+        
     }
 }

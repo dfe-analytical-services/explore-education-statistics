@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
@@ -30,5 +31,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return enumValue.GetEnumAttribute<EnumLabelValueAttribute>();
         }
         
+        
+        public static List<EnumValue> GetValues<T>()
+        {
+            return (from object itemType in Enum.GetValues(typeof(T)) select new EnumValue() {Name = Enum.GetName(typeof(T), itemType), Value = (int) itemType}).ToList();
+        }
+        
+        public class EnumValue
+        {
+            public string Name { get; set; }
+            public int Value { get; set; }
+        }
     }
 }
