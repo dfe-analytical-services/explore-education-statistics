@@ -24,9 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
             Assert.True(CalendarYearQ1.IsAlike(CalendarYearQ1));
             Assert.True(FinancialYearQ1.IsAlike(FinancialYearQ1));
             Assert.True(TaxYearQ1.IsAlike(TaxYearQ1));
-            Assert.True(EndOfMarch.IsAlike(EndOfMarch));
-            Assert.True(FiveHalfTerms.IsAlike(FiveHalfTerms));
-            Assert.True(SixHalfTerms.IsAlike(SixHalfTerms));
             Assert.True(January.IsAlike(January));
             Assert.True(SpringTerm.IsAlike(SpringTerm));
             Assert.True(ReportingYear.IsAlike(ReportingYear));
@@ -106,13 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         public void TimeIdentifiersAreMonths()
         {
             AssertTimeIdentifiersMeetCondition(identifier => identifier.IsMonth(), TimeIdentifierUtil.GetMonths());
-        }
-
-        [Fact]
-        public void TimeIdentifiersAreNumberOfTerms()
-        {
-            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsNumberOfTerms(),
-                TimeIdentifierUtil.GetNumberOfTerms());
         }
 
         [Fact]

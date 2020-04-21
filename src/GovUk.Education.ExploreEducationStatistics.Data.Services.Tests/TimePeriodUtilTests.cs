@@ -58,14 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var calendarQuarterIdentifiers = new[]
             {
                 CalendarYearQ1,
-                CalendarYearQ1Q2,
-                CalendarYearQ1Q3,
-                CalendarYearQ1Q4,
                 CalendarYearQ2,
-                CalendarYearQ2Q3,
-                CalendarYearQ2Q4,
                 CalendarYearQ3,
-                CalendarYearQ3Q4,
                 CalendarYearQ4
             };
 
@@ -121,15 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, FinancialYear)));
 
             Assert.Throws<ArgumentException>(() =>
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, EndOfMarch)));
-
-            Assert.Throws<ArgumentException>(() =>
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, FiveHalfTerms)));
-
-            Assert.Throws<ArgumentException>(() =>
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, FiveHalfTerms, 2019, SixHalfTerms)));
-            
-            Assert.Throws<ArgumentException>(() =>
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, ReportingYear)));
         }
 
@@ -184,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             CollectionAssert.AreEquivalent(expected,
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear)).ToList());
         }
-        
+
         [Fact]
         public void RangeIsGeneratedForReportingYearQuery()
         {
@@ -196,60 +181,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             CollectionAssert.AreEquivalent(expected,
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, ReportingYear, 2019, ReportingYear)).ToList());
-        }
-
-        [Fact]
-        public void RangeIsGeneratedForEndOfMarchQuery()
-        {
-            var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2018, EndOfMarch),
-                (2019, EndOfMarch)
-            };
-
-            CollectionAssert.AreEquivalent(expected,
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, EndOfMarch, 2019, EndOfMarch)).ToList());
-        }
-
-        [Fact]
-        public void RangeIsGeneratedForFiveHalfTermsQuery()
-        {
-            var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2018, FiveHalfTerms),
-                (2019, FiveHalfTerms)
-            };
-
-            CollectionAssert.AreEquivalent(expected,
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, FiveHalfTerms, 2019, FiveHalfTerms)).ToList());
-        }
-
-        [Fact]
-        public void RangeIsGeneratedForSixHalfTermsQuery()
-        {
-            var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2018, SixHalfTerms),
-                (2019, SixHalfTerms)
-            };
-
-            CollectionAssert.AreEquivalent(expected,
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, SixHalfTerms, 2019, SixHalfTerms)).ToList());
-        }
-
-        [Fact]
-        public void RangeIsGeneratedForNumberOfTermsQuery()
-        {
-            var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2018, FiveHalfTerms),
-                (2019, FiveHalfTerms),
-                (2018, SixHalfTerms),
-                (2019, SixHalfTerms)
-            };
-
-            CollectionAssert.AreEquivalent(expected,
-                TimePeriodUtil.RangeForNumberOfTerms(2018, 2019).ToList());
         }
 
         [Fact]
@@ -339,7 +270,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, AcademicYearQ3),
-                    (2019, AcademicYearQ3Q4),
                     (2019, AcademicYearQ4)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ4)).ToList());
@@ -349,19 +279,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     (2018, AcademicYearQ4),
                     (2019, AcademicYearQ1),
-                    (2019, AcademicYearQ1Q2),
-                    (2019, AcademicYearQ1Q3),
-                    (2019, AcademicYearQ1Q4),
                     (2019, AcademicYearQ2),
-                    (2019, AcademicYearQ2Q3),
-                    (2019, AcademicYearQ2Q4),
                     (2019, AcademicYearQ3),
-                    (2019, AcademicYearQ3Q4),
                     (2019, AcademicYearQ4),
                     (2020, AcademicYearQ1),
-                    (2020, AcademicYearQ1Q2),
-                    (2020, AcademicYearQ1Q3),
-                    (2020, AcademicYearQ1Q4),
                     (2020, AcademicYearQ2)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYearQ4, 2020, AcademicYearQ2)).ToList());
@@ -381,7 +302,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, CalendarYearQ3),
-                    (2019, CalendarYearQ3Q4),
                     (2019, CalendarYearQ4)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ4)).ToList());
@@ -391,19 +311,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     (2018, CalendarYearQ4),
                     (2019, CalendarYearQ1),
-                    (2019, CalendarYearQ1Q2),
-                    (2019, CalendarYearQ1Q3),
-                    (2019, CalendarYearQ1Q4),
                     (2019, CalendarYearQ2),
-                    (2019, CalendarYearQ2Q3),
-                    (2019, CalendarYearQ2Q4),
                     (2019, CalendarYearQ3),
-                    (2019, CalendarYearQ3Q4),
                     (2019, CalendarYearQ4),
                     (2020, CalendarYearQ1),
-                    (2020, CalendarYearQ1Q2),
-                    (2020, CalendarYearQ1Q3),
-                    (2020, CalendarYearQ1Q4),
                     (2020, CalendarYearQ2)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYearQ4, 2020, CalendarYearQ2)).ToList());
@@ -423,7 +334,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, FinancialYearQ3),
-                    (2019, FinancialYearQ3Q4),
                     (2019, FinancialYearQ4)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ4)).ToList());
@@ -433,19 +343,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     (2018, FinancialYearQ4),
                     (2019, FinancialYearQ1),
-                    (2019, FinancialYearQ1Q2),
-                    (2019, FinancialYearQ1Q3),
-                    (2019, FinancialYearQ1Q4),
                     (2019, FinancialYearQ2),
-                    (2019, FinancialYearQ2Q3),
-                    (2019, FinancialYearQ2Q4),
                     (2019, FinancialYearQ3),
-                    (2019, FinancialYearQ3Q4),
                     (2019, FinancialYearQ4),
                     (2020, FinancialYearQ1),
-                    (2020, FinancialYearQ1Q2),
-                    (2020, FinancialYearQ1Q3),
-                    (2020, FinancialYearQ1Q4),
                     (2020, FinancialYearQ2)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYearQ4, 2020, FinancialYearQ2)).ToList());
@@ -465,7 +366,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, TaxYearQ3),
-                    (2019, TaxYearQ3Q4),
                     (2019, TaxYearQ4)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ4)).ToList());
@@ -475,19 +375,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     (2018, TaxYearQ4),
                     (2019, TaxYearQ1),
-                    (2019, TaxYearQ1Q2),
-                    (2019, TaxYearQ1Q3),
-                    (2019, TaxYearQ1Q4),
                     (2019, TaxYearQ2),
-                    (2019, TaxYearQ2Q3),
-                    (2019, TaxYearQ2Q4),
                     (2019, TaxYearQ3),
-                    (2019, TaxYearQ3Q4),
                     (2019, TaxYearQ4),
                     (2020, TaxYearQ1),
-                    (2020, TaxYearQ1Q2),
-                    (2020, TaxYearQ1Q3),
-                    (2020, TaxYearQ1Q4),
                     (2020, TaxYearQ2)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYearQ4, 2020, TaxYearQ2)).ToList());
