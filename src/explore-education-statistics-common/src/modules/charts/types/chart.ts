@@ -3,10 +3,7 @@ import { infographicBlockDefinition } from '@common/modules/charts/components/In
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
-import {
-  DataSet,
-  DataSetConfiguration,
-} from '@common/modules/charts/types/dataSet';
+import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { ReactNode } from 'react';

@@ -20,7 +20,6 @@ import parseNumber from '@common/utils/number/parseNumber';
 
 import React, { memo } from 'react';
 import {
-  BarChart,
   CartesianGrid,
   Legend,
   LegendType,

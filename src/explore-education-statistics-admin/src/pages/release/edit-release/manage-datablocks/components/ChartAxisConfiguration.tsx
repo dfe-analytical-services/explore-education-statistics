@@ -314,12 +314,12 @@ const ChartAxisConfiguration = ({
           {configuration.type === 'major' && (
             <>
               <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
-                {/*<FormFieldSelect<AxisConfiguration>*/}
+                {/* <FormFieldSelect<AxisConfiguration>*/}
                 {/*  id={`${id}-sortBy`}*/}
                 {/*  name="sortBy"*/}
                 {/*  label="Sort data by"*/}
                 {/*  options={sortOptions}*/}
-                {/*/>*/}
+                {/* />*/}
                 <FormFieldCheckbox<AxisConfiguration>
                   id={`${id}-sortAsc`}
                   name="sortAsc"

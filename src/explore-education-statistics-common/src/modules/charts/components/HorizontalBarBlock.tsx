@@ -13,7 +13,6 @@ import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
 } from '@common/modules/charts/util/domainTicks';
-import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import getCategoryDataSetConfigurations from '@common/modules/charts/util/getCategoryDataSetConfigurations';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -23,7 +22,6 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  LineChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,

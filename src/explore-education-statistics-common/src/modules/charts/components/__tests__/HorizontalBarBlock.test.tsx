@@ -9,10 +9,7 @@ import HorizontalBarBlock, {
 import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import {
-  TableDataResponse,
-  TableDataSubjectMeta,
-} from '@common/services/tableBuilderService';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 import { render } from '@testing-library/react';
 import React from 'react';
 
