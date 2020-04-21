@@ -54,8 +54,8 @@ describe('LineChartBlock', () => {
 
     const legendItems = container.querySelectorAll('.recharts-legend-item');
     expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
-    expect(legendItems[1]).toHaveTextContent('Overall absence rate');
-    expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
+    expect(legendItems[1]).toHaveTextContent('Authorised absence rate');
+    expect(legendItems[2]).toHaveTextContent('Overall absence rate');
 
     // expect there to be lines for all 3 data sets
     expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
@@ -211,7 +211,7 @@ describe('LineChartBlock', () => {
             referenceLines: [
               {
                 label: 'hello',
-                position: '2014/15',
+                position: '2014_AY',
               },
             ],
           },
@@ -222,7 +222,7 @@ describe('LineChartBlock', () => {
 
     expect(
       container.querySelector('.recharts-reference-line'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('hello');
   });
 
   test('can render minor axis reference line', () => {
@@ -249,7 +249,7 @@ describe('LineChartBlock', () => {
 
     expect(
       container.querySelector('.recharts-reference-line'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('hello');
   });
 
   test('dies gracefully with bad data', () => {

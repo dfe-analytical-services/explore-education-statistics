@@ -55,8 +55,8 @@ describe('VerticalBarBlock', () => {
     const legendItems = container.querySelectorAll('.recharts-legend-item');
 
     expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
-    expect(legendItems[1]).toHaveTextContent('Overall absence rate');
-    expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
+    expect(legendItems[1]).toHaveTextContent('Authorised absence rate');
+    expect(legendItems[2]).toHaveTextContent('Overall absence rate');
 
     expect(container.querySelectorAll('.recharts-rectangle')).toHaveLength(15);
   });
@@ -167,7 +167,7 @@ describe('VerticalBarBlock', () => {
             referenceLines: [
               {
                 label: 'hello',
-                position: '2014/15',
+                position: '2014_AY',
               },
             ],
           },
@@ -178,7 +178,7 @@ describe('VerticalBarBlock', () => {
 
     expect(
       container.querySelector('.recharts-reference-line'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('hello');
   });
   test('can render minor axis reference line', () => {
     const { container } = render(
@@ -202,7 +202,7 @@ describe('VerticalBarBlock', () => {
 
     expect(
       container.querySelector('.recharts-reference-line'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('hello');
   });
 
   test('dies gracefully with bad data', () => {

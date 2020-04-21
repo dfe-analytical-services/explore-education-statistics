@@ -242,8 +242,12 @@ describe('DataBlockRenderer', () => {
     expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
 
     const legendItems = container.querySelectorAll('.recharts-legend-item');
-    expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
-    expect(legendItems[1]).toHaveTextContent('Overall absence rate');
-    expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
+    expect(legendItems[0]).toHaveTextContent(
+      'Unauthorised absence rate (England)',
+    );
+    expect(legendItems[1]).toHaveTextContent(
+      'Authorised absence rate (England)',
+    );
+    expect(legendItems[2]).toHaveTextContent('Overall absence rate (England)');
   });
 });
