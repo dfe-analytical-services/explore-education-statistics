@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);
             var subjectData = await _fileStorageService.GetSubjectData(message);
 
-            await _validatorService.Validate(subjectData.GetMetaTable(), subjectData.GetCsvTable(), executionContext, message)
+            await _validatorService.Validate(subjectData, executionContext, message)
                 .OnSuccess(async result =>
                 {
                     try
