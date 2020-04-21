@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return release.PublishScheduled.HasValue
                 ? Success()
                 : Failure(ValidationStage.ReleaseMustHavePublishScheduledDate,
-                    $"Scheduled publish date status is not set");
+                    $"Scheduled publish date is not set");
         }
 
         private Task<Release> GetReleaseAsync(Guid releaseId)
