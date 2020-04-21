@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -21,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (query.TimePeriod != null)
             {
-                var timePeriodRange = GetTimePeriodRange(query.TimePeriod);
+                var timePeriodRange = TimePeriodUtil.Range(query.TimePeriod);
 
                 var subPredicate = PredicateBuilder.False<Observation>();
 
@@ -248,18 +244,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return query.GeographicLevel == null
                 ? expression.AndAlso(observation => observation.GeographicLevel == geographicLevel)
                 : expression;
-        }
-
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
-            TimePeriodQuery timePeriod)
-        {
-            if (timePeriod.StartCode.IsNumberOfTerms() || timePeriod.EndCode.IsNumberOfTerms())
-            {
-                return TimePeriodUtil.RangeForNumberOfTerms(timePeriod.StartYear, timePeriod.EndYear);
-            }
-
-            return TimePeriodUtil
-                .Range(timePeriod);
         }
     }
 }
