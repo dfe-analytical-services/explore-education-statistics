@@ -238,7 +238,6 @@ const ChartBuilder = ({
                   capabilities={definition.capabilities}
                   data={data}
                   meta={meta}
-                  dataSets={axisConfiguration?.dataSets}
                   onChange={actions.updateChartAxis}
                   onSubmit={handleChartSave}
                 />

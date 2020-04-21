@@ -21,9 +21,8 @@ import {
   ChartCapabilities,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
-import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -41,7 +40,6 @@ interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
   capabilities: ChartCapabilities;
-  dataSets: DataSetConfiguration[];
   onChange: (configuration: AxisConfigurationChangeValue) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -53,46 +51,39 @@ const ChartAxisConfiguration = ({
   meta,
   type,
   capabilities,
-  dataSets = [],
   onChange,
   onSubmit,
 }: Props) => {
-  const sortOptions = useMemo<SelectOption[]>(() => {
-    return [
-      {
-        label: 'Default',
-        value: 'name',
-      },
-      ...dataSets.map<SelectOption>(dataSet => ({
-        label: dataSet.config.label,
-        value: generateDataSetKey(dataSet),
-      })),
-    ];
-  }, [dataSets]);
+  const dataSetCategories = useMemo<DataSetCategory[]>(() => {
+    const configurationWithDataSets: AxisConfiguration = {
+      ...configuration,
+      min: 0,
+      max: undefined,
+    };
+
+    return createDataSetCategories(configurationWithDataSets, data, meta);
+  }, [configuration, data, meta]);
+
+  // TODO: Figure out how we should sort data
+  // const sortOptions = useMemo<SelectOption[]>(() => {
+  //   return [
+  //     {
+  //       label: 'Default',
+  //       value: 'name',
+  //     },
+  //   ];
+  // }, []);
 
   const limitOptions = useMemo<SelectOption[]>(() => {
     if (type !== 'major') {
       return [];
     }
 
-    const configurationWithDataSets: AxisConfiguration = {
-      ...configuration,
-      min: 0,
-      max: undefined,
-      dataSets,
-    };
-
-    const dataSetCategories = createDataSetCategories(
-      configurationWithDataSets,
-      data,
-      meta,
-    );
-
     return dataSetCategories.map(({ filter }, index) => ({
       label: filter.label,
       value: index.toString(),
     }));
-  }, [configuration, data, dataSets, meta, type]);
+  }, [dataSetCategories, type]);
 
   const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
     position: '',
@@ -101,11 +92,15 @@ const ChartAxisConfiguration = ({
 
   const referenceOptions = useMemo<SelectOption[]>(() => {
     if (configuration.groupBy) {
-      const options: SelectOption[] = [{ label: 'Select', value: '' }];
+      const options: SelectOption[] = [];
 
       switch (configuration.groupBy) {
         case 'filters':
-          options.push(...Object.values(meta.filters).flat());
+          options.push(
+            ...Object.values(meta.filters).flatMap(
+              filterGroup => filterGroup.options,
+            ),
+          );
           break;
         case 'indicators':
           options.push(...meta.indicators);
@@ -315,13 +310,12 @@ const ChartAxisConfiguration = ({
           {configuration.type === 'major' && (
             <>
               <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
-                <FormFieldSelect<AxisConfiguration>
-                  id={`${id}-sortBy`}
-                  name="sortBy"
-                  label="Sort data by"
-                  order={[]}
-                  options={sortOptions}
-                />
+                {/*<FormFieldSelect<AxisConfiguration>*/}
+                {/*  id={`${id}-sortBy`}*/}
+                {/*  name="sortBy"*/}
+                {/*  label="Sort data by"*/}
+                {/*  options={sortOptions}*/}
+                {/*/>*/}
                 <FormFieldCheckbox<AxisConfiguration>
                   id={`${id}-sortAsc`}
                   name="sortAsc"
@@ -413,13 +407,14 @@ const ChartAxisConfiguration = ({
                         label=""
                         value={referenceLine.position}
                         order={[]}
+                        placeholder="Select position"
+                        options={referenceOptions}
                         onChange={e => {
                           setReferenceLine({
                             ...referenceLine,
                             position: e.target.value,
                           });
                         }}
-                        options={referenceOptions}
                       />
                     )}
                   </td>
