@@ -202,7 +202,6 @@ function isResultForDataSet(
 function createKeyedDataSets(
   dataSets: Pair<ChildDataSet, number>[],
   filter: Filter,
-  axisConfiguration: AxisConfiguration,
 ): DataSetCategory['dataSets'] {
   return dataSets.reduce<DataSetCategory['dataSets']>(
     (acc, [childDataSet, value]) => {
@@ -243,7 +242,7 @@ function createKeyedDataSets(
       // unique data point in the chart.
       const key = isEqual(expandedParent, parent)
         ? generateDataSetKey(parent)
-        : generateDataSetKey(dataSet, axisConfiguration.groupBy);
+        : generateDataSetKey(dataSet, filter);
 
       acc[key] = {
         dataSet,
@@ -371,11 +370,7 @@ export default function createDataSetCategories(
 
       return {
         filter,
-        dataSets: createKeyedDataSets(
-          matchingDataSets,
-          filter,
-          axisConfiguration,
-        ),
+        dataSets: createKeyedDataSets(matchingDataSets, filter),
       };
     })
     .filter(category => Object.values(category.dataSets).length > 0);

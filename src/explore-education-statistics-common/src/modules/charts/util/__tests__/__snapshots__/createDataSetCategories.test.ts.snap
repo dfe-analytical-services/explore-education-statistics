@@ -330,7 +330,7 @@ exports[`createDataSetCategories returns chart data categorised by indicators 1`
 Array [
   Object {
     "dataSets": Object {
-      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
           "config": Object {
             "label": "Test label 1",
@@ -348,7 +348,7 @@ Array [
         },
         "value": 0.19,
       },
-      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
           "config": Object {
             "label": "Test label 1",
@@ -366,7 +366,7 @@ Array [
         },
         "value": 0.22,
       },
-      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
           "config": Object {
             "label": "Test label 1",
@@ -384,7 +384,7 @@ Array [
         },
         "value": 0.25,
       },
-      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-female\\",\\"state-funded-primary\\"],\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
           "config": Object {
             "label": "Test label 1",
@@ -402,7 +402,7 @@ Array [
         },
         "value": 0.29,
       },
-      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2012_AY\\"}": Object {
         "dataSet": Object {
           "config": Object {
             "label": "Test label 2",
@@ -420,7 +420,7 @@ Array [
         },
         "value": 1.54,
       },
-      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2013_AY\\"}": Object {
         "dataSet": Object {
           "config": Object {
             "label": "Test label 2",
@@ -438,7 +438,7 @@ Array [
         },
         "value": 1.78,
       },
-      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2014_AY\\"}": Object {
         "dataSet": Object {
           "config": Object {
             "label": "Test label 2",
@@ -456,7 +456,7 @@ Array [
         },
         "value": 1.92,
       },
-      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"indicator\\":\\"exclusion-rate\\",\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
+      "{\\"filters\\":[\\"gender-male\\",\\"state-funded-primary\\"],\\"location\\":{\\"level\\":\\"country\\",\\"value\\":\\"E92000001\\"},\\"timePeriod\\":\\"2015_AY\\"}": Object {
         "dataSet": Object {
           "config": Object {
             "label": "Test label 2",
@@ -692,6 +692,7 @@ Array [
       "code": "AY",
       "group": undefined,
       "label": "2012/13",
+      "order": 0,
       "value": "2012_AY",
       "year": 2012,
     },
@@ -739,6 +740,7 @@ Array [
       "code": "AY",
       "group": undefined,
       "label": "2013/14",
+      "order": 1,
       "value": "2013_AY",
       "year": 2013,
     },
@@ -786,6 +788,7 @@ Array [
       "code": "AY",
       "group": undefined,
       "label": "2014/15",
+      "order": 2,
       "value": "2014_AY",
       "year": 2014,
     },
@@ -833,6 +836,7 @@ Array [
       "code": "AY",
       "group": undefined,
       "label": "2015/16",
+      "order": 3,
       "value": "2015_AY",
       "year": 2015,
     },

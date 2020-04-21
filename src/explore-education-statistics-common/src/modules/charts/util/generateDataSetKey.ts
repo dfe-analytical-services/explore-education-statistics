@@ -1,40 +1,51 @@
-import { AxisGroupBy } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
+import {
+  Filter,
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/table-tool/types/filters';
 
 /**
  * Create a key for the {@param dataSet} by stringifying
  * the data set so that we can create a unique identifier.
- * In Recharts, this is referred to as the `dataKey`.
+ * In Recharts, this is referred to as the `dataKey` and
+ * creates a new data point in the chart.
  *
- * We can also provide {@param excludeGroup} to remove part
- * of the key e.g. time period/location. These parts of the
- * data set are optional, but we can still group by them, so
- * we need to filter these out to avoid having too many
- * data points in the chart.
+ * We can also provide {@param excludeFilter} to remove part
+ * of the key. Typically, we want to remove the data set
+ * category's filter from the key as we want to reduce the
+ * number of unique data set keys (and consequently, unique
+ * data points from the charts).
  */
 export default function generateDataSetKey(
   dataSet: DataSet,
-  excludeGroup?: AxisGroupBy,
+  excludeFilter?: Filter,
 ): string {
-  const filters =
-    excludeGroup !== 'filters' ? [...dataSet.filters].sort() : undefined;
+  const filters = !(excludeFilter instanceof Filter)
+    ? [...dataSet.filters]
+    : dataSet.filters.filter(
+        filterValue => filterValue !== excludeFilter.value,
+      );
 
-  const indicator =
-    excludeGroup !== 'indicators' ? dataSet.indicator : undefined;
+  const indicator = !(excludeFilter instanceof Indicator)
+    ? dataSet.indicator
+    : undefined;
 
   const location =
-    excludeGroup !== 'locations' && dataSet.location
+    !(excludeFilter instanceof LocationFilter) && dataSet.location
       ? {
           level: dataSet.location.level,
           value: dataSet.location.value,
         }
       : undefined;
 
-  const timePeriod =
-    excludeGroup !== 'timePeriod' ? dataSet.timePeriod : undefined;
+  const timePeriod = !(excludeFilter instanceof TimePeriodFilter)
+    ? dataSet.timePeriod
+    : undefined;
 
   return JSON.stringify({
-    filters,
+    filters: filters.sort(),
     indicator,
     location,
     timePeriod,
