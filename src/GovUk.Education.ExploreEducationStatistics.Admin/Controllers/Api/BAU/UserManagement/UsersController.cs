@@ -10,16 +10,16 @@ using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.UserManagement
 {
     [Route("api")]
     [ApiController]
     [Authorize(Policy = "CanManageUsersOnSystem")]
-    public class BauUsersController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserManagementService _userManagementService;
 
-        public BauUsersController(IUserManagementService userManagementService)
+        public UsersController(IUserManagementService userManagementService)
         {
             _userManagementService = userManagementService;
         }
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
-        
+
         [HttpGet("bau/users/{userId}")]
         public async Task<ActionResult<UserViewModel>> GetUser(string userId)
         {
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
-        
+
         [HttpPut("bau/users/{userId}")]
         public async Task<ActionResult<UserViewModel>> UpdateUser(string userId, EditUserViewModel model)
         {
@@ -59,14 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             {
                 return Ok(user);
             }
-            
+
             AddErrors(ModelState, ValidationResult(UserDoesNotExist));
-            
+
             return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
-        
-        
-        
+
+
         [HttpGet("bau/users/pre-release")]
         public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
         {
@@ -79,9 +78,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
-        
+
         [HttpGet("bau/users/roles")]
-        public async Task<ActionResult<List<RoleViewModel>>> GetRoleList()
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        
+        public async Task<ActionResult<List<RoleViewModel>>> GetRoles()
         {
             var users = await _userManagementService.ListRolesAsync();
 
@@ -92,25 +94,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
-        
+
         /// <summary>
-        /// Provides a list of release roles that are avaliable within the service
+        /// Provides a list of release roles that are available within the service
         /// </summary>
         /// <returns>Name and value representation of the enum</returns>
         [HttpGet("bau/users/release-roles")]
-        public ActionResult<List<EnumExtensions.EnumValue>> GetReleaseRolesList()
+        [ProducesResponseType(200)]
+        public List<EnumExtensions.EnumValue> GetReleaseRoles()
         {
-            var values = EnumExtensions.GetValues<ReleaseRole>();;
+            var values = EnumExtensions.GetValues<ReleaseRole>();
 
-            if (values.Any())
-            {
-                return Ok(values);
-            }
-
-            return NotFound();
+            return values;
         }
-        
-        
-        
     }
 }
