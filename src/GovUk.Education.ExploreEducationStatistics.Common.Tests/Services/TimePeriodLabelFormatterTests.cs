@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
+using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
@@ -48,6 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
+        public void FormatTimePeriodUsingReportingYearIdentifier()
+        {
+            Assert.Equal($"{Year}", Format(Year, ReportingYear));
+        }
+
+        [Fact]
         public void FormatTimePeriodUsingTaxYearIdentifiers()
         {
             Assert.Equal($"{AcademicOrFiscalYear}", Format(Year, TaxYear));
@@ -81,6 +88,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{AcademicOrFiscalYear} Spring Term", Format(Year, SpringTerm));
             Assert.Equal($"{AcademicOrFiscalYear} Summer Term", Format(Year, SummerTerm));
             Assert.Equal($"{AcademicOrFiscalYear} Autumn and Spring Term", Format(Year, AutumnSpringTerm));
+        }
+
+        [Fact]
+        public void FormatTimePeriodWithOverridingLabelFormats()
+        {
+            Assert.Equal($"{Year} Calendar Year", Format(Year, CalendarYear, FullLabel));
+            Assert.Equal($"{Year}", Format(Year, CalendarYear, NoLabel));
+            Assert.Equal($"{Year}", Format(Year, CalendarYear, ShortLabel));
+
+            Assert.Equal($"{AcademicOrFiscalYear} Academic Year", Format(Year, AcademicYear, FullLabel));
+            Assert.Equal($"{AcademicOrFiscalYear}", Format(Year, AcademicYear, NoLabel));
+            Assert.Equal($"{AcademicOrFiscalYear}", Format(Year, AcademicYear, ShortLabel));
+
+            Assert.Equal($"{AcademicOrFiscalYear} Academic Year Q1", Format(Year, AcademicYearQ1, FullLabel));
+            Assert.Equal($"{AcademicOrFiscalYear}", Format(Year, AcademicYearQ1, NoLabel));
+            Assert.Equal($"{AcademicOrFiscalYear} Q1", Format(Year, AcademicYearQ1, ShortLabel));
+
+            Assert.Equal($"{Year} January", Format(Year, January, FullLabel));
+            Assert.Equal($"{Year}", Format(Year, January, NoLabel));
+            Assert.Equal($"{Year}", Format(Year, January, ShortLabel));
+
+            Assert.Equal($"{AcademicOrFiscalYear} Autumn Term", Format(Year, AutumnTerm, FullLabel));
+            Assert.Equal($"{AcademicOrFiscalYear}", Format(Year, AutumnTerm, NoLabel));
+            Assert.Equal($"{AcademicOrFiscalYear}", Format(Year, AutumnTerm, ShortLabel));
         }
 
         [Fact(Skip = "Use this to debug")]

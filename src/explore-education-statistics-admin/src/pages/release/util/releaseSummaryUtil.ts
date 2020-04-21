@@ -100,17 +100,6 @@ export const getTimePeriodCoverageDateRangeStringLong = (
     : releaseName;
 };
 
-export const getTimePeriodCoverageDateRangeStringShort = (
-  releaseName: string,
-  separatorString = '/',
-) => {
-  const fourYearRegex = /[0-9]*([0-9]{2})/;
-  const results = fourYearRegex.exec(releaseName);
-  return results
-    ? `${releaseName}${separatorString}${parseInt(results[1], 10) + 1}`
-    : releaseName;
-};
-
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
     return '(Live - Latest release)';

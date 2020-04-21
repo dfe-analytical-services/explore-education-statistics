@@ -148,14 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var title2 = new Release {ReleaseName = null, TimePeriodCoverage = TaxYear}.Title;
             Assert.Equal("Tax Year", title2);
         }
-        
-        [Fact]
-        public void CoverageTitle()
-        {
-            var coverageTitle = new Release {TimePeriodCoverage = TaxYear}.CoverageTitle;
-            Assert.Equal("Tax Year", coverageTitle);
-        }
-        
+
         [Fact]
         public void ReleaseYearTitle_CalendarYear()
         {
