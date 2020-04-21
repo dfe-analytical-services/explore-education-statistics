@@ -25,10 +25,14 @@ import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
+import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Schema } from 'yup';
+import omit from 'lodash/omit';
+
+type FormValues = OmitStrict<AxisConfiguration, 'dataSets' | 'type'>;
 
 type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
 
@@ -129,35 +133,39 @@ const ChartAxisConfiguration = ({
     return [];
   }, [configuration.groupBy, meta]);
 
-  const normalizeValues = (values: AxisConfiguration): AxisConfiguration => {
-    // Values of min/max may be treated as strings by Formik
-    // due to the way they are encoded in the form input value.
-    return {
-      ...values,
-      min: parseNumber(values.min),
-      max: parseNumber(values.max),
-      size: parseNumber(values.size),
-      tickSpacing: parseNumber(values.tickSpacing),
-    };
-  };
+  const normalizeValues = useCallback(
+    (values: FormValues): AxisConfiguration => {
+      // Values of min/max may be treated as strings by Formik
+      // due to the way they are encoded in the form input value.
+      return {
+        ...configuration,
+        ...values,
+        min: parseNumber(values.min),
+        max: parseNumber(values.max),
+        size: parseNumber(values.size),
+        tickSpacing: parseNumber(values.tickSpacing),
+      };
+    },
+    [configuration],
+  );
 
   const handleFormChange = useCallback(
-    (values: AxisConfigurationChangeValue) => {
+    (values: FormValues & { isValid: boolean }) => {
       onChange({
         ...normalizeValues(values),
         isValid: values.isValid,
       });
     },
-    [onChange],
+    [normalizeValues, onChange],
   );
 
   return (
-    <Formik<AxisConfiguration>
-      initialValues={configuration}
+    <Formik<FormValues>
+      initialValues={omit(configuration, ['dataSets', 'type'])}
       onSubmit={values => {
         onSubmit(normalizeValues(values));
       }}
-      validationSchema={Yup.object<Partial<AxisConfiguration>>({
+      validationSchema={Yup.object<FormValues>({
         size: Yup.number()
           .required('Enter size of axis')
           .positive('Size of axis must be positive'),
@@ -175,6 +183,7 @@ const ChartAxisConfiguration = ({
         max: Yup.number(),
         min: Yup.number(),
         visible: Yup.boolean(),
+        referenceLines: Yup.array(),
       })}
       render={form => (
         <Form id={id}>
@@ -391,7 +400,7 @@ const ChartAxisConfiguration = ({
                   ))}
                 <tr>
                   <td>
-                    {form.values.type === 'minor' && (
+                    {configuration.type === 'minor' && (
                       <FormTextInput
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
@@ -406,7 +415,7 @@ const ChartAxisConfiguration = ({
                         }}
                       />
                     )}
-                    {form.values.type === 'major' && (
+                    {configuration.type === 'major' && (
                       <FormSelect
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
