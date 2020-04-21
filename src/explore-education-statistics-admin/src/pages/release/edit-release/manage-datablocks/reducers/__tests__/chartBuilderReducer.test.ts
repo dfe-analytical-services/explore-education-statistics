@@ -49,6 +49,15 @@ describe('chartBuilderReducer', () => {
         type: 'major',
         defaults: {
           groupBy: 'timePeriod',
+          min: 0,
+          showGrid: true,
+          size: 50,
+          sortAsc: true,
+          sortBy: 'name',
+          tickConfig: 'default',
+          tickSpacing: 1,
+          visible: true,
+          unit: '',
         },
       },
       minor: {
@@ -168,17 +177,9 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState.axes.minor).toEqual<AxisConfiguration>({
         dataSets: [],
-        min: 0,
         referenceLines: [],
-        showGrid: true,
-        size: 50,
-        sortAsc: true,
-        sortBy: 'name',
-        tickConfig: 'default',
-        tickSpacing: 1,
         type: 'minor',
         visible: true,
-        unit: '',
       });
     });
 

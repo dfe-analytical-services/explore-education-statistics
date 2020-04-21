@@ -181,6 +181,14 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       type: 'major',
       defaults: {
         groupBy: 'timePeriod',
+        min: 0,
+        showGrid: true,
+        size: 50,
+        sortAsc: true,
+        sortBy: 'name',
+        tickConfig: 'default',
+        tickSpacing: 1,
+        unit: '',
       },
     },
     minor: {

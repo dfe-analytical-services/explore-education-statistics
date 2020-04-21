@@ -62,16 +62,8 @@ const defaultOptions: Partial<ChartOptions> = {
 
 const defaultAxisOptions: Partial<AxisConfiguration> = {
   dataSets: [],
-  min: 0,
   referenceLines: [],
-  showGrid: true,
-  size: 50,
-  sortAsc: true,
-  sortBy: 'name',
-  tickConfig: 'default',
-  tickSpacing: 1,
   visible: true,
-  unit: '',
 };
 
 export const chartBuilderReducer: Reducer<
