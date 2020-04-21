@@ -198,6 +198,13 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       id: 'minor',
       title: 'X Axis (minor axis)',
       type: 'minor',
+      defaults: {
+        min: 0,
+        size: 50,
+        tickConfig: 'default',
+        tickSpacing: 1,
+        unit: '',
+      },
     },
   },
 };

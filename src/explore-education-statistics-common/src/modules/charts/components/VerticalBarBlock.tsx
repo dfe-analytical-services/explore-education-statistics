@@ -196,6 +196,13 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       id: 'minor',
       title: 'Y Axis (minor axis)',
       type: 'minor',
+      defaults: {
+        min: 0,
+        size: 50,
+        tickConfig: 'default',
+        tickSpacing: 1,
+        unit: '',
+      },
     },
   },
 };
