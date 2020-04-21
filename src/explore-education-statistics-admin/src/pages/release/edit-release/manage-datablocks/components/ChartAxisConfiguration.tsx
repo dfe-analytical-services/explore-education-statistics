@@ -162,6 +162,7 @@ const ChartAxisConfiguration = ({
   return (
     <Formik<FormValues>
       initialValues={omit(configuration, ['dataSets', 'type'])}
+      enableReinitialize
       onSubmit={values => {
         onSubmit(normalizeValues(values));
       }}

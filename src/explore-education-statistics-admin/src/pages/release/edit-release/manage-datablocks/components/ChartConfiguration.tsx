@@ -81,6 +81,7 @@ const ChartConfiguration = ({
 
       <Formik<ChartOptions>
         initialValues={initialValues}
+        enableReinitialize
         onSubmit={values => {
           onSubmit(normalizeValues(values));
         }}
