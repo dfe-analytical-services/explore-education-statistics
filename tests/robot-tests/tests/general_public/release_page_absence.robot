@@ -27,7 +27,7 @@ Validate URL
     user checks url contains  %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Validate Published date, Next update date, and Email alerts link
-    [Tags]     HappyPath
+    [Tags]     HappyPath    NotAgainstPreProd
     user checks element contains  css:[data-testid="published-date"]   25 April 2018
     user checks element contains  css:[data-testid="next-update"]      22 March 2019
     user checks page contains link with text and url  Sign up for email alerts    /subscriptions?slug=pupil-absence-in-schools-in-england
@@ -91,6 +91,9 @@ Validate Key Statistics data block -- Summary tab
     user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
     user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
 
+Validate Key Statistics headline content block
+    [Documentation]    EES-718
+    [Tags]  HappyPath  NotAgainstPreProd
     user checks key stat bullet exists   pupils missed on average 8.2 school days
     user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
     user checks key stat bullet exists   unauthorised absence rise due to higher rates of unauthorised holidays
