@@ -392,6 +392,6 @@ export const toChartData = (chartCategory: DataSetCategory): ChartData => {
 
   return {
     ...dataSets,
-    name: chartCategory.filter.label,
+    name: chartCategory.filter.id,
   };
 };

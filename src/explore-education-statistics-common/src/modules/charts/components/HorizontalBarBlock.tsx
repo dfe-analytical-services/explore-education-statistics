@@ -15,6 +15,7 @@ import {
 } from '@common/modules/charts/util/domainTicks';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import getCategoryDataSetConfigurations from '@common/modules/charts/util/getCategoryDataSetConfigurations';
+import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import parseNumber from '@common/utils/number/parseNumber';
 import React, { memo } from 'react';
 import {
@@ -22,6 +23,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  LineChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -99,9 +101,13 @@ const HorizontalBarBlock = ({
           hide={!axes.major.visible}
           unit={axes.major.unit}
           width={parseNumber(axes.major.size)}
+          tickFormatter={getCategoryLabel(dataSetCategories)}
         />
 
-        <Tooltip content={CustomTooltip} wrapperStyle={{ zIndex: 1000 }} />
+        <Tooltip
+          content={<CustomTooltip dataSetCategories={dataSetCategories} />}
+          wrapperStyle={{ zIndex: 1000 }}
+        />
 
         {legend && legend !== 'none' && (
           <Legend content={renderLegend} align="left" layout="vertical" />

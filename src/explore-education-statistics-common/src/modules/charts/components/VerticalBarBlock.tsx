@@ -14,6 +14,7 @@ import {
   getMinorAxisDomainTicks,
 } from '@common/modules/charts/util/domainTicks';
 import getCategoryDataSetConfigurations from '@common/modules/charts/util/getCategoryDataSetConfigurations';
+import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import parseNumber from '@common/utils/number/parseNumber';
 import React, { memo } from 'react';
 import {
@@ -96,9 +97,13 @@ const VerticalBarBlock = ({
           height={parseNumber(axes.major.size)}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
+          tickFormatter={getCategoryLabel(dataSetCategories)}
         />
 
-        <Tooltip content={CustomTooltip} wrapperStyle={{ zIndex: 1000 }} />
+        <Tooltip
+          content={<CustomTooltip dataSetCategories={dataSetCategories} />}
+          wrapperStyle={{ zIndex: 1000 }}
+        />
 
         {legend && legend !== 'none' && (
           <Legend content={renderLegend} align="left" layout="vertical" />
