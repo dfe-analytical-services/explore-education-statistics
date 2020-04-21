@@ -22,6 +22,7 @@ describe('chartBuilderReducer', () => {
       lineStyle: true,
       gridLines: true,
       canSize: true,
+      canSort: true,
       fixedAxisGroupBy: false,
       hasAxes: true,
       hasReferenceLines: true,

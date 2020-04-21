@@ -313,19 +313,21 @@ const ChartAxisConfiguration = ({
 
           {configuration.type === 'major' && (
             <>
-              <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
-                {/* <FormFieldSelect<AxisConfiguration>*/}
-                {/*  id={`${id}-sortBy`}*/}
-                {/*  name="sortBy"*/}
-                {/*  label="Sort data by"*/}
-                {/*  options={sortOptions}*/}
-                {/* />*/}
-                <FormFieldCheckbox<AxisConfiguration>
-                  id={`${id}-sortAsc`}
-                  name="sortAsc"
-                  label="Sort Ascending"
-                />
-              </FormFieldset>
+              {capabilities.canSort && (
+                <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
+                  {/* <FormFieldSelect<AxisConfiguration>*/}
+                  {/*  id={`${id}-sortBy`}*/}
+                  {/*  name="sortBy"*/}
+                  {/*  label="Sort data by"*/}
+                  {/*  options={sortOptions}*/}
+                  {/* />*/}
+                  <FormFieldCheckbox<AxisConfiguration>
+                    id={`${id}-sortAsc`}
+                    name="sortAsc"
+                    label="Sort Ascending"
+                  />
+                </FormFieldset>
+              )}
 
               <FormFieldset
                 id={`${id}-majorAxisRange`}

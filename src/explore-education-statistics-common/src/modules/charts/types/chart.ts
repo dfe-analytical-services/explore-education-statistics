@@ -92,6 +92,7 @@ export interface ChartCapabilities {
   lineStyle: boolean;
   gridLines: boolean;
   canSize: boolean;
+  canSort: boolean;
   fixedAxisGroupBy: boolean;
   hasReferenceLines: boolean;
   hasLegend: boolean;

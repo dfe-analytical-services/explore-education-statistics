@@ -156,6 +156,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
     lineStyle: false,
     gridLines: true,
     canSize: true,
+    canSort: true,
     fixedAxisGroupBy: false,
     hasAxes: true,
     hasReferenceLines: true,
