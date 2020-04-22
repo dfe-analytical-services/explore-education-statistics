@@ -24,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class TableBuilderResultSubjectMetaService : AbstractTableBuilderSubjectMetaService,
         ITableBuilderResultSubjectMetaService
     {
+        private readonly IBoundaryLevelService _boundaryLevelService;
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
@@ -47,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ILogger<TableBuilderResultSubjectMetaService> logger,
             IMapper mapper) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
+            _boundaryLevelService = boundaryLevelService;
             _footnoteService = footnoteService;
             _indicatorService = indicatorService;
             _locationService = locationService;
