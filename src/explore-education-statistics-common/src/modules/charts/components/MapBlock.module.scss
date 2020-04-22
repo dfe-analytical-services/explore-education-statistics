@@ -32,6 +32,7 @@
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 1rem;
+  min-height: 300px;
 }
 
 .mapControls {
@@ -61,6 +62,8 @@
   flex: 1 0 64.6%;
   flex-direction: column;
   margin: 0.5% 0.5% 0;
+  min-height: 300px;
+
   @media print {
     display: block;
   }

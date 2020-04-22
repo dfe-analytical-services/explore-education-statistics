@@ -27,7 +27,7 @@
     .govuk-accordion__section-content) {
   display: block !important;
   height: auto;
-  padding-bottom: 15px;
+  padding: 15px 0;
   visibility: visible;
 }
 
@@ -41,7 +41,7 @@
   @media print {
     display: block !important;
     height: auto;
-    padding-bottom: 15px;
+    padding: 15px 0;
     visibility: visible;
   }
 }
