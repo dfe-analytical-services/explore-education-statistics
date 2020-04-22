@@ -73,17 +73,6 @@ export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
   }
 };
 
-export const getTimePeriodCoverageDateRangeStringLong = (
-  releaseName: string,
-  separatorString = ' to ',
-) => {
-  const numberRegex = /[0-9]+/;
-  const results = numberRegex.exec(releaseName);
-  return results
-    ? `${releaseName}${separatorString}${parseInt(results[0], 10) + 1}`
-    : releaseName;
-};
-
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
     return '(Live - Latest release)';
@@ -95,10 +84,6 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
 };
 
 export const getReleaseSummaryLabel = (release: AdminDashboardRelease) =>
-  `${
-    release.timePeriodCoverage.label
-  }, ${getTimePeriodCoverageDateRangeStringLong(
-    release.releaseName,
-  )} ${getLiveLatestLabel(release.live, release.latestRelease)}`;
+  `${release.title} ${getLiveLatestLabel(release.live, release.latestRelease)}`;
 
 export default {};
