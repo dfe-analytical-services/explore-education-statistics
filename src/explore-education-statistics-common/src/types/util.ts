@@ -12,6 +12,8 @@ export interface Dictionary<T> {
   [key: string]: T;
 }
 
+export type Pair<Key, Value> = [Key, Value];
+
 /**
  * Extract a type which are the keys from T
  * that have value matching the type U.

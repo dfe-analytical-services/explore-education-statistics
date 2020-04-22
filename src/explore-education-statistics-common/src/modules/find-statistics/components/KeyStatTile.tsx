@@ -1,9 +1,9 @@
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import tableBuilderService, {
+  TableDataResponse,
+} from '@common/services/tableBuilderService';
 import { AxiosErrorHandler } from '@common/services/api/Client';
-import dataBlockService, {
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
 import { DataBlock } from '@common/services/types/blocks';
 import formatPretty from '@common/utils/number/formatPretty';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
@@ -22,12 +22,12 @@ export interface KeyStatConfig {
 
 const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
-    DataBlockResponse | undefined
+    TableDataResponse | undefined
   >();
 
   useEffect(() => {
-    dataBlockService
-      .getDataBlockForSubject({
+    tableBuilderService
+      .getTableData({
         ...dataBlockRequest,
         includeGeoJson: false,
       })
@@ -36,15 +36,14 @@ const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
 
   const config: KeyStatConfig = useMemo(() => {
     if (dataBlockResponse) {
-      const [indicatorKey, theIndicator] = Object.entries(
-        dataBlockResponse.metaData.indicators,
-      )[0];
+      const [indicator] = dataBlockResponse.subjectMeta.indicators;
+
       return {
-        indicatorLabel: theIndicator.label,
+        indicatorLabel: indicator.label,
         value: `${formatPretty(
-          dataBlockResponse.result[0].measures[indicatorKey],
-          theIndicator.unit,
-          theIndicator.decimalPlaces,
+          dataBlockResponse.results[0].measures[indicator.value],
+          indicator.unit,
+          indicator.decimalPlaces,
         )}`,
       };
     }

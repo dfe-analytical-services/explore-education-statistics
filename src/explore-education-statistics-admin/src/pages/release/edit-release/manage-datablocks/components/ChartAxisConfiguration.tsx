@@ -17,34 +17,33 @@ import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   AxisConfiguration,
   AxisGroupBy,
+  AxisType,
   ChartCapabilities,
-  ChartDataSet,
-  ChartMetaData,
-  DataSetConfiguration,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
-import {
-  ChartData,
-  createSortedAndMappedDataForAxis,
-} from '@common/modules/charts/util/chartUtils';
-import { DataBlockData } from '@common/services/dataBlockService';
-import { Dictionary } from '@common/types';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
+import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Schema } from 'yup';
+import omit from 'lodash/omit';
+
+type FormValues = OmitStrict<AxisConfiguration, 'dataSets' | 'type'>;
 
 type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
 
 interface Props {
   id: string;
   defaultDataType?: AxisGroupBy;
+  type: AxisType;
   configuration: AxisConfiguration;
-  data: DataBlockData;
-  meta: ChartMetaData;
-  labels?: Dictionary<DataSetConfiguration>;
+  data: TableDataResult[];
+  meta: FullTableMeta;
   capabilities: ChartCapabilities;
-  dataSets: ChartDataSet[];
   onChange: (configuration: AxisConfigurationChangeValue) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -54,51 +53,45 @@ const ChartAxisConfiguration = ({
   configuration,
   data,
   meta,
-  labels = {},
+  type,
   capabilities,
-  dataSets = [],
   onChange,
   onSubmit,
 }: Props) => {
-  const sortOptions = useMemo<SelectOption[]>(() => {
-    return [
-      {
-        label: 'Default',
-        value: 'name',
-      },
-      ...Object.values(labels).map<SelectOption>(config => ({
-        label: config.label,
-        value: config.value,
-      })),
-    ];
-  }, [labels]);
+  const dataSetCategories = useMemo<DataSetCategory[]>(() => {
+    if (configuration.type === 'minor') {
+      return [];
+    }
 
-  const limitOptions = useMemo<SelectOption[]>(() => {
-    const configurationWithDataSet: AxisConfiguration = {
+    const config: AxisConfiguration = {
       ...configuration,
       min: 0,
       max: undefined,
-      dataSets,
     };
 
-    const chartData: ChartData[] = createSortedAndMappedDataForAxis(
-      configurationWithDataSet,
-      data.result,
-      meta,
-      labels,
-    );
+    return createDataSetCategories(config, data, meta);
+  }, [configuration, data, meta]);
 
-    return [
-      {
-        label: 'Default',
-        value: '',
-      },
-      ...chartData.map(({ name }, index) => ({
-        label: name,
-        value: `${index}`,
-      })),
-    ];
-  }, [configuration, data, dataSets, labels, meta]);
+  // TODO: Figure out how we should sort data
+  // const sortOptions = useMemo<SelectOption[]>(() => {
+  //   return [
+  //     {
+  //       label: 'Default',
+  //       value: 'name',
+  //     },
+  //   ];
+  // }, []);
+
+  const limitOptions = useMemo<SelectOption[]>(() => {
+    if (type !== 'major') {
+      return [];
+    }
+
+    return dataSetCategories.map(({ filter }, index) => ({
+      label: filter.label,
+      value: index.toString(),
+    }));
+  }, [dataSetCategories, type]);
 
   const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
     position: '',
@@ -107,46 +100,73 @@ const ChartAxisConfiguration = ({
 
   const referenceOptions = useMemo<SelectOption[]>(() => {
     if (configuration.groupBy) {
-      return [
-        { label: 'Select', value: '' },
-        ...Object.values(meta[configuration.groupBy]).map(({ label }) => ({
-          label,
-          value: label,
-        })),
-      ];
+      const options: SelectOption[] = [];
+
+      switch (configuration.groupBy) {
+        case 'filters':
+          options.push(
+            ...Object.values(meta.filters).flatMap(
+              filterGroup => filterGroup.options,
+            ),
+          );
+          break;
+        case 'indicators':
+          options.push(...meta.indicators);
+          break;
+        case 'locations':
+          options.push(...meta.locations);
+          break;
+        case 'timePeriod':
+          options.push(
+            ...meta.timePeriodRange.map(timePeriod => ({
+              value: `${timePeriod.year}_${timePeriod.code}`,
+              label: timePeriod.label,
+            })),
+          );
+          break;
+        default:
+          break;
+      }
+
+      return options;
     }
     return [];
   }, [configuration.groupBy, meta]);
 
-  const normalizeValues = (values: AxisConfiguration): AxisConfiguration => {
-    // Values of min/max may be treated as strings by Formik
-    // due to the way they are encoded in the form input value.
-    return {
-      ...values,
-      min: parseNumber(values.min),
-      max: parseNumber(values.max),
-      size: parseNumber(values.size),
-      tickSpacing: parseNumber(values.tickSpacing),
-    };
-  };
+  const normalizeValues = useCallback(
+    (values: FormValues): AxisConfiguration => {
+      // Values of min/max may be treated as strings by Formik
+      // due to the way they are encoded in the form input value.
+      return {
+        ...configuration,
+        ...values,
+        min: parseNumber(values.min),
+        max: parseNumber(values.max),
+        size: parseNumber(values.size),
+        tickSpacing: parseNumber(values.tickSpacing),
+      };
+    },
+    [configuration],
+  );
 
   const handleFormChange = useCallback(
-    (values: AxisConfigurationChangeValue) => {
+    (values: FormValues & { isValid: boolean }) => {
       onChange({
         ...normalizeValues(values),
         isValid: values.isValid,
       });
     },
-    [onChange],
+    [normalizeValues, onChange],
   );
 
   return (
-    <Formik<AxisConfiguration>
-      initialValues={configuration}
+    <Formik<FormValues>
+      initialValues={omit(configuration, ['dataSets', 'type'])}
+      enableReinitialize
       onSubmit={values => {
         onSubmit(normalizeValues(values));
       }}
-      validationSchema={Yup.object<Partial<AxisConfiguration>>({
+      validationSchema={Yup.object<FormValues>({
         size: Yup.number()
           .required('Enter size of axis')
           .positive('Size of axis must be positive'),
@@ -164,6 +184,7 @@ const ChartAxisConfiguration = ({
         max: Yup.number(),
         min: Yup.number(),
         visible: Yup.boolean(),
+        referenceLines: Yup.array(),
       })}
       render={form => (
         <Form id={id}>
@@ -302,20 +323,21 @@ const ChartAxisConfiguration = ({
 
           {configuration.type === 'major' && (
             <>
-              <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
-                <FormFieldSelect<AxisConfiguration>
-                  id={`${id}-sortBy`}
-                  name="sortBy"
-                  label="Sort data by"
-                  order={[]}
-                  options={sortOptions}
-                />
-                <FormFieldCheckbox<AxisConfiguration>
-                  id={`${id}-sortAsc`}
-                  name="sortAsc"
-                  label="Sort Ascending"
-                />
-              </FormFieldset>
+              {capabilities.canSort && (
+                <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
+                  {/* <FormFieldSelect<AxisConfiguration>*/}
+                  {/*  id={`${id}-sortBy`}*/}
+                  {/*  name="sortBy"*/}
+                  {/*  label="Sort data by"*/}
+                  {/*  options={sortOptions}*/}
+                  {/* />*/}
+                  <FormFieldCheckbox<AxisConfiguration>
+                    id={`${id}-sortAsc`}
+                    name="sortAsc"
+                    label="Sort Ascending"
+                  />
+                </FormFieldset>
+              )}
 
               <FormFieldset
                 id={`${id}-majorAxisRange`}
@@ -326,15 +348,15 @@ const ChartAxisConfiguration = ({
                   id={`${id}-majorMin`}
                   label="Minimum"
                   name="min"
+                  placeholder="Default"
                   options={limitOptions}
-                  order={[]}
                 />
                 <FormFieldSelect<AxisConfiguration>
                   id={`${id}-majorMax`}
                   label="Maximum"
                   name="max"
+                  placeholder="Default"
                   options={limitOptions}
-                  order={[]}
                 />
               </FormFieldset>
             </>
@@ -379,7 +401,7 @@ const ChartAxisConfiguration = ({
                   ))}
                 <tr>
                   <td>
-                    {form.values.type === 'minor' && (
+                    {configuration.type === 'minor' && (
                       <FormTextInput
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
@@ -394,20 +416,21 @@ const ChartAxisConfiguration = ({
                         }}
                       />
                     )}
-                    {form.values.type === 'major' && (
+                    {configuration.type === 'major' && (
                       <FormSelect
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
                         label=""
                         value={referenceLine.position}
                         order={[]}
+                        placeholder="Select position"
+                        options={referenceOptions}
                         onChange={e => {
                           setReferenceLine({
                             ...referenceLine,
                             position: e.target.value,
                           });
                         }}
-                        options={referenceOptions}
                       />
                     )}
                   </td>

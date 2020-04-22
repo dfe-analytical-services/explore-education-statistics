@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/prefer-default-export
-import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
-import { UnmappedFullTable } from '@common/modules/table-tool/services/tableBuilderService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 
 export const testData1 = {
   fullTable: {
@@ -71,6 +71,7 @@ export const testData1 = {
         { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
         { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
       ],
+      boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
       timePeriodRange: [
@@ -352,7 +353,7 @@ export const testData1 = {
         timePeriod: '2014_AY',
       },
     ],
-  } as UnmappedFullTable,
+  } as TableDataResponse,
   tableHeadersConfig: {
     columnGroups: [
       [
@@ -461,6 +462,7 @@ export const testData2 = {
         { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
         { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
       ],
+      boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
       timePeriodRange: [
@@ -694,7 +696,7 @@ export const testData2 = {
         timePeriod: '2014_AY',
       },
     ],
-  } as UnmappedFullTable,
+  } as TableDataResponse,
   tableHeadersConfig: {
     columnGroups: [
       [
@@ -799,6 +801,7 @@ export const testData3 = {
         { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
         { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
       ],
+      boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
       timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
@@ -917,7 +920,7 @@ export const testData3 = {
         timePeriod: '2014_AY',
       },
     ],
-  } as UnmappedFullTable,
+  } as TableDataResponse,
   tableHeadersConfig: {
     columnGroups: [
       [
@@ -987,6 +990,7 @@ export const testDataNoFilters = {
         },
       ],
       locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+      boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence in prus',
       timePeriodRange: [
@@ -1030,7 +1034,7 @@ export const testDataNoFilters = {
         timePeriod: '2016_AY',
       },
     ],
-  } as UnmappedFullTable,
+  } as TableDataResponse,
   tableHeadersConfig: {
     columns: [
       { label: '2014/15', value: '2014_AY' },
@@ -1122,6 +1126,7 @@ export const testDataFiltersWithNoResults = {
         { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
         { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
       ],
+      boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
       timePeriodRange: [
@@ -1251,5 +1256,5 @@ export const testDataFiltersWithNoResults = {
         timePeriod: '2015_AY',
       },
     ],
-  } as UnmappedFullTable,
+  } as TableDataResponse,
 };
