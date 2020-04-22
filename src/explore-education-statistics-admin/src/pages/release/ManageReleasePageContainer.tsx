@@ -8,9 +8,11 @@ import service from '@admin/services/common/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
 import releaseService from '@admin/services/release/edit-release/summary/service';
 import { ReleasePublicationStatus } from '@admin/services/release/types';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
-import React, { useEffect, useState } from 'react';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import React from 'react';
 import { Route, RouteComponentProps } from 'react-router';
 import ManageReleaseContext from './ManageReleaseContext';
 
@@ -25,20 +27,23 @@ const ManageReleasePageContainer = ({
 }: RouteComponentProps<MatchProps>) => {
   const { publicationId, releaseId } = match.params;
 
-  const [publication, setPublication] = useState<BasicPublicationDetails>();
-  const [releasePublicationStatus, setReleasePublicationStatus] = useState<
-    ReleasePublicationStatus
-  >();
+  const {
+    value = [],
+    isLoading: loadingRelease,
+    retry: reloadRelease,
+  } = useAsyncRetry(
+    () =>
+      Promise.all([
+        service.getBasicPublicationDetails(publicationId),
+        releaseService.getReleasePublicationStatus(releaseId),
+      ]),
+    [publicationId, releaseId],
+  );
 
-  useEffect(() => {
-    Promise.all([
-      service.getBasicPublicationDetails(publicationId),
-      releaseService.getReleasePublicationStatus(releaseId),
-    ]).then(([publicationDetails, publicationStatus]) => {
-      setPublication(publicationDetails);
-      setReleasePublicationStatus(publicationStatus);
-    });
-  }, [publicationId, releaseId]);
+  const [publication, releasePublicationStatus] = value as [
+    BasicPublicationDetails,
+    ReleasePublicationStatus,
+  ];
 
   const currentRouteIndex =
     viewRoutes.findIndex(
@@ -69,15 +74,14 @@ const ManageReleasePageContainer = ({
     : undefined;
 
   return (
-    <>
+    <LoadingSpinner loading={loadingRelease}>
       {publication && releasePublicationStatus && (
         <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <h1 className="govuk-heading-xl">
                 <span className="govuk-caption-xl">
-                  {releasePublicationStatus &&
-                  releasePublicationStatus.amendment
+                  {releasePublicationStatus.amendment
                     ? 'Amend release'
                     : 'Edit release'}
                 </span>
@@ -130,13 +134,7 @@ const ManageReleasePageContainer = ({
             value={{
               publication,
               releaseId,
-              onChangeReleaseStatus: (
-                updatedStatus: Partial<ReleasePublicationStatus>,
-              ) =>
-                setReleasePublicationStatus({
-                  ...releasePublicationStatus,
-                  ...updatedStatus,
-                }),
+              onChangeReleaseStatus: reloadRelease,
             }}
           >
             {releaseRoutes.manageReleaseRoutes.map(route => (
@@ -150,7 +148,7 @@ const ManageReleasePageContainer = ({
           />
         </Page>
       )}
-    </>
+    </LoadingSpinner>
   );
 };
 

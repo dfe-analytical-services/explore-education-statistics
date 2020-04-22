@@ -301,6 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private static ReleasesController ReleasesControllerWithMocks((
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
+            Mock<IImportStatusService> ImportStatusService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager
             ) mocks)
@@ -308,6 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             return new ReleasesController(
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
+                mocks.ImportStatusService.Object,
                 mocks.ReleaseStatusService.Object,
                 mocks.UserManager.Object);
         }

@@ -1,11 +1,10 @@
 import { BasicPublicationDetails } from '@admin/services/common/types';
-import { ReleasePublicationStatus } from '@admin/services/release/types';
 import { createContext, useContext } from 'react';
 
 export interface ManageRelease {
   publication: BasicPublicationDetails;
   releaseId: string;
-  onChangeReleaseStatus: (status: Partial<ReleasePublicationStatus>) => void;
+  onChangeReleaseStatus: () => void;
 }
 
 const ManageReleaseContext = createContext<ManageRelease | undefined>(

@@ -36,12 +36,7 @@ const ProtectedRoute = ({
     const accessCheck = protectionAction || basicAccessCheck;
     accessDenied = !accessCheck(user);
   } else {
-    const denyAccessToNonLoggedInUsers = !allowAnonymousUsers;
-    accessDenied = denyAccessToNonLoggedInUsers;
-  }
-
-  if (!component) {
-    return null;
+    accessDenied = !allowAnonymousUsers;
   }
 
   if (!allowAnonymousUsers && (!user || user.validToken === false)) {

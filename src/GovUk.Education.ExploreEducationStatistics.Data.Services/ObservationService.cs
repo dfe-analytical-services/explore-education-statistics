@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -154,14 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return CreateListType(parameterName, values.AsTimePeriodListTable(), "dbo.TimePeriodListType");
         }
 
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
-            ObservationQueryContext query)
+        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(ObservationQueryContext query)
         {
-            if (query.TimePeriod.StartCode.IsNumberOfTerms() || query.TimePeriod.EndCode.IsNumberOfTerms())
-            {
-                return TimePeriodUtil.RangeForNumberOfTerms(query.TimePeriod.StartYear, query.TimePeriod.EndYear);
-            }
-
             return TimePeriodUtil.Range(query.TimePeriod);
         }
     }
