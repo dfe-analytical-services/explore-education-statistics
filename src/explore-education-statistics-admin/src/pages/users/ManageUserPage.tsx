@@ -190,7 +190,7 @@ const ManageUserPage = ({
                                 {userReleaseRole.release.title}
                               </td>
                               <td className="govuk-table__cell">
-                                {userReleaseRole.releaseRole}
+                                {userReleaseRole.releaseRole.name}
                               </td>
                               {/* <td className="govuk-table__cell">
                                 <ButtonText>Remove</ButtonText>
