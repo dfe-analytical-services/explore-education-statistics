@@ -1,41 +1,10 @@
-import {
-  FilterOption,
-  IndicatorOption,
-  LocationLevelKeys,
-  PublicationSubjectMeta,
-  TimePeriodOption,
-} from '@common/modules/table-tool/services/tableBuilderService';
-import { dataApi } from '@common/services/api';
-import { DataBlockRequest } from '@common/services/types/blocks';
-import { Footnote } from '@common/services/types/footnotes';
-import { Dictionary, PartialRecord } from '@common/types/util';
-import { Feature, Geometry } from 'geojson';
-
-export enum GeographicLevel {
-  Establishment = 'Establishment',
-  LocalAuthority = 'Local_Authority',
-  LocalAuthorityDistrict = 'Local_Authority_District',
-  LocalEnterprisePartnership = 'Local_Enterprise_Partnership',
-  MATOrSponsor = 'MAT_Or_Sponsor',
-  MayoralCombinedAuthority = 'Mayoral_Combined_Authority',
-  MultiAcademyTrust = 'Multi_Academy_Trust',
-  Country = 'Country',
-  OpportunityArea = 'OpportunityArea',
-  ParliamentaryConstituency = 'Parliamentary_Constituency',
-  Provider = 'Provider',
-  Region = 'Region',
-  RSCRegion = 'RSC_Region',
-  School = 'School',
-  Ward = 'Ward',
-  Instituation = 'institution',
-}
+import { LocationLevelKeys } from '@common/services/tableBuilderService';
+import { PartialRecord } from '@common/types/util';
 
 export interface Location {
   code: string;
   name: string;
 }
-
-type LocalAuthorityDistrict = Location;
 
 export interface LocalAuthority extends Location {
   old_code: string;
@@ -50,93 +19,6 @@ export interface DataBlockLocation
   [key: string]: any;
 }
 
-export interface Result {
-  filters: string[];
-  location: DataBlockLocation;
-  geographicLevel: GeographicLevel;
-  measures: Dictionary<string>;
-  timePeriod: string;
-}
-
-export interface DataBlockData {
-  publicationId: string;
-  releaseId: string;
-  subjectId: number;
-  releaseDate: Date;
-  geographicLevel: GeographicLevel;
-  result: Result[];
-}
-
-// --- Meta data
-
-export type LabelValueMetadata = FilterOption;
-export type LabelValueUnitMetadata = IndicatorOption;
-type TimePeriodOptionMetadata = TimePeriodOption;
-
-export interface DataBlockGeoJsonProperties {
-  // these are what is required
-  code: string;
-  name: string;
-  long: number;
-  lat: number;
-
-  // the following are just named here for easier finding in code completion and not required
-  objectid?: number;
-  ctry17cd?: string | null;
-  ctry17nm?: string | null;
-  lad17cd?: string | null;
-  lad17nm?: string | null;
-
-  // allow anything as this is an extension of the GeoJsonProperties object at its heart
-  [name: string]: unknown;
-}
-
-export type DataBlockGeoJSON = Feature<Geometry, DataBlockGeoJsonProperties>;
-
-export interface DataBlockLocationMetadata {
-  level: GeographicLevel;
-  geoJson: DataBlockGeoJSON[];
-  label: string;
-  value: string;
-}
-
-// ------------------------------------------
-
-export interface BoundaryLevel {
-  id: number;
-  label: string;
-}
-
-export interface DataBlockMetadata {
-  filters: PublicationSubjectMeta['filters'];
-  indicators: Dictionary<LabelValueUnitMetadata>;
-  locations: Dictionary<DataBlockLocationMetadata>;
-  boundaryLevels?: BoundaryLevel[];
-  timePeriod: Dictionary<TimePeriodOptionMetadata>;
-  publicationName: string;
-  subjectName: string;
-  footnotes: Footnote[];
-  geoJsonAvailable: boolean;
-}
-
 export interface DataBlockRerequest {
   boundaryLevel?: number;
 }
-
-export interface DataBlockResponse extends DataBlockData {
-  metaData: DataBlockMetadata;
-}
-
-const dataBlockService = {
-  async getDataBlockForSubject(
-    request: DataBlockRequest,
-  ): Promise<DataBlockResponse | undefined> {
-    try {
-      return await dataApi.post('/Data', request);
-    } catch (_) {
-      return undefined;
-    }
-  },
-};
-
-export default dataBlockService;

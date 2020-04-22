@@ -1,20 +1,20 @@
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry, { AsyncRetryState } from '@common/hooks/useAsyncRetry';
-import dataBlockService, {
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import tableBuilderService, {
+  TableDataResponse,
+} from '@common/services/tableBuilderService';
 import { DataBlock } from '@common/services/types/blocks';
 
 interface DataBlockWithOptionalResponse extends DataBlock {
-  dataBlockResponse?: DataBlockResponse;
+  dataBlockResponse?: TableDataResponse;
 }
 
 export default function useDataBlockQuery(
   dataBlock: DataBlockWithOptionalResponse | undefined,
-): AsyncRetryState<DataBlockResponse | undefined> {
+): AsyncRetryState<TableDataResponse | undefined> {
   const { withoutErrorHandling } = useErrorControl();
 
-  return useAsyncRetry<DataBlockResponse | undefined>(async () => {
+  return useAsyncRetry<TableDataResponse | undefined>(async () => {
     if (!dataBlock) {
       return undefined;
     }
@@ -23,7 +23,7 @@ export default function useDataBlockQuery(
 
     if (!dataBlockResponse) {
       return withoutErrorHandling(() =>
-        dataBlockService.getDataBlockForSubject(dataBlockRequest),
+        tableBuilderService.getTableData(dataBlockRequest),
       );
     }
 

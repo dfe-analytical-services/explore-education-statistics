@@ -1,9 +1,51 @@
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
-import { TableDataQuery } from '@common/modules/table-tool/services/tableBuilderService';
-import { OmitStrict } from '@common/types';
+import {
+  AxisConfiguration,
+  AxisType,
+} from '@common/modules/charts/types/chart';
+import {
+  DataSetConfiguration,
+  DataSetConfigurationOptions,
+  DeprecatedDataSetConfiguration,
+} from '@common/modules/charts/types/dataSet';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { TableDataQuery } from '@common/services/tableBuilderService';
+import { Dictionary, OmitStrict } from '@common/types';
 
-export type Chart = OmitStrict<ChartRendererProps, 'data' | 'meta'>;
+/**
+ * We want to phase this out in favour of
+ * defining data set configuration alongside
+ * the data set itself.
+ *
+ * The current data structure is unwieldy
+ * as we have to unnecessarily stitch labels
+ * and their associated data set back together.
+ *
+ * @deprecated
+ */
+export type DeprecatedChartLabels = Dictionary<DeprecatedDataSetConfiguration>;
+
+interface ChartAxisConfiguration
+  extends OmitStrict<AxisConfiguration, 'dataSets'> {
+  dataSets: (OmitStrict<DataSetConfiguration, 'config'> & {
+    config?: DataSetConfigurationOptions;
+  })[];
+}
+
+type ChartAxesConfiguration = {
+  [key in AxisType]?: ChartAxisConfiguration;
+};
+
+/**
+ * This is the chart type that will be returned by the API.
+ * It differs from {@see ChartRendererProps} as we need to
+ * progressively migrate parts of its old data structure,
+ * to our newer one that is being used by {@see ChartRendererProps}.
+ */
+export type Chart = OmitStrict<ChartRendererProps, 'data' | 'meta' | 'axes'> & {
+  labels?: DeprecatedChartLabels;
+  axes: ChartAxesConfiguration;
+};
 
 export interface Table {
   indicators: string[];

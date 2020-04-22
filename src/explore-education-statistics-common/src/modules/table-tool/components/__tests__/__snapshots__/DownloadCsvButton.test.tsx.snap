@@ -74,7 +74,7 @@ Object {
       },
       "F2": Object {
         "t": "s",
-        "v": "State-funded-primary",
+        "v": "State-funded primary",
       },
       "F3": Object {
         "t": "s",
@@ -150,7 +150,7 @@ Array [
     "country",
     "201516",
     "Female",
-    "State-funded-primary",
+    "State-funded primary",
     "123",
     "456",
   ],
@@ -231,7 +231,7 @@ Array [
     "country",
     "201516",
     "Female",
-    "State-funded-primary",
+    "State-funded primary",
     "123",
     "456",
   ],

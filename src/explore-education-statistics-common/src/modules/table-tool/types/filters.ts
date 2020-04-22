@@ -1,24 +1,39 @@
 import {
   FilterOption,
+  GeoJsonFeature,
   IndicatorOption,
+  LocationOption,
   TimePeriodOption,
-} from '@common/modules/table-tool/services/tableBuilderService';
+} from '@common/services/tableBuilderService';
 import camelCase from 'lodash/camelCase';
+
+interface GroupedFilterOption extends FilterOption {
+  group?: string;
+}
 
 export abstract class Filter {
   public readonly value: string;
 
   public readonly label: string;
 
-  public readonly filterGroup?: string;
+  public readonly group?: string;
 
-  protected constructor({ value, label, filterGroup }: FilterOption) {
+  protected constructor({ value, label, group }: GroupedFilterOption) {
     this.value = value;
     this.label = label;
-    this.filterGroup = filterGroup;
+    this.group = group;
   }
 
-  public get id() {
+  /**
+   * Get an identifier that guarantees
+   * uniqueness for the filter somehow.
+   *
+   * This is unlike {@property value} where
+   * duplicates are allowed (e.g. locations),
+   * making it potentially unsafe for equality
+   * checks with other filters of the same type.
+   */
+  public get id(): string {
     return this.value;
   }
 }
@@ -26,28 +41,69 @@ export abstract class Filter {
 export class CategoryFilter extends Filter {
   public readonly isTotal: boolean;
 
-  public constructor(
-    { value, label, filterGroup }: FilterOption,
+  public readonly category: string;
+
+  public constructor({
+    value,
+    label,
+    group,
     isTotal = false,
-  ) {
-    super({ value, label, filterGroup });
+    category,
+  }: GroupedFilterOption & { isTotal?: boolean; category: string }) {
+    super({ value, label, group });
     this.isTotal = isTotal;
+    this.category = category;
   }
+}
+
+export interface LocationCompositeId {
+  level: string;
+  value: string;
 }
 
 export class LocationFilter extends Filter {
   public readonly level: string;
 
-  public constructor(
-    { value, label, filterGroup }: FilterOption,
-    level: string,
-  ) {
-    super({ value, label, filterGroup });
+  public readonly geoJson?: GeoJsonFeature[];
+
+  public constructor({
+    value,
+    label,
+    level,
+    geoJson,
+    group,
+  }: GroupedFilterOption & LocationOption) {
+    super({ value, label, group });
+
     this.level = camelCase(level);
+    this.geoJson = geoJson;
   }
 
-  public get id() {
-    return `${this.level}_${this.value}`;
+  public static createId(params: { value: string; level: string }): string {
+    return JSON.stringify({
+      level: params.level,
+      value: params.value,
+    });
+  }
+
+  public static parseCompositeId(id: string): LocationCompositeId {
+    const { level, value } = JSON.parse(id);
+
+    if (typeof level !== 'string' || typeof value !== 'string') {
+      throw new Error(`Could not parse invalid location composite id: ${id}`);
+    }
+
+    return {
+      level,
+      value,
+    };
+  }
+
+  public get id(): string {
+    return LocationFilter.createId({
+      value: this.value,
+      level: this.level,
+    });
   }
 }
 
@@ -62,11 +118,12 @@ export class Indicator extends Filter {
     value,
     label,
     unit,
-    filterGroup,
+    group,
     name,
     decimalPlaces,
-  }: IndicatorOption) {
-    super({ value, label, filterGroup });
+  }: GroupedFilterOption & IndicatorOption) {
+    super({ value, label, group });
+
     this.unit = unit;
     this.name = name;
     this.decimalPlaces = decimalPlaces;
@@ -78,10 +135,18 @@ export class TimePeriodFilter extends Filter {
 
   public readonly code: string;
 
-  public constructor({ year, code, label }: TimePeriodOption) {
+  public readonly order: number;
+
+  public constructor({
+    year,
+    code,
+    label,
+    order,
+  }: TimePeriodOption & { order: number }) {
     super({ label, value: `${year}_${code}` });
 
     this.code = code;
     this.year = year;
+    this.order = order;
   }
 }

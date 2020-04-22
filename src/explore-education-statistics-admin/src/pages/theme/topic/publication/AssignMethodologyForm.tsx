@@ -1,5 +1,5 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import { BasicMethodology, IdTitlePair } from '@admin/services/common/types';
+import { BasicMethodology } from '@admin/services/common/types';
 import { ExternalMethodology } from '@admin/services/dashboard/types';
 import service from '@admin/services/edit-publication/service';
 import Button from '@common/components/Button';
