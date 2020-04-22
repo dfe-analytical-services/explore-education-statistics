@@ -52,11 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
             return GetMonths().Contains(timeIdentifier);
         }
 
-        public static bool IsNumberOfTerms(this TimeIdentifier timeIdentifier)
-        {
-            return GetNumberOfTerms().Contains(timeIdentifier);
-        }
-
         public static bool IsTerm(this TimeIdentifier timeIdentifier)
         {
             return GetTerms().Contains(timeIdentifier);

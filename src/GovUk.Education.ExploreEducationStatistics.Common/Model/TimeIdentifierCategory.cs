@@ -23,9 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         Term,
         
         [EnumLabelValue("Month")]
-        Month,
-
-        [EnumLabelValue("Other")]
-        Other
+        Month
     }
 }
