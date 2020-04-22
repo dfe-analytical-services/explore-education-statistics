@@ -23,6 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public IdTitlePair Publication { get; set; }
         public IdTitlePair Release { get; set; }
-        public ReleaseRole ReleaseRole { get; set; }
+        public EnumExtensions.EnumValue ReleaseRole { get; set; }
     }
 }

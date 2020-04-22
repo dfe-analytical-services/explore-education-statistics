@@ -192,8 +192,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Publication = _contentDbContext.Publications.Where(p => p.Releases.Any(r => r.Id == x.ReleaseId)).Select(p => new IdTitlePair { Id = p.Id, Title = p.Title}).FirstOrDefault(),
                 Release = _contentDbContext.Releases.Where(r => r.Id == x.ReleaseId).Select(r => new IdTitlePair { Id = r.Id, Title = r.Title}).FirstOrDefault(),
-                ReleaseRole = x.Role
-            }).ToList());
+                ReleaseRole = new EnumExtensions.EnumValue { Name = x.Role.GetEnumLabel(), Value = 0}
+            }).ToList().OrderBy(x => x.Publication.Title).ThenBy(x => x.Release.Title));
             
             return result;
         }
