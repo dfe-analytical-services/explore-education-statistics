@@ -131,10 +131,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 // load of the Location owned entities is removed from the query above as it was generating
                 // very inefficient sql.
                 var locationIds = result.Select(o => o.LocationId);
-                var locations = _context.Location.Where(l => locationIds.Contains(l.Id));
+                var locations = _context.Location.AsNoTracking().Where(l => locationIds.Contains(l.Id));
                 result.ForEach(observation =>
                     {
-                        observation.Location = locations.AsNoTracking().SingleOrDefault(l => l.Id == observation.LocationId);
+                        observation.Location = locations.SingleOrDefault(l => l.Id == observation.LocationId);
                     });
             }
 
