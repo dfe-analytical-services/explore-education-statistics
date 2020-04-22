@@ -8,6 +8,7 @@ import {
 } from '@admin/services/release/edit-release/footnotes/types';
 import { FormCheckbox } from '@common/components/form';
 import FieldSubjectCheckbox from './FieldSubjectCheckbox';
+import styles from './FootnoteForm.module.scss';
 
 interface Props {
   summary: string;
@@ -48,7 +49,7 @@ const FilterGroupDetails = ({
           boldLabel
         />
       )}
-      <div className="dfe-filter-overflow">
+      <div className={styles.filterOverflow}>
         {Object.entries(filter.options).map(([filterGroupId, filterGroup]) => {
           const groupValue = get(
             form.values,

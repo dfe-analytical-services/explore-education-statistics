@@ -3,7 +3,6 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
-import classNames from 'classnames';
 import React from 'react';
 import MethodologyAccordion from './components/MethodologyAccordion';
 import { useMethodologyState } from './context/MethodologyContext';
@@ -17,12 +16,7 @@ const MethodologyContentPage = () => {
         <>
           <EditablePageModeToggle />
 
-          <div
-            className={classNames('govuk-width-container', {
-              'dfe-align--comments': isEditing,
-              'dfe-hide-comments': !isEditing,
-            })}
-          >
+          <div className="govuk-width-container">
             <section
               className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
             >

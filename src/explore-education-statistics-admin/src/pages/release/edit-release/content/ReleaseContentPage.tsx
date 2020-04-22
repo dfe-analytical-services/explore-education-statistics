@@ -47,8 +47,7 @@ const ReleaseContentPageLoaded = () => {
 
           <div
             className={classNames('govuk-width-container', {
-              'dfe-align--left-hand-controls': isEditing,
-              'dfe-hide-controls': !isEditing,
+              'govuk-!-margin-right-0': isEditing,
             })}
           >
             <div
