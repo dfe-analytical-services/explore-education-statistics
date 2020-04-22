@@ -44,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var query = new TableQuery<ReleaseStatus>()
                         .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
-                            QueryComparisons.Equal, releaseId.ToString()))
-                        .OrderByDesc(nameof(ReleaseStatus.Created));
+                            QueryComparisons.Equal, releaseId.ToString()));
 
                     var result = await _publisherTableStorageService.ExecuteQueryAsync(TableName, query);
-                    return _mapper.Map<ReleaseStatusViewModel>(result.FirstOrDefault());
+                    var first = result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
+                    return _mapper.Map<ReleaseStatusViewModel>(first);
                 });
         }
     }
