@@ -213,16 +213,19 @@ export const errorCodeToGlobalError = (errorCode: string, message: string) =>
  * Create a validation handler that, given a set of message mappers, will link server-side validation errors to
  * field and global error messages on the UI.
  *
- * @param messageMappers - a set of message mappers that can handle the validaiton messages expected from the back end.
+ * @param messageMappers - a set of message mappers that can handle the validation messages expected from the back end.
+ * @param errors
+ * @param setFieldError
+ * @param setGlobalError
  */
 const handleServerSideValidation = <T extends {}>(
-  ...messageMappers: ServerValidationMessageMapper[]
-) => (
+  messageMappers: ServerValidationMessageMapper[],
   errors: ServerValidationErrors,
   setFieldError: FieldErrorSetter,
   setGlobalError: GlobalErrorSetter,
-): boolean => {
+) => {
   const serverValidationHandler = new ServerValidationHandler(messageMappers);
+
   return serverValidationHandler.handleServerValidationErrors(
     errors,
     setFieldError,

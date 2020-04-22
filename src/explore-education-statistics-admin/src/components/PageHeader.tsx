@@ -5,6 +5,7 @@ import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import React from 'react';
+import styles from './PageHeader.module.scss';
 
 interface Props {
   wide?: boolean;
@@ -13,13 +14,31 @@ interface Props {
 const PageHeader = ({ wide }: Props) => {
   const { user } = useAuthContext();
 
+  const envs = {
+    localhost: 'dfeEnv--local',
+    'admin.dev': 'dfeEnv--dev',
+    'admin.test': 'dfeEnv--test',
+    'admin.pre-production': 'dfeEnv--pre-prod',
+    'admin.explore': 'dfeEnv--prod',
+  };
+
+  const matchingEnv = Object.keys(envs).find(env =>
+    window.location.href.includes(env),
+  );
+
+  const envClassName = envs[matchingEnv as keyof typeof envs] ?? envs.localhost;
+
   return (
     <>
       <a href="#main-content" className="govuk-skip-link">
         Skip to main content
       </a>
 
-      <header className="govuk-header " role="banner" data-module="header">
+      <header
+        className={classNames('govuk-header', styles[envClassName])}
+        role="banner"
+        data-module="header"
+      >
         <div
           className={classNames(
             'govuk-header__container',
@@ -89,6 +108,16 @@ const LoggedInLinks = ({ user }: Authentication) => (
         </a>
       </li>
     )}
+
+    {user &&
+      (user.permissions.canAccessUserAdministrationPages ||
+        user.permissions.canAccessMethodologyAdministrationPages) && (
+        <li className="govuk-header__navigation-item">
+          <a className="govuk-header__link" href="/administration">
+            Platform administration
+          </a>
+        </li>
+      )}
     <li className="govuk-header__navigation-item">
       <Link className="govuk-header__link" to={loginService.getSignOutLink()}>
         Sign out

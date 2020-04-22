@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpGet("release/{releaseId}/content/related-information")]
-        public async Task<ActionResult<List<BasicLink>>> GetRelatedInformation(Guid releaseId)
+        public async Task<ActionResult<List<Link>>> GetRelatedInformation(Guid releaseId)
         {
             return await _relatedInformationService
                 .GetRelatedInformationAsync(releaseId)
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
         
         [HttpPost("release/{releaseId}/content/related-information")]
-        public async Task<ActionResult<List<BasicLink>>> AddRelatedInformation(CreateUpdateLinkRequest request, Guid releaseId)
+        public async Task<ActionResult<List<Link>>> AddRelatedInformation(CreateUpdateLinkRequest request, Guid releaseId)
         {
             return await _relatedInformationService
                 .AddRelatedInformationAsync(releaseId, request)
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
         
         [HttpPut("release/{releaseId}/content/related-information/{relatedInformationId}")]
-        public async Task<ActionResult<List<BasicLink>>> UpdateRelatedInformation(
+        public async Task<ActionResult<List<Link>>> UpdateRelatedInformation(
             CreateUpdateLinkRequest request, Guid releaseId, Guid relatedInformationId)
         {
             return await _relatedInformationService
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
         
         [HttpDelete("release/{releaseId}/content/related-information/{relatedInformationId}")]
-        public async Task<ActionResult<List<BasicLink>>> DeleteRelatedInformation(
+        public async Task<ActionResult<List<Link>>> DeleteRelatedInformation(
             Guid releaseId, Guid relatedInformationId)
         {
             return await _relatedInformationService

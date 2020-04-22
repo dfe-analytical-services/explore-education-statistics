@@ -302,12 +302,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     {
                         Id = -30,
                         RoleId = bauUserRoleId,
-                        ClaimType = SecurityClaimTypes.MakeAmendmentsOfAllReleases.ToString(),
+                        ClaimType = SecurityClaimTypes.PublishAllReleases.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -31,
+                        RoleId = bauUserRoleId,
+                        ClaimType = SecurityClaimTypes.MakeAmendmentsOfAllReleases.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -32,
                         RoleId = bauUserRoleId,
                         ClaimType = SecurityClaimTypes.DeleteAllReleaseAmendments.ToString(),
                         ClaimValue = "",

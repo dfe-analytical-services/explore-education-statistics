@@ -35,7 +35,7 @@ describe('chartUtils', () => {
 
   test('createDataForAxis from single indicator', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = parseMetaData(meta) as ChartMetaData;
+    const chartMeta = parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       type: 'major',
@@ -119,7 +119,7 @@ describe('chartUtils', () => {
 
   test('createDataForAxis from multiple indicators', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = parseMetaData(meta) as ChartMetaData;
+    const chartMeta = parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       type: 'major',
@@ -165,7 +165,7 @@ describe('chartUtils', () => {
 
   test('createDataForAxis from multiple filters', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = parseMetaData(meta) as ChartMetaData;
+    const chartMeta = parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       type: 'major',
@@ -211,7 +211,7 @@ describe('chartUtils', () => {
 
   test('createDataForAxis returns full data range if data is missing', () => {
     const meta = Data.responseWithMissingData.metaData;
-    const chartMeta = parseMetaData(meta) as ChartMetaData;
+    const chartMeta = parseMetaData(meta);
 
     const axisConfig: AxisConfiguration = {
       type: 'major',
@@ -255,7 +255,7 @@ describe('chartUtils', () => {
 
   test('parseMetaData', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = parseMetaData(meta) as ChartMetaData;
+    const chartMeta = parseMetaData(meta);
 
     expect(chartMeta.filters).not.toBeUndefined();
     expect(chartMeta.indicators).not.toBeUndefined();

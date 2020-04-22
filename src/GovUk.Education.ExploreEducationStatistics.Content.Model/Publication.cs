@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Uri LegacyPublicationUrl { get; set; }
 
-        public List<Link> LegacyReleases { get; set; }
+        public List<LegacyRelease> LegacyReleases { get; set; }
 
         public Guid TopicId { get; set; }
 

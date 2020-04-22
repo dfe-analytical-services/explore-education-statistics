@@ -238,6 +238,8 @@ user clicks element
 
 user clicks link
   [Arguments]   ${text}
+  scroll element into view  link:${text}
+  wait until element is enabled  link:${text}
   click link  ${text}
 
 user clicks button
@@ -314,7 +316,8 @@ user opens details section
 
 user waits until results table appears
   # Extra timeout until EES-234
-  user waits until page contains element   css:table thead th    60
+  [Arguments]   ${wait_time}
+  user waits until page contains element   css:table thead th    ${wait_time}
   user waits until page does not contain element  css:[class^="dfe-LoadingSpinner"]
 
 user logs into microsoft online

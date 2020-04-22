@@ -4,7 +4,13 @@ import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/utils/dom/findAllParents';
 import { formatTestId } from '@common/utils/test-utils';
 import classNames from 'classnames';
-import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
+import React, {
+  MouseEvent,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 let hasNativeDetails: boolean;
 let idCounter = 0;
@@ -39,13 +45,14 @@ export interface DetailsProps {
 const Details = ({
   className,
   children,
-  id = `details-content-${(idCounter += 1)}`,
+  id: propId = `details-content-${(idCounter += 1)}`,
   jsRequired = false,
   open = false,
   onToggle,
   summary,
   tag,
 }: DetailsProps) => {
+  const [id] = useState(propId);
   const ref = useRef<HTMLElement>(null);
 
   const { onMounted } = useMounted(undefined, jsRequired);

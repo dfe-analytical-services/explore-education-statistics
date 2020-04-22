@@ -25,6 +25,7 @@ describe('DownloadCsvButton', () => {
     footnotes: [],
     filters: {
       characteristics: {
+        name: 'characteristic',
         legend: 'Characteristics',
         hint: '',
         options: {
@@ -40,11 +41,13 @@ describe('DownloadCsvButton', () => {
         label: 'Authorised absence rate',
         value: 'authAbsRate',
         unit: '%',
+        name: 'sess_authorised_percent',
       }),
       new Indicator({
         label: 'Number of authorised absence sessions',
         value: 'authAbsSess',
         unit: '',
+        name: 'sess_authorised',
       }),
     ],
     locations: [
@@ -71,6 +74,7 @@ describe('DownloadCsvButton', () => {
             filters: {
               ...basicSubjectMeta.filters,
               schoolType: {
+                name: 'school_type',
                 legend: 'School type',
                 hint: '',
                 options: {
@@ -146,6 +150,7 @@ describe('DownloadCsvButton', () => {
           filters: {
             ...basicSubjectMeta.filters,
             schoolType: {
+              name: 'school_type',
               legend: 'School type',
               hint: '',
               options: {
@@ -202,15 +207,15 @@ describe('DownloadCsvButton', () => {
 
       expect(data).toHaveLength(3);
 
-      expect(data[0]).toHaveLength(6);
+      expect(data[0]).toHaveLength(8);
 
-      expect(data[1]).toHaveLength(6);
-      expect(data[1][4]).toBe('123');
-      expect(data[1][5]).toBe('456');
+      expect(data[1]).toHaveLength(8);
+      expect(data[1][6]).toBe('123');
+      expect(data[1][7]).toBe('456');
 
-      expect(data[2]).toHaveLength(6);
-      expect(data[2][4]).toBe('234');
-      expect(data[2][5]).toBe('567');
+      expect(data[2]).toHaveLength(8);
+      expect(data[2][6]).toBe('234');
+      expect(data[2][7]).toBe('567');
 
       expect(data).toMatchSnapshot();
     });
@@ -222,6 +227,7 @@ describe('DownloadCsvButton', () => {
           filters: {
             ...basicSubjectMeta.filters,
             schoolType: {
+              name: 'school_type',
               legend: 'School type',
               hint: '',
               options: {
@@ -263,15 +269,15 @@ describe('DownloadCsvButton', () => {
 
       expect(data).toHaveLength(3);
 
-      expect(data[0]).toHaveLength(6);
+      expect(data[0]).toHaveLength(8);
 
-      expect(data[1]).toHaveLength(6);
-      expect(data[1][4]).toBe('123');
-      expect(data[1][5]).toBe('456');
+      expect(data[1]).toHaveLength(8);
+      expect(data[1][6]).toBe('123');
+      expect(data[1][7]).toBe('456');
 
-      expect(data[2]).toHaveLength(6);
-      expect(data[2][4]).toBe('n/a');
-      expect(data[2][5]).toBe('n/a');
+      expect(data[2]).toHaveLength(8);
+      expect(data[2][6]).toBe('n/a');
+      expect(data[2][7]).toBe('n/a');
 
       expect(data).toMatchSnapshot();
     });
@@ -284,11 +290,11 @@ describe('DownloadCsvButton', () => {
 
       expect(data).toHaveLength(2);
 
-      expect(data[0]).toHaveLength(5);
+      expect(data[0]).toHaveLength(7);
 
-      expect(data[1]).toHaveLength(5);
-      expect(data[1][3]).toBe('n/a');
-      expect(data[1][4]).toBe('n/a');
+      expect(data[1]).toHaveLength(7);
+      expect(data[1][5]).toBe('n/a');
+      expect(data[1][6]).toBe('n/a');
 
       expect(data).toMatchSnapshot();
     });
@@ -316,11 +322,11 @@ describe('DownloadCsvButton', () => {
 
       expect(data).toHaveLength(2);
 
-      expect(data[0]).toHaveLength(5);
+      expect(data[0]).toHaveLength(7);
 
-      expect(data[1]).toHaveLength(5);
-      expect(data[1][3]).toBe('n/a');
-      expect(data[1][4]).toBe('123');
+      expect(data[1]).toHaveLength(7);
+      expect(data[1][5]).toBe('n/a');
+      expect(data[1][6]).toBe('123');
 
       expect(data).toMatchSnapshot();
     });
@@ -349,11 +355,11 @@ describe('DownloadCsvButton', () => {
 
       expect(data).toHaveLength(2);
 
-      expect(data[0]).toHaveLength(5);
+      expect(data[0]).toHaveLength(7);
 
-      expect(data[1]).toHaveLength(5);
-      expect(data[1][3]).toBe('12300000');
-      expect(data[1][4]).toBe('44255667.2356');
+      expect(data[1]).toHaveLength(7);
+      expect(data[1][5]).toBe('12300000');
+      expect(data[1][6]).toBe('44255667.2356');
 
       expect(data).toMatchSnapshot();
     });
@@ -382,11 +388,11 @@ describe('DownloadCsvButton', () => {
 
       expect(data).toHaveLength(2);
 
-      expect(data[0]).toHaveLength(5);
+      expect(data[0]).toHaveLength(7);
 
-      expect(data[1]).toHaveLength(5);
-      expect(data[1][3]).toBe('13.4');
-      expect(data[1][4]).toBe('x');
+      expect(data[1]).toHaveLength(7);
+      expect(data[1][5]).toBe('13.4');
+      expect(data[1][6]).toBe('x');
 
       expect(data).toMatchSnapshot();
     });

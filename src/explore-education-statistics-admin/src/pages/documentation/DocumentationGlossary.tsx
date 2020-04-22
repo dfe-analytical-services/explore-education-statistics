@@ -20,7 +20,7 @@ const DocumentationGlossary = () => {
           </div>
           <p>
             Browse our A to Z list of style, spelling and grammar conventions
-            for all content published on the explore education statistics
+            for all content published on the Explore education statistics
             service.
           </p>
 
@@ -97,7 +97,7 @@ const DocumentationGlossary = () => {
               <p>
                 Term describing the publishing system used to manage data and
                 content and publish the latest ‘releases’ of statistics and data
-                on explore education statistics.
+                on Explore education statistics.
               </p>
               <h3 id="ages">ages</h3>
               <p>
@@ -125,14 +125,14 @@ const DocumentationGlossary = () => {
                 features of another application, service or system.
               </p>
               <p>
-                For example, a data API for explore education statistics would
+                For example, a data API for Explore education statistics would
                 allow other applications, services or systems outside of our
-                service to access the data used explore education statistics.
+                service to access the data used Explore education statistics.
               </p>
               <p>
                 See also{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
@@ -414,7 +414,7 @@ const DocumentationGlossary = () => {
               <h3 id="charts">Charts</h3>
               <p>
                 Term referring to the chart functionality available within the
-                Admin system and on explore education statistics.
+                Admin system and on Explore education statistics.
               </p>
               <h3 id="childcare">childcare</h3>
               <p>Lower case.</p>
@@ -445,7 +445,7 @@ const DocumentationGlossary = () => {
                 Name of the group of DfE Statistics staff helping to develop and
                 ‘champion’ the creation of good quality content across DfE
                 Statistics so users can quickly and easily understand the
-                statistical commentary on explore education statistics.
+                statistical commentary on Explore education statistics.
               </p>
               <h3 id="contractions">Contractions</h3>
               <p>Use contractions like you’re and we’ll.</p>
@@ -506,7 +506,7 @@ const DocumentationGlossary = () => {
               <p>
                 Term referring to the functionality which filters the data used
                 to create tables and charts within the Admin system and on
-                explore education statistics.
+                Explore education statistics.
               </p>
               <h3 id="data-centre">data centre</h3>
               <p>Not “datacentre”.</p>
@@ -527,7 +527,7 @@ const DocumentationGlossary = () => {
               <p>
                 See{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
@@ -591,7 +591,7 @@ const DocumentationGlossary = () => {
               <p>
                 See{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
@@ -609,20 +609,20 @@ const DocumentationGlossary = () => {
               <h3 id="district-council">district council</h3>
               <p>Lower case even in a name, like Warwick district council.</p>
               <h3 id="dissemination-platform">Dissemination platform</h3>
-              <p>Alternative internal name for explore education statistics.</p>
+              <p>Alternative internal name for Explore education statistics.</p>
               <p>
                 See{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
               <h3 id="dissemination-tool">Dissemination tool</h3>
-              <p>Alternative internal name for explore education statistics.</p>
+              <p>Alternative internal name for Explore education statistics.</p>
               <p>
                 See{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
@@ -706,7 +706,7 @@ const DocumentationGlossary = () => {
                 Executive Director, GDS.
               </p>
               <h3 id="explore-education-statistics">
-                explore education statistics
+                Explore education statistics
               </h3>
               <p>
                 Official GDS styled name (hence the lower case format) for the
@@ -727,7 +727,7 @@ const DocumentationGlossary = () => {
               <p>
                 See{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
@@ -770,7 +770,7 @@ const DocumentationGlossary = () => {
               <p>
                 Term referring to the functionality which adds technical
                 footnotes to data within the Admin system and then dynamically
-                displays them for users on explore education statistics when
+                displays them for users on Explore education statistics when
                 they use the table tool.
               </p>
               <p>
@@ -824,7 +824,7 @@ const DocumentationGlossary = () => {
               <h3 id="gds-assessment">GDS assessment</h3>
               <p>
                 All government and public facing digital transactional services
-                (including explore education statistics) must pass an assessment
+                (including Explore education statistics) must pass an assessment
                 run by GDS in order to finally go live to the public and become
                 an ‘official’ online government service.
               </p>
@@ -920,7 +920,7 @@ const DocumentationGlossary = () => {
               <p>
                 Government department leading digital transformation across UK
                 government and responsible for the digital standards which the
-                DfE Data Dissemination Project and explore education statistics
+                DfE Data Dissemination Project and Explore education statistics
                 has to meet.
               </p>
               <p>
@@ -933,7 +933,7 @@ const DocumentationGlossary = () => {
               <p>
                 See also{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
@@ -1201,7 +1201,7 @@ const DocumentationGlossary = () => {
               <p>
                 Term describing the release status of a release once it’s gone
                 through the pre-release process, been published and is ‘live’ on
-                explore education statistics.
+                Explore education statistics.
               </p>
               <p>
                 See also <a href="#release-status">Release status</a>.
@@ -1300,7 +1300,7 @@ const DocumentationGlossary = () => {
                 Data Dissemination Project.{' '}
               </p>
               <p>
-                Essentially, an online version of explore education statistics
+                Essentially, an online version of Explore education statistics
                 with enough features to satisfy early customers and to provide
                 feedback for its future development as a service.
               </p>
@@ -1478,7 +1478,7 @@ const DocumentationGlossary = () => {
               <p>
                 Role of person within a ‘Production team’ who may be responsible
                 for reviewing or collaborating on creating section of a release
-                for explore education statistics.
+                for Explore education statistics.
               </p>
               <p>
                 See also <a href="#production-team">Production team</a>.
@@ -1548,7 +1548,7 @@ const DocumentationGlossary = () => {
               <p>
                 Role of person (ie main primary analyst / statistician) within a
                 ‘Production team’ who’s responsible for setting up and creating
-                a release on explore education statistics.
+                a release on Explore education statistics.
               </p>
               <p>
                 See also <a href="#production-team">Production team</a>.
@@ -1558,7 +1558,7 @@ const DocumentationGlossary = () => {
               <h3 id="production-team">Production team</h3>
               <p>
                 Group of people with roles who are responsible for creating and
-                publishing a release on explore education statistics.
+                publishing a release on Explore education statistics.
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <p>Made up of the following roles: </p>
@@ -1682,7 +1682,7 @@ const DocumentationGlossary = () => {
                 Term referring to the functionality which adds specific
                 user-friendly footnotes to tables and charts within the Admin
                 system and then displays them for users within releases on
-                explore education statistics.
+                Explore education statistics.
               </p>
               <p>
                 See also <a href="#footnotes">Footnotes</a>.
@@ -1696,7 +1696,7 @@ const DocumentationGlossary = () => {
               <p>
                 These notes are then time-stamped and displayed to users under
                 the ‘About these statistics’ section of a published release on
-                explore education statistics for transparency purposes.
+                Explore education statistics for transparency purposes.
               </p>
               <p>
                 See also{' '}
@@ -1873,7 +1873,7 @@ const DocumentationGlossary = () => {
               <h3 id="start-page">start page</h3>
               <p>
                 Official GDS web page design pattern used as starting point for
-                any digital service including explore education statistics.
+                any digital service including Explore education statistics.
               </p>
               <p>
                 See{' '}
@@ -1908,7 +1908,7 @@ const DocumentationGlossary = () => {
               </p>
               <p>
                 Should be used externally as a noun to refer to what is
-                published for users on explore education statistics.
+                published for users on Explore education statistics.
               </p>
               <p>
                 Research has shown users understand what ‘statistics’ refers to
@@ -1925,12 +1925,12 @@ const DocumentationGlossary = () => {
               </h3>
               <p>
                 Official internal name of the team behind the project building
-                explore education statistics.
+                Explore education statistics.
               </p>
               <p>
                 See{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
@@ -1979,7 +1979,7 @@ const DocumentationGlossary = () => {
               <h3 id="tables">Tables</h3>
               <p>
                 Term referring to the table functionality available within the
-                Admin system and on explore education statistics.
+                Admin system and on Explore education statistics.
               </p>
               <h3 id="tax-credits">tax credits</h3>
               <p>
@@ -2058,7 +2058,7 @@ const DocumentationGlossary = () => {
               <p>
                 See{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>
@@ -2083,7 +2083,7 @@ const DocumentationGlossary = () => {
               <p>
                 See{' '}
                 <a href="#explore-education-statistics">
-                  explore education statistics
+                  Explore education statistics
                 </a>
                 .
               </p>

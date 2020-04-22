@@ -1,7 +1,7 @@
+import Page from '@admin/components/Page';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
-import Page from '@admin/components/Page';
 import imageInvertedPyramid from './images/guidance/guidance-design-standards-inverted-pyramid.png';
 
 const DocumentationDesignStandards = () => {
@@ -28,7 +28,7 @@ const DocumentationDesignStandards = () => {
 
           <Accordion id="a-z">
             <AccordionSection
-              headingId="what-is-content-design"
+              id="what-is-content-design"
               heading="What is content design?"
             >
               <p>
@@ -38,10 +38,10 @@ const DocumentationDesignStandards = () => {
               </p>
               <p>
                 Good content design allows people to simply and quickly do or
-                find out what they need to from a web page or online service.
+                find what they need from a web page or online service.
               </p>
               <p>
-                For the explore education statistics service, this means helping
+                For the Explore education statistics service, this means helping
                 people to simply and quickly carry out the following tasks:
               </p>
               <ul className="govuk-list govuk-list--bullet">
@@ -60,7 +60,7 @@ const DocumentationDesignStandards = () => {
               <p>
                 Government has a tendency to publish content which is more
                 focused on what it wants to say than what people want and need
-                to know.{' '}
+                to know.
               </p>
               <p>
                 This often makes our information difficult to understand and act
@@ -75,9 +75,9 @@ const DocumentationDesignStandards = () => {
                 within releases based on user behaviour, analytics and feedback.
               </p>
               <p>
-                From our research we know people find it difficult to find
-                statistics and data and understand the related content which is
-                currently published on GOV.UK under{' '}
+                From our research, we know people find it difficult to find
+                statistics and data, and to understand the related content which
+                is currently published on GOV.UK under{' '}
                 <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
                   Statistics at DfE
                 </a>
@@ -89,7 +89,7 @@ const DocumentationDesignStandards = () => {
                   they need
                 </li>
                 <li>
-                  be concise, consistent and formatted so it’s simple to
+                  be concise and consistently formatted so it’s simple to
                   understand and easy to read
                 </li>
               </ul>
@@ -98,13 +98,12 @@ const DocumentationDesignStandards = () => {
               </h3>
               <p>
                 There’s more than one way to present content to people and the
-                decisions about how we present it to them have to be carefully
-                made.
+                decisions about how we present it have to be carefully made.
               </p>
               <p>
                 Writing content clearly, in plain English and optimised for the
                 web helps people understand and find the information they need
-                quickly and easily.{' '}
+                quickly and easily.
               </p>
               <p>
                 This means all the content design guidance, standards and tips
@@ -114,7 +113,7 @@ const DocumentationDesignStandards = () => {
             </AccordionSection>
             <AccordionSection
               heading="Creating good web content"
-              headingId="creating-good-web-content"
+              id="creating-good-web-content"
             >
               <p>
                 People read web pages differently to how they read pages in
@@ -123,20 +122,20 @@ const DocumentationDesignStandards = () => {
               </p>
               <p>
                 Our content design guidance is based on our understanding of how
-                people read and use DfE content, statistics and data which we’ve
-                gained (and continue to gain) through carrying out hours of user
-                research.
+                people read and use DfE content, statistics and data, formed
+                from the many hours of user research which we’ve performed (and
+                continue to do so!).
               </p>
               <h3 id="meet-peoples-needs">Meet people’s needs</h3>
               <p>
                 Do not add all the information and content you can to a release.
-                Instead, only include what you people need to know to complete
-                their chosen task. Nothing more.
+                Instead, only include what your audience needs to know to
+                complete their chosen task. Nothing more.
               </p>
               <p>
                 People do not usually read content unless they want information.
-                So, when you come to creating someone content... start with the
-                same question every time: what do people want to know?
+                So when you come to creating content, start with the same
+                question every time: what do people want to know?
               </p>
               <p>Meeting that need means being:</p>
               <ul className="govuk-list govuk-list--bullet">
@@ -146,9 +145,9 @@ const DocumentationDesignStandards = () => {
               </ul>
               <h3 id="quick-and-easy-steps">Quick and easy steps</h3>
               <p>
-                Creating good content for explore education statistics should
-                mean people can take the following steps and quickly and easily
-                find the statistics and data they need:
+                Creating good content for Explore education statistics should
+                mean people can take the following journey and quickly and
+                easily find the statistics and data they need:
               </p>
               <ul className="govuk-list govuk-list--number">
                 <li>I have a question</li>
@@ -169,11 +168,11 @@ const DocumentationDesignStandards = () => {
                 about it too much.
               </p>
               <h3 id="easy-to-read-and-understand">
-                Easy to read and understand{' '}
+                Easy to read and understand
               </h3>
               <p>
                 Good online content is easy to read and understand and we know
-                from the research we’ve carried out that our service this means:
+                from the research we’ve carried out that this means:
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
@@ -201,12 +200,12 @@ const DocumentationDesignStandards = () => {
             </AccordionSection>
             <AccordionSection
               heading="Creating specialist content"
-              headingId="Creating specialist content"
+              id="creating-specialist-content"
             >
               <p>
                 Government often explains that because they’re creating
                 technical or complex content for a specialist audience, they do
-                not need to use plain English.{' '}
+                not need to use plain English.
               </p>
               <p>
                 This is not the case as research shows that, in fact,
@@ -245,7 +244,7 @@ const DocumentationDesignStandards = () => {
                 present complicated information in as simple a way as possible.
               </p>
               <p>
-                So before you start creating content for explore education
+                So before you start creating content for Explore education
                 statistics, make sure you read this guide and:
               </p>
               <ul className="govuk-list govuk-list--bullet">
@@ -261,7 +260,7 @@ const DocumentationDesignStandards = () => {
             </AccordionSection>
             <AccordionSection
               heading="Understanding your audience"
-              headingId="understanding-your-audience"
+              id="understanding-your-audience"
             >
               <p>
                 Your content will be most effective if you understand who you’re
@@ -280,11 +279,11 @@ const DocumentationDesignStandards = () => {
                 </li>
               </ul>
               <h3 id="the-explore-education-statistics-audience">
-                The explore education statistics audience
+                The Explore education statistics audience
               </h3>
               <p>
                 Our audience is potentially anyone living in the UK who needs to
-                find statistics, data and information about education.{' '}
+                find statistics, data and information about education.
               </p>
               <p>
                 This means we must try to write and communicate in a way that
@@ -310,13 +309,14 @@ const DocumentationDesignStandards = () => {
                 </li>
               </ul>
               <p>
-                However, now that we know this we’ve developed a service and set
-                of content standards which will help tackle all these issues.
+                However, now that we know this, we’ve developed a service and
+                set of content standards which will help tackle all these
+                issues.
               </p>
             </AccordionSection>
             <AccordionSection
               heading="How people use content"
-              headingId="how-people-use-content"
+              id="how-people-use-content"
             >
               <p>
                 Knowing how our audience uses content means you can create
@@ -333,7 +333,7 @@ const DocumentationDesignStandards = () => {
               <h3 id="commoon-words">Common words</h3>
               <p>
                 By the time someone is 5 or 6 years old, they’ll use 2,500 to
-                5,000 common words.{' '}
+                5,000 common words.
               </p>
               <p>
                 Adults still find these words easier to recognise and understand
@@ -346,10 +346,9 @@ const DocumentationDesignStandards = () => {
               </p>
               <h3 id="reading-skills">Reading skills</h3>
               <p>
-                People quickly learn to read the 5,000 common words (their
-                primary set) they use most). They then stop reading these words
-                and start recognising their shape allowing them to read much
-                faster.
+                People quickly learn to read the 6,000 common words (the primary
+                set that they use most). They then stop reading these words and
+                start recognising their shape allowing them to read much faster.
               </p>
               <p>
                 This means people do not read one word at a time and bounce
@@ -391,17 +390,17 @@ const DocumentationDesignStandards = () => {
               </p>
               <p>
                 This means you can create good content if you can meet these
-                sort of standards in terms of the language you use and the way
-                in which you lay out your content.
+                standards in terms of the language you use and the way in which
+                you lay out your content.
               </p>
             </AccordionSection>
             <AccordionSection
               heading="Content design best practice, concepts and tips"
-              headingId="content-design-best-practice-concepts-and-tips"
+              id="content-design-best-practice-concepts-and-tips"
             >
               <p>
                 This section contains a range of practical guidance and
-                information about creating good content for explore education
+                information about creating good content for Explore education
                 statistics.
               </p>
               <p>
@@ -437,7 +436,7 @@ const DocumentationDesignStandards = () => {
               </p>
               <p>
                 The Style guide contains a lot of detailed information about how
-                to create consistent content for explore education statistics.
+                to create consistent content for Explore education statistics.
               </p>
               <p>
                 However, here are some of the main points which will push your
@@ -516,7 +515,7 @@ const DocumentationDesignStandards = () => {
                 This should result in the conclusion of the main facts about
                 your content appearing foremost within your content with other
                 lesser points included in descending order of importance as you
-                continue to create your content .
+                continue to create your content.
               </p>
               <p>
                 In this way it mimics the way users use web content and is
@@ -589,7 +588,7 @@ const DocumentationDesignStandards = () => {
               </p>
               <p>
                 Write answers to all the questions you’ve written down and then
-                remove all the questions and see if what’s left flows logically.{' '}
+                remove all the questions and see if what’s left flows logically.
               </p>
               <p>If not, reorder and tweak your answers until they do.</p>
               <p>
@@ -611,7 +610,7 @@ const DocumentationDesignStandards = () => {
                 Write your content alongside someone else
               </h3>
               <p>
-                Consider writing your content alongside a colleague in front of
+                Consider writing your content alongside a colleague, in front of
                 the same computer or on a piece of paper.
               </p>
               <p>
@@ -631,7 +630,7 @@ const DocumentationDesignStandards = () => {
               </p>
               <p>
                 It usually means getting a team of people to meet to discuss
-                your content content while one person takes notes.
+                your content while one person takes notes.
               </p>
               <p>
                 It's not easy to let other people tell you what’s wrong with
@@ -709,15 +708,15 @@ const DocumentationDesignStandards = () => {
               </p>
               <p>
                 You can check if you’ve been successful by simply reading your
-                content out loud
+                content out loud.
               </p>
               <p>
                 Good content should also have a good rhythm and actually sound
-                natural and good when it's spoken.{' '}
+                natural and good when it's spoken.
               </p>
               <p>
                 So reading what you've written out loud is a good way to find
-                out if your sentences are short enough and words lear enough.{' '}
+                out if your sentences are short enough and words clear enough.
               </p>
               <p>
                 If you hesitate, stumble or have to take too many breaths when
@@ -725,13 +724,10 @@ const DocumentationDesignStandards = () => {
                 right.
               </p>
             </AccordionSection>
-            <AccordionSection
-              heading="Help and support"
-              headingId="help-and-support"
-            >
+            <AccordionSection heading="Help and support" id="help-and-support">
               <p>
                 The following are links to more detailed guidance on concepts
-                and guidance we’ve already covered in this guide:
+                we’ve already covered in this guide:
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
@@ -774,9 +770,9 @@ const DocumentationDesignStandards = () => {
               </ul>
               <p>
                 If you have any questions about the content design standards or
-                the Style guide contact:{' '}
+                the Style guide contact:
               </p>
-              <h3>Explore education statistics team </h3>
+              <h3>Explore education statistics team</h3>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">
@@ -784,10 +780,10 @@ const DocumentationDesignStandards = () => {
                 </a>
               </p>
             </AccordionSection>
-            <AccordionSection heading="Feedback" headingId="feedback">
+            <AccordionSection heading="Feedback" id="feedback">
               <p>
                 This guidance pulls together all our current content design
-                guidance for explore education statistics but there are and will
+                guidance for Explore education statistics but there are and will
                 be gaps.
               </p>
               <p>

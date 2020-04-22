@@ -541,6 +541,60 @@ describe('chartBuilderReducer', () => {
       });
     });
 
+    test('does not unset existing `options`', () => {
+      const initialStateWithExistingOptions: ChartBuilderState = {
+        ...initialState,
+        options: {
+          height: 300,
+          width: 400,
+        },
+      };
+
+      const nextState = produce(chartBuilderReducer)(
+        initialStateWithExistingOptions,
+        {
+          type: 'UPDATE_CHART_OPTIONS',
+          payload: {
+            legend: 'top',
+          },
+        } as ChartBuilderActions,
+      );
+
+      expect(nextState.options).toEqual<ChartOptions>({
+        height: 300,
+        legend: 'top',
+        title: '',
+        width: 400,
+      });
+    });
+
+    test('unsets existing `options` if they are set to undefined', () => {
+      const initialStateWithExistingOptions: ChartBuilderState = {
+        ...initialState,
+        options: {
+          height: 300,
+          width: 400,
+        },
+      };
+
+      const nextState = produce(chartBuilderReducer)(
+        initialStateWithExistingOptions,
+        {
+          type: 'UPDATE_CHART_OPTIONS',
+          payload: {
+            legend: 'top',
+            width: undefined,
+          },
+        } as ChartBuilderActions,
+      );
+
+      expect(nextState.options).toEqual<ChartOptions>({
+        height: 300,
+        legend: 'top',
+        title: '',
+      });
+    });
+
     test('overrides `options` with chart definition constants', () => {
       const initialStateWithConstants: ChartBuilderState = {
         ...initialState,

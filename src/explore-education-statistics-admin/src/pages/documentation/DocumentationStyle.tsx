@@ -20,7 +20,7 @@ const DocumentationGlossary = () => {
           </div>
           <p>
             Browse our A to Z list of style, spelling and grammar conventions
-            for all content published on the explore education statistics
+            for all content published on the Explore education statistics
             service.
           </p>
 

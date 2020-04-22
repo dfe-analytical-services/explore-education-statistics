@@ -1,4 +1,5 @@
 import client from '@admin/services/util/service';
+import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
 
 interface GetFileResponse {
   extension: string;
@@ -12,14 +13,8 @@ interface GetFileResponse {
 }
 
 export interface DeleteDataFilePlan {
-  dependentDataBlocks: DependentDataBlock[];
+  deleteDataBlockPlan: DeleteDataBlockPlan;
   footnoteIds: string[];
-}
-
-export interface DependentDataBlock {
-  name: string;
-  contentSectionHeading?: string;
-  infographicFilenames: string[];
 }
 
 const getFileNameFromPath = (path: string) =>
@@ -47,6 +42,7 @@ export interface DataFile {
   userName: string;
   created: Date;
   canDelete?: boolean;
+  isDeleting?: boolean;
 }
 
 export interface UploadDataFilesRequest {
@@ -62,6 +58,7 @@ export interface AncillaryFile {
     size: number;
     unit: string;
   };
+  isDeleting?: boolean;
 }
 
 export interface UploadAncillaryFileRequest {
@@ -154,12 +151,12 @@ const editReleaseDataService = {
       })
       .then(response => downloadFile(response, fileName));
   },
-  downloadFile(path: string, fileName: string): Promise<void> {
+  downloadFile(path: string): Promise<void> {
     return client
       .get<Blob>(`/release/${path}`, {
         responseType: 'blob',
       })
-      .then(response => downloadFile(response, fileName));
+      .then(response => downloadFile(response, getFileNameFromPath(path)));
   },
   getAncillaryFiles(releaseId: string): Promise<AncillaryFile[]> {
     return client

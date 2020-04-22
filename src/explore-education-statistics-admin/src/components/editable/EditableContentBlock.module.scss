@@ -1,36 +1,24 @@
-.dragHandle {
-  display: block;
-  height: 0;
-  position: relative;
-  width: 100%;
-  &::after {
-    background-color: #fff;
-    color: #999;
-    content: '\2630';
-    font-size: 2.25rem;
-    height: 2.5rem;
-    position: absolute;
-    right: 0;
-    z-index: 1000;
+@import 'src/styles/govuk-base';
+
+.preview {
+  margin-bottom: govuk-spacing(2);
+  padding: 0 govuk-spacing(2);
+
+  pre {
+    white-space: normal;
   }
 }
 
-.isDragging {
-  max-height: 200px;
-  overflow: hidden;
-  position: relative;
+.readOnly {
+  background: govuk-colour('light-grey');
+  border: 2px solid $govuk-border-colour;
+  min-height: 2.2rem;
+}
 
-  &::before {
-    background-image: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0) 50%,
-      rgba(255, 255, 255, 1) 100%
-    );
-    content: '\00a0';
-    height: 100%;
-    position: absolute;
-    width: 100%;
-    z-index: 1;
+.editButton {
+  cursor: pointer;
+
+  &:focus {
+    @include govuk-focused-text;
   }
 }

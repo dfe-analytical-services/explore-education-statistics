@@ -756,7 +756,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasDiscriminator<string>("Type").HasValue("IContentBlock");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Link", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -764,6 +764,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
@@ -775,104 +778,118 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("PublicationId");
 
-                    b.ToTable("Link");
+                    b.ToTable("LegacyRelease");
 
                     b.HasData(
                         new
                         {
                             Id = new Guid("08134c1d-8a58-49a4-8d8b-22e586ffd5ae"),
-                            Description = "2008 to 2009",
+                            Description = "Academic Year 2008/09",
+                            Order = 0,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009"
                         },
                         new
                         {
                             Id = new Guid("250bace6-aeb9-4fe9-8de2-3a25e0dc717f"),
-                            Description = "2009 to 2010",
+                            Description = "Academic Year 2009/10",
+                            Order = 1,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010"
                         },
                         new
                         {
                             Id = new Guid("a319e4ef-b957-40fb-8a47-b1a97814b220"),
-                            Description = "2010 to 2011",
+                            Description = "Academic Year 2010/11",
+                            Order = 2,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011"
                         },
                         new
                         {
                             Id = new Guid("13acf54a-8016-49ff-9050-c61ebe7acad2"),
-                            Description = "2011 to 2012",
+                            Description = "Academic Year 2011/12",
+                            Order = 3,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year"
                         },
                         new
                         {
                             Id = new Guid("45bd7f62-2018-4a5c-9b93-ccece8e89c46"),
-                            Description = "2012 to 2013",
+                            Description = "Academic Year 2012/13",
+                            Order = 4,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013"
                         },
                         new
                         {
                             Id = new Guid("f1225f98-40d5-494c-90f9-99f9fb59ac9d"),
-                            Description = "2013 to 2014",
+                            Description = "Academic Year 2013/14",
+                            Order = 5,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014"
                         },
                         new
                         {
                             Id = new Guid("78239816-507d-42b7-98fd-4a71d0d4eb1f"),
-                            Description = "2014 to 2015",
+                            Description = "Academic Year 2014/15",
+                            Order = 6,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015"
                         },
                         new
                         {
                             Id = new Guid("564dacdc-f58e-4aa0-8dbd-d8368b4fb6ba"),
-                            Description = "2015 to 2016",
+                            Description = "Academic Year 2015/16",
+                            Order = 7,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016"
                         },
                         new
                         {
                             Id = new Guid("89c02688-646d-45b5-8919-9a3fafcfe0e9"),
-                            Description = "2009 to 2010",
+                            Description = "Academic Year 2009/10",
+                            Order = 0,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010"
                         },
                         new
                         {
                             Id = new Guid("81d91c86-9bf2-496c-b026-9dc255c35635"),
-                            Description = "2010 to 2011",
+                            Description = "Academic Year 2010/11",
+                            Order = 1,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011"
                         },
                         new
                         {
                             Id = new Guid("e20141d0-d894-4b8d-a78f-e41c23500786"),
-                            Description = "2011 to 2012",
+                            Description = "Academic Year 2011/12",
+                            Order = 2,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics"
                         },
                         new
                         {
                             Id = new Guid("ce15f487-87b0-4c07-98f1-6c6732196be7"),
-                            Description = "2012 to 2013",
+                            Description = "Academic Year 2012/13",
+                            Order = 3,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013"
                         },
                         new
                         {
                             Id = new Guid("75991639-ad77-4ba6-91fc-ac08c00a4ce8"),
-                            Description = "2013 to 2014",
+                            Description = "Academic Year 2013/14",
+                            Order = 4,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014"
                         },
                         new
                         {
                             Id = new Guid("28e53936-5a52-44be-a7a6-d2f14a426d28"),
-                            Description = "2014 to 2015",
+                            Description = "Academic Year 2014/15",
+                            Order = 5,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015"
                         },
@@ -880,6 +897,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("dc8b0d8c-08bb-47cc-b3a1-9e6ac9c2c268"),
                             Description = "January 2010",
+                            Order = 0,
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010"
                         },
@@ -887,6 +905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("b086ba70-703c-40dd-aaef-d2e19335188e"),
                             Description = "January 2011",
+                            Order = 1,
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2011"
                         },
@@ -894,6 +913,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("181ec43e-cf22-4cab-a128-0a5702468566"),
                             Description = "January 2012",
+                            Order = 2,
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2012"
                         },
@@ -901,6 +921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("e6b36ee8-ef66-4864-a4b3-9047ee3da338"),
                             Description = "January 2013",
+                            Order = 3,
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2013"
                         },
@@ -908,6 +929,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("398ba8c6-3ea0-49da-8645-ceb3c7fb9860"),
                             Description = "January 2014",
+                            Order = 4,
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2014"
                         },
@@ -915,6 +937,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("5e244416-6f2a-4d22-bea4-c22a229befef"),
                             Description = "January 2015",
+                            Order = 5,
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2015"
                         },
@@ -922,6 +945,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("e3c1db23-8a8f-47fe-b2cd-8e677db700a2"),
                             Description = "January 2016",
+                            Order = 6,
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2016"
                         },
@@ -929,6 +953,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("313435b3-fe56-4b92-8e13-670dbf510062"),
                             Description = "January 2017",
+                            Order = 7,
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2017"
                         });
@@ -1192,9 +1217,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("2e510281-ca8c-41bf-bbe0-fd15fcc81aae"),
                             ContactId = new Guid("ee490e40-201a-4b25-bc52-76c15de72344"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-",
-                            Slug = "neet-statistics-quarterly-brief",
+                            Slug = "neet-statistics-annual-brief",
                             Summary = "",
-                            Title = "NEET statistics quarterly brief",
+                            Title = "NEET statistics annual brief",
                             TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860")
                         },
                         new
@@ -1464,6 +1489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                             ContactId = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191"),
+                            LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-school-applications",
                             MethodologyId = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
                             Slug = "secondary-and-primary-schools-applications-and-offers",
                             Summary = "",
@@ -1807,11 +1833,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"3\",\"Day\":\"22\"}",
                             OriginalId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                            Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublishScheduled = new DateTime(2018, 4, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Published = new DateTime(2018, 4, 25, 9, 30, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2016",
                             Slug = "2016-17",
                             SoftDeleted = false,
-                            Status = "Draft",
+                            Status = "Approved",
                             TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                             Version = 0
@@ -1824,12 +1851,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"7\",\"Day\":\"19\"}",
                             OriginalId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                            Published = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublishScheduled = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Published = new DateTime(2018, 7, 19, 9, 30, 0, 0, DateTimeKind.Unspecified),
                             RelatedInformation = "[{\"Id\":\"f3c67bc9-6132-496e-a848-c39dfcd16f49\",\"Description\":\"Additional guidance\",\"Url\":\"http://example.com\"},{\"Id\":\"45acb50c-8b21-46b4-989f-36f4b0ee37fb\",\"Description\":\"Statistics guide\",\"Url\":\"http://example.com\"}]",
                             ReleaseName = "2016",
                             Slug = "2016-17",
                             SoftDeleted = false,
-                            Status = "Draft",
+                            Status = "Approved",
                             TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                             Version = 0
@@ -1842,12 +1870,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"6\",\"Day\":\"14\"}",
                             OriginalId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
-                            Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PublishScheduled = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2018",
                             Slug = "2018",
                             SoftDeleted = false,
                             Status = "Draft",
-                            TimePeriodCoverage = "AY",
+                            TimePeriodCoverage = "CY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                             Version = 0
                         });
@@ -3044,7 +3072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Unauthorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"},\"f9ae4976-7cd3-4718-834a-09349b6eb377_183f94c3-b5d7-4868-892d-c948e256744d_cb9b57e8-9965-4cb6-b61a-acc6d34b32be_____\":{\"Label\":\"Authorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#005ea5\",\"symbol\":\"diamond\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
                             DataBlockRequest = "{\"SubjectId\":\"803fbf56-600f-490f-8409-6413a891720d\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"183f94c3-b5d7-4868-892d-c948e256744d\",\"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\",\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"f9ae4976-7cd3-4718-834a-09349b6eb377\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
                             Name = "Key Stats aggregate table",
-                            Summary = "{\"dataKeys\":[\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\"],\"dataSummary\":[\"Up from 4.6% in 2015/16\",\"Similar to previous years\",\"Up from 1.1% in 2015/16\"],\"dataDefinition\":[\"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=\\\"/glossary#overall-absence\\\">More >>></a>\",\"Number of authorised absences as a percentage of the overall school population. <a href=\\\"/glossary#authorised-absence\\\">More >>></a>\",\"Number of unauthorised absences as a percentage of the overall school population. <a href=\\\"/glossary#unauthorised-absence\\\">More >>></a>\"],\"dataDefinitionTitle\":[\"What is overall absence?\",\"What is authorized absence?\",\"What is unauthorized absence?\"]}",
+                            Summary = "{\"dataKeys\":[\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\",\"f9ae4976-7cd3-4718-834a-09349b6eb377\",\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\"],\"dataSummary\":[\"Up from 4.6% in 2015/16\",\"Similar to previous years\",\"Up from 1.1% in 2015/16\"],\"dataDefinition\":[\"Total number of all authorised and unauthorised absences from possible school sessions for all pupils.\",\"Number of authorised absences as a percentage of the overall school population.\",\"Number of unauthorised absences as a percentage of the overall school population.\"],\"dataDefinitionTitle\":[\"What is overall absence?\",\"What is authorized absence?\",\"What is unauthorized absence?\"]}",
                             Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2012/13\",\"value\":\"2012_AY\"},{\"label\":\"2013/14\",\"value\":\"2013_AY\"},{\"label\":\"2014/15\",\"value\":\"2014_AY\"},{\"label\":\"2015/16\",\"value\":\"2015_AY\"},{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Authorised absence rate\",\"value\":\"f9ae4976-7cd3-4718-834a-09349b6eb377\"},{\"label\":\"Unauthorised absence rate\",\"value\":\"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\"},{\"label\":\"Overall absence rate\",\"value\":\"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\"}]}}]"
                         },
                         new
@@ -3075,10 +3103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Order = 1,
                             Type = "DataBlock",
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"be3b765b-005f-4279-4c04-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Permanent exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"732f0d7b-dcd3-4bf8-4c08-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"be3b765b-005f-4279-4c04-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
+                            DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2016,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"be3b765b-005f-4279-4c04-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
                             Name = "Key Stat 1",
-                            Summary = "{\"dataKeys\":[\"be3b765b-005f-4279-4c04-08d78f90080f\"],\"dataSummary\":[\"Up from 0.08% in 2015/16\"],\"dataDefinition\":[\"Number of permanent exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"dataDefinitionTitle\":[\"What is permanent exclusion rate?\"]}",
-                            Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2012/13\",\"value\":\"2012_AY\"},{\"label\":\"2013/14\",\"value\":\"2013_AY\"},{\"label\":\"2014/15\",\"value\":\"2014_AY\"},{\"label\":\"2015/16\",\"value\":\"2015_AY\"},{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Permanent exclusion rate\",\"value\":\"be3b765b-005f-4279-4c04-08d78f90080f\"}]}}]"
+                            Summary = "{\"dataKeys\":[\"be3b765b-005f-4279-4c04-08d78f90080f\"],\"dataSummary\":[\"Up from 0.08% in 2015/16\"],\"dataDefinition\":[\"Number of permanent exclusions as a percentage of the overall school population.\"],\"dataDefinitionTitle\":[\"What is permanent exclusion rate?\"]}",
+                            Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Permanent exclusion rate\",\"value\":\"be3b765b-005f-4279-4c04-08d78f90080f\"}]}}]"
                         },
                         new
                         {
@@ -3087,10 +3115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Order = 2,
                             Type = "DataBlock",
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"68aeda43-2b6a-433a-4c06-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"68aeda43-2b6a-433a-4c06-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
+                            DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2016,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"68aeda43-2b6a-433a-4c06-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
                             Name = "Key Stat 2",
-                            Summary = "{\"dataKeys\":[\"68aeda43-2b6a-433a-4c06-08d78f90080f\"],\"dataSummary\":[\"Up from 4.29% in 2015/16\"],\"dataDefinition\":[\"Number of fixed-period exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"dataDefinitionTitle\":[\"What is fixed period exclusion rate?\"]}",
-                            Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2012/13\",\"value\":\"2012_AY\"},{\"label\":\"2013/14\",\"value\":\"2013_AY\"},{\"label\":\"2014/15\",\"value\":\"2014_AY\"},{\"label\":\"2015/16\",\"value\":\"2015_AY\"},{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Fixed period exclusion rate\",\"value\":\"68aeda43-2b6a-433a-4c06-08d78f90080f\"}]}}]"
+                            Summary = "{\"dataKeys\":[\"68aeda43-2b6a-433a-4c06-08d78f90080f\"],\"dataSummary\":[\"Up from 4.29% in 2015/16\"],\"dataDefinition\":[\"Number of fixed-period exclusions as a percentage of the overall school population.\"],\"dataDefinitionTitle\":[\"What is fixed period exclusion rate?\"]}",
+                            Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Fixed period exclusion rate\",\"value\":\"68aeda43-2b6a-433a-4c06-08d78f90080f\"}]}}]"
                         },
                         new
                         {
@@ -3099,10 +3127,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Order = 3,
                             Type = "DataBlock",
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"167f4807-4fdd-461a-4c03-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Number of permanent exclusions\",\"Value\":null,\"Name\":null,\"Unit\":\"\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"167f4807-4fdd-461a-4c03-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
-                            DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
+                            DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2016,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
                             Name = "Key Stat 3",
-                            Summary = "{\"dataKeys\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"dataSummary\":[\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Total number of permanent exclusions within a school year. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"dataDefinitionTitle\":[\"What is number of permanent exclusions?\"]}",
-                            Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2012/13\",\"value\":\"2012_AY\"},{\"label\":\"2013/14\",\"value\":\"2013_AY\"},{\"label\":\"2014/15\",\"value\":\"2014_AY\"},{\"label\":\"2015/16\",\"value\":\"2015_AY\"},{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Number of permanent exclusions\",\"value\":\"167f4807-4fdd-461a-4c03-08d78f90080f\"}]}}]"
+                            Summary = "{\"dataKeys\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"dataSummary\":[\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Total number of permanent exclusions within a school year.\"],\"dataDefinitionTitle\":[\"What is number of permanent exclusions?\"]}",
+                            Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Number of permanent exclusions\",\"value\":\"167f4807-4fdd-461a-4c03-08d78f90080f\"}]}}]"
                         },
                         new
                         {
@@ -3113,7 +3141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"68aeda43-2b6a-433a-4c06-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"732f0d7b-dcd3-4bf8-4c08-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Pupils with one or more exclusion\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"732f0d7b-dcd3-4bf8-4c08-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
                             DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"b3df4fb1-dae3-4c16-4c01-08d78f90080f\",\"a5a58f92-aba1-4955-4c02-08d78f90080f\",\"167f4807-4fdd-461a-4c03-08d78f90080f\",\"be3b765b-005f-4279-4c04-08d78f90080f\",\"f045bc8d-8dd1-4f16-4c05-08d78f90080f\",\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"732f0d7b-dcd3-4bf8-4c08-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
                             Name = "Key Stats aggregate table",
-                            Summary = "{\"dataKeys\":[\"be3b765b-005f-4279-4c04-08d78f90080f\",\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"dataSummary\":[\"Up from 0.08% in 2015/16\",\"Up from 4.29% in 2015/16\",\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Number of permanent exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\",\"Number of fixed-period exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\",\"Total number of permanent exclusions within a school year. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"dataDefinitionTitle\":[\"What is permanent exclusion rate?\",\"What is fixed period exclusion rate?\",\"What is number of permanent exclusions?\"]}",
+                            Summary = "{\"dataKeys\":[\"be3b765b-005f-4279-4c04-08d78f90080f\",\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"dataSummary\":[\"Up from 0.08% in 2015/16\",\"Up from 4.29% in 2015/16\",\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Number of permanent exclusions as a percentage of the overall school population.\",\"Number of fixed-period exclusions as a percentage of the overall school population.\",\"Total number of permanent exclusions within a school year.\"],\"dataDefinitionTitle\":[\"What is permanent exclusion rate?\",\"What is fixed period exclusion rate?\",\"What is number of permanent exclusions?\"]}",
                             Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2012/13\",\"value\":\"2012_AY\"},{\"label\":\"2013/14\",\"value\":\"2013_AY\"},{\"label\":\"2014/15\",\"value\":\"2014_AY\"},{\"label\":\"2015/16\",\"value\":\"2015_AY\"},{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Permanent exclusion rate\",\"value\":\"be3b765b-005f-4279-4c04-08d78f90080f\"},{\"label\":\"Fixed period exclusion rate\",\"value\":\"68aeda43-2b6a-433a-4c06-08d78f90080f\"},{\"label\":\"Number of permanent exclusions\",\"value\":\"167f4807-4fdd-461a-4c03-08d78f90080f\"}]}}]"
                         },
                         new
@@ -3134,7 +3162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
                             Order = 0,
                             Type = "DataBlock",
-                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"68aeda43-2b6a-433a-4c06-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
+                            Charts = "[{\"Legend\":\"top\",\"Labels\":{\"68aeda43-2b6a-433a-4c06-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":5,\"Size\":null,\"TickConfig\":\"custom\",\"TickSpacing\":1}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
                             DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"68aeda43-2b6a-433a-4c06-08d78f90080f\",\"a5a58f92-aba1-4955-4c02-08d78f90080f\",\"f045bc8d-8dd1-4f16-4c05-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
                             Heading = "Chart showing fixed-period exclusions in England",
                             Name = "Generic data block 2",
@@ -3148,7 +3176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"167f4807-4fdd-461a-4c03-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Number of permanent exclusions\",\"Value\":null,\"Name\":null,\"Unit\":\"\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"167f4807-4fdd-461a-4c03-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
                             DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
                             Name = "Available Data Block",
-                            Summary = "{\"dataKeys\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"dataSummary\":[\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Total number of permanent exclusions within a school year. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"dataDefinitionTitle\":[\"What is number of permanent exclusions?\"]}",
+                            Summary = "{\"dataKeys\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"dataSummary\":[\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Total number of permanent exclusions within a school year.\"],\"dataDefinitionTitle\":[\"What is number of permanent exclusions?\"]}",
                             Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2012/13\",\"value\":\"2012_AY\"},{\"label\":\"2013/14\",\"value\":\"2013_AY\"},{\"label\":\"2014/15\",\"value\":\"2014_AY\"},{\"label\":\"2015/16\",\"value\":\"2015_AY\"},{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Number of permanent exclusions\",\"value\":\"167f4807-4fdd-461a-4c03-08d78f90080f\"}]}}]"
                         },
                         new
@@ -3159,7 +3187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Charts = "[{\"Legend\":\"top\",\"Labels\":{\"167f4807-4fdd-461a-4c03-08d78f90080f_1f3f86a4-de9f-43d7-5bfd-08d78f900a85_____\":{\"Label\":\"Number of permanent exclusions\",\"Value\":null,\"Name\":null,\"Unit\":\"\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":[{\"Indicator\":\"167f4807-4fdd-461a-4c03-08d78f90080f\",\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriod\",\"SortBy\":null,\"SortAsc\":true,\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"Unit\":null,\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null,\"TickConfig\":\"default\",\"TickSpacing\":null}},\"Type\":\"line\",\"Title\":null,\"Width\":null,\"Height\":0,\"LegendHeight\":0}]",
                             DataBlockRequest = "{\"SubjectId\":\"3c0fbe56-0a4b-4caa-82f2-ab696cd96090\",\"TimePeriod\":{\"StartYear\":2012,\"StartCode\":\"AY\",\"EndYear\":2016,\"EndCode\":\"AY\"},\"Filters\":[\"1f3f86a4-de9f-43d7-5bfd-08d78f900a85\"],\"BoundaryLevel\":null,\"GeographicLevel\":null,\"Indicators\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"Country\":[\"E92000001\"],\"Institution\":null,\"LocalAuthority\":null,\"LocalAuthorityDistrict\":null,\"LocalEnterprisePartnership\":null,\"MultiAcademyTrust\":null,\"MayoralCombinedAuthority\":null,\"OpportunityArea\":null,\"ParliamentaryConstituency\":null,\"Region\":null,\"RscRegion\":null,\"Sponsor\":null,\"Ward\":null,\"PlanningArea\":null,\"IncludeGeoJson\":true}",
                             Name = "Available Data Block 2",
-                            Summary = "{\"dataKeys\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"dataSummary\":[\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Total number of permanent exclusions within a school year. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"dataDefinitionTitle\":[\"What is number of permanent exclusions?\"]}",
+                            Summary = "{\"dataKeys\":[\"167f4807-4fdd-461a-4c03-08d78f90080f\"],\"dataSummary\":[\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Total number of permanent exclusions within a school year.\"],\"dataDefinitionTitle\":[\"What is number of permanent exclusions?\"]}",
                             Tables = "[{\"tableHeaders\":{\"columnGroups\":[],\"columns\":[{\"label\":\"2012/13\",\"value\":\"2012_AY\"},{\"label\":\"2013/14\",\"value\":\"2013_AY\"},{\"label\":\"2014/15\",\"value\":\"2014_AY\"},{\"label\":\"2015/16\",\"value\":\"2015_AY\"},{\"label\":\"2016/17\",\"value\":\"2016_AY\"}],\"rowGroups\":[[{\"label\":\"England\",\"level\":\"country\",\"value\":\"E92000001\"}]],\"rows\":[{\"label\":\"Number of permanent exclusions\",\"value\":\"167f4807-4fdd-461a-4c03-08d78f90080f\"}]}}]"
                         },
                         new
@@ -3241,21 +3269,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasDiscriminator().HasValue("HtmlBlock");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.InsetTextBlock", b =>
-                {
-                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock");
-
-                    b.Property<string>("Body")
-                        .HasColumnName("InsetTextBlock_Body")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Heading")
-                        .HasColumnName("InsetTextBlock_Heading")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("InsetTextBlock");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MarkDownBlock", b =>
                 {
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock");
@@ -3279,13 +3292,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 - secondary schools
 - special schools
 
-They also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.
+They also include information for [pupil referral units](/glossary#pupil-referral-unit) and pupils aged 4 years.
 
-We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).
+We use the key measures of [overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).
 
 The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.
 
-They're also used for policy development as key indicators in behaviour and school attendance policy."
+They're also used for policy development as key indicators in behaviour and school attendance policy.
+
+Within this release, absence by reason is broken down in three different ways:
+
+* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences
+
+* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions
+
+* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
                         },
                         new
                         {
@@ -3295,13 +3316,13 @@ They're also used for policy development as key indicators in behaviour and scho
                             Type = "MarkDownBlock",
                             Body = @"**Overall absence**
 
-The [overall absence](../glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.
+The [overall absence](/glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.
 
-It increased from 4.6% to 4.7% over this period while the [unauthorised absence](../glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.
+It increased from 4.6% to 4.7% over this period while the [unauthorised absence](/glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.
 
 The rate stayed the same at 4% in primary schools but increased from 5.2% to 5.4% for secondary schools. However, in special schools it was much higher and rose to 9.7%.
 
-The overall and [authorised absence](../glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14."
+The overall and [authorised absence](/glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14."
                         },
                         new
                         {
@@ -3311,17 +3332,17 @@ The overall and [authorised absence](../glossary#authorised-absence) rates have 
                             Type = "MarkDownBlock",
                             Body = @"**Unauthorised absence**
 
-The [unauthorised absence](../glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.
+The [unauthorised absence](/glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.
 
 This is due to an increase in absence due to family holidays not agreed by schools.
 
 **Authorised absence**
 
-The [authorised absence](../glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.
+The [authorised absence](/glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.
 
 **Total number of days missed**
 
-The total number of days missed for [overall absence](../glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.
+The total number of days missed for [overall absence](/glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.
 
 This partly reflects a rise in the total number of pupils with the average number of days missed per pupil slightly increased to 8.2 days from 8.1 days in 2015/16.
 
@@ -3333,11 +3354,11 @@ In 2016/17, 91.8% of primary, secondary and special school pupils missed at leas
                             ContentSectionId = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015 to 16 but still down from 43.3% in 2011 to 12.
+                            Body = @"The [persistent absence](/glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015/16 but still down from 43.3% in 2011/12.
 
-It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).
+It also accounted for almost a third (31.6%) of all [authorised absence](/glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](/glossary#unauthorised-absence).
 
-Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
+Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015/16."
                         },
                         new
                         {
@@ -3347,25 +3368,11 @@ Overall, it's increased across primary and secondary schools to 10.8% - up from 
                             Type = "MarkDownBlock",
                             Body = @"**Persistent absentees**
 
-The [overall absence](../glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.
+The [overall absence](/glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.
 
 **Illness absence rate**
 
 The illness absence rate is almost 4 times higher for persistent absentees at 7.6% compared to 2% for other pupils."
-                        },
-                        new
-                        {
-                            Id = new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
-                            ContentSectionId = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
-                            Order = 0,
-                            Type = "MarkDownBlock",
-                            Body = @"These have been broken down into the following:
-
-* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences
-
-* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions
-
-* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
                         },
                         new
                         {
@@ -3375,7 +3382,7 @@ The illness absence rate is almost 4 times higher for persistent absentees at 7.
                             Type = "MarkDownBlock",
                             Body = @"**Illness**
 
-This is the main driver behind [overall absence](../glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.
+This is the main driver behind [overall absence](/glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.
 
 While the overall absence rate has slightly increased since 2015/16 the illness rate has stayed the same at 2.6%.
 
@@ -3417,11 +3424,11 @@ These pupils accounted for 23.5% of days missed while 8.2% of pupils had no abse
 
 Across all schools:
 
-* [overall absence](../glossary#overall-absence) - highest in summer and lowest in autumn
+* [overall absence](/glossary#overall-absence) - highest in summer and lowest in autumn
 
-* [authorised absence](../glossary#authorised-absence) - highest in spring and lowest in summer
+* [authorised absence](/glossary#authorised-absence) - highest in spring and lowest in summer
 
-* [unauthorised absence](../glossary#unauthorised-absence) - highest in summer"
+* [unauthorised absence](/glossary#unauthorised-absence) - highest in summer"
                         },
                         new
                         {
@@ -3429,7 +3436,7 @@ Across all schools:
                             ContentSectionId = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.
+                            Body = @"The [overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.
 **Ethnic groups**
 
 Overall absence rate:
@@ -3490,7 +3497,7 @@ Persistent absence rate:
                             ContentSectionId = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous 2 years.
+                            Body = @"The [overall absence](/glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous two years.
 
 Absence recorded for 4-year-olds is not treated as authorised or unauthorised and only reported as overall absence."
                         },
@@ -3500,9 +3507,9 @@ Absence recorded for 4-year-olds is not treated as authorised or unauthorised an
                             ContentSectionId = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The [overall absence](../glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.
+                            Body = @"The [overall absence](/glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.
 
-The [persistent absence](../glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16."
+The [persistent absence](/glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16."
                         },
                         new
                         {
@@ -3510,11 +3517,11 @@ The [persistent absence](../glossary#persistent-absence) rate increased to 73.9%
                             ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"[Overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).
+                            Body = @"[Overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).
 
 **Overall absence**
 
-Similar to 2015/16, the 3 regions with the highest rates across all school types were:
+Similar to 2015/16, the three regions with the highest rates across all school types were:
 
 * North East - 4.9%
 
@@ -3542,7 +3549,7 @@ The region with the highest persistent absence rate was Yorkshire and the Humber
 
 * special schools
 
-They also include national-level information on permanent and fixed-period exclusions for [pupil referral units](../glossary#pupil-referral-unit).
+They also include national-level information on permanent and fixed-period exclusions for [pupil referral units](/glossary#pupil-referral-unit).
 
 All figures are based on unrounded data so constituent parts may not add up due to rounding."
                         },
@@ -3552,11 +3559,11 @@ All figures are based on unrounded data so constituent parts may not add up due 
                             ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The number of [permanent exclusions](../glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.
+                            Body = @"The number of [permanent exclusions](/glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.
 
-This works out to an average 40.6 permanent exclusions per day - up from an 35.2 per day in 2015/16.
+This works out to an average 40.6 permanent exclusions per day - up from 35.2 per day in 2015/16.
 
-The permanent exclusion rate has also increased to 0.10% of pupils - up from from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000."
+The permanent exclusion rate has also increased to 0.10% of pupils - up from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000."
                         },
                         new
                         {
@@ -3566,9 +3573,9 @@ The permanent exclusion rate has also increased to 0.10% of pupils - up from fro
                             Type = "MarkDownBlock",
                             Body = @"Most occurred in secondary schools which accounted for 83% of all permanent exclusions.
 
-The [permanent exclusion](../glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
+The [permanent exclusion](/glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
 
-The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from from 0.08% in 2015/16.
+The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from 0.08% in 2015/16.
 
 The rate generally followed a downward trend after 2006/07 - when it stood at 0.12%.
 
@@ -3580,9 +3587,9 @@ However, since 2012/13 it has been on the rise although rates are still lower no
                             ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"The number of fixed-period exclusionshas increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.
+                            Body = @"The number of fixed-period exclusions has increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.
 
-This works out to around 2,010 fixed-period exclusions per day - up from an 1,786 per day in 2015/16."
+This works out to around 2,010 fixed-period exclusions per day - up from 1,786 per day in 2015/16."
                         },
                         new
                         {
@@ -3616,13 +3623,13 @@ This works out to around 2,010 fixed-period exclusions per day - up from an 1,78
                             Type = "MarkDownBlock",
                             Body = @"**Pupils with one or more fixed-period exclusion definition**
 
-The number of pupils with [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.
+The number of pupils with [one or more fixed-period exclusion](/glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.
 
 Of these kinds of pupils, 59.1% excluded on only 1 occasion while 1.5% received 10 or more fixed-period exclusions during the year.
 
-The percentage of pupils who went on to receive a [permanent exclusion](../glossary#permanent-exclusion) was 3.5%.
+The percentage of pupils who went on to receive a [permanent exclusion](/glossary#permanent-exclusion) was 3.5%.
 
-The average length of [fixed-period exclusion](../glossary#fixed-period-exclusion) across schools decreased to 2.1 days - slightly shorter than in 2015/16.
+The average length of [fixed-period exclusion](/glossary#fixed-period-exclusion) across schools decreased to 2.1 days - slightly shorter than in 2015/16.
 
 The highest proportion of fixed-period exclusions (46.6%) lasted for only 1 day.
 
@@ -3634,7 +3641,7 @@ Only 2.0% of fixed-period exclusions lasted for longer than 1 week and longer fi
                             ContentSectionId = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"All reasons (except bullying and theft) saw an increase in [permanent exclusions](../glossary#permanent-exclusion) since 2015/16.
+                            Body = @"All reasons (except bullying and theft) saw an increase in [permanent exclusions](/glossary#permanent-exclusion) since 2015/16.
 
 The following most common reasons saw the largest increases:
 
@@ -3648,9 +3655,9 @@ The following most common reasons saw the largest increases:
 
 Remained the most common reason for permanent exclusions accounting for 2,755 (35.7%) of all permanent exclusions - which is equivalent to 3 permanent exclusions per 10,000 pupils.
 
-However, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](../glossary#fixed-period-exclusion).
+However, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](/glossary#fixed-period-exclusion).
 
-Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 %) of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
+Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
 
 All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent disruptive behaviour and other reasons saw the largest increases."
                         },
@@ -3672,9 +3679,9 @@ All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent
 
 **Age, national curriculum year group and gender**
 
-* more than half of all [permanent exclusions](../glossary#permanent-exclusion) (57.2%) and [fixed-period exclusions](../glossary#fixed-period-exclusion) (52.6 %) occur in national curriculum year 9 or above
+* more than half of all [permanent exclusions](/glossary#permanent-exclusion) (57.2%) and [fixed-period exclusions](/glossary#fixed-period-exclusion) (52.6 %) occur in national curriculum year 9 or above
 
-* a quarter (25%) of all permanent exclusions were for pupils aged 14 - who also had the highest rates for fixed-period exclusion and pupils receiving [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion)
+* a quarter (25%) of all permanent exclusions were for pupils aged 14 - who also had the highest rates for fixed-period exclusion and pupils receiving [one or more fixed-period exclusion](/glossary#one-or-more-fixed-period-exclusion)
 
 * the permanent exclusion rate for boys (0.15%) was more than 3 times higher than for girls (0.04%)
 
@@ -3708,7 +3715,7 @@ All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent
                             ContentSectionId = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = "There were 560 reviews lodged with [independent review panels](../glossary#independent-review-panel) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
+                            Body = "There were 560 reviews lodged with [independent review panels](/glossary#independent-review-panel) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
                         },
                         new
                         {
@@ -3718,13 +3725,13 @@ All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent
                             Type = "MarkDownBlock",
                             Body = @"**Permanent exclusion**
 
-The [permanent exclusion](../glossary#permanent-exclusion) rate in [pupil referral units](../glossary#pupil-referral-unit) decreased to 0.13 - down from 0.14% in 2015/16.
+The [permanent exclusion](/glossary#permanent-exclusion) rate in [pupil referral units](/glossary#pupil-referral-unit) decreased to 0.13 - down from 0.14% in 2015/16.
 
 Permanent exclusions rates have remained fairly steady following an increase between 2013/14 and 2014/15.
 
 **Fixed-period exclusion**
 
-The [fixed period exclusion](../glossary#fixed-period-exclusion) rate has been steadily increasing since 2013/14.
+The [fixed period exclusion](/glossary#fixed-period-exclusion) rate has been steadily increasing since 2013/14.
 
 The percentage of pupils in pupil referral units who 1 or more fixed-period exclusion increased to 59.17% - up from 58.15% in 2015/16."
                         },
@@ -3734,7 +3741,7 @@ The percentage of pupils in pupil referral units who 1 or more fixed-period excl
                             ContentSectionId = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
                             Order = 0,
                             Type = "MarkDownBlock",
-                            Body = @"There's considerable variation in the [permanent exclusion](../glossary#permanent-exclusion) and [fixed-period exclusion](../glossary#fixed-period-exclusion) rate at the LA level.
+                            Body = @"There's considerable variation in the [permanent exclusion](/glossary#permanent-exclusion) and [fixed-period exclusion](/glossary#fixed-period-exclusion) rate at the LA level.
 
 **Permanent exclusion**
 
@@ -3788,7 +3795,7 @@ The proportion of applicants who received an offer of any of their preferred sch
 
 **Secondary National Offer Day**
 
-These statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of secondary school places to all applicants on the [Secondary National Offer Day](../glossary#national-offer-day) of 1 March 2018.
+These statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of secondary school places to all applicants on the [Secondary National Offer Day](/glossary#national-offer-day) of 1 March 2018.
 
 The secondary figures have been collected since 2008 and can be viewed as a time series in the following table."
                         },
@@ -3931,7 +3938,9 @@ As in previous years, at primary level a smaller proportion of offers were made 
                             Type = "MarkDownBlock",
                             Body = @"Read national statistical summaries, view charts and tables and download data files.
 
-Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england)."
+Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](/methodology/pupil-absence-in-schools-in-england).
+
+This release was created as example content during the platform’s Private Beta phase, whilst it provides access to real data, the below release should be used with some caution. To access the original, release please see [Pupil absence in schools in England: 2016 to 2017](https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2016-to-2017)"
                         },
                         new
                         {
@@ -3941,7 +3950,9 @@ Find out how and why these statistics are collected and published - [Pupil absen
                             Type = "MarkDownBlock",
                             Body = @"Read national statistical summaries, view charts and tables and download data files.
 
-Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)"
+Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](/methodology/permanent-and-fixed-period-exclusions-in-england)
+
+This release was created as example content during the platform’s Private Beta phase, whilst it provides access to real data, the below release should be used with some caution. To access the original release, please see [Permanent and fixed-period exclusions in England: 2016 to 2017](https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2016-to-2017)"
                         },
                         new
                         {
@@ -3951,18 +3962,19 @@ Find out how and why these statistics are collected and published - [Permanent a
                             Type = "MarkDownBlock",
                             Body = @"Read national statistical summaries, view charts and tables and download data files.
 
-Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)"
+Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](/methodology/secondary-and-primary-schools-applications-and-offers)"
                         },
                         new
                         {
                             Id = new Guid("b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9"),
-                            ContentSectionId = new Guid("93ef0486-479f-4013-8012-a66ed01f1880"),
+                            ContentSectionId = new Guid("c0241ab7-f40a-4755-bc69-365eba8114a3"),
                             Order = 1,
                             Type = "MarkDownBlock",
-                            Body = @" * pupils missed on average 8.2 school days
- * overall and unauthorised absence rates up on 2015/16
- * unauthorised absence rise due to higher rates of unauthorised holidays
- * 10% of pupils persistently absent during 2016/17"
+                            Body = @"* pupils missed on average 8.2 school days
+* overall and unauthorised absence rates up on 2015/16
+* unauthorised absence rise due to higher rates of unauthorised holidays
+* 10% of pupils persistently absent during 2016/17
+"
                         },
                         new
                         {
@@ -3970,9 +3982,9 @@ Find out how and why these statistics are collected and published - [Secondary a
                             ContentSectionId = new Guid("601aadcc-be7d-4d3e-9154-c9eb64144692"),
                             Order = 1,
                             Type = "MarkDownBlock",
-                            Body = @"* majority of applicants received a preferred offer
-* percentage of applicants receiving secondary first choice offers decreases as applications increase
-* slight proportional increase in applicants receiving primary first choice offer as applications decrease
+                            Body = @"* The rate of permanent exclusions has increased since last year from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17. The number of exclusions has also increased, from 6,685 to 7,720.
+* The rate of fixed period exclusions have also increased since last year from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17. The number of exclusions has also increased, from 339,360 to 381,865.
+* There were 183,475 pupil enrolments, 2.29 per cent, with at least one fixed term exclusion in 2016/17, up from 167,125 pupil enrolments, 2.11 per cent, in 2015/16.
 "
                         },
                         new
@@ -4002,7 +4014,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                         .HasForeignKey("ContentSectionId");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Link", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", null)
                         .WithMany("LegacyReleases")

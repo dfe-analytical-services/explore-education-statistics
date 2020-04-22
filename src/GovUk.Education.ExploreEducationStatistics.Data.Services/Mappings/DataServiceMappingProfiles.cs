@@ -19,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings
 
             CreateMap<Indicator, IndicatorMetaViewModel>()
                 .ForMember(dest => dest.Value, opts => opts.MapFrom(indicator => indicator.Id))
+                .ForMember(dest => dest.Name, opts => opts.MapFrom(indicator => indicator.Name))
                 .ForMember(dest => dest.Unit, opts => opts.MapFrom(indicator => indicator.Unit.GetEnumValue()));
 
             CreateMap<Location, LocationViewModel>();

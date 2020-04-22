@@ -3,6 +3,7 @@ import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
+import AdminDocumentationConfigureCharts from '@admin/pages/documentation/DocumentationConfigureCharts';
 import AdminDocumentationCreateNewPublication from '@admin/pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationCreateNewRelease from '@admin/pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationContentDesignStandards from '@admin/pages/documentation/DocumentationDesignStandards';
@@ -25,6 +26,8 @@ import ThemeTopicWrapper, {
 } from '@admin/pages/theme/ThemeTopicWrapper';
 import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
+import ManageUserPage from '@admin/pages/users/ManageUserPage';
+import PreReleaseUsersPage from '@admin/pages/users/PreReleaseUsersPage';
 import { User } from '@admin/services/sign-in/types';
 import { Dictionary } from '@admin/types';
 import { generatePath, RouteProps } from 'react-router';
@@ -96,6 +99,17 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     component: PendingInvitesPage,
     protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
+  },
+  administrationPreReleaseUsers: {
+    path: '/administration/users/pre-release',
+    component: PreReleaseUsersPage,
+    protectedAction: user => user.permissions.canAccessUserAdministrationPages,
+    exact: true,
+  },
+  administrationUserManage: {
+    path: '/administration/users/:userId',
+    component: ManageUserPage,
+    protectedAction: user => user.permissions.canAccessUserAdministrationPages,
   },
   methodologies: {
     path: '/methodologies',
@@ -194,6 +208,12 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   documentationManageDataBlock: {
     path: '/documentation/manage-data-block',
     component: AdminDocumentationManageDataBlocks,
+    protectedAction: user => user.permissions.canAccessAnalystPages,
+    exact: true,
+  },
+  documentationConfigureCharts: {
+    path: '/documentation/configure-charts',
+    component: AdminDocumentationConfigureCharts,
     protectedAction: user => user.permissions.canAccessAnalystPages,
     exact: true,
   },

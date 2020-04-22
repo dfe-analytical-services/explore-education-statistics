@@ -8,6 +8,7 @@ Object {
       "test": Object {
         "hint": "",
         "legend": "",
+        "name": "",
         "options": Object {
           "test": Object {
             "label": "test",
@@ -31,16 +32,19 @@ Object {
     "indicators": Object {
       "23": Object {
         "label": "Unauthorised absence rate",
+        "name": "sess_unauthorised_percent",
         "unit": "%",
         "value": "23",
       },
       "26": Object {
         "label": "Overall absence rate",
+        "name": "sess_overall_percent",
         "unit": "%",
         "value": "26",
       },
       "28": Object {
         "label": "Authorised absence rate",
+        "name": "sess_authorised_percent",
         "unit": "%",
         "value": "28",
       },

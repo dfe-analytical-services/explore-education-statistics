@@ -11,8 +11,41 @@ interface Props {
   exclude?: 'status' | 'details';
 }
 
+type PublishingStage =
+  | 'Validating'
+  | 'Cancelled'
+  | 'Complete'
+  | 'Failed'
+  | 'Scheduled'
+  | 'NotStarted'
+  | 'Started';
+
+type OverallStage =
+  | 'Validating'
+  | 'Complete'
+  | 'Failed'
+  | 'Invalid'
+  | 'Scheduled'
+  | 'Started'
+  | 'Superseded';
+
+type TaskStage =
+  | 'Validating'
+  | 'Cancelled'
+  | 'Complete'
+  | 'Failed'
+  | 'Queued'
+  | 'NotStarted'
+  | 'Started';
+
 export interface ReleaseStatus {
-  overallStage: string;
+  releaseId?: string;
+  dataStage?: TaskStage;
+  contentStage?: TaskStage;
+  filesStage?: TaskStage;
+  publishingStage?: PublishingStage;
+  overallStage: OverallStage;
+  lastUpdated?: string;
 }
 
 const ReleaseServiceStatus = ({
@@ -39,11 +72,7 @@ const ReleaseServiceStatus = ({
           );
         } else {
           setCurrentStatus(status);
-          if (
-            status &&
-            (status.overallStage === 'Started' ||
-              status.overallStage === 'Queued')
-          ) {
+          if (status && status.overallStage === 'Started') {
             timeoutRef.current = setTimeout(
               fetchReleaseServiceStatus,
               refreshPeriod,
@@ -70,11 +99,8 @@ const ReleaseServiceStatus = ({
     (status: string): { color: StatusBlockProps['color']; text: string } => {
       if (currentStatus) {
         switch (status) {
-          case 'Scheduled':
-            return { color: 'blue', text: status };
           case 'NotStarted':
             return { color: 'blue', text: 'Not Started' };
-          case 'Invalid':
           case 'Failed':
           case 'Cancelled':
             return { color: 'red', text: status };
@@ -104,6 +130,7 @@ const ReleaseServiceStatus = ({
   }, [currentStatus, statusDetailColor]);
 
   if (!currentStatus) return null;
+
   return (
     <>
       {exclude !== 'status' && (
@@ -118,8 +145,9 @@ const ReleaseServiceStatus = ({
       )}
 
       {currentStatus &&
-        currentStatus.overallStage !== 'Scheduled' &&
-        currentStatus.overallStage !== 'Invalid' &&
+        !['Validating', 'Scheduled', 'Invalid'].includes(
+          currentStatus.overallStage,
+        ) &&
         exclude !== 'details' && (
           <Details className={styles.errorSummary} summary="View stages">
             <ul className="govuk-list">

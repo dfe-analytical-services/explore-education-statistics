@@ -32,7 +32,7 @@ const BrowseReleasesPage = () => {
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Browse our A to Z list of style, spelling and grammar conventions
-            for all content published on the explore education statistics
+            for all content published on the Explore education statistics
             service{' '}
           </p>
         </div>
@@ -96,7 +96,7 @@ const BrowseReleasesPage = () => {
       </h3>
       <p className="govuk-caption-m govuk-!-margin-top-1">
         How to create a new release - including uploading data and files and
-        creating data blocks (ie tables and charts) and content.{' '}
+        creating data blocks (i.e. tables and charts) and content.{' '}
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
@@ -117,6 +117,13 @@ const BrowseReleasesPage = () => {
       <p className="govuk-caption-m govuk-!-margin-top-1">
         How to manage data blocks within a release - including creating tables
         and charts.{' '}
+      </p>
+
+      <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+        <Link to="/documentation/configure-charts">Creating charts</Link>
+      </h3>
+      <p className="govuk-caption-m govuk-!-margin-top-1">
+        How to create charts based on a saved data block.{' '}
       </p>
     </Page>
   );

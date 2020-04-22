@@ -35,7 +35,7 @@ parser.add_argument("-i", "--interp",
 parser.add_argument("-e", "--env",
                     dest="env",
                     default="test",
-                    choices=["local", "dev", "dev02", "dev03", "test", "prod", "ci"],
+                    choices=["local", "dev", "test", "preprod", "prod", "ci"],
                     help="the environment to run the tests against")
 parser.add_argument("-f", "--file",
                     dest="tests",
@@ -203,7 +203,10 @@ if args.env == 'dev':
 if args.env == 'test':
     robotArgs += ['--include', 'Test',
                   '--exclude', 'AltersData']
-if args.env in ['dev03', 'prod']:
+if args.env == 'preprod':
+    robotArgs += ['--include', 'Preprod',
+                  '--exclude', 'AltersData']
+if args.env == 'prod':
     robotArgs += ['--include', 'Prod',
                   '--exclude', 'AltersData']
 

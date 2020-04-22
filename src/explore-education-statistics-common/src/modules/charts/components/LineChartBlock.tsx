@@ -1,10 +1,10 @@
-import '@common/modules/charts/components/charts.scss';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
   AxisConfiguration,
   ChartDefinition,
   ChartProps,
   ChartSymbol,
+  RenderLegend,
 } from '@common/modules/charts/types/chart';
 import {
   ChartData,
@@ -72,7 +72,7 @@ const LineChartBlock = ({
   legend,
   width,
   renderLegend,
-}: LineChartProps) => {
+}: LineChartProps & RenderLegend) => {
   if (
     axes === undefined ||
     axes.major === undefined ||

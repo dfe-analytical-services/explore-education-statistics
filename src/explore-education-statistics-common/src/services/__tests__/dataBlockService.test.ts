@@ -2,9 +2,9 @@ import { testDataBlockResponse } from '@common/modules/charts/components/__tests
 
 import { dataApi } from '@common/services/api';
 import dataBlockService, {
-  DataBlockRequest,
   GeographicLevel,
 } from '@common/services/dataBlockService';
+import { DataBlockRequest } from '@common/services/types/blocks';
 
 jest.mock('@common/services/api', () => {
   return {

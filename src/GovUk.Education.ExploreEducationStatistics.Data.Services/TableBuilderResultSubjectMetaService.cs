@@ -35,8 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        public TableBuilderResultSubjectMetaService(IFilterItemService filterItemService,
+        public TableBuilderResultSubjectMetaService(IBoundaryLevelService boundaryLevelService,
+            IFilterItemService filterItemService,
             IFootnoteService footnoteService,
+            IGeoJsonService geoJsonService,
             IIndicatorService indicatorService,
             ILocationService locationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
@@ -44,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IUserService userService,
             ISubjectService subjectService,
             ILogger<TableBuilderResultSubjectMetaService> logger,
-            IMapper mapper) : base(filterItemService)
+            IMapper mapper) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
             _footnoteService = footnoteService;
             _indicatorService = indicatorService;
@@ -67,28 +69,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
 
-                    var filters = GetFilters(observations);
+                    var observationalUnits = _locationService.GetObservationalUnits(observations);
+                    _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
+                    var filters = GetFilters(observations);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var footnotes = GetFootnotes(observations, query);
-
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var indicators = GetIndicators(query);
+                    var geoJsonAvailable = HasBoundaryLevelDataForAnyObservationalUnits(observationalUnits);
+                    _logger.LogTrace("Got GeoJsonAvailable in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
 
+                    var indicators = GetIndicators(query);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var locations = GetObservationalUnits(observations);
-
+                    var locations = GetGeoJsonObservationalUnits(observationalUnits, query.IncludeGeoJson ?? false,
+                        query.BoundaryLevel);
                     _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var timePeriodRange = GetTimePeriodRange(observations);
-
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
@@ -98,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     {
                         Filters = filters,
                         Footnotes = footnotes,
+                        GeoJsonAvailable = geoJsonAvailable,
                         Indicators = indicators,
                         Locations = locations,
                         PublicationName = publication.Title,
@@ -117,13 +124,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new ForbidResult();
         }
 
-        private IEnumerable<ObservationalUnitMetaViewModel> GetObservationalUnits(IQueryable<Observation> observations)
+        private IEnumerable<ObservationalUnitMetaViewModel> GetGeoJsonObservationalUnits(
+            Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits,
+            bool geoJsonRequested,
+            long? boundaryLevelId)
         {
             var observationalUnits = _locationService.GetObservationalUnits(observations);
 
             var viewModels = observationalUnits.SelectMany(pair =>
-                pair.Value.Select(observationalUnit =>
-                    BuildObservationalUnitMetaViewModel(pair.Key, observationalUnit)));
+                BuildObservationalUnitMetaViewModelsWithGeoJsonIfAvailable(
+                    pair.Key,
+                    pair.Value.ToList(),
+                    geoJsonRequested,
+                    boundaryLevelId));
 
             return TransformDuplicateObservationalUnitsWithUniqueLabels(viewModels);
         }
@@ -149,18 +162,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return _timePeriodService.GetTimePeriodRange(observations).Select(tuple =>
                 new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier));
-        }
-
-        private static ObservationalUnitMetaViewModel BuildObservationalUnitMetaViewModel(GeographicLevel level,
-            IObservationalUnit unit)
-        {
-            var value = unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code;
-            return new ObservationalUnitMetaViewModel
-            {
-                Label = unit.Name,
-                Level = level,
-                Value = value
-            };
         }
     }
 }

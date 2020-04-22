@@ -7,7 +7,7 @@ export default function isChartRenderable(
     return false;
   }
 
-  if (props.type === 'infographic' && props.fileId && props.releaseId) {
+  if (props.type === 'infographic' && props.fileId) {
     return true;
   }
 

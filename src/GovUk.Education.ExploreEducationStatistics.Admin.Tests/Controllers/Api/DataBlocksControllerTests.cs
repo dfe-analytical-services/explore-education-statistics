@@ -51,12 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var (dataBlockService, persistenceHelper) = Mocks();
             SetupDataBlockExistsResult(persistenceHelper);
 
-            dataBlockService.Setup(s => s.DeleteAsync(_dataBlockId))
+            dataBlockService.Setup(s => s.DeleteAsync(_releaseId, _dataBlockId))
                 .Returns(Task.FromResult(new Either<ActionResult, bool>(true)));
 
             var controller = ControllerWithMocks(dataBlockService, persistenceHelper);
 
-            var result = await controller.DeleteDataBlockAsync(_dataBlockId);
+            var result = await controller.DeleteDataBlockAsync(_releaseId, _dataBlockId);
             Assert.IsAssignableFrom<NoContentResult>(result);
         }
 
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = ControllerWithMocks(dataBlockService, persistenceHelper);
 
-            var result = await controller.DeleteDataBlockAsync(_dataBlockId);
+            var result = await controller.DeleteDataBlockAsync(_releaseId,_dataBlockId);
             Assert.IsAssignableFrom<NotFoundResult>(result);
         }
 
