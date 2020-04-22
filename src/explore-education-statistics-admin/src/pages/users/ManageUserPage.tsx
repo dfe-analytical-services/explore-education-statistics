@@ -41,12 +41,12 @@ const ManageUserPage = ({
   );
 
   const { value: roles } = useAsyncRetry(() => userService.getRoles());
-  const { value: releases } = useAsyncRetry(() =>
-    dashboardService.getDraftReleases(),
-  );
-  const { value: releaseRoles } = useAsyncRetry(() =>
-    userService.getReleaseRoles(),
-  );
+  // const { value: releases } = useAsyncRetry(() =>
+  //   dashboardService.getDraftReleases(),
+  // );
+  // const { value: releaseRoles } = useAsyncRetry(() =>
+  //   userService.getReleaseRoles(),
+  // );
 
   const cancelHandler = () => history.push('/administration/users');
 
@@ -124,7 +124,7 @@ const ManageUserPage = ({
                   legendSize="m"
                   hint="The releases a user can access within the service."
                 >
-                  <div className="govuk-grid-row">
+                  {/* <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-half">
                       <FormFieldSelect
                         id={`${formId}-selectedReleaseId`}
@@ -153,7 +153,54 @@ const ManageUserPage = ({
                         Add release access
                       </Button>
                     </div>
-                  </div>
+                  </div> */}
+
+                  <table className="govuk-table">
+                    <thead className="govuk-table__head">
+                      <tr className="govuk-table__row">
+                        <th scope="col" className="govuk-table__header">
+                          Publication
+                        </th>
+                        <th scope="col" className="govuk-table__header">
+                          Release
+                        </th>
+                        <th scope="col" className="govuk-table__header">
+                          Role
+                        </th>
+                        {/* <th scope="col" className="govuk-table__header">
+                          Actions
+                        </th> */}
+                      </tr>
+                    </thead>
+                    <LoadingSpinner
+                      loading={isLoading}
+                      text="Loading pre-release users"
+                    >
+                      {user && (
+                        <tbody className="govuk-table__body">
+                          {user.userReleaseRoles.map(userReleaseRole => (
+                            <tr
+                              className="govuk-table__row"
+                              key={userReleaseRole.release.id}
+                            >
+                              <th className="govuk-table__cell">
+                                {userReleaseRole.publication.title}
+                              </th>
+                              <th className="govuk-table__cell">
+                                {userReleaseRole.release.title}
+                              </th>
+                              <td className="govuk-table__cell">
+                                {userReleaseRole.releaseRole}
+                              </td>
+                              {/* <td className="govuk-table__cell">
+                                <ButtonText>Remove</ButtonText>
+                              </td> */}
+                            </tr>
+                          ))}
+                        </tbody>
+                      )}
+                    </LoadingSpinner>
+                  </table>
                 </FormFieldset>
 
                 <Button type="submit" className="govuk-!-margin-top-6">

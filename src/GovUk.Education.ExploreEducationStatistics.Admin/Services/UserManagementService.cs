@@ -7,6 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Model
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
@@ -16,16 +19,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class UserManagementService : IUserManagementService
     {
-        private readonly UsersAndRolesDbContext _context;
+        private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
+        private readonly ContentDbContext _contentDbContext;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
 
 
-        public UserManagementService(UsersAndRolesDbContext context, IEmailService emailService,
+        public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext, ContentDbContext contentDbContext, IEmailService emailService,
             IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _usersAndRolesDbContext = usersAndRolesDbContext;
+            _contentDbContext = contentDbContext;
             _emailService = emailService;
             _configuration = configuration;
             _userManager = userManager;
@@ -33,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<UserViewModel>> ListAsync()
         {
-            var users = await _context.Users.Select(u => new UserViewModel
+            var users = await _usersAndRolesDbContext.Users.Select(u => new UserViewModel
                 {
                     Id = u.Id,
                     Name = u.FirstName + " " + u.LastName,
@@ -51,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<RoleViewModel>> ListRolesAsync()
         {
-            var roles = await _context.Roles.Select(r => new RoleViewModel()
+            var roles = await _usersAndRolesDbContext.Roles.Select(r => new RoleViewModel()
                 {
                     Id = r.Id,
                     Name = r.Name,
@@ -64,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
         {
-            var users = await _context.Users.Select(u => new UserViewModel
+            var users = await _usersAndRolesDbContext.Users.Select(u => new UserViewModel
                 {
                     Id = u.Id,
                     Name = u.FirstName + " " + u.LastName,
@@ -83,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<UserViewModel> GetAsync(string userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _usersAndRolesDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user != null)
             {
@@ -92,7 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Id = user.Id,
                     Name = user.FirstName + " " + user.LastName,
                     Email = user.Email,
-                    Role = GetUserRoleId(user.Id)
+                    Role = GetUserRoleId(user.Id),
+                    UserReleaseRoles = GetUserReleaseRoles(user.Id)
                 };
             }
 
@@ -101,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<UserViewModel>> ListPendingAsync()
         {
-            var pendingUsers = await _context.UserInvites.Where(u => u.Accepted == false)
+            var pendingUsers = await _usersAndRolesDbContext.UserInvites.Where(u => u.Accepted == false)
                 .OrderBy(x => x.Email).Select(u => new UserViewModel
                 {
                     Email = u.Email,
@@ -116,14 +122,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO: Part 2: Verify valid email address
         public async Task<bool> InviteAsync(string email, string user, string roleId)
         {
-            if (_context.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email)) return false;
+            if (_usersAndRolesDbContext.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email)) return false;
 
             try
             {
-                if (_context.UserInvites.Any(i => i.Email == email) == false)
+                if (_usersAndRolesDbContext.UserInvites.Any(i => i.Email == email) == false)
                 {
                     // TODO add role selection to Invite Users UI
-                    var analystRole = await _context
+                    var analystRole = await _usersAndRolesDbContext
                         .Roles
                         .Where(r => r.Id == roleId)
                         .FirstAsync();
@@ -136,11 +142,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Role = analystRole
                     };
 
-                    await _context.UserInvites.AddAsync(invite);
-                    await _context.SaveChangesAsync();
+                    await _usersAndRolesDbContext.UserInvites.AddAsync(invite);
+                    await _usersAndRolesDbContext.SaveChangesAsync();
                 }
 
-                if (_context.UserInvites.Any(i => i.Email == email && i.Accepted == false))
+                if (_usersAndRolesDbContext.UserInvites.Any(i => i.Email == email && i.Accepted == false))
                 {
                     SendInviteEmail(email);
                 }
@@ -155,18 +161,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<bool> CancelInviteAsync(string email)
         {
-            var invite = _context.UserInvites.FirstOrDefault(i => i.Email == email);
-            _context.UserInvites.Remove(invite);
+            var invite = _usersAndRolesDbContext.UserInvites.FirstOrDefault(i => i.Email == email);
+            _usersAndRolesDbContext.UserInvites.Remove(invite);
 
-            await _context.SaveChangesAsync();
+            await _usersAndRolesDbContext.SaveChangesAsync();
 
             return true;
         }
 
         public async Task<bool> UpdateAsync(string userId, string roleId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(i => i.Id == userId);
-            var userRole = await _context.UserRoles.FirstOrDefaultAsync(i => i.UserId == userId);
+            var user = await _usersAndRolesDbContext.Users.FirstOrDefaultAsync(i => i.Id == userId);
+            var userRole = await _usersAndRolesDbContext.UserRoles.FirstOrDefaultAsync(i => i.UserId == userId);
 
             if (user == null || userRole == null)
             {
@@ -179,24 +185,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
+        private List<UserReleaseRole> GetUserReleaseRoles(string userId)
+        {
+            var result = new List<UserReleaseRole>();
+            result.AddRange(_contentDbContext.UserReleaseRoles.Where(x => x.UserId == Guid.Parse(userId)).Select(x => new UserReleaseRole
+            {
+                Publication = _contentDbContext.Publications.Where(p => p.Releases.Any(r => r.Id == x.ReleaseId)).Select(p => new IdTitlePair { Id = p.Id, Title = p.Title}).FirstOrDefault(),
+                Release = _contentDbContext.Releases.Where(r => r.Id == x.ReleaseId).Select(r => new IdTitlePair { Id = r.Id, Title = r.Title}).FirstOrDefault(),
+                ReleaseRole = x.Role
+            }).ToList());
+            
+            return result;
+        }
 
         private string GetRoleName(string roleId)
         {
-            var userRole = _context.Roles.FirstOrDefault(r => r.Id == roleId);
+            var userRole = _usersAndRolesDbContext.Roles.FirstOrDefault(r => r.Id == roleId);
 
             return userRole?.Name;
         }
 
         private string GetUserRoleName(string userId)
         {
-            var userRole = _context.UserRoles.FirstOrDefault(r => r.UserId == userId);
+            var userRole = _usersAndRolesDbContext.UserRoles.FirstOrDefault(r => r.UserId == userId);
 
-            return userRole == null ? null : _context.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
+            return userRole == null ? null : _usersAndRolesDbContext.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
         }
 
         private string GetUserRoleId(string userId)
         {
-            var userRole = _context.UserRoles.FirstOrDefault(r => r.UserId == userId);
+            var userRole = _usersAndRolesDbContext.UserRoles.FirstOrDefault(r => r.UserId == userId);
 
             return userRole?.RoleId;
         }

@@ -1,5 +1,6 @@
 import client from '@admin/services/util/service';
 import {
+  User,
   UserStatus,
   UserInvite,
   Role,
@@ -10,7 +11,7 @@ import {
 export interface UsersService {
   getRoles(): Promise<Role[]>;
   getReleaseRoles(): Promise<ReleaseRole[]>;
-  getUser(userId: string): Promise<UserStatus>;
+  getUser(userId: string): Promise<User>;
   getUsers(): Promise<UserStatus[]>;
   getPreReleaseUsers(): Promise<UserStatus[]>;
   getInvitedUsers(): Promise<UserStatus[]>;
@@ -26,8 +27,8 @@ const service: UsersService = {
   getReleaseRoles(): Promise<ReleaseRole[]> {
     return client.get<ReleaseRole[]>('/bau/users/release-roles');
   },
-  getUser(userId: string): Promise<UserStatus> {
-    return client.get<UserStatus>(`/bau/users/${userId}`);
+  getUser(userId: string): Promise<User> {
+    return client.get<User>(`/bau/users/${userId}`);
   },
   getUsers(): Promise<UserStatus[]> {
     return client.get<UserStatus[]>('/bau/users');
