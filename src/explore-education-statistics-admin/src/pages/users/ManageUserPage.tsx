@@ -183,12 +183,12 @@ const ManageUserPage = ({
                               className="govuk-table__row"
                               key={userReleaseRole.release.id}
                             >
-                              <th className="govuk-table__cell">
+                              <td className="govuk-table__cell">
                                 {userReleaseRole.publication.title}
-                              </th>
-                              <th className="govuk-table__cell">
+                              </td>
+                              <td className="govuk-table__cell">
                                 {userReleaseRole.release.title}
-                              </th>
+                              </td>
                               <td className="govuk-table__cell">
                                 {userReleaseRole.releaseRole}
                               </td>
