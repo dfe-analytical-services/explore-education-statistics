@@ -7,6 +7,7 @@ import Form from '@common/components/form/Form';
 import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService from '@admin/services/users/service';
+import dashboardService from '@admin/services/dashboard/service';
 import { UserUpdate } from '@admin/services/users/types';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import Yup from '@common/validation/yup';
@@ -40,6 +41,12 @@ const ManageUserPage = ({
   );
 
   const { value: roles } = useAsyncRetry(() => userService.getRoles());
+  const { value: releases } = useAsyncRetry(() =>
+    dashboardService.getDraftReleases(),
+  );
+  const { value: releaseRoles } = useAsyncRetry(() =>
+    userService.getReleaseRoles(),
+  );
 
   const cancelHandler = () => history.push('/administration/users');
 
@@ -111,14 +118,43 @@ const ManageUserPage = ({
                   />
                 </FormFieldset>
 
-                {/* <FormFieldCheckboxGroup
-                id={`${formId}-releaseaccess`}
-                legend="Release access"
-                legendSize="m"
-                hint="The releases a user has access to (BAU Users have access to all releases)."
-                name="releaseAccess"
-                options={[]}
-              /> */}
+                <FormFieldset
+                  id={`${formId}-role`}
+                  legend="Release access"
+                  legendSize="m"
+                  hint="The releases a user can access within the service."
+                >
+                  <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-one-half">
+                      <FormFieldSelect
+                        id={`${formId}-selectedReleaseId`}
+                        label="Release"
+                        name="selectedReleaseId"
+                        options={releases?.map(release => ({
+                          label: `${release.publicationTitle} - ${release.releaseName}`,
+                          value: release.id,
+                        }))}
+                      />
+                    </div>
+
+                    <div className="govuk-grid-column-one-quarter">
+                      <FormFieldSelect
+                        id={`${formId}-releaseRoleId`}
+                        label="Release role"
+                        name="releaseRoleId"
+                        options={releaseRoles?.map(releaseRole => ({
+                          label: releaseRole.name,
+                          value: releaseRole.value,
+                        }))}
+                      />
+                    </div>
+                    <div className="govuk-grid-column-one-quarter">
+                      <Button type="submit" className="govuk-!-margin-top-6">
+                        Add release access
+                      </Button>
+                    </div>
+                  </div>
+                </FormFieldset>
 
                 <Button type="submit" className="govuk-!-margin-top-6">
                   Save

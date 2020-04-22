@@ -21,4 +21,9 @@ export interface Role {
   normalizedName: string;
 }
 
+export interface ReleaseRole {
+  name: string;
+  value: string;
+}
+
 export default {};

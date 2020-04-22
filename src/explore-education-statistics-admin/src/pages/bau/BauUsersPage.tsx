@@ -56,15 +56,6 @@ const BauUsersPage = () => {
           )}
         </LoadingSpinner>
       </table>
-      <Link
-        to="/administration/users/pending"
-        className="govuk-button govuk-button--secondary"
-      >
-        View pending invites
-      </Link>{' '}
-      <Link to="/administration/users/invite" className="govuk-button">
-        Invite a new user
-      </Link>
       <p>
         <Link to="/administration/" className="govuk-back-link">
           Back

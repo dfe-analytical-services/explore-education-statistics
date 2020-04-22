@@ -11,7 +11,7 @@ interface Model {
   users: UserStatus[];
 }
 
-const PendingInvitesPage = () => {
+const InvitedUsersPage = () => {
   const [model, setModel] = useState<Model>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorStatus, setErrorStatus] = useState<number>();
@@ -43,7 +43,6 @@ const PendingInvitesPage = () => {
       wide
       breadcrumbs={[
         { name: 'Platform administration', link: '/administration' },
-        { name: 'Users', link: '/administration/users' },
         { name: 'Pending invites' },
       ]}
     >
@@ -95,11 +94,11 @@ const PendingInvitesPage = () => {
           </LoadingSpinner>
         </table>
       )}
-      <Link to="/administration/users/invite" className="govuk-button">
+      <Link to="/administration/users/invites/create" className="govuk-button">
         Invite a new user
       </Link>
       <p>
-        <Link to="/administration/users/" className="govuk-back-link">
+        <Link to="/administration/" className="govuk-back-link">
           Back
         </Link>
       </p>
@@ -107,4 +106,4 @@ const PendingInvitesPage = () => {
   );
 };
 
-export default PendingInvitesPage;
+export default InvitedUsersPage;
