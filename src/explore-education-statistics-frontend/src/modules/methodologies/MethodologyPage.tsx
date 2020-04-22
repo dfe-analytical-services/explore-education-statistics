@@ -113,11 +113,13 @@ class MethodologyPage extends Component<Props> {
                   key={order}
                 >
                   <div className="govuk-grid-row">
-                    <MethodologyHeader>
-                      <ContentSectionIndex
-                        fromId={`${this.accId[0]}-${order}-content`}
-                      />
-                    </MethodologyHeader>
+                    <div className="govuk-grid-column-one-quarter">
+                      <MethodologyHeader>
+                        <ContentSectionIndex
+                          fromId={`${this.accId[0]}-${order}-content`}
+                        />
+                      </MethodologyHeader>
+                    </div>
 
                     <div className="govuk-grid-column-three-quarters">
                       <SectionBlocks content={content} />
