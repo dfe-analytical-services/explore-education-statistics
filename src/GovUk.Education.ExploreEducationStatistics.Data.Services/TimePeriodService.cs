@@ -4,9 +4,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -45,26 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var start = timePeriods.First();
             var end = timePeriods.Last();
 
-            if (start.TimeIdentifier.IsNumberOfTerms() || end.TimeIdentifier.IsNumberOfTerms())
-            {
-                return MergeTimePeriodsWithHalfTermRange(timePeriods, start.Year, end.Year);
-            }
-
             return TimePeriodUtil.GetTimePeriodRange(start, end);
-        }
-
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)>
-            MergeTimePeriodsWithHalfTermRange(
-                List<(int Year, TimeIdentifier TimeIdentifier)> timePeriods, int startYear, int endYear)
-        {
-            // Generate a year range based only on Six Half Terms
-            var range = TimePeriodUtil.Range(startYear, SixHalfTerms, endYear, SixHalfTerms);
-
-            // Merge it with the distinct time periods to replace any years which should be Five Half Terms
-            var rangeMap = range.ToDictionary(tuple => tuple.Year, tuple => tuple);
-            timePeriods.ForEach(tuple => { rangeMap[tuple.Year] = (tuple.Year, tuple.TimeIdentifier); });
-
-            return rangeMap.Values;
         }
 
         private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
