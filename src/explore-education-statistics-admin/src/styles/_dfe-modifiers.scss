@@ -14,15 +14,8 @@
 h1.govuk-panel__title {
   color: govuk-colour('white');
 }
+
 // Admin navigation
-
-.app-navigation--current-page a:visited {
-  border-bottom: 0.3rem solid $govuk-link-colour;
-}
-
-.app-navigation--current-page a {
-  border-bottom: 0.3rem solid $govuk-link-colour;
-}
 
 .dfe-details-no-margin {
   details {
