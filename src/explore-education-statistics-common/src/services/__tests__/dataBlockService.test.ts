@@ -26,9 +26,9 @@ describe('dataBlockService', () => {
     geographicLevel: GeographicLevel.Country,
     timePeriod: {
       startYear: 2014,
-      startCode: 'HT6',
+      startCode: 'AY',
       endYear: 2015,
-      endCode: 'HT6',
+      endCode: 'AY',
     },
     filters: ['1', '2'],
     indicators: ['23', '26', '28'],
