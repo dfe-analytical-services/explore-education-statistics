@@ -314,14 +314,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IImportStatusService> ImportStatusService,
             Mock<IReleaseStatusService> ReleaseStatusService,
-            Mock<UserManager<ApplicationUser>> UserManager) mocks)
+            Mock<UserManager<ApplicationUser>> UserManager,
+            ) mocks)
         {
             return new ReleasesController(
+                mocks.ImportService.Object,
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
-                mocks.ImportStatusService.Object,
                 mocks.ReleaseStatusService.Object,
                 mocks.UserManager.Object);
         }

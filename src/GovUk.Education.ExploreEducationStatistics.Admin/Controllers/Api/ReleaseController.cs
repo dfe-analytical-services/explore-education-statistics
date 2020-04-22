@@ -25,14 +25,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class ReleasesController : ControllerBase
     {   
-        private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReleasesController(IImportService importService,
+        public ReleasesController(
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IImportStatusService importStatusService,
@@ -40,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             UserManager<ApplicationUser> userManager
             )
         {
-            _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
@@ -278,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
         {
             return await _releaseStatusService
-                .GetReleaseStatusesAsync(releaseId)
+                .GetReleaseStatusAsync(releaseId)
                 .HandleFailuresOrOk();
         }
 
