@@ -9,7 +9,9 @@ import {
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import _tableBuilderService from '@common/services/tableBuilderService';
+import _tableBuilderService, {
+  TableDataQuery,
+} from '@common/services/tableBuilderService';
 import {
   Chart,
   DataBlock,
@@ -72,9 +74,10 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      testDataBlock.dataBlockRequest,
-    );
+    expect(getDataBlockForSubject).toBeCalledWith({
+      ...testDataBlock.dataBlockRequest,
+      includeGeoJson: false,
+    } as TableDataQuery);
 
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),
@@ -105,9 +108,10 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      testDataBlock.dataBlockRequest,
-    );
+    expect(getDataBlockForSubject).toBeCalledWith({
+      ...testDataBlock.dataBlockRequest,
+      includeGeoJson: false,
+    } as TableDataQuery);
 
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),
@@ -140,9 +144,10 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      testDataBlock.dataBlockRequest,
-    );
+    expect(getDataBlockForSubject).toBeCalledWith({
+      ...testDataBlock.dataBlockRequest,
+      includeGeoJson: false,
+    } as TableDataQuery);
 
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),
@@ -181,9 +186,10 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      testDataBlock.dataBlockRequest,
-    );
+    expect(getDataBlockForSubject).toBeCalledWith({
+      ...testDataBlock.dataBlockRequest,
+      includeGeoJson: false,
+    } as TableDataQuery);
 
     expect(container.querySelector('table')).toMatchSnapshot();
   });
@@ -207,9 +213,10 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      testDataBlock.dataBlockRequest,
-    );
+    expect(getDataBlockForSubject).toBeCalledWith({
+      ...testDataBlock.dataBlockRequest,
+      includeGeoJson: true,
+    } as TableDataQuery);
 
     expect(container.querySelector('.leaflet-container')).toMatchSnapshot();
   });
@@ -231,9 +238,10 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      testDataBlock.dataBlockRequest,
-    );
+    expect(getDataBlockForSubject).toBeCalledWith({
+      ...testDataBlock.dataBlockRequest,
+      includeGeoJson: false,
+    } as TableDataQuery);
 
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),
