@@ -5,7 +5,7 @@ import Link from '@frontend/components/Link';
 function AcccessibilityStatementPage() {
   return (
     <Page
-      title="Accessibility statement for explore education statistics"
+      title="Accessibility statement for Explore education statistics"
       breadcrumbLabel="Accessibility statement"
     >
       <div className="govuk-grid-row">

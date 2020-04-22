@@ -11,7 +11,7 @@ const FormFieldCheckboxMenu = <T extends {}>(
   props: FormFieldCheckboxSearchGroupProps<T>,
 ) => {
   const { error, name, options, legend } = props;
-  const [open, setOpen] = useState();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (error) {

@@ -3,11 +3,14 @@ import styles from './LinkContainer.module.scss';
 
 interface Props {
   url: string;
+  datatestid?: string;
 }
 
-const LinkContainer = ({ url }: Props) => (
+const LinkContainer = ({ url, datatestid }: Props) => (
   <div className={styles.container}>
-    <span className={styles.linkSelect}>{url}</span>
+    <span className={styles.linkSelect} data-testid={datatestid}>
+      {url}
+    </span>
   </div>
 );
 

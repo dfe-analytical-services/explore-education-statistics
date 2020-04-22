@@ -343,6 +343,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 });
             }
 
+            if(env.IsDevelopment() || Configuration.GetValue<bool>("enableSwagger"))
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
+                    c.RoutePrefix = "docs";
+                });
+            }
+
             // Security Headers
             app.UseXContentTypeOptions();
             app.UseXXssProtection(options => options.EnabledWithBlockMode());
@@ -365,7 +375,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ScriptSources(s => s.Self())
                 .ScriptSources(s => s.UnsafeInline())
             );
-
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -393,13 +402,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     template: "{controller}/{action=Index}/{id?}");
             });
             
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
-                c.RoutePrefix = "docs";
-            });
-
             app.UseSpa(spa =>
             {
                 if (env.IsDevelopment())
@@ -415,11 +417,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
             {
-                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
-                {
-                    context.Database.SetCommandTimeout(int.MaxValue);
-                    context.Database.Migrate();
-                }
+               using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
+               {
+                   context.Database.SetCommandTimeout(int.MaxValue);
+                   context.Database.Migrate();
+               }
 
                 using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
                 {

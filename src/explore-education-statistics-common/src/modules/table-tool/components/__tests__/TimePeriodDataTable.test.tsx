@@ -2,16 +2,15 @@ import {
   testData1,
   testData2,
   testData3,
+  testDataFiltersWithNoResults,
   testDataNoFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
-import TimePeriodDataTable, {
-  createGroupHeaders,
-} from '@common/modules/table-tool/components/TimePeriodDataTable';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { UnmappedFullTable } from '@common/modules/table-tool/services/tableBuilderService';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 
 describe('TimePeriodDataTable', () => {
   test('renders table with two of every option', () => {
@@ -230,6 +229,7 @@ describe('TimePeriodDataTable', () => {
             totalValue: '',
             hint: 'Filter by pupil characteristic',
             legend: 'Characteristic',
+            name: 'characteristic',
             options: {
               EthnicGroupMajor: {
                 label: 'Ethnic group major',
@@ -249,6 +249,8 @@ describe('TimePeriodDataTable', () => {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
             label: 'Authorised absence rate',
             unit: '%',
+            name: 'sess_authorised_percent',
+            decimalPlaces: 3,
           },
         ],
         locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
@@ -337,6 +339,8 @@ describe('TimePeriodDataTable', () => {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
             label: 'Authorised absence rate',
             unit: '%',
+            name: 'sess_authorised_percent',
+            decimalPlaces: 2,
           },
         ],
         locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
@@ -417,6 +421,7 @@ describe('TimePeriodDataTable', () => {
           {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
             label: 'Authorised absence rate',
+            name: 'sess_authorised_percent',
             unit: '%',
           },
         ],
@@ -489,222 +494,161 @@ describe('TimePeriodDataTable', () => {
     expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
   });
 
-  describe('createGroupHeaders', () => {
-    test('creates extra filter group headers', () => {
-      const data = [
-        [{ value: 'E92000001', label: 'England', level: '6' }],
+  test('renders table with completely empty rows removed', () => {
+    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+
+    const tableHeadersConfig = {
+      columnGroups: [
         [
           {
-            value: '1',
-            label: 'Total',
-            filterGroup: 'Total',
-            isTotal: true,
-          },
-          {
-            value: '53',
-            label: 'Gender male',
-            filterGroup: 'Gender',
-            isTotal: false,
-          },
-          {
-            value: '52',
-            label: 'Gender female',
-            filterGroup: 'Gender',
-            isTotal: false,
-          },
-          {
-            value: '71',
-            label: 'Ethnicity Major Asian Total',
-            filterGroup: 'Ethnic group major',
-            isTotal: false,
-          },
-          {
-            value: '72',
-            label: 'Ethnicity Major Black Total',
-            filterGroup: 'Ethnic group major',
-            isTotal: false,
+            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            label: 'Special',
           },
         ],
-      ];
-
-      const result = createGroupHeaders(data);
-
-      expect(result).toStrictEqual([
-        { headers: [{ text: 'England' }] },
+      ],
+      rowGroups: [
+        [
+          { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
+          { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
+        ],
+        [
+          {
+            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            label: 'First language Known or believed to be other than English',
+          },
+          {
+            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            label: 'First language Unclassified',
+          },
+        ],
+      ],
+      columns: [
+        { value: '2013_AY', label: '2013/14' },
+        { value: '2014_AY', label: '2014/15' },
+        { value: '2015_AY', label: '2015/16' },
+      ],
+      rows: [
         {
-          groups: [
-            { text: 'Total' },
-            { text: 'Gender', span: 2 },
-            { text: 'Ethnic group major', span: 2 },
-          ],
-          headers: [
-            { text: 'Total' },
-            { text: 'Gender male' },
-            { text: 'Gender female' },
-            { text: 'Ethnicity Major Asian Total' },
-            { text: 'Ethnicity Major Black Total' },
-          ],
+          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          label: 'Number of authorised absence sessions',
         },
-      ]);
-    });
-
-    test('creates extra filter group headers in reverse', () => {
-      const data = [
-        [{ value: 'E92000001', label: 'England', level: '6' }],
-        [
-          {
-            value: '71',
-            label: 'Ethnicity Major Asian Total',
-            filterGroup: 'Ethnic group major',
-            isTotal: false,
-          },
-          {
-            value: '72',
-            label: 'Ethnicity Major Black Total',
-            filterGroup: 'Ethnic group major',
-            isTotal: false,
-          },
-          {
-            value: '53',
-            label: 'Gender male',
-            filterGroup: 'Gender',
-            isTotal: false,
-          },
-          {
-            value: '52',
-            label: 'Gender female',
-            filterGroup: 'Gender',
-            isTotal: false,
-          },
-
-          {
-            value: '1',
-            label: 'Total',
-            filterGroup: 'Total',
-            isTotal: true,
-          },
-        ],
-      ];
-
-      const result = createGroupHeaders(data);
-
-      expect(result).toStrictEqual([
-        { headers: [{ text: 'England' }] },
         {
-          groups: [
-            { text: 'Ethnic group major', span: 2 },
-            { text: 'Gender', span: 2 },
-            { text: 'Total' },
-          ],
-          headers: [
-            { text: 'Ethnicity Major Asian Total' },
-            { text: 'Ethnicity Major Black Total' },
-            { text: 'Gender male' },
-            { text: 'Gender female' },
-            { text: 'Total' },
-          ],
+          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          label: 'Number of overall absence sessions',
         },
-      ]);
-    });
+      ],
+    };
 
-    test('does not create `Default` filter group headers for only `Default` filters', () => {
-      const data = [
-        [{ value: 'E92000001', label: 'England', level: '6' }],
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(2);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(4);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(3);
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(6);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(11);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(5);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(6);
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(18);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with completely empty columns removed', () => {
+    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+
+    const tableHeadersConfig = {
+      columnGroups: [
         [
           {
-            value: '1',
-            label: 'Total',
-            filterGroup: 'Total',
-            isTotal: true,
+            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            label: 'First language Known or believed to be other than English',
           },
           {
-            value: '53',
-            label: 'Gender male',
-            filterGroup: 'Gender',
-            isTotal: false,
+            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            label: 'First language Unclassified',
           },
-          {
-            value: '52',
-            label: 'Gender female',
-            filterGroup: 'Gender',
-            isTotal: false,
-          },
+        ],
+      ],
+      rowGroups: [
+        [
+          { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
+          { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
         ],
         [
           {
-            value: '100',
-            label: 'State-funded primary',
-            filterGroup: 'Default',
-            isTotal: false,
+            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            label: 'Special',
           },
         ],
-      ];
-
-      const result = createGroupHeaders(data);
-
-      expect(result).toStrictEqual([
-        { headers: [{ text: 'England' }] },
+      ],
+      columns: [
+        { value: '2013_AY', label: '2013/14' },
+        { value: '2014_AY', label: '2014/15' },
+        { value: '2015_AY', label: '2015/16' },
+      ],
+      rows: [
         {
-          groups: [{ text: 'Total' }, { text: 'Gender', span: 2 }],
-          headers: [
-            { text: 'Total' },
-            { text: 'Gender male' },
-            { text: 'Gender female' },
-          ],
+          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          label: 'Number of authorised absence sessions',
         },
-        { headers: [{ text: 'State-funded primary' }] },
-      ]);
-    });
-
-    test('creates `Default` filter group header if some sibling filters are not `Default`', () => {
-      const data = [
-        [{ value: 'E92000001', label: 'England', level: '6' }],
-        [
-          {
-            value: '1',
-            label: 'Total',
-            filterGroup: 'Total',
-            isTotal: true,
-          },
-          {
-            value: '53',
-            label: 'Gender male',
-            filterGroup: 'Gender',
-            isTotal: false,
-          },
-          {
-            value: '52',
-            label: 'Gender female',
-            filterGroup: 'Gender',
-            isTotal: false,
-          },
-          {
-            value: '100',
-            label: 'Some default filter',
-            filterGroup: 'Default',
-            isTotal: false,
-          },
-        ],
-      ];
-
-      const result = createGroupHeaders(data);
-
-      expect(result).toStrictEqual([
-        { headers: [{ text: 'England' }] },
         {
-          groups: [
-            { text: 'Total' },
-            { text: 'Gender', span: 2 },
-            { text: 'Default' },
-          ],
-          headers: [
-            { text: 'Total' },
-            { text: 'Gender male' },
-            { text: 'Gender female' },
-            { text: 'Some default filter' },
-          ],
+          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          label: 'Number of overall absence sessions',
         },
-      ]);
-    });
+      ],
+    };
+
+    const { container } = render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          tableHeadersConfig,
+          fullTable.subjectMeta,
+        )}
+      />,
+    );
+
+    expect(container.querySelectorAll('table thead tr')).toHaveLength(2);
+    expect(container.querySelectorAll('table thead th')).toHaveLength(6);
+    expect(
+      container.querySelectorAll('table thead th[scope="colgroup"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll('table thead th[scope="col"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('table tbody tr')).toHaveLength(4);
+    expect(container.querySelectorAll('table tbody th')).toHaveLength(8);
+    expect(
+      container.querySelectorAll('table tbody th[scope="rowgroup"]'),
+    ).toHaveLength(4);
+    expect(
+      container.querySelectorAll('table tbody th[scope="row"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('table tbody td')).toHaveLength(16);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(container.querySelector('table')!.innerHTML).toMatchSnapshot();
   });
 });

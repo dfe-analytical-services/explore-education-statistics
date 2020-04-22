@@ -66,6 +66,7 @@ describe('mapTableHeadersConfig', () => {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             EthnicGroupMajor: {
               label: 'Ethnic group major',
@@ -86,6 +87,7 @@ describe('mapTableHeadersConfig', () => {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
@@ -110,16 +112,22 @@ describe('mapTableHeadersConfig', () => {
           value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
           label: 'Number of overall absence sessions',
           unit: '',
+          name: 'sess_overall,Indicator',
+          decimalPlaces: 2,
         },
         {
           value: 'd1c4a0be-8756-470d-2b51-08d78f6f2b08',
           label: 'Number of authorised absence sessions',
           unit: '',
+          name: 'sess_overall,Indicator',
+          decimalPlaces: 2,
         },
         {
           value: '63043c27-f055-472f-2b56-08d78f6f2b08',
           label: 'Number of persistent absentees',
           unit: '',
+          name: 'enrolments_pa_10_exact,Indicator',
+          decimalPlaces: 2,
         },
       ],
       locations: [
@@ -197,16 +205,22 @@ describe('mapTableHeadersConfig', () => {
         value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
         label: 'Number of overall absence sessions',
         unit: '',
+        name: 'sess_overall,Indicator',
+        decimalPlaces: 2,
       }),
       new Indicator({
         value: 'd1c4a0be-8756-470d-2b51-08d78f6f2b08',
         label: 'Number of authorised absence sessions',
         unit: '',
+        name: 'sess_overall,Indicator',
+        decimalPlaces: 2,
       }),
       new Indicator({
         value: '63043c27-f055-472f-2b56-08d78f6f2b08',
         label: 'Number of persistent absentees',
         unit: '',
+        name: 'enrolments_pa_10_exact,Indicator',
+        decimalPlaces: 2,
       }),
     ]);
   });

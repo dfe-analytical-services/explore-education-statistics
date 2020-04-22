@@ -68,9 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdateContentAsync(IEnumerable<Guid> releaseIds)
+        public async Task UpdateContentAsync(IEnumerable<Guid> releaseIds, bool staging = true)
         {
-            await UpdateTreesAsync(releaseIds);
+            await UpdateTreesAsync(releaseIds, staging);
 
             var releases = await _releaseService.GetAsync(releaseIds);
             var publications = releases.Select(release => release.Publication).ToList();
@@ -79,17 +79,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                await UpdatePublicationAsync(publication, releaseIds);
-                await UpdateLatestReleaseAsync(publication, releaseIds);
+                await UpdatePublicationAsync(publication, releaseIds, staging);
+                await UpdateLatestReleaseAsync(publication, releaseIds, staging);
                 foreach (var release in releases)
                 {
-                    await UpdateReleaseAsync(release);
+                    await UpdateReleaseAsync(release, staging);
                 }
             }
 
             foreach (var methodologyId in methodologyIds)
             {
-                await UpdateMethodologyAsync(methodologyId);
+                await UpdateMethodologyAsync(methodologyId, staging);
             }
         }
 
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateMethodologyAsync(Guid methodologyId, bool staging = true)
+        private async Task UpdateMethodologyAsync(Guid methodologyId, bool staging)
         {
             var viewModel = await _methodologyService.GetViewModelAsync(methodologyId);
             await UploadAsync(prefix => PublicContentMethodologyPath(viewModel.Slug, prefix), staging, viewModel,
@@ -128,21 +128,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         private async Task UpdatePublicationAsync(Publication publication, IEnumerable<Guid> includedReleaseIds,
-            bool staging = true)
+            bool staging)
         {
             var viewModel = await _publicationService.GetViewModelAsync(publication.Id, includedReleaseIds);
             await UploadAsync(prefix => PublicContentPublicationPath(publication.Slug, prefix), staging, viewModel,
                 _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateReleaseAsync(Release release, bool staging = true)
+        private async Task UpdateReleaseAsync(Release release, bool staging)
         {
             var viewModel = _releaseService.GetReleaseViewModel(release.Id);
             await UploadAsync(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix),
                 staging, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateTreesAsync(IEnumerable<Guid> includedReleaseIds, bool staging = true)
+        private async Task UpdateTreesAsync(IEnumerable<Guid> includedReleaseIds, bool staging)
         {
             await UpdateDownloadTreeAsync(includedReleaseIds, staging);
             await UpdateMethodologyTreeAsync(includedReleaseIds, staging);
@@ -169,14 +169,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var blobName = pathFunction.Invoke(pathPrefix);
             var json = JsonConvert.SerializeObject(value, null, settings);
             await _fileStorageService.UploadFromStreamAsync(blobName, MediaTypeNames.Application.Json, json);
-        }
-    }
-
-    internal class LowerCaseNamingStrategy : CamelCaseNamingStrategy
-    {
-        protected override string ResolvePropertyName(string name)
-        {
-            return name.ToLower();
         }
     }
 }

@@ -21,19 +21,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
                 Heading = section.Heading,
                 Order = section.Order
             };
-            
+
             return model;
         }
 
         public Guid Id { get; set; }
-        
+
         public int Order { get; set; }
 
         public string Heading { get; set; }
 
         public string Caption { get; set; }
 
-        public List<IContentBlock> Content { get; set; }
+        public List<IContentBlock> Content { get; set; } = new List<IContentBlock>();
     }
 
 }

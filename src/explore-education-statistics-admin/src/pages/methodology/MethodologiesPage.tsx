@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import { summaryRoute } from '@admin/routes/edit-methodology/routes';
-import methodologyService from '@admin/services/methodology/service';
+import { contentRoute } from '@admin/routes/edit-methodology/routes';
+import methodologyService from '@admin/services/methodology/methodologyService';
 import { MethodologyStatusListItem } from '@admin/services/methodology/types';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
@@ -11,24 +11,79 @@ import React, { useEffect, useState } from 'react';
 
 interface Model {
   liveMethodologies: MethodologyStatusListItem[];
-  otherMethodologies: MethodologyStatusListItem[];
+  approvedMethodologies: MethodologyStatusListItem[];
+  draftMethodologies: MethodologyStatusListItem[];
 }
+
+interface MethodologiesTableProps {
+  methodologies: MethodologyStatusListItem[];
+}
+
+const MethodologiesTable = ({ methodologies }: MethodologiesTableProps) => {
+  return (
+    <table className="govuk-table">
+      <thead className="govuk-table__head">
+        <tr className="govuk-table__row">
+          <th scope="col" className="govuk-table__header">
+            Methodology title
+          </th>
+          <th scope="col" className="govuk-table__header">
+            Status
+          </th>
+          <th scope="col" className="govuk-table__header">
+            Related publications
+          </th>
+        </tr>
+      </thead>
+      <tbody className="govuk-table__body">
+        {methodologies.map(methodology => (
+          <tr className="govuk-table__row" key={methodology.id}>
+            <td className="govuk-table__header">
+              <Link to={contentRoute.generateLink(methodology.id)}>
+                {methodology.title}
+              </Link>
+            </td>
+            <td className="govuk-table__cell">
+              <Tag strong>{methodology.status}</Tag>
+            </td>
+            <td className="govuk-table__cell">
+              <ul className="govuk-list">
+                {methodology.publications.map(publication => (
+                  <li key={publication.id}>{publication.title}</li>
+                ))}
+              </ul>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
 
 const MethodologiesPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
     methodologyService.getMethodologies().then(methodologies => {
-      const liveMethodologies: MethodologyStatusListItem[] = [];
+      const liveMethodologies: MethodologyStatusListItem[] = methodologies.filter(
+        methodology => {
+          return methodology.status === 'Live';
+        },
+      );
+      const approvedMethodologies: MethodologyStatusListItem[] = methodologies.filter(
+        methodology => {
+          return methodology.status === 'Approved';
+        },
+      );
+      const draftMethodologies: MethodologyStatusListItem[] = methodologies.filter(
+        methodology => {
+          return methodology.status === 'Draft';
+        },
+      );
       setModel({
-        otherMethodologies: methodologies.filter(method => {
-          if (method.status.toLocaleLowerCase() === 'live') {
-            liveMethodologies.push(method);
-            return false;
-          }
-          return true;
-        }),
         liveMethodologies,
+        approvedMethodologies,
+        draftMethodologies,
       });
     });
   }, []);
@@ -53,47 +108,25 @@ const MethodologiesPage = () => {
       </div>
 
       <Tabs id="methodologyTabs">
-        <TabsSection id="manage-methodology" title="Methodologies">
+        <TabsSection
+          id="live-methodologies"
+          title={`Live methodologies ${
+            model && model.liveMethodologies.length
+              ? `(${model.liveMethodologies.length})`
+              : '(0)'
+          }`}
+        >
+          <Link
+            to="/methodologies/create"
+            className="govuk-button govuk-!-margin-bottom-1"
+          >
+            Create new methodology
+          </Link>
           {model && model.liveMethodologies.length ? (
-            <table className="govuk-table">
-              <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header">
-                    Methodology title
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Status
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Related publications
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="govuk-table__body">
-                {model.liveMethodologies.map(methodology => (
-                  <tr className="govuk-table__row" key={methodology.id}>
-                    <td className="govuk-table__header">
-                      <Link to={summaryRoute.generateLink(methodology.id)}>
-                        {methodology.title}
-                      </Link>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <Tag strong>{methodology.status}</Tag>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <ul className="govuk-list">
-                        {methodology.publications.map(publication => (
-                          <li key={publication.id}>{publication.title}</li>
-                        ))}
-                      </ul>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <MethodologiesTable methodologies={model.liveMethodologies} />
           ) : (
             <div className="govuk-inset-text">
-              There is currently no draft methodology
+              There are currently no live methodologies
             </div>
           )}
           <Link to="/methodologies/create" className="govuk-button">
@@ -101,53 +134,34 @@ const MethodologiesPage = () => {
           </Link>
         </TabsSection>
         <TabsSection
-          id="draft-methodology"
+          id="draft-methodologies"
           title={`Draft methodologies ${
-            model && model.otherMethodologies.length
-              ? `(${model.otherMethodologies.length})`
+            model && model.draftMethodologies.length
+              ? `(${model.draftMethodologies.length})`
               : '(0)'
           }`}
         >
-          {model && model.otherMethodologies.length ? (
-            <table className="govuk-table">
-              <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header">
-                    Methodology title
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Status
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Related publications
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="govuk-table__body">
-                {model.otherMethodologies.map(methodology => (
-                  <tr className="govuk-table__row" key={methodology.id}>
-                    <td className="govuk-table__header">
-                      <Link to={summaryRoute.generateLink(methodology.id)}>
-                        {methodology.title}
-                      </Link>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <Tag strong>{methodology.status}</Tag>
-                    </td>
-                    <td className="govuk-table__cell">
-                      <ul className="govuk-list">
-                        {methodology.publications.map(publication => (
-                          <li key={publication.id}>{publication.title}</li>
-                        ))}
-                      </ul>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {model && model.draftMethodologies.length ? (
+            <MethodologiesTable methodologies={model.draftMethodologies} />
           ) : (
             <div className="govuk-inset-text">
-              There is currently no draft methodology
+              There are currently no draft methodologies
+            </div>
+          )}
+        </TabsSection>
+        <TabsSection
+          id="approved-methodologies"
+          title={`Approved methodologies ${
+            model && model.approvedMethodologies.length
+              ? `(${model.approvedMethodologies.length})`
+              : '(0)'
+          }`}
+        >
+          {model && model.approvedMethodologies.length ? (
+            <MethodologiesTable methodologies={model.approvedMethodologies} />
+          ) : (
+            <div className="govuk-inset-text">
+              There are currently no approved methodologies
             </div>
           )}
         </TabsSection>

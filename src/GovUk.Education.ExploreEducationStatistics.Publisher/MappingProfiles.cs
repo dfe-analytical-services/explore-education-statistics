@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public MappingProfiles()
         {
-            CreateMap<BasicLink, LinkViewModel>();
+            CreateMap<Link, LinkViewModel>();
 
             CreateMap<Contact, ContactViewModel>();
 
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
 
-            CreateMap<Link, LinkViewModel>();
+            CreateMap<LegacyRelease, LegacyReleaseViewModel>();
 
             CreateMap<Methodology, MethodologySummaryViewModel>();
 
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Publication, CachedPublicationViewModel>()
                 .ForMember(dest => dest.LegacyReleases,
-                    m => m.MapFrom(p => p.LegacyReleases.OrderBy(l => l.Description)))
+                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Release, CachedReleaseViewModel>()
@@ -60,8 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateDataBlockMap();
 
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
-
-            CreateMap<InsetTextBlock, InsetTextBlockViewModel>();
 
             CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
         }

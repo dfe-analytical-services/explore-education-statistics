@@ -51,13 +51,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task<TableResult> RetrieveEntity(string tableName, ITableEntity entity, List<string> columns)
         {
             var table = _client.GetTableReference(tableName);
-            return await table.ExecuteAsync(TableOperation.Retrieve(entity.PartitionKey,entity.RowKey, columns));
+            return await table.ExecuteAsync(TableOperation.Retrieve(entity.PartitionKey, entity.RowKey, columns));
         }
-        
+
         public async Task<TableResult> UpdateEntity(string tableName, ITableEntity entity)
         {
             var table = _client.GetTableReference(tableName);
             return await table.ExecuteAsync(TableOperation.InsertOrReplace(entity));
+        }
+
+        public async Task<IEnumerable<TElement>> ExecuteQueryAsync<TElement>(string tableName, TableQuery<TElement> query) where TElement : ITableEntity, new()
+        {
+            var results = new List<TElement>();
+            var table = await GetTableAsync(tableName);
+            TableContinuationToken token = null;
+            do
+            {
+                var queryResult = await table.ExecuteQuerySegmentedAsync(query, token);
+                results.AddRange(queryResult.Results);
+                token = queryResult.ContinuationToken;
+            } while (token != null);
+
+            return results;
         }
     }
 }

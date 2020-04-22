@@ -1,20 +1,19 @@
 import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
-import React, { createElement, ReactNode } from 'react';
+import React, { createElement, memo, ReactNode } from 'react';
 import styles from './Accordion.module.scss';
 import GoToTopLink from './GoToTopLink';
 
-export type ToggleHandler = (open: boolean) => void;
+export type ToggleHandler = (open: boolean, id: string) => void;
 
 export interface AccordionSectionProps {
   caption?: string;
   children?: ReactNode;
   className?: string;
-  contentId?: string;
   goToTop?: boolean;
+  header?: ReactNode;
   heading: string;
-  headingId?: string;
   /**
    * Only for accessibility/semantic markup,
    * does not change the actual styling
@@ -39,15 +38,18 @@ const AccordionSection = ({
   caption,
   className,
   children,
-  contentId,
   goToTop = true,
+  header,
   heading,
-  headingId,
   headingTag = 'h2',
+  id = 'accordionSection',
   open = false,
   onToggle,
 }: AccordionSectionProps) => {
   const { isMounted } = useMounted();
+
+  const headingId = `${id}-heading`;
+  const contentId = `${id}-content`;
 
   return (
     <div
@@ -55,34 +57,39 @@ const AccordionSection = ({
         [classes.expanded]: open,
       })}
       role="presentation"
+      id={id}
     >
       <div className="govuk-accordion__section-header">
-        {createElement(
-          headingTag,
-          {
-            className: classes.sectionHeading,
-          },
-          isMounted ? (
-            <>
-              <button
-                aria-expanded={open}
-                className={classes.sectionButton}
-                id={headingId}
-                type="button"
-                onClick={() => {
-                  if (onToggle) {
-                    onToggle(!open);
-                  }
-                }}
-              >
+        {header ??
+          createElement(
+            headingTag,
+            {
+              className: classes.sectionHeading,
+            },
+            isMounted ? (
+              <>
+                <button
+                  aria-expanded={open}
+                  className={classes.sectionButton}
+                  id={headingId}
+                  type="button"
+                  onClick={() => {
+                    if (onToggle) {
+                      onToggle(!open, id);
+                    }
+                  }}
+                >
+                  {heading}
+                  <span aria-hidden className="govuk-accordion__icon" />
+                </button>
+              </>
+            ) : (
+              <span id={headingId} className={classes.sectionButton}>
                 {heading}
-                <span aria-hidden className="govuk-accordion__icon" />
-              </button>
-            </>
-          ) : (
-            <span id={headingId}>{heading}</span>
-          ),
-        )}
+              </span>
+            ),
+          )}
+
         {caption && (
           <div className="govuk-accordion__section-summary govuk-body">
             {caption}
@@ -102,7 +109,7 @@ const AccordionSection = ({
   );
 };
 
-export default AccordionSection;
+export default memo(AccordionSection);
 
 export const openAllParentAccordionSections = (target: HTMLElement) => {
   const sections = findAllParents(target, `.${classes.section}`);

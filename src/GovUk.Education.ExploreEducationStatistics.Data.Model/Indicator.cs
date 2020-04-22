@@ -13,5 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public IndicatorGroup IndicatorGroup { get; set; }
         public Guid IndicatorGroupId { get; set; }
         public ICollection<IndicatorFootnote> Footnotes { get; set; }
+        public int? DecimalPlaces { get; set; }
     }
 }

@@ -27,13 +27,19 @@
       "value": "702e692e-8bdf-4283-9799-9630cb781e33"
     },
     "domain": {
-      "value": "s101p02-as-ees-public.azurewebsites.net"
+      "value": "pre-production.explore-education-statistics.service.gov.uk"
     },
     "contentApiUrl": {
       "value": "s101p02-as-ees-content.azurewebsites.net"
     },
     "dataApiUrl": {
-      "value": "s101p02-as-ees-data.azurewebsites.net"
+      "value": "data.pre-production.explore-education-statistics.service.gov.uk"
+    },
+    "publicAppGATrackingId": {
+      "value": "UA-139424173-4"
+    },
+    "publicAppHotjarId": {
+      "value": "1341531"
     }
   }
 }

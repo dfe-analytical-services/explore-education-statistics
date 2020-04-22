@@ -19,7 +19,7 @@ interface FormValues {
 }
 
 function CookiesIndexPage() {
-  const [submitted, setSubmitted] = useState();
+  const [submitted, setSubmitted] = useState(false);
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
 
   const submitCookieSettings = (values: { [key: string]: string }) => {

@@ -1,0 +1,17 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+.block {
+  > :last-child {
+    margin-bottom: govuk-spacing(2);
+  }
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: govuk-spacing(2);
+
+  button {
+    margin-bottom: 0;
+  }
+}

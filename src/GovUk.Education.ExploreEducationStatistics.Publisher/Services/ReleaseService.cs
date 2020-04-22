@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private DateTime GetNextScheduledPublishingTime()
+        private static DateTime GetNextScheduledPublishingTime()
         {
             var publishReleasesCronSchedule = Environment.GetEnvironmentVariable("PublishReleaseContentCronSchedule");
             return TryParseCronSchedule(publishReleasesCronSchedule, out var cronSchedule)

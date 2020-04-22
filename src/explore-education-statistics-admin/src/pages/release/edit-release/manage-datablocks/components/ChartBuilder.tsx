@@ -1,10 +1,10 @@
+import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
 import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
@@ -21,10 +21,8 @@ import {
   lineChartBlockDefinition,
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import {
-  mapBlockDefinition,
-  MapBlockProps,
-} from '@common/modules/charts/components/MapBlock';
+import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
+import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
 import {
   verticalBarBlockDefinition,
   VerticalBarProps,
@@ -37,12 +35,12 @@ import {
   ChartProps,
   DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
-import { parseMetaData } from '@common/modules/charts/util/chartUtils';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import {
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
+import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import React, { useCallback, useMemo } from 'react';
 
@@ -52,14 +50,6 @@ const chartDefinitions: ChartDefinition[] = [
   horizontalBarBlockDefinition,
   mapBlockDefinition,
 ];
-
-interface Props {
-  data: DataBlockResponse;
-  initialConfiguration?: ChartRendererProps;
-  onChartSave?: (props: ChartRendererProps) => void;
-
-  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
-}
 
 function getReduceMetaDataForAxis(
   data: DataBlockResponse,
@@ -99,24 +89,21 @@ function generateAxesMetaData(
   );
 }
 
-const emptyMetadata = {
-  timePeriod: {},
-  filters: {},
-  indicators: {},
-  locations: {},
-};
+interface Props {
+  data: DataBlockResponse;
+  meta: ChartMetaData;
+  initialConfiguration?: Chart;
+  onChartSave?: (chart: Chart) => void;
+  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
+}
 
 const ChartBuilder = ({
   data,
+  meta,
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
 }: Props) => {
-  const metaData = useMemo(
-    () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
-    [data.metaData],
-  );
-
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
     initialConfiguration,
   );
@@ -129,6 +116,8 @@ const ChartBuilder = ({
     isValid,
   } = chartBuilderState;
 
+  const getChartFile = useGetChartFile(data.releaseId);
+
   const labels: Dictionary<DataSetConfiguration> = useMemo(
     () => ({
       ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
@@ -139,9 +128,9 @@ const ChartBuilder = ({
         },
         {},
       ),
-      ...generateAxesMetaData(axes, data, metaData),
+      ...generateAxesMetaData(axes, data, meta),
     }),
-    [axes, data, dataSetAndConfiguration, metaData],
+    [axes, data, dataSetAndConfiguration, meta],
   );
 
   const chartProps = useMemo<ChartRendererProps | undefined>(() => {
@@ -153,7 +142,7 @@ const ChartBuilder = ({
       ...options,
       data,
       axes,
-      meta: metaData,
+      meta,
       labels,
     };
 
@@ -163,8 +152,8 @@ const ChartBuilder = ({
           ...baseProps,
           labels: {},
           type: 'infographic',
-          releaseId: data.releaseId,
-          getInfographic: editReleaseDataService.downloadChartFile,
+          fileId: options.fileId ?? '',
+          getInfographic: getChartFile,
         };
       case 'line':
         return {
@@ -183,13 +172,13 @@ const ChartBuilder = ({
         };
       case 'map':
         return {
-          ...(baseProps as MapBlockProps),
+          ...(baseProps as MapBlockInternalProps),
           type: 'map',
         };
       default:
         return undefined;
     }
-  }, [axes, data, definition, labels, metaData, options]);
+  }, [axes, data, definition, getChartFile, labels, meta, options]);
 
   const handleBoundaryLevelChange = useCallback(
     (boundaryLevel: string) => {
@@ -258,7 +247,7 @@ const ChartBuilder = ({
             >
               <ChartDataSelector
                 canSaveChart={isValid}
-                metaData={metaData}
+                meta={meta}
                 selectedData={dataSetAndConfiguration}
                 chartType={definition}
                 capabilities={definition.capabilities}
@@ -277,7 +266,7 @@ const ChartBuilder = ({
             <ChartConfiguration
               selectedChartType={definition}
               chartOptions={options}
-              meta={metaData}
+              meta={meta}
               data={data}
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={actions.updateChartOptions}
@@ -306,7 +295,7 @@ const ChartBuilder = ({
                   configuration={axisConfiguration}
                   capabilities={definition.capabilities}
                   data={data}
-                  meta={metaData}
+                  meta={meta}
                   labels={chartProps?.labels}
                   dataSets={axisConfiguration?.dataSets}
                   onChange={actions.updateChartAxis}

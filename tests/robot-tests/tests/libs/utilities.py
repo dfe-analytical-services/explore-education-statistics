@@ -1,10 +1,11 @@
+import json
+import time
+from datetime import datetime
 from logging import warn
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
-from datetime import datetime
-import json
 
 def user_sets_focus_to_element(selector):
   if selector.startswith('css:'):
@@ -190,6 +191,7 @@ def user_selects_end_date(end_date):
   sl.select_from_list_by_label('css:#timePeriodForm-end', end_date)
 
 def user_clicks_indicator_checkbox(indicator_label):
+  sl.wait_until_page_contains_element(f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]')
   sl.driver.find_element_by_xpath(
     f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]').click()
 
@@ -214,12 +216,20 @@ def user_checks_category_checkbox_is_selected(subheading_label, category_label):
 def user_clicks_select_all_for_category(category_label):
   sl.driver.find_element_by_xpath(f'//legend[text()="{category_label}"]/..//button[contains(text(),"Select")]').click()
 
-def user_checks_results_table_column_heading_contains(table_selector, row, column, expected):
+def user_checks_results_table_column_heading_contains(table_selector, row, column, expected, timeout=30):
   table_elem = sl.get_webelement(table_selector)
-  elem = table_elem.find_element_by_xpath(f'.//thead/tr[{row}]/th[{column}]')
-  if expected not in elem.text:
+
+  max_time = time.time() + timeout
+  while time.time() < max_time:
+    try:
+      table_elem.find_element_by_xpath(f'.//thead/tr[{row}]/th[{column}][text()="{expected}"]')
+      return
+    except:
+      time.sleep(0.5)
+
+    sl.capture_page_screenshot()
     raise AssertionError(
-      f'"{expected}" not found in th tag in results table thead row {row}, column {column}. Found text "{elem.text}".')
+      f'"{expected}" not found in th tag in results table thead row {row}, column {column}.')
 
 def user_gets_row_with_heading(heading):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')

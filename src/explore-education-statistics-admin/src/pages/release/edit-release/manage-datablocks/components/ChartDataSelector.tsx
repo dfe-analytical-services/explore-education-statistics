@@ -40,7 +40,7 @@ interface Props {
   canSaveChart?: boolean;
   chartType: ChartDefinition;
   selectedData?: ChartDataSetAndConfiguration[];
-  metaData: ChartMetaData;
+  meta: ChartMetaData;
   capabilities: ChartCapabilities;
   onDataAdded?: (data: SelectedData) => void;
   onDataRemoved?: (data: SelectedData, index: number) => void;
@@ -52,7 +52,7 @@ const formId = 'chartDataSelectorForm';
 
 const ChartDataSelector = ({
   canSaveChart,
-  metaData,
+  meta,
   capabilities,
   selectedData = [],
   onDataRemoved,
@@ -66,14 +66,14 @@ const ChartDataSelector = ({
         label: 'Select an indicator...',
         value: '',
       },
-      ...Object.values(metaData.indicators),
+      ...Object.values(meta.indicators),
     ],
-    [metaData.indicators],
+    [meta.indicators],
   );
 
   const filtersByValue: Dictionary<FilterOption> = useMemo(
-    () => pairFiltersByValue(metaData.filters),
-    [metaData.filters],
+    () => pairFiltersByValue(meta.filters),
+    [meta.filters],
   );
 
   const [chartData, setChartData] = useState<ChartDataSetAndConfiguration[]>([
@@ -94,13 +94,13 @@ const ChartDataSelector = ({
   return (
     <Formik<FormValues>
       initialValues={{
-        filters: mapValues(metaData.filters, () => ''),
+        filters: mapValues(meta.filters, () => ''),
         indicator: '',
       }}
       validationSchema={Yup.object<FormValues>({
         indicator: Yup.string().required('Select an indicator'),
         filters: Yup.object(
-          mapValues(metaData.filters, filter =>
+          mapValues(meta.filters, filter =>
             Yup.string().required(`Select a ${filter.legend.toLowerCase()}`),
           ),
         ),
@@ -121,7 +121,7 @@ const ChartDataSelector = ({
           );
         }
 
-        const name = `${metaData.indicators[indicator].label}${
+        const name = `${meta.indicators[indicator].label}${
           filterOptions.length
             ? ` (${filterOptions
                 .map(filter => filtersByValue[filter].label)
@@ -142,7 +142,7 @@ const ChartDataSelector = ({
             label: name,
             colour: colours[chartData.length % colours.length],
             symbol: symbols[chartData.length % symbols.length],
-            unit: metaData.indicators[indicator].unit || '',
+            unit: meta.indicators[indicator].unit || '',
           },
         };
 
@@ -158,7 +158,7 @@ const ChartDataSelector = ({
         <>
           <Form {...form} id={formId} showSubmitError>
             <div className="govuk-grid-row">
-              {Object.entries(metaData.filters).map(([filterKey, filter]) => (
+              {Object.entries(meta.filters).map(([filterKey, filter]) => (
                 <div className="govuk-grid-column-one-third" key={filterKey}>
                   <FormFieldSelect
                     id={`${formId}-filters-${filterKey}`}
@@ -221,7 +221,7 @@ const ChartDataSelector = ({
                       )}
 
                       <div className={styles.selectedDataIndicator}>
-                        {metaData.indicators[selected.dataSet.indicator].label}
+                        {meta.indicators[selected.dataSet.indicator].label}
                       </div>
 
                       <div className={styles.selectedDataAction}>

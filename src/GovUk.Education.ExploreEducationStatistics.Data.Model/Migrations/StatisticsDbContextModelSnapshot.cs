@@ -176,6 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("DecimalPlaces")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("IndicatorGroupId")
                         .HasColumnType("uniqueidentifier");
 

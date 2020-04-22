@@ -16,67 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 - secondary schools
 - special schools
 
-They also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.
+They also include information for [pupil referral units](/glossary#pupil-referral-unit) and pupils aged 4 years.
 
-We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).
+We use the key measures of [overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).
 
 The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.
 
-They're also used for policy development as key indicators in behaviour and school attendance policy."
-            },
-            {
-                new Guid("2c369594-3bbc-40b4-ad19-196c923f5c7f"),
-                @"**Overall absence**
+They're also used for policy development as key indicators in behaviour and school attendance policy.
 
-The [overall absence](../glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.
-
-It increased from 4.6% to 4.7% over this period while the [unauthorised absence](../glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.
-
-The rate stayed the same at 4% in primary schools but increased from 5.2% to 5.4% for secondary schools. However, in special schools it was much higher and rose to 9.7%.
-
-The overall and [authorised absence](../glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14."
-            },
-            {
-                new Guid("3913a0af-9455-4802-a037-c4cfd4719b18"),
-                @"**Unauthorised absence**
-
-The [unauthorised absence](../glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.
-
-This is due to an increase in absence due to family holidays not agreed by schools.
-
-**Authorised absence**
-
-The [authorised absence](../glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.
-
-**Total number of days missed**
-
-The total number of days missed for [overall absence](../glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.
-
-This partly reflects a rise in the total number of pupils with the average number of days missed per pupil slightly increased to 8.2 days from 8.1 days in 2015/16.
-
-In 2016/17, 91.8% of primary, secondary and special school pupils missed at least 1 session during the school year - similar to the 91.7% figure from 2015/16."
-            },
-            {
-                new Guid("8a8add13-368c-4067-9210-166bb19a00c1"),
-                @"The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015 to 16 but still down from 43.3% in 2011 to 12.
-
-It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).
-
-Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
-            },
-            {
-                new Guid("4aa06200-406b-4f5a-bee4-19e3b83eb1d2"),
-                @"**Persistent absentees**
-
-The [overall absence](../glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.
-
-**Illness absence rate**
-
-The illness absence rate is almost 4 times higher for persistent absentees at 7.6% compared to 2% for other pupils."
-            },
-            {
-                new Guid("33c3a82e-7d8d-47fc-9019-2fe5344ec32d"),
-                @"These have been broken down into the following:
+Within this release, absence by reason is broken down in three different ways:
 
 * distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences
 
@@ -85,10 +33,60 @@ The illness absence rate is almost 4 times higher for persistent absentees at 7.
 * one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
             },
             {
+                new Guid("2c369594-3bbc-40b4-ad19-196c923f5c7f"),
+                @"**Overall absence**
+
+The [overall absence](/glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.
+
+It increased from 4.6% to 4.7% over this period while the [unauthorised absence](/glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.
+
+The rate stayed the same at 4% in primary schools but increased from 5.2% to 5.4% for secondary schools. However, in special schools it was much higher and rose to 9.7%.
+
+The overall and [authorised absence](/glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14."
+            },
+            {
+                new Guid("3913a0af-9455-4802-a037-c4cfd4719b18"),
+                @"**Unauthorised absence**
+
+The [unauthorised absence](/glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.
+
+This is due to an increase in absence due to family holidays not agreed by schools.
+
+**Authorised absence**
+
+The [authorised absence](/glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.
+
+**Total number of days missed**
+
+The total number of days missed for [overall absence](/glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.
+
+This partly reflects a rise in the total number of pupils with the average number of days missed per pupil slightly increased to 8.2 days from 8.1 days in 2015/16.
+
+In 2016/17, 91.8% of primary, secondary and special school pupils missed at least 1 session during the school year - similar to the 91.7% figure from 2015/16."
+            },
+            {
+                new Guid("8a8add13-368c-4067-9210-166bb19a00c1"),
+                @"The [persistent absence](/glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015/16 but still down from 43.3% in 2011/12.
+
+It also accounted for almost a third (31.6%) of all [authorised absence](/glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](/glossary#unauthorised-absence).
+
+Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015/16."
+            },
+            {
+                new Guid("4aa06200-406b-4f5a-bee4-19e3b83eb1d2"),
+                @"**Persistent absentees**
+
+The [overall absence](/glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.
+
+**Illness absence rate**
+
+The illness absence rate is almost 4 times higher for persistent absentees at 7.6% compared to 2% for other pupils."
+            },
+            {
                 new Guid("2ef5f84f-e151-425d-8906-2921712f9157"),
                 @"**Illness**
 
-This is the main driver behind [overall absence](../glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.
+This is the main driver behind [overall absence](/glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.
 
 While the overall absence rate has slightly increased since 2015/16 the illness rate has stayed the same at 2.6%.
 
@@ -126,15 +124,15 @@ These pupils accounted for 23.5% of days missed while 8.2% of pupils had no abse
 
 Across all schools:
 
-* [overall absence](../glossary#overall-absence) - highest in summer and lowest in autumn
+* [overall absence](/glossary#overall-absence) - highest in summer and lowest in autumn
 
-* [authorised absence](../glossary#authorised-absence) - highest in spring and lowest in summer
+* [authorised absence](/glossary#authorised-absence) - highest in spring and lowest in summer
 
-* [unauthorised absence](../glossary#unauthorised-absence) - highest in summer"
+* [unauthorised absence](/glossary#unauthorised-absence) - highest in summer"
             },
             {
                 new Guid("eb4318f9-11e0-46ea-9796-c36a9dc25014"),
-                @"The [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.
+                @"The [overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.
 **Ethnic groups**
 
 Overall absence rate:
@@ -191,23 +189,23 @@ Persistent absence rate:
             },
             {
                 new Guid("97c54e5f-2406-4333-851d-b6c9cc4bf612"),
-                @"The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous 2 years.
+                @"The [overall absence](/glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous two years.
 
 Absence recorded for 4-year-olds is not treated as authorised or unauthorised and only reported as overall absence."
             },
             {
                 new Guid("3aaafa20-bc32-4523-bb23-dd55c458f928"),
-                @"The [overall absence](../glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.
+                @"The [overall absence](/glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.
 
-The [persistent absence](../glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16."
+The [persistent absence](/glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16."
             },
             {
                 new Guid("7d97f8ed-e1d0-4244-bec3-3432af356f57"),
-                @"[Overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).
+                @"[Overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).
 
 **Overall absence**
 
-Similar to 2015/16, the 3 regions with the highest rates across all school types were:
+Similar to 2015/16, the three regions with the highest rates across all school types were:
 
 * North East - 4.9%
 
@@ -233,25 +231,25 @@ The region with the highest persistent absence rate was Yorkshire and the Humber
 
 * special schools
 
-They also include national-level information on permanent and fixed-period exclusions for [pupil referral units](../glossary#pupil-referral-unit).
+They also include national-level information on permanent and fixed-period exclusions for [pupil referral units](/glossary#pupil-referral-unit).
 
 All figures are based on unrounded data so constituent parts may not add up due to rounding."
             },
             {
                 new Guid("70546a7d-5edd-4b8f-b096-cfd50153f4cb"),
-                @"The number of [permanent exclusions](../glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.
+                @"The number of [permanent exclusions](/glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.
 
-This works out to an average 40.6 permanent exclusions per day - up from an 35.2 per day in 2015/16.
+This works out to an average 40.6 permanent exclusions per day - up from 35.2 per day in 2015/16.
 
-The permanent exclusion rate has also increased to 0.10% of pupils - up from from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000."
+The permanent exclusion rate has also increased to 0.10% of pupils - up from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000."
             },
             {
                 new Guid("81d8eba2-9cba-4b04-bb02-e00ace5c4418"),
                 @"Most occurred in secondary schools which accounted for 83% of all permanent exclusions.
 
-The [permanent exclusion](../glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
+The [permanent exclusion](/glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.
 
-The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from from 0.08% in 2015/16.
+The rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from 0.08% in 2015/16.
 
 The rate generally followed a downward trend after 2006/07 - when it stood at 0.12%.
 
@@ -259,9 +257,9 @@ However, since 2012/13 it has been on the rise although rates are still lower no
             },
             {
                 new Guid("7971329a-9e16-468b-9eb3-62bfc384b5a3"),
-                @"The number of fixed-period exclusionshas increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.
+                @"The number of fixed-period exclusions has increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.
 
-This works out to around 2,010 fixed-period exclusions per day - up from an 1,786 per day in 2015/16."
+This works out to around 2,010 fixed-period exclusions per day - up from 1,786 per day in 2015/16."
             },
             {
                 new Guid("e9462ed0-10dc-4ff5-8cda-f8c3b66f2714"),
@@ -287,13 +285,13 @@ This works out to around 2,010 fixed-period exclusions per day - up from an 1,78
                 new Guid("4e05bbb3-bd4e-4602-8424-069e59034c87"),
                 @"**Pupils with one or more fixed-period exclusion definition**
 
-The number of pupils with [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.
+The number of pupils with [one or more fixed-period exclusion](/glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.
 
 Of these kinds of pupils, 59.1% excluded on only 1 occasion while 1.5% received 10 or more fixed-period exclusions during the year.
 
-The percentage of pupils who went on to receive a [permanent exclusion](../glossary#permanent-exclusion) was 3.5%.
+The percentage of pupils who went on to receive a [permanent exclusion](/glossary#permanent-exclusion) was 3.5%.
 
-The average length of [fixed-period exclusion](../glossary#fixed-period-exclusion) across schools decreased to 2.1 days - slightly shorter than in 2015/16.
+The average length of [fixed-period exclusion](/glossary#fixed-period-exclusion) across schools decreased to 2.1 days - slightly shorter than in 2015/16.
 
 The highest proportion of fixed-period exclusions (46.6%) lasted for only 1 day.
 
@@ -301,7 +299,7 @@ Only 2.0% of fixed-period exclusions lasted for longer than 1 week and longer fi
             },
             {
                 new Guid("99d75d39-7ea5-456e-979d-1215fa673a83"),
-                @"All reasons (except bullying and theft) saw an increase in [permanent exclusions](../glossary#permanent-exclusion) since 2015/16.
+                @"All reasons (except bullying and theft) saw an increase in [permanent exclusions](/glossary#permanent-exclusion) since 2015/16.
 
 The following most common reasons saw the largest increases:
 
@@ -315,9 +313,9 @@ The following most common reasons saw the largest increases:
 
 Remained the most common reason for permanent exclusions accounting for 2,755 (35.7%) of all permanent exclusions - which is equivalent to 3 permanent exclusions per 10,000 pupils.
 
-However, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](../glossary#fixed-period-exclusion).
+However, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](/glossary#fixed-period-exclusion).
 
-Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 %) of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
+Persistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.
 
 All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent disruptive behaviour and other reasons saw the largest increases."
             },
@@ -335,9 +333,9 @@ All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent
 
 **Age, national curriculum year group and gender**
 
-* more than half of all [permanent exclusions](../glossary#permanent-exclusion) (57.2%) and [fixed-period exclusions](../glossary#fixed-period-exclusion) (52.6 %) occur in national curriculum year 9 or above
+* more than half of all [permanent exclusions](/glossary#permanent-exclusion) (57.2%) and [fixed-period exclusions](/glossary#fixed-period-exclusion) (52.6 %) occur in national curriculum year 9 or above
 
-* a quarter (25%) of all permanent exclusions were for pupils aged 14 - who also had the highest rates for fixed-period exclusion and pupils receiving [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion)
+* a quarter (25%) of all permanent exclusions were for pupils aged 14 - who also had the highest rates for fixed-period exclusion and pupils receiving [one or more fixed-period exclusion](/glossary#one-or-more-fixed-period-exclusion)
 
 * the permanent exclusion rate for boys (0.15%) was more than 3 times higher than for girls (0.04%)
 
@@ -367,25 +365,25 @@ All reasons saw an increase in fixed-period exclusions since 2015/16. Persistent
             },
             {
                 new Guid("d988a5e8-4e3c-4c1d-b5a9-bf0e1d947085"),
-                @"There were 560 reviews lodged with [independent review panels](../glossary#independent-review-panel) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
+                @"There were 560 reviews lodged with [independent review panels](/glossary#independent-review-panel) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
             },
             {
                 new Guid("d3288340-2689-4346-91a6-c070e7b0799d"),
                 @"**Permanent exclusion**
 
-The [permanent exclusion](../glossary#permanent-exclusion) rate in [pupil referral units](../glossary#pupil-referral-unit) decreased to 0.13 - down from 0.14% in 2015/16.
+The [permanent exclusion](/glossary#permanent-exclusion) rate in [pupil referral units](/glossary#pupil-referral-unit) decreased to 0.13 - down from 0.14% in 2015/16.
 
 Permanent exclusions rates have remained fairly steady following an increase between 2013/14 and 2014/15.
 
 **Fixed-period exclusion**
 
-The [fixed period exclusion](../glossary#fixed-period-exclusion) rate has been steadily increasing since 2013/14.
+The [fixed period exclusion](/glossary#fixed-period-exclusion) rate has been steadily increasing since 2013/14.
 
 The percentage of pupils in pupil referral units who 1 or more fixed-period exclusion increased to 59.17% - up from 58.15% in 2015/16."
             },
             {
                 new Guid("1a1d29f6-c4d5-41a9-9a06-b2ce84043edd"),
-                @"There's considerable variation in the [permanent exclusion](../glossary#permanent-exclusion) and [fixed-period exclusion](../glossary#fixed-period-exclusion) rate at the LA level.
+                @"There's considerable variation in the [permanent exclusion](/glossary#permanent-exclusion) and [fixed-period exclusion](/glossary#fixed-period-exclusion) rate at the LA level.
 
 **Permanent exclusion**
 
@@ -433,7 +431,7 @@ The proportion of applicants who received an offer of any of their preferred sch
 
 **Secondary National Offer Day**
 
-These statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of secondary school places to all applicants on the [Secondary National Offer Day](../glossary#national-offer-day) of 1 March 2018.
+These statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of secondary school places to all applicants on the [Secondary National Offer Day](/glossary#national-offer-day) of 1 March 2018.
 
 The secondary figures have been collected since 2008 and can be viewed as a time series in the following table."
             },

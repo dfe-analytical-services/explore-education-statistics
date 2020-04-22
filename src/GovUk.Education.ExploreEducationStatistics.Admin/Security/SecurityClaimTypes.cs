@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         SubmitAllReleasesToHigherReview,
         ApproveAllReleases,
         MakeAmendmentsOfAllReleases,
+        PublishAllReleases,
         DeleteAllReleaseAmendments,
         
         /**

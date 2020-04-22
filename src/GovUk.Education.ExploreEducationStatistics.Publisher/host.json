@@ -3,12 +3,13 @@
   "logging": {
     "logLevel": {
       "default": "None",
-      "Function.GenerateAllContent": "Information",
+      "Function.PublishAllContent": "Information",
       "Function.GenerateReleaseContent": "Information",
       "Function.PublishReleases": "Information",
       "Function.PublishReleaseContent": "Information",
       "Function.PublishReleaseData": "Information",
       "Function.PublishReleaseFiles": "Information",
+      "Function.PublishReleaseContentImmediate": "Information",
       "Function.ValidateRelease": "Information",
       "Function.DataFactoryPipelineStatusFunction": "Information",
       "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"

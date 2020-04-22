@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public enum IStatus
     {
+        UPLOADING,
         QUEUED,
         RUNNING_PHASE_1,
         RUNNING_PHASE_2,
@@ -23,7 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     {
         private static readonly List<IStatus> FinishedImportStatuses = new List<IStatus> {
             IStatus.COMPLETE,
-            IStatus.FAILED
+            IStatus.FAILED,
+            IStatus.NOT_FOUND
         };
         
         private readonly CloudTable _table;

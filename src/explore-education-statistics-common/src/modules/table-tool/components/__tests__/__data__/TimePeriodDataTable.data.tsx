@@ -10,6 +10,7 @@ export const testData1 = {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             EthnicGroupMajor: {
               label: 'Ethnic group major',
@@ -30,6 +31,7 @@ export const testData1 = {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
@@ -54,11 +56,15 @@ export const testData1 = {
           value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
           label: 'Number of authorised absence sessions',
           unit: '',
+          name: 'sess_authorised',
+          decimalPlaces: 2,
         },
         {
           value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
           label: 'Number of overall absence sessions',
           unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
         },
       ],
       locations: [
@@ -401,6 +407,7 @@ export const testData2 = {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             EthnicGroupMajor: {
               label: 'Ethnic group major',
@@ -421,6 +428,7 @@ export const testData2 = {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
@@ -445,6 +453,8 @@ export const testData2 = {
           value: 'f9ae4976-7cd3-4718-834a-09349b6eb377',
           label: 'Authorised absence rate',
           unit: '%',
+          name: 'sess_authorised_percent',
+          decimalPlaces: 2,
         },
       ],
       locations: [
@@ -735,6 +745,7 @@ export const testData3 = {
           totalValue: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
+          name: 'characteristic',
           options: {
             EthnicGroupMajor: {
               label: 'Ethnic group major',
@@ -755,6 +766,7 @@ export const testData3 = {
           totalValue: '',
           hint: 'Filter by school type',
           legend: 'School type',
+          name: 'school_type',
           options: {
             Default: {
               label: 'Default',
@@ -779,6 +791,8 @@ export const testData3 = {
           value: 'f9ae4976-7cd3-4718-834a-09349b6eb377',
           label: 'Authorised absence rate',
           unit: '%',
+          name: 'sess_authorised_percent',
+          decimalPlaces: 2,
         },
       ],
       locations: [
@@ -954,16 +968,22 @@ export const testDataNoFilters = {
           value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
           label: 'Number of overall absence sessions',
           unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
         },
         {
           value: 'd1c4a0be-8756-470d-2b51-08d78f6f2b08',
           label: 'Number of authorised absence sessions',
           unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
         },
         {
           value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
           label: 'Authorised absence rate',
           unit: '%',
+          name: 'sess_authorised_percent',
+          decimalPlaces: 2,
         },
       ],
       locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
@@ -1034,4 +1054,202 @@ export const testDataNoFilters = {
     ],
     rowGroups: [[{ value: 'E92000001', label: 'England' }]],
   } as UnmappedTableHeadersConfig,
+};
+
+export const testDataFiltersWithNoResults = {
+  fullTable: {
+    subjectMeta: {
+      geoJsonAvailable: false,
+      filters: {
+        Characteristic: {
+          totalValue: '',
+          hint: 'Filter by pupil characteristic',
+          legend: 'Characteristic',
+          name: 'characteristic',
+          options: {
+            FirstLanguage: {
+              label: 'First language',
+              options: [
+                {
+                  label:
+                    'First language Known or believed to be other than English',
+                  value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+                },
+                {
+                  label: 'First language Unclassified',
+                  value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+                },
+              ],
+            },
+          },
+        },
+        SchoolType: {
+          totalValue: '',
+          hint: 'Filter by school type',
+          legend: 'School type',
+          name: 'school_type',
+          options: {
+            Default: {
+              label: 'Default',
+              options: [
+                {
+                  label: 'Special',
+                  value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+                },
+              ],
+            },
+          },
+        },
+      },
+      footnotes: [],
+      indicators: [
+        {
+          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          label: 'Number of authorised absence sessions',
+          unit: '',
+          name: 'sess_authorised',
+          decimalPlaces: 2,
+        },
+        {
+          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          label: 'Number of overall absence sessions',
+          unit: '',
+          name: 'sess_overall',
+          decimalPlaces: 2,
+        },
+      ],
+      locations: [
+        { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
+        { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
+      ],
+      publicationName: 'Pupil absence in schools in England',
+      subjectName: 'Absence by characteristic',
+      timePeriodRange: [
+        { label: '2013/14', year: 2013, code: 'AY' },
+        { label: '2014/15', year: 2014, code: 'AY' },
+        { label: '2015/16', year: 2015, code: 'AY' },
+      ],
+    },
+    results: [
+      {
+        filters: [
+          '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+          'b3207d77-143b-43d5-8b48-32d29727e96f',
+        ],
+        geographicLevel: 'LocalAuthority',
+        location: {
+          country: { code: 'E92000001', name: 'England' },
+          localAuthority: { code: 'E08000026', name: 'Coventry' },
+          region: { code: 'E12000005', name: 'West Midlands' },
+        },
+        measures: {
+          '0003d2ac-4425-4432-2afb-08d78f6f2b08': '4185',
+          '829460cd-ae9e-4266-2aff-08d78f6f2b08': '5142',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: [
+          '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+          'b3207d77-143b-43d5-8b48-32d29727e96f',
+        ],
+        geographicLevel: 'LocalAuthority',
+        location: {
+          country: { code: 'E92000001', name: 'England' },
+          localAuthority: { code: 'E09000008', name: 'Croydon' },
+          region: { code: 'E13000002', name: 'Outer London' },
+        },
+        measures: {
+          '0003d2ac-4425-4432-2afb-08d78f6f2b08': 'x',
+          '829460cd-ae9e-4266-2aff-08d78f6f2b08': 'x',
+        },
+        timePeriod: '2013_AY',
+      },
+      {
+        filters: [
+          '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+          'b3207d77-143b-43d5-8b48-32d29727e96f',
+        ],
+        geographicLevel: 'LocalAuthority',
+        location: {
+          country: { code: 'E92000001', name: 'England' },
+          localAuthority: { code: 'E08000026', name: 'Coventry' },
+          region: { code: 'E12000005', name: 'West Midlands' },
+        },
+        measures: {
+          '0003d2ac-4425-4432-2afb-08d78f6f2b08': '6492',
+          '829460cd-ae9e-4266-2aff-08d78f6f2b08': '7280',
+        },
+        timePeriod: '2013_AY',
+      },
+      {
+        filters: [
+          '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+          'b3207d77-143b-43d5-8b48-32d29727e96f',
+        ],
+        geographicLevel: 'LocalAuthority',
+        location: {
+          country: { code: 'E92000001', name: 'England' },
+          localAuthority: { code: 'E09000008', name: 'Croydon' },
+          region: { code: 'E13000002', name: 'Outer London' },
+        },
+        measures: {
+          '0003d2ac-4425-4432-2afb-08d78f6f2b08': '4809',
+          '829460cd-ae9e-4266-2aff-08d78f6f2b08': '5076',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: [
+          '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+          'b3207d77-143b-43d5-8b48-32d29727e96f',
+        ],
+        geographicLevel: 'LocalAuthority',
+        location: {
+          country: { code: 'E92000001', name: 'England' },
+          localAuthority: { code: 'E09000008', name: 'Croydon' },
+          region: { code: 'E13000002', name: 'Outer London' },
+        },
+        measures: {
+          '0003d2ac-4425-4432-2afb-08d78f6f2b08': '4179',
+          '829460cd-ae9e-4266-2aff-08d78f6f2b08': '4390',
+        },
+        timePeriod: '2013_AY',
+      },
+      {
+        filters: [
+          '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+          'b3207d77-143b-43d5-8b48-32d29727e96f',
+        ],
+        geographicLevel: 'LocalAuthority',
+        location: {
+          country: { code: 'E92000001', name: 'England' },
+          localAuthority: { code: 'E08000026', name: 'Coventry' },
+          region: { code: 'E12000005', name: 'West Midlands' },
+        },
+        measures: {
+          '0003d2ac-4425-4432-2afb-08d78f6f2b08': '5542',
+          '829460cd-ae9e-4266-2aff-08d78f6f2b08': '6493',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: [
+          '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+          'b3207d77-143b-43d5-8b48-32d29727e96f',
+        ],
+        geographicLevel: 'LocalAuthority',
+        location: {
+          country: { code: 'E92000001', name: 'England' },
+          localAuthority: { code: 'E09000008', name: 'Croydon' },
+          region: { code: 'E13000002', name: 'Outer London' },
+        },
+        measures: {
+          '0003d2ac-4425-4432-2afb-08d78f6f2b08': '5322',
+          '829460cd-ae9e-4266-2aff-08d78f6f2b08': '5483',
+        },
+        timePeriod: '2015_AY',
+      },
+    ],
+  } as UnmappedFullTable,
 };

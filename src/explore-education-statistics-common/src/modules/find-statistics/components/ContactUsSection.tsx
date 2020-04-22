@@ -1,6 +1,5 @@
-import React, { useContext } from 'react';
 import { PublicationContact } from '@common/services/publicationService';
-import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import React from 'react';
 
 const ContactUsSection = ({
   publicationContact,
@@ -9,7 +8,6 @@ const ContactUsSection = ({
   publicationContact: PublicationContact;
   themeTitle: string;
 }) => {
-  const { isEditing } = useContext(EditingContext);
   return (
     <>
       <p>
@@ -20,13 +18,9 @@ const ContactUsSection = ({
       </h4>
       <p className="govuk-!-margin-top-0">
         Email <br />
-        {isEditing ? (
-          <a>{publicationContact.teamEmail}</a>
-        ) : (
-          <a href={`mailto:${publicationContact.teamEmail}`}>
-            {publicationContact.teamEmail}
-          </a>
-        )}
+        <a href={`mailto:${publicationContact.teamEmail}`}>
+          {publicationContact.teamEmail}
+        </a>
       </p>
       <p>
         Telephone: {publicationContact.contactName} <br />{' '}

@@ -1,17 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
     public class ReleaseStatusViewModel
     {
         public Guid ReleaseId { get; set; }
-        public string DataStage { get; set; }
-        public string ContentStage { get; set; }
-        public string FilesStage { get; set; }
-        public string PublishingStage { get; set; }
-        public string OverallStage { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatusDataStage DataStage { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatusContentStage ContentStage { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatusFilesStage FilesStage { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatusPublishingStage PublishingStage { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatusOverallStage OverallStage { get; set; }
         public DateTimeOffset LastUpdated { get; set; }
     }
 }

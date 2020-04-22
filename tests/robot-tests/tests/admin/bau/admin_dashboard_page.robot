@@ -30,4 +30,3 @@ Verify correct data is shown when theme and topic is shown
     environment variable should be set   RUN_IDENTIFIER
     user selects from list by label  css:#selectTopic  UI test topic %{RUN_IDENTIFIER}
     user waits until page contains element   xpath://h2[text()="Test theme"]/../h3[text()="UI test topic %{RUN_IDENTIFIER}"]
-

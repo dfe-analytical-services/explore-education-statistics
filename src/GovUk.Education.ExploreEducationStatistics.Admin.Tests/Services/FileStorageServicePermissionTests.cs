@@ -113,10 +113,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private void AssertSecurityPoliciesChecked<T>(
             Func<FileStorageService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (configuration, subjectService, userService, releaseHelper, fileTypeService, contentDbContext) = Mocks();
+            var (configuration, subjectService, userService, releaseHelper, fileTypeService, contentDbContext, importService) = Mocks();
 
             var service = new FileStorageService(configuration.Object, subjectService.Object, 
-                userService.Object, releaseHelper.Object, fileTypeService.Object, contentDbContext.Object);
+                userService.Object, releaseHelper.Object, fileTypeService.Object, contentDbContext.Object, importService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
@@ -127,7 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IUserService>, 
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IFileTypeService>,
-            Mock<ContentDbContext>) Mocks()
+            Mock<ContentDbContext>,
+            Mock<IImportService>) Mocks()
         {
             var mockConf= new Mock<IConfiguration>();
             mockConf.Setup(c => c.GetSection(It.IsAny<string>())).Returns(new Mock<IConfigurationSection>().Object);  
@@ -138,7 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IUserService>(), 
                 MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
                 new Mock<IFileTypeService>(),
-                new Mock<ContentDbContext>());
+                new Mock<ContentDbContext>(),
+                new Mock<IImportService>());
         }
     }
 }

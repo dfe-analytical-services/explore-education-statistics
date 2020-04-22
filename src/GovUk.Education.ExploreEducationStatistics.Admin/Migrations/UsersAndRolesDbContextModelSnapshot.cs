@@ -590,13 +590,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         new
                         {
                             Id = -30,
-                            ClaimType = "MakeAmendmentsOfAllReleases",
+                            ClaimType = "PublishAllReleases",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         },
                         new
                         {
                             Id = -31,
+                            ClaimType = "MakeAmendmentsOfAllReleases",
+                            ClaimValue = "",
+                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
+                        },
+                        new
+                        {
+                            Id = -32,
                             ClaimType = "DeleteAllReleaseAmendments",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
