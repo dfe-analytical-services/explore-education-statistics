@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -312,18 +311,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
-                    .OnSuccess(async release =>
+                .OnSuccess(_userService.CheckCanPublishRelease)
+                .OnSuccess(async release =>
+                {
+                    if (release.Status != ReleaseStatus.Approved)
                     {
-                        if (release.Status != ReleaseStatus.Approved)
-                        {
-                            return ValidationActionResult(ReleaseNotApproved);
-                        }
+                        return ValidationActionResult(ReleaseNotApproved);
+                    }
 
-                        await _publishingService.QueueValidateReleaseAsync(releaseId, true);
+                    await _publishingService.QueueValidateReleaseAsync(releaseId, true);
 
-                        return new Either<ActionResult, bool>(true);
-                    }));
+                    return new Either<ActionResult, bool>(true);
+                });
         }
 
         public Task<Either<ActionResult, bool>> PublishReleaseContentAsync(Guid releaseId)
@@ -451,7 +450,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async deletePlan =>
                 {
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                    await RemoveChartFileReleaseLinks(deletePlan);
                     await _subjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
 
                     return await _fileStorageService
@@ -527,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         QueryComparisons.NotEqual, IStatus.COMPLETE.ToString()));
                 
                 var query = new TableQuery<DatafileImport>().Where(filters);
-                var cloudTable = await _coreTableStorageService.GetTableAsync("imports", true);
+                var cloudTable = await _coreTableStorageService.GetTableAsync("imports");
                 var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
                 if (results.Results.Count != 0)
                 {
@@ -535,18 +533,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
             return true;
-        }
-
-        private async Task RemoveChartFileReleaseLinks(DeleteDataFilePlan deletePlan)
-        {
-            // TODO DW - does deleting of chart files need to go into datablockservice?
-            var deletes = deletePlan.DeleteDataBlockPlan.DependentDataBlocks.SelectMany(block =>
-                block.InfographicFilenames.Select(chartFilename =>
-                    _fileStorageService.DeleteNonDataFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
-                )
-            );
-            
-            await Task.WhenAll(deletes);
         }
 
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)

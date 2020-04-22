@@ -268,13 +268,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             return result.Value;
         }
         
-        private static void AssertNotFound<T>(ActionResult<T> result) where T : class
-        {
-            Assert.IsAssignableFrom<ActionResult<T>>(result);
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
-            Assert.Null(result.Value);
-        }
-        
         private static ValidationProblemDetails AssertValidationProblem<T>(ActionResult<T> result) where T : class
         {
             Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
@@ -293,14 +286,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         private static (
-            Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager) Mocks()
         {
-            return (new Mock<IImportService>(),
-                    new Mock<IReleaseService>(),
+            return (new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
                     new Mock<IReleaseStatusService>(),
                     MockUserManager(Users)
@@ -308,15 +299,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         private static ReleasesController ReleasesControllerWithMocks((
-            Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
-            Mock<UserManager<ApplicationUser>> UserManager,
+            Mock<UserManager<ApplicationUser>> UserManager
             ) mocks)
         {
             return new ReleasesController(
-                mocks.ImportService.Object,
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.ReleaseStatusService.Object,

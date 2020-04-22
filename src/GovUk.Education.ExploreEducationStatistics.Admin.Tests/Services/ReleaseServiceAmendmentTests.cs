@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -31,7 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
        [Fact]
        public void CreateReleaseAmendmentAsync()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, _) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService,
+                fileStorageService, importStatusService, footnoteService, _, dataBlockService) = Mocks();
 
             var releaseId = Guid.NewGuid();
             var releaseType = new ReleaseType
@@ -103,15 +103,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 CreatedBy = createdBy,
                 CreatedById = createdById,
                 InternalReleaseNote = internalReleaseNote,
-                RelatedInformation = new List<BasicLink>
+                RelatedInformation = new List<Link>
                 {
-                    new BasicLink
+                    new Link
                     {
                         Id = Guid.NewGuid(),
                         Description = "Link 1",
                         Url = "URL 1"
                     },
-                    new BasicLink
+                    new Link
                     {
                         Id = Guid.NewGuid(),
                         Description = "Link 2",
@@ -187,11 +187,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Order = 2,
                             Content = new List<IContentBlock>
                             {
-                                new InsetTextBlock
+                                new MarkDownBlock
                                 {
                                     Id = Guid.NewGuid(),
                                     Body = "Text",
-                                    Heading = "Heading",
                                     Comments = new List<Comment>
                                     {
                                         new Comment
@@ -218,11 +217,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Order = 1,
                             Content = new List<IContentBlock>
                             {
-                                new InsetTextBlock
+                                new MarkDownBlock
                                 {
                                     Id = Guid.NewGuid(),
                                     Body = "Text",
-                                    Heading = "Heading",
                                     Comments = new List<Comment> {
                                         new Comment
                                         {
@@ -357,7 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext.SaveChanges();
             }
 
-            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment2"))
+            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
             {
                 statisticsDbContext.Release.Add(new Data.Model.Release
                 {
@@ -391,14 +389,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
             {
-                using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment2"))
+                using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
                 {
                     var releaseService = new ReleaseService(contentDbContext, AdminMapper(),
                         publishingService.Object, new PersistenceHelper<ContentDbContext>(contentDbContext),
                         userService.Object,
                         repository.Object,
                         subjectService.Object, tableStorageService.Object, fileStorageService.Object,
-                        importStatusService.Object, footnoteService.Object, statisticsDbContext);
+                        importStatusService.Object, footnoteService.Object, statisticsDbContext, dataBlockService.Object);
 
                     // Method under test 
                     var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
@@ -452,7 +450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var index = amendment.RelatedInformation.IndexOf(amended);
                     var original = release.RelatedInformation[index];
-                    AssertAmendedBasicLinkCorrect(amended, original);
+                    AssertAmendedLinkCorrect(amended, original);
                 });
                 
                 Assert.Equal(release.Updates.Count, amendment.Updates.Count);
@@ -522,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(amendment.Amendment);
             }
 
-            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment2"))
+            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
             {
                 var releaseSubjectLinks = statisticsDbContext
                     .ReleaseSubject
@@ -535,7 +533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
        }
 
-       private static void AssertAmendedBasicLinkCorrect(BasicLink amended, BasicLink original)
+       private static void AssertAmendedLinkCorrect(Link amended, Link original)
        {
            Assert.True(amended.Id != Guid.Empty);
            Assert.NotEqual(original.Id, amended.Id);
@@ -622,7 +620,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IFileStorageService>,
             Mock<IImportStatusService>,
             Mock<IFootnoteService>,
-            Mock<StatisticsDbContext>) Mocks()
+            Mock<StatisticsDbContext>,
+            Mock<IDataBlockService>) Mocks()
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
@@ -644,7 +643,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IFileStorageService>(),
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
-                new Mock<StatisticsDbContext>());
+                new Mock<StatisticsDbContext>(),
+                new Mock<IDataBlockService>());
         }
     }
 }

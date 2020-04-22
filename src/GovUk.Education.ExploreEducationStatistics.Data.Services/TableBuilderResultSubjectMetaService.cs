@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
@@ -129,8 +128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             bool geoJsonRequested,
             long? boundaryLevelId)
         {
-            var observationalUnits = _locationService.GetObservationalUnits(observations);
-
             var viewModels = observationalUnits.SelectMany(pair =>
                 BuildObservationalUnitMetaViewModelsWithGeoJsonIfAvailable(
                     pair.Key,
