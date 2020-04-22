@@ -31,6 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             _releaseMigrationService = releaseMigrationService;
         }
+        
+        [HttpPost("releases/populate-release-amendment-tables")]
+        public async Task<ActionResult<bool>> PopulateReleaseAmendmentTables()
+        {
+            return await _releaseMigrationService
+                .PopulateReleaseAmendmentTables()
+                .HandleFailuresOrOk();
+        }
 
         [HttpPost("release/{releaseId}/populate-release-amendment-tables")]
         public async Task<ActionResult<bool>> PopulateReleaseAmendmentTables(Guid releaseId)

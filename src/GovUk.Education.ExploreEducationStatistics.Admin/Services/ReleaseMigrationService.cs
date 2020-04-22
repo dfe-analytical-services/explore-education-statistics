@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -9,9 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -24,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        private readonly ISubjectService _subjectService;
         private readonly IFileStorageService _fileStorageService;
 
         public ReleaseMigrationService(
@@ -32,23 +32,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             StatisticsDbContext statisticsDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
-            ISubjectService subjectService,
             IFileStorageService fileStorageService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
-            _subjectService = subjectService;
             _persistenceHelper = persistenceHelper;
             _fileStorageService = fileStorageService;
+        }
+
+        public async Task<Either<ActionResult, bool>> PopulateReleaseAmendmentTables()
+        {
+            var releaseIds = _contentDbContext
+                .Releases
+                .Select(r => r.Id)
+                .ToList();
+            
+            foreach (var releaseId in releaseIds)
+            {
+                var result = await PopulateReleaseAmendmentTables(releaseId);
+
+                if (result.IsLeft)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public Task<Either<ActionResult, Release>> PopulateReleaseAmendmentTables(Guid releaseId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-//                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanRunReleaseMigrations)
                 .OnSuccess(PopulateFileTables)
                 .OnSuccess(PopulateReleaseSubjectTable);
         }

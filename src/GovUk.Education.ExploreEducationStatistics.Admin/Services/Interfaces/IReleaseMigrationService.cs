@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseMigrationService
     {
+        Task<Either<ActionResult, bool>> PopulateReleaseAmendmentTables();
+        
         Task<Either<ActionResult, Release>> PopulateReleaseAmendmentTables(Guid releaseId);
     }
 }
