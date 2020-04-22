@@ -37,9 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         [TimeIdentifierMeta("Calendar Year Q3", "CYQ3", Category.CalendarYear, Default, ShortLabel, "Q3")]
         CalendarYearQ3,
 
-        [TimeIdentifierMeta("Calendar Year Q3-Q4", "CYQ3Q4", Category.CalendarYear, Default, ShortLabel, "Q3-Q4")]
-        CalendarYearQ3Q4,
-
         [TimeIdentifierMeta("Calendar Year Q4", "CYQ4", Category.CalendarYear, Default, ShortLabel, "Q4")]
         CalendarYearQ4,
 

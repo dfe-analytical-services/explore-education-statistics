@@ -6,6 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Database
     public enum TimePeriodLabelFormat
     {
         FullLabel,
+        FullLabelBeforeYear,
         NoLabel,
         ShortLabel
     }

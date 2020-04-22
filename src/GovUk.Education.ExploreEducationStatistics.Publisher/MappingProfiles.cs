@@ -1,5 +1,6 @@
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
@@ -37,6 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .ForMember(dest => dest.Releases, m => m.Ignore());
 
             CreateMap<Release, CachedReleaseViewModel>()
+                .ForMember(dest => dest.CoverageTitle,
+                    m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
                 .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));

@@ -1,9 +1,6 @@
 import Link from '@admin/components/Link';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import {
-  getSelectedTimePeriodCoverageLabel,
-  getTimePeriodCoverageDateRangeStringLong,
-} from '@admin/pages/release/util/releaseSummaryUtil';
+import { getTimePeriodCoverageDateRangeStringLong } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
 import {
@@ -68,10 +65,7 @@ const ReleaseSummaryPage = () => {
               {publication.title}
             </SummaryListItem>
             <SummaryListItem term="Time period">
-              {getSelectedTimePeriodCoverageLabel(
-                model.releaseSummaryDetails.timePeriodCoverage.value,
-                model.timePeriodCoverageGroups,
-              )}
+              {model.releaseSummaryDetails.timePeriodCoverage.label}
             </SummaryListItem>
             <SummaryListItem term="Release period">
               <time>

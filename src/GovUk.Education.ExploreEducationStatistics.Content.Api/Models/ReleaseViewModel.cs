@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             release.Id,
             release.Title,
             release.YearTitle,
+            release.CoverageTitle,
             release.ReleaseName,
             release.NextReleaseDate,
             release.Published,

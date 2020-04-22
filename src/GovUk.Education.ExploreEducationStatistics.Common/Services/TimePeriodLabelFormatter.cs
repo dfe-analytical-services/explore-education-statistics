@@ -14,7 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private TimePeriodLabelFormat LabelFormat { get; }
         private TimePeriodYearFormat YearFormat { get; }
 
-        private TimePeriodLabelFormatter(TimePeriodLabelFormat labelFormat, TimePeriodYearFormat yearFormat)
+        private TimePeriodLabelFormatter(TimePeriodLabelFormat labelFormat,
+            TimePeriodYearFormat yearFormat)
         {
             LabelFormat = labelFormat;
             YearFormat = yearFormat;
@@ -33,9 +34,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private string FormatInternal(int year, TimeIdentifier timeIdentifier)
         {
-            var formattedLabel = FormatLabelInternal(timeIdentifier);
+            var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
             var formattedYear = FormatYearInternal(year);
-            return IsNullOrEmpty(formattedLabel) ? formattedYear : $"{formattedYear} {formattedLabel}";
+            return LabelFormat switch
+            {
+                TimePeriodLabelFormat.FullLabel => $"{formattedYear} {labelValueAttribute.Label}",
+                TimePeriodLabelFormat.FullLabelBeforeYear => $"{labelValueAttribute.Label} {formattedYear}",
+                TimePeriodLabelFormat.NoLabel => formattedYear,
+                TimePeriodLabelFormat.ShortLabel => IsNullOrEmpty(labelValueAttribute.ShortLabel)
+                    ? formattedYear
+                    : $"{formattedYear} {labelValueAttribute.ShortLabel}",
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         private string FormatYearInternal(int year)
@@ -54,25 +64,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             throw new ArgumentOutOfRangeException();
         }
 
-        private string FormatLabelInternal(TimeIdentifier timeIdentifier)
-        {
-            var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
-            return LabelFormat switch
-            {
-                TimePeriodLabelFormat.FullLabel => labelValueAttribute.Label,
-                TimePeriodLabelFormat.NoLabel => Empty,
-                TimePeriodLabelFormat.ShortLabel => labelValueAttribute.ShortLabel,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
-
         private static TimePeriodLabelFormatter FormatterFor(TimeIdentifier timeIdentifier,
             TimePeriodLabelFormat? overridingLabelFormat = null)
         {
             var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
             return overridingLabelFormat.HasValue
                 ? new TimePeriodLabelFormatter(overridingLabelFormat.Value, labelValueAttribute.YearFormat)
-                : new TimePeriodLabelFormatter(labelValueAttribute.LabelFormat, labelValueAttribute.YearFormat);
+                : new TimePeriodLabelFormatter(labelValueAttribute.LabelFormat,
+                    labelValueAttribute.YearFormat);
         }
     }
 }
