@@ -60,22 +60,6 @@ export const findTimePeriodCoverageGroup = (
   );
 };
 
-export const findTimePeriodCoverageOption = (
-  code: string,
-  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
-) =>
-  timePeriodCoverageGroups
-    .flatMap(group => group.timeIdentifiers)
-    .find(option => option.identifier.value === code) ||
-  timePeriodCoverageGroups[0].timeIdentifiers[0];
-
-export const getSelectedTimePeriodCoverageLabel = (
-  timePeriodCoverageCode: string,
-  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
-) =>
-  findTimePeriodCoverageOption(timePeriodCoverageCode, timePeriodCoverageGroups)
-    .identifier.label;
-
 export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
   switch (approvalStatus) {
     case 'Draft':

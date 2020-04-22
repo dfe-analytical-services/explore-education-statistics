@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public string Title => TimePeriodLabelFormatter.Format(Year, TimePeriodCoverage, FullLabel);
+        public string Title => TimePeriodLabelFormatter.Format(Year, TimePeriodCoverage, FullLabelBeforeYear);
 
         public int Year => int.Parse(_releaseName);
 

@@ -13,6 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         protected CachedReleaseViewModel(Guid id,
             string title,
             string yearTitle,
+            string coverageTitle,
             string releaseName,
             PartialDate nextReleaseDate,
             DateTime? published,
@@ -30,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
             Id = id;
             Title = title;
             YearTitle = yearTitle;
+            CoverageTitle = coverageTitle;
             ReleaseName = releaseName;
             NextReleaseDate = nextReleaseDate;
             Published = published;
@@ -50,6 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         public string Title { get; set; }
 
         public string YearTitle { get; set; }
+
+        public string CoverageTitle { get; set; }
 
         public string ReleaseName { get; set; }
 
