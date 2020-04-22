@@ -171,7 +171,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            // TODO DW - test these!
             if (await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;

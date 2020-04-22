@@ -96,7 +96,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var newSubject = context.Subject.Add(new Subject
                 {
                     Id = subjectId,
-                    Name = name
+                    Name = name,
+                    // TODO BAU-384 - remove after this work goes out
+                    ReleaseId = release.Id
                 }
             ).Entity;
             
@@ -110,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             context.ReleaseSubject.AddRange(newReleaseSubjectLinks);
             
             context.SaveChanges();
-            return existingSubject;
+            return newSubject;
         }
 
         private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext context)

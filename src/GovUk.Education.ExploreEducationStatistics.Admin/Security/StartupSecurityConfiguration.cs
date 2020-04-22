@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy => 
-                    policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
+                    policy.Requirements.Add(new ViewSubjectDataRequirement()));
 
                 /**
                  * Pre Release management
@@ -177,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ViewSubjectDataForSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSubjectDataAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
 
             /**

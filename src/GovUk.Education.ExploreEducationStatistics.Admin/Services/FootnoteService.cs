@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     filterItemIds,
                     indicatorIds,
                     subjectIds)
-                .OnSuccess(_ =>
+                .OnSuccess(releaseIds =>
                 {
                     var footnote = DbSet().Add(new Footnote
                     {
@@ -76,6 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         FilterItems = new List<FilterItemFootnote>(),
                         Indicators = new List<IndicatorFootnote>(),
                         Subjects = new List<SubjectFootnote>(),
+                        // TODO BAU-384 - this can be removed when this work goes out
+                        ReleaseId = releaseIds.First()
                     }).Entity;
 
                     CreateSubjectLinks(footnote, subjectIds);
@@ -413,7 +415,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => footnote);
         }
 
-        private async Task<Either<ActionResult, bool>> CheckCanUpdateReleases(
+        // TODO BAU-384 - the returned list of release ids can be removed when this work goes out
+        private async Task<Either<ActionResult, List<Guid>>> CheckCanUpdateReleases(
             IEnumerable<Guid> filterIds,
             IEnumerable<Guid> filterGroupIds,
             IEnumerable<Guid> filterItemIds,
@@ -437,16 +440,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             foreach (var releaseId in releaseIds)
             {
                 var canUpdate = await GetContentReleaseById(releaseId)
-                    .OnSuccess(_userService.CheckCanUpdateRelease)
-                    .OnSuccess(_ => true);
+                    .OnSuccess(_userService.CheckCanUpdateRelease);
 
                 if (canUpdate.IsLeft)
                 {
-                    return canUpdate;
+                    return canUpdate.OnSuccess(_ => new List<Guid>());
                 }
             }
 
-            return true;
+            return releaseIds;
         }
         
         private Task<Either<ActionResult, Release>> GetContentReleaseById(Guid releaseId)
