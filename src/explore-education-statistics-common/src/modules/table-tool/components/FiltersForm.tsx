@@ -11,7 +11,7 @@ import useResetFormOnPreviousStep from '@common/modules/table-tool/components/ho
 import {
   FilterOption,
   PublicationSubjectMeta,
-} from '@common/modules/table-tool/services/tableBuilderService';
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';

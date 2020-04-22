@@ -1,4 +1,4 @@
-import { UnmappedTableHeadersConfig } from '@common/modules/table-tool/services/permalinkService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import {
   CategoryFilter,
   Indicator,
@@ -134,6 +134,7 @@ describe('mapTableHeadersConfig', () => {
         { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
         { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
       ],
+      boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
       timePeriodRange: [
@@ -155,12 +156,14 @@ describe('mapTableHeadersConfig', () => {
         new CategoryFilter({
           value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           label: 'Ethnicity Major Asian Total',
-          filterGroup: 'Ethnic group major',
+          group: 'Ethnic group major',
+          category: 'Characteristic',
         }),
         new CategoryFilter({
           value: '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           label: 'Ethnicity Major Black Total',
-          filterGroup: 'Ethnic group major',
+          group: 'Ethnic group major',
+          category: 'Characteristic',
         }),
       ],
     ]);
@@ -169,23 +172,27 @@ describe('mapTableHeadersConfig', () => {
         new CategoryFilter({
           value: 'd7e7e412-f462-444f-84ac-3454fa471cb8',
           label: 'State-funded primary',
-          filterGroup: 'Default',
+          group: 'Default',
+          category: 'School type',
         }),
         new CategoryFilter({
           value: 'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
           label: 'State-funded secondary',
-          filterGroup: 'Default',
+          group: 'Default',
+          category: 'School type',
         }),
       ],
       [
-        new LocationFilter(
-          { value: 'E09000003', label: 'Barnet' },
-          'localAuthority',
-        ),
-        new LocationFilter(
-          { value: 'E08000016', label: 'Barnsley' },
-          'localAuthority',
-        ),
+        new LocationFilter({
+          value: 'E09000003',
+          label: 'Barnet',
+          level: 'localAuthority',
+        }),
+        new LocationFilter({
+          value: 'E08000016',
+          label: 'Barnsley',
+          level: 'localAuthority',
+        }),
       ],
     ]);
     expect(headers.columns).toEqual([
@@ -193,11 +200,13 @@ describe('mapTableHeadersConfig', () => {
         year: 2014,
         code: 'AY',
         label: '2014/15',
+        order: 0,
       }),
       new TimePeriodFilter({
         year: 2015,
         code: 'AY',
         label: '2015/16',
+        order: 1,
       }),
     ]);
     expect(headers.rows).toEqual([

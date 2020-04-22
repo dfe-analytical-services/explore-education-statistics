@@ -84,6 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got GeoJsonAvailable in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
+                    var boundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys);
+
                     var indicators = GetIndicators(query);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
@@ -106,6 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         GeoJsonAvailable = geoJsonAvailable,
                         Indicators = indicators,
                         Locations = locations,
+                        BoundaryLevels = boundaryLevels,
                         PublicationName = publication.Title,
                         SubjectName = subject.Name,
                         TimePeriodRange = timePeriodRange
@@ -136,6 +139,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     boundaryLevelId));
 
             return TransformDuplicateObservationalUnitsWithUniqueLabels(viewModels);
+        }
+
+        private IEnumerable<BoundaryLevelIdLabel> GetBoundaryLevelOptions(long? boundaryLevelId,
+            IEnumerable<GeographicLevel> geographicLevels)
+        {
+            var boundaryLevels = boundaryLevelId.HasValue
+                ? _boundaryLevelService.FindRelatedByBoundaryLevel(boundaryLevelId.Value)
+                : _boundaryLevelService.FindByGeographicLevels(geographicLevels);
+            return boundaryLevels.Select(level => _mapper.Map<BoundaryLevelIdLabel>(level));
         }
 
         private IEnumerable<IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)

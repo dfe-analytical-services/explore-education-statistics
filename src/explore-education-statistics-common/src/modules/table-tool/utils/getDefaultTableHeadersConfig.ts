@@ -1,39 +1,26 @@
 import {
   CategoryFilter,
-  Filter,
   Indicator,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
-import { Dictionary } from '@common/types/util';
-import sortBy from 'lodash/sortBy';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-
-export interface TableHeadersConfig {
-  columns: Filter[];
-  columnGroups: Filter[][];
-  rows: Filter[];
-  rowGroups: Filter[][];
-}
+import sortBy from 'lodash/sortBy';
 
 const removeSiblinglessTotalRows = (
-  categoryFilters: Dictionary<CategoryFilter[]>,
+  filters: FullTableMeta['filters'],
 ): CategoryFilter[][] => {
-  return Object.values(categoryFilters).filter(filter => {
-    return filter.length > 1 || !filter[0].isTotal;
-  });
+  return Object.values(filters)
+    .map(filterGroup => filterGroup.options)
+    .filter(filterGroup => {
+      return filterGroup.length > 1 || !filterGroup[0].isTotal;
+    });
 };
 
 const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
   const { indicators, filters, locations, timePeriodRange } = fullTableMeta;
 
   const sortedFilters = sortBy(
-    [
-      ...removeSiblinglessTotalRows(
-        transformTableMetaFiltersToCategoryFilters(filters),
-      ),
-      locations,
-    ],
+    [...removeSiblinglessTotalRows(filters), locations],
     [options => options.length],
   );
 
@@ -43,7 +30,7 @@ const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
     columnGroups: sortedFilters.slice(0, halfwayIndex),
     rowGroups: sortedFilters.slice(halfwayIndex),
     columns: timePeriodRange.map(
-      timePeriod => new TimePeriodFilter(timePeriod),
+      (timePeriod, order) => new TimePeriodFilter({ ...timePeriod, order }),
     ),
     rows: sortBy(
       indicators.map(i => new Indicator(i)),

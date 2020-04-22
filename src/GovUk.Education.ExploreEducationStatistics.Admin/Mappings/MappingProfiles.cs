@@ -184,9 +184,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(c => c.State.GetEnumValue())
                 );
             
-            CreateMap<ContentSection, ContentSectionViewModel>();
+            CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
+                m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
-            CreateMap<Methodology, ManageMethodologyContentViewModel>();
+            CreateMap<Methodology, ManageMethodologyContentViewModel>()
+                .ForMember(dest => dest.Content,
+                    m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
+                .ForMember(dest => dest.Annexes,
+                    m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
 
             CreateMap<Release, ReleasePublicationStatusViewModel>();
         }
