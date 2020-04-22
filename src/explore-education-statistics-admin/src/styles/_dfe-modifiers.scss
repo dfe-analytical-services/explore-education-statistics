@@ -46,40 +46,11 @@ h1.govuk-panel__title {
   width: 15%;
 }
 
-.dfe-toggle-edit {
-  background: $govuk-brand-colour;
-  bottom: 0;
-  left: 0;
-  padding: 0 6px 6px;
-  position: fixed;
-  z-index: 10000;
-}
-.dfe-toggle-edit {
-  .govuk-fieldset__legend {
-    background: $govuk-brand-colour;
-    color: govuk-colour('white');
-    margin-bottom: 0;
-    padding: 5px;
-  }
-  h1 {
-    color: govuk-colour('white');
-  }
-  .govuk-radios {
-    background: govuk-colour('white');
-    min-height: 100px;
-    padding: 6px 6px 0;
-  }
-}
-
 .govuk-link.dfe-link--white {
   color: govuk-colour('white');
   &:hover {
     text-decoration: none;
   }
-}
-
-.dfe-header--white {
-  color: govuk-colour('white') !important;
 }
 
 // Hide page status tag from admin pages
