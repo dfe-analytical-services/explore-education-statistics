@@ -1,0 +1,27 @@
+@import '../../../styles/govuk-base';
+
+.tooltip {
+  background-color: #fff;
+  border: 1px solid govuk-colour('mid-grey');
+  padding: 10px;
+}
+
+.itemList {
+  list-style: none;
+  margin-bottom: 0;
+  padding-left: 0;
+
+  li {
+    align-items: center;
+    display: flex;
+    font-size: 1rem;
+  }
+}
+
+.itemColour {
+  border: 1px solid govuk-colour('black');
+  display: inline-block;
+  height: 0.5rem;
+  margin-right: 0.5rem;
+  width: 0.5rem;
+}

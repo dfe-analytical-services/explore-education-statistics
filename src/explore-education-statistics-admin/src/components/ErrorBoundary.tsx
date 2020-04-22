@@ -3,6 +3,7 @@ import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import { clients } from '@admin/services/util/configureAxios';
 import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContext';
+import logger from '@common/services/logger';
 import { AxiosError } from 'axios';
 import * as H from 'history';
 import React from 'react';
@@ -76,7 +77,9 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
     }
   };
 
-  public componentDidCatch() {
+  public componentDidCatch(error: Error) {
+    logger.error(error);
+
     this.setState({
       errorCode: 500,
     });

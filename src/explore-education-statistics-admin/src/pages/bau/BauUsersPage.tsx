@@ -1,15 +1,12 @@
 import Link from '@admin/components/Link';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import Page from '@admin/components/Page';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import userService from '@admin/services/users/service';
-import { UserStatus } from '@admin/services/users/types';
-import React, { useEffect, useState } from 'react';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import React from 'react';
 
 const BauUsersPage = () => {
-  const { value, isLoading, error } = useAsyncRetry(() =>
-    userService.getUsers(),
-  );
+  const { value, isLoading } = useAsyncRetry(() => userService.getUsers());
 
   return (
     <Page

@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -31,6 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
      
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
+        
+        public string YearTitle { get; set; }
         
         private string _slug;
         public string Slug

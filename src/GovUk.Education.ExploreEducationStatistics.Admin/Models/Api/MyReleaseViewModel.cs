@@ -28,6 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier? TimePeriodCoverage { get; set; }
         
+        public string Title { get; set; }
+        
         public Contact Contact { get; set; }
 
         public DateTime? PublishScheduled { get; set; }
