@@ -8,9 +8,7 @@ interface Props {
 }
 
 const Tag = ({ children, className, strong = false }: Props) => {
-  const classes = classNames('govuk-tag', {
-    [className || '']: className,
-  });
+  const classes = classNames('govuk-tag', className);
 
   return strong ? (
     <strong className={classes}>{children}</strong>

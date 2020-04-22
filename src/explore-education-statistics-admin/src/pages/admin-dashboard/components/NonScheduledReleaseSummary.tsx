@@ -4,7 +4,6 @@ import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummary
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import Button from '@common/components/Button';
-import { formatTestId } from '@common/utils/test-utils';
 import React from 'react';
 
 interface Props {
@@ -30,11 +29,9 @@ const NonScheduledReleaseSummary = ({
                   publicationId: release.publicationId,
                   releaseId: release.id,
                 })}
-                testId={formatTestId(
-                  `Edit release amendment link for ${
-                    release.publicationTitle
-                  }, ${getReleaseSummaryLabel(release)}`,
-                )}
+                testId={`Edit release amendment link for ${
+                  release.publicationTitle
+                }, ${getReleaseSummaryLabel(release)}`}
               >
                 {release.permissions.canUpdateRelease
                   ? 'Edit this release amendment'
@@ -47,11 +44,9 @@ const NonScheduledReleaseSummary = ({
                   releaseId: release.originalId,
                 })}
                 className="govuk-button--secondary govuk-!-margin-left-4"
-                testId={formatTestId(
-                  `View original release link for ${
-                    release.publicationTitle
-                  }, ${getReleaseSummaryLabel(release)}`,
-                )}
+                testId={`View original release link for ${
+                  release.publicationTitle
+                }, ${getReleaseSummaryLabel(release)}`}
               >
                 View original release
               </ButtonLink>
@@ -63,11 +58,9 @@ const NonScheduledReleaseSummary = ({
                   publicationId: release.publicationId,
                   releaseId: release.id,
                 })}
-                testId={formatTestId(
-                  `Edit release link for ${
-                    release.publicationTitle
-                  }, ${getReleaseSummaryLabel(release)}`,
-                )}
+                testId={`Edit release link for ${
+                  release.publicationTitle
+                }, ${getReleaseSummaryLabel(release)}`}
               >
                 {release.permissions.canUpdateRelease
                   ? 'Edit this release'

@@ -99,9 +99,7 @@ const ReleaseStatusPage = () => {
 
     setShowForm(false);
 
-    onChangeReleaseStatus({
-      status: values.releaseStatus,
-    });
+    onChangeReleaseStatus();
   }, errorCodeMappings);
 
   if (!model) return null;
