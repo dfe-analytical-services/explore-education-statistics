@@ -114,6 +114,10 @@ h1.govuk-panel__title {
   padding: 0 6px 6px;
   position: fixed;
   z-index: 10000;
+
+  @media print {
+    display: none;
+  }
 }
 .dfe-toggle-edit {
   .govuk-fieldset__legend {

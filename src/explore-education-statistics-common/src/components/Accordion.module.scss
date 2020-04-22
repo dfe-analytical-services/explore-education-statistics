@@ -21,3 +21,33 @@
 .section {
   page-break-inside: avoid;
 }
+
+:global(.js-enabled
+    .govuk-accordion__section--expanded
+    .govuk-accordion__section-content) {
+  display: block !important;
+  height: auto;
+  padding-bottom: 15px;
+  visibility: visible;
+}
+
+:global(.js-enabled .govuk-accordion__section-content) {
+  display: block !important;
+  height: 0;
+  overflow: hidden;
+  padding: 0;
+  visibility: hidden;
+
+  @media print {
+    display: block !important;
+    height: auto;
+    padding-bottom: 15px;
+    visibility: visible;
+  }
+}
+
+.govuk-accordion__section {
+  @media print {
+    display: block !important;
+  }
+}
