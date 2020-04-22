@@ -6,7 +6,7 @@ import {
   FilterOption,
   LocationLevelKeys,
   PublicationSubjectMeta,
-} from '@common/modules/table-tool/services/tableBuilderService';
+} from '@common/services/tableBuilderService';
 import { Dictionary, PartialRecord } from '@common/types/util';
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';

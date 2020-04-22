@@ -27,7 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Methodology, MethodologySummaryViewModel>();
 
-            CreateMap<Methodology, MethodologyViewModel>();
+            CreateMap<Methodology, MethodologyViewModel>()
+                .ForMember(dest => dest.Content,
+                    m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
+                .ForMember(dest => dest.Annexes,
+                    m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
 
             CreateMap<Publication, PublicationTitleViewModel>();
 

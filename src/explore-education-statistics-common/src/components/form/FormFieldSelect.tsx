@@ -5,12 +5,13 @@ import FormGroup from './FormGroup';
 import FormSelect, { FormSelectProps } from './FormSelect';
 
 type Props<FormValues> = {
+  groupClass?: string;
   name: keyof FormValues | string;
   showError?: boolean;
 } & FormSelectProps;
 
 const FormFieldSelect = <T extends {}>(props: Props<T>) => {
-  const { error, name, showError = true } = props;
+  const { error, name, groupClass, showError = true } = props;
 
   return (
     <Field name={name}>
@@ -24,7 +25,7 @@ const FormFieldSelect = <T extends {}>(props: Props<T>) => {
         }
 
         return (
-          <FormGroup hasError={!!errorMessage}>
+          <FormGroup hasError={!!errorMessage} className={groupClass}>
             <FormSelect
               {...props}
               {...field}

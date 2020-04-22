@@ -10,7 +10,6 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
-import MethodologyContent from '@frontend/modules/methodologies/components/MethodologyContent';
 import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
 import { NextPageContext } from 'next';
 import React, { Component } from 'react';
@@ -113,15 +112,19 @@ class MethodologyPage extends Component<Props> {
                   caption={caption}
                   key={order}
                 >
-                  <MethodologyHeader>
-                    <ContentSectionIndex
-                      fromId={`${this.accId[0]}-${order}-content`}
-                    />
-                  </MethodologyHeader>
+                  <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-one-quarter">
+                      <MethodologyHeader>
+                        <ContentSectionIndex
+                          fromId={`${this.accId[0]}-${order}-content`}
+                        />
+                      </MethodologyHeader>
+                    </div>
 
-                  <MethodologyContent>
-                    <SectionBlocks content={content} />
-                  </MethodologyContent>
+                    <div className="govuk-grid-column-three-quarters">
+                      <SectionBlocks content={content} />
+                    </div>
+                  </div>
                 </AccordionSection>
               );
             })}
