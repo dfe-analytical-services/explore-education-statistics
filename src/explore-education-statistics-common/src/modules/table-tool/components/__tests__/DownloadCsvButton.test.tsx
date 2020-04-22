@@ -1,8 +1,10 @@
 import {
+  CategoryFilter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import { writeFile } from 'xlsx';
@@ -18,22 +20,23 @@ jest.mock('xlsx', () => {
 });
 
 describe('DownloadCsvButton', () => {
-  const basicSubjectMeta = {
+  const basicSubjectMeta: FullTableMeta = {
     geoJsonAvailable: false,
     publicationName: '',
     subjectName: '',
     footnotes: [],
+    boundaryLevels: [],
     filters: {
-      characteristics: {
+      Characteristic: {
         name: 'characteristic',
-        legend: 'Characteristics',
-        hint: '',
-        options: {
-          gender: {
-            label: 'Gender',
-            options: [{ label: 'Female', value: 'gender_female' }],
-          },
-        },
+        options: [
+          new CategoryFilter({
+            value: 'gender_female',
+            label: 'Female',
+            group: 'Gender',
+            category: 'Characteristic',
+          }),
+        ],
       },
     },
     indicators: [
@@ -51,16 +54,19 @@ describe('DownloadCsvButton', () => {
       }),
     ],
     locations: [
-      new LocationFilter(
-        {
-          value: 'england',
-          label: 'England',
-        },
-        'country',
-      ),
+      new LocationFilter({
+        value: 'england',
+        label: 'England',
+        level: 'country',
+      }),
     ],
     timePeriodRange: [
-      new TimePeriodFilter({ code: 'AY', year: 2015, label: '2015/16' }),
+      new TimePeriodFilter({
+        code: 'AY',
+        year: 2015,
+        label: '2015/16',
+        order: 0,
+      }),
     ],
   };
 
@@ -73,25 +79,20 @@ describe('DownloadCsvButton', () => {
             ...basicSubjectMeta,
             filters: {
               ...basicSubjectMeta.filters,
-              schoolType: {
+              'School Type': {
                 name: 'school_type',
-                legend: 'School type',
-                hint: '',
-                options: {
-                  default: {
-                    label: '',
-                    options: [
-                      {
-                        label: 'State-funded-primary',
-                        value: 'school_primary',
-                      },
-                      {
-                        label: 'State-funded secondary',
-                        value: 'school_secondary',
-                      },
-                    ],
-                  },
-                },
+                options: [
+                  new CategoryFilter({
+                    value: 'school_primary',
+                    label: 'State-funded primary',
+                    category: 'School Type',
+                  }),
+                  new CategoryFilter({
+                    value: 'school_secondary',
+                    label: 'State-funded secondary',
+                    category: 'School Type',
+                  }),
+                ],
               },
             },
           },
@@ -149,25 +150,20 @@ describe('DownloadCsvButton', () => {
           ...basicSubjectMeta,
           filters: {
             ...basicSubjectMeta.filters,
-            schoolType: {
+            'School Type': {
               name: 'school_type',
-              legend: 'School type',
-              hint: '',
-              options: {
-                default: {
-                  label: '',
-                  options: [
-                    {
-                      label: 'State-funded-primary',
-                      value: 'school_primary',
-                    },
-                    {
-                      label: 'State-funded secondary',
-                      value: 'school_secondary',
-                    },
-                  ],
-                },
-              },
+              options: [
+                new CategoryFilter({
+                  value: 'school_primary',
+                  label: 'State-funded primary',
+                  category: 'School Type',
+                }),
+                new CategoryFilter({
+                  value: 'school_secondary',
+                  label: 'State-funded secondary',
+                  category: 'School Type',
+                }),
+              ],
             },
           },
         },
@@ -226,25 +222,20 @@ describe('DownloadCsvButton', () => {
           ...basicSubjectMeta,
           filters: {
             ...basicSubjectMeta.filters,
-            schoolType: {
+            'School Type': {
               name: 'school_type',
-              legend: 'School type',
-              hint: '',
-              options: {
-                default: {
-                  label: '',
-                  options: [
-                    {
-                      label: 'State-funded-primary',
-                      value: 'school_primary',
-                    },
-                    {
-                      label: 'State-funded secondary',
-                      value: 'school_secondary',
-                    },
-                  ],
-                },
-              },
+              options: [
+                new CategoryFilter({
+                  value: 'school_primary',
+                  label: 'State-funded primary',
+                  category: 'School Type',
+                }),
+                new CategoryFilter({
+                  value: 'school_secondary',
+                  label: 'State-funded secondary',
+                  category: 'School Type',
+                }),
+              ],
             },
           },
         },

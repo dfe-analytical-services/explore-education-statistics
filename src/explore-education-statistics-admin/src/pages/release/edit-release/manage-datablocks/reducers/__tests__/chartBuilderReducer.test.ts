@@ -1,15 +1,14 @@
 import {
   AxisConfiguration,
   AxisType,
-  ChartDataSet,
   ChartDefinition,
 } from '@common/modules/charts/types/chart';
+import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import produce from 'immer';
 import {
   ChartBuilderActions,
   chartBuilderReducer,
   ChartBuilderState,
-  ChartDataSetAndConfiguration,
   ChartOptions,
 } from '../chartBuilderReducer';
 
@@ -23,6 +22,7 @@ describe('chartBuilderReducer', () => {
       lineStyle: true,
       gridLines: true,
       canSize: true,
+      canSort: true,
       fixedAxisGroupBy: false,
       hasAxes: true,
       hasReferenceLines: true,
@@ -50,6 +50,15 @@ describe('chartBuilderReducer', () => {
         type: 'major',
         defaults: {
           groupBy: 'timePeriod',
+          min: 0,
+          showGrid: true,
+          size: 50,
+          sortAsc: true,
+          sortBy: 'name',
+          tickConfig: 'default',
+          tickSpacing: 1,
+          visible: true,
+          unit: '',
         },
       },
       minor: {
@@ -63,7 +72,6 @@ describe('chartBuilderReducer', () => {
   describe('UPDATE_CHART_DEFINITION', () => {
     const initialState: ChartBuilderState = {
       axes: {},
-      dataSetAndConfiguration: [],
       options: {
         height: 300,
       },
@@ -152,10 +160,7 @@ describe('chartBuilderReducer', () => {
         payload: testChartDefinition,
       } as ChartBuilderActions);
 
-      // Need to spread as there's a weird Jest bug
-      // when comparing read-only objects
-      // See: https://github.com/facebook/jest/issues/9531
-      expect({ ...nextState.axes.major }).toEqual<AxisConfiguration>({
+      expect(nextState.axes.major).toEqual<AxisConfiguration>({
         dataSets: [],
         groupBy: 'timePeriod',
         min: 0,
@@ -171,19 +176,11 @@ describe('chartBuilderReducer', () => {
         unit: '',
       });
 
-      expect({ ...nextState.axes.minor }).toEqual<AxisConfiguration>({
+      expect(nextState.axes.minor).toEqual<AxisConfiguration>({
         dataSets: [],
-        min: 0,
         referenceLines: [],
-        showGrid: true,
-        size: 50,
-        sortAsc: true,
-        sortBy: 'name',
-        tickConfig: 'default',
-        tickSpacing: 1,
         type: 'minor',
         visible: true,
-        unit: '',
       });
     });
 
@@ -194,6 +191,7 @@ describe('chartBuilderReducer', () => {
           major: {
             type: 'major',
             dataSets: [],
+            referenceLines: [],
             groupBy: 'filters',
             visible: false,
             sortBy: 'something',
@@ -201,6 +199,7 @@ describe('chartBuilderReducer', () => {
           minor: {
             type: 'minor',
             dataSets: [],
+            referenceLines: [],
             visible: false,
             sortBy: 'something else',
           },
@@ -212,21 +211,14 @@ describe('chartBuilderReducer', () => {
         payload: testChartDefinition,
       } as ChartBuilderActions);
 
-      // Need to spread as there's a weird Jest bug
-      // when comparing read-only objects
-      // See: https://github.com/facebook/jest/issues/9531
-      expect({ ...nextState.axes.major }).toMatchObject<
-        Partial<AxisConfiguration>
-      >({
+      expect(nextState.axes.major).toMatchObject<Partial<AxisConfiguration>>({
         dataSets: [],
         groupBy: 'filters',
         sortBy: 'something',
         visible: false,
       });
 
-      expect({ ...nextState.axes.minor }).toMatchObject<
-        Partial<AxisConfiguration>
-      >({
+      expect(nextState.axes.minor).toMatchObject<Partial<AxisConfiguration>>({
         sortBy: 'something else',
         visible: false,
       });
@@ -253,6 +245,7 @@ describe('chartBuilderReducer', () => {
           major: {
             type: 'major',
             dataSets: [],
+            referenceLines: [],
             visible: false,
             sortBy: 'override me',
           },
@@ -264,76 +257,10 @@ describe('chartBuilderReducer', () => {
         payload: testChartDefinitionWithConstants,
       } as ChartBuilderActions);
 
-      // Need to spread as there's a weird Jest bug
-      // when comparing read-only objects
-      // See: https://github.com/facebook/jest/issues/9531
-      expect({ ...nextState.axes.major }).toMatchObject<
-        Partial<AxisConfiguration>
-      >({
+      expect(nextState.axes.major).toMatchObject<Partial<AxisConfiguration>>({
         sortBy: 'overriding value',
         visible: true,
       });
-    });
-
-    test('adds `axes.dataSets` if the definition has a major axis', () => {
-      const initialStateWithDataSets: ChartBuilderState = {
-        ...initialState,
-        dataSetAndConfiguration: [
-          {
-            configuration: {
-              value: '1',
-              label: 'Data set 1',
-            },
-            dataSet: {
-              filters: ['filter-1', 'filter-2'],
-              indicator: 'indicator-1',
-            },
-          },
-        ],
-      };
-
-      const nextState = produce(chartBuilderReducer)(initialStateWithDataSets, {
-        type: 'UPDATE_CHART_DEFINITION',
-        payload: testChartDefinition,
-      } as ChartBuilderActions);
-
-      // Need to spread as there's a weird Jest bug
-      // when comparing read-only objects
-      // See: https://github.com/facebook/jest/issues/9531
-      expect(nextState.axes.major?.dataSets).toEqual<ChartDataSet[]>([
-        {
-          filters: ['filter-1', 'filter-2'],
-          indicator: 'indicator-1',
-        },
-      ]);
-    });
-
-    test('does not add `axes.dataSets` for minor axis', () => {
-      const initialStateWithDataSets: ChartBuilderState = {
-        ...initialState,
-        dataSetAndConfiguration: [
-          {
-            configuration: {
-              value: '1',
-              label: 'Data set 1',
-            },
-            dataSet: {
-              filters: ['filter-1', 'filter-2'],
-              indicator: 'indicator-1',
-            },
-          },
-        ],
-      };
-
-      const nextState = produce(chartBuilderReducer)(initialStateWithDataSets, {
-        type: 'UPDATE_CHART_DEFINITION',
-        payload: testChartDefinition,
-      } as ChartBuilderActions);
-
-      // Need to spread as there's a weird Jest bug
-      // when comparing read-only objects
-      // See: https://github.com/facebook/jest/issues/9531
-      expect(nextState.axes.minor?.dataSets).toEqual<ChartDataSet[]>([]);
     });
   });
 
@@ -342,11 +269,11 @@ describe('chartBuilderReducer', () => {
       axes: {
         major: {
           dataSets: [],
+          referenceLines: [],
           type: 'major',
           visible: true,
         },
       },
-      dataSetAndConfiguration: [],
       definition: testChartDefinition,
       options: {
         height: 300,
@@ -363,10 +290,7 @@ describe('chartBuilderReducer', () => {
         },
       } as ChartBuilderActions);
 
-      // Need to spread as there's a weird Jest bug
-      // when comparing read-only objects
-      // See: https://github.com/facebook/jest/issues/9531
-      expect({ ...nextState.axes.major }).toEqual<AxisConfiguration>({
+      expect(nextState.axes.major).toEqual<AxisConfiguration>({
         dataSets: [],
         groupBy: 'indicators',
         min: 0,
@@ -413,90 +337,10 @@ describe('chartBuilderReducer', () => {
         } as ChartBuilderActions,
       );
 
-      // Need to spread as there's a weird Jest bug
-      // when comparing read-only objects
-      // See: https://github.com/facebook/jest/issues/9531
-      expect({ ...nextState.axes.major }).toMatchObject<
-        Partial<AxisConfiguration>
-      >({
+      expect(nextState.axes.major).toMatchObject<Partial<AxisConfiguration>>({
         groupBy: 'filters',
         visible: true,
       });
-    });
-
-    test('updates `axes.dataSets` property with `dataSetsAndConfiguration` state', () => {
-      const initialStateWithDataSets: ChartBuilderState = {
-        ...initialState,
-        dataSetAndConfiguration: [
-          {
-            configuration: {
-              value: '1',
-              label: 'Data set 1',
-            },
-            dataSet: {
-              filters: ['filter-1', 'filter-2'],
-              indicator: 'indicator-1',
-            },
-          },
-        ],
-      };
-
-      const nextState = produce(chartBuilderReducer)(initialStateWithDataSets, {
-        type: 'UPDATE_CHART_AXIS',
-        payload: {
-          type: 'major',
-        },
-      } as ChartBuilderActions);
-
-      expect(nextState.axes.major?.dataSets).toEqual([
-        {
-          filters: ['filter-1', 'filter-2'],
-          indicator: 'indicator-1',
-        },
-      ]);
-    });
-
-    test('does not update `axes.dataSets` for minor axis', () => {
-      const initialStateWithDataSets: ChartBuilderState = {
-        ...initialState,
-        dataSetAndConfiguration: [
-          {
-            configuration: {
-              value: '1',
-              label: 'Data set 1',
-            },
-            dataSet: {
-              filters: ['filter-1', 'filter-2'],
-              indicator: 'indicator-1',
-            },
-          },
-        ],
-      };
-
-      const nextState = produce(chartBuilderReducer)(initialStateWithDataSets, {
-        type: 'UPDATE_CHART_AXIS',
-        payload: {
-          type: 'minor',
-        },
-      } as ChartBuilderActions);
-
-      expect(nextState.axes.minor?.dataSets).toEqual([]);
-    });
-
-    test('cannot update `axes.dataSets` property directly', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
-        type: 'UPDATE_CHART_AXIS',
-        payload: {
-          type: 'major',
-          dataSets: [
-            {
-              indicator: 'some thing',
-            },
-          ],
-        },
-      } as ChartBuilderActions);
-
-      expect(nextState.axes.major?.dataSets).toEqual([]);
     });
 
     test('throws if an invalid axis definition `type` is provided', () => {
@@ -519,7 +363,6 @@ describe('chartBuilderReducer', () => {
   describe('UPDATE_CHART_OPTIONS', () => {
     const initialState: ChartBuilderState = {
       axes: {},
-      dataSetAndConfiguration: [],
       definition: testChartDefinition,
       options: {
         height: 300,
@@ -633,61 +476,53 @@ describe('chartBuilderReducer', () => {
 
   describe('ADD_DATA_SET', () => {
     const initialState: ChartBuilderState = {
-      axes: {},
-      dataSetAndConfiguration: [
-        {
-          dataSet: {
-            indicator: 'indicator-1',
-            filters: ['filter-1'],
-          },
-          configuration: {
-            label: 'Label 1',
-            value: 'value-1',
-          },
+      axes: {
+        major: {
+          type: 'major',
+          visible: true,
+          referenceLines: [],
+          dataSets: [
+            {
+              indicator: 'indicator-1',
+              filters: ['filter-1'],
+              config: {
+                label: 'Label 1',
+              },
+            },
+          ],
         },
-      ],
+      },
       definition: testChartDefinition,
       options: {
         height: 300,
       },
     };
 
-    test('adds to `dataSetAndConfiguration` with payload', () => {
+    test('adds payload to data sets', () => {
       const nextState = produce(chartBuilderReducer)(initialState, {
         type: 'ADD_DATA_SET',
         payload: {
-          dataSet: {
-            indicator: 'indicator-2',
-            filters: ['filter-2'],
-          },
-          configuration: {
+          indicator: 'indicator-2',
+          filters: ['filter-2'],
+          config: {
             label: 'Label 2',
-            value: 'value-2',
           },
         },
       } as ChartBuilderActions);
 
-      expect(nextState.dataSetAndConfiguration).toEqual<
-        ChartDataSetAndConfiguration[]
-      >([
+      expect(nextState.axes.major?.dataSets).toEqual<DataSetConfiguration[]>([
         {
-          dataSet: {
-            indicator: 'indicator-1',
-            filters: ['filter-1'],
-          },
-          configuration: {
+          indicator: 'indicator-1',
+          filters: ['filter-1'],
+          config: {
             label: 'Label 1',
-            value: 'value-1',
           },
         },
         {
-          dataSet: {
-            indicator: 'indicator-2',
-            filters: ['filter-2'],
-          },
-          configuration: {
+          indicator: 'indicator-2',
+          filters: ['filter-2'],
+          config: {
             label: 'Label 2',
-            value: 'value-2',
           },
         },
       ]);
@@ -696,29 +531,29 @@ describe('chartBuilderReducer', () => {
 
   describe('REMOVE_DATA_SET', () => {
     const initialState: ChartBuilderState = {
-      axes: {},
-      dataSetAndConfiguration: [
-        {
-          dataSet: {
-            indicator: 'indicator-1',
-            filters: ['filter-1'],
-          },
-          configuration: {
-            label: 'Label 1',
-            value: 'value-1',
-          },
+      axes: {
+        major: {
+          type: 'major',
+          visible: true,
+          referenceLines: [],
+          dataSets: [
+            {
+              indicator: 'indicator-1',
+              filters: ['filter-1'],
+              config: {
+                label: 'Label 1',
+              },
+            },
+            {
+              indicator: 'indicator-2',
+              filters: ['filter-2'],
+              config: {
+                label: 'Label 2',
+              },
+            },
+          ],
         },
-        {
-          dataSet: {
-            indicator: 'indicator-2',
-            filters: ['filter-2'],
-          },
-          configuration: {
-            label: 'Label 2',
-            value: 'value-2',
-          },
-        },
-      ],
+      },
       definition: testChartDefinition,
       options: {
         height: 300,
@@ -731,15 +566,12 @@ describe('chartBuilderReducer', () => {
         payload: 1,
       } as ChartBuilderActions);
 
-      expect(nextState.dataSetAndConfiguration).toEqual([
+      expect(nextState.axes.major?.dataSets).toEqual<DataSetConfiguration[]>([
         {
-          dataSet: {
-            indicator: 'indicator-1',
-            filters: ['filter-1'],
-          },
-          configuration: {
+          indicator: 'indicator-1',
+          filters: ['filter-1'],
+          config: {
             label: 'Label 1',
-            value: 'value-1',
           },
         },
       ]);
@@ -748,45 +580,42 @@ describe('chartBuilderReducer', () => {
 
   describe('UPDATE_DATA_SETS', () => {
     const initialState: ChartBuilderState = {
-      axes: {},
-      dataSetAndConfiguration: [
-        {
-          dataSet: {
-            indicator: 'indicator-1',
-            filters: ['filter-1'],
-          },
-          configuration: {
-            label: 'Label 1',
-            value: 'value-1',
-          },
+      axes: {
+        major: {
+          type: 'major',
+          visible: true,
+          referenceLines: [],
+          dataSets: [
+            {
+              indicator: 'indicator-1',
+              filters: ['filter-1'],
+              config: {
+                label: 'Label 1',
+              },
+            },
+            {
+              indicator: 'indicator-2',
+              filters: ['filter-2'],
+              config: {
+                label: 'Label 2',
+              },
+            },
+          ],
         },
-        {
-          dataSet: {
-            indicator: 'indicator-2',
-            filters: ['filter-2'],
-          },
-          configuration: {
-            label: 'Label 2',
-            value: 'value-2',
-          },
-        },
-      ],
+      },
       definition: testChartDefinition,
       options: {
         height: 300,
       },
     };
 
-    test('replaces `dataSetAndConfiguration` with payload', () => {
-      const payload = [
+    test('replaces data sets with payload', () => {
+      const payload: DataSetConfiguration[] = [
         {
-          dataSet: {
-            indicator: 'indicator-3',
-            filters: ['filter-3'],
-          },
-          configuration: {
+          indicator: 'indicator-3',
+          filters: ['filter-3'],
+          config: {
             label: 'Label 3',
-            value: 'value-3',
           },
         },
       ];
@@ -796,7 +625,7 @@ describe('chartBuilderReducer', () => {
         payload,
       } as ChartBuilderActions);
 
-      expect(nextState.dataSetAndConfiguration).toEqual(payload);
+      expect(nextState.axes.major?.dataSets).toEqual(payload);
     });
   });
 });

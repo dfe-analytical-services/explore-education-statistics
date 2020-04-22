@@ -1,18 +1,14 @@
-import ButtonText from '@common/components/ButtonText';
 import Link from '@admin/components/Link';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import Page from '@admin/components/Page';
 import userService from '@admin/services/users/service';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { UserStatus } from '@admin/services/users/types';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 const PreReleaseUsersPage = () => {
-  const { value, isLoading, error } = useAsyncRetry(() =>
+  const { value, isLoading } = useAsyncRetry(() =>
     userService.getPreReleaseUsers(),
   );
-
-  const removeAccessHander = () => {};
 
   return (
     <Page

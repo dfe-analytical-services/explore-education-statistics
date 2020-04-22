@@ -13,7 +13,6 @@ export default function isChartRenderable(
 
   return Boolean(
     props.type &&
-      props.labels &&
       props.axes?.major?.dataSets.length &&
       props.data &&
       props.meta,

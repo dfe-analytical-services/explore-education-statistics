@@ -28,20 +28,16 @@ import {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import {
-  AxesConfiguration,
   AxisType,
   ChartDefinition,
-  ChartMetaData,
   ChartProps,
-  DataSetConfiguration,
 } from '@common/modules/charts/types/chart';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
-import {
-  DataBlockRerequest,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { DataBlockRerequest } from '@common/services/dataBlockService';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
-import { Dictionary } from '@common/types';
+import omit from 'lodash/omit';
 import React, { useCallback, useMemo } from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
@@ -51,47 +47,10 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-function getReduceMetaDataForAxis(
-  data: DataBlockResponse,
-  metaData: ChartMetaData,
-) {
-  return (
-    items: Dictionary<DataSetConfiguration>,
-    groupName?: string,
-  ): Dictionary<DataSetConfiguration> => {
-    if (groupName === 'timePeriod') {
-      return {
-        ...items,
-        ...data.result.reduce<Dictionary<DataSetConfiguration>>(
-          (moreItems, { timePeriod }) => ({
-            ...moreItems,
-            [timePeriod]: metaData.timePeriod[timePeriod],
-          }),
-          {},
-        ),
-      };
-    }
-    return items;
-  };
-}
-
-function generateAxesMetaData(
-  axes: AxesConfiguration,
-  data: DataBlockResponse,
-  metaData: ChartMetaData,
-) {
-  return Object.values(axes as Required<AxesConfiguration>).reduce(
-    (allValues, axis) => ({
-      ...allValues,
-      ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data, metaData), {}),
-    }),
-    {},
-  );
-}
-
 interface Props {
-  data: DataBlockResponse;
-  meta: ChartMetaData;
+  data: TableDataResult[];
+  meta: FullTableMeta;
+  releaseId: string;
   initialConfiguration?: Chart;
   onChartSave?: (chart: Chart) => void;
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
@@ -100,38 +59,19 @@ interface Props {
 const ChartBuilder = ({
   data,
   meta,
+  releaseId,
   onChartSave,
   initialConfiguration,
   onRequiresDataUpdate,
 }: Props) => {
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
+    meta,
     initialConfiguration,
   );
 
-  const {
-    axes,
-    definition,
-    options,
-    dataSetAndConfiguration,
-    isValid,
-  } = chartBuilderState;
+  const { axes, definition, options, isValid } = chartBuilderState;
 
-  const getChartFile = useGetChartFile(data.releaseId);
-
-  const labels: Dictionary<DataSetConfiguration> = useMemo(
-    () => ({
-      ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-        (acc, { configuration }) => {
-          acc[configuration.value] = configuration;
-
-          return acc;
-        },
-        {},
-      ),
-      ...generateAxesMetaData(axes, data, meta),
-    }),
-    [axes, data, dataSetAndConfiguration, meta],
-  );
+  const getChartFile = useGetChartFile(releaseId);
 
   const chartProps = useMemo<ChartRendererProps | undefined>(() => {
     if (!definition) {
@@ -143,14 +83,13 @@ const ChartBuilder = ({
       data,
       axes,
       meta,
-      labels,
     };
 
     switch (definition.type) {
       case 'infographic':
         return {
           ...baseProps,
-          labels: {},
+          labels: [],
           type: 'infographic',
           fileId: options.fileId ?? '',
           getInfographic: getChartFile,
@@ -178,7 +117,7 @@ const ChartBuilder = ({
       default:
         return undefined;
     }
-  }, [axes, data, definition, getChartFile, labels, meta, options]);
+  }, [axes, data, definition, getChartFile, meta, options]);
 
   const handleBoundaryLevelChange = useCallback(
     (boundaryLevel: string) => {
@@ -193,12 +132,14 @@ const ChartBuilder = ({
   );
 
   const handleChartSave = useCallback(async () => {
-    if (!isChartRenderable(chartProps) && !isValid) {
+    if (chartProps && !isChartRenderable(chartProps) && !isValid) {
       return;
     }
 
     if (onChartSave) {
-      await onChartSave(chartProps as ChartRendererProps);
+      // We don't want to persist data set labels
+      // anymore in the deprecated format.
+      await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
     }
   }, [chartProps, isValid, onChartSave]);
 
@@ -207,7 +148,7 @@ const ChartBuilder = ({
       <ChartTypeSelector
         chartDefinitions={chartDefinitions}
         selectedChartDefinition={definition}
-        geoJsonAvailable={data.metaData.geoJsonAvailable}
+        geoJsonAvailable={meta.geoJsonAvailable}
         onSelectChart={actions.updateChartDefinition}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
@@ -248,7 +189,7 @@ const ChartBuilder = ({
               <ChartDataSelector
                 canSaveChart={isValid}
                 meta={meta}
-                selectedData={dataSetAndConfiguration}
+                dataSets={axes.major?.dataSets}
                 chartType={definition}
                 capabilities={definition.capabilities}
                 onDataAdded={actions.addDataSet}
@@ -267,7 +208,7 @@ const ChartBuilder = ({
               selectedChartType={definition}
               chartOptions={options}
               meta={meta}
-              data={data}
+              releaseId={releaseId}
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={actions.updateChartOptions}
               onSubmit={handleChartSave}
@@ -292,12 +233,11 @@ const ChartBuilder = ({
               >
                 <ChartAxisConfiguration
                   id={key}
+                  type={key as AxisType}
                   configuration={axisConfiguration}
                   capabilities={definition.capabilities}
                   data={data}
                   meta={meta}
-                  labels={chartProps?.labels}
-                  dataSets={axisConfiguration?.dataSets}
                   onChange={actions.updateChartAxis}
                   onSubmit={handleChartSave}
                 />
