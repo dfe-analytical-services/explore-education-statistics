@@ -10,13 +10,16 @@ import {
   ChartSymbol,
   LineStyle,
 } from '@common/modules/charts/types/chart';
-import { DataSetConfigurationOptions } from '@common/modules/charts/types/dataSet';
+import {
+  DataSetConfiguration,
+  DataSetConfigurationOptions,
+} from '@common/modules/charts/types/dataSet';
 import { colours, symbols } from '@common/modules/charts/util/chartUtils';
 import React from 'react';
 
 interface Props {
-  configuration: DataSetConfigurationOptions;
   capabilities: ChartCapabilities;
+  dataSet: DataSetConfiguration;
   id: string;
   onConfigurationChange?: (value: DataSetConfigurationOptions) => void;
 }
@@ -41,11 +44,13 @@ const lineStyleOptions: SelectOption[] = [
 ];
 
 const ChartDataConfiguration = ({
-  configuration,
   capabilities,
+  dataSet,
   id,
   onConfigurationChange,
 }: Props) => {
+  const { config } = dataSet;
+
   const updateConfig = (newConfig: DataSetConfigurationOptions) => {
     if (onConfigurationChange) {
       onConfigurationChange(newConfig);
@@ -61,20 +66,22 @@ const ChartDataConfiguration = ({
       </datalist>
       <FormFieldset id={id} legend="" legendHidden>
         <div className={styles.chartDataLabelConfiguration}>
-          <div className={styles.chartDataItem}>
-            <FormTextInput
-              id={`${id}-label`}
-              name="label"
-              value={configuration.label}
-              label="Label"
-              onChange={e =>
-                updateConfig({
-                  ...configuration,
-                  label: e.target.value,
-                })
-              }
-            />
-          </div>
+          {dataSet.timePeriod && dataSet.location && (
+            <div className={styles.chartDataItem}>
+              <FormTextInput
+                id={`${id}-label`}
+                name="label"
+                value={config.label}
+                label="Label"
+                onChange={e =>
+                  updateConfig({
+                    ...config,
+                    label: e.target.value,
+                  })
+                }
+              />
+            </div>
+          )}
 
           <div className={styles.chartDataItem}>
             <FormTextInput
@@ -82,11 +89,11 @@ const ChartDataConfiguration = ({
               name="colour"
               label="Colour"
               type="color"
-              value={configuration.colour}
+              value={config.colour}
               list={`${id}-colours`}
               onChange={e =>
                 updateConfig({
-                  ...configuration,
+                  ...config,
                   colour: e.target.value,
                 })
               }
@@ -99,12 +106,12 @@ const ChartDataConfiguration = ({
                 id={`${id}-symbol`}
                 name="symbol"
                 label="Symbol"
-                value={configuration.symbol}
+                value={config.symbol}
                 placeholder="none"
                 options={symbolOptions}
                 onChange={e =>
                   updateConfig({
-                    ...configuration,
+                    ...config,
                     symbol: e.target.value as ChartSymbol,
                   })
                 }
@@ -118,12 +125,12 @@ const ChartDataConfiguration = ({
                 id={`${id}-lineStyle`}
                 name="lineStyle"
                 label="Style"
-                value={configuration.lineStyle}
+                value={config.lineStyle}
                 order={[]}
                 options={lineStyleOptions}
                 onChange={e =>
                   updateConfig({
-                    ...configuration,
+                    ...config,
                     lineStyle: e.target.value as LineStyle,
                   })
                 }

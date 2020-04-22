@@ -258,8 +258,8 @@ const ChartDataSelector = ({
                             className="govuk-!-margin-bottom-3 govuk-body-s"
                           >
                             <ChartDataConfiguration
-                              configuration={dataSet.config}
                               capabilities={capabilities}
+                              dataSet={dataSet}
                               id={`${formId}-chartDataConfiguration-${index}`}
                               onConfigurationChange={updateDataSetConfig => {
                                 const nextDataSetConfigs = [...dataSetConfigs];
