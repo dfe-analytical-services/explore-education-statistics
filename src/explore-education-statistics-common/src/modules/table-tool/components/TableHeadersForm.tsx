@@ -2,7 +2,7 @@ import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormGroup, Formik } from '@common/components/form';
 import { Filter } from '@common/modules/table-tool/types/filters';
-import { TableHeadersConfig } from '@common/modules/table-tool/utils/tableHeaders';
+import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { PickByType } from '@common/types';
 import reorder from '@common/utils/reorder';
 import Yup from '@common/validation/yup';

@@ -1,5 +1,4 @@
 import ButtonText from '@common/components/ButtonText';
-import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import {
   CategoryFilter,
   Filter,
@@ -13,17 +12,10 @@ import { utils, writeFile } from 'xlsx';
 
 export const getCsvData = (fullTable: FullTable): string[][] => {
   const { subjectMeta, results } = fullTable;
-  const {
-    indicators,
-    filters: metaFilters,
-    timePeriodRange: timePeriods,
-    locations,
-  } = subjectMeta;
+  const { indicators, filters, timePeriodRange, locations } = subjectMeta;
 
-  const filters = transformTableMetaFiltersToCategoryFilters(metaFilters);
-
-  const filterColumns = Object.entries(metaFilters).map(
-    ([key]) => metaFilters[key].name,
+  const filterColumns = Object.values(filters).map(
+    filterGroup => filterGroup.name,
   );
 
   const indicatorColumns = indicators.map(indicator => indicator.name);
@@ -39,8 +31,8 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
 
   const rows = cartesian<Filter>(
     locations,
-    timePeriods,
-    ...Object.values(filters),
+    timePeriodRange,
+    ...Object.values(filters).map(filterGroup => filterGroup.options),
   ).map(row => {
     // TODO: Remove ignore when Prettier stops adding trailing comma to tuple type
     // prettier-ignore

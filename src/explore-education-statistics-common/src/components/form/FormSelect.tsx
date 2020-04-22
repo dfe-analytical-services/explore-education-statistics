@@ -19,6 +19,7 @@ export interface SelectOption {
 }
 
 export interface FormSelectProps {
+  className?: string;
   disabled?: boolean;
   error?: string;
   id: string;
@@ -32,11 +33,12 @@ export interface FormSelectProps {
     | (keyof SelectOption)[]
     | ((option: SelectOption) => SelectOption[keyof SelectOption])[];
   orderDirection?: ('asc' | 'desc')[];
+  placeholder?: string;
   value?: string | number;
-  className?: string;
 }
 
 const FormSelect = ({
+  className,
   disabled,
   error,
   id,
@@ -48,8 +50,8 @@ const FormSelect = ({
   optGroups,
   order = ['label'],
   orderDirection = ['asc'],
+  placeholder,
   value,
-  className,
 }: FormSelectProps) => {
   return (
     <>
@@ -68,6 +70,7 @@ const FormSelect = ({
         onChange={onChange}
         value={value}
       >
+        {placeholder && <option value="">{placeholder}</option>}
         {options &&
           (order === undefined || order.length === 0
             ? options
@@ -100,5 +103,7 @@ const FormSelect = ({
     </>
   );
 };
+
+FormSelect.unordered = [] as [];
 
 export default FormSelect;

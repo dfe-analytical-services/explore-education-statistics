@@ -21,7 +21,6 @@ const basicAccessCheck = (user: User) => user.permissions.canAccessSystem;
  * authorized.
  */
 const ProtectedRoute = ({
-  component,
   allowAnonymousUsers = false,
   protectionAction,
   ...rest
@@ -54,7 +53,7 @@ const ProtectedRoute = ({
     return null;
   }
 
-  return <Route component={component} {...rest} />;
+  return <Route {...rest} />;
 };
 
 export default ProtectedRoute;

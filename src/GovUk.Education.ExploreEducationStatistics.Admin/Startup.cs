@@ -44,6 +44,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -196,6 +197,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
+            services.AddLogging(builder =>
+            {
+                builder.AddApplicationInsights(Configuration.GetSection("AppInsights").GetValue<string>("InstrumentationKey"));
+                builder.AddFilter<ApplicationInsightsLoggerProvider>("", HostingEnvironment.IsDevelopment() ? LogLevel.Debug : LogLevel.Warning);
+                builder.AddFilter<ApplicationInsightsLoggerProvider>("Microsoft", LogLevel.Error);
+            });
             services.AddApplicationInsightsTelemetry();
 
             services.AddTransient<IFileStorageService, FileStorageService>();

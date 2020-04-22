@@ -7,7 +7,7 @@ import {
   locationLevelKeys,
   TimePeriodQuery,
   LocationLevelKeys,
-} from '@common/modules/table-tool/services/tableBuilderService';
+} from '@common/services/tableBuilderService';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 

@@ -1,20 +1,31 @@
-import { testChartPropsWithData1 } from '@common/modules/charts/components/__tests__/__data__/testBlockData';
+import {
+  testChartConfiguration,
+  testChartTableData,
+} from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
-import { ChartMetaData } from '@common/modules/charts/types/chart';
-import { DataBlockData } from '@common/services/dataBlockService';
+import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 import { render } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props: HorizontalBarProps = testChartPropsWithData1 as HorizontalBarProps;
-
-const { axes } = props;
-
 describe('HorizontalBarBlock', () => {
+  const fullTable = mapFullTable(testChartTableData);
+  const props: VerticalBarProps = {
+    ...testChartConfiguration,
+    axes: testChartConfiguration.axes as VerticalBarProps['axes'],
+    meta: fullTable.subjectMeta,
+    data: fullTable.results,
+  };
+
+  const { axes } = props;
+
   test('renders basic chart correctly', () => {
     const { container } = render(<HorizontalBarBlock {...props} />);
 
@@ -45,11 +56,10 @@ describe('HorizontalBarBlock', () => {
     const legendItems = container.querySelectorAll('.recharts-legend-item');
 
     expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
-    expect(legendItems[1]).toHaveTextContent('Overall absence rate');
-    expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
+    expect(legendItems[1]).toHaveTextContent('Authorised absence rate');
+    expect(legendItems[2]).toHaveTextContent('Overall absence rate');
 
-    // expect there to be rectangles for all 3 data sets across both years
-    expect(container.querySelectorAll('.recharts-rectangle')).toHaveLength(6);
+    expect(container.querySelectorAll('.recharts-rectangle')).toHaveLength(15);
   });
 
   test('major axis can be hidden', () => {
@@ -130,15 +140,13 @@ describe('HorizontalBarBlock', () => {
   test('can stack data', () => {
     const { container } = render(
       <HorizontalBarBlock
-        {...{
-          ...props,
-          axes: {
-            ...props.axes,
-            minor: {
-              ...props.axes.minor,
-              min: -10,
-              max: 20,
-            },
+        {...props}
+        axes={{
+          ...props.axes,
+          minor: {
+            ...props.axes.minor,
+            min: -10,
+            max: 20,
           },
         }}
         stacked
@@ -146,29 +154,25 @@ describe('HorizontalBarBlock', () => {
       />,
     );
 
-    // Unsure how to tell stacked data apart, other than the snapshot
-
     expect(
       Array.from(container.querySelectorAll('.recharts-rectangle')).length,
-    ).toBe(6);
+    ).toBe(15);
   });
 
   test('can render major axis reference line', () => {
     const { container } = render(
       <HorizontalBarBlock
-        {...{
-          ...props,
-          axes: {
-            ...props.axes,
-            major: {
-              ...props.axes.major,
-              referenceLines: [
-                {
-                  label: 'hello',
-                  position: '2014/15',
-                },
-              ],
-            },
+        {...props}
+        axes={{
+          ...props.axes,
+          major: {
+            ...props.axes.major,
+            referenceLines: [
+              {
+                label: 'hello',
+                position: '2014_AY',
+              },
+            ],
           },
         }}
         legend="none"
@@ -177,24 +181,22 @@ describe('HorizontalBarBlock', () => {
 
     expect(
       container.querySelector('.recharts-reference-line'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('hello');
   });
   test('can render minor axis reference line', () => {
     const { container } = render(
       <HorizontalBarBlock
-        {...{
-          ...props,
-          axes: {
-            ...props.axes,
-            minor: {
-              ...props.axes.minor,
-              referenceLines: [
-                {
-                  label: 'hello',
-                  position: 0,
-                },
-              ],
-            },
+        {...props}
+        axes={{
+          ...props.axes,
+          minor: {
+            ...props.axes.minor,
+            referenceLines: [
+              {
+                label: 'hello',
+                position: 0,
+              },
+            ],
           },
         }}
         legend="none"
@@ -203,19 +205,18 @@ describe('HorizontalBarBlock', () => {
 
     expect(
       container.querySelector('.recharts-reference-line'),
-    ).toBeInTheDocument();
+    ).toHaveTextContent('hello');
   });
 
   test('dies gracefully with bad data', () => {
-    const invalidData = (undefined as unknown) as DataBlockData;
-    const invalidMeta = (undefined as unknown) as ChartMetaData;
+    const invalidData = (undefined as unknown) as TableDataResponse['results'];
+    const invalidMeta = (undefined as unknown) as FullTableMeta;
     const invalidAxes = (undefined as unknown) as HorizontalBarProps['axes'];
 
     const { container } = render(
       <HorizontalBarBlock
         height={300}
         data={invalidData}
-        labels={{}}
         meta={invalidMeta}
         axes={invalidAxes}
       />,
@@ -224,12 +225,7 @@ describe('HorizontalBarBlock', () => {
   });
 
   test('can change width of chart', () => {
-    const propsWithSize = {
-      ...props,
-      width: 200,
-    };
-
-    const { container } = render(<HorizontalBarBlock {...propsWithSize} />);
+    const { container } = render(<HorizontalBarBlock {...props} width={200} />);
 
     const responsiveContainer = container.querySelector(
       '.recharts-responsive-container',
@@ -244,12 +240,9 @@ describe('HorizontalBarBlock', () => {
   });
 
   test('can change height of chart', () => {
-    const propsWithSize = {
-      ...props,
-      height: 200,
-    };
-
-    const { container } = render(<HorizontalBarBlock {...propsWithSize} />);
+    const { container } = render(
+      <HorizontalBarBlock {...props} height={200} />,
+    );
 
     const responsiveContainer = container.querySelector(
       '.recharts-responsive-container',
@@ -264,179 +257,186 @@ describe('HorizontalBarBlock', () => {
   });
 
   test('can limit range of minor ticks to default', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        major: props.axes.major,
-        minor: {
-          ...props.axes.minor,
-          tickConfig: 'default',
-        },
-      },
-    };
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          major: props.axes.major,
+          minor: {
+            ...props.axes.minor,
+            tickConfig: 'default',
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'x', '-3', '3', '9', '20');
+    expectTicks(container, 'x', '0', '2', '4', '6');
   });
 
   test('can limit range of minor ticks to start and end', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        major: props.axes.major,
-        minor: {
-          ...props.axes.minor,
-          tickConfig: 'startEnd',
-        },
-      },
-    };
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          major: props.axes.major,
+          minor: {
+            ...props.axes.minor,
+            tickConfig: 'startEnd',
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'x', '-3', '20');
+    expectTicks(container, 'x', '0', '6');
   });
 
   test('can limit range of minor ticks to custom', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        major: props.axes.major,
-        minor: {
-          ...props.axes.minor,
-          tickConfig: 'custom',
-          tickSpacing: 1,
-        },
-      },
-    };
-
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(
-      container,
-      'x',
-      '-3',
-      '-2',
-      '-1',
-      '0',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '10',
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          major: props.axes.major,
+          minor: {
+            ...props.axes.minor,
+            tickConfig: 'custom',
+            tickSpacing: 1,
+          },
+        }}
+      />,
     );
+
+    expectTicks(container, 'x', '0', '1', '2', '3', '4', '5', '6');
   });
 
   test('can limit range of major ticks to default', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          tickConfig: 'default',
-        },
-      },
-    };
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            tickConfig: 'default',
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'y', '2014/15', '2015/16');
+    expectTicks(
+      container,
+      'y',
+      '2012/13',
+      '2013/14',
+      '2014/15',
+      '2015/16',
+      '2016/17',
+    );
   });
 
   test('can limit range of major ticks to start and end', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          tickConfig: 'startEnd',
-        },
-      },
-    };
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            tickConfig: 'startEnd',
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'y', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2012/13', '2016/17');
   });
 
-  test('can limit range of minor ticks to custom', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          tickConfig: 'custom',
-          tickSpacing: 2,
-        },
-      },
-    };
+  test('can limit range of major ticks to custom', () => {
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            tickConfig: 'custom',
+            tickSpacing: 2,
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'y', '2014/15', '2015/16');
+    expectTicks(container, 'y', '2012/13', '2014/15', '2016/17');
   });
 
   test('can sort by name', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          sortBy: 'name',
-          sortAsc: true,
-        },
-      },
-    };
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            sortBy: 'name',
+            sortAsc: true,
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'y', '2014/15', '2015/16');
+    expectTicks(
+      container,
+      'y',
+      '2012/13',
+      '2013/14',
+      '2014/15',
+      '2015/16',
+      '2016/17',
+    );
   });
 
   test('can sort by name descending', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          sortBy: 'name',
-          sortAsc: false,
-        },
-      },
-    };
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            sortBy: 'name',
+            sortAsc: false,
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'y', '2015/16', '2014/15');
+    expectTicks(
+      container,
+      'y',
+      '2016/17',
+      '2015/16',
+      '2014/15',
+      '2013/14',
+      '2012/13',
+    );
   });
 
   test('can filter a data range', () => {
-    const propsWithTicks: HorizontalBarProps = {
-      ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          sortBy: 'name',
-          sortAsc: true,
-          min: 0,
-          max: 1,
-        },
-      },
-    };
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          minor: props.axes.minor,
+          major: {
+            ...props.axes.major,
+            sortBy: 'name',
+            sortAsc: true,
+            min: 0,
+            max: 1,
+          },
+        }}
+      />,
+    );
 
-    const { container } = render(<HorizontalBarBlock {...propsWithTicks} />);
-
-    expectTicks(container, 'y', '2014/15');
+    expectTicks(container, 'y', '2012/13', '2013/14');
   });
 });

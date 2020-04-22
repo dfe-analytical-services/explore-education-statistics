@@ -53,7 +53,7 @@ export default class MethodologyHeader extends React.Component<
     const { children } = this.props;
 
     return (
-      <div className="govuk-grid-column-one-quarter" ref={this.element}>
+      <div ref={this.element}>
         <div ref={this.staticRef}>{children}</div>
       </div>
     );
