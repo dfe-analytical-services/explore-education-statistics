@@ -86,9 +86,9 @@ function generateGeometryAndLegend(
   const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
 
   const { min = 0, max = 0 } = getMinMax(
-    dataSetCategories.map(
-      category => category.dataSets[selectedDataSetKey].value,
-    ),
+    dataSetCategories
+      .map(category => category.dataSets[selectedDataSetKey]?.value)
+      .filter(value => typeof value !== 'undefined'),
   );
 
   const range = max - min;
