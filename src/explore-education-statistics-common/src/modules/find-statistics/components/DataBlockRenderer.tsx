@@ -12,15 +12,9 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import { DataBlock } from '@common/services/types/blocks';
 import React, { MouseEvent, ReactNode } from 'react';
 
-export interface DataQuery {
-  method: string;
-  path: string;
-  body: string;
-}
-
 export interface DataBlockRendererProps {
   additionalTabContent?: ReactNode;
-  dataBlock: DataBlock;
+  dataBlock?: DataBlock;
   firstTabs?: ReactNode;
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
@@ -41,10 +35,14 @@ const DataBlockRenderer = ({
   id,
   onToggle,
 }: DataBlockRendererProps) => {
-  const { value: fullTable, isLoading } = useTableQuery({
-    ...dataBlock.dataBlockRequest,
-    includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
-  });
+  const { value: fullTable, isLoading } = useTableQuery(
+    dataBlock
+      ? {
+          ...dataBlock.dataBlockRequest,
+          includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
+        }
+      : undefined,
+  );
 
   return (
     <LoadingSpinner loading={isLoading}>
