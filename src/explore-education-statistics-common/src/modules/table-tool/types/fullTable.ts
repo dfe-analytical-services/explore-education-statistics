@@ -1,9 +1,13 @@
-import { GroupedFilterOptions } from '@common/modules/table-tool/services/tableBuilderService';
 import {
+  CategoryFilter,
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
+import {
+  BoundaryLevel,
+  TableDataResult,
+} from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 
 export interface FullTableMeta {
@@ -13,12 +17,10 @@ export interface FullTableMeta {
   timePeriodRange: TimePeriodFilter[];
   filters: Dictionary<{
     name: string;
-    legend: string;
-    hint?: string;
-    options: GroupedFilterOptions;
-    totalValue?: string;
+    options: CategoryFilter[];
   }>;
   indicators: Indicator[];
+  boundaryLevels: BoundaryLevel[];
   footnotes: {
     id: string;
     label: string;
@@ -26,19 +28,8 @@ export interface FullTableMeta {
   geoJsonAvailable: boolean;
 }
 
-export interface FullTableResult {
-  filters: string[];
-  geographicLevel: string;
-  location: Dictionary<{
-    code: string;
-    name: string;
-  }>;
-  measures: Dictionary<string>;
-  timePeriod: string;
-}
-
 export interface FullTable {
   title?: string;
   subjectMeta: FullTableMeta;
-  results: FullTableResult[];
+  results: TableDataResult[];
 }

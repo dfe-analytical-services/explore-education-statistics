@@ -4,7 +4,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Page from '@admin/components/Page';
 import userService from '@admin/services/users/service';
 import { UserStatus } from '@admin/services/users/types';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 
 interface Model {
@@ -17,7 +17,7 @@ const PendingInvitesPage = () => {
   const [errorStatus, setErrorStatus] = useState<number>();
   const { withoutErrorHandling } = useErrorControl();
 
-  const getPendingInvites = () => {
+  const getPendingInvites = useCallback(() => {
     setIsLoading(true);
     withoutErrorHandling(() =>
       userService
@@ -32,11 +32,11 @@ const PendingInvitesPage = () => {
         })
         .then(() => setIsLoading(false)),
     );
-  };
+  }, [withoutErrorHandling]);
 
   useEffect(() => {
     getPendingInvites();
-  }, []);
+  }, [getPendingInvites]);
 
   return (
     <Page

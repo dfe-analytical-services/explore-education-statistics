@@ -1,6 +1,9 @@
-import 'cross-fetch/polyfill';
 import 'core-js/features/array/flat';
 import 'core-js/features/array/flat-map';
+import 'cross-fetch/polyfill';
+import { enableES5 as immerPolyfill } from 'immer';
+
+immerPolyfill();
 
 if (typeof window !== 'undefined') {
   // NodeList.forEach

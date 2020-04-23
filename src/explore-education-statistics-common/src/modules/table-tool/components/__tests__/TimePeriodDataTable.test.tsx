@@ -6,7 +6,7 @@ import {
   testDataNoFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import { UnmappedFullTable } from '@common/modules/table-tool/services/tableBuilderService';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { render } from '@testing-library/react';
@@ -254,6 +254,7 @@ describe('TimePeriodDataTable', () => {
           },
         ],
         locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
@@ -268,7 +269,7 @@ describe('TimePeriodDataTable', () => {
           timePeriod: '2014_AY',
         },
       ],
-    } as UnmappedFullTable);
+    } as TableDataResponse);
 
     const tableHeadersConfig = mapTableHeadersConfig(
       {
@@ -344,6 +345,7 @@ describe('TimePeriodDataTable', () => {
           },
         ],
         locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
@@ -358,7 +360,7 @@ describe('TimePeriodDataTable', () => {
           timePeriod: '2014_AY',
         },
       ],
-    } as UnmappedFullTable);
+    } as TableDataResponse);
 
     const tableHeadersConfig = mapTableHeadersConfig(
       {
@@ -426,6 +428,7 @@ describe('TimePeriodDataTable', () => {
           },
         ],
         locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
@@ -440,7 +443,7 @@ describe('TimePeriodDataTable', () => {
           timePeriod: '2014_AY',
         },
       ],
-    } as UnmappedFullTable);
+    } as TableDataResponse);
 
     const tableHeadersConfig = mapTableHeadersConfig(
       {

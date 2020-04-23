@@ -5,7 +5,6 @@ import {
   CreateReleaseDataBlock,
   ReleaseDataBlock,
 } from '@admin/services/release/edit-release/datablocks/service';
-import { mapDataBlockResponseToFullTable } from '@common/modules/find-statistics/components/util/tableUtil';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
@@ -15,19 +14,15 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import initialiseFromQuery from '@common/modules/table-tool/components/utils/initialiseFromQuery';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import {
   TableDataQuery,
-  TimeIdentifier,
-} from '@common/modules/table-tool/services/tableBuilderService';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import getDefaultTableHeaderConfig, {
-  TableHeadersConfig,
-} from '@common/modules/table-tool/utils/tableHeaders';
-import {
-  DataBlockResponse,
-  GeographicLevel,
-} from '@common/services/dataBlockService';
+  TableDataResponse,
+} from '@common/services/tableBuilderService';
 import React, {
   createRef,
   useCallback,
@@ -43,7 +38,7 @@ export type SavedDataBlock = CreateReleaseDataBlock & {
 interface DataBlockSourceWizardProps {
   releaseId: string;
   dataBlock?: ReleaseDataBlock;
-  dataBlockResponse?: DataBlockResponse;
+  dataBlockResponse?: TableDataResponse;
   loading?: boolean;
   onDataBlockSave: (dataBlock: SavedDataBlock) => void;
   onTableToolLoaded?: () => void;
@@ -64,7 +59,7 @@ const DataBlockSourceWizard = ({
     dataBlock?.dataBlockRequest,
   );
   const [table, setTable] = useState<FullTable | undefined>(
-    dataBlockResponse && mapDataBlockResponseToFullTable(dataBlockResponse),
+    dataBlockResponse && mapFullTable(dataBlockResponse),
   );
   const [tableHeaders, setTableHeaders] = useState<TableHeadersConfig>();
   const [tableToolState, setTableToolState] = useState<TableToolState>();
@@ -91,7 +86,7 @@ const DataBlockSourceWizard = ({
 
       setQuery(dataBlock.dataBlockRequest);
 
-      const dataTable = mapDataBlockResponseToFullTable(dataBlockResponse);
+      const dataTable = mapFullTable(dataBlockResponse);
       setTable(dataTable);
 
       if (dataBlock?.tables?.length) {
@@ -145,11 +140,11 @@ const DataBlockSourceWizard = ({
         ...values,
         dataBlockRequest: {
           ...query,
-          geographicLevel: query.geographicLevel as GeographicLevel,
+          geographicLevel: query.geographicLevel,
           timePeriod: query.timePeriod && {
             ...query.timePeriod,
-            startCode: query.timePeriod.startCode as TimeIdentifier,
-            endCode: query.timePeriod.endCode as TimeIdentifier,
+            startCode: query.timePeriod.startCode,
+            endCode: query.timePeriod.endCode,
           },
         },
       };

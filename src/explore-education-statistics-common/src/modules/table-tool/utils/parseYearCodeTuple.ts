@@ -1,16 +1,11 @@
-import { TimeIdentifier } from '@common/modules/table-tool/services/tableBuilderService';
-
-export default function parseYearCodeTuple(
-  value: string,
-): [number, TimeIdentifier] {
+export default function parseYearCodeTuple(value: string): [number, string] {
   const [year, code] = value.split('_');
 
   const parsedYear = Number(year);
-  const parsedCode = code as TimeIdentifier;
 
   if (Number.isNaN(parsedYear)) {
     throw new TypeError('Could not parse time period year');
   }
 
-  return [parsedYear, parsedCode];
+  return [parsedYear, code];
 }

@@ -10,9 +10,9 @@ import KeyStatTile, {
   KeyStatProps,
 } from '@common/modules/find-statistics/components/KeyStatTile';
 import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
-import dataBlockService, {
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import tableBuilderService, {
+  TableDataResponse,
+} from '@common/services/tableBuilderService';
 import formatPretty from '@common/utils/number/formatPretty';
 import classNames from 'classnames';
 import { FormikProps } from 'formik';
@@ -41,7 +41,7 @@ const EditableKeyStatTile = ({
   ...props
 }: EditableKeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
-    DataBlockResponse | undefined
+    TableDataResponse | undefined
   >();
   const [config, setConfig] = useState<KeyStatConfig>({
     indicatorLabel: '',
@@ -52,23 +52,22 @@ const EditableKeyStatTile = ({
 
   useEffect(() => {
     if (!dataBlockResponse) {
-      dataBlockService
-        .getDataBlockForSubject({
+      tableBuilderService
+        .getTableData({
           ...dataBlockRequest,
           includeGeoJson: false,
         })
         .then(newResponse => {
           if (newResponse) {
             setDataBlockResponse(newResponse);
-            const [indicatorKey, theIndicator] = Object.entries(
-              newResponse.metaData.indicators,
-            )[0];
+            const [indicator] = newResponse.subjectMeta.indicators;
+
             setConfig({
-              indicatorLabel: theIndicator.label,
+              indicatorLabel: indicator.label,
               value: formatPretty(
-                newResponse.result[0].measures[indicatorKey],
-                theIndicator.unit,
-                theIndicator.decimalPlaces,
+                newResponse.results[0].measures[indicator.value],
+                indicator.unit,
+                indicator.decimalPlaces,
               ),
             });
           }

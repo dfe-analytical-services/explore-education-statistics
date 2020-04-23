@@ -9,7 +9,7 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { ThemeMeta } from '@common/modules/table-tool/services/tableBuilderService';
+import { ThemeMeta } from '@common/services/tableBuilderService';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
