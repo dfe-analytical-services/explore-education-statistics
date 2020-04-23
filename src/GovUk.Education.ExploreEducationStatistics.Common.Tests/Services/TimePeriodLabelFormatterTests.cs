@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{Year}", Format(Year, January, ShortLabel));
             Assert.Equal($"{FormattedAcademicYear}", Format(Year, AutumnTerm, ShortLabel));
         }
-        
+
         [Fact(Skip = "Use this to debug")]
         [SuppressMessage("ReSharper", "xUnit1004")]
         public void Debug()

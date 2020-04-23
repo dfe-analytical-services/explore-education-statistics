@@ -13,7 +13,7 @@
         Academic,
         
         /**
-         * Formats the year as a fiscal year e.g. 2018 becomes 2018/19
+         * Formats the year as a fiscal year e.g. 2018 becomes 2018-19
          */
         Fiscal
     }
