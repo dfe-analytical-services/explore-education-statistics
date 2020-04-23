@@ -103,9 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.U
         [ProducesResponseType(200)]
         public List<EnumExtensions.EnumValue> GetReleaseRoles()
         {
-            var values = EnumExtensions.GetValues<ReleaseRole>();
-
-            return values;
+            return EnumExtensions.GetValues<ReleaseRole>();
         }
     }
 }

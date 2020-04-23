@@ -188,9 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private List<UserReleaseRole> GetUserReleaseRoles(string userId)
         {
-            var result = new List<UserReleaseRole>();
-
-            result.AddRange(_contentDbContext.UserReleaseRoles
+            return _contentDbContext.UserReleaseRoles
                 .Where(x => x.UserId == Guid.Parse(userId))
                 .Select(x => new UserReleaseRole
                 {
@@ -202,10 +200,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
                     ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
                 })
+                .ToList()
                 .OrderBy(x => x.Publication.Title)
-                .ThenBy(x => x.Release.Title));
-
-            return result;
+                .ThenBy(x => x.Release.Title)
+                .ToList();
         }
 
         private string GetRoleName(string roleId)

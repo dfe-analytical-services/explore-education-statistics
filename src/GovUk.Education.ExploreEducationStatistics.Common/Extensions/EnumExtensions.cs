@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         }
         
         
-        public static List<EnumValue> GetValues<T>()
+        public static List<EnumValue> GetValues<T>() where T: Enum
         {
             return (from object itemType in Enum.GetValues(typeof(T)) select new EnumValue() {Name = Enum.GetName(typeof(T), itemType), Value = (int) itemType}).ToList();
         }
