@@ -193,9 +193,16 @@ export function useChartBuilderReducer(
             ({ type }) => type === initialConfiguration.type,
           )
         : undefined,
-      options: initialConfiguration ?? {
-        height: 300,
-        title: '',
+      options: {
+        ...(initialConfiguration ?? {}),
+        title: initialConfiguration?.title ?? '',
+        // Make sure height is never actually 0 or negative
+        // as this wouldn't make sense for any chart.
+        height:
+          typeof initialConfiguration?.height !== 'undefined' &&
+          initialConfiguration?.height > 0
+            ? initialConfiguration.height
+            : 300,
       },
     },
     initialState => {
