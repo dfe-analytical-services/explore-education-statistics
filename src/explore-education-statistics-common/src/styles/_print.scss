@@ -16,7 +16,7 @@
 }
 
 @mixin dfe-print-break-before() {
-  page-break-inside: avoid;
+  page-break-before: always;
 }
 .dfe-print-break-before {
   @include dfe-print-break-before();
@@ -27,12 +27,17 @@
     content: none !important;
   }
 
-  .govuk-accordion {
+  .govuk-accordion__section {
     @include print-break-avoid();
   }
 
   .govuk-details {
     @include print-hide();
+  }
+
+  figure {
+    @include print-break-avoid();
+    width: calc(100%) !important;
   }
 }
 

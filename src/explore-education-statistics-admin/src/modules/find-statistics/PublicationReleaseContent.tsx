@@ -85,7 +85,7 @@ const PublicationReleaseContent = () => {
 
   return (
     <>
-      <h1 className="govuk-heading-l">
+      <h1 className="govuk-heading-l dfe-print-break-before">
         <span className="govuk-caption-l">
           {`${
             release.coverageTitle

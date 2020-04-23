@@ -23,14 +23,14 @@
 }
 
 @mixin accordion-section-expanded() {
-  display: block !important;
+  display: block;
   height: auto;
   padding: 15px 0;
   visibility: visible;
 }
 
-:global(.js-enabled .govuk-accordion__section-content) {
-  display: block !important;
+.accordion :global(.govuk-accordion__section-content) {
+  display: block;
   height: 0;
   overflow: hidden;
   padding: 0;
@@ -41,8 +41,8 @@
   }
 }
 
-:global(.js-enabled
-    .govuk-accordion__section--expanded
+.accordion
+  :global(.govuk-accordion__section--expanded
     .govuk-accordion__section-content) {
   @include accordion-section-expanded();
 }
