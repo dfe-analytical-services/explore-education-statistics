@@ -1,17 +1,20 @@
 import client from '@admin/services/util/service';
 import {
+  User,
   UserStatus,
   UserInvite,
   Role,
+  ReleaseRole,
   UserUpdate,
 } from '@admin/services/users/types';
 
 export interface UsersService {
   getRoles(): Promise<Role[]>;
-  getUser(userId: string): Promise<UserStatus>;
+  getReleaseRoles(): Promise<ReleaseRole[]>;
+  getUser(userId: string): Promise<User>;
   getUsers(): Promise<UserStatus[]>;
   getPreReleaseUsers(): Promise<UserStatus[]>;
-  getPendingInvites(): Promise<UserStatus[]>;
+  getInvitedUsers(): Promise<UserStatus[]>;
   inviteUser: (invite: UserInvite) => Promise<boolean>;
   cancelInvite: (email: string) => Promise<boolean>;
   updateUser: (user: UserUpdate) => Promise<boolean>;
@@ -21,8 +24,11 @@ const service: UsersService = {
   getRoles(): Promise<Role[]> {
     return client.get<Role[]>('/bau/users/roles');
   },
-  getUser(userId: string): Promise<UserStatus> {
-    return client.get<UserStatus>(`/bau/users/${userId}`);
+  getReleaseRoles(): Promise<ReleaseRole[]> {
+    return client.get<ReleaseRole[]>('/bau/users/release-roles');
+  },
+  getUser(userId: string): Promise<User> {
+    return client.get<User>(`/bau/users/${userId}`);
   },
   getUsers(): Promise<UserStatus[]> {
     return client.get<UserStatus[]>('/bau/users');
@@ -30,8 +36,8 @@ const service: UsersService = {
   getPreReleaseUsers(): Promise<UserStatus[]> {
     return client.get<UserStatus[]>('/bau/users/pre-release');
   },
-  getPendingInvites(): Promise<UserStatus[]> {
-    return client.get<UserStatus[]>('/bau/users/pending');
+  getInvitedUsers(): Promise<UserStatus[]> {
+    return client.get<UserStatus[]>('/bau/users/invite');
   },
   inviteUser(invite: UserInvite): Promise<boolean> {
     return client.post(`/bau/users/invite`, invite);
