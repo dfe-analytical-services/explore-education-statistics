@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200422163109_EES616UpdateConfigAfterChangesForCharts")]
+    partial class EES616UpdateConfigAfterChangesForCharts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1530,9 +1532,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("88312cc0-fe1d-4ab5-81df-33fd708185cb"),
                             ContactId = new Guid("0b63e6c7-5a9d-4c48-b30f-f0729e0644c0"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans",
-                            Slug = "education-health-and-care-plans",
+                            Slug = "statements-on-sen-and-ehc-plans",
                             Summary = "",
-                            Title = "Education, health and care plans",
+                            Title = "Statements on SEN and EHC plans",
                             TopicId = new Guid("85349b0a-19c7-4089-a56b-ad8dbe85449a")
                         },
                         new

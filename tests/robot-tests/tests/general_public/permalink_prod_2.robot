@@ -16,7 +16,7 @@ Go to Table Tool page
 Go to permalink
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables/permalink/edfe9f83-d1f0-40fc-8dce-9467a250c61b
-    user waits until page contains heading
+    user waits until page contains heading   'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
 
 Validate breadcrumbs
     [Tags]  HappyPath

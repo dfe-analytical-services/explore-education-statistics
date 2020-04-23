@@ -174,7 +174,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     }))
                 .ForMember(
                     dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
+                .ForMember(dest => dest.CoverageTitle,
+                    m => m.MapFrom(r => r.TimePeriodCoverage.GetEnumLabel()));
             
             CreateMap<Update, ReleaseNoteViewModel>();
 

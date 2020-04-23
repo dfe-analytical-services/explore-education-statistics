@@ -5,6 +5,7 @@ using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -1640,10 +1641,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Publication
                 {
                     Id = new Guid("88312cc0-fe1d-4ab5-81df-33fd708185cb"),
-                    Title = "Statements on SEN and EHC plans",
+                    Title = "Education, health and care plans",
                     Summary = "",
                     TopicId = new Guid("85349b0a-19c7-4089-a56b-ad8dbe85449a"),
-                    Slug = "statements-on-sen-and-ehc-plans",
+                    Slug = "education-health-and-care-plans",
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans"),
@@ -5330,7 +5331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("08134c1d-8a58-49a4-8d8b-22e586ffd5ae"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2008, AcademicYear)}",
+                    Description = Format(2008, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 0,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009",
@@ -5339,7 +5340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("250bace6-aeb9-4fe9-8de2-3a25e0dc717f"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2009, AcademicYear)}",
+                    Description = Format(2009, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 1,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010",
@@ -5348,7 +5349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("a319e4ef-b957-40fb-8a47-b1a97814b220"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2010, AcademicYear)}",
+                    Description = Format(2010, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 2,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011",
@@ -5357,7 +5358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("13acf54a-8016-49ff-9050-c61ebe7acad2"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2011, AcademicYear)}",
+                    Description = Format(2011, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 3,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year",
@@ -5366,7 +5367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("45bd7f62-2018-4a5c-9b93-ccece8e89c46"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2012, AcademicYear)}",
+                    Description = Format(2012, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 4,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013",
@@ -5375,7 +5376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("f1225f98-40d5-494c-90f9-99f9fb59ac9d"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2013, AcademicYear)}",
+                    Description = Format(2013, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 5,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014",
@@ -5384,7 +5385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("78239816-507d-42b7-98fd-4a71d0d4eb1f"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2014, AcademicYear)}",
+                    Description = Format(2014, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 6,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015",
@@ -5393,7 +5394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("564dacdc-f58e-4aa0-8dbd-d8368b4fb6ba"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2015, AcademicYear)}",
+                    Description = Format(2015, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 7,
                     Url =
                         "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016",
@@ -5402,7 +5403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("89c02688-646d-45b5-8919-9a3fafcfe0e9"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2009, AcademicYear)}",
+                    Description = Format(2009, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 0,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010",
@@ -5411,7 +5412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("81d91c86-9bf2-496c-b026-9dc255c35635"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2010, AcademicYear)}",
+                    Description = Format(2010, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 1,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011",
@@ -5420,7 +5421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("e20141d0-d894-4b8d-a78f-e41c23500786"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2011, AcademicYear)}",
+                    Description = Format(2011, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 2,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics",
@@ -5429,7 +5430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("ce15f487-87b0-4c07-98f1-6c6732196be7"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2012, AcademicYear)}",
+                    Description = Format(2012, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 3,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013",
@@ -5438,7 +5439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("75991639-ad77-4ba6-91fc-ac08c00a4ce8"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2013, AcademicYear)}",
+                    Description = Format(2013, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 4,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014",
@@ -5447,7 +5448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Id = new Guid("28e53936-5a52-44be-a7a6-d2f14a426d28"),
-                    Description = $"{AcademicYear.GetEnumLabel()} {Format(2014, AcademicYear)}",
+                    Description = Format(2014, AcademicYear, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 5,
                     Url =
                         "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015",
@@ -5456,7 +5457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("dc8b0d8c-08bb-47cc-b3a1-9e6ac9c2c268"),
-                    Description = "January 2010",
+                    Description = Format(2010, January, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 0,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010",
@@ -5465,7 +5466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("b086ba70-703c-40dd-aaef-d2e19335188e"),
-                    Description = "January 2011",
+                    Description = Format(2011, January, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 1,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2011",
@@ -5474,7 +5475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("181ec43e-cf22-4cab-a128-0a5702468566"),
-                    Description = "January 2012",
+                    Description = Format(2012, January, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 2,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2012",
@@ -5483,7 +5484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("e6b36ee8-ef66-4864-a4b3-9047ee3da338"),
-                    Description = "January 2013",
+                    Description = Format(2013, January, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 3,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2013",
@@ -5492,7 +5493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("398ba8c6-3ea0-49da-8645-ceb3c7fb9860"),
-                    Description = "January 2014",
+                    Description = Format(2014, January, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 4,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2014",
@@ -5501,7 +5502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("5e244416-6f2a-4d22-bea4-c22a229befef"),
-                    Description = "January 2015",
+                    Description = Format(2015, January, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 5,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2015",
@@ -5510,7 +5511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("e3c1db23-8a8f-47fe-b2cd-8e677db700a2"),
-                    Description = "January 2016",
+                    Description = Format(2016, January, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 6,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2016",
@@ -5519,7 +5520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("313435b3-fe56-4b92-8e13-670dbf510062"),
-                    Description = "January 2017",
+                    Description = Format(2017, January, TimePeriodLabelFormat.FullLabelBeforeYear),
                     Order = 7,
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2017",
