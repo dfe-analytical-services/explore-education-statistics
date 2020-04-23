@@ -54,13 +54,6 @@ interface LegendEntry {
   max: string;
 }
 
-interface MapClickEvent extends LeafletMouseEvent {
-  layer: Layer;
-  sourceTarget: {
-    feature: MapFeature;
-  };
-}
-
 interface MapDataSetCategory extends DataSetCategory {
   geoJson: GeoJsonFeature;
 }
