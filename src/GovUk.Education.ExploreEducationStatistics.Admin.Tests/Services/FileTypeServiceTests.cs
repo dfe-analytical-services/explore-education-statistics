@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AllTypes.ForEach(type =>
             {
                 var expectedToSucceed = ImageTypes.Contains(type);
-                AssertHasMatchingMimeType(type, FileStorageService.AllowedChartFileTypes.ToList(), expectedToSucceed);
+                AssertHasMatchingMimeType(type, FileUploadsValidatorService.AllowedChartFileTypes.ToList(), expectedToSucceed);
             });
         }
         
@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // check that all types are valid for ancillary file uploads
             AllTypes.ForEach(type =>
             {
-                AssertHasMatchingMimeType(type, FileStorageService.AllowedAncillaryFileTypes.ToList(), true);
+                AssertHasMatchingMimeType(type, FileUploadsValidatorService.AllowedAncillaryFileTypes.ToList(), true);
             });
         }
         
@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AllTypes.ForEach(type =>
             {
                 var expectedToSucceed = CsvTypes.Contains(type);
-                AssertHasMatchingMimeType(type, FileStorageService.AllowedCsvMimeTypes.ToList(), expectedToSucceed);
+                AssertHasMatchingMimeType(type, FileUploadsValidatorService.AllowedCsvMimeTypes.ToList(), expectedToSucceed);
             });
         }
         

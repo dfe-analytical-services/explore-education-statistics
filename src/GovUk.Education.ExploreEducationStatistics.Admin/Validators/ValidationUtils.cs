@@ -95,6 +95,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotRemoveDataFilesUntilImportComplete,
         DatafileAlreadyUploaded,
         AllDatafilesUploadedMustBeComplete,
-        ReleaseNotApproved
+        ReleaseNotApproved,
+        DataFilenameCannotContainSpacesOrSpecialCharacters,
+        MetaFilenameCannotContainSpacesOrSpecialCharacters,
+        FilenameCannotContainSpacesOrSpecialCharacters
     }
 }

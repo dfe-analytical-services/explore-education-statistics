@@ -65,6 +65,16 @@ const errorCodeMappings = [
     'subjectTitle',
     'Subject title must be unique',
   ),
+  errorCodeToFieldError(
+      'DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
+      'dataFile',
+      'Data filename cannot contain spaces or special characters',
+  ),
+  errorCodeToFieldError(
+      'META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
+      'metadataFile',
+      'Meta filename cannot contain spaces or special characters',
+  ),
 ];
 
 interface FormValues {
