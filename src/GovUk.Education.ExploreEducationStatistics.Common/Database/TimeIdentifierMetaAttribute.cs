@@ -6,7 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Database
     [AttributeUsage(AttributeTargets.Field)]
     public class TimeIdentifierMetaAttribute : EnumLabelValueAttribute
     {
-        public TimePeriodLabelFormat Format { get; }
+        public TimePeriodYearFormat YearFormat { get; }
+        public TimePeriodLabelFormat LabelFormat { get; }
         public string ShortLabel { get; }
 
         public TimeIdentifierCategory Category { get; }
@@ -14,10 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Database
         public TimeIdentifierMetaAttribute(string label,
             string value,
             TimeIdentifierCategory category,
-            TimePeriodLabelFormat format = TimePeriodLabelFormat.Default,
+            TimePeriodYearFormat yearFormat = TimePeriodYearFormat.Default,
+            TimePeriodLabelFormat labelFormat = TimePeriodLabelFormat.FullLabel,
             string shortLabel = null) : base(label, value)
         {
-            Format = format;
+            YearFormat = yearFormat;
+            LabelFormat = labelFormat;
             ShortLabel = shortLabel;
             Category = category;
         }
