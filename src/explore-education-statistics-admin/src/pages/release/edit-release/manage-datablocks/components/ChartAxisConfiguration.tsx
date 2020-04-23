@@ -34,6 +34,27 @@ import omit from 'lodash/omit';
 
 type FormValues = OmitStrict<AxisConfiguration, 'dataSets' | 'type'>;
 
+const validationSchema = Yup.object<FormValues>({
+  size: Yup.number()
+    .required('Enter size of axis')
+    .positive('Size of axis must be positive'),
+  sortAsc: Yup.boolean(),
+  tickConfig: Yup.string().oneOf(
+    ['default', 'startEnd', 'custom'],
+    'Select a valid tick display type',
+  ) as Schema<AxisConfiguration['tickConfig']>,
+  tickSpacing: Yup.number().when('tickConfig', {
+    is: 'custom',
+    then: Yup.number()
+      .required('Enter tick spacing')
+      .positive('Tick spacing must be positive'),
+  }),
+  max: Yup.number(),
+  min: Yup.number(),
+  visible: Yup.boolean(),
+  referenceLines: Yup.array(),
+});
+
 type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
 
 interface Props {
@@ -191,33 +212,17 @@ const ChartAxisConfiguration = ({
     [normalizeValues, onChange],
   );
 
+  const initialValues = omit(configuration, ['dataSets', 'type']);
+
   return (
     <Formik<FormValues>
-      initialValues={omit(configuration, ['dataSets', 'type'])}
+      initialValues={initialValues}
       enableReinitialize
+      validationSchema={validationSchema}
+      isInitialValid={validationSchema.isValidSync(initialValues)}
       onSubmit={values => {
         onSubmit(normalizeValues(values));
       }}
-      validationSchema={Yup.object<FormValues>({
-        size: Yup.number()
-          .required('Enter size of axis')
-          .positive('Size of axis must be positive'),
-        sortAsc: Yup.boolean(),
-        tickConfig: Yup.string().oneOf(
-          ['default', 'startEnd', 'custom'],
-          'Select a valid tick display type',
-        ) as Schema<AxisConfiguration['tickConfig']>,
-        tickSpacing: Yup.number().when('tickConfig', {
-          is: 'custom',
-          then: Yup.number()
-            .required('Enter tick spacing')
-            .positive('Tick spacing must be positive'),
-        }),
-        max: Yup.number(),
-        min: Yup.number(),
-        visible: Yup.boolean(),
-        referenceLines: Yup.array(),
-      })}
       render={form => (
         <Form id={id}>
           <Effect

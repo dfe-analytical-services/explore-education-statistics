@@ -30,6 +30,18 @@ interface Props {
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
+const validationSchema = Yup.object<ChartOptions>({
+  height: Yup.number()
+    .required('Enter chart height')
+    .positive('Chart height must be positive'),
+  width: Yup.number().positive('Chart width must be positive'),
+  legend: Yup.string().oneOf(
+    ['bottom', 'top', 'none'],
+    'Select a valid legend position',
+  ) as Schema<ChartOptions['legend']>,
+  stacked: Yup.boolean(),
+});
+
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
@@ -85,17 +97,8 @@ const ChartConfiguration = ({
         onSubmit={values => {
           onSubmit(normalizeValues(values));
         }}
-        validationSchema={Yup.object<ChartOptions>({
-          height: Yup.number()
-            .required('Enter chart height')
-            .positive('Chart height must be positive'),
-          width: Yup.number().positive('Chart width must be positive'),
-          legend: Yup.string().oneOf(
-            ['bottom', 'top', 'none'],
-            'Select a valid legend position',
-          ) as Schema<ChartOptions['legend']>,
-          stacked: Yup.boolean(),
-        })}
+        isInitialValid={validationSchema.isValidSync(initialValues)}
+        validationSchema={validationSchema}
         render={form => (
           <Form id={formId}>
             <Effect
