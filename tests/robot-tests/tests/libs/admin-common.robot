@@ -31,7 +31,7 @@ User creates a new release for publication "${publication}" for start year "${st
     ${nextYearNumber} =    Evaluate    ${startYearNumber} + 1
     ${nextYear} =    Convert to String  ${nextYearNumber}
     user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverage
-    user selects from list by label  css:#releaseSummaryForm-timePeriodCoverage  Academic Year Q1-Q4
+    user selects from list by label  css:#releaseSummaryForm-timePeriodCoverage  Academic Year
     user enters text into element  css:#releaseSummaryForm-timePeriodCoverageStartYear  ${startYear}
     user enters text into element  css:[id="scheduledPublishDate.day"]  30
     user enters text into element  css:[id="scheduledPublishDate.month"]  09

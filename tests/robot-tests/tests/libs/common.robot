@@ -64,6 +64,7 @@ user signs in as analyst1
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
+  run keyword if    "${browser}" == "ie"        user opens ie
   go to    about:blank
 
 user opens chrome
@@ -75,6 +76,10 @@ user opens firefox
   run keyword if    ${headless} == 1      user opens firefox headless
   #run keyword if    ${headless} == 1      user opens firefox with xvfb
   run keyword if    ${headless} == 0      user opens firefox without xvfb
+
+user opens ie
+  open browser   about:blank   ie
+  maximize browser window
 
 # Requires chromedriver v2.31+ -- you can alternatively use "user opens chrome with xvfb"
 user opens chrome headless
