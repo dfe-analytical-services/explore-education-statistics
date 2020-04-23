@@ -8,8 +8,13 @@
         Default,
 
         /**
-         * Formats the year as an academic or fiscal year e.g. 2018 becomes 2018/19
+         * Formats the year as an academic year e.g. 2018 becomes 2018/19
          */
-        AcademicOrFiscal
+        Academic,
+        
+        /**
+         * Formats the year as a fiscal year e.g. 2018 becomes 2018-19
+         */
+        Fiscal
     }
 }

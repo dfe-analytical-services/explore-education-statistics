@@ -10,19 +10,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum TimeIdentifier
     {
-        [TimeIdentifierMeta("Academic Year", "AY", Category.AcademicYear, AcademicOrFiscal, NoLabel)]
+        [TimeIdentifierMeta("Academic Year", "AY", Category.AcademicYear, Academic, NoLabel)]
         AcademicYear,
 
-        [TimeIdentifierMeta("Academic Year Q1", "AYQ1", Category.AcademicYear, AcademicOrFiscal, ShortLabel, "Q1")]
+        [TimeIdentifierMeta("Academic Year Q1", "AYQ1", Category.AcademicYear, Academic, ShortLabel, "Q1")]
         AcademicYearQ1,
 
-        [TimeIdentifierMeta("Academic Year Q2", "AYQ2", Category.AcademicYear, AcademicOrFiscal, ShortLabel, "Q2")]
+        [TimeIdentifierMeta("Academic Year Q2", "AYQ2", Category.AcademicYear, Academic, ShortLabel, "Q2")]
         AcademicYearQ2,
 
-        [TimeIdentifierMeta("Academic Year Q3", "AYQ3", Category.AcademicYear, AcademicOrFiscal, ShortLabel, "Q3")]
+        [TimeIdentifierMeta("Academic Year Q3", "AYQ3", Category.AcademicYear, Academic, ShortLabel, "Q3")]
         AcademicYearQ3,
 
-        [TimeIdentifierMeta("Academic Year Q4", "AYQ4", Category.AcademicYear, AcademicOrFiscal, ShortLabel, "Q4")]
+        [TimeIdentifierMeta("Academic Year Q4", "AYQ4", Category.AcademicYear, Academic, ShortLabel, "Q4")]
         AcademicYearQ4,
 
         [TimeIdentifierMeta("Calendar Year", "CY", Category.CalendarYear, Default, NoLabel)]
@@ -36,53 +36,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         [TimeIdentifierMeta("Calendar Year Q3", "CYQ3", Category.CalendarYear, Default, ShortLabel, "Q3")]
         CalendarYearQ3,
-        
+
         [TimeIdentifierMeta("Calendar Year Q4", "CYQ4", Category.CalendarYear, Default, ShortLabel, "Q4")]
         CalendarYearQ4,
 
-        [TimeIdentifierMeta("Financial Year", "FY", Category.FinancialYear, AcademicOrFiscal, NoLabel)]
+        [TimeIdentifierMeta("Financial Year", "FY", Category.FinancialYear, Fiscal, NoLabel)]
         FinancialYear,
 
-        [TimeIdentifierMeta("Financial Year Q1", "FYQ1", Category.FinancialYear, AcademicOrFiscal, ShortLabel, "Q1")]
+        [TimeIdentifierMeta("Financial Year Q1", "FYQ1", Category.FinancialYear, Fiscal, ShortLabel, "Q1")]
         FinancialYearQ1,
 
-        [TimeIdentifierMeta("Financial Year Q2", "FYQ2", Category.FinancialYear, AcademicOrFiscal, ShortLabel, "Q2")]
+        [TimeIdentifierMeta("Financial Year Q2", "FYQ2", Category.FinancialYear, Fiscal, ShortLabel, "Q2")]
         FinancialYearQ2,
 
-        [TimeIdentifierMeta("Financial Year Q3", "FYQ3", Category.FinancialYear, AcademicOrFiscal, ShortLabel, "Q3")]
+        [TimeIdentifierMeta("Financial Year Q3", "FYQ3", Category.FinancialYear, Fiscal, ShortLabel, "Q3")]
         FinancialYearQ3,
 
-        [TimeIdentifierMeta("Financial Year Q4", "FYQ4", Category.FinancialYear, AcademicOrFiscal, ShortLabel, "Q4")]
+        [TimeIdentifierMeta("Financial Year Q4", "FYQ4", Category.FinancialYear, Fiscal, ShortLabel, "Q4")]
         FinancialYearQ4,
 
-        [TimeIdentifierMeta("Tax Year", "TY", Category.TaxYear, AcademicOrFiscal, NoLabel)]
+        [TimeIdentifierMeta("Tax Year", "TY", Category.TaxYear, Fiscal, NoLabel)]
         TaxYear,
 
-        [TimeIdentifierMeta("Tax Year Q1", "TYQ1", Category.TaxYear, AcademicOrFiscal, ShortLabel, "Q1")]
+        [TimeIdentifierMeta("Tax Year Q1", "TYQ1", Category.TaxYear, Fiscal, ShortLabel, "Q1")]
         TaxYearQ1,
 
-        [TimeIdentifierMeta("Tax Year Q2", "TYQ2", Category.TaxYear, AcademicOrFiscal, ShortLabel, "Q2")]
+        [TimeIdentifierMeta("Tax Year Q2", "TYQ2", Category.TaxYear, Fiscal, ShortLabel, "Q2")]
         TaxYearQ2,
 
-        [TimeIdentifierMeta("Tax Year Q3", "TYQ3", Category.TaxYear, AcademicOrFiscal, ShortLabel, "Q3")]
+        [TimeIdentifierMeta("Tax Year Q3", "TYQ3", Category.TaxYear, Fiscal, ShortLabel, "Q3")]
         TaxYearQ3,
 
-        [TimeIdentifierMeta("Tax Year Q4", "TYQ4", Category.TaxYear, AcademicOrFiscal, ShortLabel, "Q4")]
+        [TimeIdentifierMeta("Tax Year Q4", "TYQ4", Category.TaxYear, Fiscal, ShortLabel, "Q4")]
         TaxYearQ4,
 
         [TimeIdentifierMeta("Reporting Year", "RY", Category.ReportingYear, Default, NoLabel)]
         ReportingYear,
 
-        [TimeIdentifierMeta("Autumn Term", "T1", Term, AcademicOrFiscal)]
+        [TimeIdentifierMeta("Autumn Term", "T1", Term, Academic)]
         AutumnTerm,
 
-        [TimeIdentifierMeta("Autumn and Spring Term", "T1T2", Term, AcademicOrFiscal)]
+        [TimeIdentifierMeta("Autumn and Spring Term", "T1T2", Term, Academic)]
         AutumnSpringTerm,
 
-        [TimeIdentifierMeta("Spring Term", "T2", Term, AcademicOrFiscal)]
+        [TimeIdentifierMeta("Spring Term", "T2", Term, Academic)]
         SpringTerm,
 
-        [TimeIdentifierMeta("Summer Term", "T3", Term, AcademicOrFiscal)]
+        [TimeIdentifierMeta("Summer Term", "T3", Term, Academic)]
         SummerTerm,
 
         [TimeIdentifierMeta("January", "M1", Month)]
