@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.UserManagement;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.BAU.UserManagement
 {

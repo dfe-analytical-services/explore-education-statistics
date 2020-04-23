@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.U
 
             if (user)
             {
-                return Ok(user);
+                return Ok(true);
             }
 
             AddErrors(ModelState, ValidationResult(UserDoesNotExist));

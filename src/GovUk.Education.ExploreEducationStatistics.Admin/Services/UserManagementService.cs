@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -26,7 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly UserManager<ApplicationUser> _userManager;
 
 
-        public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext, ContentDbContext contentDbContext, IEmailService emailService,
+        public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext, ContentDbContext contentDbContext,
+            IEmailService emailService,
             IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
@@ -122,7 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO: Part 2: Verify valid email address
         public async Task<bool> InviteAsync(string email, string user, string roleId)
         {
-            if (_usersAndRolesDbContext.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email)) return false;
+            if (_usersAndRolesDbContext.Users.Any(u => u.Email == email) || string.IsNullOrWhiteSpace(email))
+                return false;
 
             try
             {
@@ -188,13 +189,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private List<UserReleaseRole> GetUserReleaseRoles(string userId)
         {
             var result = new List<UserReleaseRole>();
-            result.AddRange(_contentDbContext.UserReleaseRoles.Where(x => x.UserId == Guid.Parse(userId)).Select(x => new UserReleaseRole
-            {
-                Publication = _contentDbContext.Publications.Where(p => p.Releases.Any(r => r.Id == x.ReleaseId)).Select(p => new IdTitlePair { Id = p.Id, Title = p.Title}).FirstOrDefault(),
-                Release = _contentDbContext.Releases.Where(r => r.Id == x.ReleaseId).Select(r => new IdTitlePair { Id = r.Id, Title = r.Title}).FirstOrDefault(),
-                ReleaseRole = new EnumExtensions.EnumValue { Name = x.Role.GetEnumLabel(), Value = 0}
-            }).ToList().OrderBy(x => x.Publication.Title).ThenBy(x => x.Release.Title));
-            
+
+            result.AddRange(_contentDbContext.UserReleaseRoles
+                .Where(x => x.UserId == Guid.Parse(userId))
+                .Select(x => new UserReleaseRole
+                {
+                    Publication = _contentDbContext.Publications
+                        .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
+                        .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
+                    Release = _contentDbContext.Releases
+                        .Where(r => r.Id == x.ReleaseId)
+                        .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
+                    ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
+                })
+                .OrderBy(x => x.Publication.Title)
+                .ThenBy(x => x.Release.Title));
+
             return result;
         }
 
@@ -209,7 +219,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userRole = _usersAndRolesDbContext.UserRoles.FirstOrDefault(r => r.UserId == userId);
 
-            return userRole == null ? null : _usersAndRolesDbContext.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
+            return userRole == null
+                ? null
+                : _usersAndRolesDbContext.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
         }
 
         private string GetUserRoleId(string userId)

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.UserManagement
 {
     [Route("api")]
     [ApiController]
@@ -34,11 +34,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
 
             return NotFound();
         }
-        
+
         [HttpPost("bau/users/invite")]
         public async Task<ActionResult> InviteUser(UserInviteViewModel userInviteViewModel)
         {
-            var invite = await _userManagementService.InviteAsync(userInviteViewModel.Email, User.Identity.Name, userInviteViewModel.RoleId);
+            var invite = await _userManagementService.InviteAsync(userInviteViewModel.Email, User.Identity.Name,
+                userInviteViewModel.RoleId);
 
             if (invite)
             {
@@ -46,10 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             }
 
             AddErrors(ModelState, ValidationResult(UserAlreadyExists));
-            
+
             return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
-        
+
         [HttpDelete("bau/users/invite/{email}")]
         public async Task<ActionResult> CancelUserInvite(string email)
         {
@@ -61,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             }
 
             AddErrors(ModelState, ValidationResult(UnableToCancelInvite));
-            
+
             return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
     }
