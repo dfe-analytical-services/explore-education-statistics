@@ -1,12 +1,12 @@
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
 import CollapsibleList from './CollapsibleList';
+import styles from './SummaryListItem.module.scss';
 
 interface Props {
   actions?: ReactNode;
   children?: ReactNode;
   term: string;
-  detailsNoMargin?: boolean;
   smallKey?: boolean;
   showActions?: boolean;
   shouldCollapse?: boolean;
@@ -17,7 +17,6 @@ const SummaryListItem = ({
   actions,
   children,
   term,
-  detailsNoMargin,
   smallKey = false,
   shouldCollapse = false,
   collapseAfter = 5,
@@ -26,18 +25,13 @@ const SummaryListItem = ({
     <div className="govuk-summary-list__row">
       <dt
         className={classNames('govuk-summary-list__key', {
-          'dfe-details-no-margin': detailsNoMargin,
-          'dfe-summary-list__key--small': smallKey,
+          [styles.smallKey]: smallKey,
         })}
       >
         {term}
       </dt>
       {children && (
-        <dd
-          className={classNames('govuk-summary-list__value', {
-            'dfe-details-no-margin': detailsNoMargin,
-          })}
-        >
+        <dd className="govuk-summary-list__value">
           {shouldCollapse && children ? (
             <CollapsibleList collapseAfter={collapseAfter}>
               {children}
@@ -50,11 +44,7 @@ const SummaryListItem = ({
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
       {!children && !actions && (
         <>
-          <dd
-            className={classNames('govuk-summary-list__value', {
-              'dfe-details-no-margin': detailsNoMargin,
-            })}
-          />
+          <dd className="govuk-summary-list__value" />
           <dd className="govuk-summary-list__actions" />
         </>
       )}

@@ -1,3 +1,4 @@
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import commonService from '@admin/services/common/service';
 import { EditableContentBlock } from '@admin/services/publicationService';
@@ -53,13 +54,9 @@ const BasicReleaseSummary = ({ release }: Props) => {
       {releaseTypeIdsToIcons && (
         <>
           <div className="govuk-grid-column-three-quarters">
-            {release.prerelease ? (
+            {release.prerelease && (
               <span className={`govuk-tag ${styles.ragStatusRed}`}>
                 Pre Release
-              </span>
-            ) : (
-              <span className="govuk-tag">
-                {getReleaseStatusLabel(release.status)}
               </span>
             )}
 

@@ -11,7 +11,7 @@ exports[`Details renders correctly 1`] = `
            role="button"
            tabindex="0"
   >
-    <span class="govuk-details__summary-text"
+    <span class="summaryText govuk-details__summary-text"
           data-testid="Expand Details Section Test summary"
     >
       Test summary
@@ -38,7 +38,7 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
            role="button"
            tabindex="0"
   >
-    <span class="govuk-details__summary-text"
+    <span class="summaryText govuk-details__summary-text"
           data-testid="Expand Details Section Test summary"
     >
       Test summary
