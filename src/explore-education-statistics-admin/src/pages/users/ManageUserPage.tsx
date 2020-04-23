@@ -36,7 +36,7 @@ const ManageUserPage = ({
   const { userId } = match.params;
   const formId = userId;
 
-  const { value: user, isLoading, error } = useAsyncRetry(() =>
+  const { value: user, isLoading } = useAsyncRetry(() =>
     userService.getUser(userId),
   );
 

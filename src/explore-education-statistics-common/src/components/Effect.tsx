@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import isEqual from 'lodash/isEqual';
 
 interface Props<T> {
   value: T;
@@ -7,17 +8,22 @@ interface Props<T> {
 
 const Effect = <T extends unknown>({ onChange, value }: Props<T>) => {
   const rendered = useRef<boolean>(false);
-
-  const valueDependency = JSON.stringify(value);
+  const previousValue = useRef(value);
 
   useEffect(() => {
     if (!rendered.current) {
       rendered.current = true;
-    } else {
-      onChange(value);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onChange, valueDependency]);
+
+    // Prevent potential infinite re-rendering
+    if (isEqual(previousValue.current, value)) {
+      return;
+    }
+
+    onChange(value);
+    previousValue.current = value;
+  }, [onChange, value]);
 
   return null;
 };

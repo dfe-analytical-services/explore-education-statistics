@@ -17,6 +17,10 @@ const logger = {
       console.log(...args);
     }
   },
+  error(...args: unknown[]) {
+    // eslint-disable-next-line no-console
+    console.error(...args);
+  },
 };
 
 export default logger;

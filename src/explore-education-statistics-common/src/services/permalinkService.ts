@@ -1,14 +1,14 @@
 import {
   TableDataQuery,
-  UnmappedFullTable,
-} from '@common/modules/table-tool/services/tableBuilderService';
+  TableDataResponse,
+} from '@common/services/tableBuilderService';
 import { dataApi } from '@common/services/api';
 
 export interface UnmappedPermalink {
   id: string;
   title: string;
   created: string;
-  fullTable: UnmappedFullTable;
+  fullTable: TableDataResponse;
   query: PermalinkCreateQuery;
 }
 

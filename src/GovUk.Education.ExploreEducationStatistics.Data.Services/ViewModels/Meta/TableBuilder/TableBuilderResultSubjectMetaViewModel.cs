@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder
 {
@@ -12,12 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public IEnumerable<ObservationalUnitMetaViewModel> Locations { get; set; }
 
+        public IEnumerable<BoundaryLevelIdLabel> BoundaryLevels { get; set; }
+
         public string PublicationName { get; set; }
 
         public string SubjectName { get; set; }
 
         public IEnumerable<TimePeriodMetaViewModel> TimePeriodRange { get; set; }
-        
+
         public bool GeoJsonAvailable { get; set; }
     }
 }

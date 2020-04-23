@@ -22,8 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions
 
         private static async Task<DataTable> GetDataTableFromBlob(CloudBlob blob)
         {
-            var reader = new StreamReader(await blob.OpenReadAsync());
-            var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            using var reader = new StreamReader(await blob.OpenReadAsync());
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             using var dr = new CsvDataReader(csv);
             var dt = new DataTable();
             dt.Load(dr);

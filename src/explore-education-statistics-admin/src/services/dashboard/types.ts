@@ -36,6 +36,7 @@ export interface AdminDashboardRelease {
   publicationId: string;
   publicationTitle: string;
   timePeriodCoverage: IdLabelPair;
+  title: string;
   contact: ContactDetails;
   lastEditedUser: UserDetails;
   lastEditedDateTime: string;

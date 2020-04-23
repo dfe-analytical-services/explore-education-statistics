@@ -1,34 +1,59 @@
-import React from 'react';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
+import formatPretty from '@common/utils/number/formatPretty';
+import orderBy from 'lodash/orderBy';
+import React, { useMemo } from 'react';
 import { TooltipProps } from 'recharts';
+import styles from './CustomTooltip.module.scss';
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
-  if (active) {
-    return (
-      <div className="graph-tooltip">
-        <p className="govuk-!-font-weight-bold">{label}</p>
-        {payload &&
-          [...payload]
-            .sort((a, b) => {
-              if (typeof b.value === 'number' && typeof a.value === 'number') {
-                return b.value - a.value;
-              }
+interface CustomTooltipProps extends TooltipProps {
+  dataSetCategories: DataSetCategory[];
+}
 
-              return 0;
-            })
-            .map((_, index) => {
+const CustomTooltip = ({
+  payload,
+  label,
+  dataSetCategories,
+}: CustomTooltipProps) => {
+  const tooltipLabel = useMemo(() => {
+    if (typeof label !== 'string') {
+      return label;
+    }
+
+    return getCategoryLabel(dataSetCategories)(label);
+  }, [dataSetCategories, label]);
+
+  return (
+    <div className={styles.tooltip}>
+      <p className="govuk-!-font-weight-bold">{tooltipLabel}</p>
+
+      {payload && (
+        <ul className={styles.itemList}>
+          {orderBy(payload, item => Number(item.value), ['desc']).map(
+            (item, index) => {
               return (
                 // eslint-disable-next-line react/no-array-index-key
-                <p key={index}>
-                  {payload[index].name} :{' '}
-                  <strong> {payload[index].value}</strong>
-                </p>
-              );
-            })}
-      </div>
-    );
-  }
+                <li key={index}>
+                  <span
+                    className={styles.itemColour}
+                    style={{ backgroundColor: item.fill }}
+                  />
 
-  return null;
+                  <span>
+                    {`${item.name} : `}
+
+                    <strong>
+                      {formatPretty(item.value.toString(), item.unit)}
+                    </strong>
+                  </span>
+                </li>
+              );
+            },
+          )}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default CustomTooltip;
