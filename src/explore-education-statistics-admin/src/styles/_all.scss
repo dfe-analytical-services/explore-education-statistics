@@ -1,17 +1,3 @@
-@import '~leaflet/dist/leaflet.css';
-
 @import './variables';
-@import './reset';
-@import './form';
-@import './layout';
-@import './tables';
-@import './typography';
 
-// Patterns that aren't in Frontend
-@import './patterns/related-items';
-@import './patterns/step-by-step-navigation';
-@import './patterns/task-list';
-
-// DfE patterns
-@import './patterns/dfe-stats-indicators';
-@import './patterns/dfe-modifiers';
+@import '~explore-education-statistics-common/src/styles/all';

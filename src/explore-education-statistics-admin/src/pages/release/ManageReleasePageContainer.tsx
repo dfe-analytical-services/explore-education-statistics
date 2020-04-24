@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import NavLink from '@admin/components/NavLink';
+import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
@@ -83,20 +83,13 @@ const ManageReleasePageContainer = ({
             </div>
           </div>
 
-          <nav className="app-navigation govuk-!-margin-top-6 govuk-!-margin-bottom-9">
-            <ul className="app-navigation__list govuk-!-margin-bottom-0">
-              {viewRoutes.map(route => (
-                <li key={route.path}>
-                  <NavLink
-                    key={route.path}
-                    to={route.generateLink({ publicationId, releaseId })}
-                  >
-                    {route.title}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <NavBar
+            routes={viewRoutes.map(route => ({
+              path: route.path,
+              title: route.title,
+              to: route.generateLink({ publicationId, releaseId }),
+            }))}
+          />
 
           <ManageReleaseContext.Provider
             value={{
