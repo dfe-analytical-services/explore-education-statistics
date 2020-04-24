@@ -142,15 +142,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public void DeleteReleaseAsync()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                    service.DeleteReleaseAsync(_release.Id),  
+                _release,
+                CanDeleteSpecificRelease);
+        }
+        
+        [Fact]
         public async void GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
         {
             var (userService, releaseHelper, publishingService, contentDbContext, repository, 
                 subjectService, tableStorageService, fileStorageService, importStatusService,
                 footnoteService, dataBlockService) = Mocks();
 
-            var list = new List<ReleaseViewModel>
+            var list = new List<MyReleaseViewModel>
             {
-                new ReleaseViewModel
+                new MyReleaseViewModel
                 {
                     Id = Guid.NewGuid()
                 }
@@ -191,9 +200,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 subjectService, tableStorageService, fileStorageService, importStatusService,
                 footnoteService, dataBlockService) = Mocks();
 
-            var list = new List<ReleaseViewModel>
+            var list = new List<MyReleaseViewModel>
             {
-                new ReleaseViewModel
+                new MyReleaseViewModel
                 {
                     Id = Guid.NewGuid()
                 }

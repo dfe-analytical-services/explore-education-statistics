@@ -1,3 +1,4 @@
+import Tag from '@common/components/Tag';
 import useMounted from '@common/hooks/useMounted';
 import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/utils/dom/findAllParents';
@@ -137,12 +138,12 @@ const Details = ({
             tag.map((item, index) => {
               if (typeof item === 'string') {
                 return (
-                  <span
+                  <Tag
                     key={`tag-${String(index)}`}
-                    className="govuk-tag govuk-!-margin-left-2"
+                    className="govuk-!-margin-left-2"
                   >
                     {item}
-                  </span>
+                  </Tag>
                 );
               }
               return (

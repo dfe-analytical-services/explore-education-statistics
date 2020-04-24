@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public ReleaseStatus Status { get; set; }
 
         public bool LatestRelease { get; set; }
-
-        public bool Live => Published != null;
         
         public string ReleaseName { get; set; }
 
@@ -36,6 +34,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DateTime? Published { get; set; }
 
+        public bool Live { get; set; }
+        
+        public bool Amendment { get; set; }
+        
+        // TODO BAU-419 - this'll need to be a "PreviousVersionId" if we need to keep a version history of all Release
+        // versions - otherwise if we just need to keep the current live one and a single "amendment" one, that'd make
+        // things easier
+        public Guid OriginalId { get; set; }
+
         public PartialDate NextReleaseDate { get; set; }
 
         public string InternalReleaseNote { get; set; }
@@ -49,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public class PermissionsSet
         {
             public bool CanUpdateRelease { get; set; }
+            
+            public bool CanDeleteRelease { get; set; }
             
             public bool CanMakeAmendmentOfRelease { get; set; }
         }

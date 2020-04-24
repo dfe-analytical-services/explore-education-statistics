@@ -90,6 +90,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanPublishSpecificRelease.ToString(), policy => 
                     policy.Requirements.Add(new PublishSpecificReleaseRequirement()));
 
+                // does this user have permission to delete an existing release?
+                options.AddPolicy(SecurityPolicies.CanDeleteSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new DeleteSpecificReleaseRequirement()));
+                
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectDataForRelease.ToString(), policy => 
                     policy.Requirements.Add(new ViewSubjectDataForReleaseRequirement()));
@@ -168,6 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, DeleteSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkSpecificReleaseAsDraftAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, SubmitSpecificReleaseToHigherReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ApproveSpecificReleaseAuthorizationHandler>();

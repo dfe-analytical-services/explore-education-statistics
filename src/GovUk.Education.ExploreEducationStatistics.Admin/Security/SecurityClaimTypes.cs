@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         ApproveAllReleases,
         MakeAmendmentsOfAllReleases,
         PublishAllReleases,
+        DeleteAllReleaseAmendments,
         
         /**
          * Pre Release management

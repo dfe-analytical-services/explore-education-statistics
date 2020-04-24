@@ -119,6 +119,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public Task<Either<ActionResult, bool>> DeleteReleaseAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanDeleteRelease)
+                .OnSuccess(async release =>
+                {
+                    var roles = await _context
+                        .UserReleaseRoles
+                        .Where(r => r.ReleaseId == releaseId)
+                        .ToListAsync();
+
+                    var invites = await _context
+                        .UserReleaseInvites
+                        .Where(r => r.ReleaseId == releaseId)
+                        .ToListAsync();
+                    
+                    release.SoftDeleted = true;
+                    roles.ForEach(r => r.SoftDeleted = true);
+                    invites.ForEach(r => r.SoftDeleted = true);
+
+                    _context.Update(release);
+                    _context.UpdateRange(roles);
+                    _context.UpdateRange(invites);
+
+                    await _context.SaveChangesAsync();
+
+                    return true;
+                });
+        }
+
+
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
         {
             return await _persistenceHelper
@@ -183,6 +215,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ReleaseSummaryViewModel>);
         }
 
+        public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
+        }
+
         public async Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(
             Guid releaseId, UpdateReleaseSummaryRequest request)
         {
@@ -226,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
         
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
+        public async Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
             params ReleaseStatus[] releaseStatuses)
         {
             return await _userService

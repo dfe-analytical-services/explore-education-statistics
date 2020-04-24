@@ -51,7 +51,7 @@ const ReleaseStatusPage = () => {
   const [model, setModel] = useState<Model>();
   const [showForm, setShowForm] = useState(false);
 
-  const { releaseId } = useManageReleaseContext();
+  const { releaseId, onChangeReleaseStatus } = useManageReleaseContext();
 
   useEffect(() => {
     Promise.all([
@@ -87,17 +87,19 @@ const ReleaseStatusPage = () => {
   }, [releaseId, showForm]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
-    await service.updateReleaseStatus(releaseId, values).then(() => {
-      if (model) {
-        setModel({
-          ...model,
-          releaseStatus: values.releaseStatus,
-          statusOptions: model.statusOptions,
-        });
-      }
+    await service.updateReleaseStatus(releaseId, values);
 
-      setShowForm(false);
-    });
+    if (model) {
+      setModel({
+        ...model,
+        releaseStatus: values.releaseStatus,
+        statusOptions: model.statusOptions,
+      });
+    }
+
+    setShowForm(false);
+
+    onChangeReleaseStatus();
   }, errorCodeMappings);
 
   if (!model) return null;

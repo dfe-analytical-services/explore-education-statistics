@@ -282,6 +282,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(r => r.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+            
+            modelBuilder.Entity<Release>()
+                .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<ReleaseFile>()
                 .HasOne(r => r.Release)
@@ -368,9 +371,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
 
+            modelBuilder.Entity<UserReleaseRole>()
+                .HasQueryFilter(r => !r.SoftDeleted);
+
             modelBuilder.Entity<UserReleaseInvite>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
+
+            modelBuilder.Entity<UserReleaseInvite>()
+                .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType

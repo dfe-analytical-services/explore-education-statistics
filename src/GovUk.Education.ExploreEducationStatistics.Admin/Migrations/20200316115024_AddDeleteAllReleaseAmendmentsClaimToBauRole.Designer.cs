@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    partial class UsersAndRolesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200316115024_AddDeleteAllReleaseAmendmentsClaimToBauRole")]
+    partial class AddDeleteAllReleaseAmendmentsClaimToBauRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -590,20 +592,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         new
                         {
                             Id = -30,
-                            ClaimType = "PublishAllReleases",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -31,
                             ClaimType = "MakeAmendmentsOfAllReleases",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         },
                         new
                         {
-                            Id = -32,
+                            Id = -31,
                             ClaimType = "DeleteAllReleaseAmendments",
                             ClaimValue = "",
                             RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"

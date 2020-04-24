@@ -4,7 +4,10 @@ import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/ro
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
-import { AdminDashboardPublication } from '@admin/services/dashboard/types';
+import {
+  AdminDashboardPublication,
+  AdminDashboardRelease,
+} from '@admin/services/dashboard/types';
 import permissionService from '@admin/services/permissions/permissionService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -31,12 +34,20 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
 
+interface Props {
+  onChangePublication: () => void;
+  nonLiveReleases: AdminDashboardRelease[];
+}
+
 const ManagePublicationsAndReleasesTab = ({
   match,
-}: RouteComponentProps<{
-  themeId?: string;
-  topicId?: string;
-}>) => {
+  onChangePublication,
+  nonLiveReleases,
+}: Props &
+  RouteComponentProps<{
+    themeId?: string;
+    topicId?: string;
+  }>) => {
   const {
     selectedThemeAndTopic: { theme: selectedTheme, topic: selectedTopic },
     setSelectedThemeAndTopic,
@@ -108,7 +119,7 @@ const ManagePublicationsAndReleasesTab = ({
         ),
       );
     }
-  }, [selectedTheme, selectedTopic]);
+  }, [selectedTheme, selectedTopic, nonLiveReleases]);
 
   return (
     <section>
@@ -180,7 +191,10 @@ const ManagePublicationsAndReleasesTab = ({
                         heading={publication.title}
                         headingTag="h3"
                       >
-                        <PublicationSummary publication={publication} />
+                        <PublicationSummary
+                          publication={publication}
+                          onChangePublication={onChangePublication}
+                        />
                       </AccordionSection>
                     ),
                   )}

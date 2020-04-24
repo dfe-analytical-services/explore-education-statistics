@@ -134,6 +134,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             return userService.DoCheck(release, SecurityPolicies.CanUpdateSpecificRelease);
         }
+        
+        public static Task<Either<ActionResult, Release>> CheckCanDeleteRelease(
+            this IUserService userService, Release release)
+        {
+            return userService.DoCheck(release, SecurityPolicies.CanDeleteSpecificRelease);
+        }
 
         public static Task<Either<ActionResult, Release>> CheckCanUpdateReleaseStatus(
             this IUserService userService, Release release, ReleaseStatus status)

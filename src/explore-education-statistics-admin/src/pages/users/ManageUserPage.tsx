@@ -7,7 +7,6 @@ import Form from '@common/components/form/Form';
 import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService from '@admin/services/users/service';
-import dashboardService from '@admin/services/dashboard/service';
 import { UserUpdate } from '@admin/services/users/types';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import Yup from '@common/validation/yup';

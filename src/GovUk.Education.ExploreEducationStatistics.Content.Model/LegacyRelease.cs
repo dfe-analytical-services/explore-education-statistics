@@ -13,5 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public int Order { get; set; }
 
         public Guid PublicationId { get; set; }
+
+        public LegacyRelease CreateCopy()
+        {
+            return MemberwiseClone() as LegacyRelease;
+        }
     }
 }
