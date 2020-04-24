@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import NavLink from '@admin/components/NavLink';
+import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import methodologyRoutes from '@admin/routes/edit-methodology/routes';
@@ -98,20 +98,13 @@ const MethodologyPage = ({
               </div>
             </div>
 
-            <nav className="app-navigation govuk-!-margin-top-6 govuk-!-margin-bottom-9">
-              <ul className="app-navigation__list govuk-!-margin-bottom-0">
-                {methodologyRoutes.map(route => (
-                  <li key={route.path}>
-                    <NavLink
-                      key={route.path}
-                      to={route.generateLink(methodologyId)}
-                    >
-                      {route.title}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <NavBar
+              routes={methodologyRoutes.map(route => ({
+                path: route.path,
+                title: route.title,
+                to: route.generateLink(methodologyId),
+              }))}
+            />
 
             <MethodologyProvider value={value}>
               <Switch>

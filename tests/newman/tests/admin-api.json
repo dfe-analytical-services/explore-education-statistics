@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4230a36f-a1ee-4a7d-9db8-0ecbfdf74330",
+		"_postman_id": "06ac83cb-db55-4d22-8c0d-914167cd4ce2",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+								"id": "44e92a47-2c75-4267-91a9-6f73bf0089a9",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -69,7 +69,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e472dd85-13ad-411e-bdcc-d5e6e875df7f",
+								"id": "b158c9d0-ef7d-43e0-bc38-46a905024b93",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -114,7 +114,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "372a9979-fd08-4af1-bb4c-5314db6a237b",
+								"id": "d693321e-b7d6-4295-adc2-f9e87392c326",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
@@ -160,7 +160,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+								"id": "6fb0cc84-6eb3-4f94-9532-9081641a38ec",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -225,7 +225,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "50f6efbc-4157-4ec4-b3f2-a7c2cb4abe9e",
+								"id": "ce3382a9-9769-4cf1-b901-75869e95b0d6",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -261,7 +261,6 @@
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationId`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].releaseName`));",
-									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].coverageTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].yearTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].typeId`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].nextReleaseDate`));",
@@ -294,7 +293,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "152c86f6-6905-4366-a08e-4b8a54d6c2ec",
+								"id": "9b2ab80f-5365-4713-a9da-e72132408272",
 								"exec": [
 									""
 								],
@@ -324,7 +323,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7cbd4f1c-cf5e-4b8a-b7ec-c2e479396b3a",
+								"id": "c7d4c8a5-6675-4251-9520-3a979001e8ca",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -378,7 +377,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "5c3f3658-a145-40af-9a97-5f9f0e1f241c",
+								"id": "8f2df5c8-7e82-4356-895d-b1c1fd49b34f",
 								"exec": [
 									""
 								],
@@ -414,7 +413,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "aad25515-6076-4a4a-b609-61fe0a986e11",
+								"id": "be30c5d1-2dbb-4948-b9c5-8f4e22335971",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -505,7 +504,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "e410765b-32b1-46fe-aa95-7af48eb3a419",
 												"exec": [
 													""
 												],
@@ -515,7 +514,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "cec7fbc9-5b31-4d07-ba5e-368a1a29c756",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -609,7 +608,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "08c7178b-9b71-4fb9-8c3e-9770e6d90e49",
+												"id": "661ddfc0-6e10-4cc2-b13b-32b83cae89ff",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -671,7 +670,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "6db8370e-6078-4279-94d7-438d85a476f7",
+												"id": "53317adc-46f6-4aa2-916d-0ca870b41170",
 												"exec": [
 													""
 												],
@@ -720,7 +719,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "2f0b7e39-a53f-4169-ba2a-6fb4021da638",
 												"exec": [
 													""
 												],
@@ -730,7 +729,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ac4b1f03-19f2-44f5-b80f-840e78849333",
+												"id": "3ee40b37-7463-4879-95d2-f422e72e4a43",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -784,7 +783,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "dfaf14b3-a0d3-488f-8b73-fe037a6e81bd",
+										"id": "62d3380e-80a1-4cd5-aaa8-8853d098a32c",
 										"exec": [
 											"respJson = pm.response.json();",
 											"",
@@ -867,7 +866,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "cb2cca58-377d-4cbf-9559-64137459f142",
+										"id": "c8fa7481-1006-41f4-a226-790859eeec4a",
 										"exec": [
 											""
 										],
@@ -913,108 +912,6 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Data",
-					"item": [
-						{
-							"name": "Data - Absence by characteristic - Adur (LAD) + Wandsworth (LA)",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-											"",
-											"pm.test(\"Should have correct fields\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"pm.test(\"Number of metaData filters should be correct\", function () {",
-											"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-											"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
-											"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
-											"});",
-											"",
-											"pm.test(\"Number of metaData indicators should be correct\", function () {",
-											"   pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(5); ",
-											"});",
-											"",
-											"pm.test(\"Number of metaData locations should be correct\", function () {",
-											"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(2);",
-											"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000032\")); // LA Wandsworth",
-											"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E07000223\")); // LAD Adur",
-											"});",
-											"",
-											"pm.test(\"Number of results should be correct\", function () { ",
-											"    pm.expect(respJson.result.length).to.equal(35); // LA 24 + LAD 11",
-											"});",
-											" ",
-											"pm.test(\"All results should have correction geographicLevel\", function () {",
-											"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-											"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
-											"           return geoLevel === \"LocalAuthority\" || geoLevel === \"LocalAuthorityDistrict\"; ",
-											"        });",
-											"    }",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{1FI_Char__FSMEligible}}\",\n        \"{{1FI_Char__FSMNotEligible}}\",\n        \"{{1FI_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n    \t\"{{1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}}\",\n    \t\"{{1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}}\",\n    \t\"{{1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions}}\",\n    \t\"{{1I_AbsenceByReason__NumberOfNoReasonYetSessions}}\",\n    \t\"{{1I_AbsenceByReason__NumberOfLateSessions}}\"\n    ]\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/data/data?releaseId=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"data",
-										"data"
-									],
-									"query": [
-										{
-											"key": "releaseId",
-											"value": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				},
-				{
 					"name": "Footnotes",
 					"item": [
 						{
@@ -1023,7 +920,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "dd36a8ff-2cc8-4b0a-8a59-1bddf2c1ad7e",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -1035,7 +932,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "9085a3f9-5215-4509-857c-29a600bcdefb",
 										"exec": [
 											""
 										],
@@ -1077,7 +974,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "7f3d3acc-0493-419e-87a1-f9de87f052c0",
+						"id": "8445aab9-7470-462a-9d5a-3f12962bdbed",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1087,7 +984,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ca57d5a3-d2ae-4438-8c91-32ab3e2f592d",
+						"id": "68134b7e-1167-42e9-a293-1d6b4833459b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1109,7 +1006,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4058cdab-06fe-46b8-b135-d6fc821c6b69",
+										"id": "982efdab-c141-48ea-8d95-627ea1148671",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { ",
 											"    pm.response.to.have.status(200); ",
@@ -1134,7 +1031,7 @@
 											"    ",
 											"    pm.expect(release.type.id).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\");",
 											"    pm.expect(release.type.title).to.equal(\"Official Statistics\");",
-											"    ",
+											"    pm.expect(release.title).to.equal(\"Academic Year 2016/17\");",
 											"    pm.expect(release.yearTitle).to.equal(\"2016/17\");",
 											"    pm.expect(release.coverageTitle).to.equal(\"Academic Year\");",
 											"    ",
@@ -1165,9 +1062,9 @@
 											"    pm.expect(release.publication.summary).to.equal(\"\");",
 											"    ",
 											"    pm.expect(release.publication.legacyReleases.length).to.equal(8);",
-											"    pm.expect(release.publication.legacyReleases[0].id).to.equal(\"08134c1d-8a58-49a4-8d8b-22e586ffd5ae\");",
-											"    pm.expect(release.publication.legacyReleases[0].description).to.equal(\"2008 to 2009\");",
-											"    pm.expect(release.publication.legacyReleases[0].url).to.equal(\"https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009\");",
+											"    pm.expect(release.publication.legacyReleases[0].id).to.equal(\"564dacdc-f58e-4aa0-8dbd-d8368b4fb6ba\");",
+											"    pm.expect(release.publication.legacyReleases[0].description).to.equal(\"Academic Year 2015/16\");",
+											"    pm.expect(release.publication.legacyReleases[0].url).to.equal(\"https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016\");",
 											"    ",
 											"    pm.expect(release.publication.topic.theme.title).to.equal(\"Pupils and schools\");",
 											"   ",
@@ -1339,7 +1236,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "635d2fe4-1382-4c75-a582-4972d8c40e4f",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { ",
 													"    pm.response.to.have.status(200); ",
@@ -1444,7 +1341,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "1505b5a9-18a0-4946-abed-a6eb0a801f8e",
 												"exec": [
 													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
 													"",
@@ -1507,7 +1404,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "ab694b80-f170-4665-b8ba-21e4d192c969",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { ",
 													"    pm.response.to.have.status(200); ",
@@ -1572,7 +1469,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "748e543c-c46e-4ae7-bb7b-fb6e873062b9",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { ",
 													"    pm.response.to.have.status(200); ",
@@ -1643,7 +1540,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"id": "ef4ab330-fa5e-432f-99c2-7bd3609a0097",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1660,7 +1557,6 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationId\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationTitle\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]coverageTitle\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]yearTitle\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]typeId\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
@@ -1690,7 +1586,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"id": "a478c11f-e21a-463d-a7b4-09b050eef384",
 								"exec": [
 									""
 								],
@@ -1720,7 +1616,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"id": "610a1fed-d661-4a37-87ca-98f410a9fdcb",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1736,7 +1632,6 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationId\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationTitle\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]coverageTitle\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]yearTitle\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]typeId\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
@@ -1764,7 +1659,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"id": "f45aa7bf-9296-49ab-ab83-dce667495ea7",
 								"exec": [
 									""
 								],
@@ -1794,7 +1689,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"id": "8d3437d7-714c-41c7-9136-15d5335a6a54",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1833,7 +1728,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"id": "7ce582d2-cdef-4a12-96a9-853427442d48",
 								"exec": [
 									""
 								],
@@ -1865,7 +1760,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"id": "75033ed0-57a2-41ac-9d99-2faf8fc4a604",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1886,7 +1781,6 @@
 									"        pm.expect(release).to.have.property(\"publicationId\");",
 									"        pm.expect(release).to.have.property(\"publicationId\");",
 									"        pm.expect(release).to.have.property(\"releaseName\");",
-									"        pm.expect(release).to.have.property(\"coverageTitle\");",
 									"        pm.expect(release).to.have.property(\"yearTitle\");",
 									"        pm.expect(release).to.have.property(\"typeId\");",
 									"        pm.expect(release).to.have.property(\"nextReleaseDate\");",
@@ -1915,7 +1809,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"id": "3cf41918-427f-4ec2-b159-00ea32f452aa",
 								"exec": [
 									"postman.setNextRequest(null);"
 								],
@@ -1959,7 +1853,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "313f3538-ad70-44ec-aed5-3d9286545bf0",
+								"id": "bbc0678f-82f5-4bd6-878d-a9feaeacf502",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -2004,7 +1898,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "06d9ef58-8beb-4ec6-aac6-18ddc1a3c9e4",
+								"id": "70ed1d85-1727-46a7-9d5d-564857a74d15",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -2055,7 +1949,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0e8a7e3f-244d-43aa-a936-4238169dcd82",
+								"id": "451badca-d1f7-48b3-8a7c-04e51fecfb9d",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -2106,7 +2000,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"id": "d1327b9d-5415-4fa3-bc2b-ce224bb55278",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -2136,7 +2030,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"id": "ee23a166-0c3d-4c7d-9bb5-e7063b9c5201",
 								"exec": [
 									""
 								],
@@ -2180,7 +2074,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "6464fc17-e41b-4120-9ac9-00c93234437a",
+				"id": "25a678dd-7604-411d-8dcd-ba49577eab66",
 				"type": "text/javascript",
 				"exec": [
 					"// Absence by characteristic",
@@ -2213,7 +2107,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "8d33b604-23a0-45bf-9ff6-91ec28db96e4",
+				"id": "3e207660-241a-4c03-84d8-e4b1e5cb6124",
 				"type": "text/javascript",
 				"exec": [
 					""

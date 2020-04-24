@@ -126,9 +126,9 @@ def user_checks_accordion_section_contains_text(accordion_section, details_compo
     raise AssertionError(f'Details component "{details_component}" not found in accordion section "{accordion_section}"')
 
 def user_opens_details_dropdown(exact_details_text):
-  sl.scroll_element_into_view(f'xpath://*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
+  sl.scroll_element_into_view(f'xpath://*[contains(@class,"govuk-details__summary-text") and text()="{exact_details_text}"]')
   try:
-    elem = sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
+    elem = sl.driver.find_element_by_xpath(f'//*[contains(@class,"govuk-details__summary-text") and text()="{exact_details_text}"]')
   except NoSuchElementException:
     raise AssertionError(f'No such detail component "{exact_details_text}" found')
 
@@ -138,7 +138,7 @@ def user_opens_details_dropdown(exact_details_text):
 
 def user_closes_details_dropdown(exact_details_text):
   try:
-    elem = sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
+    elem = sl.driver.find_element_by_xpath(f'//*[contains(@class,"govuk-details__summary-text") and text()="{exact_details_text}"]')
   except:
     raise AssertionError(f'Cannot find details component "{exact_details_text}"')
   elem.click()

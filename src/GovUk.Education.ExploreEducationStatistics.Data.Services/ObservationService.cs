@@ -124,9 +124,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 result.AddRange(DbSet()
                     .AsNoTracking()
                     .Where(observation => batch.Contains(observation.Id))
-                    .Include(observation => observation.Location)
                     .Include(observation => observation.FilterItems)
                     .ThenInclude(item => item.FilterItem.FilterGroup.Filter));
+
+                // load of the Location owned entities is removed from the query above as it was generating
+                // very inefficient sql.
+                var locationIds = result.Select(o => o.LocationId);
+                var locations = _context.Location.AsNoTracking().Where(l => locationIds.Contains(l.Id));
+                result.ForEach(observation =>
+                    {
+                        observation.Location = locations.SingleOrDefault(l => l.Id == observation.LocationId);
+                    });
             }
 
             _logger.LogTrace("Fetched Observations by id from {Count} batches in {Time} ms", batches.Count(),

@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
 parser.add_argument("-b", "--browser",
                     dest="browser",
                     default="chrome",
-                    choices=["chrome", "firefox"],
+                    choices=["chrome", "firefox", "ie"],
                     help="name of the browser you wish to run the tests with (NOTE: Only chromedriver is automatically installed!)")
 parser.add_argument("-i", "--interp",
                     dest="interp",
@@ -205,7 +205,9 @@ if args.env == 'test':
                   '--exclude', 'AltersData']
 if args.env == 'preprod':
     robotArgs += ['--include', 'Preprod',
-                  '--exclude', 'AltersData']
+                  '--exclude', 'AltersData',
+                  '--exclude', 'NotAgainstPreProd']
+
 if args.env == 'prod':
     robotArgs += ['--include', 'Prod',
                   '--exclude', 'AltersData']

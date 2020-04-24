@@ -7,6 +7,7 @@ import {
   FootnoteSubjectMeta,
 } from '@admin/services/release/edit-release/footnotes/types';
 import { FormCheckbox } from '@common/components/form';
+import styles from './FootnoteForm.module.scss';
 
 interface Props {
   summary: string;
@@ -28,7 +29,7 @@ const IndicatorDetails = ({
       summary={`${summary} ${parentSelected ? '(All)' : ''}`}
       className="govuk-!-margin-bottom-2"
     >
-      <div className="dfe-filter-overflow">
+      <div className={styles.filterOverflow}>
         {Object.entries(indicator).map(([indicatorGroupId, indicatorGroup]) => {
           const groupValue = get(
             form.values,
@@ -46,7 +47,7 @@ const IndicatorDetails = ({
                 <div className="govuk-!-margin-top-1 govuk-!-margin-bottom-1">
                   <strong>{indicatorGroup.label}</strong>
                 </div>
-                /* 
+                /*
                  // Disabling indicatorGroup selection for now
                   <FieldSubjectCheckbox
                   key={indicatorGroupId}

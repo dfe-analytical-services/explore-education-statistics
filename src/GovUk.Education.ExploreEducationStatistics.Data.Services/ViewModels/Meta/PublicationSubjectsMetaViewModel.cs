@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 {
     public class PublicationSubjectsMetaViewModel
     {
-        public Guid PublicationId { get; set; }        
+        public Guid PublicationId { get; set; }
         public IEnumerable<IdLabel> Subjects { get; set; }
     }
 }

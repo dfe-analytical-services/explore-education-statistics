@@ -2,6 +2,7 @@ import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import FormattedDate from '@common/components/FormattedDate';
+import RelatedAside from '@common/components/RelatedAside';
 import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
 import methodologyService, {
   Methodology,
@@ -87,7 +88,7 @@ class MethodologyPage extends Component<Props> {
             </div>
 
             <div className="govuk-grid-column-one-third">
-              <aside className="app-related-items">
+              <RelatedAside>
                 <h2 className="govuk-heading-m" id="subsection-title">
                   Related content
                 </h2>
@@ -98,7 +99,7 @@ class MethodologyPage extends Component<Props> {
                     </Link>{' '}
                   </li>
                 </ul>
-              </aside>
+              </RelatedAside>
             </div>
           </div>
         )}

@@ -11,6 +11,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import styles from './Details.module.scss';
 
 let hasNativeDetails: boolean;
 let idCounter = 0;
@@ -126,7 +127,10 @@ const Details = ({
         }}
       >
         <span
-          className="govuk-details__summary-text"
+          className={classNames(
+            styles.summaryText,
+            'govuk-details__summary-text',
+          )}
           data-testid={formatTestId(`Expand Details Section ${summary}`)}
         >
           {summary}
