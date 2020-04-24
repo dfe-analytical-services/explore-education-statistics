@@ -91,6 +91,7 @@
     "postcss-flexbugs-fixes": "4.2.0",
     "postcss-preset-env": "^6.7.0",
     "postcss-safe-parser": "^4.0.2",
+    "react-test-renderer": "16.13.1",
     "sass": "^1.26.3",
     "stylelint": "^13.3.0",
     "stylelint-webpack-plugin": "^1.2.3",
