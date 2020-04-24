@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Newtonsoft.Json;
@@ -23,17 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private const string ContainerName = "permalinks";
 
-        private readonly IDataService<TableBuilderResultViewModel> _dataService;
+        private readonly ITableBuilderService _tableBuilderService;
         private readonly IFileStorageService _fileStorageService;
         private readonly ISubjectService _subjectService;
         private readonly IMapper _mapper;
 
-        public PermalinkService(IDataService<TableBuilderResultViewModel> dataService,
+        public PermalinkService(ITableBuilderService tableBuilderService,
             IFileStorageService fileStorageService,
             ISubjectService subjectService,
             IMapper mapper)
         {
-            _dataService = dataService;
+            _tableBuilderService = tableBuilderService;
             _fileStorageService = fileStorageService;
             _subjectService = subjectService;
             _mapper = mapper;
@@ -56,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(TableBuilderQueryContext query)
         {
-            return await _dataService.Query(query).OnSuccess(async result =>
+            return await _tableBuilderService.Query(query).OnSuccess(async result =>
             {
                 var permalink = new Permalink(result, query);
                 await _fileStorageService.UploadFromStreamAsync(ContainerName, permalink.Id.ToString(),

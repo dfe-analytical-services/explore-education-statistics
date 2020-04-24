@@ -9,13 +9,13 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public abstract class AbstractTableBuilderSubjectMetaService
+    public abstract class AbstractSubjectMetaService
     {
         private readonly IBoundaryLevelService _boundaryLevelService;
         private readonly IFilterItemService _filterItemService;
         private readonly IGeoJsonService _geoJsonService;
 
-        protected AbstractTableBuilderSubjectMetaService(IBoundaryLevelService boundaryLevelService,
+        protected AbstractSubjectMetaService(IBoundaryLevelService boundaryLevelService,
             IFilterItemService filterItemService,
             IGeoJsonService geoJsonService)
         {

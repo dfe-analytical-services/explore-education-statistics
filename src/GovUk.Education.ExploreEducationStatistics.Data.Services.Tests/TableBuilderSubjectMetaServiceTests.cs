@@ -29,13 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var (boundaryLevelService, filterService, filterItemService, geoJsonService, indicatorGroupService, locationService, observationService, timePeriodService, userService) = Mocks();
 
-                var service = new TableBuilderSubjectMetaService(boundaryLevelService.Object,
+                var service = new SubjectMetaService(boundaryLevelService.Object,
                     filterService.Object,
                     filterItemService.Object,
                     geoJsonService.Object,
                     indicatorGroupService.Object,
                     locationService.Object,
-                    new Mock<ILogger<TableBuilderSubjectMetaService>>().Object,
+                    new Mock<ILogger<SubjectMetaService>>().Object,
                     MapperUtils.MapperForProfile<DataServiceMappingProfiles>(),
                     observationService.Object,
                     new PersistenceHelper<StatisticsDbContext>(context),
@@ -77,13 +77,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 userService.Setup(s => s.MatchesPolicy(release, CanViewSubjectDataForRelease)).ReturnsAsync(false);
 
-                var service = new TableBuilderSubjectMetaService(boundaryLevelService.Object,
+                var service = new SubjectMetaService(boundaryLevelService.Object,
                     filterService.Object,
                     filterItemService.Object,
                     geoJsonService.Object,
                     indicatorGroupService.Object,
                     locationService.Object,
-                    new Mock<ILogger<TableBuilderSubjectMetaService>>().Object,
+                    new Mock<ILogger<SubjectMetaService>>().Object,
                     MapperUtils.MapperForProfile<DataServiceMappingProfiles>(),
                     observationService.Object,
                     new PersistenceHelper<StatisticsDbContext>(context),

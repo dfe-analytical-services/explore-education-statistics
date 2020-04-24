@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
-    public interface ITableBuilderResultSubjectMetaService
+    public interface IResultSubjectMetaService
     {
-        Task<Either<ActionResult, TableBuilderResultSubjectMetaViewModel>> GetSubjectMeta(SubjectMetaQueryContext query,
+        Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(SubjectMetaQueryContext query,
             IQueryable<Observation> observations);
     }
 }
