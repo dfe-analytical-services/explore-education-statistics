@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "749d9233-ce5f-4e35-b07e-413013dd04c8",
+		"_postman_id": "2e0aafd2-b921-4d9e-bdc9-15d76ed14535",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -17,7 +17,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+										"id": "8077415a-a7cc-427d-90e4-3e6e65e4b66d",
 										"exec": [
 											""
 										],
@@ -27,7 +27,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+										"id": "13917ab1-eeea-4f58-8d0c-cc4739e9f189",
 										"exec": [
 											"var respJson;",
 											"",
@@ -86,7 +86,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "825f37b0-86f3-4428-8d17-16a68a9a77eb",
 												"exec": [
 													"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
 													"pm.globals.set(\"FILT_SchoolType__Total\", \"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\");"
@@ -97,7 +97,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "b551ad2c-b847-4c12-9bbd-3d240236462b",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -190,7 +190,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "fca1452c-a3e7-42bf-9d9e-a0402a256e4a",
 												"exec": [
 													"pm.globals.set(\"FILT_SchoolType__Total\", \"0b0daf53-3dd5-4b9b-913e-f4518f4afb96\");"
 												],
@@ -200,7 +200,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "57af4ba4-ee78-438f-a4df-b8d1926dc80c",
+												"id": "87857de6-32b3-4e0b-8435-b2051a7e64d0",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -276,7 +276,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "bafb78db-c696-488f-a933-f2fcc91a1fd9",
 												"exec": [
 													""
 												],
@@ -286,7 +286,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "a523c41a-6b1e-4a9b-9f93-32dd1af9874b",
+												"id": "d5677f8d-ac15-48d7-8d3f-a4dfef850154",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -355,7 +355,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "6fe045c4-7d78-4fa4-b4d5-28630dad387c",
 												"exec": [
 													""
 												],
@@ -365,7 +365,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "e2295ce7-38c1-45c6-996b-4ce026c97c1a",
+												"id": "c573c969-aa40-4086-b672-a19ce4a0bc31",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -411,7 +411,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "8252ed77-36bb-4b30-80ea-fe53d2d9798d",
 												"exec": [
 													""
 												],
@@ -421,7 +421,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "1fad1b97-df53-4082-87b4-986fad0ba79f",
+												"id": "84ebe906-494d-45bd-8a45-6e0bad69b525",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -467,7 +467,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "664654b0-0a55-4d57-9f05-38bac7376aae",
 												"exec": [
 													""
 												],
@@ -477,7 +477,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "4b0060fe-f9a2-459c-b9b9-eab8c748eb49",
+												"id": "c631b1a1-9583-48b4-a9a0-93813213ef2c",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -526,7 +526,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "838c87e4-f209-43d1-96b6-5997dc21131a",
 												"exec": [
 													""
 												],
@@ -536,7 +536,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "401992c9-fff3-4a14-8f54-04e7bc9d61a9",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -581,7 +581,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "3fb474bb-87fb-4446-8e04-f879c19212a1",
 												"exec": [
 													""
 												],
@@ -591,7 +591,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "591a1e4f-510b-48a1-8aa9-e3e1936c50ea",
 												"exec": [
 													"pm.test(\"Status code is 404\", function () { ",
 													"    pm.response.to.have.status(404); ",
@@ -625,7 +625,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "70057a2c-ebb3-4a38-925f-7db29350d256",
 												"exec": [
 													""
 												],
@@ -635,7 +635,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "d9911d9c-943f-4a24-8fad-ace3cc3c2d84",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -729,7 +729,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "3b0ef31a-4902-44f8-bb85-43f140a31f36",
 												"exec": [
 													""
 												],
@@ -739,7 +739,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "ef734676-bebc-4263-9da5-c7a4eb91c616",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -832,7 +832,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "273b383a-6b63-4d92-86b4-af04ffa8a56f",
 												"exec": [
 													""
 												],
@@ -842,7 +842,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "1f40277f-623e-44fe-a1ec-39a736867204",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -933,7 +933,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "dfce7c08-6b02-40c8-85ea-dc6026d4bad5",
 												"exec": [
 													""
 												],
@@ -943,7 +943,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "e0a5a45d-f808-45eb-bd12-77e11931705a",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1023,7 +1023,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "f39eeb43-4997-430a-8907-3a03fcf3b5f0",
 												"exec": [
 													""
 												],
@@ -1033,7 +1033,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "c33c76f3-4785-4717-a34c-4a078be48f94",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1110,7 +1110,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "a0e957f4-5b18-4986-a053-dd5a9d12ed41",
+										"id": "e2a89fc5-5a32-4838-ad94-b954acfb85e0",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -1120,7 +1120,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7f1dd3fe-1ecd-4adc-a95e-a4b3e350146d",
+										"id": "7ef44b9f-a1ff-40c6-b310-5c7f5b7dc3ab",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -1140,7 +1140,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "4a422a80-b87b-4a8f-8cc2-17c940b4c4e1",
 												"exec": [
 													""
 												],
@@ -1150,7 +1150,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "60febe34-d1b9-4b7a-a80c-17b13366007a",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1199,7 +1199,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "8624d01b-69f3-4bc2-a0ac-9ec05fb91f34",
 												"exec": [
 													""
 												],
@@ -1209,7 +1209,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "5ef566ae-046d-4582-8636-d30008d3f124",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1259,7 +1259,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "f2b7c516-80dd-4d80-9f8d-ca202e072890",
 												"exec": [
 													""
 												],
@@ -1269,7 +1269,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "1abd44ff-ec9c-4935-a3cb-7097a00ea036",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1321,7 +1321,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "4de3a17f-c4ec-4031-98a6-79489ca9fd04",
 												"exec": [
 													""
 												],
@@ -1331,7 +1331,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "4c5de936-4d75-4417-a7c8-33eec64367a3",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1380,7 +1380,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "82e94023-9713-4742-86ea-7c97d2b21224",
 												"exec": [
 													""
 												],
@@ -1390,7 +1390,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "b4c7ddc7-b4d8-44f4-b096-23e06880241c",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1441,7 +1441,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "7c3f6ccd-a553-4034-a5ff-a3fd784c347b",
 												"exec": [
 													""
 												],
@@ -1451,7 +1451,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "7e5b12ef-e77a-4323-89af-b58e56e2fdae",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1510,7 +1510,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "f5c4e30f-e34f-4c7b-b93f-29b9d11d72d0",
 												"exec": [
 													""
 												],
@@ -1520,7 +1520,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "e7bca018-83a4-46bd-9e9a-d57e56d21829",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -1609,7 +1609,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "ea4c2bbc-2867-4e99-b449-c26d53c65028",
 												"exec": [
 													""
 												],
@@ -1619,7 +1619,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "d6331357-1177-4735-b01d-631fe25e7bc4",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -1716,7 +1716,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "7ddfd220-166d-4944-9b07-0648da999f07",
 												"exec": [
 													""
 												],
@@ -1726,7 +1726,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "32083281-7d3c-4234-99a2-078691c4655e",
 												"exec": [
 													"if(pm.environment.get('env') === 'prod') {",
 													"    pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });",
@@ -1824,7 +1824,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "595f2dce-cc95-43ef-abfe-be98632b442f",
+								"id": "75c176fb-0974-4087-8169-8537812aa119",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1834,7 +1834,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f42619e7-fe77-47ac-a97a-0b143cf1d4eb",
+								"id": "d054e127-a1ba-4628-a76f-91e69ca92d65",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1854,7 +1854,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+										"id": "19ac758e-b7b5-41d6-ae60-9427211bff44",
 										"exec": [
 											"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
 										],
@@ -1864,7 +1864,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ac4b1f03-19f2-44f5-b80f-840e78849333",
+										"id": "9af85726-7c56-4294-a264-0eb535ba4265",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
@@ -1906,7 +1906,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+										"id": "3cfa36ea-ed60-42f2-8998-2c33937c0cac",
 										"exec": [
 											"pm.variables.set('publication_id', '66c8e9db-8bf2-4b0b-b094-cfab25c20b05');"
 										],
@@ -1916,7 +1916,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ac4b1f03-19f2-44f5-b80f-840e78849333",
+										"id": "abee063a-832d-4243-aaf7-6e74720160e1",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -1965,7 +1965,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b1bc576e-a31d-4330-ae1d-84416c336e6c",
+								"id": "d4f33046-4b5c-48ff-8e72-5735166c7564",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1975,7 +1975,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b342cb85-fd1c-421c-b348-1ce17d472dde",
+								"id": "3c2ac6ac-8136-4ea7-9511-a0a389931476",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1991,7 +1991,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ecb99d52-e5cd-4a4d-942b-eb37d390ca34",
+						"id": "d0cf1868-6610-4a98-80a1-efe2cc559cdd",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2001,7 +2001,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "31fb4c96-88b3-4e61-8c97-88941525fc5a",
+						"id": "a02e4875-f981-41bc-888d-884fa80ed841",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2026,7 +2026,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "25b228b2-a5ae-4b3b-a65c-e3c449b7a46d",
+												"id": "c80b1049-5e49-4168-81e2-d4903d21faf4",
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
@@ -2167,7 +2167,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "0c491405-7891-4f02-a4bb-47785d27fa09",
+												"id": "f8185953-e5af-44e6-ad9f-9f6265a7d77e",
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
@@ -2232,7 +2232,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "730a5e14-094b-4368-86ba-c1d2d00de1fb",
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
@@ -2292,7 +2292,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "be43473c-e6d5-4af2-bd3b-69ab2f3c948c",
+												"id": "5f2e707a-cb13-450c-8695-88ab6de3abcb",
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
@@ -2404,7 +2404,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "bdfdf38d-e872-4faa-9f39-d3f5cbe02f7d",
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
@@ -2510,7 +2510,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "e5f21415-1dde-40f8-b4f8-d40b7000091d",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2572,7 +2572,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "a2f93f15-3577-4c87-ae52-685637abbb01",
+												"id": "cfe8b9d2-3128-4e29-8a22-e06366807d84",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2636,7 +2636,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "2e719340-8ecf-4d9a-abe9-b7d2b3509890",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2705,7 +2705,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "8e333071-d132-4e86-a4af-7bd6d4c444b4",
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
@@ -2769,7 +2769,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "688fb97a-5023-4538-9c17-91ca35101013",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2836,7 +2836,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1b454eae-43c4-4e92-a06e-1a803aa8858b",
+										"id": "5deadcc5-bf89-4eb0-8855-960ccb10400a",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
@@ -2864,7 +2864,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9b07e3a7-08a0-4256-ab4a-53508f6331c5",
+										"id": "a3b0a8e1-45b1-4ce9-86f0-a497f5e9b878",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -2884,7 +2884,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "6550635e-051a-43df-95b3-4654d1ebc780",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2960,7 +2960,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ca61e14b-1422-4898-a302-90665970c869",
+												"id": "f580cca2-70ba-4577-8071-c318a16556ae",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3043,7 +3043,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "7d6b7a45-3e07-4fc5-9965-8c110aac7200",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3119,7 +3119,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "31ff30b6-9ada-41d9-a17f-c1e8b2db238e",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3189,7 +3189,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "ab9e44e2-f0aa-4f7e-b889-19c494404560",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3253,7 +3253,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "6354b6c5-34ad-43c1-b2d7-45f006621e28",
+										"id": "c2b50302-aa7a-42c5-88c6-487796e46ce2",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_SchoolType__Total\", \"0b0daf53-3dd5-4b9b-913e-f4518f4afb96\");",
@@ -3276,7 +3276,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a06c2178-26b4-4c5d-966b-2bc10331373a",
+										"id": "719b1b64-d671-4fe7-8a2b-a94216b00990",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -3296,7 +3296,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "f1f5f0ff-2061-4a18-b0de-363134fb357d",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3348,7 +3348,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "99290dbe-ce13-42b3-8644-191f7116bbb0",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3401,7 +3401,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "5150b24b-0993-4899-b1f7-70d0c2395f5c",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3449,7 +3449,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "7bd4ddef-4cc9-4c88-9588-5f9cac12ce98",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3561,7 +3561,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "e739a556-4605-4484-8020-2e0ed212c3df",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3608,7 +3608,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "f28d57d5-c4a2-4c3c-a90c-e672993bec6d",
+										"id": "a35c154c-7092-43e1-b05b-28559b507128",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"514b404f-ca0c-4568-9539-9dea79d43bc8\");",
@@ -3625,7 +3625,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f54a546f-c365-4bfc-831e-2e3cbfdef1d6",
+										"id": "55c69fe1-0bdc-4432-8110-fe1c839b82ae",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -3656,7 +3656,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "f4fb4aff-3352-42dd-af90-e9a85636e703",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3709,7 +3709,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "232885b9-2fcc-42d8-9d1d-3f29eca9d68d",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3792,7 +3792,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "f38d8984-728e-4d90-831a-b02dd5617a05",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3844,7 +3844,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
+										"id": "00f73e07-1fa0-4713-896d-51c16d356a26",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_SchoolType__Total\", \"26f7f3d0-b7ad-4517-8815-e0c70295ff3b\");",
@@ -3860,7 +3860,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "540c3551-b43a-4768-a64e-bcdd881d9a7b",
+										"id": "009f015f-d96b-4efd-a7a1-d2f90793ad82",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -3891,7 +3891,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "3d8e22a1-9e2f-4816-bc74-f0bf0b10a346",
 												"exec": [
 													"// DFE-998 - If no geographicLevel is provided, respond with all geographicLevels",
 													"var respJson = pm.response.json()",
@@ -3944,7 +3944,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "4c273344-e97a-4db8-a615-9c6884493a02",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3999,7 +3999,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "977785f9-af28-4fa3-ad99-cb1c437d6df4",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4047,7 +4047,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "53801e65-8544-4412-9976-56fe389ee37d",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4096,7 +4096,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "52135f05-03ae-4080-bbbb-dddcd7ee3e42",
+										"id": "8ff48301-9164-4110-b2eb-73082b1dd4e4",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfSchools\", \"9472758e-6c4a-4cb2-8270-d0551ce91494\");",
@@ -4109,7 +4109,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6dbbadee-c752-4d88-b613-f2953c175a62",
+										"id": "beb245dd-4b88-4a80-beb4-d3634ccfc057",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -4140,7 +4140,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "15fde1c2-e5ca-4d48-82b2-f0b32c79d76e",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4188,7 +4188,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "23530fd9-0b30-4e21-b6ff-528b4fd75589",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4235,7 +4235,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "e04223f2-1e08-4ff6-9984-732c655dbcdf",
+										"id": "037dc385-0cd0-45a8-9c9f-104fc83afca9",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"0089b1b3-626c-4326-a2ec-a4b99b4735bc\");",
@@ -4251,7 +4251,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "368397eb-8cbb-4195-ac61-415b8c3abe28",
+										"id": "4eaff758-309d-49db-a4c6-3c501ac7b5d2",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -4282,7 +4282,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "eb0f33e9-881e-43cf-8f02-30b1f74e51fc",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4329,7 +4329,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "49522da0-95a0-4ddf-9a8a-9ca103db1df2",
+										"id": "e8840aa2-d0cf-49c3-a0e6-1ab673f4fc76",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"0af225c6-c70b-4053-b7e7-4e719e2b751f\");",
@@ -4346,7 +4346,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ca434135-2e41-4ff4-806d-48a458f28b61",
+										"id": "fb6d8b50-2015-421d-92c8-a7d38302a8b4",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -4377,7 +4377,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "fbc8c7a0-54dc-48b7-ac2f-ab840c45cc29",
+						"id": "ce8c8ffc-c51a-4ec6-88e0-73d807ad891a",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -4387,1022 +4387,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8141f36f-4bf9-49a4-822c-0c6087cadbbe",
+						"id": "76169198-8674-4855-918c-4962acfaf8e4",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Data",
-			"item": [
-				{
-					"name": "Pupil absence in schools in England",
-					"item": [
-						{
-							"name": "By characteristic",
-							"item": [
-								{
-									"name": "Data - Absence by characteristic - Country - *",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-												"exec": [
-													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"   pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1); ",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(16); ",
-													"});",
-													"",
-													"pm.test(\"Every result should contain location country England only\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.region`));",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}\n"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Country - * - Male, Female AND Primary, Secondary",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-												"exec": [
-													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1); ",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(4); ",
-													"});",
-													"",
-													"pm.test(\"Every result should contain location country England only\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.region`));",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Derbyshire - Male AND Secondary",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(1);",
-													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(1);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E10000007.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(1); });",
-													"",
-													"pm.test(\"Every result should contain location country, localAuthority, and region\", function () {",
-													"    pm.expect(respJson.result[0].location.country.name).to.equal(\"England\");",
-													"    pm.expect(pm.response.to.have.jsonBody(`result[${0}].location.localAuthority`));",
-													"    pm.expect(pm.response.to.not.have.jsonBody(`result[${0}].location.localAuthorityDistrict`));",
-													"    pm.expect(pm.response.to.have.jsonBody(`result[${0}].location.region`));",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\n    \t\"E10000007\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Wandsworth",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000032.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(4); });",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Hartlepool",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "7be51e96-5401-48dc-986c-42c7ee78d7e5",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(8);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"Number of boundaryLevels should be correct\", function () {",
-													"    var foundId8 = false;",
-													"    var foundId3 = false;",
-													"    for(var i = 0; i < respJson.metaData.boundaryLevels.length; i++) {",
-													"        if(respJson.metaData.boundaryLevels[i].id === 8) {",
-													"            foundId8 = true;",
-													"            pm.expect(respJson.metaData.boundaryLevels[i].label).to.equal(\"Local Authority Districts (April 2019) Boundaries UK BUC\");",
-													"        }",
-													"        if(respJson.metaData.boundaryLevels[i].id === 3) {",
-													"            foundId3 = true;",
-													"            pm.expect(respJson.metaData.boundaryLevels[i].label).to.equal(\"Local Authority Districts December 2017 Ultra Generalised Clipped Boundaries in United Kingdom WGS84\");",
-													"        }",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 1",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(8);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and not have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\"));",
-													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 1\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 3",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(8);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 3\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 6",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(8);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\"));",
-													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 6\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Adur",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData indicators should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(3); ",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1); ",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"All results should have correction location attributes\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Adur\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\", \n        \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Adur (LAD) + Wandsworth (LA)",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
-													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData indicators should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(5); ",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(2);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000032\")); // LA Wandsworth",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E07000223\")); // LAD Adur",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(35); // LA 24 + LAD 11",
-													"});",
-													"",
-													"pm.test(\"All results should have correction geographicLevel\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
-													"           return geoLevel === \"LocalAuthority\" || geoLevel === \"LocalAuthorityDistrict\"; ",
-													"        });",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfNoReasonYetSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfLateSessions}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								}
-							],
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "ec9d2b73-2598-40e5-abd3-b8598bbf2497",
-										"type": "text/javascript",
-										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"eb6013a7-6e69-4ab6-b51e-b7a3e68256ae\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"ab381336-5e81-4caa-9e59-6e9067e8fb04\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"d7e7e412-f462-444f-84ac-3454fa471cb8\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"a9fe9fa6-e91f-460b-a0b1-66877b97c581\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"b3207d77-143b-43d5-8b48-32d29727e96f\");",
-											"pm.globals.set(\"FILT_Char__FSMEligible\", \"278ce0cb-f1d2-4e8f-84d1-ad794352c925\");",
-											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"bc6e41d5-5078-4207-b0ae-69261ac192e0\");",
-											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"c649015c-8203-43aa-b424-dfb897766391\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"5a18e770-73b9-4b4f-8c3c-b3130b810422\");",
-											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1293b484-93f5-4177-a451-fcf4467b26a2\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"74c8ab3a-0ec3-4348-852c-9055f354f86f\");",
-											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\");",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\");",
-											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"f9ae4976-7cd3-4718-834a-09349b6eb377\");",
-											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"a93b664a-c537-4bb0-8d06-b4ce9bf60ff9\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"5a59cfeb-19e7-486c-906e-f2ad45f896f6\");",
-											"pm.globals.set(\"IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"71c77c7d-dec5-4c31-baa5-b59f3c8c8f2e\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"a3b1afa4-b3de-44c6-b8b2-0ef59f211a2a\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"71761e61-6a80-400f-8778-a8761306eb77\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfNoReasonYetSessions\", \"b4cc7de4-30f3-495b-a967-0d2a9473583f\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfLateSessions\", \"57452cb9-6bda-495a-a012-7fda71e4bf90\");"
-										]
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"id": "65c89d21-118a-4749-bd42-fa874f4a7be9",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
-						}
-					],
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "d788e097-9c6f-43c3-89bc-db3db49c5404",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "07a946d0-b2d1-44a1-acc5-a04c987e7a69",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Secondary and primary schools applications and offers",
-					"item": [
-						{
-							"name": "Data - Applications and offers by school phase - LA Wirral, York",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-										"exec": [
-											"respJson = pm.response.json()",
-											"",
-											"if(pm.environment.get('env') === 'prod') {",
-											"    pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });",
-											"} else {",
-											"    pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-											"    ",
-											"    pm.test(\"Should have correct fields\", function () {",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"    });",
-											"    ",
-											"    pm.test(\"Number of metaData filters should be correct\", function () {",
-											"       pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(1); ",
-											"    });",
-											"    ",
-											"    pm.test(\"Number of metaData locations should be correct\", function () {",
-											"       pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(2); ",
-											"    });",
-											"    ",
-											"    pm.test(\"Correct metaData locations should be returned\", function () {",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E08000015\"));  // LA Wirral",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000014\"));  // LA York",
-											"    });",
-											"    ",
-											"    pm.test(\"geographicLevel should be same as request\", function () {",
-											"        for(var i = 0; i < respJson.result.length; i++) {",
-											"            pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
-											"        }",
-											"    });",
-											"    ",
-											"    pm.test(\"Number of results should be correct\", function () { ",
-											"        pm.expect(respJson.result.length).to.equal(6); ",
-											"    });",
-											"}",
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"subjectId\": \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n    \"localAuthority\": [\"E08000015\", \"E06000014\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Primary__R}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_Applications__NumberOfApplicationsReceived}}\",\n    \t\"{{IND_Applications__NumberOfOnlineApplications}}\",\n    \t\"{{IND_Applications__PercentageOfOnlineApplications}}\"\n    ]\n}"
-								},
-								"url": {
-									"raw": "{{data_api_url}}/data",
-									"host": [
-										"{{data_api_url}}"
-									],
-									"path": [
-										"data"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "06185e19-060d-44b4-9adf-3c424694ae9e",
-								"type": "text/javascript",
-								"exec": [
-									"pm.globals.set(\"FILT_Primary__R\", \"f5ad9114-14b8-4102-89a1-3ab76801ecde\");",
-									"pm.globals.set(\"FILT_Secondary__9\", \"3f101896-1c4a-4153-bb22-1d3888eb61ea\");",
-									"pm.globals.set(\"FILT_Secondary__7\", \"ff8614ba-ec1c-4012-a5e3-2d788a4f5460\");",
-									"",
-									"pm.globals.set(\"IND_Applications__NumberOfApplicationsReceived\", \"020a4da6-1111-443d-af80-3a425c558d14\");",
-									"pm.globals.set(\"IND_Applications__NumberOfOnlineApplications\", \"f472e6cc-9e25-401b-9fca-9dc3755bab2d\");",
-									"pm.globals.set(\"IND_Applications__PercentageOfOnlineApplications\", \"0af5ea39-828f-4afe-9a9f-643dce0112cf\");"
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "a725cb4a-8a8f-477e-85f1-8ead50eacf42",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -5416,7 +4406,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bf224cd6-d62d-4b6b-afd4-8cf2e352fcbd",
+								"id": "8efa4f3c-7f38-40db-a0ca-3563c6a13869",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -5476,7 +4466,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "2cec492a-fc8e-4e42-9663-af2f42ae27c7",
+								"id": "58e367d7-8744-43c0-8163-bfe31231940e",
 								"exec": [
 									"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
 									"pm.globals.set(\"FILT_Char__GenderMale\", \"eb6013a7-6e69-4ab6-b51e-b7a3e68256ae\");",
@@ -5534,7 +4524,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
+								"id": "5014a541-438e-41d0-a42d-e39d519197be",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -5627,7 +4617,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "022c9044-3a78-41f6-9476-916e5c92e4b6",
+								"id": "f090f216-5276-4597-bb5a-3bf0a412619f",
 								"exec": [
 									""
 								],
@@ -5637,7 +4627,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c80a67f6-be1b-4a79-89b6-f21275308965",
+								"id": "e82173d0-bdad-416d-8cd9-1920ac328bf9",
 								"exec": [
 									"pm.test(\"Status code is 404\", function () {",
 									"    pm.response.to.have.status(404);",
@@ -5689,7 +4679,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0eff5d76-4361-43c8-92b1-fcd6f6238f37",
+								"id": "bc899554-f2da-4dc1-a280-bc1db1151223",
 								"exec": [
 									"",
 									"/*",
@@ -5795,7 +4785,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "022c9044-3a78-41f6-9476-916e5c92e4b6",
+								"id": "5406a366-ea69-4390-b270-9a88265a0ab3",
 								"exec": [
 									""
 								],
@@ -5805,7 +4795,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c80a67f6-be1b-4a79-89b6-f21275308965",
+								"id": "be8a52c5-c390-414f-8144-d275a133ee8b",
 								"exec": [
 									"pm.test(\"Status code is 404\", function () {",
 									"    pm.response.to.have.status(404);",
@@ -5850,7 +4840,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ed583c2e-33b1-4e58-b324-6c75f5dd0180",
+						"id": "8a06c7cf-84e5-4d6a-8104-c01eaa52c777",
 						"type": "text/javascript",
 						"exec": [
 							"pm.globals.set(\"FILT_AbsenceForFourYearOlds__SchoolType__StateFundedPrimary\", \"2f219985-8900-4a84-b096-89d133ef8bc6\");",
@@ -5862,7 +4852,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a2fe84e3-f593-456d-be3e-e73aa891f1a8",
+						"id": "c916aadf-0874-45df-9ac1-1c78c83cf816",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -5881,7 +4871,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a8450e2f-c9ab-49e3-ade8-a3a285209058",
+								"id": "a765835c-2ffc-4395-bf82-3388622c8bd6",
 								"exec": [
 									"/*",
 									"// EES-562",
@@ -5924,7 +4914,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "134cd34a-d839-401e-bc0b-88090d1b51c9",
+				"id": "73a44939-ea97-4196-918c-7453d6b915a5",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -5934,7 +4924,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "9279878e-d394-4bcd-a0d0-a638c88016dc",
+				"id": "d683288b-2847-4e6d-b51d-a1c588944598",
 				"type": "text/javascript",
 				"exec": [
 					""
