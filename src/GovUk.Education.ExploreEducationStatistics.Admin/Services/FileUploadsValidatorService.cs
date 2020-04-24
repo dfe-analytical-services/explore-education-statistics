@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
         
-        private static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
+        public static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
             new Dictionary<ReleaseFileTypes, IEnumerable<Regex>>
             {
                 { ReleaseFileTypes.Ancillary, AllowedAncillaryFileTypes },
