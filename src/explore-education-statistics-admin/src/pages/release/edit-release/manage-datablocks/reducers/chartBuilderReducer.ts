@@ -66,26 +66,25 @@ const defaultAxisOptions: Partial<AxisConfiguration> = {
   visible: true,
 };
 
+const updateAxis = (
+  axisDefinition: ChartDefinitionAxis,
+  current: AxisConfiguration,
+  next: Partial<AxisConfiguration> = {},
+): AxisConfiguration => {
+  return {
+    ...defaultAxisOptions,
+    ...(axisDefinition.defaults ?? {}),
+    ...current,
+    ...next,
+    ...(axisDefinition.constants ?? {}),
+    type: axisDefinition.type,
+  };
+};
+
 export const chartBuilderReducer: Reducer<
   ChartBuilderState,
   ChartBuilderActions
 > = (draft, action) => {
-  const updateAxis = (
-    next: AxisConfiguration,
-    axisDefinition: ChartDefinitionAxis,
-  ): AxisConfiguration => {
-    const current: Partial<AxisConfiguration> = draft.axes[next.type] ?? {};
-
-    return {
-      ...defaultAxisOptions,
-      ...(axisDefinition.defaults ?? {}),
-      ...current,
-      ...next,
-      ...(axisDefinition.constants ?? {}),
-      type: axisDefinition.type,
-    };
-  };
-
   switch (action.type) {
     case 'UPDATE_CHART_DEFINITION': {
       draft.definition = action.payload;
@@ -101,8 +100,8 @@ export const chartBuilderReducer: Reducer<
         action.payload.axes,
         (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
           return updateAxis(
-            draft.axes[type] ?? ({} as AxisConfiguration),
             axisDefinition,
+            draft.axes[type] as AxisConfiguration,
           );
         },
       );
@@ -114,13 +113,20 @@ export const chartBuilderReducer: Reducer<
 
       if (!axisDefinition) {
         throw new Error(
-          `Could not find chart axis definition with type '${action.payload.type}'`,
+          `Could not find chart axis definition for type '${action.payload.type}'`,
+        );
+      }
+
+      if (!draft.axes[action.payload.type]) {
+        throw new Error(
+          `Could not find axis configuration for type '${action.payload.type}'`,
         );
       }
 
       draft.axes[action.payload.type] = updateAxis(
-        action.payload,
         axisDefinition,
+        draft.axes[action.payload.type] as AxisConfiguration,
+        action.payload,
       );
 
       break;
@@ -205,12 +211,26 @@ export function useChartBuilderReducer(
             : 300,
       },
     },
-    initialState => {
+    (initialState: ChartBuilderState) => {
       if (!initialConfiguration) {
         return initialState;
       }
 
-      const axes = { ...initialConfiguration.axes } as AxesConfiguration;
+      const axes: AxesConfiguration = mapValues(
+        initialState.definition?.axes ?? {},
+        (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
+          if (!initialConfiguration.axes[type]) {
+            throw new Error(
+              `Could not find chart axis definition for type '${type}'`,
+            );
+          }
+
+          return updateAxis(
+            axisDefinition,
+            initialConfiguration.axes[type] as AxisConfiguration,
+          );
+        },
+      );
 
       if (
         axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
