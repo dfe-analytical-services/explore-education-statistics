@@ -17,38 +17,3 @@
     }
   }
 }
-
-.section {
-  page-break-inside: avoid;
-}
-
-@mixin accordion-section-expanded() {
-  display: block;
-  height: auto;
-  padding: 15px 0;
-  visibility: visible;
-}
-
-.accordion :global(.govuk-accordion__section-content) {
-  display: block;
-  height: 0;
-  overflow: hidden;
-  padding: 0;
-  visibility: hidden;
-
-  @media print {
-    @include accordion-section-expanded();
-  }
-}
-
-.accordion
-  :global(.govuk-accordion__section--expanded
-    .govuk-accordion__section-content) {
-  @include accordion-section-expanded();
-}
-
-.govuk-accordion__section {
-  @media print {
-    display: block !important;
-  }
-}
