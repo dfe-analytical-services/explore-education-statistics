@@ -37,9 +37,9 @@ const errorCodeMappings = [
     'Choose a file of an allowed format',
   ),
   errorCodeToFieldError(
-      'FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
-      'file',
-      'Filename cannot contain spaces or special characters',
+    'FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
+    'file',
+    'Filename cannot contain spaces or special characters',
   ),
 ];
 
