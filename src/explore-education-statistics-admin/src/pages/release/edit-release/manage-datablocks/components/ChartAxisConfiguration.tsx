@@ -59,6 +59,7 @@ type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
 
 interface Props {
   id: string;
+  canSaveChart: boolean;
   defaultDataType?: AxisGroupBy;
   type: AxisType;
   configuration: AxisConfiguration;
@@ -71,6 +72,7 @@ interface Props {
 
 const ChartAxisConfiguration = ({
   id,
+  canSaveChart,
   configuration,
   data,
   meta,
@@ -495,7 +497,9 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          <Button type="submit">Save chart options</Button>
+          <Button type="submit" disabled={!canSaveChart}>
+            Save chart options
+          </Button>
         </Form>
       )}
     />

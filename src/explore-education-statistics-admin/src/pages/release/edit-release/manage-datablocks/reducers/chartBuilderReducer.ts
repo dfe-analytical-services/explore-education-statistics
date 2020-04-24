@@ -11,6 +11,7 @@ import {
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
 import { Chart } from '@common/services/types/blocks';
+import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer, useImmerReducer } from 'use-immer';
@@ -20,12 +21,20 @@ export interface ChartOptions extends ChartDefinitionOptions {
   geographicId?: string;
 }
 
+export interface FormState {
+  isValid: boolean;
+}
+
 export interface ChartBuilderState {
   definition?: ChartDefinition;
   options: ChartOptions;
   axes: AxesConfiguration;
-  isValid?: boolean;
   chartProps?: ChartRendererProps;
+  forms: {
+    data: FormState;
+    options: FormState;
+    [form: string]: FormState;
+  };
 }
 
 export type ChartBuilderActions =
@@ -51,8 +60,11 @@ export type ChartBuilderActions =
       payload: AxisConfiguration;
     }
   | {
-      type: 'UPDATE_VALID';
-      payload: boolean;
+      type: 'UPDATE_FORM';
+      payload: {
+        form: keyof ChartBuilderState['forms'];
+        state: FormState;
+      };
     };
 
 const defaultOptions: Partial<ChartOptions> = {
@@ -146,9 +158,7 @@ export const chartBuilderReducer: Reducer<
         draft.axes.major.dataSets.push(action.payload);
       }
 
-      if (typeof draft.isValid === 'undefined') {
-        draft.isValid = true;
-      }
+      draft.forms.data.isValid = true;
 
       break;
     }
@@ -156,9 +166,7 @@ export const chartBuilderReducer: Reducer<
       if (draft.axes.major) {
         draft.axes.major.dataSets.splice(action.payload, 1);
 
-        if (typeof draft.isValid === 'undefined') {
-          draft.isValid = draft.axes.major.dataSets.length > 0;
-        }
+        draft.forms.data.isValid = draft.axes.major.dataSets.length > 0;
       }
 
       break;
@@ -167,15 +175,20 @@ export const chartBuilderReducer: Reducer<
       if (draft.axes.major) {
         draft.axes.major.dataSets = action.payload;
 
-        if (typeof draft.isValid === 'undefined') {
-          draft.isValid = draft.axes.major.dataSets.length > 0;
-        }
+        draft.forms.data.isValid = draft.axes.major.dataSets.length > 0;
       }
 
       break;
     }
-    case 'UPDATE_VALID':
-      draft.isValid = action.payload;
+    case 'UPDATE_FORM':
+      if (!draft.forms[action.payload.form]) {
+        throw new Error(
+          `Could not find form '${action.payload.form}' to update`,
+        );
+      }
+
+      draft.forms[action.payload.form] = action.payload.state;
+
       break;
     default:
       break;
@@ -205,6 +218,10 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
           initialConfiguration?.height > 0
             ? initialConfiguration.height
             : 300,
+      },
+      forms: {
+        data: { isValid: true },
+        options: { isValid: true },
       },
     },
     (initialState: ChartBuilderState) => {
@@ -238,9 +255,17 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
         );
       }
 
+      const forms: ChartBuilderState['forms'] = {
+        ...initialState.forms,
+        ...(mapValues(axes, () => ({
+          isValid: true,
+        })) as Dictionary<FormState>),
+      };
+
       return {
         ...initialState,
         axes,
+        forms,
       };
     },
   );
@@ -287,7 +312,14 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
 
   const updateChartOptions = useCallback(
     ({ isValid, ...chartOptions }: ChartOptions & { isValid: boolean }) => {
-      dispatch({ type: 'UPDATE_VALID', payload: isValid });
+      dispatch({
+        type: 'UPDATE_FORM',
+        payload: {
+          form: 'options',
+          state: { isValid },
+        },
+      });
+
       dispatch({
         type: 'UPDATE_CHART_OPTIONS',
         payload: chartOptions,
@@ -301,7 +333,14 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       isValid,
       ...axisConfiguration
     }: AxisConfiguration & { isValid: boolean }) => {
-      dispatch({ type: 'UPDATE_VALID', payload: isValid });
+      dispatch({
+        type: 'UPDATE_FORM',
+        payload: {
+          form: axisConfiguration.type,
+          state: { isValid },
+        },
+      });
+
       dispatch({
         type: 'UPDATE_CHART_AXIS',
         payload: axisConfiguration,

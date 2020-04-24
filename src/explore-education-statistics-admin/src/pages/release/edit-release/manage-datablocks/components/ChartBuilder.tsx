@@ -68,9 +68,14 @@ const ChartBuilder = ({
     initialConfiguration,
   );
 
-  const { axes, definition, options, isValid } = chartBuilderState;
+  const { axes, definition, options, forms } = chartBuilderState;
 
   const getChartFile = useGetChartFile(releaseId);
+
+  const canSaveChart = useMemo(
+    () => Object.values(forms).every(form => form.isValid),
+    [forms],
+  );
 
   const chartProps = useMemo<ChartRendererProps | undefined>(() => {
     if (!definition) {
@@ -131,7 +136,11 @@ const ChartBuilder = ({
   );
 
   const handleChartSave = useCallback(async () => {
-    if (chartProps && !isChartRenderable(chartProps) && !isValid) {
+    if (chartProps && !isChartRenderable(chartProps)) {
+      return;
+    }
+
+    if (!canSaveChart) {
       return;
     }
 
@@ -140,7 +149,7 @@ const ChartBuilder = ({
       // anymore in the deprecated format.
       await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
     }
-  }, [chartProps, isValid, onChartSave]);
+  }, [chartProps, canSaveChart, onChartSave]);
 
   return (
     <div className={styles.editor}>
@@ -186,7 +195,7 @@ const ChartBuilder = ({
               headingTitle="Add data from the existing dataset to the chart"
             >
               <ChartDataSelector
-                canSaveChart={isValid}
+                canSaveChart={canSaveChart}
                 meta={meta}
                 dataSets={axes.major?.dataSets}
                 chartType={definition}
@@ -204,6 +213,7 @@ const ChartBuilder = ({
             headingTitle="Chart configuration"
           >
             <ChartConfiguration
+              canSaveChart={canSaveChart}
               selectedChartType={definition}
               chartOptions={options}
               meta={meta}
@@ -231,6 +241,7 @@ const ChartBuilder = ({
                 headingTitle={axis.title}
               >
                 <ChartAxisConfiguration
+                  canSaveChart={canSaveChart}
                   id={key}
                   type={key as AxisType}
                   configuration={axisConfiguration}

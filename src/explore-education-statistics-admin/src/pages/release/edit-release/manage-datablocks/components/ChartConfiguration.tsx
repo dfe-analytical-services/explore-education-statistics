@@ -21,6 +21,7 @@ import InfographicChartForm from './InfographicChartForm';
 type ChartOptionsChangeValue = ChartOptions & { isValid: boolean };
 
 interface Props {
+  canSaveChart: boolean;
   selectedChartType: ChartDefinition;
   chartOptions: ChartOptions;
   releaseId: string;
@@ -45,6 +46,7 @@ const validationSchema = Yup.object<ChartOptions>({
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
+  canSaveChart,
   chartOptions,
   selectedChartType,
   meta,
@@ -201,7 +203,9 @@ const ChartConfiguration = ({
               </>
             )}
 
-            <Button type="submit">Save chart options</Button>
+            <Button type="submit" disabled={!canSaveChart}>
+              Save chart options
+            </Button>
           </Form>
         )}
       />
