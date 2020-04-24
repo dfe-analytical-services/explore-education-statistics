@@ -28,23 +28,23 @@ def cookie_names_should_be_on_page():
 
 def user_checks_details_dropdown_contains_publication(details_heading, publication_name):
     try:
-        sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]')
+        sl.driver.find_element_by_xpath(f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]')
     except:
         raise AssertionError(f'Cannot find details component "{details_heading}"')
 
     try:
-        sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
+        sl.driver.find_element_by_xpath(f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
     except:
         raise AssertionError(f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
 
 def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
     try:
-        sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]')
+        sl.driver.find_element_by_xpath(f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]')
     except:
         raise AssertionError(f'Cannot find details component "{details_heading}"')
 
     try:
-        sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
+        sl.driver.find_element_by_xpath(f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
     except:
         raise AssertionError(f'Cannot find link "{download_link}" in "{details_heading}"')
 
