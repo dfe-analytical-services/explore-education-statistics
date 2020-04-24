@@ -21,6 +21,7 @@ const basicAuth = require('express-basic-auth');
 const express = require('express');
 const helmet = require('helmet');
 const nextApp = require('next');
+const path = require('path');
 const referrerPolicy = require('referrer-policy');
 const url = require('url');
 const cookiesMiddleware = require('universal-cookie-express');
@@ -120,6 +121,10 @@ async function startServer(port = process.env.PORT || 3000) {
   });
 
   if (process.env.BASIC_AUTH === 'true') {
+    server.use(
+      '/_next/static',
+      express.static(path.resolve(__dirname, 'src/.next/static')),
+    );
     server.use(
       basicAuth({
         users: {
