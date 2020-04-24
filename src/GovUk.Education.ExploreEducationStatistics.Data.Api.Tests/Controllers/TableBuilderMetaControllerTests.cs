@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -35,13 +35,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         public TableBuilderMetaControllerTests()
         {
-            var subjectMetaService = new Mock<ITableBuilderSubjectMetaService>();
+            var subjectMetaService = new Mock<ISubjectMetaService>();
 
             subjectMetaService.Setup(s => s.GetSubjectMeta(SubjectId))
-                .ReturnsAsync(new TableBuilderSubjectMetaViewModel());
+                .ReturnsAsync(new SubjectMetaViewModel());
 
             subjectMetaService.Setup(s => s.GetSubjectMeta(_queryContext))
-                .ReturnsAsync(new TableBuilderSubjectMetaViewModel());
+                .ReturnsAsync(new SubjectMetaViewModel());
 
             subjectMetaService.Setup(s => s.GetSubjectMeta(NotFoundId)).ReturnsAsync(new NotFoundResult());
 
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         public async Task Get_SubjectMetaAsync_Returns_Ok()
         {
             var result = await _controller.GetSubjectMetaAsync(SubjectId);
-            Assert.IsAssignableFrom<TableBuilderSubjectMetaViewModel>(result.Value);
+            Assert.IsAssignableFrom<SubjectMetaViewModel>(result.Value);
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         public async Task Post_SubjectMetaAsync_Returns_Ok()
         {
             var result = await _controller.GetSubjectMetaAsync(_queryContext);
-            Assert.IsAssignableFrom<TableBuilderSubjectMetaViewModel>(result.Value);
+            Assert.IsAssignableFrom<SubjectMetaViewModel>(result.Value);
         }
 
         [Fact]

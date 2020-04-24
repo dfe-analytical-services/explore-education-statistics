@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
-    public class TableBuilderResultSubjectMetaViewModel
+    public class ResultSubjectMetaViewModel
     {
         public Dictionary<string, FilterMetaViewModel> Filters { get; set; }
 

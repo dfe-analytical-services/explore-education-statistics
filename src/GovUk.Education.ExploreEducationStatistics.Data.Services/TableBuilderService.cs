@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -16,27 +17,31 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.D
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class TableBuilderDataService : AbstractDataService<TableBuilderResultViewModel>
+    public class TableBuilderService : ITableBuilderService
     {
-        private readonly ITableBuilderResultSubjectMetaService _resultSubjectMetaService;
+        private readonly IResultSubjectMetaService _resultSubjectMetaService;
         private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
+        private readonly IObservationService _observationService;
+        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ISubjectService _subjectService;
+        private readonly IUserService _userService;
 
-        public TableBuilderDataService(IObservationService observationService,
+        public TableBuilderService(IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
-            ITableBuilderResultSubjectMetaService resultSubjectMetaService,
+            IResultSubjectMetaService resultSubjectMetaService,
             ISubjectService subjectService,
             IUserService userService,
-            IResultBuilder<Observation, ObservationViewModel> resultBuilder) :
-            base(observationService, persistenceHelper, userService)
+            IResultBuilder<Observation, ObservationViewModel> resultBuilder)
         {
+            _observationService = observationService;
             _resultBuilder = resultBuilder;
             _resultSubjectMetaService = resultSubjectMetaService;
+            _persistenceHelper = persistenceHelper;
             _subjectService = subjectService;
+            _userService = userService;
         }
 
-        public override Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
-            ObservationQueryContext queryContext)
+        public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId, HydrateSubject)
                 .OnSuccess(CheckCanViewSubjectData)
@@ -73,7 +78,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             return new ForbidResult();
         }
-        
+
+        private IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
+        {
+            return _observationService.FindObservations(queryContext);
+        }
+
         private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
         {
             return queryable.Include(subject => subject.Release);

@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,8 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.D
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class TableBuilderResultSubjectMetaService : AbstractTableBuilderSubjectMetaService,
-        ITableBuilderResultSubjectMetaService
+    public class ResultSubjectMetaService : AbstractSubjectMetaService, IResultSubjectMetaService
     {
         private readonly IBoundaryLevelService _boundaryLevelService;
         private readonly IFootnoteService _footnoteService;
@@ -35,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        public TableBuilderResultSubjectMetaService(IBoundaryLevelService boundaryLevelService,
+        public ResultSubjectMetaService(IBoundaryLevelService boundaryLevelService,
             IFilterItemService filterItemService,
             IFootnoteService footnoteService,
             IGeoJsonService geoJsonService,
@@ -44,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
-            ILogger<TableBuilderResultSubjectMetaService> logger,
+            ILogger<ResultSubjectMetaService> logger,
             IMapper mapper) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
             _boundaryLevelService = boundaryLevelService;
@@ -58,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _mapper = mapper;
         }
 
-        public Task<Either<ActionResult, TableBuilderResultSubjectMetaViewModel>> GetSubjectMeta(
+        public Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(
             SubjectMetaQueryContext query, IQueryable<Observation> observations)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId, HydrateSubject)
@@ -99,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
-                    return new TableBuilderResultSubjectMetaViewModel
+                    return new ResultSubjectMetaViewModel
                     {
                         Filters = filters,
                         Footnotes = footnotes,

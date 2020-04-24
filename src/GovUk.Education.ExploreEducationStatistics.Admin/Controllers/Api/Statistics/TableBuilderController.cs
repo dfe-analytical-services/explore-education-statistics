@@ -15,13 +15,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
     [Authorize]
     public class TableBuilderController : ControllerBase
     {
-        private readonly IDataService<TableBuilderResultViewModel> _dataService;
+        private readonly ITableBuilderService _tableBuilderService;
         private readonly ILogger _logger;
 
-        public TableBuilderController(IDataService<TableBuilderResultViewModel> dataService,
+        public TableBuilderController(ITableBuilderService tableBuilderService,
             ILogger<TableBuilderController> logger)
         {
-            _dataService = dataService;
+            _tableBuilderService = tableBuilderService;
             _logger = logger;
         }
 
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var tableBuilderResultViewModel = _dataService.Query(query);
+            var tableBuilderResultViewModel = _tableBuilderService.Query(query);
 
             stopwatch.Stop();
             _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);
