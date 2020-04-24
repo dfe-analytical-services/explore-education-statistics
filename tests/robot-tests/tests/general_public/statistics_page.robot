@@ -32,7 +32,7 @@ Open "Pupils and schools" accordion section
     user opens accordion section  Pupils and schools
 
 Validate "Pupils and schools" section
-    [Tags]  HappyPath   Failing
+    [Tags]  HappyPath
     [Documentation]  EES-1577
     user checks accordion section contains text  Pupils and schools    Admission appeals
     user checks accordion section contains text  Pupils and schools    Exclusions
