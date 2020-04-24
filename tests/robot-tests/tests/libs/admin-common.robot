@@ -31,7 +31,7 @@ User creates a new release for publication "${publication}" for start year "${st
     ${nextYearNumber} =    Evaluate    ${startYearNumber} + 1
     ${nextYear} =    Convert to String  ${nextYearNumber}
     user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverage
-    user selects from list by label  css:#releaseSummaryForm-timePeriodCoverage  Academic Year Q1-Q4
+    user selects from list by label  css:#releaseSummaryForm-timePeriodCoverage  Academic Year
     user enters text into element  css:#releaseSummaryForm-timePeriodCoverageStartYear  ${startYear}
     user enters text into element  css:[id="scheduledPublishDate.day"]  30
     user enters text into element  css:[id="scheduledPublishDate.month"]  09
@@ -59,3 +59,15 @@ user waits until draft releases tab contains publication
 user checks draft releases tab publication has release
     [Arguments]   ${publication_name}   ${release_text}
     user checks page contains element   xpath://*[@id="draft-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]
+
+user checks scheduled releases tab contains publication
+    [Arguments]    ${publication_name}
+    user checks page contains element   xpath://*[@id="scheduled-releases"]//h3[text()="${publication_name}"]
+
+user waits until scheduled releases tab contains publication
+    [Arguments]    ${publication_name}
+    user waits until page contains element   xpath://*[@id="scheduled-releases"]//h3[text()="${publication_name}"]
+
+user checks scheduled releases tab publication has release
+    [Arguments]   ${publication_name}   ${release_text}
+    user checks page contains element   xpath://*[@id="scheduled-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]

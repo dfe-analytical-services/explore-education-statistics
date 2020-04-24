@@ -73,6 +73,15 @@
         "S3 Standard"
       ]
     },
+    "skuImporter": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard"
+      ]
+    },
     "adminFirewallRules": {
       "type": "array",
       "metadata": {
@@ -2063,8 +2072,12 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2018-11-01",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuImporter'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuImporter'), ' '))]"
+      },
       "name": "[variables('importerPlanName')]",
+      "apiVersion": "2018-11-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2078,10 +2091,6 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "sku": {
-        "Tier": "Standard",
-        "Name": "S1"
       },
       "properties": {
         "name": "[variables('importerPlanName')]",

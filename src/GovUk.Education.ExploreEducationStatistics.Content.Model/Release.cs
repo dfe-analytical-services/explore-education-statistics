@@ -4,12 +4,11 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
 using static System.DateTime;
-using static System.String;
+using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.PartialDate;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -17,15 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class Release : Versioned<Release>
     {
         public Guid Id { get; set; }
-        
-        public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
+
+        public string Title => TimePeriodLabelFormatter.Format(Year, TimePeriodCoverage, FullLabelBeforeYear);
 
         public int Year => int.Parse(_releaseName);
-        
-        public string YearTitle => TimePeriodLabelFormatter.FormatYear(ReleaseName, TimePeriodCoverage);
 
-        public string CoverageTitle => TimePeriodCoverage.GetEnumLabel();
-        
+        public string YearTitle => TimePeriodLabelFormatter.FormatYear(Year, TimePeriodCoverage);
+
         private string _releaseName;
 
         public string ReleaseName

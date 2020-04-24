@@ -34,18 +34,27 @@ const BauDashboardPage = () => {
 
       <hr className="govuk-!-margin-top-9" />
 
-      <h2 className="govuk-heading-m govuk-!-margin-top-9">Platform</h2>
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        Access to the service
+      </h2>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         {canManageUsers && (
           <>
             <div className="govuk-grid-column-one-third">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                <Link to="/administration/users">
-                  Manage access to the service
-                </Link>
+                <Link to="/administration/users">Manage users</Link>
               </h3>
               <p className="govuk-caption-m govuk-!-margin-top-1">
-                Invite users to the service, manage permissions and access.
+                Assign users permissions and roles within the service.
+              </p>
+            </div>
+            <div className="govuk-grid-column-one-third">
+              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                <Link to="/administration/users/invites">Invite new users</Link>
+              </h3>
+              <p className="govuk-caption-m govuk-!-margin-top-1">
+                Invite new users to the service and assign their roles and
+                permissions.
               </p>
             </div>
             <div className="govuk-grid-column-one-third">

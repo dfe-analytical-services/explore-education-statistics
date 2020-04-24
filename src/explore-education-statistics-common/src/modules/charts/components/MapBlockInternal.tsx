@@ -24,7 +24,7 @@ import formatPretty from '@common/utils/number/formatPretty';
 import getMinMax from '@common/utils/number/getMinMax';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
-import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
+import { Layer, Path, PathOptions, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import times from 'lodash/times';
 import React, {
@@ -41,7 +41,6 @@ interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
   data: number;
   dataSets: DataSetCategory['dataSets'];
-  scaledData: number;
   layer?: Layer & Path & Polyline;
 }
 
@@ -55,25 +54,18 @@ interface LegendEntry {
   max: string;
 }
 
-interface MapClickEvent extends LeafletMouseEvent {
-  layer: Layer;
-  sourceTarget: {
-    feature: MapFeature;
-  };
-}
-
 interface MapDataSetCategory extends DataSetCategory {
   geoJson: GeoJsonFeature;
 }
 
-function calculateColour({
-  scaledData,
+function calculateScaledColour({
+  scale,
   colour,
 }: {
-  scaledData: number;
+  scale: number;
   colour: string;
 }) {
-  return lighten(colour, 90 - (scaledData / 0.2) * 30);
+  return lighten(colour, 90 - (scale / 0.2) * 30);
 }
 
 function generateGeometryAndLegend(
@@ -86,9 +78,9 @@ function generateGeometryAndLegend(
   const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
 
   const { min = 0, max = 0 } = getMinMax(
-    dataSetCategories.map(
-      category => category.dataSets[selectedDataSetKey].value,
-    ),
+    dataSetCategories
+      .map(category => category.dataSets[selectedDataSetKey]?.value)
+      .filter(value => typeof value !== 'undefined'),
   );
 
   const range = max - min;
@@ -108,7 +100,7 @@ function generateGeometryAndLegend(
           const i = idx / 4;
 
           return {
-            colour: calculateColour({ scaledData: i, colour }),
+            colour: calculateScaledColour({ scale: i, colour }),
             min: formatPretty(min + i * range, unit, decimalPlaces),
             max: formatPretty(min + (i + 0.25) * range, unit, decimalPlaces),
           };
@@ -124,7 +116,17 @@ function generateGeometryAndLegend(
   const geometry: FeatureCollection<Geometry, MapFeatureProperties> = {
     type: 'FeatureCollection',
     features: dataSetCategories.map(({ dataSets, filter, geoJson }) => {
-      const data = dataSets?.[selectedDataSetKey]?.value ?? 0;
+      const data = dataSets?.[selectedDataSetKey]?.value;
+
+      // Defaults to white if there is no data
+      const scaledColour =
+        typeof data !== 'undefined'
+          ? calculateScaledColour({
+              // Avoid divisions by 0
+              scale: range > 0 ? (data - min) / range : 0,
+              colour,
+            })
+          : '#fff';
 
       return {
         ...geoJson,
@@ -132,9 +134,8 @@ function generateGeometryAndLegend(
         properties: {
           ...geoJson.properties,
           dataSets,
-          colour,
+          colour: scaledColour,
           data,
-          scaledData: (data - min) / range,
         },
       };
     }),
@@ -451,7 +452,7 @@ export const MapBlockInternal = ({
                     }
 
                     return {
-                      fillColor: calculateColour(feature.properties),
+                      fillColor: feature.properties.colour,
                     };
                   }}
                   onclick={e => {

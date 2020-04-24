@@ -60,22 +60,6 @@ export const findTimePeriodCoverageGroup = (
   );
 };
 
-export const findTimePeriodCoverageOption = (
-  code: string,
-  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
-) =>
-  timePeriodCoverageGroups
-    .flatMap(group => group.timeIdentifiers)
-    .find(option => option.identifier.value === code) ||
-  timePeriodCoverageGroups[0].timeIdentifiers[0];
-
-export const getSelectedTimePeriodCoverageLabel = (
-  timePeriodCoverageCode: string,
-  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
-) =>
-  findTimePeriodCoverageOption(timePeriodCoverageCode, timePeriodCoverageGroups)
-    .identifier.label;
-
 export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
   switch (approvalStatus) {
     case 'Draft':
@@ -89,28 +73,6 @@ export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
   }
 };
 
-export const getTimePeriodCoverageDateRangeStringLong = (
-  releaseName: string,
-  separatorString = ' to ',
-) => {
-  const numberRegex = /[0-9]+/;
-  const results = numberRegex.exec(releaseName);
-  return results
-    ? `${releaseName}${separatorString}${parseInt(results[0], 10) + 1}`
-    : releaseName;
-};
-
-export const getTimePeriodCoverageDateRangeStringShort = (
-  releaseName: string,
-  separatorString = '/',
-) => {
-  const fourYearRegex = /[0-9]*([0-9]{2})/;
-  const results = fourYearRegex.exec(releaseName);
-  return results
-    ? `${releaseName}${separatorString}${parseInt(results[1], 10) + 1}`
-    : releaseName;
-};
-
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
     return '(Live - Latest release)';
@@ -122,10 +84,6 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
 };
 
 export const getReleaseSummaryLabel = (release: AdminDashboardRelease) =>
-  `${
-    release.timePeriodCoverage.label
-  }, ${getTimePeriodCoverageDateRangeStringLong(
-    release.releaseName,
-  )} ${getLiveLatestLabel(release.live, release.latestRelease)}`;
+  `${release.title} ${getLiveLatestLabel(release.live, release.latestRelease)}`;
 
 export default {};

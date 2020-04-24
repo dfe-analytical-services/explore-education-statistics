@@ -390,6 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(adhocReleaseType, summary.Type);
                 Assert.Equal(releaseName, summary.ReleaseName);
                 Assert.Equal(timePeriodCoverage, summary.TimePeriodCoverage);
+                Assert.Equal("2035", summary.YearTitle);
             }
         }
         

@@ -14,7 +14,7 @@ const NavLink = ({ children, className, to, ...props }: Props) => {
     <RouterNavLink
       {...props}
       to={to}
-      activeClassName={styles['app-navigation--current-page']}
+      activeClassName={styles.currentPage}
       className={classNames(
         'govuk-link',
         'govuk-link--no-visited-state',

@@ -13,6 +13,7 @@ export interface ReleaseSummaryDetails {
   publishScheduled: string;
   nextReleaseDate?: DayMonthYearValues;
   status: ReleaseStatus;
+  yearTitle: string;
 }
 
 export interface BaseReleaseSummaryDetailsRequest {

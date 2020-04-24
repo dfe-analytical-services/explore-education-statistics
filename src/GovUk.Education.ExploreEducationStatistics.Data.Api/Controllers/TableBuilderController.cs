@@ -11,17 +11,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class TableBuilderController : ControllerBase
     {
-        private readonly IDataService<TableBuilderResultViewModel> _dataService;
+        private readonly ITableBuilderService _tableBuilderService;
 
-        public TableBuilderController(IDataService<TableBuilderResultViewModel> dataService)
+        public TableBuilderController(ITableBuilderService tableBuilderService)
         {
-            _dataService = dataService;
+            _tableBuilderService = tableBuilderService;
         }
 
         [HttpPost]
         public Task<ActionResult<TableBuilderResultViewModel>> Query([FromBody] ObservationQueryContext query)
         {
-            return _dataService.Query(query).HandleFailuresOrOk();
+            return _tableBuilderService.Query(query).HandleFailuresOrOk();
         }
     }
 }

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
@@ -26,10 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
-        
-        public string Slug
-        {
-            get => SlugFromTitle(Format(ReleaseName, TimePeriodCoverage));
-        }
+
+        public string Slug => SlugFromTitle(Title);
+
+        private string Title => Format(Year, TimePeriodCoverage);
+
+        private int Year => int.Parse(ReleaseName);
     }
 }
