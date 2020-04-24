@@ -1,3 +1,4 @@
+import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { ReleaseRouteParams } from '@admin/routes/edit-release/routes';
@@ -8,14 +9,12 @@ import {
   ExtendedComment,
 } from '@admin/services/publicationService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import FormFieldset from '@common/components/form/FormFieldset';
-import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ContentSection } from '@common/services/publicationService';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import {
   ReleaseContextState,
@@ -23,75 +22,43 @@ import {
   useReleaseState,
 } from './ReleaseContext';
 
-type PageMode = 'edit' | 'preview';
-
 const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, unresolvedComments } = useReleaseState();
-  const [pageMode, setPageMode] = useState<PageMode>(
-    canUpdateRelease ? 'edit' : 'preview',
-  );
 
   return (
-    <>
-      {canUpdateRelease && (
-        <div className="govuk-form-group">
-          {unresolvedComments.length > 0 && (
-            <WarningMessage>
-              There are {unresolvedComments.length} unresolved comments
-            </WarningMessage>
+    <EditingContextProvider
+      value={{
+        isEditing: canUpdateRelease,
+      }}
+    >
+      {({ isEditing }) => (
+        <>
+          {canUpdateRelease && (
+            <div className="govuk-form-group">
+              {unresolvedComments.length > 0 && (
+                <WarningMessage>
+                  There are {unresolvedComments.length} unresolved comments
+                </WarningMessage>
+              )}
+
+              <EditablePageModeToggle />
+            </div>
           )}
 
-          <FormFieldset
-            id="pageModelFieldset"
-            legend=""
-            className="dfe-toggle-edit"
-            legendHidden
+          <div
+            className={classNames('govuk-width-container', {
+              'govuk-!-margin-right-0': isEditing,
+            })}
           >
-            <FormRadioGroup
-              id="pageMode"
-              name="pageMode"
-              value={pageMode}
-              legend="Set page view"
-              small
-              options={[
-                {
-                  label: 'Add / view comments and edit content',
-                  value: 'edit',
-                },
-                {
-                  label: 'Preview content',
-                  value: 'preview',
-                },
-              ]}
-              onChange={event => {
-                setPageMode(event.target.value as PageMode);
-              }}
-            />
-          </FormFieldset>
-        </div>
+            <div
+              className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
+            >
+              <PublicationReleaseContent />
+            </div>
+          </div>
+        </>
       )}
-
-      <div
-        className={classNames('govuk-width-container', {
-          'dfe-align--left-hand-controls': pageMode === 'edit',
-          'dfe-hide-controls': pageMode === 'preview',
-        })}
-      >
-        <div
-          className={
-            pageMode === 'edit' ? 'dfe-page-editing' : 'dfe-page-preview'
-          }
-        >
-          <EditingContextProvider
-            value={{
-              isEditing: pageMode === 'edit',
-            }}
-          >
-            <PublicationReleaseContent />
-          </EditingContextProvider>
-        </div>
-      </div>
-    </>
+    </EditingContextProvider>
   );
 };
 

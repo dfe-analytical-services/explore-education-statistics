@@ -7,7 +7,6 @@ import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPa
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -86,14 +85,7 @@ const PublicationReleaseContent = () => {
   return (
     <>
       <h1 className="govuk-heading-l">
-        <span className="govuk-caption-l">
-          {`${
-            release.coverageTitle
-          } ${getTimePeriodCoverageDateRangeStringShort(
-            release.releaseName,
-            '/',
-          )}`}
-        </span>
+        <span className="govuk-caption-l">{release.title}</span>
         {release.publication.title}
       </h1>
 
@@ -113,7 +105,7 @@ const PublicationReleaseContent = () => {
                 onBlockDelete={summaryBlockDelete}
               />
               {release.summarySection.content?.length === 0 && (
-                <div className="govuk-!-margin-bottom-8 dfe-align--center">
+                <div className="govuk-!-margin-bottom-8 dfe-align--centre">
                   <Button variant="secondary" onClick={addSummaryBlock}>
                     Add a summary text block
                   </Button>

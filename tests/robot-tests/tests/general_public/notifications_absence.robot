@@ -36,7 +36,8 @@ Go to Notify me page for Absence publication
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(4)   Notify me
 
 Sign up for email alerts
-    [Tags]  HappyPath
+    [Tags]  HappyPath   NotAgainstPreProd
+    [Documentation]   EES-716
     user clicks element  css:#email-id
     user presses keys    mark@hiveit.co.uk
     user clicks element  css:#submit-button
