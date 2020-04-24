@@ -55,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 return YearFormat switch
                 {
                     Default => year.ToString(),
-                    AcademicOrFiscal => $"{year}/{(year + 1) % 100:D2}", // Only want the last two digits,
+                    Academic => $"{year}/{(year + 1) % 100:D2}", // Only want the last two digits,
+                    Fiscal => $"{year}-{(year + 1) % 100:D2}", // Only want the last two digits,
                     _ => throw new ArgumentOutOfRangeException()
                 };
             }

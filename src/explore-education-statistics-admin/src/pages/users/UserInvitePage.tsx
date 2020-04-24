@@ -48,7 +48,7 @@ const UserInvitePage = ({
     });
   }, []);
 
-  const cancelHandler = () => history.push('/administration/users/');
+  const cancelHandler = () => history.push('/administration/users/invites');
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     const submission: UserInvite = {
@@ -58,7 +58,7 @@ const UserInvitePage = ({
 
     await userService.inviteUser(submission);
 
-    history.push(`/administration/users/pending`);
+    history.push(`/administration/users/invites`);
   }, errorCodeMappings);
 
   return (
@@ -66,8 +66,8 @@ const UserInvitePage = ({
       wide
       breadcrumbs={[
         { name: 'Platform administration', link: '/administration' },
-        { name: 'Users', link: '/administration/users' },
-        { name: 'Invite' },
+        { name: 'Invites', link: '/administration/users/invites' },
+        { name: 'Invite user' },
       ]}
     >
       <div className="govuk-grid-row">

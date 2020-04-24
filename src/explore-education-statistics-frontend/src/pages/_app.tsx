@@ -10,7 +10,7 @@ import BaseApp, { AppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import { Cookies, CookiesProvider } from 'react-cookie';
-import './_app.scss';
+import '../styles/_all.scss';
 
 enableES5();
 

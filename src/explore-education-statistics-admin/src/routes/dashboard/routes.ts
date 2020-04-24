@@ -24,7 +24,7 @@ import PreReleasePage from '@admin/pages/release/prerelease/PreReleasePage';
 import ThemeTopicWrapper, {
   themeTopicPath,
 } from '@admin/pages/theme/ThemeTopicWrapper';
-import PendingInvitesPage from '@admin/pages/users/PendingInvitesPage';
+import InvitedUsersPage from '@admin/pages/users/InvitedUsersPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import ManageUserPage from '@admin/pages/users/ManageUserPage';
 import PreReleaseUsersPage from '@admin/pages/users/PreReleaseUsersPage';
@@ -89,14 +89,14 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     exact: true,
   },
   administrationUserInvite: {
-    path: '/administration/users/invite',
+    path: '/administration/users/invites/create',
     component: UserInvitePage,
     protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
   },
-  administrationPendingUsers: {
-    path: '/administration/users/pending',
-    component: PendingInvitesPage,
+  administrationInvitedUsers: {
+    path: '/administration/users/invites',
+    component: InvitedUsersPage,
     protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
   },

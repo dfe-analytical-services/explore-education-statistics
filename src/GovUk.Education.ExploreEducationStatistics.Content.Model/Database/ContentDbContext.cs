@@ -1641,10 +1641,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Publication
                 {
                     Id = new Guid("88312cc0-fe1d-4ab5-81df-33fd708185cb"),
-                    Title = "Statements on SEN and EHC plans",
+                    Title = "Education, health and care plans",
                     Summary = "",
                     TopicId = new Guid("85349b0a-19c7-4089-a56b-ad8dbe85449a"),
-                    Slug = "statements-on-sen-and-ehc-plans",
+                    Slug = "education-health-and-care-plans",
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans"),
