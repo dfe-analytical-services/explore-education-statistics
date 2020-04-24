@@ -10,7 +10,6 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Chart } from '@common/services/types/blocks';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
@@ -183,10 +182,7 @@ export const chartBuilderReducer: Reducer<
   }
 };
 
-export function useChartBuilderReducer(
-  meta: FullTableMeta,
-  initialConfiguration?: Chart,
-) {
+export function useChartBuilderReducer(initialConfiguration?: Chart) {
   const [state, dispatch] = useImmerReducer<
     ChartBuilderState,
     ChartBuilderActions

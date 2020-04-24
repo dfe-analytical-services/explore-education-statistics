@@ -65,7 +65,6 @@ const ChartBuilder = ({
   onRequiresDataUpdate,
 }: Props) => {
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
-    meta,
     initialConfiguration,
   );
 
