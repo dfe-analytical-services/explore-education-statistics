@@ -55,8 +55,6 @@ const validationSchema = Yup.object<FormValues>({
   referenceLines: Yup.array(),
 });
 
-type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
-
 interface Props {
   id: string;
   canSaveChart: boolean;
@@ -66,7 +64,8 @@ interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
   capabilities: ChartCapabilities;
-  onChange: (configuration: AxisConfigurationChangeValue) => void;
+  onChange: (configuration: AxisConfiguration) => void;
+  onFormStateChange: (state: { form: AxisType; isValid: boolean }) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
 
@@ -79,6 +78,7 @@ const ChartAxisConfiguration = ({
   type,
   capabilities,
   onChange,
+  onFormStateChange,
   onSubmit,
 }: Props) => {
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
@@ -205,11 +205,8 @@ const ChartAxisConfiguration = ({
   );
 
   const handleFormChange = useCallback(
-    (values: FormValues & { isValid: boolean }) => {
-      onChange({
-        ...normalizeValues(values),
-        isValid: values.isValid,
-      });
+    (values: FormValues) => {
+      onChange(normalizeValues(values));
     },
     [normalizeValues, onChange],
   );
@@ -227,12 +224,15 @@ const ChartAxisConfiguration = ({
       }}
       render={form => (
         <Form id={id}>
+          <Effect value={form.values} onChange={handleFormChange} />
+
           <Effect
             value={{
-              ...form.values,
+              form: type,
               isValid: form.isValid,
             }}
-            onChange={handleFormChange}
+            onMount={onFormStateChange}
+            onChange={onFormStateChange}
           />
 
           <FormGroup>

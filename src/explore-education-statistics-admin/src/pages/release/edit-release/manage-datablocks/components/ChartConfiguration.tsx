@@ -18,8 +18,6 @@ import React, { useCallback } from 'react';
 import { Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
 
-type ChartOptionsChangeValue = ChartOptions & { isValid: boolean };
-
 interface Props {
   canSaveChart: boolean;
   selectedChartType: ChartDefinition;
@@ -27,7 +25,8 @@ interface Props {
   releaseId: string;
   meta: FullTableMeta;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
-  onChange: (chartOptions: ChartOptionsChangeValue) => void;
+  onChange: (chartOptions: ChartOptions) => void;
+  onFormStateChange: (state: { form: 'options'; isValid: boolean }) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
@@ -53,6 +52,7 @@ const ChartConfiguration = ({
   releaseId,
   onBoundaryLevelChange,
   onChange,
+  onFormStateChange,
   onSubmit,
 }: Props) => {
   const { fileId, ...initialValues } = chartOptions;
@@ -65,11 +65,8 @@ const ChartConfiguration = ({
   };
 
   const handleChange = useCallback(
-    ({ isValid, ...values }: ChartOptionsChangeValue) => {
-      onChange({
-        ...normalizeValues(values),
-        isValid,
-      });
+    (values: ChartOptions) => {
+      onChange(normalizeValues(values));
     },
     [onChange],
   );
@@ -85,6 +82,10 @@ const ChartConfiguration = ({
               onChange({
                 ...chartOptions,
                 fileId: nextFileId,
+              });
+
+              onFormStateChange({
+                form: 'options',
                 isValid: true,
               });
             }}
@@ -109,6 +110,15 @@ const ChartConfiguration = ({
                 isValid: form.isValid,
               }}
               onChange={handleChange}
+            />
+
+            <Effect
+              value={{
+                form: 'options',
+                isValid: form.isValid,
+              }}
+              onChange={onFormStateChange}
+              onMount={onFormStateChange}
             />
 
             <FormGroup>

@@ -1,3 +1,4 @@
+import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import {
   AxesConfiguration,
@@ -14,7 +15,7 @@ import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
-import { Reducer, useImmerReducer } from 'use-immer';
+import { Reducer } from 'use-immer';
 
 export interface ChartOptions extends ChartDefinitionOptions {
   fileId?: string;
@@ -196,10 +197,11 @@ export const chartBuilderReducer: Reducer<
 };
 
 export function useChartBuilderReducer(initialConfiguration?: Chart) {
-  const [state, dispatch] = useImmerReducer<
+  const [state, dispatch] = useLoggedImmerReducer<
     ChartBuilderState,
     ChartBuilderActions
   >(
+    'Chart builder',
     chartBuilderReducer,
     {
       axes: {},
@@ -311,15 +313,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const updateChartOptions = useCallback(
-    ({ isValid, ...chartOptions }: ChartOptions & { isValid: boolean }) => {
-      dispatch({
-        type: 'UPDATE_FORM',
-        payload: {
-          form: 'options',
-          state: { isValid },
-        },
-      });
-
+    (chartOptions: ChartOptions) => {
       dispatch({
         type: 'UPDATE_CHART_OPTIONS',
         payload: chartOptions,
@@ -329,21 +323,29 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const updateChartAxis = useCallback(
-    ({
-      isValid,
-      ...axisConfiguration
-    }: AxisConfiguration & { isValid: boolean }) => {
-      dispatch({
-        type: 'UPDATE_FORM',
-        payload: {
-          form: axisConfiguration.type,
-          state: { isValid },
-        },
-      });
-
+    (axisConfiguration: AxisConfiguration) => {
       dispatch({
         type: 'UPDATE_CHART_AXIS',
         payload: axisConfiguration,
+      });
+    },
+    [dispatch],
+  );
+
+  const updateFormState = useCallback(
+    ({
+      form,
+      isValid,
+    }: {
+      form: keyof ChartBuilderState['forms'];
+      isValid: boolean;
+    }) => {
+      dispatch({
+        type: 'UPDATE_FORM',
+        payload: {
+          form,
+          state: { isValid },
+        },
       });
     },
     [dispatch],
@@ -357,6 +359,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       updateChartDefinition,
       updateChartOptions,
       updateChartAxis,
+      updateFormState,
     }),
     [
       addDataSet,
@@ -365,6 +368,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       updateChartDefinition,
       updateChartOptions,
       updateDataSet,
+      updateFormState,
     ],
   );
 

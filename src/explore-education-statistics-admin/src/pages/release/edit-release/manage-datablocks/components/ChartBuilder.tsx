@@ -220,6 +220,7 @@ const ChartBuilder = ({
               releaseId={releaseId}
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={actions.updateChartOptions}
+              onFormStateChange={actions.updateFormState}
               onSubmit={handleChartSave}
             />
           </TabsSection>
@@ -249,6 +250,7 @@ const ChartBuilder = ({
                   data={data}
                   meta={meta}
                   onChange={actions.updateChartAxis}
+                  onFormStateChange={actions.updateFormState}
                   onSubmit={handleChartSave}
                 />
               </TabsSection>
