@@ -144,11 +144,25 @@ function getCategoryFilters(
   let filters: Filter[] = [];
 
   switch (axisGroupBy) {
-    case 'filters':
-      filters = Object.values(meta.filters).flatMap(
-        filterGroup => filterGroup.options,
-      );
+    case 'filters': {
+      const filterGroups = Object.values(meta.filters);
+
+      // We want to try and remove any filter groups with only
+      // one filter as these don't really make sense to display
+      // on the chart (this is similar to what we do in table tool).
+      const filteredFilters = filterGroups
+        .filter(filterGroup => filterGroup.options.length > 1)
+        .flatMap(filterGroup => filterGroup.options);
+
+      // If there are no filtered filters, we need to at least
+      // try to show something otherwise the chart will just
+      // break due to the major axis having no categories.
+      filters =
+        filteredFilters.length > 0
+          ? filteredFilters
+          : filterGroups.flatMap(filterGroup => filterGroup.options);
       break;
+    }
     case 'timePeriod':
       filters = meta.timePeriodRange;
       break;
