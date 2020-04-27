@@ -134,7 +134,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
         className={classNames('govuk-table', styles.table, className)}
         ref={ref}
       >
-        <thead>
+        <thead className={styles.tableHead}>
           {expandedColumnHeaders.map((columns, rowIndex) => {
             return (
               // eslint-disable-next-line react/no-array-index-key
@@ -154,14 +154,6 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
 
                     return (
                       <th
-                        className={classNames({
-                          'govuk-table__header--numeric': !column.isGroup,
-                          [styles.columnHeaderGroup]:
-                            column.isGroup || column.crossSpan > 1,
-                          [styles.borderBottom]: !column.isGroup,
-                          [styles.borderRightNone]:
-                            column.start + column.span === rows[0].length,
-                        })}
                         colSpan={column.span}
                         rowSpan={column.crossSpan}
                         scope={column.isGroup ? 'colgroup' : 'col'}
