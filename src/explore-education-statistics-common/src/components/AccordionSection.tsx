@@ -2,7 +2,7 @@ import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
 import React, { createElement, memo, ReactNode } from 'react';
-import styles from './Accordion.module.scss';
+import styles from './AccordionSection.module.scss';
 import GoToTopLink from './GoToTopLink';
 
 export type ToggleHandler = (open: boolean, id: string) => void;
@@ -55,6 +55,7 @@ const AccordionSection = ({
     <div
       className={classNames(classes.section, styles.section, className, {
         [classes.expanded]: open,
+        [styles.sectionExpanded]: open,
       })}
       role="presentation"
       id={id}
@@ -97,7 +98,9 @@ const AccordionSection = ({
         )}
       </div>
       <div
-        className={classes.sectionContent}
+        className={classNames(classes.sectionContent, styles.sectionContent, {
+          [styles.sectionContentExpanded]: open,
+        })}
         aria-labelledby={headingId}
         id={contentId}
       >
