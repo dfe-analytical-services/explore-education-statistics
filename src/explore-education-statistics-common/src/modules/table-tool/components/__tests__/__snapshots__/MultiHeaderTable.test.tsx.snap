@@ -818,6 +818,454 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
 </table>
 `;
 
+exports[`MultiHeaderTable renders table with \`col\` header merged with identical parent 1`] = `
+<table class="govuk-table table">
+  <thead>
+    <tr>
+      <td colspan="1"
+          rowspan="3"
+          class="borderBottom"
+      >
+      </td>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        A
+      </th>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        D
+      </th>
+      <th class="columnHeaderGroup borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        F
+      </th>
+    </tr>
+    <tr>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        B
+      </th>
+      <th class="govuk-table__header--numeric columnHeaderGroup borderBottom"
+          colspan="1"
+          rowspan="2"
+          scope="col"
+      >
+        E
+      </th>
+      <th class="columnHeaderGroup borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        G
+      </th>
+    </tr>
+    <tr>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        C
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        H
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        1
+      </th>
+      <td class="govuk-table__cell--numeric">
+        ABC1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        DEE1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        FGH1
+      </td>
+    </tr>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        2
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ABC2
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        DEE2
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        FGH2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders table with \`col\` header merged with identical parent on first column 1`] = `
+<table class="govuk-table table">
+  <thead>
+    <tr>
+      <td colspan="1"
+          rowspan="3"
+          class="borderBottom"
+      >
+      </td>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        A
+      </th>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        C
+      </th>
+      <th class="columnHeaderGroup borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        F
+      </th>
+    </tr>
+    <tr>
+      <th class="govuk-table__header--numeric columnHeaderGroup borderBottom"
+          colspan="1"
+          rowspan="2"
+          scope="col"
+      >
+        B
+      </th>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        D
+      </th>
+      <th class="columnHeaderGroup borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        G
+      </th>
+    </tr>
+    <tr>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        E
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        H
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        1
+      </th>
+      <td class="govuk-table__cell--numeric">
+        ABB1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        CDE1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        FGH1
+      </td>
+    </tr>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        2
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ABB2
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        CDE2
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        FGH2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders table with \`colgroup\` header merged with identical parent 1`] = `
+<table class="govuk-table table">
+  <thead>
+    <tr>
+      <td colspan="1"
+          rowspan="3"
+          class="borderBottom"
+      >
+      </td>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        B
+      </th>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="2"
+          scope="colgroup"
+      >
+        C
+      </th>
+      <th class="columnHeaderGroup borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        D
+      </th>
+    </tr>
+    <tr>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        A
+      </th>
+      <th class="columnHeaderGroup borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        E
+      </th>
+    </tr>
+    <tr>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        F
+      </th>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        F
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        F
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        1
+      </th>
+      <td class="govuk-table__cell--numeric">
+        BAF1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        CCF1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        DEF1
+      </td>
+    </tr>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        2
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        BAF2
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        CCF2
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        DEF2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders table with \`colgroup\` header merged with identical parent on first column 1`] = `
+<table class="govuk-table table">
+  <thead>
+    <tr>
+      <td colspan="1"
+          rowspan="3"
+          class="borderBottom"
+      >
+      </td>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="2"
+          scope="colgroup"
+      >
+        A
+      </th>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        B
+      </th>
+      <th class="columnHeaderGroup borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        D
+      </th>
+    </tr>
+    <tr>
+      <th class="columnHeaderGroup"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        C
+      </th>
+      <th class="columnHeaderGroup borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="colgroup"
+      >
+        E
+      </th>
+    </tr>
+    <tr>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        F
+      </th>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        F
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        F
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        1
+      </th>
+      <td class="govuk-table__cell--numeric">
+        BAF1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        CCF1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        DEF1
+      </td>
+    </tr>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        2
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        BAF2
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        CCF2
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        DEF2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
 exports[`MultiHeaderTable renders table with \`colgroup\` header merged with identical subgroup 1`] = `
 <table class="govuk-table table">
   <thead>
@@ -930,7 +1378,7 @@ exports[`MultiHeaderTable renders table with \`colgroup\` header merged with ide
 </table>
 `;
 
-exports[`MultiHeaderTable renders table with \`row\` header merged with identical subgroup 1`] = `
+exports[`MultiHeaderTable renders table with \`row\` header merged with identical parent 1`] = `
 <table class="govuk-table table">
   <thead>
     <tr>
@@ -1020,6 +1468,418 @@ exports[`MultiHeaderTable renders table with \`row\` header merged with identica
       </td>
       <td class="govuk-table__cell--numeric borderBottom">
         ADF2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders table with \`row\` header merged with identical parent on first row 1`] = `
+<table class="govuk-table table">
+  <thead>
+    <tr>
+      <td colspan="3"
+          rowspan="1"
+          class="borderBottom"
+      >
+      </td>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        1
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        2
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class="borderBottom"
+          rowspan="3"
+          colspan="1"
+          scope="rowgroup"
+      >
+        A
+      </th>
+      <th class
+          rowspan="1"
+          colspan="2"
+          scope="row"
+      >
+        B
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ABB1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ABB2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        C
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        D
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ACD1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ACD2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        E
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        F
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        AEF1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        AEF2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders table with \`row\` header merged with identical subgroup on first row 1`] = `
+<table class="govuk-table table">
+  <thead>
+    <tr>
+      <td colspan="3"
+          rowspan="1"
+          class="borderBottom"
+      >
+      </td>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        1
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        2
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class="borderBottom"
+          rowspan="3"
+          colspan="1"
+          scope="rowgroup"
+      >
+        A
+      </th>
+      <th class
+          rowspan="1"
+          colspan="2"
+          scope="row"
+      >
+        B
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ABB1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ABB2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        C
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        D
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ACD1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        ACD2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        E
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        F
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        AEF1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        AEF2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders table with \`rowgroup\` header merged with identical parent 1`] = `
+<table class="govuk-table table">
+  <thead>
+    <tr>
+      <td colspan="3"
+          rowspan="1"
+          class="borderBottom"
+      >
+      </td>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        1
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        2
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        A
+      </th>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        B
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        C
+      </th>
+      <td class="govuk-table__cell--numeric">
+        ABC1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ABC2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="2"
+          scope="rowgroup"
+      >
+        D
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        E
+      </th>
+      <td class="govuk-table__cell--numeric">
+        DDE1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        DDE2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        F
+      </th>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        G
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        H
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        FGH1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        FGH2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders table with \`rowgroup\` header merged with identical parent on first row 1`] = `
+<table class="govuk-table table">
+  <thead>
+    <tr>
+      <td colspan="3"
+          rowspan="1"
+          class="borderBottom"
+      >
+      </td>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        1
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderRightNone"
+          colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        2
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="2"
+          scope="rowgroup"
+      >
+        A
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        B
+      </th>
+      <td class="govuk-table__cell--numeric">
+        AAB1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        AAB2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        C
+      </th>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        D
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        E
+      </th>
+      <td class="govuk-table__cell--numeric">
+        CDE1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        CDE2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        F
+      </th>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        G
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        H
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        FGH1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        FGH2
       </td>
     </tr>
   </tbody>

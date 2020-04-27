@@ -6,21 +6,19 @@ import {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import sortBy from 'lodash/sortBy';
 
-const removeSiblinglessTotalRows = (
+const removeSiblinglessFilters = (
   filters: FullTableMeta['filters'],
 ): CategoryFilter[][] => {
   return Object.values(filters)
     .map(filterGroup => filterGroup.options)
-    .filter(filterGroup => {
-      return filterGroup.length > 1 || !filterGroup[0].isTotal;
-    });
+    .filter(filterGroup => filterGroup.length > 1);
 };
 
 const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
   const { indicators, filters, locations, timePeriodRange } = fullTableMeta;
 
   const sortedFilters = sortBy(
-    [...removeSiblinglessTotalRows(filters), locations],
+    [...removeSiblinglessFilters(filters), locations],
     [options => options.length],
   );
 
