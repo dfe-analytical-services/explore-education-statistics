@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using Newtonsoft.Json;
@@ -146,69 +145,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<IContentBlockChart> Charts { get; set; }
 
-        public Summary Summary { get; set; }
+        public DataBlockSummary Summary { get; set; }
 
-        public List<Table> Tables { get; set; }
+        // TODO EES-228 Table replaced with TableBuilderConfiguration
+        public List<TableBuilderConfiguration> Tables { get; set; }
 
         public override string Type { get; set; } = ContentBlockType.DataBlock.ToString();
-    }
-
-    public class Summary
-    {
-        public List<Guid> dataKeys { get; set; }
-
-        public List<string> dataSummary { get; set; }
-
-        public List<string> dataDefinition { get; set; }
-
-        public List<string> dataDefinitionTitle { get; set; }
-    }
-
-    public class Table
-    {
-        public TableHeaders tableHeaders { get; set; }
-    }
-
-    public class TableHeaders
-    {
-        public List<List<TableOption>> columnGroups { get; set; }
-        public List<TableOption> columns { get; set; }
-        public List<List<TableRowGroupOption>> rowGroups { get; set; }
-        public List<TableOption> rows { get; set; }
-    }
-
-    public class TableRowGroupOption
-    {
-        public string label { get; set; }
-        public string level { get; set; }
-        public string value { get; set; }
-
-        public TableRowGroupOption()
-        {
-        }
-
-        public TableRowGroupOption(string label, string level, string value)
-        {
-            this.label = label;
-            this.level = level;
-            this.value = value;
-        }
-    }
-
-    public class TableOption
-    {
-        public string label { get; set; }
-        public string value { get; set; }
-
-        public TableOption()
-        {
-        }
-
-        public TableOption(string label, string value)
-        {
-            this.label = label;
-            this.value = value;
-        }
     }
 
     public static class ContentBlockUtil
@@ -226,25 +168,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         {
             return enumValue.GetEnumAttribute<ContentBlockClassType>().Type;
         }
-    }
-
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    [JsonConverter(typeof(EnumToEnumValueJsonConverter<CommentState>))]
-    public enum CommentState
-    {
-        open,
-        resolved
-    }
-
-    public class Comment
-    {
-        public Guid Id { get; set; }
-        public Guid? IContentBlockId { get; set; }
-        public string Name { get; set; }
-        public DateTime Time { get; set; }
-        public string CommentText { get; set; }
-        public string? ResolvedBy { get; set; }
-        public DateTime? ResolvedOn { get; set; }
-        public CommentState State { get; set; }
     }
 }

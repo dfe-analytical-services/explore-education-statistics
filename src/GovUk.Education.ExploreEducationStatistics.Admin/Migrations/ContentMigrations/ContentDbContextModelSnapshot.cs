@@ -1794,9 +1794,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1837,7 +1834,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Published = new DateTime(2018, 4, 25, 9, 30, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2016",
                             Slug = "2016-17",
-                            SoftDeleted = false,
                             Status = "Approved",
                             TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
@@ -1856,7 +1852,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             RelatedInformation = "[{\"Id\":\"f3c67bc9-6132-496e-a848-c39dfcd16f49\",\"Description\":\"Additional guidance\",\"Url\":\"http://example.com\"},{\"Id\":\"45acb50c-8b21-46b4-989f-36f4b0ee37fb\",\"Description\":\"Statistics guide\",\"Url\":\"http://example.com\"}]",
                             ReleaseName = "2016",
                             Slug = "2016-17",
-                            SoftDeleted = false,
                             Status = "Approved",
                             TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
@@ -1873,7 +1868,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             PublishScheduled = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2018",
                             Slug = "2018",
-                            SoftDeleted = false,
                             Status = "Draft",
                             TimePeriodCoverage = "CY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
@@ -2852,9 +2846,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
@@ -2877,9 +2868,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2897,7 +2885,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("1501265c-979b-4cd4-8a55-00bfe909a2da"),
                             ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Role = "Contributor",
-                            SoftDeleted = false,
                             UserId = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04")
                         },
                         new
@@ -2905,7 +2892,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("086b1354-473c-48bb-9d30-0ac1963dc4cb"),
                             ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Role = "Lead",
-                            SoftDeleted = false,
                             UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
                         },
                         new
@@ -2913,7 +2899,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("1851e50d-04ac-4e16-911b-3df3350c589b"),
                             ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Role = "Approver",
-                            SoftDeleted = false,
                             UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
                         },
                         new
@@ -2921,7 +2906,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("239d8eed-8a7d-4f7a-ac0a-c20bc4e9167d"),
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Role = "Contributor",
-                            SoftDeleted = false,
                             UserId = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04")
                         },
                         new
@@ -2929,7 +2913,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("e0dddf7a-f616-4e6f-bb9c-0b6e8ea3d9b9"),
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Role = "Approver",
-                            SoftDeleted = false,
                             UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
                         },
                         new
@@ -2937,7 +2920,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("f7884899-baf9-4009-8561-f0c5df0d0a69"),
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Role = "Lead",
-                            SoftDeleted = false,
                             UserId = new Guid("b390b405-ef90-4b9d-8770-22948e53189a")
                         },
                         new
@@ -2945,7 +2927,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("77ff439d-e1cd-4e50-9c25-24a5207953a5"),
                             ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Role = "Contributor",
-                            SoftDeleted = false,
                             UserId = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62")
                         },
                         new
@@ -2953,7 +2934,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("b00fd7c0-226f-474d-8cec-820a1a789182"),
                             ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Role = "Lead",
-                            SoftDeleted = false,
                             UserId = new Guid("b390b405-ef90-4b9d-8770-22948e53189a")
                         },
                         new
@@ -2961,7 +2941,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("d1cbc96e-75c0-424f-bd63-c1920b763020"),
                             ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Role = "Approver",
-                            SoftDeleted = false,
                             UserId = new Guid("b390b405-ef90-4b9d-8770-22948e53189a")
                         },
                         new
@@ -2969,7 +2948,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("69860a07-91d0-49d6-973d-98830fbbedfb"),
                             ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Role = "PrereleaseViewer",
-                            SoftDeleted = false,
                             UserId = new Guid("d5c85378-df85-482c-a1ce-09654dae567d")
                         },
                         new
@@ -2977,7 +2955,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("00cf98d9-c16c-4004-9fde-fe212b059845"),
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Role = "PrereleaseViewer",
-                            SoftDeleted = false,
                             UserId = new Guid("d5c85378-df85-482c-a1ce-09654dae567d")
                         },
                         new
@@ -2985,7 +2962,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("ef19a735-81b4-482c-b1e2-31616ca26f51"),
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Role = "PrereleaseViewer",
-                            SoftDeleted = false,
                             UserId = new Guid("ee9a02c1-b3f9-402c-9e9b-4fb78d737050")
                         });
                 });

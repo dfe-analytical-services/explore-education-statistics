@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -20,8 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public List<IContentBlockChart> Charts { get; set; }
 
-        public Summary Summary { get; set; }
+        public DataBlockSummary Summary { get; set; }
 
-        public List<Table> Tables { get; set; }
+        // TODO EES-228 Table replaced with TableBuilderConfiguration
+        public List<TableBuilderConfiguration> Tables { get; set; }
     }
 }
