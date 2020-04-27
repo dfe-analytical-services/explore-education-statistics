@@ -16,6 +16,7 @@ import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary, Pair } from '@common/types';
 import cartesian from '@common/utils/cartesian';
 import parseNumber from '@common/utils/number/parseNumber';
+import camelCase from 'lodash/camelCase';
 import difference from 'lodash/difference';
 import groupBy from 'lodash/groupBy';
 import isEqual from 'lodash/isEqual';
@@ -197,7 +198,9 @@ function isResultForDataSet(
 
   if (
     dataSet.location &&
-    dataSet.location.value !== result.location?.[dataSet.location.level]?.code
+    (dataSet.location.level !== camelCase(result.geographicLevel) ||
+      dataSet.location.value !==
+        result.location?.[dataSet.location.level]?.code)
   ) {
     return false;
   }
