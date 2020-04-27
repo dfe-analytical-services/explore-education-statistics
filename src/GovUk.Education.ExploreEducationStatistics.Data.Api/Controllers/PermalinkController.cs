@@ -25,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        // TODO EES-17 EES-228 Using new Permalink request type after abstracting out Configuration
         public async Task<ActionResult<PermalinkViewModel>> CreateAsync([FromBody] CreatePermalinkRequest request)
         {
             return await _permalinkService.CreateAsync(request).HandleFailuresOrOk();

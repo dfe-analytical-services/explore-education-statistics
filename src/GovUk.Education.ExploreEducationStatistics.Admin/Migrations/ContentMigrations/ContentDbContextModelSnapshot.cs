@@ -3002,6 +3002,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnName("DataBlock_Request")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("EES17DataBlockRequest")
+                        .HasColumnName("DataBlock_EES17Request")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EES17Tables")
+                        .HasColumnName("DataBlock_EES17Tables")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Heading")
                         .HasColumnName("DataBlock_Heading")
                         .HasColumnType("nvarchar(max)");

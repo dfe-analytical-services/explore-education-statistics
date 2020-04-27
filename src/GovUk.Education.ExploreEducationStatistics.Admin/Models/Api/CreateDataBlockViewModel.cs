@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DataBlockSummary Summary { get; set; }
 
-        // TODO EES-228 Table replaced with TableBuilderConfiguration
         public List<TableBuilderConfiguration> Tables { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations.Temp
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Migrations.EES17
 {
     public class EES17TableHeaders
     {

@@ -12,9 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public Guid Id { get; set; }
 
         public string Heading { get; set; }
-        
+
         public string Name { get; set; }
-        
+
         public string Source { get; set; }
 
         public ObservationQueryContext DataBlockRequest { get; set; }
@@ -23,7 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DataBlockSummary Summary { get; set; }
 
-        // TODO EES-228 Table replaced with TableBuilderConfiguration
         public List<TableBuilderConfiguration> Tables { get; set; }
     }
 }

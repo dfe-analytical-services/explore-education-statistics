@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20200427180425_EES17DataBlockRefactor")]
-    partial class EES17DataBlockRefactor
+    [Migration("20200427215411_EES17MigrateDataBlocks")]
+    partial class EES17MigrateDataBlocks
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -3002,6 +3002,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("DataBlockRequest")
                         .HasColumnName("DataBlock_Request")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EES17DataBlockRequest")
+                        .HasColumnName("DataBlock_EES17Request")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EES17Tables")
+                        .HasColumnName("DataBlock_EES17Tables")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Heading")

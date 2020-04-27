@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations.Temp
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations.EES17
 {
     public class EES17TableBuilderTableHeadersConfig
     {

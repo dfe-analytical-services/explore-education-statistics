@@ -6,9 +6,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Migrations.EES17;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Migrations.EES17;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -331,6 +333,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
 
             modelBuilder.Entity<DataBlock>()
+                .Property(block => block.EES17DataBlockRequest)
+                .HasColumnName("DataBlock_EES17Request")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<EES17ObservationQueryContext>(v));
+
+            modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Charts)
                 .HasColumnName("DataBlock_Charts")
                 .HasConversion(
@@ -350,6 +359,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<TableBuilderConfiguration>>(v));
+
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.EES17Tables)
+                .HasColumnName("DataBlock_EES17Tables")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<EES17Table>>(v));
 
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
@@ -2879,7 +2895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -3032,7 +3048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -3161,7 +3177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -3328,7 +3344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -3485,7 +3501,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -3780,7 +3796,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -3919,7 +3935,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -4047,7 +4063,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -4198,7 +4214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -4334,7 +4350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -4450,7 +4466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -4587,7 +4603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -4720,7 +4736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>(),
                                 Columns = new List<TableHeader>
@@ -4852,7 +4868,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>
                                 {
@@ -4944,7 +4960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>
                                 {
@@ -5036,7 +5052,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>
                                 {
@@ -5154,7 +5170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>
                                 {
@@ -5239,7 +5255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>
                                 {
@@ -5319,7 +5335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new TableBuilderConfiguration
                         {
-                            TableHeaders = new TableBuilderTableHeadersConfig
+                            TableHeaders = new TableHeaders
                             {
                                 ColumnGroups = new List<List<TableHeader>>
                                 {

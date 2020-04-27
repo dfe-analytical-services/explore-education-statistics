@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations.Temp
+namespace GovUk.Education.ExploreEducationStatistics.Common.Migrations.EES17
 {
     public class EES17ObservationQueryContext
     {

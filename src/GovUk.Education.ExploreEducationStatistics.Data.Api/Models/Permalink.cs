@@ -11,12 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 
         public DateTime Created { get; set; }
 
-        // TODO EES-229 Added from TableBuilderQueryContext
         public TableBuilderConfiguration Configuration { get; set; }
-        
+
         public TableBuilderResultViewModel FullTable { get; set; }
 
-        // TODO EES-229 Replaced with ObservationQueryContext from TableBuilderQueryContext
         public ObservationQueryContext Query { get; set; }
 
         public Permalink(TableBuilderConfiguration configuration,
