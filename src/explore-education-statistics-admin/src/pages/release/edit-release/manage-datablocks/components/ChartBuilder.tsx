@@ -214,7 +214,7 @@ const ChartBuilder = ({
           >
             <ChartConfiguration
               canSaveChart={canSaveChart}
-              selectedChartType={definition}
+              definition={definition}
               chartOptions={options}
               meta={meta}
               releaseId={releaseId}

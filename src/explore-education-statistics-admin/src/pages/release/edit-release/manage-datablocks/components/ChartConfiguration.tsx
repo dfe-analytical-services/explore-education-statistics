@@ -16,13 +16,16 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import merge from 'lodash/merge';
-import React, { useCallback } from 'react';
-import { Schema } from 'yup';
+import pick from 'lodash/pick';
+import React, { useCallback, useMemo } from 'react';
+import { ObjectSchema, Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
+
+type FormValues = Partial<ChartOptions>;
 
 interface Props {
   canSaveChart: boolean;
-  selectedChartType: ChartDefinition;
+  definition: ChartDefinition;
   chartOptions: ChartOptions;
   releaseId: string;
   meta: FullTableMeta;
@@ -32,24 +35,12 @@ interface Props {
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
-const validationSchema = Yup.object<ChartOptions>({
-  height: Yup.number()
-    .required('Enter chart height')
-    .positive('Chart height must be positive'),
-  width: Yup.number().positive('Chart width must be positive'),
-  legend: Yup.string().oneOf(
-    ['bottom', 'top', 'none'],
-    'Select a valid legend position',
-  ) as Schema<ChartOptions['legend']>,
-  stacked: Yup.boolean(),
-});
-
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
   canSaveChart,
   chartOptions,
-  selectedChartType,
+  definition,
   meta,
   releaseId,
   onBoundaryLevelChange,
@@ -57,26 +48,60 @@ const ChartConfiguration = ({
   onFormStateChange,
   onSubmit,
 }: Props) => {
-  const { fileId, ...initialValues } = chartOptions;
+  const { fileId } = chartOptions;
 
-  const normalizeValues = (values: ChartOptions): ChartOptions => {
-    // Use `merge` as we want to avoid potential undefined
-    // values from overwriting existing values
-    return merge(values, {
-      width: parseNumber(values.width),
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
+      title: Yup.string(),
+      height: Yup.number()
+        .required('Enter chart height')
+        .positive('Chart height must be positive'),
+      width: Yup.number().positive('Chart width must be positive'),
     });
-  };
+
+    if (definition.capabilities.hasLegend) {
+      schema = schema.shape({
+        legend: Yup.string().oneOf(
+          ['bottom', 'top', 'none'],
+          'Select a valid legend position',
+        ) as Schema<ChartOptions['legend']>,
+      });
+    }
+
+    if (definition.capabilities.stackable) {
+      schema = schema.shape({
+        stacked: Yup.boolean(),
+      });
+    }
+
+    return schema;
+  }, [definition.capabilities.hasLegend, definition.capabilities.stackable]);
+
+  const initialValues = useMemo<FormValues>(() => {
+    return pick(chartOptions, Object.keys(validationSchema.fields));
+  }, [chartOptions, validationSchema]);
+
+  const normalizeValues = useCallback(
+    (values: FormValues): ChartOptions => {
+      // Use `merge` as we want to avoid potential undefined
+      // values from overwriting existing values
+      return merge(chartOptions, values, {
+        width: parseNumber(values.width),
+      });
+    },
+    [chartOptions],
+  );
 
   const handleChange = useCallback(
-    (values: ChartOptions) => {
+    (values: FormValues) => {
       onChange(normalizeValues(values));
     },
-    [onChange],
+    [normalizeValues, onChange],
   );
 
   return (
     <>
-      {selectedChartType.type === 'infographic' && (
+      {definition.type === 'infographic' && (
         <>
           <InfographicChartForm
             releaseId={releaseId}
@@ -97,7 +122,7 @@ const ChartConfiguration = ({
         </>
       )}
 
-      <Formik<ChartOptions>
+      <Formik<FormValues>
         initialValues={initialValues}
         enableReinitialize
         onSubmit={values => {
@@ -124,65 +149,56 @@ const ChartConfiguration = ({
               onMount={onFormStateChange}
             />
 
-            <FormGroup>
-              <FormFieldTextInput<ChartOptions>
-                id={`${formId}-title`}
-                name="title"
-                label="Chart title"
-                percentageWidth="three-quarters"
+            <FormFieldTextInput<ChartOptions>
+              id={`${formId}-title`}
+              name="title"
+              label="Chart title"
+              percentageWidth="three-quarters"
+            />
+
+            {validationSchema.fields.stacked && (
+              <FormFieldCheckbox<ChartOptions>
+                id={`${formId}-stacked`}
+                name="stacked"
+                label="Stacked bars"
+                className={styles['margin-top-30']}
               />
-            </FormGroup>
-
-            {selectedChartType.capabilities.stackable && (
-              <FormGroup>
-                <FormFieldCheckbox<ChartOptions>
-                  id={`${formId}-stacked`}
-                  name="stacked"
-                  label="Stacked bars"
-                  className={styles['margin-top-30']}
-                />
-              </FormGroup>
             )}
 
-            {selectedChartType.capabilities.hasLegend && (
-              <FormGroup>
-                <FormFieldSelect<ChartOptions>
-                  id={`${formId}-position`}
-                  name="legend"
-                  label="Legend position"
-                  options={[
-                    { label: 'Top', value: 'top' },
-                    { label: 'Bottom', value: 'bottom' },
-                    { label: 'None', value: 'none' },
-                  ]}
-                  order={[]}
-                />
-              </FormGroup>
+            {validationSchema.fields.legend && (
+              <FormFieldSelect<ChartOptions>
+                id={`${formId}-position`}
+                name="legend"
+                label="Legend position"
+                options={[
+                  { label: 'Top', value: 'top' },
+                  { label: 'Bottom', value: 'bottom' },
+                  { label: 'None', value: 'none' },
+                ]}
+                order={[]}
+              />
             )}
 
-            {selectedChartType.capabilities.canSize && (
-              <>
-                <FormGroup>
-                  <FormFieldNumberInput<ChartOptions>
-                    id={`${formId}-height`}
-                    name="height"
-                    label="Chart height (px)"
-                    width={5}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <FormFieldNumberInput<ChartOptions>
-                    id={`${formId}-width`}
-                    name="width"
-                    label="Chart width (px)"
-                    hint="Leave blank to set as full width"
-                    width={5}
-                  />
-                </FormGroup>
-              </>
+            {validationSchema.fields.height && (
+              <FormFieldNumberInput<ChartOptions>
+                id={`${formId}-height`}
+                name="height"
+                label="Chart height (px)"
+                width={5}
+              />
             )}
 
-            {selectedChartType.type === 'map' && meta.boundaryLevels && (
+            {validationSchema.fields.width && (
+              <FormFieldNumberInput<ChartOptions>
+                id={`${formId}-width`}
+                name="width"
+                label="Chart width (px)"
+                hint="Leave blank to set as full width"
+                width={5}
+              />
+            )}
+
+            {definition.type === 'map' && meta.boundaryLevels && (
               <>
                 {meta.boundaryLevels.length === 1 && (
                   <div>
