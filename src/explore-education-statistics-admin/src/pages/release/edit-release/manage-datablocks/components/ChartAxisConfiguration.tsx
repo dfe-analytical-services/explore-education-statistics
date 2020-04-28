@@ -106,7 +106,7 @@ const ChartAxisConfiguration = ({
     return options;
   }, [meta.filters]);
 
-  // TODO: Figure out how we should sort data
+  // TODO EES-721: Figure out how we should sort data
   // const sortOptions = useMemo<SelectOption[]>(() => {
   //   return [
   //     {
