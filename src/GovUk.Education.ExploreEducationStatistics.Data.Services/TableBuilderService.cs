@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(_ =>
                 {
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
             if (_subjectService.IsSubjectForLatestPublishedRelease(subject.Id) ||
-                await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+                await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;
             }
@@ -82,11 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
         {
             return _observationService.FindObservations(queryContext);
-        }
-
-        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
-        {
-            return queryable.Include(subject => subject.Release);
         }
     }
 }

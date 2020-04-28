@@ -35,16 +35,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             // Avoid potential collisions
             Thread.Sleep(new Random().Next(1, 5) * 1000);
+            
             var release = CreateOrUpdateRelease(message, context);
             var subject = RemoveAndCreateSubject(message.SubjectId, subjectData.Name, release, context);
             
+            CreateReleaseFileLink(message, contentDbContext, release, subject);
+            CreateReleaseSubjectLink(context, release, subject);
+            
+            return subject;
+        }
+
+        private static void CreateReleaseSubjectLink(StatisticsDbContext context, Release release, Subject subject)
+        {
+            context
+                .ReleaseSubject
+                .Add(new ReleaseSubject
+                {
+                    ReleaseId = release.Id,
+                    SubjectId = subject.Id
+                });
+        }
+
+        private static void CreateReleaseFileLink(ImportMessage message, ContentDbContext contentDbContext, Release release,
+            Subject subject)
+        {
             var releaseFileLink = contentDbContext
                 .ReleaseFiles
                 .Include(
                     f => f.ReleaseFileReference)
                 .FirstOrDefault(
-                    f => f.ReleaseId == release.Id 
-                    && f.ReleaseFileReference.Filename == message.DataFileName);
+                    f => f.ReleaseId == release.Id
+                         && f.ReleaseFileReference.Filename == message.DataFileName);
 
             if (releaseFileLink != null)
             {
@@ -52,33 +73,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 contentDbContext.Update(releaseFileLink);
                 contentDbContext.SaveChanges();
             }
-
-            return subject;
         }
 
         private Subject RemoveAndCreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext context)
         {
-            var subject = context.Subject
-                .FirstOrDefault(s => s.Name.Equals(name) && s.ReleaseId == release.Id);
+            var existingReleaseSubjectLinks = context
+                .ReleaseSubject
+                .Include(r => r.Subject)
+                .Where(r => r.Subject.Name == name && r.ReleaseId == release.Id)
+                .ToList();
+                
+            var existingSubject = existingReleaseSubjectLinks.FirstOrDefault()?.Subject;
 
             // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
-
-            if (subject != null)
+            if (existingSubject != null)
             {
-                context.Subject.Remove(subject);
+                context.Subject.Remove(existingSubject);
+                context.ReleaseSubject.RemoveRange(existingReleaseSubjectLinks);
                 context.SaveChanges();
             }
 
-            subject = context.Subject.Add(new Subject
+            var newSubject = context.Subject.Add(new Subject
                 {
                     Id = subjectId,
                     Name = name,
-                    Release = release
+                    // TODO BAU-384 - remove after this work goes out
+                    ReleaseId = release.Id
                 }
             ).Entity;
             
+            // reinstate any Release-to-Subject links
+            var newReleaseSubjectLinks = existingReleaseSubjectLinks.Select(r => new ReleaseSubject
+            {
+                ReleaseId = r.ReleaseId,
+                SubjectId = newSubject.Id
+            });
+            
+            context.ReleaseSubject.AddRange(newReleaseSubjectLinks);
+            
             context.SaveChanges();
-            return subject;
+            return newSubject;
         }
 
         private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext context)

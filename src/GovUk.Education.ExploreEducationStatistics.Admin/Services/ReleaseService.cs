@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -16,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
@@ -34,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _context;
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IPublishingService _publishingService;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
@@ -59,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ITableStorageService coreTableStorageService, 
             IFileStorageService fileStorageService, 
             IImportStatusService importStatusService,
-	        IFootnoteService footnoteService,
+	        IFootnoteService footnoteService, 
+            StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService)
         {
             _context = context;
@@ -73,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileStorageService = fileStorageService;
             _importStatusService = importStatusService;
             _footnoteService = footnoteService;
+            _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
         }
 
@@ -150,7 +155,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId)
         {
             return await _persistenceHelper
@@ -158,11 +162,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
+                    .OnSuccess(CreateStatisticsReleaseRecord)
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
-                    .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Ancillary))
-                    .OnSuccess(amendment => CopyReleaseFilesOfType(releaseId, amendment, ReleaseFileTypes.Chart))
-                    .OnSuccess(amendment => CopyDataFileLinks(originalRelease, amendment))
+                    .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id)));
+        }
+
+        private async Task<Either<ActionResult, Release>> CreateStatisticsReleaseRecord(Release amendment)
+        {
+            var statsRelease =_statisticsDbContext
+                .Release
+                .First(r => r.Id == amendment.OriginalId);
+
+            // TODO BAU-384 - this is currently only possible if a Live release was available
+            // without any subjects uploaded for it.  Does this check need to remain?
+            if (statsRelease != null)
+            {
+                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
+
+                var statsAmendmentSubjectLinks =_statisticsDbContext
+                    .ReleaseSubject
+                    .Where(s => s.ReleaseId == amendment.OriginalId)
+                    .Select(s => new ReleaseSubject
+                    {
+                        ReleaseId = statsAmendment.Id,
+                        SubjectId = s.SubjectId
+                    });
+
+                _statisticsDbContext.Release.Add(statsAmendment);
+                _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
+                await _statisticsDbContext.SaveChangesAsync();
+            }
+            
+            return amendment;
         }
 
         private async Task<Either<ActionResult, Release>> CopyReleaseTeam(Guid originalReleaseId, Release amendment)
@@ -185,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return amendment;
         }
 
-        private async Task<Either<ActionResult, Release>> CopyDataFileLinks(Release originalRelease, Release newRelease)
+        private async Task<Either<ActionResult, Release>> CopyFileLinks(Release originalRelease, Release newRelease)
         {
             var releaseFileCopies = _context
                 .ReleaseFiles
@@ -196,13 +228,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _context.AddRangeAsync(releaseFileCopies);
             await _context.SaveChangesAsync();
             return newRelease;
-        }
-
-        private Task<Either<ActionResult, Release>> CopyReleaseFilesOfType(
-            Guid originalReleaseId, Release newRelease, ReleaseFileTypes type)
-        {
-            return _fileStorageService
-                .CopyReleaseFilesAsync(originalReleaseId, newRelease.Id, type);
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
@@ -232,13 +257,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
                 .OnSuccess(async () =>
                 {
-                    var release = await _context.Releases
-                        .Where(r => r.Id == releaseId)
-                        .FirstOrDefaultAsync();
+                    var release = await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(_context.Releases
+                            .Where(r => r.Id == releaseId));
 
                     release.Slug = request.Slug;
                     release.TypeId = request.TypeId;
-                    release.PublishScheduled = request.PublishScheduled?.Date;
+                    release.PublishScheduled = request.PublishScheduled;
                     release.ReleaseName = request.ReleaseName;
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
@@ -286,18 +310,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
-                    .OnSuccess(async release =>
+                .OnSuccess(_userService.CheckCanPublishRelease)
+                .OnSuccess(async release =>
+                {
+                    if (release.Status != ReleaseStatus.Approved)
                     {
-                        if (release.Status != ReleaseStatus.Approved)
-                        {
-                            return ValidationActionResult(ReleaseNotApproved);
-                        }
+                        return ValidationActionResult(ReleaseNotApproved);
+                    }
 
-                        await _publishingService.QueueValidateReleaseAsync(releaseId, true);
+                    await _publishingService.QueueValidateReleaseAsync(releaseId, true);
 
-                        return new Either<ActionResult, bool>(true);
-                    }));
+                    return new Either<ActionResult, bool>(true);
+                });
         }
 
         public Task<Either<ActionResult, bool>> PublishReleaseContentAsync(Guid releaseId)
@@ -415,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> RemoveDataFileReleaseLinkAsync(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -424,21 +448,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileName, subjectTitle))
                 .OnSuccess(async deletePlan =>
                 {
-                    await _subjectService.DeleteAsync(deletePlan.SubjectId);
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
+                    await _subjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
 
                     return await _fileStorageService
-                        .DeleteDataFileAsync(releaseId, fileName)
-                        .OnSuccessDo(async () =>
-                        {
-                            await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
-                        });
+                        .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
+                        .OnSuccessDo(() => RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
         }
 
-        private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string fileName)
+        private async Task<bool> RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
         {
-            var importFinished = await _importStatusService.IsImportFinished(releaseId.ToString(), fileName);
+            if (!_subjectService.Exists(deletePlan.SubjectId))
+            {
+                return await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
+            }
+
+            return false;
+        }
+
+        public async Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async _ =>
+                {
+                    var fileLink = _context
+                            .ReleaseFiles
+                            .Include(f => f.ReleaseFileReference)
+                            .First(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
+
+                    if (fileLink == null)
+                    {
+                        return new ImportStatus
+                        {
+                            Status = IStatus.NOT_FOUND.GetEnumValue()
+                        };
+                    }
+                    
+                    var fileReference = fileLink.ReleaseFileReference;
+
+                    return await _importStatusService.GetImportStatus(fileReference.ReleaseId.ToString(), dataFileName);
+                });
+        }
+
+        private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string dataFileName)
+        {
+            var releaseFileReference = _context
+                .ReleaseFiles
+                .Include(r => r.ReleaseFileReference)
+                .Where(r => r.ReleaseId == releaseId && r.ReleaseFileReference.Filename == dataFileName)
+                .Select(r => r.ReleaseFileReference)
+                .First();
+                
+            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId.ToString(), dataFileName);
             
             if (!importFinished)
             {
@@ -460,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         QueryComparisons.NotEqual, IStatus.COMPLETE.ToString()));
                 
                 var query = new TableQuery<DatafileImport>().Where(filters);
-                var cloudTable = await _coreTableStorageService.GetTableAsync("imports", true);
+                var cloudTable = await _coreTableStorageService.GetTableAsync("imports");
                 var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
                 if (results.Results.Count != 0)
                 {

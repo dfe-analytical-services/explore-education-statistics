@@ -36,13 +36,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 var subject = new Subject
                 {
-                    Id = Guid.NewGuid(),
-                    ReleaseId = release.Id
+                    Id = Guid.NewGuid()
+                };
+
+                var releaseSubjectLink = new ReleaseSubject
+                {
+                    ReleaseId = release.Id,
+                    SubjectId = subject.Id
                 };
 
                 context.Add(publication);
                 context.Add(release);
                 context.Add(subject);
+                context.Add(releaseSubjectLink);
 
                 context.SaveChanges();
 
@@ -50,22 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 var service = new SubjectService(context, logger.Object, releaseService.Object);
                 Assert.True(service.IsSubjectForLatestPublishedRelease(subject.Id));
-            }
-        }
-
-        [Fact]
-        public void IsSubjectForLatestPublishedRelease_SubjectNotFound()
-        {
-            var (logger, releaseService) = Mocks();
-
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
-            {
-                var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.Throws<ArgumentException>(() => service.IsSubjectForLatestPublishedRelease(Guid.NewGuid()));
             }
         }
 
@@ -94,13 +84,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 var subject = new Subject
                 {
-                    Id = Guid.NewGuid(),
-                    ReleaseId = release.Id
+                    Id = Guid.NewGuid()
+                };
+                
+                var releaseSubjectLink = new ReleaseSubject
+                {
+                    ReleaseId = release.Id,
+                    SubjectId = subject.Id
                 };
 
                 context.Add(publication);
                 context.Add(release);
                 context.Add(subject);
+                context.Add(releaseSubjectLink);
 
                 context.SaveChanges();
 
@@ -136,20 +132,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 var subject = new Subject
                 {
-                    Id = Guid.NewGuid(),
-                    ReleaseId = release.Id
+                    Id = Guid.NewGuid()
+                };
+                
+                var releaseSubjectLink = new ReleaseSubject
+                {
+                    ReleaseId = release.Id,
+                    SubjectId = subject.Id
                 };
 
                 context.Add(publication);
                 context.Add(release);
                 context.Add(subject);
+                context.Add(releaseSubjectLink);
 
                 context.SaveChanges();
 
                 releaseService.Setup(s => s.GetLatestPublishedRelease(publication.Id)).Returns(Guid.NewGuid());
 
                 var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.Throws<ArgumentException>(() => service.IsSubjectForLatestPublishedRelease(Guid.NewGuid()));
+                Assert.False(service.IsSubjectForLatestPublishedRelease(subject.Id));
             }
         }
 

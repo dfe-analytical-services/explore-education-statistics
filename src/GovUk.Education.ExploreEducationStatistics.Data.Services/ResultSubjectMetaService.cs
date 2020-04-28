@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
@@ -30,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
+        private readonly ISubjectService _subjectService;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
@@ -42,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
+            ISubjectService subjectService,
             ILogger<ResultSubjectMetaService> logger,
             IMapper mapper) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
@@ -52,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
+            _subjectService = subjectService;
             _logger = logger;
             _mapper = mapper;
         }
@@ -59,9 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(
             SubjectMetaQueryContext query, IQueryable<Observation> observations)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(subject =>
+                .OnSuccess(async subject =>
                 {
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
@@ -97,6 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
+                    var publication = await _subjectService.GetPublicationForSubjectAsync(subject.Id);
+                    
                     return new ResultSubjectMetaViewModel
                     {
                         Filters = filters,
@@ -105,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Indicators = indicators,
                         Locations = locations,
                         BoundaryLevels = boundaryLevels,
-                        PublicationName = subject.Release.Publication.Title,
+                        PublicationName = publication.Title,
                         SubjectName = subject.Name,
                         TimePeriodRange = timePeriodRange
                     };
@@ -114,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            if (await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+            if (await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;
             }
@@ -167,12 +171,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return _timePeriodService.GetTimePeriodRange(observations).Select(tuple =>
                 new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier));
-        }
-
-        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
-        {
-            return queryable.Include(subject => subject.Release)
-                .ThenInclude(release => release.Publication);
         }
     }
 }

@@ -88,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     
                         logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
                                            $"{message.DataFileName} : {ex.Message}");
+                        logger.LogError(ex.StackTrace);
                     }
 
                     return true;

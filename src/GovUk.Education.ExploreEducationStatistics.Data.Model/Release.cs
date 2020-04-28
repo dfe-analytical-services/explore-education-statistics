@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static System.DateTime;
 
@@ -12,7 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string Slug { get; set; }
         public Publication Publication { get; set; }
         public Guid PublicationId { get; set; }
-        public IEnumerable<Subject> Subjects { get; set; }
         public TimeIdentifier TimeIdentifier { get; set; }
         public int Year { get; set; }
 
@@ -22,5 +20,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         // TODO by the PublishReleaseContentFunction. See method PublishingService.PublishReleaseContentAsync
         // TODO where the Published date on a Release is set in the Content db for the same Live check there.
         public bool Live => Published.HasValue && Compare(UtcNow, Published.Value) > 0;
+
+        public Release CreateReleaseAmendment(Guid contentReleaseAmendmentId)
+        {
+            var copy = MemberwiseClone() as Release;
+            copy.Id = contentReleaseAmendmentId;
+            return copy;
+        }
     }
 }
