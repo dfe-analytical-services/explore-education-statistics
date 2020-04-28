@@ -27,10 +27,10 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
     const createExpandedHeaders = (headers: Header[]): ExpandedHeader[][] => {
       const createExpandedHeader = (
         header: Header,
-        expandedHeaders?: ExpandedHeader[][],
+        expandedHeaders: ExpandedHeader[][],
       ): ExpandedHeader => {
         const { depth } = header;
-        const previousSibling = last(expandedHeaders?.[depth]);
+        const previousSibling = last(expandedHeaders[depth]);
 
         const newExpandedHeader = {
           id: header.id,
@@ -47,10 +47,10 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
         // Header and its parents appear identical
         // so we can merge them together.
         if (
-          header.text === header?.parent?.text &&
-          header.span === header?.parent?.span
+          header.text === header.parent?.text &&
+          header.span === header.parent?.span
         ) {
-          const parent = expandedHeaders?.[depth - 1]?.find(
+          const parent = expandedHeaders[depth - 1]?.find(
             expandedHeader => expandedHeader.start === newExpandedHeader.start,
           );
 
@@ -75,7 +75,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
           const { depth } = child;
 
           if (!acc[depth]) {
-            acc.push([createExpandedHeader(child)]);
+            acc[depth] = [createExpandedHeader(child, acc)];
           } else {
             acc[depth].push(createExpandedHeader(child, acc));
           }
@@ -92,7 +92,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
         const { depth } = header;
 
         if (!acc[depth]) {
-          acc.push([createExpandedHeader(header)]);
+          acc[depth] = [createExpandedHeader(header, acc)];
         } else {
           acc[depth].push(createExpandedHeader(header, acc));
         }
@@ -134,7 +134,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
         className={classNames('govuk-table', styles.table, className)}
         ref={ref}
       >
-        <thead>
+        <thead className={styles.tableHead}>
           {expandedColumnHeaders.map((columns, rowIndex) => {
             return (
               // eslint-disable-next-line react/no-array-index-key
@@ -154,14 +154,6 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
 
                     return (
                       <th
-                        className={classNames({
-                          'govuk-table__header--numeric': !column.isGroup,
-                          [styles.columnHeaderGroup]:
-                            column.isGroup || column.crossSpan > 1,
-                          [styles.borderBottom]: !column.isGroup,
-                          [styles.borderRightNone]:
-                            column.start + column.span === rows[0].length,
-                        })}
                         colSpan={column.span}
                         rowSpan={column.crossSpan}
                         scope={column.isGroup ? 'colgroup' : 'col'}
