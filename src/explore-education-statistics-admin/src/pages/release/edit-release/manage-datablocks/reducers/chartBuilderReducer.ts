@@ -197,6 +197,18 @@ export const chartBuilderReducer: Reducer<
 };
 
 export function useChartBuilderReducer(initialConfiguration?: Chart) {
+  const definition = chartDefinitions.find(
+    ({ type }) => type === initialConfiguration?.type,
+  );
+
+  // Make sure height is never actually 0 or negative
+  // as this wouldn't make sense for any chart.
+  const height =
+    typeof initialConfiguration?.height !== 'undefined' &&
+    initialConfiguration?.height > 0
+      ? initialConfiguration.height
+      : definition?.options?.defaults?.height ?? 300;
+
   const [state, dispatch] = useLoggedImmerReducer<
     ChartBuilderState,
     ChartBuilderActions
@@ -205,21 +217,11 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
     chartBuilderReducer,
     {
       axes: {},
-      definition: initialConfiguration
-        ? chartDefinitions.find(
-            ({ type }) => type === initialConfiguration.type,
-          )
-        : undefined,
+      definition,
       options: {
         ...(initialConfiguration ?? {}),
         title: initialConfiguration?.title ?? '',
-        // Make sure height is never actually 0 or negative
-        // as this wouldn't make sense for any chart.
-        height:
-          typeof initialConfiguration?.height !== 'undefined' &&
-          initialConfiguration?.height > 0
-            ? initialConfiguration.height
-            : 300,
+        height,
       },
       forms: {
         data: { isValid: true },
