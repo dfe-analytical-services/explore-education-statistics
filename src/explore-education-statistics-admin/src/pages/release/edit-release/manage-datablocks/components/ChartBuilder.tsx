@@ -241,7 +241,7 @@ const ChartBuilder = ({
                 headingTitle={axis.title}
               >
                 <ChartAxisConfiguration
-                  id={type}
+                  id={`chartAxisConfiguration-${type}`}
                   type={type as AxisType}
                   configuration={axisConfiguration}
                   capabilities={definition.capabilities}
