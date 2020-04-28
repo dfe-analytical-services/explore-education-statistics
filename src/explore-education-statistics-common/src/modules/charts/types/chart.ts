@@ -129,6 +129,7 @@ export interface ChartDefinitionAxis {
   id: string;
   title: string;
   type: AxisType;
+  hide?: boolean;
   defaults?: Partial<AxisConfiguration>;
   constants?: Partial<AxisConfiguration>;
 }

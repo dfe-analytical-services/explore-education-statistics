@@ -58,6 +58,7 @@ export const mapBlockDefinition: ChartDefinition = {
       id: 'geojson',
       title: 'GeoJSON (major axis)',
       type: 'major',
+      hide: true,
       constants: {
         groupBy: 'locations',
       },
