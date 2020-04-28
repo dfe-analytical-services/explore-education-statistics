@@ -213,7 +213,6 @@ const ChartBuilder = ({
             headingTitle="Chart configuration"
           >
             <ChartConfiguration
-              canSaveChart={canSaveChart}
               definition={definition}
               chartOptions={options}
               meta={meta}
@@ -242,7 +241,6 @@ const ChartBuilder = ({
                 headingTitle={axis.title}
               >
                 <ChartAxisConfiguration
-                  canSaveChart={canSaveChart}
                   id={type}
                   type={type as AxisType}
                   configuration={axisConfiguration}

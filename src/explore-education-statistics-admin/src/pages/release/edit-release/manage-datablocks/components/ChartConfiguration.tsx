@@ -24,7 +24,6 @@ import InfographicChartForm from './InfographicChartForm';
 type FormValues = Partial<ChartOptions>;
 
 interface Props {
-  canSaveChart: boolean;
   definition: ChartDefinition;
   chartOptions: ChartOptions;
   releaseId: string;
@@ -38,7 +37,6 @@ interface Props {
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
-  canSaveChart,
   chartOptions,
   definition,
   meta,
@@ -230,9 +228,7 @@ const ChartConfiguration = ({
               </>
             )}
 
-            <Button type="submit" disabled={!canSaveChart}>
-              Save chart options
-            </Button>
+            <Button type="submit">Save chart options</Button>
           </Form>
         )}
       />
