@@ -158,7 +158,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
     canSize: true,
     canSort: true,
     fixedAxisGroupBy: false,
-    hasAxes: true,
     hasReferenceLines: true,
     hasLegend: true,
     requiresGeoJson: false,

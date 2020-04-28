@@ -156,7 +156,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
     canSize: true,
     canSort: true,
     fixedAxisGroupBy: false,
-    hasAxes: true,
     hasReferenceLines: true,
     hasLegend: true,
     requiresGeoJson: false,

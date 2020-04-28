@@ -195,39 +195,35 @@ const ChartAxisConfiguration = ({
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    let schema: ObjectSchema<FormValues> = Yup.object();
+    let schema: ObjectSchema<FormValues> = Yup.object({
+      size: Yup.number()
+        .required('Enter size of axis')
+        .positive('Size of axis must be positive')
+        .max(100, 'Size of axis must be less than 100px'),
+      tickConfig: Yup.string().oneOf(
+        ['default', 'startEnd', 'custom'],
+        'Select a valid tick display type',
+      ) as Schema<AxisConfiguration['tickConfig']>,
+      tickSpacing: Yup.number().when('tickConfig', {
+        is: 'custom',
+        then: Yup.number()
+          .required('Enter tick spacing')
+          .positive('Tick spacing must be positive'),
+      }),
+      max: Yup.number(),
+      min: Yup.number(),
+      visible: Yup.boolean(),
+    });
 
-    if (capabilities.hasAxes) {
+    if (type === 'major' && !capabilities.fixedAxisGroupBy) {
       schema = schema.shape({
-        size: Yup.number()
-          .required('Enter size of axis')
-          .positive('Size of axis must be positive')
-          .max(100, 'Size of axis must be less than 100px'),
-        tickConfig: Yup.string().oneOf(
-          ['default', 'startEnd', 'custom'],
-          'Select a valid tick display type',
-        ) as Schema<AxisConfiguration['tickConfig']>,
-        tickSpacing: Yup.number().when('tickConfig', {
-          is: 'custom',
-          then: Yup.number()
-            .required('Enter tick spacing')
-            .positive('Tick spacing must be positive'),
-        }),
-        max: Yup.number(),
-        min: Yup.number(),
-        visible: Yup.boolean(),
+        groupBy: Yup.string().oneOf([
+          'locations',
+          'timePeriod',
+          'filters',
+          'indicators',
+        ]) as Schema<AxisConfiguration['groupBy']>,
       });
-
-      if (type === 'major' && !capabilities.fixedAxisGroupBy) {
-        schema = schema.shape({
-          groupBy: Yup.string().oneOf([
-            'locations',
-            'timePeriod',
-            'filters',
-            'indicators',
-          ]) as Schema<AxisConfiguration['groupBy']>,
-        });
-      }
     }
 
     if (capabilities.canSort) {
@@ -253,7 +249,6 @@ const ChartAxisConfiguration = ({
     capabilities.canSort,
     capabilities.fixedAxisGroupBy,
     capabilities.gridLines,
-    capabilities.hasAxes,
     capabilities.hasReferenceLines,
     type,
   ]);

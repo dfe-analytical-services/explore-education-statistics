@@ -86,7 +86,6 @@ export interface StackedBarProps extends ChartProps {
 }
 
 export interface ChartCapabilities {
-  hasAxes: boolean;
   dataSymbols: boolean;
   stackable: boolean;
   lineStyle: boolean;
