@@ -16,6 +16,7 @@ import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer } from 'use-immer';
+import omit from 'lodash/omit';
 
 export interface ChartOptions extends ChartDefinitionOptions {
   fileId?: string;
@@ -219,7 +220,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       axes: {},
       definition,
       options: {
-        ...(initialConfiguration ?? {}),
+        ...omit(initialConfiguration ?? {}, ['axes', 'type']),
         title: initialConfiguration?.title ?? '',
         height,
       },
@@ -236,15 +237,9 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       const axes: AxesConfiguration = mapValues(
         initialState.definition?.axes ?? {},
         (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
-          if (!initialConfiguration.axes[type]) {
-            throw new Error(
-              `Could not find chart axis definition for type '${type}'`,
-            );
-          }
-
           return updateAxis(
             axisDefinition,
-            initialConfiguration.axes[type] as AxisConfiguration,
+            (initialConfiguration.axes[type] ?? {}) as AxisConfiguration,
           );
         },
       );

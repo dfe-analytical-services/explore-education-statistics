@@ -1,15 +1,19 @@
+import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import {
   AxisConfiguration,
   AxisType,
   ChartDefinition,
 } from '@common/modules/charts/types/chart';
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { Chart } from '@common/services/types/blocks';
+import { renderHook } from '@testing-library/react-hooks';
 import produce from 'immer';
 import {
   ChartBuilderActions,
   chartBuilderReducer,
   ChartBuilderState,
   ChartOptions,
+  useChartBuilderReducer,
 } from '../chartBuilderReducer';
 
 describe('chartBuilderReducer', () => {
@@ -788,6 +792,322 @@ describe('chartBuilderReducer', () => {
       } as ChartBuilderActions);
 
       expect(nextState.forms.options.isValid).toBe(false);
+    });
+  });
+
+  describe('useChartBuilderReducer', () => {
+    test('has correct state when no initial configuration', () => {
+      const { result } = renderHook(() => useChartBuilderReducer());
+
+      expect(result.current.state).toEqual<ChartBuilderState>({
+        axes: {},
+        options: {
+          title: '',
+          height: 300,
+        },
+        forms: {
+          data: {
+            isValid: true,
+          },
+          options: {
+            isValid: true,
+          },
+        },
+      });
+    });
+
+    test('has correct with with initial configuration', () => {
+      const initialConfiguration: Chart = {
+        legend: 'top',
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'timePeriod',
+            sortAsc: true,
+            dataSets: [
+              {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+                config: {
+                  label: 'Test label 1',
+                },
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+            size: 100,
+            showGrid: true,
+            min: 2,
+            max: 10,
+            tickConfig: 'default',
+            unit: '%',
+          },
+          minor: {
+            type: 'minor',
+            sortAsc: true,
+            dataSets: [],
+            referenceLines: [],
+            visible: true,
+            size: 75,
+            showGrid: true,
+            min: 500,
+            max: 1000,
+            tickConfig: 'default',
+          },
+        },
+        type: 'line',
+        height: 300,
+      };
+
+      const { result } = renderHook(() =>
+        useChartBuilderReducer(initialConfiguration),
+      );
+
+      expect(result.current.state).toEqual<ChartBuilderState>({
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'timePeriod',
+            sortAsc: true,
+            dataSets: [
+              {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+                config: {
+                  label: 'Test label 1',
+                },
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+            showGrid: true,
+            size: 100,
+            min: 2,
+            max: 10,
+            tickConfig: 'default',
+            tickSpacing: 1,
+            unit: '%',
+          },
+          minor: {
+            type: 'minor',
+            sortAsc: true,
+            dataSets: [],
+            referenceLines: [],
+            visible: true,
+            showGrid: true,
+            size: 75,
+            min: 500,
+            max: 1000,
+            tickConfig: 'default',
+            tickSpacing: 1,
+            unit: '',
+          },
+        },
+        definition: lineChartBlockDefinition,
+        options: {
+          height: 300,
+          legend: 'top',
+          title: '',
+        },
+        forms: {
+          data: {
+            isValid: true,
+          },
+          options: {
+            isValid: true,
+          },
+          major: {
+            isValid: true,
+          },
+          minor: {
+            isValid: true,
+          },
+        },
+      });
+    });
+
+    test('has correct state with minimal initial configuration merged with chart definition defaults', () => {
+      const initialConfiguration: Chart = {
+        legend: 'top',
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'timePeriod',
+            dataSets: [
+              {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+                config: {
+                  label: 'Test label 1',
+                },
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+          },
+          minor: {
+            type: 'minor',
+            dataSets: [],
+            referenceLines: [],
+            visible: true,
+          },
+        },
+        type: 'line',
+        height: 300,
+      };
+
+      const { result } = renderHook(() =>
+        useChartBuilderReducer(initialConfiguration),
+      );
+
+      expect(result.current.state).toEqual<ChartBuilderState>({
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'timePeriod',
+            sortAsc: true,
+            dataSets: [
+              {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+                config: {
+                  label: 'Test label 1',
+                },
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+            size: 50,
+            showGrid: true,
+            min: 0,
+            tickConfig: 'default',
+            tickSpacing: 1,
+            unit: '',
+          },
+          minor: {
+            type: 'minor',
+            dataSets: [],
+            referenceLines: [],
+            visible: true,
+            showGrid: true,
+            size: 50,
+            min: 0,
+            tickConfig: 'default',
+            tickSpacing: 1,
+            unit: '',
+          },
+        },
+        definition: lineChartBlockDefinition,
+        options: {
+          height: 300,
+          legend: 'top',
+          title: '',
+        },
+        forms: {
+          data: {
+            isValid: true,
+          },
+          options: {
+            isValid: true,
+          },
+          major: {
+            isValid: true,
+          },
+          minor: {
+            isValid: true,
+          },
+        },
+      });
+    });
+
+    test('has default `axes.minor` state if initial configuration is missing it', () => {
+      const initialConfiguration: Chart = {
+        legend: 'top',
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'timePeriod',
+            dataSets: [
+              {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+                config: {
+                  label: 'Test label 1',
+                },
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+          },
+        },
+        type: 'line',
+        height: 300,
+      };
+
+      const { result } = renderHook(() =>
+        useChartBuilderReducer(initialConfiguration),
+      );
+
+      expect(result.current.state.axes.minor).toEqual<AxisConfiguration>({
+        type: 'minor',
+        dataSets: [],
+        referenceLines: [],
+        visible: true,
+        showGrid: true,
+        size: 50,
+        min: 0,
+        tickConfig: 'default',
+        tickSpacing: 1,
+        unit: '',
+      });
+    });
+
+    test('merges deprecated `labels` configurations into `axes.major.dataSets`', () => {
+      const initialConfiguration: Chart = {
+        legend: 'top',
+        labels: {
+          'indicator-1_filter-1_____': {
+            value: 'indicator-1_filter-1_____',
+            label: 'Test label 1',
+          },
+        },
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'timePeriod',
+            dataSets: [
+              {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+          },
+          minor: {
+            type: 'minor',
+            dataSets: [],
+            referenceLines: [],
+            visible: true,
+          },
+        },
+        type: 'line',
+        height: 300,
+      };
+
+      const { result } = renderHook(() =>
+        useChartBuilderReducer(initialConfiguration),
+      );
+
+      expect(result.current.state.axes.major?.dataSets).toEqual([
+        {
+          indicator: 'indicator-1',
+          filters: ['filter-1'],
+          config: {
+            label: 'Test label 1',
+          },
+        },
+      ]);
     });
   });
 });

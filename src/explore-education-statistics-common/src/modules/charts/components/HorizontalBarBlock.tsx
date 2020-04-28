@@ -200,6 +200,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       type: 'minor',
       defaults: {
         min: 0,
+        showGrid: true,
         size: 50,
         tickConfig: 'default',
         tickSpacing: 1,
