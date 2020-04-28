@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
   KeyboardEventHandler,
@@ -8,40 +7,29 @@ import React, {
 import ErrorMessage from '../ErrorMessage';
 import createDescribedBy from './util/createDescribedBy';
 
-export interface FormTextInputProps {
+export interface FormFileInputProps {
+  disabled?: boolean;
   error?: ReactNode | string;
   hint?: string;
   id: string;
   label: ReactNode | string;
   name: string;
-  type?: string;
-  pattern?: string;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
-  onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
-  onClick?: MouseEventHandler<HTMLInputElement>;
-  width?: 20 | 10 | 5 | 4 | 3 | 2;
-  percentageWidth?: string;
   value?: string;
-  defaultValue?: string;
-  min?: string;
-  max?: string;
-  list?: string;
-  disabled?: boolean;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onClick?: MouseEventHandler<HTMLInputElement>;
+  onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
 }
 
-const FormTextInput = ({
+const FormFileInput = ({
   error,
   hint,
   id,
   label,
-  width,
-  percentageWidth,
-  type = 'text',
   ...props
-}: FormTextInputProps) => {
+}: FormFileInputProps) => {
   return (
     <>
-      <label className="govuk-label" htmlFor={id}>
+      <label className="govuk-label govuk-label--s" htmlFor={id}>
         {label}
       </label>
       {hint && (
@@ -57,15 +45,12 @@ const FormTextInput = ({
           error: !!error,
           hint: !!hint,
         })}
-        className={classNames('govuk-input', {
-          [`govuk-input--width-${width}`]: width !== undefined,
-          [`govuk-!-width-${percentageWidth}`]: percentageWidth !== undefined,
-        })}
+        className="govuk-file-upload"
         id={id}
-        type={type}
+        type="file"
       />
     </>
   );
 };
 
-export default FormTextInput;
+export default FormFileInput;
