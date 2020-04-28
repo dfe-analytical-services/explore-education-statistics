@@ -72,6 +72,38 @@ const ChartAxisConfiguration = ({
     return createDataSetCategories(config, data, meta);
   }, [configuration, data, meta]);
 
+  const groupByOptions = useMemo<SelectOption<AxisGroupBy>[]>(() => {
+    const options: SelectOption<AxisGroupBy>[] = [
+      {
+        label: 'Time periods',
+        value: 'timePeriod',
+      },
+      {
+        label: 'Locations',
+        value: 'locations',
+      },
+      {
+        label: 'Indicators',
+        value: 'indicators',
+      },
+    ];
+
+    // Don't show 'Filters' option if we would end up with no
+    // categories due to every filter being siblingless filters.
+    const canGroupByFilters = Object.values(meta.filters).some(
+      filterGroup => filterGroup.options.length > 1,
+    );
+
+    if (canGroupByFilters) {
+      options.push({
+        label: 'Filters',
+        value: 'filters',
+      });
+    }
+
+    return options;
+  }, [meta.filters]);
+
   // TODO: Figure out how we should sort data
   // const sortOptions = useMemo<SelectOption[]>(() => {
   //   return [
@@ -197,31 +229,15 @@ const ChartAxisConfiguration = ({
           />
 
           <FormGroup>
-            {configuration.type === 'major' && !capabilities.fixedAxisGroupBy && (
-              <FormFieldSelect<AxisConfiguration>
-                id={`${id}-groupBy`}
-                label="Group data by"
-                name="groupBy"
-                options={[
-                  {
-                    label: 'Time periods',
-                    value: 'timePeriod' as AxisGroupBy,
-                  },
-                  {
-                    label: 'Locations',
-                    value: 'locations' as AxisGroupBy,
-                  },
-                  {
-                    label: 'Indicators',
-                    value: 'indicators' as AxisGroupBy,
-                  },
-                  {
-                    label: 'Filters',
-                    value: 'filters' as AxisGroupBy,
-                  },
-                ]}
-              />
-            )}
+            {configuration.type === 'major' &&
+              !capabilities.fixedAxisGroupBy && (
+                <FormFieldSelect<AxisConfiguration>
+                  id={`${id}-groupBy`}
+                  label="Group data by"
+                  name="groupBy"
+                  options={groupByOptions}
+                />
+              )}
 
             {capabilities.hasAxes && (
               <FormFieldTextInput<AxisConfiguration>

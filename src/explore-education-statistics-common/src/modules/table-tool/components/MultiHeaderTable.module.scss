@@ -18,18 +18,6 @@ $border-width: 1px;
     padding-right: govuk-spacing(2);
   }
 
-  thead td {
-    background: #fff;
-    position: relative;
-    z-index: 3;
-  }
-
-  thead th {
-    background: #fff;
-    position: relative;
-    z-index: 2;
-  }
-
   tbody th {
     background: #fff;
     position: relative;
@@ -38,15 +26,30 @@ $border-width: 1px;
   }
 }
 
-:global(.govuk-table) {
-  .columnHeaderGroup {
+.tableHead {
+  td {
+    background: #fff;
+    position: relative;
+    z-index: 3;
+  }
+
+  th {
     background: govuk-colour('light-grey');
     border-bottom: 1px solid $govuk-border-colour;
     border-right: 1px solid $govuk-border-colour;
+    padding: govuk-spacing(2);
+    position: relative;
     text-align: center;
+    z-index: 2;
   }
 
-  .borderRightNone {
+  tr:first-child:last-child th {
+    background: govuk-colour('white');
+    border-right: 0;
+    text-align: right;
+  }
+
+  th:last-child {
     border-right: 0;
   }
 }
