@@ -173,7 +173,7 @@ const ChartAxisConfiguration = ({
     (values: FormValues): AxisConfiguration => {
       // Use `merge` as we want to avoid potential undefined
       // values from overwriting existing values
-      return merge(configuration, values, {
+      return merge({}, configuration, values, {
         // `configuration.type` may be incorrectly set by
         // seeded releases so we want to make sure this is
         // set using the `type` prop (which uses the axis key)

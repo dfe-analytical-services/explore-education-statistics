@@ -85,7 +85,7 @@ const ChartConfiguration = ({
     (values: FormValues): ChartOptions => {
       // Use `merge` as we want to avoid potential undefined
       // values from overwriting existing values
-      return merge(chartOptions, values, {
+      return merge({}, chartOptions, values, {
         width: parseNumber(values.width),
       });
     },
