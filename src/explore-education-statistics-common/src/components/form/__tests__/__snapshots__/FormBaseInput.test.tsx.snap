@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormTextInput renders correctly with required props 1`] = `
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<input name="testInput"
+       class="govuk-input"
+       id="test-input"
+       type="text"
+>
+`;

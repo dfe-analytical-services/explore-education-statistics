@@ -1,3 +1,4 @@
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import createErrorHelper from '@common/validation/createErrorHelper';
@@ -37,29 +38,23 @@ const FormFieldDayMonthYear = <FormValues extends {}>({
             legendSize={fieldsetLegendSize}
             error={showError ? getError(fieldName) : ''}
           >
-            <FormFieldTextInput<DayMonthYearValues>
+            <FormFieldNumberInput<DayMonthYearValues>
               id={`${fieldName}.day`}
               name={`${fieldName}.day`}
               label="Day"
-              type="number"
-              pattern="[0-9]*"
               width={2}
               formGroupClass="govuk-date-input__item"
             />
-            <FormFieldTextInput<DayMonthYearValues>
+            <FormFieldNumberInput<DayMonthYearValues>
               id={`${fieldName}.month`}
               name={`${fieldName}.month`}
-              type="number"
-              pattern="[0-9]*"
               label="Month"
               width={2}
               formGroupClass="govuk-date-input__item"
             />
-            <FormFieldTextInput<DayMonthYearValues>
+            <FormFieldNumberInput<DayMonthYearValues>
               id={`${fieldName}.year`}
               name={`${fieldName}.year`}
-              type="number"
-              pattern="[0-9]*"
               label="Year"
               width={4}
               formGroupClass="govuk-date-input__item"

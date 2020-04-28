@@ -12,6 +12,7 @@ import {
   FormTextInput,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
@@ -292,18 +293,16 @@ const ChartAxisConfiguration = ({
               hint="Leaving these values blank will set them to 'auto'"
             >
               <div className={styles.axisRange}>
-                <FormFieldTextInput<AxisConfiguration>
+                <FormFieldNumberInput<AxisConfiguration>
                   id={`${id}-minorMin`}
                   name="min"
-                  type="number"
                   width={10}
                   label="Minimum value"
                   formGroupClass="govuk-!-margin-right-2"
                 />
-                <FormFieldTextInput<AxisConfiguration>
+                <FormFieldNumberInput<AxisConfiguration>
                   id={`${id}-minorMax`}
                   name="max"
-                  type="number"
                   width={10}
                   label="Maximum value"
                 />
@@ -331,10 +330,9 @@ const ChartAxisConfiguration = ({
                   label: 'Custom',
                   value: 'custom',
                   conditional: (
-                    <FormFieldTextInput<AxisConfiguration>
+                    <FormFieldNumberInput<AxisConfiguration>
                       id={`${id}-tickSpacing`}
                       name="tickSpacing"
-                      type="number"
                       width={10}
                       label="Every nth value"
                     />
@@ -429,7 +427,6 @@ const ChartAxisConfiguration = ({
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
                         label=""
-                        type="text"
                         defaultValue={`${referenceLine.position}`}
                         onChange={e => {
                           setReferenceLine({
@@ -462,7 +459,6 @@ const ChartAxisConfiguration = ({
                       name={`referenceLines[${form.values.referenceLines?.length}].label`}
                       id={`${id}-referenceLines-label`}
                       label=""
-                      type="text"
                       defaultValue={referenceLine.label}
                       onChange={e => {
                         setReferenceLine({

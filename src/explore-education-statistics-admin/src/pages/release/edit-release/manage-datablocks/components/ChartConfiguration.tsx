@@ -10,6 +10,7 @@ import {
   Formik,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -160,8 +161,7 @@ const ChartConfiguration = ({
             {selectedChartType.capabilities.canSize && (
               <>
                 <FormGroup>
-                  <FormFieldTextInput<ChartOptions>
-                    type="number"
+                  <FormFieldNumberInput<ChartOptions>
                     id={`${formId}-height`}
                     name="height"
                     label="Chart height (px)"
@@ -169,8 +169,7 @@ const ChartConfiguration = ({
                   />
                 </FormGroup>
                 <FormGroup>
-                  <FormFieldTextInput<ChartOptions>
-                    type="number"
+                  <FormFieldNumberInput<ChartOptions>
                     id={`${formId}-width`}
                     name="width"
                     label="Chart width (px)"

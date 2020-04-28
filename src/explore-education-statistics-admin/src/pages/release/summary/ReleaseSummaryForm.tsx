@@ -14,6 +14,7 @@ import ButtonText from '@common/components/ButtonText';
 import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -145,7 +146,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                       model.timePeriodCoverageGroups,
                     )}
                   />
-                  <FormFieldTextInput<FormValues>
+                  <FormFieldNumberInput<FormValues>
                     id={`${formId}-timePeriodCoverageStartYear`}
                     name="timePeriodCoverageStartYear"
                     label={`
@@ -156,8 +157,6 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                       }
                     `}
                     width={4}
-                    type="number"
-                    pattern="[0-9]*"
                   />
                 </FormFieldset>
                 <FormFieldDayMonthYear<FormValues>
