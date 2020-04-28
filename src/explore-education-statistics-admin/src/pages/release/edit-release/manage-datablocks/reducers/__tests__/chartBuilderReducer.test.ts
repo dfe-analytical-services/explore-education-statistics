@@ -75,6 +75,14 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
       },
+      forms: {
+        options: {
+          isValid: true,
+        },
+        data: {
+          isValid: true,
+        },
+      },
     };
 
     test('sets the `definition` to the payload', () => {
@@ -278,6 +286,17 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
       },
+      forms: {
+        options: {
+          isValid: true,
+        },
+        data: {
+          isValid: true,
+        },
+        major: {
+          isValid: true,
+        },
+      },
     };
 
     test('overrides chart definition defaults', () => {
@@ -356,7 +375,7 @@ describe('chartBuilderReducer', () => {
             ],
           },
         } as ChartBuilderActions);
-      }).toThrow("Could not find chart axis definition with type 'not valid'");
+      }).toThrow("Could not find chart axis definition for type 'not valid'");
     });
   });
 
@@ -366,6 +385,17 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+      },
+      forms: {
+        options: {
+          isValid: true,
+        },
+        data: {
+          isValid: true,
+        },
+        major: {
+          isValid: true,
+        },
       },
     };
 
@@ -496,6 +526,17 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
       },
+      forms: {
+        options: {
+          isValid: true,
+        },
+        data: {
+          isValid: true,
+        },
+        major: {
+          isValid: true,
+        },
+      },
     };
 
     test('adds payload to data sets', () => {
@@ -526,6 +567,32 @@ describe('chartBuilderReducer', () => {
           },
         },
       ]);
+    });
+
+    test('sets `forms.data.isValid` to true', () => {
+      const nextState = produce(chartBuilderReducer)(
+        {
+          ...initialState,
+          forms: {
+            ...initialState.forms,
+            data: {
+              isValid: false,
+            },
+          },
+        },
+        {
+          type: 'ADD_DATA_SET',
+          payload: {
+            indicator: 'indicator-2',
+            filters: ['filter-2'],
+            config: {
+              label: 'Label 2',
+            },
+          },
+        } as ChartBuilderActions,
+      );
+
+      expect(nextState.forms.data.isValid).toBe(true);
     });
   });
 
@@ -558,6 +625,17 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
       },
+      forms: {
+        options: {
+          isValid: true,
+        },
+        data: {
+          isValid: true,
+        },
+        major: {
+          isValid: true,
+        },
+      },
     };
 
     test('removes data set at the payload index', () => {
@@ -575,6 +653,23 @@ describe('chartBuilderReducer', () => {
           },
         },
       ]);
+    });
+
+    test('sets `forms.data.isValid` to false if there are no remaining data sets', () => {
+      let nextState = produce(chartBuilderReducer)(initialState, {
+        type: 'REMOVE_DATA_SET',
+        payload: 0,
+      } as ChartBuilderActions);
+
+      expect(nextState.forms.data.isValid).toBe(true);
+
+      nextState = produce(chartBuilderReducer)(nextState, {
+        type: 'REMOVE_DATA_SET',
+        payload: 0,
+      } as ChartBuilderActions);
+
+      expect(nextState.axes.major?.dataSets).toEqual([]);
+      expect(nextState.forms.data.isValid).toBe(false);
     });
   });
 
@@ -607,6 +702,17 @@ describe('chartBuilderReducer', () => {
       options: {
         height: 300,
       },
+      forms: {
+        options: {
+          isValid: true,
+        },
+        data: {
+          isValid: true,
+        },
+        major: {
+          isValid: true,
+        },
+      },
     };
 
     test('replaces data sets with payload', () => {
@@ -626,6 +732,62 @@ describe('chartBuilderReducer', () => {
       } as ChartBuilderActions);
 
       expect(nextState.axes.major?.dataSets).toEqual(payload);
+    });
+
+    test('sets `forms.data.isValid` to false if there are no remaining data sets', () => {
+      const nextState = produce(chartBuilderReducer)(initialState, {
+        type: 'UPDATE_DATA_SETS',
+        payload: [],
+      } as ChartBuilderActions);
+
+      expect(nextState.axes.major?.dataSets).toEqual([]);
+      expect(nextState.forms.data.isValid).toBe(false);
+    });
+  });
+
+  describe('UPDATE_FORM', () => {
+    const initialState: ChartBuilderState = {
+      axes: {},
+      definition: testChartDefinition,
+      options: {
+        height: 300,
+      },
+      forms: {
+        options: {
+          isValid: true,
+        },
+        data: {
+          isValid: true,
+        },
+      },
+    };
+
+    test('throws error if invalid `form` key is used', () => {
+      expect(() => {
+        produce(chartBuilderReducer)(initialState, {
+          type: 'UPDATE_FORM',
+          payload: {
+            form: 'not-correct',
+            state: {
+              isValid: false,
+            },
+          },
+        } as ChartBuilderActions);
+      }).toThrowError("Could not find form 'not-correct' to update");
+    });
+
+    test('updates correct `form` with payload', () => {
+      const nextState = produce(chartBuilderReducer)(initialState, {
+        type: 'UPDATE_FORM',
+        payload: {
+          form: 'options',
+          state: {
+            isValid: false,
+          },
+        },
+      } as ChartBuilderActions);
+
+      expect(nextState.forms.options.isValid).toBe(false);
     });
   });
 });
