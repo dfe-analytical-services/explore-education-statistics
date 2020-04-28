@@ -15,6 +15,7 @@ import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
+import merge from 'lodash/merge';
 import React, { useCallback } from 'react';
 import { Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
@@ -59,10 +60,11 @@ const ChartConfiguration = ({
   const { fileId, ...initialValues } = chartOptions;
 
   const normalizeValues = (values: ChartOptions): ChartOptions => {
-    return {
-      ...values,
+    // Use `merge` as we want to avoid potential undefined
+    // values from overwriting existing values
+    return merge(values, {
       width: parseNumber(values.width),
-    };
+    });
   };
 
   const handleChange = useCallback(

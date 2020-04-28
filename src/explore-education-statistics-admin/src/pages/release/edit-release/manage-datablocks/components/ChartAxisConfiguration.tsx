@@ -29,6 +29,7 @@ import { TableDataResult } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
+import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema, Schema } from 'yup';
@@ -170,18 +171,22 @@ const ChartAxisConfiguration = ({
 
   const normalizeValues = useCallback(
     (values: FormValues): AxisConfiguration => {
-      // Values of min/max may be treated as strings by Formik
-      // due to the way they are encoded in the form input value.
-      return {
-        ...configuration,
-        ...values,
+      // Use `merge` as we want to avoid potential undefined
+      // values from overwriting existing values
+      return merge(configuration, values, {
+        // `configuration.type` may be incorrectly set by
+        // seeded releases so we want to make sure this is
+        // set using the `type` prop (which uses the axis key)
+        type,
+        // Numeric values may be treated as strings by Formik
+        // due to the way they are encoded in the form input value.
         min: parseNumber(values.min),
         max: parseNumber(values.max),
         size: parseNumber(values.size),
         tickSpacing: parseNumber(values.tickSpacing),
-      };
+      });
     },
-    [configuration],
+    [configuration, type],
   );
 
   const handleFormChange = useCallback(

@@ -227,8 +227,8 @@ const ChartBuilder = ({
 
           {Object.entries(
             definition.axes as Required<ChartDefinition['axes']>,
-          ).map(([key, axis]) => {
-            const axisConfiguration = axes[key as AxisType];
+          ).map(([type, axis]) => {
+            const axisConfiguration = axes[type as AxisType];
 
             if (!axisConfiguration) {
               return null;
@@ -236,15 +236,15 @@ const ChartBuilder = ({
 
             return (
               <TabsSection
-                key={key}
-                id={`${key}-tab`}
+                key={type}
+                id={`${type}-tab`}
                 title={axis.title}
                 headingTitle={axis.title}
               >
                 <ChartAxisConfiguration
                   canSaveChart={canSaveChart}
-                  id={key}
-                  type={key as AxisType}
+                  id={type}
+                  type={type as AxisType}
                   configuration={axisConfiguration}
                   capabilities={definition.capabilities}
                   data={data}
