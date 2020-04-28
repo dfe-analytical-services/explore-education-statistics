@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, bool>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan)
         {
             await DeleteDependentDataBlocks(deletePlan);
-            await DeleteChartFiles(deletePlan);
+            await RemoveChartFileReleaseLinks(deletePlan);
             return true;
         }
         
@@ -178,11 +178,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
         
-        private async Task DeleteChartFiles(DeleteDataBlockPlan deletePlan)
+        private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
             var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
                 block.InfographicFilenames.Select(chartFilename =>
-                    _fileStorageService.DeleteFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
+                    _fileStorageService.DeleteNonDataFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
                 )
             );
             

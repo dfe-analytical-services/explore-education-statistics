@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,21 +26,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     {   
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IImportStatusService _importStatusService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public ReleasesController(
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
-            IImportStatusService importStatusService,
             IReleaseStatusService releaseStatusService,
             UserManager<ApplicationUser> userManager
             )
         {
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
-            _importStatusService = importStatusService;
             _releaseStatusService = releaseStatusService;
             _userManager = userManager;
         }
@@ -104,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(Guid releaseId)
         {
             return await _fileStorageService
-                .ListFilesAsync(releaseId, ReleaseFileTypes.Data)
+                .ListFilesAsync(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
                 .HandleFailuresOrOk();
         }
 
@@ -233,9 +229,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
-        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(Guid releaseId, string fileName)
+        public Task<ActionResult<ImportStatus>> GetDataUploadStatus(Guid releaseId, string fileName)
         {
-            return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
+            return _releaseService
+                .GetDataFileImportStatus(releaseId, fileName)
+                .HandleFailuresOrOk();
         }
 
         [HttpGet("release/{releaseId}/data/{fileName}/{subjectTitle}/delete-plan")]
@@ -250,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _releaseService
-                .DeleteDataFilesAsync(releaseId, fileName, subjectTitle)
+                .RemoveDataFileReleaseLinkAsync(releaseId, fileName, subjectTitle)
                 .HandleFailuresOrOk();
         }
 
@@ -259,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseId, string fileName)
         {
             return await _fileStorageService
-                .DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)
+                .DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)
                 .HandleFailuresOrOk();
         }
 
@@ -268,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseId, string fileName)
         {
             return await _fileStorageService
-                .DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName)
+                .DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName)
                 .HandleFailuresOrOk();
         }
         

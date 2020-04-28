@@ -11,9 +11,9 @@ import ErrorMessage from '../ErrorMessage';
 
 export type SelectChangeEventHandler = ChangeEventHandler<HTMLSelectElement>;
 
-export interface SelectOption {
+export interface SelectOption<Value = string | number> {
   label: string;
-  value: string | number;
+  value: Value;
   selected?: boolean;
   style?: CSSProperties;
 }

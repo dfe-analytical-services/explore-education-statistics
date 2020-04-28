@@ -1140,4 +1140,292 @@ describe('createDataSetCategories', () => {
       },
     });
   });
+
+  test('does not categorise by siblingless filters', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'filters',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          config: {
+            label: 'Test label 1',
+          },
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable({
+      ...testTable,
+      subjectMeta: {
+        ...testTable.subjectMeta,
+        filters: {
+          ...testTable.subjectMeta.filters,
+          SchoolType: {
+            ...testTable.subjectMeta.filters.SchoolType,
+            options: {
+              Default: {
+                ...testTable.subjectMeta.filters.SchoolType.options.Default,
+                options: [
+                  {
+                    label: 'State-funded primary',
+                    value: 'state-funded-primary',
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    } as TableDataResponse);
+
+    const dataSetCategories = createDataSetCategories(
+      axisConfiguration,
+      fullTable.results,
+      fullTable.subjectMeta,
+    );
+
+    expect(dataSetCategories).toHaveLength(1);
+
+    expect(dataSetCategories[0].filter.label).toBe('Ethnicity Major Chinese');
+  });
+
+  test('falls back to categorising by siblingless filters if there would be no categories otherwise', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'filters',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          config: {
+            label: 'Test label 1',
+          },
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable({
+      ...testTable,
+      subjectMeta: {
+        ...testTable.subjectMeta,
+        filters: {
+          Characteristic: {
+            ...testTable.subjectMeta.filters.Characteristic,
+            options: {
+              EthnicGroupMajor: {
+                ...testTable.subjectMeta.filters.Characteristic.options
+                  .EthnicGroupMajor,
+                options: [
+                  {
+                    label: 'Ethnicity Major Chinese',
+                    value: 'ethnicity-major-chinese',
+                  },
+                ],
+              },
+            },
+          },
+          SchoolType: {
+            ...testTable.subjectMeta.filters.SchoolType,
+            options: {
+              Default: {
+                ...testTable.subjectMeta.filters.SchoolType.options.Default,
+                options: [
+                  {
+                    label: 'State-funded primary',
+                    value: 'state-funded-primary',
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    } as TableDataResponse);
+
+    const dataSetCategories = createDataSetCategories(
+      axisConfiguration,
+      fullTable.results,
+      fullTable.subjectMeta,
+    );
+
+    expect(dataSetCategories).toHaveLength(2);
+
+    expect(dataSetCategories[0].filter.label).toBe('Ethnicity Major Chinese');
+    expect(dataSetCategories[1].filter.label).toBe('State-funded primary');
+  });
+
+  test('matches results correctly when table has multiple location levels', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'timePeriod',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['state-funded-primary'],
+          location: {
+            level: 'country',
+            value: 'E92000001',
+          },
+          config: {
+            label: 'Test label 1',
+          },
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['state-funded-secondary'],
+          location: {
+            level: 'country',
+            value: 'E92000001',
+          },
+          config: {
+            label: 'Test label 2',
+          },
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable({
+      subjectMeta: {
+        filters: {
+          SchoolType: {
+            totalValue: '',
+            hint: 'Filter by school type',
+            legend: 'School type',
+            options: {
+              Default: {
+                label: 'Default',
+                options: [
+                  {
+                    label: 'State-funded primary',
+                    value: 'state-funded-primary',
+                  },
+                  {
+                    label: 'State-funded secondary',
+                    value: 'state-funded-secondary',
+                  },
+                ],
+              },
+            },
+            name: 'school_type',
+          },
+        },
+        footnotes: [],
+        indicators: [
+          {
+            label: 'Number of authorised absence sessions',
+            unit: '',
+            value: 'authorised-absence-sessions',
+            name: 'sess_authorised',
+          },
+        ],
+        locations: [
+          { level: 'country', label: 'England', value: 'E92000001' },
+          { level: 'region', label: 'North East', value: 'E12000001' },
+        ],
+        boundaryLevels: [],
+        publicationName: 'Pupil absence in schools in England',
+        subjectName: 'Absence by geographic level',
+        timePeriodRange: [{ code: 'AY', label: '2015/16', year: 2015 }],
+        geoJsonAvailable: true,
+      },
+      results: [
+        {
+          filters: ['state-funded-primary'],
+          geographicLevel: 'Region',
+          location: {
+            country: { code: 'E92000001', name: 'England' },
+            region: { code: 'E12000001', name: 'North East' },
+          },
+          measures: { 'authorised-absence-sessions': '1892595' },
+          timePeriod: '2015_AY',
+        },
+        {
+          filters: ['state-funded-primary'],
+          geographicLevel: 'Country',
+          location: { country: { code: 'E92000001', name: 'England' } },
+          measures: { 'authorised-absence-sessions': '42219483' },
+          timePeriod: '2015_AY',
+        },
+        {
+          filters: ['state-funded-secondary'],
+          geographicLevel: 'Region',
+          location: {
+            country: { code: 'E92000001', name: 'England' },
+            region: { code: 'E12000001', name: 'North East' },
+          },
+          measures: { 'authorised-absence-sessions': '1856777' },
+          timePeriod: '2015_AY',
+        },
+        {
+          filters: ['state-funded-secondary'],
+          geographicLevel: 'Country',
+          location: { country: { code: 'E92000001', name: 'England' } },
+          measures: { 'authorised-absence-sessions': '37997247' },
+          timePeriod: '2015_AY',
+        },
+      ],
+    } as TableDataResponse);
+
+    const dataSetCategories = createDataSetCategories(
+      axisConfiguration,
+      fullTable.results,
+      fullTable.subjectMeta,
+    );
+
+    expect(dataSetCategories).toHaveLength(1);
+
+    expect(dataSetCategories[0].filter.label).toBe('2015/16');
+
+    const dataSets = Object.values(dataSetCategories[0].dataSets);
+
+    expect(dataSets).toHaveLength(2);
+
+    expect(dataSets[0].value).toBe(42219483);
+    expect(dataSets[0].dataSet).toEqual<DataSetConfiguration>({
+      indicator: 'authorised-absence-sessions',
+      filters: ['state-funded-primary'],
+      location: {
+        level: 'country',
+        value: 'E92000001',
+      },
+      timePeriod: '2015_AY',
+      config: {
+        label: 'Test label 1',
+      },
+    });
+
+    expect(dataSets[1].value).toBe(37997247);
+    expect(dataSets[1].dataSet).toEqual<DataSetConfiguration>({
+      indicator: 'authorised-absence-sessions',
+      filters: ['state-funded-secondary'],
+      location: {
+        level: 'country',
+        value: 'E92000001',
+      },
+      timePeriod: '2015_AY',
+      config: {
+        label: 'Test label 2',
+      },
+    });
+  });
 });

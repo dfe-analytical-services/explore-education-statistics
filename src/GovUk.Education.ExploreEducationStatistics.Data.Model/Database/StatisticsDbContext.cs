@@ -49,6 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
         public DbSet<Theme> Theme { get; set; }
         public DbSet<Topic> Topic { get; set; }
+        
+        public DbSet<ReleaseSubject> ReleaseSubject { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureObservationFilterItem(modelBuilder);
             ConfigurePublication(modelBuilder);
             ConfigureRelease(modelBuilder);
+            ConfigureReleaseSubject(modelBuilder);
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
@@ -136,6 +139,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(r => r.TimeIdentifier)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
+        }
+        
+        private static void ConfigureReleaseSubject(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ReleaseSubject>()
+                .HasKey(item => new {item.ReleaseId, item.SubjectId});
+            
+            modelBuilder.Entity<ReleaseSubject>()
+                .HasOne(r => r.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+            
+            modelBuilder.Entity<ReleaseSubject>()
+                .HasOne(r => r.Subject)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
         private static void ConfigureMeasures(ModelBuilder modelBuilder)

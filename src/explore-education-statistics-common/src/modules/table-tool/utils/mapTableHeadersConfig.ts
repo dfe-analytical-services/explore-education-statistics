@@ -77,8 +77,7 @@ export default function mapTableHeadersConfig(
         optionGroup.map(
           option =>
             locationAndFilterGroups[currentIndex].find(filter => {
-              const hasMatch =
-                filter.value === option.value && filter.label === option.label;
+              const hasMatch = filter.value === option.value;
 
               // The filter might be a location so just cast
               // these as variables for convenience.

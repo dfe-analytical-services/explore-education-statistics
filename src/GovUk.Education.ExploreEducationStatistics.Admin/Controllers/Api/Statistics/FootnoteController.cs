@@ -67,12 +67,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         {
             return await _footnoteService
                 .GetFootnotesAsync(releaseId)
-                .OnSuccess(footnotes =>
+                .OnSuccess(async footnotes =>
                 {
                     var viewModels = footnotes.Select(GatherAndBuildFootnoteViewModel);
 
-                    var subjects = _releaseMetaService
-                        .GetSubjects(releaseId)
+                    var subjects = (await _releaseMetaService
+                        .GetSubjectsAsync(releaseId))
                         .ToDictionary(subject => subject.Id, subject =>
                             new FootnotesSubjectMetaViewModel
                             {

@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -156,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var mocks = Mocks();
             
-            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data))
+            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -173,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(service => service.DeleteDataFilesAsync(_releaseId, "datafilename", "subject title"))
+                .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(new List<FileInfo>());
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -188,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(service => service.DeleteDataFilesAsync(_releaseId, "datafilename", "subject title"))
+                .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -269,13 +268,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             return result.Value;
         }
         
-        private static void AssertNotFound<T>(ActionResult<T> result) where T : class
-        {
-            Assert.IsAssignableFrom<ActionResult<T>>(result);
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
-            Assert.Null(result.Value);
-        }
-        
         private static ValidationProblemDetails AssertValidationProblem<T>(ActionResult<T> result) where T : class
         {
             Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
@@ -296,13 +288,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private static (
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IImportStatusService> ImportStatusService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager) Mocks()
         {
             return (new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
-                    new Mock<IImportStatusService>(),
                     new Mock<IReleaseStatusService>(),
                     MockUserManager(Users)
                 );
@@ -311,7 +301,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private static ReleasesController ReleasesControllerWithMocks((
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IImportStatusService> ImportStatusService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager
             ) mocks)
@@ -319,7 +308,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             return new ReleasesController(
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
-                mocks.ImportStatusService.Object,
                 mocks.ReleaseStatusService.Object,
                 mocks.UserManager.Object);
         }

@@ -87,16 +87,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
             DataCsvFile.KS4_2018_Subject_Tables_S3_TestData
         };
 
-        public static List<Subject> GetSubjects()
+        public static Dictionary<Subject, Release> GetSubjectsAndReleases()
         {
-            var subjects = GetThemes()
-                .SelectMany(theme => theme.Topics)
-                .SelectMany(topic => topic.Publications)
-                .SelectMany(publication => publication.Releases)
-                .SelectMany(release => release.Subjects);
+            var subjectsAndReleases = GetSubjectsWithReleases();
 
-            return subjects.Where(subject => !IgnoredSubjectFiles.Contains(
-                GetSubjectFile(subject.Id))).ToList();
+            return subjectsAndReleases.Where(subjectAndRelease =>
+            {
+                var subject = subjectAndRelease.Key;
+                
+                return !IgnoredSubjectFiles.Contains(
+                    GetSubjectFile(subject.Id));
+                
+            }).ToDictionary(value => value.Key, value => value.Value);
         }
 
         private static Guid GetSubjectKey(int i)
@@ -110,8 +112,318 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
             return file;
         }
         
-        private static IEnumerable<Theme> GetThemes()
+        private static Dictionary<Subject, Release> GetSubjectsWithReleases()
         {
+            var pupilAbsenceSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(0),
+                    Name = "Absence by characteristic"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(1),
+                    Name = "Absence by geographic level"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(2),
+                    Name = "Absence by term"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(3),
+                    Name = "Absence for four year olds"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(4),
+                    Name = "Absence in prus"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(5),
+                    Name = "Absence number missing at least one session by reason"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(6),
+                    Name = "Absence rate percent bands"
+                }
+            };
+            
+            var pupilAbsenceRelease = new Release
+            {
+                Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                Published = new DateTime(2018, 4, 25),
+                Slug = "2016-17",
+                TimeIdentifier = TimeIdentifier.AcademicYear,
+                Year = 2016
+            };
+
+            var exclusionsSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(10),
+                    Name = "Exclusions by characteristic"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(11),
+                    Name = "Exclusions by geographic level"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(12),
+                    Name = "Exclusions by reason"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(13),
+                    Name = "Duration of fixed exclusions"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(14),
+                    Name = "Number of fixed exclusions"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(15),
+                    Name = "Total days missed due to fixed period exclusions"
+                }
+            };
+            
+            var exclusionsRelease = new Release
+            {
+                Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                Published = new DateTime(2018, 7, 19),
+                Slug = "2016-17",
+                TimeIdentifier = TimeIdentifier.AcademicYear,
+                Year = 2016
+            };
+
+            var applicationsAndOffersSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(16),
+                    Name = "Applications and offers by school phase"
+                }
+            };
+            
+            
+                
+            var applicationsAndOffersRelease = new Release
+            {
+                Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                Published = new DateTime(2019, 4, 29),
+                Slug = "2018",
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Year = 2018
+            };
+
+            var senSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(17),
+                    Name = "New cases by age"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(18),
+                    Name = "Stock cases by age"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(19),
+                    Name = "New cases by establishment"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(20),
+                    Name = "Stock cases by establishment"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(21),
+                    Name = "Management information"
+                }
+            };
+            
+            var senRelease = new Release
+            {
+                Id = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5"),
+                Published = new DateTime(2019, 4, 29),
+                Slug = "2018",
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Year = 2018
+            };
+
+            var earlyYearsSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(7),
+                    Name = "ELG underlying data 2013 - 2018"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(8),
+                    Name = "Areas of learning underlying data 2013 - 2018"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(9),
+                    Name = "APS GLD ELG underlying data 2013 - 2018"
+                }
+            };
+            
+            var earlyYearsRelease = new Release
+            {
+                Id = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a"),
+                Published = new DateTime(2019, 5, 20),
+                Slug = "2017-18",
+                TimeIdentifier = TimeIdentifier.AcademicYear,
+                Year = 2017
+            };
+
+            var nationalAchievementSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(22),
+                    Name = "National achievement rates tables (NARTs)"
+                }
+            };
+            
+            var nationalAchievementRelease = new Release
+            {
+                Id = new Guid("59258583-b075-47a2-bee4-5969e2d58873"),
+                Published = new DateTime(2019, 4, 29),
+                Slug = "2018",
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Year = 2018
+            };
+
+            var apprenticeshipsSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(23),
+                    Name = "Apprenticeship annual"
+                }
+            };
+            
+            var apprenticeshipsRelease = new Release
+            {
+                Id = new Guid("463c8521-d9b4-4ccc-aee9-0666e39c8e47"),
+                Published = new DateTime(2019, 4, 29),
+                Slug = "2018",
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Year = 2018
+            };
+
+            var furtherEducationSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(32),
+                    Name = "Further education and skills"
+                }
+            };
+            
+            var furtherEducationRelease = new Release
+            {
+                Id = new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60"),
+                Published = new DateTime(2019, 4, 29),
+                Slug = "2018",
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Year = 2018
+            };
+
+            var level2And3AttainmentSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(24),
+                    Name = "Level 2 and 3 National"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(25),
+                    Name = "Level 2 and 3 sf"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(26),
+                    Name = "Level 2 and 3 sf by Local authority"
+                }
+            };
+            
+            var level2And3AttainmentRelease = new Release
+            {
+                Id = new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a"),
+                Published = new DateTime(2019, 4, 29),
+                Slug = "2018",
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Year = 2018
+            };
+
+            var nationalCurriculumSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(27),
+                    Name = "2016 test data"
+                }
+            };
+            
+            var nationalCurriculumRelease = new Release
+            {
+                Id = new Guid("dbaeb363-33fa-4928-870f-5054278e0c9a"),
+                Published = new DateTime(2019, 4, 29),
+                Slug = "2018",
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Year = 2018
+            };
+
+            var gcseSubjects = new List<Subject>
+            {
+                new Subject
+                {
+                    Id = GetSubjectKey(28),
+                    Name = "Characteristic test data by Local authority"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(29),
+                    Name = "National characteristic test data"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(30),
+                    Name = "Subject tables S1 test data"
+                },
+                new Subject
+                {
+                    Id = GetSubjectKey(31),
+                    Name = "Subject tables S3 test data"
+                }
+            };
+            
+            var gcseRelease = new Release
+            {
+                Id = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801"),
+                Published = new DateTime(2019, 4, 29),
+                Slug = "2018",
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Year = 2018
+            };
+            
             var themes = new List<Theme>
             {
                 new Theme
@@ -135,52 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "pupil-absence-in-schools-in-england",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                                            Published = new DateTime(2018, 4, 25),
-                                            Slug = "2016-17",
-                                            Subjects = new List<Subject>
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(0),
-                                                    Name = "Absence by characteristic"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(1),
-                                                    Name = "Absence by geographic level"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(2),
-                                                    Name = "Absence by term"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(3),
-                                                    Name = "Absence for four year olds"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(4),
-                                                    Name = "Absence in prus"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(5),
-                                                    Name = "Absence number missing at least one session by reason"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(6),
-                                                    Name = "Absence rate percent bands"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.AcademicYear,
-                                            Year = 2016
-                                        }
+                                        pupilAbsenceRelease
                                     }
                                 }
                             }
@@ -199,47 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "permanent-and-fixed-period-exclusions-in-england",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                                            Published = new DateTime(2018, 7, 19),
-                                            Slug = "2016-17",
-                                            Subjects = new List<Subject>
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(10),
-                                                    Name = "Exclusions by characteristic"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(11),
-                                                    Name = "Exclusions by geographic level"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(12),
-                                                    Name = "Exclusions by reason"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(13),
-                                                    Name = "Duration of fixed exclusions"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(14),
-                                                    Name = "Number of fixed exclusions"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(15),
-                                                    Name = "Total days missed due to fixed period exclusions"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.AcademicYear,
-                                            Year = 2016
-                                        }
+                                        exclusionsRelease
                                     }
                                 }
                             }
@@ -258,22 +485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "secondary-and-primary-schools-applications-and-offers",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                                            Published = new DateTime(2019, 4, 29),
-                                            Slug = "2018",
-                                            Subjects = new List<Subject>
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(16),
-                                                    Name = "Applications and offers by school phase"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.CalendarYear,
-                                            Year = 2018
-                                        }
+                                        applicationsAndOffersRelease
                                     }
                                 }
                             }
@@ -292,42 +504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "statements-of-sen-and-ehc-plans",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5"),
-                                            Published = new DateTime(2019, 4, 29),
-                                            Slug = "2018",
-                                            Subjects = new List<Subject>
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(17),
-                                                    Name = "New cases by age"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(18),
-                                                    Name = "Stock cases by age"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(19),
-                                                    Name = "New cases by establishment"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(20),
-                                                    Name = "Stock cases by establishment"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(21),
-                                                    Name = "Management information"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.CalendarYear,
-                                            Year = 2018
-                                        }
+                                        senRelease
                                     }
                                 }
                             }
@@ -355,32 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "early-years-foundation-stage-profile-results",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a"),
-                                            Published = new DateTime(2019, 5, 20),
-                                            Slug = "2017-18",
-                                            Subjects = new List<Subject>
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(7),
-                                                    Name = "ELG underlying data 2013 - 2018"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(8),
-                                                    Name = "Areas of learning underlying data 2013 - 2018"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(9),
-                                                    Name = "APS GLD ELG underlying data 2013 - 2018"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.AcademicYear,
-                                            Year = 2017
-                                        }
+                                        earlyYearsRelease
                                     }
                                 }
                             }
@@ -408,22 +560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "national-achievement-rates-tables",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("59258583-b075-47a2-bee4-5969e2d58873"),
-                                            Published = new DateTime(2019, 4, 29),
-                                            Slug = "2018",
-                                            Subjects = new[]
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(22),
-                                                    Name = "National achievement rates tables (NARTs)"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.CalendarYear,
-                                            Year = 2018
-                                        }
+                                        nationalAchievementRelease
                                     }
                                 }
                             }
@@ -442,22 +579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "apprenticeships-and-traineeships",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("463c8521-d9b4-4ccc-aee9-0666e39c8e47"),
-                                            Published = new DateTime(2019, 4, 29),
-                                            Slug = "2018",
-                                            Subjects = new[]
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(23),
-                                                    Name = "Apprenticeship annual"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.CalendarYear,
-                                            Year = 2018
-                                        }
+                                        apprenticeshipsRelease
                                     }
                                 },
                                 new Publication
@@ -467,22 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "further-education-and-skills",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60"),
-                                            Published = new DateTime(2019, 4, 29),
-                                            Slug = "2018",
-                                            Subjects = new[]
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(32),
-                                                    Name = "Further education and skills"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.CalendarYear,
-                                            Year = 2018
-                                        }
+                                        furtherEducationRelease
                                     }
                                 }
                             }
@@ -510,32 +617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "Level 2 and 3 attainment by young people aged 19",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a"),
-                                            Published = new DateTime(2019, 4, 29),
-                                            Slug = "2018",
-                                            Subjects = new[]
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(24),
-                                                    Name = "Level 2 and 3 National"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(25),
-                                                    Name = "Level 2 and 3 sf"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(26),
-                                                    Name = "Level 2 and 3 sf by Local authority"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.CalendarYear,
-                                            Year = 2018
-                                        }
+                                        level2And3AttainmentRelease
                                     }
                                 }
                             }
@@ -554,22 +636,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "national-curriculum-assessments-key-stage2",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("dbaeb363-33fa-4928-870f-5054278e0c9a"),
-                                            Published = new DateTime(2019, 4, 29),
-                                            Slug = "2018",
-                                            Subjects = new[]
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(27),
-                                                    Name = "2016 test data"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.CalendarYear,
-                                            Year = 2018
-                                        }
+                                        nationalCurriculumRelease
                                     }
                                 }
                             }
@@ -588,37 +655,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     Slug = "gcse-results-including-pupil-characteristics",
                                     Releases = new[]
                                     {
-                                        new Release
-                                        {
-                                            Id = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801"),
-                                            Published = new DateTime(2019, 4, 29),
-                                            Slug = "2018",
-                                            Subjects = new[]
-                                            {
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(28),
-                                                    Name = "Characteristic test data by Local authority"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(29),
-                                                    Name = "National characteristic test data"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(30),
-                                                    Name = "Subject tables S1 test data"
-                                                },
-                                                new Subject
-                                                {
-                                                    Id = GetSubjectKey(31),
-                                                    Name = "Subject tables S3 test data"
-                                                }
-                                            },
-                                            TimeIdentifier = TimeIdentifier.CalendarYear,
-                                            Year = 2018
-                                        }
+                                        gcseRelease
                                     }
                                 }
                             }
@@ -643,18 +680,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                         {
                             release.Publication = publication;
                             release.PublicationId = publication.Id;
-
-                            foreach (var subject in release.Subjects)
-                            {
-                                subject.Release = release;
-                                subject.ReleaseId = release.Id;
-                            }
                         }
                     }
                 }
             }
 
-            return themes;
+            var releasesWithSubjects = new Dictionary<Release, List<Subject>>
+            {
+                {pupilAbsenceRelease, pupilAbsenceSubjects},
+                {exclusionsRelease, exclusionsSubjects},
+                {applicationsAndOffersRelease, applicationsAndOffersSubjects},
+                {senRelease, senSubjects},
+                {earlyYearsRelease, earlyYearsSubjects},
+                {nationalAchievementRelease, nationalAchievementSubjects},
+                {apprenticeshipsRelease, apprenticeshipsSubjects},
+                {furtherEducationRelease, furtherEducationSubjects},
+                {level2And3AttainmentRelease, level2And3AttainmentSubjects},
+                {nationalCurriculumRelease, nationalCurriculumSubjects},
+                {gcseRelease, gcseSubjects},
+            };
+
+            var subjectsWithReleases = new Dictionary<Subject, Release>();
+
+            foreach (var releaseWithSubjects in releasesWithSubjects)
+            {
+                var release = releaseWithSubjects.Key;
+                var subjects = releaseWithSubjects.Value;
+                subjects.ForEach(subject => subjectsWithReleases.Add(subject, release));
+            }
+            
+            return subjectsWithReleases;
         }
     }
 }

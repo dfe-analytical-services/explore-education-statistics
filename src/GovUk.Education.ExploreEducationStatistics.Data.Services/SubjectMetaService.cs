@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(subjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(subject => new SubjectMetaViewModel
                 {
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
             SubjectMetaQueryContext query)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId, HydrateSubject)
+            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(subject =>
                 {
@@ -218,17 +218,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            if (await _userService.MatchesPolicy(subject.Release, CanViewSubjectDataForRelease))
+            if (await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;
             }
 
             return new ForbidResult();
-        }
-
-        private static IQueryable<Subject> HydrateSubject(IQueryable<Subject> queryable)
-        {
-            return queryable.Include(subject => subject.Release);
         }
     }
 }

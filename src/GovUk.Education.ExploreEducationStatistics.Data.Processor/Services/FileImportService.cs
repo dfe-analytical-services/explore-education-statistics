@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 IStatus.RUNNING_PHASE_3))
             {
                 var subjectData = await _fileStorageService.GetSubjectData(message);
-                var subject = GetSubject(message, subjectData.Name, context);
+                var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
                 var csvTable = subjectData.GetCsvTable();
                 var metaTable = subjectData.GetMetaTable();
                 
@@ -49,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _importerService.ImportObservations(
                     csvTable.Columns,
                     csvTable.Rows,
-                    subject,
-                    _importerService.GetMeta(metaTable, subject, context),
+                    releaseSubject.Subject,
+                    _importerService.GetMeta(metaTable, releaseSubject.Subject, context),
                     message.BatchNo,
                     message.RowsPerBatch,
                     context
@@ -69,26 +69,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var subject = GetSubject(message, subjectData.Name, context);
+            var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
             var csvTable = subjectData.GetCsvTable();
             var metaTable = subjectData.GetMetaTable();
 
             _importerService.ImportFiltersLocationsAndSchools(
                 csvTable.Columns,
                 csvTable.Rows,
-                _importerService.GetMeta(metaTable, subject, context),
-                subject,
+                _importerService.GetMeta(metaTable, releaseSubject.Subject, context),
                 context);
         }
 
-        private static Subject GetSubject(ImportMessage message, string subjectName, StatisticsDbContext context)
+        private static ReleaseSubject GetReleaseSubjectLink(ImportMessage message, string subjectName, StatisticsDbContext context)
         {
-            return context.Subject
-                .Include(s => s.Release)
+            return context
+                .ReleaseSubject
+                .Include(r => r.Subject)
+                .Include(r => r.Release)
                 .ThenInclude(r => r.Publication)
                 .ThenInclude(p => p.Topic)
                 .ThenInclude(t => t.Theme)
-                .FirstOrDefault(s => s.Name.Equals(subjectName) && s.ReleaseId == message.Release.Id);
+                .FirstOrDefault(r => r.Subject.Name.Equals(subjectName) && r.ReleaseId == message.Release.Id);
         }
     }
 }

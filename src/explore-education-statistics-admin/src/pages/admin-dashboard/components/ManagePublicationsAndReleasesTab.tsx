@@ -72,7 +72,8 @@ const ManagePublicationsAndReleasesTab = ({
       ]);
     }
     return undefined;
-  }, [selectedTopic.id]);
+  }, [selectedTopic.id, nonLiveReleases]);
+
   const [myPublications, canCreatePublication] = value as [
     AdminDashboardPublication[],
     boolean,
