@@ -1140,4 +1140,131 @@ describe('createDataSetCategories', () => {
       },
     });
   });
+
+  test('does not categorise by siblingless filters', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'filters',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          config: {
+            label: 'Test label 1',
+          },
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable({
+      ...testTable,
+      subjectMeta: {
+        ...testTable.subjectMeta,
+        filters: {
+          ...testTable.subjectMeta.filters,
+          SchoolType: {
+            ...testTable.subjectMeta.filters.SchoolType,
+            options: {
+              Default: {
+                ...testTable.subjectMeta.filters.SchoolType.options.Default,
+                options: [
+                  {
+                    label: 'State-funded primary',
+                    value: 'state-funded-primary',
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    } as TableDataResponse);
+
+    const dataSetCategories = createDataSetCategories(
+      axisConfiguration,
+      fullTable.results,
+      fullTable.subjectMeta,
+    );
+
+    expect(dataSetCategories).toHaveLength(1);
+
+    expect(dataSetCategories[0].filter.label).toBe('Ethnicity Major Chinese');
+  });
+
+  test('falls back to categorising by siblingless filters if there would be no categories otherwise', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'filters',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          config: {
+            label: 'Test label 1',
+          },
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable({
+      ...testTable,
+      subjectMeta: {
+        ...testTable.subjectMeta,
+        filters: {
+          Characteristic: {
+            ...testTable.subjectMeta.filters.Characteristic,
+            options: {
+              EthnicGroupMajor: {
+                ...testTable.subjectMeta.filters.Characteristic.options
+                  .EthnicGroupMajor,
+                options: [
+                  {
+                    label: 'Ethnicity Major Chinese',
+                    value: 'ethnicity-major-chinese',
+                  },
+                ],
+              },
+            },
+          },
+          SchoolType: {
+            ...testTable.subjectMeta.filters.SchoolType,
+            options: {
+              Default: {
+                ...testTable.subjectMeta.filters.SchoolType.options.Default,
+                options: [
+                  {
+                    label: 'State-funded primary',
+                    value: 'state-funded-primary',
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    } as TableDataResponse);
+
+    const dataSetCategories = createDataSetCategories(
+      axisConfiguration,
+      fullTable.results,
+      fullTable.subjectMeta,
+    );
+
+    expect(dataSetCategories).toHaveLength(2);
+
+    expect(dataSetCategories[0].filter.label).toBe('Ethnicity Major Chinese');
+    expect(dataSetCategories[1].filter.label).toBe('State-funded primary');
+  });
 });
