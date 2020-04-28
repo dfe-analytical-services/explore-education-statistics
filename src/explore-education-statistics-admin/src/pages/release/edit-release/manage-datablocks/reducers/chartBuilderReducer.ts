@@ -119,6 +119,21 @@ export const chartBuilderReducer: Reducer<
         },
       );
 
+      const newAxisForms: Dictionary<FormState> = mapValues(
+        draft.axes as Required<AxesConfiguration>,
+        () => {
+          return {
+            isValid: true,
+          };
+        },
+      );
+
+      draft.forms = {
+        ...newAxisForms,
+        options: draft.forms.options,
+        data: draft.forms.data,
+      };
+
       break;
     }
     case 'UPDATE_CHART_AXIS': {

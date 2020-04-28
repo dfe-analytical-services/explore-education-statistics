@@ -273,6 +273,28 @@ describe('chartBuilderReducer', () => {
         visible: true,
       });
     });
+
+    test('adds new `forms` state for each new axis', () => {
+      const nextState = produce(chartBuilderReducer)(initialState, {
+        type: 'UPDATE_CHART_DEFINITION',
+        payload: testChartDefinition,
+      } as ChartBuilderActions);
+
+      expect(nextState.forms).toEqual<ChartBuilderState['forms']>({
+        options: {
+          isValid: true,
+        },
+        data: {
+          isValid: true,
+        },
+        major: {
+          isValid: true,
+        },
+        minor: {
+          isValid: true,
+        },
+      });
+    });
   });
 
   describe('UPDATE_CHART_AXIS', () => {
