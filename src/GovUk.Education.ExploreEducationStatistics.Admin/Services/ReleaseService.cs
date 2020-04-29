@@ -497,9 +497,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var releaseFileReference = _context
                 .ReleaseFiles
-                .Include(r => r.ReleaseFileReference)
-                .Where(r => r.ReleaseId == releaseId && r.ReleaseFileReference.Filename == dataFileName)
-                .Select(r => r.ReleaseFileReference)
+                .Include(rf => rf.ReleaseFileReference)
+                .ThenInclude(rfr => rfr.Release)
+                .Where(rf => rf.ReleaseId == releaseId && rf.ReleaseFileReference.Filename == dataFileName)
+                .Select(rf => rf.ReleaseFileReference)
                 .First();
                 
             var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId.ToString(), dataFileName);
@@ -507,6 +508,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!importFinished)
             {
                 return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
+            }
+
+            if (releaseFileReference.Release.Status == ReleaseStatus.Approved
+                || releaseFileReference.Release.Id != releaseFileReference.Release.OriginalId)
+            {
+                return ValidationActionResult(CannotRemoveDataFilesLinkedToAnApprovedRelease); 
             }
 
             return true;
