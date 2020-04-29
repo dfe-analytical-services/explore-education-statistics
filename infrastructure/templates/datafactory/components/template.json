@@ -2529,38 +2529,6 @@
                         }
                     },
                     {
-                        "name": "Execute update success",
-                        "type": "ExecutePipeline",
-                        "dependsOn": [
-                            {
-                                "activity": "Copy_FilterItemFootnotes",
-                                "dependencyConditions": [
-                                    "Succeeded"
-                                ]
-                            }
-                        ],
-                        "userProperties": [],
-                        "typeProperties": {
-                            "pipeline": {
-                                "referenceName": "pl_update_status",
-                                "type": "PipelineReference"
-                            },
-                            "waitOnCompletion": true,
-                            "parameters": {
-                                "ErrorMessage": "No errors",
-                                "Status": "Complete",
-                                "ReleaseId": {
-                                    "value": "@pipeline().parameters.releaseId",
-                                    "type": "Expression"
-                                },
-                                "ReleaseStatusId": {
-                                    "value": "@pipeline().parameters.releaseStatusId",
-                                    "type": "Expression"
-                                }
-                            }
-                        }
-                    },
-                    {
                         "name": "Copy_SubjectFootnotes",
                         "type": "Copy",
                         "dependsOn": [
