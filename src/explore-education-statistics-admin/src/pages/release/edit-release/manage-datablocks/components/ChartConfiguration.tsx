@@ -94,8 +94,10 @@ const ChartConfiguration = ({
   );
 
   const handleChange = useCallback(
-    (values: FormValues) => {
-      onChange(normalizeValues(values));
+    ({ isValid, ...values }: FormValues & { isValid: boolean }) => {
+      if (isValid) {
+        onChange(normalizeValues(values));
+      }
     },
     [normalizeValues, onChange],
   );

@@ -191,8 +191,10 @@ const ChartAxisConfiguration = ({
   );
 
   const handleFormChange = useCallback(
-    (values: FormValues) => {
-      onChange(normalizeValues(values));
+    ({ isValid, ...values }: FormValues & { isValid: boolean }) => {
+      if (isValid) {
+        onChange(normalizeValues(values));
+      }
     },
     [normalizeValues, onChange],
   );
@@ -272,7 +274,13 @@ const ChartAxisConfiguration = ({
       }}
       render={form => (
         <Form id={id}>
-          <Effect value={form.values} onChange={handleFormChange} />
+          <Effect
+            value={{
+              ...form.values,
+              isValid: form.isValid,
+            }}
+            onChange={handleFormChange}
+          />
 
           <Effect
             value={{
