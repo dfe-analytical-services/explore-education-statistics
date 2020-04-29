@@ -2,19 +2,6 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "subscription": {
-            "type": "string",
-            "metadata": {
-                "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
-            }
-        },
-        "environment": {
-            "type": "string",
-            "defaultValue": "ees",
-            "metadata": {
-                "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
-            }
-        },
         "factoryName": {
             "type": "string",
             "metadata": {
@@ -203,6 +190,104 @@
         },
         {
             "name": "[concat(parameters('factoryName'), '/pl_release_statistics')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Execute update success",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Execute stage2",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": "No errors",
+                                "Status": "Complete",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "Execute stage1",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_release_statistics_stage1",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ReleaseId": "@pipeline().parameters.releaseId",
+                                "ReleaseStatusId": "@pipeline().parameters.releaseStatusId"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Execute stage2",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Execute stage1",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_release_statistics_stage2",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ReleaseId": "@pipeline().parameters.releaseId",
+                                "ReleaseStatusId": "@pipeline().parameters.releaseStatusId"
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "releaseId": {
+                        "type": "string",
+                        "defaultValue": "CFEB8DC9-9B70-4AD1-ED98-08D7ABD4CCD5"
+                    },
+                    "releaseStatusId": {
+                        "type": "string",
+                        "defaultValue": "24B9CBA7-C873-4BF2-8329-355F5FDA14AB"
+                    }
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/pl_update_status')]",
+                "[concat(variables('factoryId'), '/pipelines/pl_release_statistics_stage1')]",
+                "[concat(variables('factoryId'), '/pipelines/pl_release_statistics_stage2')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/pl_release_statistics_stage1')]",
             "type": "Microsoft.DataFactory/factories/pipelines",
             "apiVersion": "2018-06-01",
             "properties": {
@@ -601,7 +686,7 @@
                         "type": "Copy",
                         "dependsOn": [
                             {
-                                "activity": "Copy_Subjects",
+                                "activity": "Copy_ReleaseSubjects",
                                 "dependencyConditions": [
                                     "Succeeded"
                                 ]
@@ -2193,16 +2278,145 @@
                         ]
                     },
                     {
-                        "name": "Copy_Footnotes",
+                        "name": "Copy_ReleaseSubjects",
                         "type": "Copy",
                         "dependsOn": [
                             {
-                                "activity": "Copy_ObservationFilterItems",
+                                "activity": "Copy_Subjects",
                                 "dependencyConditions": [
                                     "Succeeded"
                                 ]
                             }
                         ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.ReleaseSubject WITH (NOLOCK) WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')",
+                                    "type": "Expression"
+                                }
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "SubjectId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ReleaseId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "ReleaseId",
+                                            "type": "Guid"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_sql_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "ReleaseSubject"
+                                }
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "ds_sql_public_statistics",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "cw_table": "ReleaseSubject"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fail_Copy_ReleaseSubjects",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_ReleaseSubjects",
+                                "dependencyConditions": [
+                                    "Failed"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "pl_update_status",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true,
+                            "parameters": {
+                                "ErrorMessage": {
+                                    "value": "@{activity('Copy_ReleaseSubjects').Error.Message}",
+                                    "type": "Expression"
+                                },
+                                "Status": "Failed",
+                                "ReleaseId": {
+                                    "value": "@pipeline().parameters.releaseId",
+                                    "type": "Expression"
+                                },
+                                "ReleaseStatusId": {
+                                    "value": "@pipeline().parameters.releaseStatusId",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "releaseId": {
+                        "type": "string",
+                        "defaultValue": "CFEB8DC9-9B70-4AD1-ED98-08D7ABD4CCD5"
+                    },
+                    "releaseStatusId": {
+                        "type": "string",
+                        "defaultValue": "24B9CBA7-C873-4BF2-8329-355F5FDA14AB"
+                    }
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/ds_sql_statistics')]",
+                "[concat(variables('factoryId'), '/datasets/ds_sql_public_statistics')]",
+                "[concat(variables('factoryId'), '/pipelines/pl_update_status')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/pl_release_statistics_stage2')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Copy_Footnotes",
+                        "type": "Copy",
+                        "dependsOn": [],
                         "policy": {
                             "timeout": "7.00:00:00",
                             "retry": 0,
@@ -2368,7 +2582,10 @@
                         "typeProperties": {
                             "source": {
                                 "type": "AzureSqlSource",
-                                "sqlReaderQuery": "SELECT * FROM dbo.SubjectFootnote WITH (NOLOCK) WHERE SubjectId IN (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.SubjectFootnote WITH (NOLOCK) WHERE SubjectId IN (SELECT Id FROM dbo.Subject WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                },
                                 "queryTimeout": "02:00:00"
                             },
                             "sink": {
@@ -2442,7 +2659,10 @@
                         "typeProperties": {
                             "source": {
                                 "type": "AzureSqlSource",
-                                "sqlReaderQuery": "SELECT * FROM dbo.IndicatorFootnote WITH (NOLOCK) WHERE IndicatorId IN (SELECT I.Id FROM dbo.IndicatorGroup IG JOIN dbo.Indicator I ON IG.Id = I.IndicatorGroupId JOIN dbo.Subject S ON IG.SubjectId = S.Id WHERE S.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.IndicatorFootnote WITH (NOLOCK) WHERE IndicatorId IN (SELECT I.Id FROM dbo.IndicatorGroup IG JOIN dbo.Indicator I ON IG.Id = I.IndicatorGroupId JOIN dbo.Subject S ON IG.SubjectId = S.Id WHERE S.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                },
                                 "queryTimeout": "02:00:00"
                             },
                             "sink": {
@@ -2516,7 +2736,10 @@
                         "typeProperties": {
                             "source": {
                                 "type": "AzureSqlSource",
-                                "sqlReaderQuery": "SELECT * FROM dbo.FilterFootnote WITH (NOLOCK) WHERE FilterId IN (SELECT F.Id FROM dbo.Filter F JOIN dbo.Subject S ON F.SubjectId = S.Id WHERE S.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.FilterFootnote WITH (NOLOCK) WHERE FilterId IN (SELECT F.Id FROM dbo.Filter F JOIN dbo.Subject S ON F.SubjectId = S.Id WHERE S.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                },
                                 "queryTimeout": "02:00:00"
                             },
                             "sink": {
@@ -2590,7 +2813,10 @@
                         "typeProperties": {
                             "source": {
                                 "type": "AzureSqlSource",
-                                "sqlReaderQuery": "SELECT * FROM dbo.FilterGroupFootnote WITH (NOLOCK) WHERE FilterGroupId IN (SELECT FG.Id FROM dbo.Filter F JOIN dbo.FilterGroup FG ON F.Id = FG.FilterId JOIN dbo.Subject S ON F.SubjectId = S.Id WHERE S.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.FilterGroupFootnote WITH (NOLOCK) WHERE FilterGroupId IN (SELECT FG.Id FROM dbo.Filter F JOIN dbo.FilterGroup FG ON F.Id = FG.FilterId JOIN dbo.Subject S ON F.SubjectId = S.Id WHERE S.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                },
                                 "queryTimeout": "02:00:00"
                             },
                             "sink": {
@@ -2664,7 +2890,10 @@
                         "typeProperties": {
                             "source": {
                                 "type": "AzureSqlSource",
-                                "sqlReaderQuery": "SELECT * FROM dbo.FilterItemFootnote WITH (NOLOCK) WHERE FilterItemId IN (SELECT FI.Id FROM dbo.Filter F JOIN dbo.FilterGroup FG ON F.Id = FG.FilterId JOIN dbo.FilterItem FI ON FG.Id = FI.FilterGroupId JOIN dbo.Subject S ON F.SubjectId = S.Id WHERE S.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM dbo.FilterItemFootnote WITH (NOLOCK) WHERE FilterItemId IN (SELECT FI.Id FROM dbo.Filter F JOIN dbo.FilterGroup FG ON F.Id = FG.FilterId JOIN dbo.FilterItem FI ON FG.Id = FI.FilterGroupId JOIN dbo.Subject S ON F.SubjectId = S.Id WHERE S.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))",
+                                    "type": "Expression"
+                                },
                                 "queryTimeout": "02:00:00"
                             },
                             "sink": {
