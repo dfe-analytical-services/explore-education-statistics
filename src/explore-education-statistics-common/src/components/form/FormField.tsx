@@ -31,7 +31,7 @@ const FormField = <P extends {}, FormValues>({
   formGroupClass,
   error,
   name,
-  showError,
+  showError = true,
   type,
   ...props
 }: Props<FormValues, P>) => {
