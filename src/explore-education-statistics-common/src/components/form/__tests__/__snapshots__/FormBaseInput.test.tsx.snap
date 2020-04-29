@@ -1,5 +1,43 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`FormTextInput renders correctly with error 1`] = `
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<span class="govuk-error-message"
+      id="test-input-error"
+>
+  Field is required
+</span>
+<input name="testInput"
+       aria-describedby="test-input-error"
+       class="govuk-input"
+       id="test-input"
+       type="text"
+>
+`;
+
+exports[`FormTextInput renders correctly with hint 1`] = `
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<span id="test-input-hint"
+      class="govuk-hint"
+>
+  Fill me in
+</span>
+<input name="testInput"
+       aria-describedby="test-input-hint"
+       class="govuk-input"
+       id="test-input"
+       type="text"
+>
+`;
+
 exports[`FormTextInput renders correctly with required props 1`] = `
 <label class="govuk-label"
        for="test-input"
@@ -8,6 +46,25 @@ exports[`FormTextInput renders correctly with required props 1`] = `
 </label>
 <input name="testInput"
        class="govuk-input"
+       id="test-input"
+       type="text"
+>
+`;
+
+exports[`FormTextInput renders with a specific width class 1`] = `
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<span id="test-input-hint"
+      class="govuk-hint"
+>
+  Fill me in
+</span>
+<input name="testInput"
+       aria-describedby="test-input-hint"
+       class="govuk-input govuk-input--width-20"
        id="test-input"
        type="text"
 >

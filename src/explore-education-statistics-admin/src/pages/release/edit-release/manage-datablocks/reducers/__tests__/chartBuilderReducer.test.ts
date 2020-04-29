@@ -844,6 +844,7 @@ describe('chartBuilderReducer', () => {
           major: {
             type: 'major',
             groupBy: 'timePeriod',
+            sortBy: 'something',
             sortAsc: true,
             dataSets: [
               {
@@ -889,6 +890,7 @@ describe('chartBuilderReducer', () => {
           major: {
             type: 'major',
             groupBy: 'timePeriod',
+            sortBy: 'something',
             sortAsc: true,
             dataSets: [
               {
@@ -986,6 +988,7 @@ describe('chartBuilderReducer', () => {
           major: {
             type: 'major',
             groupBy: 'timePeriod',
+            sortBy: 'name',
             sortAsc: true,
             dataSets: [
               {
