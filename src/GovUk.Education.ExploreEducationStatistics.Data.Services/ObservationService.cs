@@ -32,37 +32,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             var locationsQuery = query.Locations;
             
-            var localAuthorityOldCodes = locationsQuery.LocalAuthority?.Where(s => s.Length == 3).ToList();
-            var localAuthorityCodes = locationsQuery.LocalAuthority?.Except(localAuthorityOldCodes).ToList();
+            var localAuthorityOldCodes = locationsQuery?.LocalAuthority?.Where(s => s.Length == 3).ToList();
+            var localAuthorityCodes = locationsQuery?.LocalAuthority?.Except(localAuthorityOldCodes).ToList();
 
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel",
-                locationsQuery.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
+                locationsQuery?.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
             var timePeriodListParam = CreateTimePeriodListType("timePeriodList", GetTimePeriodRange(query));
-            var countriesListParam = CreateIdListType("countriesList", locationsQuery.Country);
+            var countriesListParam = CreateIdListType("countriesList", locationsQuery?.Country);
             var institutionListParam =
-                CreateIdListType("institutionList", locationsQuery.Institution);
+                CreateIdListType("institutionList", locationsQuery?.Institution);
             var localAuthorityListParam = CreateIdListType("localAuthorityList", localAuthorityCodes);
             var localAuthorityOldCodeListParam = CreateIdListType("localAuthorityOldCodeList", localAuthorityOldCodes);
             var localAuthorityDistrictListParam =
-                CreateIdListType("localAuthorityDistrictList", locationsQuery.LocalAuthorityDistrict);
+                CreateIdListType("localAuthorityDistrictList", locationsQuery?.LocalAuthorityDistrict);
             var localEnterprisePartnershipListParam =
-                CreateIdListType("localEnterprisePartnershipList", locationsQuery.LocalEnterprisePartnership);
+                CreateIdListType("localEnterprisePartnershipList", locationsQuery?.LocalEnterprisePartnership);
             var mayoralCombinedAuthorityListParam =
-                CreateIdListType("mayoralCombinedAuthorityList", locationsQuery.MayoralCombinedAuthority);
+                CreateIdListType("mayoralCombinedAuthorityList", locationsQuery?.MayoralCombinedAuthority);
             var multiAcademyTrustListParam =
-                CreateIdListType("multiAcademyTrustList", locationsQuery.MultiAcademyTrust);
+                CreateIdListType("multiAcademyTrustList", locationsQuery?.MultiAcademyTrust);
             var opportunityAreaListParam =
-                CreateIdListType("opportunityAreaList", locationsQuery.OpportunityArea);
+                CreateIdListType("opportunityAreaList", locationsQuery?.OpportunityArea);
             var parliamentaryConstituencyListParam =
-                CreateIdListType("parliamentaryConstituencyList", locationsQuery.ParliamentaryConstituency);
+                CreateIdListType("parliamentaryConstituencyList", locationsQuery?.ParliamentaryConstituency);
             var planningAreaListParam =
-                CreateIdListType("planningAreaList", locationsQuery.PlanningArea);
-            var regionsListParam = CreateIdListType("regionsList", locationsQuery.Region);
-            var rscRegionListParam = CreateIdListType("rscRegionsList", locationsQuery.RscRegion);
-            var sponsorListParam = CreateIdListType("sponsorList", locationsQuery.Sponsor);
+                CreateIdListType("planningAreaList", locationsQuery?.PlanningArea);
+            var regionsListParam = CreateIdListType("regionsList", locationsQuery?.Region);
+            var rscRegionListParam = CreateIdListType("rscRegionsList", locationsQuery?.RscRegion);
+            var sponsorListParam = CreateIdListType("sponsorList", locationsQuery?.Sponsor);
             var wardListParam =
-                CreateIdListType("wardList", locationsQuery.Ward);
+                CreateIdListType("wardList", locationsQuery?.Ward);
             var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
             // EES-745 It's ok to use Observation as the return type here, as long as only the Id field is selected

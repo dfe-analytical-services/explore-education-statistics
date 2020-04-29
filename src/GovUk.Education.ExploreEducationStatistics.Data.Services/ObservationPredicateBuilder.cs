@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.AndAlso(subPredicate);
             }
 
-            if (query.Locations.GeographicLevel != null)
+            if (query.Locations?.GeographicLevel != null)
             {
                 predicate = predicate.AndAlso(observation =>
                     observation.GeographicLevel == query.Locations.GeographicLevel);
@@ -127,7 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static bool ObservationalUnitExists(LocationQuery query)
         {
-            return !(query.Country == null &&
+            return !(query == null ||
+                     query.Country == null &&
                      query.Institution == null &&
                      query.LocalAuthority == null &&
                      query.LocalAuthorityDistrict == null &&
