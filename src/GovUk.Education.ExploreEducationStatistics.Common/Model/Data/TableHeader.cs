@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
         public string Level { get; set; }
         public string Value { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public TableHeaderType Type { get; set; }
+        public TableHeaderType? Type { get; set; }
 
         private TableHeader()
         {
