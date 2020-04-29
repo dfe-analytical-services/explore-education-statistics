@@ -1,6 +1,7 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
+import ErrorSummary from '@common/components/ErrorSummary';
 import {
   Form,
   FormFieldRadioGroup,
@@ -37,6 +38,7 @@ import { ObjectSchema, Schema } from 'yup';
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
 interface Props {
+  canSaveChart: boolean;
   id: string;
   defaultDataType?: AxisGroupBy;
   type: AxisType;
@@ -50,6 +52,7 @@ interface Props {
 }
 
 const ChartAxisConfiguration = ({
+  canSaveChart,
   id,
   configuration,
   data,
@@ -546,7 +549,22 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          <Button type="submit">Save chart options</Button>
+          {form.isValid && form.submitCount > 0 && !canSaveChart && (
+            <ErrorSummary
+              title="Cannot save chart"
+              errors={[
+                {
+                  id: `${id}-submit`,
+                  message: 'Ensure that all other tabs are valid first',
+                },
+              ]}
+              id={`${id}-errorSummary`}
+            />
+          )}
+
+          <Button type="submit" id={`${id}-submit`}>
+            Save chart options
+          </Button>
         </Form>
       )}
     />

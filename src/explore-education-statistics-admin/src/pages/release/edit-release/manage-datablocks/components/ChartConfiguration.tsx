@@ -2,6 +2,7 @@ import styles from '@admin/pages/release/edit-release/manage-datablocks/componen
 import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
+import ErrorSummary from '@common/components/ErrorSummary';
 import {
   Form,
   FormFieldSelect,
@@ -24,6 +25,7 @@ import InfographicChartForm from './InfographicChartForm';
 type FormValues = Partial<ChartOptions>;
 
 interface Props {
+  canSaveChart: boolean;
   definition: ChartDefinition;
   chartOptions: ChartOptions;
   releaseId: string;
@@ -37,6 +39,7 @@ interface Props {
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
+  canSaveChart,
   chartOptions,
   definition,
   meta,
@@ -228,7 +231,16 @@ const ChartConfiguration = ({
               </>
             )}
 
-            <Button type="submit">Save chart options</Button>
+            {form.isValid && form.submitCount > 0 && !canSaveChart && (
+              <ErrorSummary
+                errors={[{ id: `${formId}-submit`, message: 'Cannot submit' }]}
+                id={`${formId}-errorSummary`}
+              />
+            )}
+
+            <Button type="submit" id={`${formId}-submit`}>
+              Save chart options
+            </Button>
           </Form>
         )}
       />
