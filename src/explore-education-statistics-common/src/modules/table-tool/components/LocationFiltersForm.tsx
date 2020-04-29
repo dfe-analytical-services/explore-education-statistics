@@ -170,10 +170,10 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                     shouldCollapse
                   >
                     {sortBy(levelOptions, ['label']).map(level => (
-                      <React.Fragment key={level.value}>
+                      <div key={level.value}>
                         {level.label}
                         <br />
-                      </React.Fragment>
+                      </div>
                     ))}
                   </SummaryListItem>
                 ))}
