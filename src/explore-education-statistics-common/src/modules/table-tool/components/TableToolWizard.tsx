@@ -87,7 +87,7 @@ const TableToolWizard = ({
   const [publication, setPublication] = useState<Publication>();
   const [subjects, setSubjects] = useState<PublicationSubject[]>([]);
 
-  const [tableToolState, updateTableToolState] = useImmer<TableToolState>(
+  const [state, updateState] = useImmer<TableToolState>(
     initialState ?? {
       initialStep: 1,
       subjectMeta: getDefaultSubjectMeta(),
@@ -138,7 +138,7 @@ const TableToolWizard = ({
       selectedSubjectId,
     );
 
-    updateTableToolState(draft => {
+    updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
 
       draft.query.subjectId = selectedSubjectId;
@@ -151,11 +151,11 @@ const TableToolWizard = ({
     const nextSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
         ...locations,
-        subjectId: tableToolState.query.subjectId,
+        subjectId: state.query.subjectId,
       },
     );
 
-    updateTableToolState(draft => {
+    updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
       draft.query = {
@@ -173,8 +173,8 @@ const TableToolWizard = ({
 
     const nextSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
-        ...tableToolState.query,
-        subjectId: tableToolState.query.subjectId,
+        ...state.query,
+        subjectId: state.query.subjectId,
         timePeriod: {
           startYear,
           startCode,
@@ -184,7 +184,7 @@ const TableToolWizard = ({
       },
     );
 
-    updateTableToolState(draft => {
+    updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
       draft.subjectMeta.filters = nextSubjectMeta.filters;
 
@@ -202,14 +202,16 @@ const TableToolWizard = ({
     indicators,
   }) => {
     const query: TableDataQuery = {
-      ...tableToolState.query,
+      ...state.query,
       indicators,
       filters: Object.values(filters).flat(),
     };
 
     const response = await executeTableQuery(query);
 
-    updateTableToolState(draft => {
+    console.log('response?', response);
+
+    updateState(draft => {
       draft.query = query;
       draft.response = response;
     });
@@ -227,7 +229,7 @@ const TableToolWizard = ({
       {({ askConfirm }) => (
         <>
           <Wizard
-            initialStep={tableToolState.initialStep}
+            initialStep={state.initialStep}
             id="tableTool-steps"
             onStepChange={async (nextStep, previousStep) => {
               if (nextStep < previousStep) {
@@ -256,7 +258,7 @@ const TableToolWizard = ({
                 <PublicationSubjectForm
                   {...stepProps}
                   options={subjects}
-                  initialValues={tableToolState.query}
+                  initialValues={state.query}
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
               )}
@@ -265,8 +267,8 @@ const TableToolWizard = ({
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
-                  options={tableToolState.subjectMeta.locations}
-                  initialValues={tableToolState.query}
+                  options={state.subjectMeta.locations}
+                  initialValues={state.query}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
               )}
@@ -275,8 +277,8 @@ const TableToolWizard = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={tableToolState.query}
-                  options={tableToolState.subjectMeta.timePeriod.options}
+                  initialValues={state.query}
+                  options={state.subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
               )}
@@ -286,15 +288,15 @@ const TableToolWizard = ({
                 <FiltersForm
                   {...stepProps}
                   onSubmit={handleFiltersFormSubmit}
-                  initialValues={tableToolState.query}
-                  subjectMeta={tableToolState.subjectMeta}
+                  initialValues={state.query}
+                  subjectMeta={state.subjectMeta}
                 />
               )}
             </WizardStep>
             {finalStep &&
               finalStep({
-                ...tableToolState.response,
-                query: tableToolState.query,
+                ...state.response,
+                query: state.query,
                 publication,
               })}
           </Wizard>
