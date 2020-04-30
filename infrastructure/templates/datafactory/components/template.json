@@ -215,11 +215,11 @@
                             "parameters": {
                                 "ErrorMessage": "No errors",
                                 "Status": "Complete",
-                                "releaseId": {
+                                "ReleaseId": {
                                     "value": "@pipeline().parameters.releaseId",
                                     "type": "Expression"
                                 },
-                                "releaseStatusId": {
+                                "ReleaseStatusId": {
                                     "value": "@pipeline().parameters.releaseStatusId",
                                     "type": "Expression"
                                 }
@@ -238,8 +238,8 @@
                             },
                             "waitOnCompletion": true,
                             "parameters": {
-                                "ReleaseId": "@pipeline().parameters.releaseId",
-                                "ReleaseStatusId": "@pipeline().parameters.releaseStatusId"
+                                "releaseId": "@pipeline().parameters.releaseId",
+                                "releaseStatusId": "@pipeline().parameters.releaseStatusId"
                             }
                         }
                     },
