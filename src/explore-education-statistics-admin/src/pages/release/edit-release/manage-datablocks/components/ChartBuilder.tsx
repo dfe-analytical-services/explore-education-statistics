@@ -60,7 +60,7 @@ interface Props {
   meta: FullTableMeta;
   releaseId: string;
   initialConfiguration?: Chart;
-  onChartSave?: (chart: Chart) => void;
+  onChartSave: (chart: Chart) => void;
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
 
@@ -172,12 +172,10 @@ const ChartBuilder = ({
       return;
     }
 
-    if (onChartSave) {
-      // We don't want to persist data set labels
-      // anymore in the deprecated format.
-      await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
-    }
-  }, [chartProps, canSaveChart, onChartSave]);
+    // We don't want to persist data set labels
+    // anymore in the deprecated format.
+    await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
+  }, [canSaveChart, chartProps, onChartSave]);
 
   return (
     <div className={styles.editor}>
