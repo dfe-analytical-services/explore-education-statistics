@@ -19,6 +19,7 @@ import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';
+import CollapsibleList from '@common/components/CollapsibleList';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -270,23 +271,26 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           <>
             {stepHeading}
             <SummaryList noBorder>
-              <SummaryListItem term="Indicators" shouldCollapse>
-                {form.values.indicators.map(indicator => (
-                  <div key={indicator}>{parsedMeta.indicators[indicator]}</div>
-                ))}
+              <SummaryListItem term="Indicators">
+                <CollapsibleList>
+                  {form.values.indicators.map(indicator => (
+                    <li key={indicator}>{parsedMeta.indicators[indicator]}</li>
+                  ))}
+                </CollapsibleList>
               </SummaryListItem>
               {Object.entries(form.values.filters).map(
                 ([filterGroupId, filterItemIds]) => (
                   <SummaryListItem
                     term={parsedMeta.filters[filterGroupId]}
-                    shouldCollapse
                     key={filterGroupId}
                   >
-                    {filterItemIds.map(filterItemId => (
-                      <div key={filterItemId}>
-                        {parsedMeta.filters[filterItemId]}
-                      </div>
-                    ))}
+                    <CollapsibleList>
+                      {filterItemIds.map(filterItemId => (
+                        <li key={filterItemId}>
+                          {parsedMeta.filters[filterItemId]}
+                        </li>
+                      ))}
+                    </CollapsibleList>
                   </SummaryListItem>
                 ),
               )}

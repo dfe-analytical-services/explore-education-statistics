@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
-import CollapsibleList from './CollapsibleList';
 import styles from './SummaryListItem.module.scss';
 
 interface Props {
@@ -9,8 +8,6 @@ interface Props {
   term: string;
   smallKey?: boolean;
   showActions?: boolean;
-  shouldCollapse?: boolean;
-  collapseAfter?: number;
 }
 
 const SummaryListItem = ({
@@ -18,8 +15,6 @@ const SummaryListItem = ({
   children,
   term,
   smallKey = false,
-  shouldCollapse = false,
-  collapseAfter = 5,
 }: Props) => {
   return (
     <div className="govuk-summary-list__row">
@@ -30,17 +25,7 @@ const SummaryListItem = ({
       >
         {term}
       </dt>
-      {children && (
-        <dd className="govuk-summary-list__value">
-          {shouldCollapse && children ? (
-            <CollapsibleList collapseAfter={collapseAfter}>
-              {children}
-            </CollapsibleList>
-          ) : (
-            children
-          )}
-        </dd>
-      )}
+      {children && <dd className="govuk-summary-list__value">{children}</dd>}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
       {!children && !actions && (
         <>
