@@ -7,6 +7,7 @@ import styles from '@admin/pages/release/edit-release/manage-datablocks/componen
 import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
@@ -34,11 +35,14 @@ import {
 } from '@common/modules/charts/types/chart';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import { DataBlockRerequest } from '@common/services/dataBlockService';
-import { TableDataResult } from '@common/services/tableBuilderService';
+import {
+  TableDataQuery,
+  TableDataResult,
+} from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
+import parseNumber from '@common/utils/number/parseNumber';
 import omit from 'lodash/omit';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
   lineChartBlockDefinition,
@@ -47,13 +51,17 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
+export type TableQueryUpdateHandler = (
+  query: Partial<TableDataQuery>,
+) => Promise<void>;
+
 interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
   releaseId: string;
   initialConfiguration?: Chart;
   onChartSave?: (chart: Chart) => void;
-  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
+  onTableQueryUpdate: TableQueryUpdateHandler;
 }
 
 const ChartBuilder = ({
@@ -62,8 +70,10 @@ const ChartBuilder = ({
   releaseId,
   onChartSave,
   initialConfiguration,
-  onRequiresDataUpdate,
+  onTableQueryUpdate,
 }: Props) => {
+  const [isDataLoading, setDataLoading] = useState(false);
+
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
     initialConfiguration,
   );
@@ -123,16 +133,34 @@ const ChartBuilder = ({
     }
   }, [axes, data, definition, getChartFile, meta, options]);
 
-  const handleBoundaryLevelChange = useCallback(
-    (boundaryLevel: string) => {
-      if (onRequiresDataUpdate)
-        onRequiresDataUpdate({
-          boundaryLevel: boundaryLevel
-            ? Number.parseInt(boundaryLevel, 10)
-            : undefined,
+  const handleChartDefinitionChange = useCallback(
+    async (chartDefinition: ChartDefinition) => {
+      actions.updateChartDefinition(chartDefinition);
+
+      if (chartDefinition.type === 'map') {
+        setDataLoading(true);
+
+        await onTableQueryUpdate({
+          includeGeoJson: true,
         });
+
+        setDataLoading(false);
+      }
     },
-    [onRequiresDataUpdate],
+    [actions, onTableQueryUpdate],
+  );
+
+  const handleBoundaryLevelChange = useCallback(
+    async (boundaryLevel: string) => {
+      setDataLoading(true);
+
+      await onTableQueryUpdate({
+        boundaryLevel: parseNumber(boundaryLevel),
+      });
+
+      setDataLoading(false);
+    },
+    [onTableQueryUpdate],
   );
 
   const handleChartSave = useCallback(async () => {
@@ -157,7 +185,7 @@ const ChartBuilder = ({
         chartDefinitions={chartDefinitions}
         selectedChartDefinition={definition}
         geoJsonAvailable={meta.geoJsonAvailable}
-        onSelectChart={actions.updateChartDefinition}
+        onChange={handleChartDefinitionChange}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
         <ButtonText
@@ -173,7 +201,9 @@ const ChartBuilder = ({
         <Details summary="Chart preview" open>
           <div className="govuk-width-container">
             {isChartRenderable(chartProps) ? (
-              <ChartRenderer {...chartProps} />
+              <LoadingSpinner loading={isDataLoading} text="Loading chart data">
+                <ChartRenderer {...chartProps} />
+              </LoadingSpinner>
             ) : (
               <div className={styles.previewPlaceholder}>
                 {Object.keys(axes).length > 0 ? (

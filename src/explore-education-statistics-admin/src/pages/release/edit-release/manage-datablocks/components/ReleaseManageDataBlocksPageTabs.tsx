@@ -1,6 +1,8 @@
+import ChartBuilderTabSection from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderTabSection';
 import DataBlockSourceWizard, {
   SavedDataBlock,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
+import TableTabSection from '@admin/pages/release/edit-release/manage-datablocks/components/TableTabSection';
 import dataBlocksService, {
   ReleaseDataBlock,
 } from '@admin/services/release/edit-release/datablocks/service';
@@ -15,11 +17,8 @@ import initialiseFromQuery from '@common/modules/table-tool/components/utils/ini
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import tableBuilderService, {
-  TableDataResponse,
-} from '@common/services/tableBuilderService';
+import tableBuilderService from '@common/services/tableBuilderService';
 import React, { useCallback, useEffect, useState } from 'react';
-import DataBlockContentTabs from './DataBlockContentTabs';
 
 interface Props {
   releaseId: string;
@@ -43,13 +42,9 @@ const ReleaseManageDataBlocksPageTabs = ({
   const [isLoading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [initialTableToolState, setInitialTableToolState] = useState<
-    TableToolState
-  >();
+  const [tableToolState, setInitialTableToolState] = useState<TableToolState>();
 
   const [deleteDataBlock, setDeleteDataBlock] = useState<DeleteDataBlock>();
-
-  const [tableData, setTableData] = useState<TableDataResponse>();
 
   useEffect(() => {
     if (!selectedDataBlock) {
@@ -82,7 +77,6 @@ const ReleaseManageDataBlocksPageTabs = ({
             : getDefaultTableHeaderConfig(table.subjectMeta),
         },
       });
-      setTableData(response);
 
       setLoading(false);
     });
@@ -138,13 +132,7 @@ const ReleaseManageDataBlocksPageTabs = ({
           }}
           id="manageDataBlocks"
         >
-          <TabsSection
-            title={
-              selectedDataBlock && selectedDataBlock
-                ? 'Update data source'
-                : 'Create data source'
-            }
-          >
+          <TabsSection title="Data source">
             <p>Configure the data source for the data block</p>
 
             {selectedDataBlock && (
@@ -211,22 +199,31 @@ const ReleaseManageDataBlocksPageTabs = ({
               <DataBlockSourceWizard
                 releaseId={releaseId}
                 dataBlock={selectedDataBlock}
-                initialTableToolState={initialTableToolState}
+                initialTableToolState={tableToolState}
                 onDataBlockSave={handleDataBlockSave}
               />
             )}
           </TabsSection>
 
-          {!isLoading && selectedDataBlock && tableData && (
-            <TabsSection title="Configure content">
-              <DataBlockContentTabs
-                dataBlock={selectedDataBlock}
-                dataBlockResponse={tableData}
-                releaseId={releaseId}
-                onDataBlockSave={onDataBlockSave}
-              />
-            </TabsSection>
-          )}
+          {!isLoading &&
+            selectedDataBlock &&
+            tableToolState?.response && [
+              <TabsSection title="Table" key="table">
+                <TableTabSection
+                  dataBlock={selectedDataBlock}
+                  table={tableToolState.response.table}
+                  tableHeaders={tableToolState.response.tableHeaders}
+                  onDataBlockSave={handleDataBlockSave}
+                />
+              </TabsSection>,
+              <TabsSection title="Chart" key="chart">
+                <ChartBuilderTabSection
+                  dataBlock={selectedDataBlock}
+                  table={tableToolState.response.table}
+                  onDataBlockSave={handleDataBlockSave}
+                />
+              </TabsSection>,
+            ]}
         </Tabs>
       </div>
     </div>
