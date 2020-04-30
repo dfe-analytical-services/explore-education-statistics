@@ -3,10 +3,13 @@ import { manageDataBlocksRoute } from '@admin/routes/edit-release/routes';
 import dataBlocksService, {
   ReleaseDataBlock,
 } from '@admin/services/release/edit-release/datablocks/service';
+import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
+import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ModalConfirm from '@common/components/ModalConfirm';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 export interface ReleaseManageDataBlocksPageParams {
@@ -22,6 +25,8 @@ const ReleaseManageDataBlocksPage = ({
   history,
 }: RouteComponentProps<ReleaseManageDataBlocksPageParams>) => {
   const { publicationId, releaseId, dataBlockId } = match.params;
+
+  const [deletePlan, setDeletePlan] = useState<DeleteDataBlockPlan>();
 
   const {
     value: dataBlocks = emptyDataBlocks,
@@ -45,8 +50,8 @@ const ReleaseManageDataBlocksPage = ({
     return dataBlocks.find(({ id }) => dataBlockId === id);
   }, [dataBlockId, dataBlocks]);
 
-  const handleDataBlockSave = useMemo(
-    () => async (dataBlock: ReleaseDataBlock) => {
+  const handleDataBlockSave = useCallback(
+    async (dataBlock: ReleaseDataBlock) => {
       const currentBlockIndex = dataBlocks.findIndex(
         db => db.id === dataBlock.id,
       );
@@ -72,17 +77,18 @@ const ReleaseManageDataBlocksPage = ({
     [dataBlocks, setDataBlocks, history, publicationId, releaseId],
   );
 
-  const handleDataBlockDelete = useCallback(
-    async (dataBlock: ReleaseDataBlock) => {
-      await dataBlocksService.deleteDataBlock(releaseId, dataBlock.id);
-      await fetchDataBlocks();
+  const handleDataBlockDelete = useCallback(async () => {
+    if (!selectedDataBlock) {
+      return;
+    }
 
-      history.push(
-        manageDataBlocksRoute.generateLink({ publicationId, releaseId }),
-      );
-    },
-    [fetchDataBlocks, history, publicationId, releaseId],
-  );
+    await dataBlocksService.deleteDataBlock(releaseId, selectedDataBlock.id);
+    await fetchDataBlocks();
+
+    history.push(
+      manageDataBlocksRoute.generateLink({ publicationId, releaseId }),
+    );
+  }, [fetchDataBlocks, history, publicationId, releaseId, selectedDataBlock]);
 
   return (
     <>
@@ -118,12 +124,65 @@ const ReleaseManageDataBlocksPage = ({
       <hr />
 
       <LoadingSpinner loading={isLoading}>
+        <h2>{selectedDataBlock?.name ?? 'Create new data block'}</h2>
+
+        {selectedDataBlock && (
+          <>
+            <Button
+              type="button"
+              variant="warning"
+              onClick={() => {
+                dataBlocksService
+                  .getDeleteBlockPlan(releaseId, selectedDataBlock.id)
+                  .then(setDeletePlan);
+              }}
+            >
+              Delete this data block
+            </Button>
+
+            {deletePlan && (
+              <ModalConfirm
+                title="Delete data block"
+                mounted
+                onConfirm={handleDataBlockDelete}
+                onExit={() => setDeletePlan(undefined)}
+                onCancel={() => setDeletePlan(undefined)}
+              >
+                <p>Are you sure you wish to delete this data block?</p>
+                <ul>
+                  {deletePlan.dependentDataBlocks.map(block => (
+                    <li key={block.name}>
+                      <p>{block.name}</p>
+                      {block.contentSectionHeading && (
+                        <p>
+                          {`It will be removed from the "${block.contentSectionHeading}" content section.`}
+                        </p>
+                      )}
+                      {block.infographicFilenames.length > 0 && (
+                        <p>
+                          The following infographic files will also be removed:
+                          <ul>
+                            {block.infographicFilenames.map(filename => (
+                              <li key={filename}>
+                                <p>{filename}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </ModalConfirm>
+            )}
+          </>
+        )}
+
         <ReleaseManageDataBlocksPageTabs
           key={selectedDataBlock?.id}
           releaseId={releaseId}
           selectedDataBlock={selectedDataBlock}
           onDataBlockSave={handleDataBlockSave}
-          onDataBlockDelete={handleDataBlockDelete}
         />
       </LoadingSpinner>
     </>
