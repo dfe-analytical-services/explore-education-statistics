@@ -42,7 +42,7 @@ import {
 import { Chart } from '@common/services/types/blocks';
 import parseNumber from '@common/utils/number/parseNumber';
 import omit from 'lodash/omit';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
   lineChartBlockDefinition,
@@ -72,6 +72,8 @@ const ChartBuilder = ({
   initialConfiguration,
   onTableQueryUpdate,
 }: Props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [isDataLoading, setDataLoading] = useState(false);
 
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
@@ -172,13 +174,20 @@ const ChartBuilder = ({
       return;
     }
 
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+
     // We don't want to persist data set labels
     // anymore in the deprecated format.
     await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
   }, [canSaveChart, chartProps, onChartSave]);
 
   return (
-    <div className={styles.editor}>
+    <div className={styles.editor} ref={containerRef}>
       <ChartTypeSelector
         chartDefinitions={chartDefinitions}
         selectedChartDefinition={definition}
