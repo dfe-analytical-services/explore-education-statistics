@@ -12,12 +12,12 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
 import { TableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService from '@common/services/tableBuilderService';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Props {
   releaseId: string;
@@ -38,53 +38,61 @@ const ReleaseManageDataBlocksPageTabs = ({
   onDataBlockSave,
 }: Props) => {
   const [activeTab, setActiveTab] = useState<string>('');
+
   const [isLoading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   const [tableToolState, setInitialTableToolState] = useState<TableToolState>();
-
   const [deleteDataBlock, setDeleteDataBlock] = useState<DeleteDataBlock>();
 
+  const query = useMemo(
+    () =>
+      selectedDataBlock
+        ? {
+            ...selectedDataBlock.dataBlockRequest,
+            includeGeoJson: selectedDataBlock.charts.some(
+              chart => chart.type === 'map',
+            ),
+          }
+        : undefined,
+    [selectedDataBlock],
+  );
+
+  const { value: table } = useTableQuery(query);
+
   useEffect(() => {
-    if (!selectedDataBlock) {
+    if (!query) {
       setLoading(false);
       return;
     }
 
     setLoading(true);
 
-    const query = {
-      ...selectedDataBlock.dataBlockRequest,
-      includeGeoJson: selectedDataBlock.charts.some(
-        chart => chart.type === 'map',
-      ),
-    };
+    if (!table) {
+      return;
+    }
 
-    tableBuilderService.getTableData(query).then(async response => {
-      const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
-        query,
-      );
+    tableBuilderService
+      .filterPublicationSubjectMeta(query)
+      .then(subjectMeta => {
+        setInitialTableToolState({
+          initialStep: 5,
+          query,
+          subjectMeta,
+          response: {
+            table,
+            tableHeaders: selectedDataBlock
+              ? mapTableHeadersConfig(
+                  selectedDataBlock.tables[0].tableHeaders,
+                  table.subjectMeta,
+                )
+              : getDefaultTableHeaderConfig(table.subjectMeta),
+          },
+        });
 
-      const table = mapFullTable(response);
-
-      setInitialTableToolState({
-        initialStep: 5,
-        query,
-        subjectMeta,
-        response: {
-          table,
-          tableHeaders: selectedDataBlock
-            ? mapTableHeadersConfig(
-                selectedDataBlock.tables[0].tableHeaders,
-                table.subjectMeta,
-              )
-            : getDefaultTableHeaderConfig(table.subjectMeta),
-        },
+        setLoading(false);
       });
-
-      setLoading(false);
-    });
-  }, [selectedDataBlock]);
+  }, [query, selectedDataBlock, table]);
 
   const handleDataBlockSave = useCallback(
     async (dataBlock: SavedDataBlock) => {
@@ -97,18 +105,15 @@ const ReleaseManageDataBlocksPageTabs = ({
           dataBlock.id,
           dataBlock as ReleaseDataBlock,
         );
-
-        setIsSaving(false);
       } else {
         newDataBlock = await dataBlocksService.postDataBlock(
           releaseId,
           dataBlock,
         );
-
-        setIsSaving(false);
       }
 
       onDataBlockSave(newDataBlock);
+      setIsSaving(false);
     },
     [onDataBlockSave, releaseId],
   );
@@ -130,11 +135,11 @@ const ReleaseManageDataBlocksPageTabs = ({
         </h2>
 
         <Tabs
+          id="manageDataBlocks"
           openId={activeTab}
           onToggle={tab => {
             setActiveTab(tab.id);
           }}
-          id="manageDataBlocks"
         >
           <TabsSection title="Data source">
             <p>Configure the data source for the data block</p>
@@ -209,8 +214,7 @@ const ReleaseManageDataBlocksPageTabs = ({
             )}
           </TabsSection>
 
-          {!isLoading &&
-            selectedDataBlock &&
+          {selectedDataBlock &&
             tableToolState?.response && [
               <TabsSection title="Table" key="table">
                 <TableTabSection
