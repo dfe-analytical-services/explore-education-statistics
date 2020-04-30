@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200430092421_EES761UpdatePublicationName")]
+    partial class EES761UpdatePublicationName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -418,8 +420,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e"),
-                            ContactName = "Daisy Astill",
-                            ContactTelNo = "07741 118332",
+                            ContactName = "Matthew Bridge",
+                            ContactTelNo = "07384 456648",
                             TeamEmail = "he.leo@education.gov.uk",
                             TeamName = "Higher education statistics team (LEO)"
                         });

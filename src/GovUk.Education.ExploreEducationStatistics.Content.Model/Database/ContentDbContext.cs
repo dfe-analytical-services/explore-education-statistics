@@ -1437,10 +1437,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Publication
                 {
                     Id = new Guid("4d29c28c-efd1-4245-a80c-b55c6a50e3f7"),
-                    Title = "Graduate outcomes (LEO)",
+                    Title = "Graduate outcomes (LEO): postgraduate outcomes",
                     Summary = "",
                     TopicId = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535"),
-                    Slug = "graduate-outcomes",
+                    Slug = "graduate-outcomes-leo-postgraduate-outcomes",
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents"),
