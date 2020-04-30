@@ -101,8 +101,11 @@ const ReleaseServiceStatus = ({
         switch (status) {
           case 'NotStarted':
             return { color: 'blue', text: 'Not Started' };
+          case 'Scheduled':
+            return { color: 'blue', text: status };
           case 'Failed':
           case 'Cancelled':
+          case 'Superseded':
             return { color: 'red', text: status };
           case 'Validating':
           case 'Queued':
