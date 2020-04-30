@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -52,8 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var releaseMetaService = new Mock<IReleaseMetaService>();
 
-            releaseMetaService.Setup(s => s.GetSubjects(_releaseId))
-                .Returns(new List<IdLabel>
+            releaseMetaService.Setup(s => s.GetSubjectsAsync(_releaseId))
+                .ReturnsAsync(new List<IdLabel>
                 {
                     new IdLabel(ReleaseId.NewGuid(), "Absence by characteristic")
                 });

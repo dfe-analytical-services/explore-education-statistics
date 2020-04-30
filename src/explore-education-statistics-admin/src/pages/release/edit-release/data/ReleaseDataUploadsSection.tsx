@@ -236,7 +236,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {canUpdateRelease && (
+            {canUpdateRelease && canUpdateReleaseDataFiles && (
               <>
                 {isUploading && (
                   <LoadingSpinner text="Uploading files" overlay />
@@ -314,7 +314,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
             {typeof canUpdateRelease !== 'undefined' &&
               canUpdateRelease &&
               !canUpdateReleaseDataFiles &&
-              'This release is an amendment to a live release and so cannot change any data files.'}
+              'This release is an amendment to a live release and so it is not possible to change any data files.'}
 
             {dataFiles.length > 0 && (
               <>

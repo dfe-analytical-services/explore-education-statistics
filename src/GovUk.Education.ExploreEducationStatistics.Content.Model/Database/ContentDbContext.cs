@@ -295,6 +295,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(r => r.Release)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+            
+            modelBuilder.Entity<ReleaseFileReference>()
+                .Property(b => b.ReleaseFileType)
+                .HasConversion(new EnumToStringConverter<ReleaseFileTypes>());
 
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.Original)
