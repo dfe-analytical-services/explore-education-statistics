@@ -60,7 +60,7 @@ interface Props {
   source?: string;
 }
 
-const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
+const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
   (
     { fullTable, tableHeadersConfig, captionTitle, source }: Props,
     dataTableRef,
@@ -264,32 +264,40 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
     const rows = filteredCartesian.map(row => row.map(cell => cell.text));
 
     return (
-      <ErrorBoundary
-        fallback={
-          <WarningMessage>
-            There was a problem rendering your table.
-          </WarningMessage>
+      <FixedMultiHeaderDataTable
+        caption={
+          <DataTableCaption
+            {...subjectMeta}
+            title={captionTitle}
+            id="dataTableCaption"
+          />
         }
-      >
-        <FixedMultiHeaderDataTable
-          caption={
-            <DataTableCaption
-              {...subjectMeta}
-              title={captionTitle}
-              id="dataTableCaption"
-            />
-          }
-          columnHeaders={columnHeaders}
-          rowHeaders={rowHeaders}
-          rows={rows}
-          ref={dataTableRef}
-          footnotes={subjectMeta.footnotes}
-          source={source}
-        />
-      </ErrorBoundary>
+        columnHeaders={columnHeaders}
+        rowHeaders={rowHeaders}
+        rows={rows}
+        ref={dataTableRef}
+        footnotes={subjectMeta.footnotes}
+        source={source}
+      />
     );
   },
 );
+
+TimePeriodDataTableInternal.displayName = 'TimePeriodDataTableInternal';
+
+const TimePeriodDataTable = forwardRef<HTMLElement, Props>((props, ref) => {
+  return (
+    <ErrorBoundary
+      fallback={
+        <WarningMessage>
+          There was a problem rendering the table.
+        </WarningMessage>
+      }
+    >
+      <TimePeriodDataTableInternal {...props} ref={ref} />
+    </ErrorBoundary>
+  );
+});
 
 TimePeriodDataTable.displayName = 'TimePeriodDataTable';
 

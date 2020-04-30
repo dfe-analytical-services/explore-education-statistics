@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200430091144_EES775UpdateContact")]
+    partial class EES775UpdateContact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1197,10 +1199,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("42a888c4-9ee7-40fd-9128-f5de546780b3"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/graduate-labour-market-quarterly-statistics#documents",
-                            Slug = "graduate-labour-market-statistics",
+                            Slug = "graduate-labour-markets",
                             Summary = "",
                             Title = "Graduate labour market statistics",
-                            TopicId = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535")
+                            TopicId = new Guid("3bef5b2b-76a1-4be1-83b1-a3269245c610")
                         },
                         new
                         {
@@ -1344,9 +1346,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("4d29c28c-efd1-4245-a80c-b55c6a50e3f7"),
                             ContactId = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents",
-                            Slug = "graduate-outcomes-leo-postgraduate-outcomes",
+                            Slug = "graduate-outcomes",
                             Summary = "",
-                            Title = "Graduate outcomes (LEO): postgraduate outcomes",
+                            Title = "Graduate outcomes (LEO)",
                             TopicId = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535")
                         },
                         new
@@ -2302,7 +2304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
                             Slug = "destination-of-pupils-and-students",
-                            Summary = "Including not in education, employment or training (NEET) statistics",
+                            Summary = "Including graduate labour market and not in education, employment or training (NEET) statistics",
                             Title = "Destination of pupils and students"
                         },
                         new
@@ -2323,7 +2325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("2ca22e34-b87a-4281-a0eb-b80f4f8dd374"),
                             Slug = "higher-education",
-                            Summary = "Including university graduate employment, graduate labour market and participation statistics",
+                            Summary = "Including university graduate employment and participation statistics",
                             Title = "Higher education"
                         },
                         new
@@ -2440,6 +2442,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Summary = "",
                             ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
                             Title = "Destinations of key stage 4 and key stage 5 pupils"
+                        },
+                        new
+                        {
+                            Id = new Guid("3bef5b2b-76a1-4be1-83b1-a3269245c610"),
+                            Slug = "graduate-labour-market",
+                            Summary = "",
+                            ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
+                            Title = "Graduate labour market"
                         },
                         new
                         {
