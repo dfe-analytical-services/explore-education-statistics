@@ -99,11 +99,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ISubjectService, SubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
+            services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>();
             services.AddTransient<IFastTrackService, FastTrackService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IEES17PermalinkMigrationService, EES17PermalinkMigrationService>();
 
             services
                 .AddAuthentication(options=>{
@@ -131,6 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
+            // TODO EES-17 Prevent this from running more than once
+            //MigratePermalinks(app);
 
             if (env.IsDevelopment())
             {
@@ -186,6 +190,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     context.Database.Migrate();
                 }
             }
+        }
+
+        /**
+         * Temporary method to migrate permalinks for EES-17
+         */
+        private static void MigratePermalinks(IApplicationBuilder app)
+        {
+            var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            var permalinkMigrationService = serviceScope.ServiceProvider.GetRequiredService<IEES17PermalinkMigrationService>();
+            // TODO EES-17 Fails without a user
+            permalinkMigrationService.MigrateAll();
         }
     }
 }

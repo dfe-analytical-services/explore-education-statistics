@@ -17,6 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 
         public ObservationQueryContext Query { get; set; }
 
+        public Permalink()
+        {
+        }
+
         public Permalink(TableBuilderConfiguration configuration,
             TableBuilderResultViewModel result,
             ObservationQueryContext query)

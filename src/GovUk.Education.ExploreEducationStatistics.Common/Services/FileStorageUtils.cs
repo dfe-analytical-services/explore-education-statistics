@@ -109,12 +109,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return files.OrderBy(f => f.Name);
         }
 
+        public static IEnumerable<CloudBlockBlob> ListBlobs(string storageConnectionString, string containerName, string prefix = null)
+        {
+            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
+            return blobContainer.ListBlobs(prefix, true, BlobListingDetails.Metadata)
+                .OfType<CloudBlockBlob>();
+        }
+        
         private static IEnumerable<FileInfo> ListFiles(string storageConnectionString, string containerName,
             string prefix, bool releasedFilesOnly)
         {
-            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
-            var result = blobContainer.ListBlobs(prefix, true, BlobListingDetails.Metadata)
-                .OfType<CloudBlockBlob>()
+            return ListBlobs(storageConnectionString, containerName, prefix)
                 .Where(blob => !IsMetaDataFile(blob) && (!releasedFilesOnly || IsFileReleased(blob)))
                 .Select(file => new FileInfo
                 {
@@ -124,7 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     Size = GetSize(file)
                 })
                 .OrderBy(info => info.Name).ToList();
-            return result;
         }
         
         public static async Task UploadFromStreamAsync(string storageConnectionString, string containerName,

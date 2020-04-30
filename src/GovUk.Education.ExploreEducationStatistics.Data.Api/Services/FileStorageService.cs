@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -22,17 +25,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await FileStorageUtils.DownloadTextAsync(_storageConnectionString, containerName, blobName);
         }
 
+        public IEnumerable<CloudBlockBlob> ListBlobs(string containerName)
+        {
+            return FileStorageUtils.ListBlobs(_storageConnectionString, containerName);
+        }
+
         public bool FileExistsAndIsReleased(string containerName, string blobName)
         {
-            var blobContainer = FileStorageUtils.GetCloudBlobContainer(_storageConnectionString, containerName);
+            var blobContainer = GetCloudBlobContainer(_storageConnectionString, containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
-            return blob.Exists() && FileStorageUtils.IsFileReleased(blob);
+            return blob.Exists() && IsFileReleased(blob);
         }
 
         public async Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName)
         {
             var blobContainer =
-                await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, containerName);
+                await GetCloudBlobContainerAsync(_storageConnectionString, containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
 
             if (!blob.Exists())

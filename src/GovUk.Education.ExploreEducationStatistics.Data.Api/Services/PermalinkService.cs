@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class PermalinkService : IPermalinkService
     {
-        private const string ContainerName = "permalinks";
+        public const string ContainerName = "permalinks";
 
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IFileStorageService _fileStorageService;
