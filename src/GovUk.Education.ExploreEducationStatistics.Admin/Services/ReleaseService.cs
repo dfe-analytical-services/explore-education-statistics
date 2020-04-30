@@ -297,11 +297,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccess(approvedReleases =>
                 {
-                    var notLiveReleases = new List<MyReleaseViewModel>();
-                    foreach(var release in approvedReleases) {
-                        if(!release.Live) notLiveReleases.Add(release);
-                    }
-                    return notLiveReleases;
+                    return approvedReleases
+                        .Where(release => !release.Live)
+                        .ToList();
                 });
         }
 
