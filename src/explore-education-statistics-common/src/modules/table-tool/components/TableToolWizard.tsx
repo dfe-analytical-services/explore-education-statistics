@@ -53,11 +53,13 @@ export interface TableToolState {
   };
 }
 
-export interface FinalStepProps {
+export interface FinalStepRenderProps {
   publication?: Publication;
-  table?: FullTable;
   query?: TableDataQuery;
-  tableHeaders?: TableHeadersConfig;
+  response?: {
+    table: FullTable;
+    tableHeaders: TableHeadersConfig;
+  };
 }
 
 export interface TableToolWizardProps {
@@ -65,13 +67,8 @@ export interface TableToolWizardProps {
   publicationId?: string;
   releaseId?: string;
   initialState?: TableToolState;
-  finalStep?: (props: FinalStepProps) => ReactElement;
+  finalStep?: (props: FinalStepRenderProps) => ReactElement;
   scrollOnMount?: boolean;
-  onTableCreated?: (response: {
-    query: TableDataQuery;
-    table: FullTable;
-    tableHeaders: TableHeadersConfig;
-  }) => void;
 }
 
 const TableToolWizard = ({
@@ -80,7 +77,6 @@ const TableToolWizard = ({
   releaseId,
   initialState,
   finalStep,
-  onTableCreated,
 }: TableToolWizardProps) => {
   const { withoutErrorHandling } = useErrorControl();
 
@@ -201,6 +197,10 @@ const TableToolWizard = ({
     filters,
     indicators,
   }) => {
+    updateState(draft => {
+      draft.response = undefined;
+    });
+
     const query: TableDataQuery = {
       ...state.query,
       indicators,
@@ -209,19 +209,10 @@ const TableToolWizard = ({
 
     const response = await executeTableQuery(query);
 
-    console.log('response?', response);
-
     updateState(draft => {
       draft.query = query;
       draft.response = response;
     });
-
-    if (onTableCreated) {
-      onTableCreated({
-        ...response,
-        query,
-      });
-    }
   };
 
   return (
@@ -295,8 +286,8 @@ const TableToolWizard = ({
             </WizardStep>
             {finalStep &&
               finalStep({
-                ...state.response,
                 query: state.query,
+                response: state.response,
                 publication,
               })}
           </Wizard>
