@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<MyReleaseViewModel>>> GetScheduledReleasesAsync()
         {
             return await _releaseService
-                .GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved)
+                .GetMyScheduledReleasesAsync()
                 .HandleFailuresOrOk();
         }
         

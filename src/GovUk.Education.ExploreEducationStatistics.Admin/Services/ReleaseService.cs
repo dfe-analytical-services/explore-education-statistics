@@ -282,6 +282,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyScheduledReleasesAsync()
+        {
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_ =>
+                {
+                    return _userService
+                        .CheckCanViewAllReleases()
+                        .OnSuccess(() => _repository.GetAllReleasesForReleaseStatusesAsync(ReleaseStatus.Approved))
+                        .OrElse(() =>
+                            _repository.GetReleasesForReleaseStatusRelatedToUserAsync(_userService.GetUserId(),
+                                ReleaseStatus.Approved));
+                })
+                .OnSuccess(approvedReleases =>
+                {
+                    var notLiveReleases = new List<MyReleaseViewModel>();
+                    foreach(var release in approvedReleases) {
+                        if(!release.Live) notLiveReleases.Add(release);
+                    }
+                    return notLiveReleases;
+                });
+        }
+
         public Task<Either<ActionResult, bool>> PublishReleaseAsync(Guid releaseId)
         {
             return _persistenceHelper
