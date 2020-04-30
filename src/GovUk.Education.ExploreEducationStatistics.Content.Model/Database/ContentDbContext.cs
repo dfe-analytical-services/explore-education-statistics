@@ -1126,8 +1126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e"),
                     TeamName = "Higher education statistics team (LEO)",
                     TeamEmail = "he.leo@education.gov.uk",
-                    ContactName = "Matthew Bridge",
-                    ContactTelNo = "07384 456648"
+                    ContactName = "Daisy Astill",
+                    ContactTelNo = "07741 118332"
                 }
             );
 
