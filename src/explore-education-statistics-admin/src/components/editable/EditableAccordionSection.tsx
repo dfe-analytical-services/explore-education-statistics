@@ -131,6 +131,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
             [styles.dragContainer]: isReordering,
             [styles.isDragging]: snapshot.isDragging,
           })}
+          data-testid="EditableAccordionSection"
         >
           <AccordionSection
             {...props}
