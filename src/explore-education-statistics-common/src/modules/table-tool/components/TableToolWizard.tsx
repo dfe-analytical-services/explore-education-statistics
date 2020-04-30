@@ -18,7 +18,11 @@ import TimePeriodForm, {
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import tableBuilderService, {
   LocationLevelKeys,
   locationLevelKeys,
@@ -27,15 +31,20 @@ import tableBuilderService, {
   TableDataQuery,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import omitBy from 'lodash/omitBy';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useImmer } from 'use-immer';
-import {
-  executeTableQuery,
-  getDefaultSubjectMeta,
-} from './utils/tableToolHelpers';
+
+const getDefaultSubjectMeta = (): PublicationSubjectMeta => ({
+  timePeriod: {
+    hint: '',
+    legend: '',
+    options: [],
+  },
+  locations: {},
+  indicators: {},
+  filters: {},
+});
 
 interface Publication {
   id: string;
@@ -207,11 +216,17 @@ const TableToolWizard = ({
       filters: Object.values(filters).flat(),
     };
 
-    const response = await executeTableQuery(query);
+    const tableData = await tableBuilderService.getTableData(query);
+
+    const table = mapFullTable(tableData);
+    const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
 
     updateState(draft => {
       draft.query = query;
-      draft.response = response;
+      draft.response = {
+        table,
+        tableHeaders,
+      };
     });
   };
 

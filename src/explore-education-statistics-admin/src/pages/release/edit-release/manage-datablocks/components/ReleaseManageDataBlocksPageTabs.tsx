@@ -13,7 +13,6 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { TableToolState } from '@common/modules/table-tool/components/TableToolWizard';
-import initialiseFromQuery from '@common/modules/table-tool/components/utils/initialiseFromQuery';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
@@ -62,11 +61,16 @@ const ReleaseManageDataBlocksPageTabs = ({
     };
 
     tableBuilderService.getTableData(query).then(async response => {
-      const state = await initialiseFromQuery(query);
+      const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+        query,
+      );
+
       const table = mapFullTable(response);
 
       setInitialTableToolState({
-        ...state,
+        initialStep: 5,
+        query,
+        subjectMeta,
         response: {
           table,
           tableHeaders: selectedDataBlock
