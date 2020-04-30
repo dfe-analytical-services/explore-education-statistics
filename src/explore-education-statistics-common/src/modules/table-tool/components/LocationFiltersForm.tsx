@@ -170,10 +170,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                     shouldCollapse
                   >
                     {sortBy(levelOptions, ['label']).map(level => (
-                      <div key={level.value}>
-                        {level.label}
-                        <br />
-                      </div>
+                      <li key={level.value}>{level.label}</li>
                     ))}
                   </SummaryListItem>
                 ))}
