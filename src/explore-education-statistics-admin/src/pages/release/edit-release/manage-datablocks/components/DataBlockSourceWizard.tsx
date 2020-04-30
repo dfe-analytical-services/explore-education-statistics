@@ -189,18 +189,6 @@ const DataBlockSourceWizard = ({
                       onSubmit={async nextTableHeaders => {
                         setTableHeaders(nextTableHeaders);
 
-                        if (dataBlock) {
-                          await onDataBlockSave({
-                            ...dataBlock,
-                            tables: [
-                              {
-                                tableHeaders: nextTableHeaders,
-                                indicators: [],
-                              },
-                            ],
-                          });
-                        }
-
                         if (dataTableRef.current) {
                           dataTableRef.current.scrollIntoView({
                             behavior: 'smooth',
