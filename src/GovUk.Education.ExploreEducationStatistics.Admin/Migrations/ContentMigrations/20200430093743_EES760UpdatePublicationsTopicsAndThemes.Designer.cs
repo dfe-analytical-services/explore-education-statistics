@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200430093743_EES760UpdatePublicationsTopicsAndThemes")]
+    partial class EES760UpdatePublicationsTopicsAndThemes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -418,8 +420,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e"),
-                            ContactName = "Daisy Astill",
-                            ContactTelNo = "07741 118332",
+                            ContactName = "Matthew Bridge",
+                            ContactTelNo = "07384 456648",
                             TeamEmail = "he.leo@education.gov.uk",
                             TeamName = "Higher education statistics team (LEO)"
                         });
@@ -1344,9 +1346,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Id = new Guid("4d29c28c-efd1-4245-a80c-b55c6a50e3f7"),
                             ContactId = new Guid("ee8b0c92-b556-4670-904b-c265f0332a9e"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents",
-                            Slug = "graduate-outcomes-leo-postgraduate-outcomes",
+                            Slug = "graduate-outcomes",
                             Summary = "",
-                            Title = "Graduate outcomes (LEO): postgraduate outcomes",
+                            Title = "Graduate outcomes (LEO)",
                             TopicId = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535")
                         },
                         new
