@@ -416,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
                     Title = "Destination of pupils and students",
                     Summary =
-                        "Including graduate labour market and not in education, employment or training (NEET) statistics",
+                        "Including not in education, employment or training (NEET) statistics",
                     Slug = "destination-of-pupils-and-students"
                 },
                 new Theme
@@ -438,7 +438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("2ca22e34-b87a-4281-a0eb-b80f4f8dd374"),
                     Title = "Higher education",
-                    Summary = "Including university graduate employment and participation statistics",
+                    Summary = "Including university graduate employment, graduate labour market and participation statistics",
                     Slug = "higher-education"
                 },
                 new Theme
@@ -529,14 +529,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
                     Slug = "destinations-of-ks4-and-ks5-pupils"
-                },
-                new Topic
-                {
-                    Id = new Guid("3bef5b2b-76a1-4be1-83b1-a3269245c610"),
-                    Title = "Graduate labour market",
-                    Summary = "",
-                    ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
-                    Slug = "graduate-labour-market"
                 },
                 new Topic
                 {
@@ -1267,8 +1259,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("42a888c4-9ee7-40fd-9128-f5de546780b3"),
                     Title = "Graduate labour market statistics",
                     Summary = "",
-                    TopicId = new Guid("3bef5b2b-76a1-4be1-83b1-a3269245c610"),
-                    Slug = "graduate-labour-markets",
+                    TopicId = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535"),
+                    Slug = "graduate-labour-market-statistics",
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/graduate-labour-market-quarterly-statistics#documents")
