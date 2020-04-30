@@ -17,6 +17,7 @@ import { TableToolState } from '@common/modules/table-tool/components/TableToolW
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService from '@common/services/tableBuilderService';
+import minDelay from '@common/utils/minDelay';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Props {
@@ -98,21 +99,19 @@ const ReleaseManageDataBlocksPageTabs = ({
     async (dataBlock: SavedDataBlock) => {
       setIsSaving(true);
 
-      let newDataBlock: ReleaseDataBlock;
+      const newDataBlock = await minDelay(() => {
+        if (dataBlock.id) {
+          return dataBlocksService.putDataBlock(
+            dataBlock.id,
+            dataBlock as ReleaseDataBlock,
+          );
+        }
 
-      if (dataBlock.id) {
-        newDataBlock = await dataBlocksService.putDataBlock(
-          dataBlock.id,
-          dataBlock as ReleaseDataBlock,
-        );
-      } else {
-        newDataBlock = await dataBlocksService.postDataBlock(
-          releaseId,
-          dataBlock,
-        );
-      }
+        return dataBlocksService.postDataBlock(releaseId, dataBlock);
+      }, 500);
 
       onDataBlockSave(newDataBlock);
+
       setIsSaving(false);
     },
     [onDataBlockSave, releaseId],
