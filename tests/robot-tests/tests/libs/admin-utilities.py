@@ -24,8 +24,8 @@ def data_file_number_contains_xpath(num, xpath):
 
 def user_changes_accordion_section_title(num, new_title):
     try:
-        sl.wait_until_page_contains_element(f'xpath:(//*[@id="releaseContentAccordion"]//div[contains(@class, "Accordion_section")])[{num}]')
-        elem = sl.driver.find_element_by_xpath(f'(//*[@id="releaseContentAccordion"]//div[contains(@class, "Accordion_section")])[{num}]')
+        sl.wait_until_page_contains_element(f'xpath://*[@data-testid="EditableAccordionSection"][{num}]')
+        elem = sl.driver.find_element_by_xpath(f'//*[@data-testid="EditableAccordionSection"][{num}]')
     except:
         raise AssertionError(f'Cannot find accordion section number "{num}"')
 
@@ -54,7 +54,7 @@ def user_changes_accordion_section_title(num, new_title):
     except:
         raise AssertionError('Cannot click "Save section title" button!')
 
-    sl.wait_until_page_contains_element(f'xpath:(//*[@id="releaseContentAccordion"]//div[contains(@class, "Accordion_section")])[{num}]//button[.="Edit section title"]')
+    sl.wait_until_page_contains_element(f'xpath://*[@data-testid="EditableAccordionSection"][{num}]//button[.="Edit section title"]')
 
     try:
         elem.find_element_by_xpath(f'.//button[text()="{new_title}"]').click()
@@ -64,7 +64,7 @@ def user_changes_accordion_section_title(num, new_title):
 
 def user_gets_editable_accordion_section_element(section_title):
     try:
-        elem = sl.driver.find_element_by_xpath(f'//*[@id="releaseContentAccordion"]//button[text()="{section_title}"]/../../..')
+        elem = sl.driver.find_element_by_xpath(f'//*[@data-testid="EditableAccordionSection"][.//button = "{section_title}"]')
     except:
         raise AssertionError(f'Cannot find accordion section titled "{section_title}"')
     return elem
@@ -105,7 +105,7 @@ def user_adds_text_block_to_editable_accordion_section(section_elem, timeout=30)
 def user_checks_accordion_section_contains_X_blocks(section_elem, num_blocks):
     try:
         elems = section_elem.find_elements_by_xpath(
-            f'.//*[@class="govuk-accordion__section-content"]//*[contains(@id, "editableSectionBlocks")]'
+            f'.//*[@data-testid="EditableSectionBlock"]'
         )
     except:
         raise AssertionError(f'Failed to find any content blocks in accordion section')
@@ -130,7 +130,7 @@ def user_adds_content_to_accordion_section_text_block(section_elem, block_num, c
 def user_checks_accordion_section_text_block_contains_text(section_elem, block_num, content):
     try:
         section_elem.find_element_by_xpath(
-            f'.//*[@class="govuk-accordion__section-content"]//*[contains(@id,"editableSectionBlocks")][{block_num}]//*[text()="{content}"]'
+            f'.//*[@data-testid="EditableSectionBlock"][{block_num}]//*[text()="{content}"]'
         )
     except:
         raise AssertionError(f'Failed to find text "{content}" in content block number {block_num}')
