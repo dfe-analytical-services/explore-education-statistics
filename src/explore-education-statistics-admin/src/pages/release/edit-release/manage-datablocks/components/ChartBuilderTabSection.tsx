@@ -8,6 +8,7 @@ import tableBuilderService, {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
+import isEqual from 'lodash/isEqual';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
@@ -55,6 +56,11 @@ const ChartBuilderTabSection = ({
         ...tableQuery,
         ...query,
       };
+
+      // Don't fetch table data again if queries are the same
+      if (isEqual(tableQuery, nextTableQuery)) {
+        return;
+      }
 
       const tableData = await tableBuilderService.getTableData(nextTableQuery);
 
