@@ -13,6 +13,7 @@ import { FormikProps } from 'formik';
 import mapValues from 'lodash/mapValues';
 import sortBy from 'lodash/sortBy';
 import React, { useMemo, useRef } from 'react';
+import CollapsibleList from '@common/components/CollapsibleList';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -167,11 +168,12 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                   <SummaryListItem
                     term={formOptions[levelKey].legend}
                     key={levelKey}
-                    shouldCollapse
                   >
-                    {sortBy(levelOptions, ['label']).map(level => (
-                      <li key={level.value}>{level.label}</li>
-                    ))}
+                    <CollapsibleList>
+                      {sortBy(levelOptions, ['label']).map(level => (
+                        <li key={level.value}>{level.label}</li>
+                      ))}
+                    </CollapsibleList>
                   </SummaryListItem>
                 ))}
             </SummaryList>
