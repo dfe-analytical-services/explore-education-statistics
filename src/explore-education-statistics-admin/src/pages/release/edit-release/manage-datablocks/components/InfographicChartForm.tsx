@@ -5,7 +5,7 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
@@ -151,11 +151,10 @@ const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
                   width={10}
                 />
 
-                <FormFieldFileSelector<FormValues>
+                <FormFieldFileInput<FormValues>
                   id={`${formId}-file`}
                   name="file"
                   label="Select a file to upload"
-                  form={form}
                 />
 
                 <Button

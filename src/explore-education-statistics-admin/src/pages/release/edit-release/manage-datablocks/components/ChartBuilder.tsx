@@ -65,13 +65,17 @@ const ChartBuilder = ({
   onRequiresDataUpdate,
 }: Props) => {
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
-    meta,
     initialConfiguration,
   );
 
-  const { axes, definition, options, isValid } = chartBuilderState;
+  const { axes, definition, options, forms } = chartBuilderState;
 
   const getChartFile = useGetChartFile(releaseId);
+
+  const canSaveChart = useMemo(
+    () => Object.values(forms).every(form => form.isValid),
+    [forms],
+  );
 
   const chartProps = useMemo<ChartRendererProps | undefined>(() => {
     if (!definition) {
@@ -132,7 +136,11 @@ const ChartBuilder = ({
   );
 
   const handleChartSave = useCallback(async () => {
-    if (chartProps && !isChartRenderable(chartProps) && !isValid) {
+    if (chartProps && !isChartRenderable(chartProps)) {
+      return;
+    }
+
+    if (!canSaveChart) {
       return;
     }
 
@@ -141,7 +149,7 @@ const ChartBuilder = ({
       // anymore in the deprecated format.
       await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
     }
-  }, [chartProps, isValid, onChartSave]);
+  }, [chartProps, canSaveChart, onChartSave]);
 
   return (
     <div className={styles.editor}>
@@ -187,7 +195,7 @@ const ChartBuilder = ({
               headingTitle="Add data from the existing dataset to the chart"
             >
               <ChartDataSelector
-                canSaveChart={isValid}
+                canSaveChart={canSaveChart}
                 meta={meta}
                 dataSets={axes.major?.dataSets}
                 chartType={definition}
@@ -205,45 +213,49 @@ const ChartBuilder = ({
             headingTitle="Chart configuration"
           >
             <ChartConfiguration
-              selectedChartType={definition}
+              canSaveChart={canSaveChart}
+              definition={definition}
               chartOptions={options}
               meta={meta}
               releaseId={releaseId}
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={actions.updateChartOptions}
+              onFormStateChange={actions.updateFormState}
               onSubmit={handleChartSave}
             />
           </TabsSection>
 
-          {Object.entries(
-            definition.axes as Required<ChartDefinition['axes']>,
-          ).map(([key, axis]) => {
-            const axisConfiguration = axes[key as AxisType];
+          {Object.entries(definition.axes as Required<ChartDefinition['axes']>)
+            .filter(([, axis]) => !axis.hide)
+            .map(([type, axis]) => {
+              const axisConfiguration = axes[type as AxisType];
 
-            if (!axisConfiguration) {
-              return null;
-            }
+              if (!axisConfiguration) {
+                return null;
+              }
 
-            return (
-              <TabsSection
-                key={key}
-                id={`${key}-tab`}
-                title={axis.title}
-                headingTitle={axis.title}
-              >
-                <ChartAxisConfiguration
-                  id={key}
-                  type={key as AxisType}
-                  configuration={axisConfiguration}
-                  capabilities={definition.capabilities}
-                  data={data}
-                  meta={meta}
-                  onChange={actions.updateChartAxis}
-                  onSubmit={handleChartSave}
-                />
-              </TabsSection>
-            );
-          })}
+              return (
+                <TabsSection
+                  key={type}
+                  id={`${type}-tab`}
+                  title={axis.title}
+                  headingTitle={axis.title}
+                >
+                  <ChartAxisConfiguration
+                    canSaveChart={canSaveChart}
+                    id={`chartAxisConfiguration-${type}`}
+                    type={type as AxisType}
+                    configuration={axisConfiguration}
+                    capabilities={definition.capabilities}
+                    data={data}
+                    meta={meta}
+                    onChange={actions.updateChartAxis}
+                    onFormStateChange={actions.updateFormState}
+                    onSubmit={handleChartSave}
+                  />
+                </TabsSection>
+              );
+            })}
         </Tabs>
       )}
     </div>

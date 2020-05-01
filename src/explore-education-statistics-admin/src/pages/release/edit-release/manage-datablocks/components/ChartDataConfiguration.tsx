@@ -4,6 +4,7 @@ import {
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
+import FormColourInput from '@common/components/form/FormColourInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
@@ -84,11 +85,10 @@ const ChartDataConfiguration = ({
           )}
 
           <div className={styles.chartDataItem}>
-            <FormTextInput
+            <FormColourInput
               id={`${id}-colour`}
               name="colour"
               label="Colour"
-              type="color"
               value={config.colour}
               list={`${id}-colours`}
               onChange={e =>

@@ -35,7 +35,6 @@ export const mapBlockDefinition: ChartDefinition = {
     canSize: true,
     canSort: false,
     fixedAxisGroupBy: true,
-    hasAxes: false,
     hasReferenceLines: false,
     hasLegend: false,
     requiresGeoJson: true,
@@ -59,6 +58,7 @@ export const mapBlockDefinition: ChartDefinition = {
       id: 'geojson',
       title: 'GeoJSON (major axis)',
       type: 'major',
+      hide: true,
       constants: {
         groupBy: 'locations',
       },

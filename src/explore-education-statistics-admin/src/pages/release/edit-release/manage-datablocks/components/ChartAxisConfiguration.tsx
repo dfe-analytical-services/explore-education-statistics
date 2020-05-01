@@ -1,6 +1,7 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
+import ErrorSummary from '@common/components/ErrorSummary';
 import {
   Form,
   FormFieldRadioGroup,
@@ -12,6 +13,7 @@ import {
   FormTextInput,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
@@ -28,15 +30,15 @@ import { TableDataResult } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
+import merge from 'lodash/merge';
+import pick from 'lodash/pick';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Schema } from 'yup';
-import omit from 'lodash/omit';
+import { ObjectSchema, Schema } from 'yup';
 
-type FormValues = OmitStrict<AxisConfiguration, 'dataSets' | 'type'>;
-
-type AxisConfigurationChangeValue = AxisConfiguration & { isValid: boolean };
+type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
 interface Props {
+  canSaveChart: boolean;
   id: string;
   defaultDataType?: AxisGroupBy;
   type: AxisType;
@@ -44,11 +46,13 @@ interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
   capabilities: ChartCapabilities;
-  onChange: (configuration: AxisConfigurationChangeValue) => void;
+  onChange: (configuration: AxisConfiguration) => void;
+  onFormStateChange: (state: { form: AxisType; isValid: boolean }) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
 
 const ChartAxisConfiguration = ({
+  canSaveChart,
   id,
   configuration,
   data,
@@ -56,10 +60,11 @@ const ChartAxisConfiguration = ({
   type,
   capabilities,
   onChange,
+  onFormStateChange,
   onSubmit,
 }: Props) => {
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
-    if (configuration.type === 'minor') {
+    if (type === 'minor') {
       return [];
     }
 
@@ -70,7 +75,7 @@ const ChartAxisConfiguration = ({
     };
 
     return createDataSetCategories(config, data, meta);
-  }, [configuration, data, meta]);
+  }, [configuration, data, meta, type]);
 
   const groupByOptions = useMemo<SelectOption<AxisGroupBy>[]>(() => {
     const options: SelectOption<AxisGroupBy>[] = [
@@ -104,7 +109,7 @@ const ChartAxisConfiguration = ({
     return options;
   }, [meta.filters]);
 
-  // TODO: Figure out how we should sort data
+  // TODO EES-721: Figure out how we should sort data
   // const sortOptions = useMemo<SelectOption[]>(() => {
   //   return [
   //     {
@@ -167,57 +172,106 @@ const ChartAxisConfiguration = ({
 
   const normalizeValues = useCallback(
     (values: FormValues): AxisConfiguration => {
-      // Values of min/max may be treated as strings by Formik
-      // due to the way they are encoded in the form input value.
-      return {
-        ...configuration,
-        ...values,
+      // Use `merge` as we want to avoid potential undefined
+      // values from overwriting existing values
+      return merge({}, configuration, values, {
+        // `configuration.type` may be incorrectly set by
+        // seeded releases so we want to make sure this is
+        // set using the `type` prop (which uses the axis key)
+        type,
+        // Numeric values may be treated as strings by Formik
+        // due to the way they are encoded in the form input value.
         min: parseNumber(values.min),
         max: parseNumber(values.max),
         size: parseNumber(values.size),
         tickSpacing: parseNumber(values.tickSpacing),
-      };
+      });
     },
-    [configuration],
+    [configuration, type],
   );
 
   const handleFormChange = useCallback(
-    (values: FormValues & { isValid: boolean }) => {
-      onChange({
-        ...normalizeValues(values),
-        isValid: values.isValid,
-      });
+    ({ isValid, ...values }: FormValues & { isValid: boolean }) => {
+      if (isValid) {
+        onChange(normalizeValues(values));
+      }
     },
     [normalizeValues, onChange],
   );
 
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    let schema: ObjectSchema<FormValues> = Yup.object({
+      size: Yup.number()
+        .required('Enter size of axis')
+        .positive('Size of axis must be positive')
+        .max(100, 'Size of axis must be less than 100px'),
+      tickConfig: Yup.string().oneOf(
+        ['default', 'startEnd', 'custom'],
+        'Select a valid tick display type',
+      ) as Schema<AxisConfiguration['tickConfig']>,
+      tickSpacing: Yup.number().when('tickConfig', {
+        is: 'custom',
+        then: Yup.number()
+          .required('Enter tick spacing')
+          .positive('Tick spacing must be positive'),
+      }),
+      max: Yup.number(),
+      min: Yup.number(),
+      visible: Yup.boolean(),
+    });
+
+    if (type === 'major' && !capabilities.fixedAxisGroupBy) {
+      schema = schema.shape({
+        groupBy: Yup.string().oneOf([
+          'locations',
+          'timePeriod',
+          'filters',
+          'indicators',
+        ]) as Schema<AxisConfiguration['groupBy']>,
+      });
+    }
+
+    if (capabilities.canSort) {
+      schema = schema.shape({
+        sortAsc: Yup.boolean(),
+      });
+    }
+
+    if (capabilities.gridLines) {
+      schema = schema.shape({
+        showGrid: Yup.boolean(),
+      });
+    }
+
+    if (capabilities.hasReferenceLines) {
+      schema = schema.shape({
+        referenceLines: Yup.array(),
+      });
+    }
+
+    return schema;
+  }, [
+    capabilities.canSort,
+    capabilities.fixedAxisGroupBy,
+    capabilities.gridLines,
+    capabilities.hasReferenceLines,
+    type,
+  ]);
+
+  const initialValues = useMemo<FormValues>(
+    () => pick(configuration, Object.keys(validationSchema.fields)),
+    [configuration, validationSchema.fields],
+  );
+
   return (
     <Formik<FormValues>
-      initialValues={omit(configuration, ['dataSets', 'type'])}
+      initialValues={initialValues}
       enableReinitialize
+      validationSchema={validationSchema}
+      isInitialValid={validationSchema.isValidSync(initialValues)}
       onSubmit={values => {
         onSubmit(normalizeValues(values));
       }}
-      validationSchema={Yup.object<FormValues>({
-        size: Yup.number()
-          .required('Enter size of axis')
-          .positive('Size of axis must be positive'),
-        sortAsc: Yup.boolean(),
-        tickConfig: Yup.string().oneOf(
-          ['default', 'startEnd', 'custom'],
-          'Select a valid tick display type',
-        ) as Schema<AxisConfiguration['tickConfig']>,
-        tickSpacing: Yup.number().when('tickConfig', {
-          is: 'custom',
-          then: Yup.number()
-            .required('Enter tick spacing')
-            .positive('Tick spacing must be positive'),
-        }),
-        max: Yup.number(),
-        min: Yup.number(),
-        visible: Yup.boolean(),
-        referenceLines: Yup.array(),
-      })}
       render={form => (
         <Form id={id}>
           <Effect
@@ -228,22 +282,29 @@ const ChartAxisConfiguration = ({
             onChange={handleFormChange}
           />
 
-          <FormGroup>
-            {configuration.type === 'major' &&
-              !capabilities.fixedAxisGroupBy && (
-                <FormFieldSelect<AxisConfiguration>
-                  id={`${id}-groupBy`}
-                  label="Group data by"
-                  name="groupBy"
-                  options={groupByOptions}
-                />
-              )}
+          <Effect
+            value={{
+              form: type,
+              isValid: form.isValid,
+            }}
+            onMount={onFormStateChange}
+            onChange={onFormStateChange}
+          />
 
-            {capabilities.hasAxes && (
-              <FormFieldTextInput<AxisConfiguration>
+          <FormGroup>
+            {validationSchema.fields.groupBy && (
+              <FormFieldSelect<AxisConfiguration>
+                id={`${id}-groupBy`}
+                label="Group data by"
+                name="groupBy"
+                options={groupByOptions}
+              />
+            )}
+
+            {validationSchema.fields.size && (
+              <FormFieldNumberInput<AxisConfiguration>
                 id={`${id}-size`}
                 name="size"
-                type="number"
                 min="0"
                 max="100"
                 label="Size of axis (px)"
@@ -251,7 +312,7 @@ const ChartAxisConfiguration = ({
               />
             )}
 
-            {capabilities.gridLines && (
+            {validationSchema.fields.showGrid && (
               <FormFieldCheckbox<AxisConfiguration>
                 id={`${id}-showGrid`}
                 name="showGrid"
@@ -259,7 +320,7 @@ const ChartAxisConfiguration = ({
               />
             )}
 
-            {capabilities.hasAxes && (
+            {validationSchema.fields.visible && (
               <FormFieldCheckbox<AxisConfiguration>
                 id={`${id}-visible`}
                 name="visible"
@@ -277,34 +338,37 @@ const ChartAxisConfiguration = ({
             )}
           </FormGroup>
 
-          {configuration.type === 'minor' && (
-            <FormFieldset
-              id={`${id}-minorAxisRange`}
-              legend="Axis range"
-              legendSize="m"
-              hint="Leaving these values blank will set them to 'auto'"
-            >
-              <div className={styles.axisRange}>
-                <FormFieldTextInput<AxisConfiguration>
-                  id={`${id}-minorMin`}
-                  name="min"
-                  type="number"
-                  width={10}
-                  label="Minimum value"
-                  formGroupClass="govuk-!-margin-right-2"
-                />
-                <FormFieldTextInput<AxisConfiguration>
-                  id={`${id}-minorMax`}
-                  name="max"
-                  type="number"
-                  width={10}
-                  label="Maximum value"
-                />
-              </div>
-            </FormFieldset>
-          )}
+          {type === 'minor' &&
+            (validationSchema.fields.min || validationSchema.fields.max) && (
+              <FormFieldset
+                id={`${id}-minorAxisRange`}
+                legend="Axis range"
+                legendSize="m"
+                hint="Leaving these values blank will set them to 'auto'"
+              >
+                <div className={styles.axisRange}>
+                  {validationSchema.fields.min && (
+                    <FormFieldNumberInput<AxisConfiguration>
+                      id={`${id}-minorMin`}
+                      name="min"
+                      width={10}
+                      label="Minimum value"
+                      formGroupClass="govuk-!-margin-right-2"
+                    />
+                  )}
+                  {validationSchema.fields.max && (
+                    <FormFieldNumberInput<AxisConfiguration>
+                      id={`${id}-minorMax`}
+                      name="max"
+                      width={10}
+                      label="Maximum value"
+                    />
+                  )}
+                </div>
+              </FormFieldset>
+            )}
 
-          {capabilities.hasAxes && (
+          {validationSchema.fields.tickConfig && (
             <FormFieldRadioGroup<AxisConfiguration>
               id={`${id}-tickConfig`}
               name="tickConfig"
@@ -324,10 +388,9 @@ const ChartAxisConfiguration = ({
                   label: 'Custom',
                   value: 'custom',
                   conditional: (
-                    <FormFieldTextInput<AxisConfiguration>
+                    <FormFieldNumberInput<AxisConfiguration>
                       id={`${id}-tickSpacing`}
                       name="tickSpacing"
-                      type="number"
                       width={10}
                       label="Every nth value"
                     />
@@ -337,9 +400,9 @@ const ChartAxisConfiguration = ({
             />
           )}
 
-          {configuration.type === 'major' && (
+          {type === 'major' && (
             <>
-              {capabilities.canSort && (
+              {validationSchema.fields.sortAsc && (
                 <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
                   {/* <FormFieldSelect<AxisConfiguration>*/}
                   {/*  id={`${id}-sortBy`}*/}
@@ -355,30 +418,36 @@ const ChartAxisConfiguration = ({
                 </FormFieldset>
               )}
 
-              <FormFieldset
-                id={`${id}-majorAxisRange`}
-                legend="Limiting data"
-                legendSize="m"
-              >
-                <FormFieldSelect<AxisConfiguration>
-                  id={`${id}-majorMin`}
-                  label="Minimum"
-                  name="min"
-                  placeholder="Default"
-                  options={limitOptions}
-                />
-                <FormFieldSelect<AxisConfiguration>
-                  id={`${id}-majorMax`}
-                  label="Maximum"
-                  name="max"
-                  placeholder="Default"
-                  options={limitOptions}
-                />
-              </FormFieldset>
+              {(validationSchema.fields.min || validationSchema.fields.max) && (
+                <FormFieldset
+                  id={`${id}-majorAxisRange`}
+                  legend="Limiting data"
+                  legendSize="m"
+                >
+                  {validationSchema.fields.min && (
+                    <FormFieldSelect<AxisConfiguration>
+                      id={`${id}-majorMin`}
+                      label="Minimum"
+                      name="min"
+                      placeholder="Default"
+                      options={limitOptions}
+                    />
+                  )}
+                  {validationSchema.fields.max && (
+                    <FormFieldSelect<AxisConfiguration>
+                      id={`${id}-majorMax`}
+                      label="Maximum"
+                      name="max"
+                      placeholder="Default"
+                      options={limitOptions}
+                    />
+                  )}
+                </FormFieldset>
+              )}
             </>
           )}
 
-          {capabilities.hasReferenceLines && (
+          {validationSchema.fields.referenceLines && (
             <table className="govuk-table">
               <caption className="govuk-heading-m">Reference lines</caption>
               <thead>
@@ -417,12 +486,11 @@ const ChartAxisConfiguration = ({
                   ))}
                 <tr>
                   <td>
-                    {configuration.type === 'minor' && (
+                    {type === 'minor' && (
                       <FormTextInput
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
                         label=""
-                        type="text"
                         defaultValue={`${referenceLine.position}`}
                         onChange={e => {
                           setReferenceLine({
@@ -432,7 +500,7 @@ const ChartAxisConfiguration = ({
                         }}
                       />
                     )}
-                    {configuration.type === 'major' && (
+                    {type === 'major' && (
                       <FormSelect
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
@@ -455,7 +523,6 @@ const ChartAxisConfiguration = ({
                       name={`referenceLines[${form.values.referenceLines?.length}].label`}
                       id={`${id}-referenceLines-label`}
                       label=""
-                      type="text"
                       defaultValue={referenceLine.label}
                       onChange={e => {
                         setReferenceLine({
@@ -490,7 +557,22 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          <Button type="submit">Save chart options</Button>
+          {form.isValid && form.submitCount > 0 && !canSaveChart && (
+            <ErrorSummary
+              title="Cannot save chart"
+              errors={[
+                {
+                  id: `${id}-submit`,
+                  message: 'Ensure that all other tabs are valid first',
+                },
+              ]}
+              id={`${id}-errorSummary`}
+            />
+          )}
+
+          <Button type="submit" id={`${id}-submit`}>
+            Save chart options
+          </Button>
         </Form>
       )}
     />

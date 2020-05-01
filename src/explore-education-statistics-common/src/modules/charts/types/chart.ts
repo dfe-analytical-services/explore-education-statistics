@@ -86,7 +86,6 @@ export interface StackedBarProps extends ChartProps {
 }
 
 export interface ChartCapabilities {
-  hasAxes: boolean;
   dataSymbols: boolean;
   stackable: boolean;
   lineStyle: boolean;
@@ -130,6 +129,7 @@ export interface ChartDefinitionAxis {
   id: string;
   title: string;
   type: AxisType;
+  hide?: boolean;
   defaults?: Partial<AxisConfiguration>;
   constants?: Partial<AxisConfiguration>;
 }

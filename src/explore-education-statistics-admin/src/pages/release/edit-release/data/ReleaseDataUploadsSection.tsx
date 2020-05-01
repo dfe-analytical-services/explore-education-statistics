@@ -11,7 +11,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
-import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -276,19 +276,17 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     width={20}
                   />
 
-                  <FormFieldFileSelector<FormValues>
+                  <FormFieldFileInput<FormValues>
                     id={`${formId}-dataFile`}
                     name="dataFile"
                     label="Upload data file"
                     formGroupClass="govuk-!-margin-top-6"
-                    form={form}
                   />
 
-                  <FormFieldFileSelector<FormValues>
+                  <FormFieldFileInput<FormValues>
                     id={`${formId}-metadataFile`}
                     name="metadataFile"
                     label="Upload metadata file"
-                    form={form}
                   />
                 </FormFieldset>
 
