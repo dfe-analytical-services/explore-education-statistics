@@ -69,7 +69,6 @@ export const infographicBlockDefinition: ChartDefinition = {
     canSize: true,
     canSort: false,
     fixedAxisGroupBy: true,
-    hasAxes: false,
     hasReferenceLines: false,
     hasLegend: false,
     requiresGeoJson: false,

@@ -1,3 +1,4 @@
+import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import {
   AxesConfiguration,
@@ -10,23 +11,32 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Chart } from '@common/services/types/blocks';
+import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
-import { Reducer, useImmerReducer } from 'use-immer';
+import { Reducer } from 'use-immer';
+import omit from 'lodash/omit';
 
 export interface ChartOptions extends ChartDefinitionOptions {
   fileId?: string;
   geographicId?: string;
 }
 
+export interface FormState {
+  isValid: boolean;
+}
+
 export interface ChartBuilderState {
   definition?: ChartDefinition;
   options: ChartOptions;
   axes: AxesConfiguration;
-  isValid?: boolean;
   chartProps?: ChartRendererProps;
+  forms: {
+    data: FormState;
+    options: FormState;
+    [form: string]: FormState;
+  };
 }
 
 export type ChartBuilderActions =
@@ -52,8 +62,11 @@ export type ChartBuilderActions =
       payload: AxisConfiguration;
     }
   | {
-      type: 'UPDATE_VALID';
-      payload: boolean;
+      type: 'UPDATE_FORM';
+      payload: {
+        form: keyof ChartBuilderState['forms'];
+        state: FormState;
+      };
     };
 
 const defaultOptions: Partial<ChartOptions> = {
@@ -66,26 +79,25 @@ const defaultAxisOptions: Partial<AxisConfiguration> = {
   visible: true,
 };
 
+const updateAxis = (
+  axisDefinition: ChartDefinitionAxis,
+  current: AxisConfiguration,
+  next: Partial<AxisConfiguration> = {},
+): AxisConfiguration => {
+  return {
+    ...defaultAxisOptions,
+    ...(axisDefinition.defaults ?? {}),
+    ...current,
+    ...next,
+    ...(axisDefinition.constants ?? {}),
+    type: axisDefinition.type,
+  };
+};
+
 export const chartBuilderReducer: Reducer<
   ChartBuilderState,
   ChartBuilderActions
 > = (draft, action) => {
-  const updateAxis = (
-    next: AxisConfiguration,
-    axisDefinition: ChartDefinitionAxis,
-  ): AxisConfiguration => {
-    const current: Partial<AxisConfiguration> = draft.axes[next.type] ?? {};
-
-    return {
-      ...defaultAxisOptions,
-      ...(axisDefinition.defaults ?? {}),
-      ...current,
-      ...next,
-      ...(axisDefinition.constants ?? {}),
-      type: axisDefinition.type,
-    };
-  };
-
   switch (action.type) {
     case 'UPDATE_CHART_DEFINITION': {
       draft.definition = action.payload;
@@ -101,11 +113,26 @@ export const chartBuilderReducer: Reducer<
         action.payload.axes,
         (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
           return updateAxis(
-            draft.axes[type] ?? ({} as AxisConfiguration),
             axisDefinition,
+            draft.axes[type] as AxisConfiguration,
           );
         },
       );
+
+      const newAxisForms: Dictionary<FormState> = mapValues(
+        draft.axes as Required<AxesConfiguration>,
+        () => {
+          return {
+            isValid: true,
+          };
+        },
+      );
+
+      draft.forms = {
+        ...newAxisForms,
+        options: draft.forms.options,
+        data: draft.forms.data,
+      };
 
       break;
     }
@@ -114,13 +141,20 @@ export const chartBuilderReducer: Reducer<
 
       if (!axisDefinition) {
         throw new Error(
-          `Could not find chart axis definition with type '${action.payload.type}'`,
+          `Could not find chart axis definition for type '${action.payload.type}'`,
+        );
+      }
+
+      if (!draft.axes[action.payload.type]) {
+        throw new Error(
+          `Could not find axis configuration for type '${action.payload.type}'`,
         );
       }
 
       draft.axes[action.payload.type] = updateAxis(
-        action.payload,
         axisDefinition,
+        draft.axes[action.payload.type] as AxisConfiguration,
+        action.payload,
       );
 
       break;
@@ -141,9 +175,7 @@ export const chartBuilderReducer: Reducer<
         draft.axes.major.dataSets.push(action.payload);
       }
 
-      if (typeof draft.isValid === 'undefined') {
-        draft.isValid = true;
-      }
+      draft.forms.data.isValid = true;
 
       break;
     }
@@ -151,9 +183,7 @@ export const chartBuilderReducer: Reducer<
       if (draft.axes.major) {
         draft.axes.major.dataSets.splice(action.payload, 1);
 
-        if (typeof draft.isValid === 'undefined') {
-          draft.isValid = draft.axes.major.dataSets.length > 0;
-        }
+        draft.forms.data.isValid = draft.axes.major.dataSets.length > 0;
       }
 
       break;
@@ -162,48 +192,72 @@ export const chartBuilderReducer: Reducer<
       if (draft.axes.major) {
         draft.axes.major.dataSets = action.payload;
 
-        if (typeof draft.isValid === 'undefined') {
-          draft.isValid = draft.axes.major.dataSets.length > 0;
-        }
+        draft.forms.data.isValid = draft.axes.major.dataSets.length > 0;
       }
 
       break;
     }
-    case 'UPDATE_VALID':
-      draft.isValid = action.payload;
+    case 'UPDATE_FORM':
+      if (!draft.forms[action.payload.form]) {
+        throw new Error(
+          `Could not find form '${action.payload.form}' to update`,
+        );
+      }
+
+      draft.forms[action.payload.form] = action.payload.state;
+
       break;
     default:
       break;
   }
 };
 
-export function useChartBuilderReducer(
-  meta: FullTableMeta,
-  initialConfiguration?: Chart,
-) {
-  const [state, dispatch] = useImmerReducer<
+export function useChartBuilderReducer(initialConfiguration?: Chart) {
+  const definition = chartDefinitions.find(
+    ({ type }) => type === initialConfiguration?.type,
+  );
+
+  // Make sure height is never actually 0 or negative
+  // as this wouldn't make sense for any chart.
+  const height =
+    typeof initialConfiguration?.height !== 'undefined' &&
+    initialConfiguration?.height > 0
+      ? initialConfiguration.height
+      : definition?.options?.defaults?.height ?? 300;
+
+  const [state, dispatch] = useLoggedImmerReducer<
     ChartBuilderState,
     ChartBuilderActions
   >(
+    'Chart builder',
     chartBuilderReducer,
     {
       axes: {},
-      definition: initialConfiguration
-        ? chartDefinitions.find(
-            ({ type }) => type === initialConfiguration.type,
-          )
-        : undefined,
-      options: initialConfiguration ?? {
-        height: 300,
-        title: '',
+      definition,
+      options: {
+        ...omit(initialConfiguration ?? {}, ['axes', 'type']),
+        title: initialConfiguration?.title ?? '',
+        height,
+      },
+      forms: {
+        data: { isValid: true },
+        options: { isValid: true },
       },
     },
-    initialState => {
+    (initialState: ChartBuilderState) => {
       if (!initialConfiguration) {
         return initialState;
       }
 
-      const axes = { ...initialConfiguration.axes } as AxesConfiguration;
+      const axes: AxesConfiguration = mapValues(
+        initialState.definition?.axes ?? {},
+        (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
+          return updateAxis(
+            axisDefinition,
+            (initialConfiguration.axes[type] ?? {}) as AxisConfiguration,
+          );
+        },
+      );
 
       if (
         axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
@@ -215,9 +269,17 @@ export function useChartBuilderReducer(
         );
       }
 
+      const forms: ChartBuilderState['forms'] = {
+        ...initialState.forms,
+        ...(mapValues(axes, () => ({
+          isValid: true,
+        })) as Dictionary<FormState>),
+      };
+
       return {
         ...initialState,
         axes,
+        forms,
       };
     },
   );
@@ -263,8 +325,7 @@ export function useChartBuilderReducer(
   );
 
   const updateChartOptions = useCallback(
-    ({ isValid, ...chartOptions }: ChartOptions & { isValid: boolean }) => {
-      dispatch({ type: 'UPDATE_VALID', payload: isValid });
+    (chartOptions: ChartOptions) => {
       dispatch({
         type: 'UPDATE_CHART_OPTIONS',
         payload: chartOptions,
@@ -274,14 +335,29 @@ export function useChartBuilderReducer(
   );
 
   const updateChartAxis = useCallback(
-    ({
-      isValid,
-      ...axisConfiguration
-    }: AxisConfiguration & { isValid: boolean }) => {
-      dispatch({ type: 'UPDATE_VALID', payload: isValid });
+    (axisConfiguration: AxisConfiguration) => {
       dispatch({
         type: 'UPDATE_CHART_AXIS',
         payload: axisConfiguration,
+      });
+    },
+    [dispatch],
+  );
+
+  const updateFormState = useCallback(
+    ({
+      form,
+      isValid,
+    }: {
+      form: keyof ChartBuilderState['forms'];
+      isValid: boolean;
+    }) => {
+      dispatch({
+        type: 'UPDATE_FORM',
+        payload: {
+          form,
+          state: { isValid },
+        },
       });
     },
     [dispatch],
@@ -295,6 +371,7 @@ export function useChartBuilderReducer(
       updateChartDefinition,
       updateChartOptions,
       updateChartAxis,
+      updateFormState,
     }),
     [
       addDataSet,
@@ -303,6 +380,7 @@ export function useChartBuilderReducer(
       updateChartDefinition,
       updateChartOptions,
       updateDataSet,
+      updateFormState,
     ],
   );
 

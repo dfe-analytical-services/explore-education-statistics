@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import FormTextInput from '../FormTextInput';
+import FormBaseInput from '../FormBaseInput';
 
 describe('FormTextInput', () => {
   test('renders correctly with required props', () => {
     const { container, getByLabelText } = render(
-      <FormTextInput id="test-input" label="Test input" name="testInput" />,
+      <FormBaseInput id="test-input" label="Test input" name="testInput" />,
     );
 
     expect(getByLabelText('Test input')).toBeDefined();
@@ -14,7 +14,7 @@ describe('FormTextInput', () => {
 
   test('renders correctly with hint', () => {
     const { container, getByText } = render(
-      <FormTextInput
+      <FormBaseInput
         id="test-input"
         label="Test input"
         name="testInput"
@@ -30,7 +30,7 @@ describe('FormTextInput', () => {
 
   test('renders correctly with error', () => {
     const { container, getByText } = render(
-      <FormTextInput
+      <FormBaseInput
         id="test-input"
         label="Test input"
         name="testInput"
@@ -46,7 +46,7 @@ describe('FormTextInput', () => {
 
   test('aria-describedby is equal to the hint id', () => {
     const { getByLabelText } = render(
-      <FormTextInput
+      <FormBaseInput
         id="test-input"
         label="Test input"
         name="testInput"
@@ -62,7 +62,7 @@ describe('FormTextInput', () => {
 
   test('aria-describedby is equal to the error id', () => {
     const { getByLabelText } = render(
-      <FormTextInput
+      <FormBaseInput
         id="test-input"
         label="Test input"
         name="testInput"
@@ -78,7 +78,7 @@ describe('FormTextInput', () => {
 
   test('aria-describedby contains both hint and error ids', () => {
     const { getByLabelText } = render(
-      <FormTextInput
+      <FormBaseInput
         id="test-input"
         label="Test input"
         name="testInput"
@@ -97,7 +97,7 @@ describe('FormTextInput', () => {
 
   test('renders with a specific width class', () => {
     const { container } = render(
-      <FormTextInput
+      <FormBaseInput
         id="test-input"
         label="Test input"
         name="testInput"
