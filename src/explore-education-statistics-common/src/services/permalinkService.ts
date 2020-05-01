@@ -1,44 +1,52 @@
+import { dataApi } from '@common/services/api';
 import {
   TableDataQuery,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
-import { dataApi } from '@common/services/api';
 
 export interface UnmappedPermalink {
   id: string;
   title: string;
   created: string;
   fullTable: TableDataResponse;
-  query: PermalinkCreateQuery;
+  query: UnmappedPermalinkQuery;
 }
 
-interface HeaderOption {
-  value: string;
-  label: string;
-}
+export type TableHeader =
+  | {
+      type: 'TimePeriod' | 'Indicator' | 'Filter';
+      value: string;
+    }
+  | {
+      type: 'Location';
+      value: string;
+      level: string;
+    };
 
-// TODO: We should re-work this to store type information
-//  in the backend so that its easier to work with
 export interface UnmappedTableHeadersConfig {
-  columnGroups: HeaderOption[][];
-  columns: HeaderOption[];
-  rowGroups: HeaderOption[][];
-  rows: HeaderOption[];
+  columnGroups: TableHeader[][];
+  columns: TableHeader[];
+  rowGroups: TableHeader[][];
+  rows: TableHeader[];
 }
 
-interface PermalinkCreateQuery extends TableDataQuery {
+interface UnmappedPermalinkQuery extends TableDataQuery {
   configuration: {
-    tableHeadersConfig: UnmappedTableHeadersConfig;
+    tableHeaders: UnmappedTableHeadersConfig;
   };
 }
 
 export default {
-  createTablePermalink(
-    query: PermalinkCreateQuery,
-  ): Promise<UnmappedPermalink> {
-    return dataApi.post('/permalink', query);
+  createPermalink(query: UnmappedPermalinkQuery): Promise<UnmappedPermalink> {
+    return dataApi.post('/permalink', {
+      ...query,
+      configuration: {
+        ...query.configuration,
+        tableHeaders: {},
+      },
+    });
   },
   getPermalink(publicationSlug: string): Promise<UnmappedPermalink> {
-    return dataApi.get(`Permalink/${publicationSlug}`);
+    return dataApi.get(`/permalink/${publicationSlug}`);
   },
 };

@@ -4,7 +4,7 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 
 interface PermalinkQuery extends TableDataQuery {
   configuration: {
-    tableHeadersConfig: TableHeadersConfig;
+    tableHeaders: TableHeadersConfig;
   };
 }
 

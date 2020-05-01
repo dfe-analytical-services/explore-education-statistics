@@ -15,6 +15,7 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import React, { createRef, useCallback, useEffect, useState } from 'react';
 
@@ -62,7 +63,7 @@ const DataBlockSourceWizardFinalStep = ({
         dataBlockRequest: query,
         tables: [
           {
-            tableHeaders: currentTableHeaders,
+            tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
             indicators: [],
           },
         ],

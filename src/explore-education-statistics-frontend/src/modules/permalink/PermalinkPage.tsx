@@ -2,12 +2,10 @@ import FormattedDate from '@common/components/FormattedDate';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import mapPermalink from '@common/modules/table-tool/utils/mapPermalink';
 import permalinkService, {
   UnmappedPermalink,
 } from '@common/services/permalinkService';
-import mapPermalink from '@common/modules/table-tool/utils/mapPermalink';
-import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
@@ -66,14 +64,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         <TimePeriodDataTable
           fullTable={fullTable}
           source="DfE prototype example statistics"
-          tableHeadersConfig={
-            configuration.tableHeadersConfig
-              ? mapTableHeadersConfig(
-                  configuration.tableHeadersConfig,
-                  fullTable.subjectMeta,
-                )
-              : getDefaultTableHeaderConfig(fullTable.subjectMeta)
-          }
+          tableHeadersConfig={configuration.tableHeaders}
         />
       </div>
 

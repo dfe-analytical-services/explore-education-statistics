@@ -9,6 +9,7 @@ import {
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService, {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
@@ -172,7 +173,9 @@ describe('DataBlockRenderer', () => {
           ...testDataBlock,
           tables: [
             {
-              tableHeaders: getDefaultTableHeaderConfig(fullTable.subjectMeta),
+              tableHeaders: mapUnmappedTableHeaders(
+                getDefaultTableHeaderConfig(fullTable.subjectMeta),
+              ),
               indicators: [
                 'authorised-absence-rate',
                 'unauthorised-absence-rate',

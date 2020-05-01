@@ -14,6 +14,7 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import permalinkService from '@common/services/permalinkService';
 import publicationService from '@common/services/publicationService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
@@ -59,10 +60,10 @@ const TableToolFinalStep = ({
     }
     setPermalinkLoading(true);
 
-    const { id } = await permalinkService.createTablePermalink({
+    const { id } = await permalinkService.createPermalink({
       ...query,
       configuration: {
-        tableHeadersConfig: currentTableHeaders,
+        tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
       },
     });
 

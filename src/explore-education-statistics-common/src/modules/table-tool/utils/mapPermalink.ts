@@ -6,17 +6,17 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 export default function mapPermalink(
   unmappedPermalink: UnmappedPermalink,
 ): Permalink {
-  const mappedFullTable = mapFullTable(unmappedPermalink.fullTable);
+  const fullTable = mapFullTable(unmappedPermalink.fullTable);
 
   return {
     ...unmappedPermalink,
-    fullTable: mappedFullTable,
+    fullTable,
     query: {
       ...unmappedPermalink.query,
       configuration: {
-        tableHeadersConfig: mapTableHeadersConfig(
-          unmappedPermalink.query.configuration.tableHeadersConfig,
-          mappedFullTable.subjectMeta,
+        tableHeaders: mapTableHeadersConfig(
+          unmappedPermalink.query.configuration.tableHeaders,
+          fullTable.subjectMeta,
         ),
       },
     },

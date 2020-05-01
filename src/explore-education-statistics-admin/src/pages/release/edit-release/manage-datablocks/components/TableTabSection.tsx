@@ -4,6 +4,7 @@ import TableHeadersForm from '@common/modules/table-tool/components/TableHeaders
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import React, { useRef } from 'react';
 
 interface Props {
@@ -31,7 +32,7 @@ const TableTabSection = ({
             ...dataBlock,
             tables: [
               {
-                tableHeaders: nextTableHeaders,
+                tableHeaders: mapUnmappedTableHeaders(nextTableHeaders),
                 indicators: [],
               },
             ],
