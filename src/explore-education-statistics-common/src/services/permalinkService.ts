@@ -38,13 +38,7 @@ interface UnmappedPermalinkQuery extends TableDataQuery {
 
 export default {
   createPermalink(query: UnmappedPermalinkQuery): Promise<UnmappedPermalink> {
-    return dataApi.post('/permalink', {
-      ...query,
-      configuration: {
-        ...query.configuration,
-        tableHeaders: {},
-      },
-    });
+    return dataApi.post('/permalink', query);
   },
   getPermalink(publicationSlug: string): Promise<UnmappedPermalink> {
     return dataApi.get(`/permalink/${publicationSlug}`);
