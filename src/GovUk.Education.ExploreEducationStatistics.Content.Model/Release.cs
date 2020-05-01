@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.Created = createdDate;
             amendment.CreatedById = createdByUserId;
             amendment.Version = Version + 1;
-            amendment.OriginalId = Id;
+            amendment.PreviousVersionId = Id;
             amendment.InternalReleaseNote = null;
             
             var ctx = new CreateAmendmentContext(this, amendment);
@@ -255,13 +255,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class CreateAmendmentContext
     {
-        public CreateAmendmentContext(Release original, Release amendment)
+        public CreateAmendmentContext(Release previousVersion, Release amendment)
         {
-            Original = original;
+            PreviousVersion = previousVersion;
             Amendment = amendment;
         }
 
-        public Release Original { get; set; }
+        public Release PreviousVersion { get; set; }
 
         public Release Amendment { get; set; }
         

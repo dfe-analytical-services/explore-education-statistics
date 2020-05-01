@@ -40,8 +40,7 @@ const NonScheduledReleaseSummary = ({
               <ButtonLink
                 to={summaryRoute.generateLink({
                   publicationId: release.publicationId,
-                  // TODO BAU-419 - previousReleaseId
-                  releaseId: release.originalId,
+                  releaseId: release.previousVersionId,
                 })}
                 className="govuk-button--secondary govuk-!-margin-left-4"
                 testId={`View original release link for ${

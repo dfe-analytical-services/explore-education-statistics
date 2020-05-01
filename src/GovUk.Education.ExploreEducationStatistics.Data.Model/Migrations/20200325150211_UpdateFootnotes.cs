@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_FootnoteData.sql");
+            //migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_FootnoteData.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
