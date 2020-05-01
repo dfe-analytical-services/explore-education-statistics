@@ -560,13 +560,13 @@ const ChartAxisConfiguration = ({
           {form.isValid && form.submitCount > 0 && !canSaveChart && (
             <ErrorSummary
               title="Cannot save chart"
+              id={`${id}-errorSummary`}
               errors={[
                 {
                   id: `${id}-submit`,
                   message: 'Ensure that all other tabs are valid first',
                 },
               ]}
-              id={`${id}-errorSummary`}
             />
           )}
 
