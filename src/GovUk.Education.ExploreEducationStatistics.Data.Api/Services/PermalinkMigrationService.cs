@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             await Task.WhenAll(permalinks.Select(permalink =>
                 _fileStorageService.UploadFromStreamAsync(PermalinkContainerName,
                     permalink.Id.ToString(),
-                    MediaTypeNames.Text.Plain,
+                    MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink))));
         }
 
