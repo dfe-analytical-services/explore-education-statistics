@@ -137,6 +137,54 @@ describe('Tabs', () => {
     expect(getAllByText('Tab 2')[0]).toHaveAttribute('href', '#test-tabs-2');
   });
 
+  test('renders with tab open that matches location hash', () => {
+    window.location.hash = '#test-tabs-2';
+
+    const { container, getByText } = render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(getByText('Tab 1')).toHaveAttribute('aria-selected', 'false');
+    expect(getByText('Tab 2')).toHaveAttribute('aria-selected', 'true');
+
+    const tabSection1 = container.querySelector<HTMLElement>('#test-tabs-1');
+    const tabSection2 = container.querySelector<HTMLElement>('#test-tabs-2');
+
+    expect(tabSection1).toHaveClass(hiddenSectionClass);
+    expect(tabSection2).not.toHaveClass(hiddenSectionClass);
+  });
+
+  test('renders with tab with custom id open that matches location hash', () => {
+    window.location.hash = '#tab2';
+
+    const { container, getByText } = render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1" id="tab1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2" id="tab2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(getByText('Tab 1')).toHaveAttribute('aria-selected', 'false');
+    expect(getByText('Tab 2')).toHaveAttribute('aria-selected', 'true');
+
+    const tabSection1 = container.querySelector<HTMLElement>('#tab1');
+    const tabSection2 = container.querySelector<HTMLElement>('#tab2');
+
+    expect(tabSection1).toHaveClass(hiddenSectionClass);
+    expect(tabSection2).not.toHaveClass(hiddenSectionClass);
+  });
+
   test('clicking tab reveals correct section', () => {
     const { getAllByText, container } = render(
       <Tabs id="test-tabs">

@@ -4,10 +4,12 @@ import classNames from 'classnames';
 import React, {
   cloneElement,
   HTMLAttributes,
-  ReactComponentElement,
+  ReactElement,
   ReactNode,
   RefAttributes,
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import styles from './Tabs.module.scss';
@@ -26,45 +28,69 @@ const Tabs = ({ children, id, onToggle }: Props) => {
 
   const { onMedia } = useDesktopMedia();
 
-  const tabElements: HTMLAnchorElement[] = [];
-  const sectionElements: HTMLElement[] = [];
+  const tabElements = useRef<HTMLAnchorElement[]>([]);
+  const sectionElements = useRef<HTMLElement[]>([]);
 
-  const setSelectedTab = (index: number) => {
-    if (sectionElements[index]) {
-      if (window.history.pushState) {
-        window.history.pushState(null, '', `#${sectionElements[index].id}`);
-      } else {
-        window.location.hash = sectionElements[index].id;
-      }
-    }
-
-    setLoadedSections(loadedSections.add(index));
-    setSelectedTabIndex(index);
-  };
-
-  const sections = React.Children.toArray(children).filter(child =>
+  const filteredChildren = React.Children.toArray(children).filter(child =>
     isComponentType(child, TabsSection),
-  ) as ReactComponentElement<typeof TabsSection>[];
+  ) as ReactElement<TabsSectionProps>[];
 
-  if (selectedTabIndex >= sections.length)
-    setSelectedTabIndex(sections.length - 1);
+  const sections = filteredChildren.map((section, index) => {
+    const { lazy } = section.props;
+    const sectionId = section.props.id || `${id}-${index + 1}`;
+
+    return cloneElement<
+      TabsSectionProps &
+        HTMLAttributes<HTMLElement> &
+        RefAttributes<HTMLElement>
+    >(
+      section,
+      {
+        'aria-labelledby': `${sectionId}-tab`,
+        hidden: selectedTabIndex !== index,
+        id: sectionId,
+        key: sectionId,
+        ref: (element: HTMLElement) => sectionElements.current.push(element),
+      },
+      lazy && !loadedSections.has(index) ? null : section.props.children,
+    );
+  });
+
+  const selectTab = useCallback(
+    (index: number) => {
+      if (sectionElements.current[index]) {
+        if (window.history.pushState) {
+          window.history.pushState(
+            null,
+            '',
+            `#${sectionElements.current[index].id}`,
+          );
+        } else {
+          window.location.hash = sectionElements.current[index].id;
+        }
+      }
+
+      setLoadedSections(loadedSections.add(index));
+      setSelectedTabIndex(index);
+    },
+    [loadedSections, sectionElements],
+  );
+
+  useEffect(() => {
+    if (selectedTabIndex >= sections.length) {
+      setSelectedTabIndex(sections.length - 1);
+    }
+  }, [sections, selectedTabIndex, selectTab]);
 
   useEffect(() => {
     if (window) {
-      let tabIndex = 0;
-      sections.map(function getTabIndex(e, index) {
-        if (e.props.id === window.location.hash.substr(1)) {
-          tabIndex = index;
-          setSelectedTab(index);
+      sections.forEach((element, index) => {
+        if (element.props.id === window.location.hash.substr(1)) {
+          selectTab(index);
         }
-        return null;
       });
-      if (tabIndex !== null) {
-        setSelectedTabIndex(tabIndex);
-      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sections, selectTab]);
 
   return (
     <div className={classNames('govuk-tabs', styles.tabs)}>
@@ -86,11 +112,13 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                 className="govuk-tabs__tab"
                 href={`#${sectionId}`}
                 id={`${sectionId}-tab`}
-                ref={(element: HTMLAnchorElement) => tabElements.push(element)}
+                ref={(element: HTMLAnchorElement) =>
+                  tabElements.current.push(element)
+                }
                 tabIndex={selectedTabIndex !== index ? -1 : undefined}
                 onClick={event => {
                   event.preventDefault();
-                  setSelectedTab(index);
+                  selectTab(index);
                   if (typeof onToggle === 'function') {
                     onToggle({
                       title: props.title,
@@ -106,8 +134,8 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                           ? selectedTabIndex - 1
                           : sections.length - 1;
 
-                      setSelectedTab(nextTabIndex);
-                      tabElements[nextTabIndex].focus();
+                      selectTab(nextTabIndex);
+                      tabElements.current[nextTabIndex].focus();
                       if (typeof onToggle === 'function') {
                         onToggle({
                           title: `${props.title}`,
@@ -122,8 +150,8 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                           ? selectedTabIndex + 1
                           : 0;
 
-                      setSelectedTab(nextTabIndex);
-                      tabElements[nextTabIndex].focus();
+                      selectTab(nextTabIndex);
+                      tabElements.current[nextTabIndex].focus();
                       if (typeof onToggle === 'function') {
                         onToggle({
                           title: `${props.title}`,
@@ -133,7 +161,7 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                       break;
                     }
                     case 'ArrowDown':
-                      sectionElements[selectedTabIndex].focus();
+                      sectionElements.current[selectedTabIndex].focus();
                       break;
                     default:
                       break;
@@ -147,26 +175,7 @@ const Tabs = ({ children, id, onToggle }: Props) => {
         })}
       </ul>
 
-      {sections.map((section, index) => {
-        const { lazy } = section.props;
-        const sectionId = section.props.id || `${id}-${index + 1}`;
-
-        return cloneElement<
-          TabsSectionProps &
-            HTMLAttributes<HTMLElement> &
-            RefAttributes<HTMLElement>
-        >(
-          section,
-          {
-            'aria-labelledby': `${sectionId}-tab`,
-            hidden: selectedTabIndex !== index,
-            id: sectionId,
-            key: sectionId,
-            ref: (element: HTMLElement) => sectionElements.push(element),
-          },
-          lazy && !loadedSections.has(index) ? null : section.props.children,
-        );
-      })}
+      {sections}
     </div>
   );
 };
