@@ -235,8 +235,14 @@ const ChartConfiguration = ({
 
             {form.isValid && form.submitCount > 0 && !canSaveChart && (
               <ErrorSummary
-                errors={[{ id: `${formId}-submit`, message: 'Cannot submit' }]}
+                title="Cannot save chart"
                 id={`${formId}-errorSummary`}
+                errors={[
+                  {
+                    id: `${formId}-submit`,
+                    message: 'Ensure that all other tabs are valid first',
+                  },
+                ]}
               />
             )}
 
