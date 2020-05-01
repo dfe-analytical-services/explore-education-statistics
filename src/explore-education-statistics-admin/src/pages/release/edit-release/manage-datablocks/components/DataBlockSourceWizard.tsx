@@ -126,32 +126,36 @@ const DataBlockSourceWizard = ({
   onDataBlockSave,
 }: DataBlockSourceWizardProps) => {
   return (
-    <TableToolWizard
-      releaseId={releaseId}
-      themeMeta={[]}
-      initialState={initialTableToolState}
-      finalStep={({ response, query }) => (
-        <WizardStep>
-          {wizardStepProps => (
-            <>
-              <WizardStepHeading {...wizardStepProps}>
-                {dataBlock ? 'Update data block' : 'Create data block'}
-              </WizardStepHeading>
+    <>
+      <p>Configure data source for the data block</p>
 
-              {query && response && (
-                <DataBlockSourceWizardFinalStep
-                  dataBlock={dataBlock}
-                  query={query}
-                  table={response.table}
-                  tableHeaders={response.tableHeaders}
-                  onDataBlockSave={onDataBlockSave}
-                />
-              )}
-            </>
-          )}
-        </WizardStep>
-      )}
-    />
+      <TableToolWizard
+        releaseId={releaseId}
+        themeMeta={[]}
+        initialState={initialTableToolState}
+        finalStep={({ response, query }) => (
+          <WizardStep>
+            {wizardStepProps => (
+              <>
+                <WizardStepHeading {...wizardStepProps}>
+                  {dataBlock ? 'Update data block' : 'Create data block'}
+                </WizardStepHeading>
+
+                {query && response && (
+                  <DataBlockSourceWizardFinalStep
+                    dataBlock={dataBlock}
+                    query={query}
+                    table={response.table}
+                    tableHeaders={response.tableHeaders}
+                    onDataBlockSave={onDataBlockSave}
+                  />
+                )}
+              </>
+            )}
+          </WizardStep>
+        )}
+      />
+    </>
   );
 };
 

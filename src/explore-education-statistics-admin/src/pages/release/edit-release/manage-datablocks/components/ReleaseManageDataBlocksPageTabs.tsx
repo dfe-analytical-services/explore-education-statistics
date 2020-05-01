@@ -9,6 +9,7 @@ import dataBlocksService, {
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import WarningMessage from '@common/components/WarningMessage';
 import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
 import { TableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
@@ -47,7 +48,7 @@ const ReleaseManageDataBlocksPageTabs = ({
     [selectedDataBlock],
   );
 
-  const { value: table } = useTableQuery(query);
+  const { value: table, error } = useTableQuery(query);
 
   useEffect(() => {
     if (!query) {
@@ -114,45 +115,52 @@ const ReleaseManageDataBlocksPageTabs = ({
         />
       )}
 
-      <Tabs
-        id="manageDataBlocks"
-        openId={activeTab}
-        onToggle={tab => {
-          setActiveTab(tab.id);
-        }}
-      >
-        <TabsSection title="Data source">
-          <p>Configure the data source for the data block</p>
-
-          {!isLoading && (
-            <DataBlockSourceWizard
-              releaseId={releaseId}
-              dataBlock={selectedDataBlock}
-              initialTableToolState={tableToolState}
-              onDataBlockSave={handleDataBlockSave}
-            />
-          )}
-        </TabsSection>
-
-        {selectedDataBlock &&
-          tableToolState?.response && [
-            <TabsSection title="Table" key="table">
-              <TableTabSection
+      {!error ? (
+        <Tabs
+          id="manageDataBlocks"
+          openId={activeTab}
+          onToggle={tab => {
+            setActiveTab(tab.id);
+          }}
+        >
+          <TabsSection title="Data source">
+            {!isLoading && (
+              <DataBlockSourceWizard
+                releaseId={releaseId}
                 dataBlock={selectedDataBlock}
-                table={tableToolState.response.table}
-                tableHeaders={tableToolState.response.tableHeaders}
+                initialTableToolState={tableToolState}
                 onDataBlockSave={handleDataBlockSave}
               />
+            )}
+          </TabsSection>
+
+          {selectedDataBlock && [
+            <TabsSection title="Table" key="table">
+              {tableToolState?.response && (
+                <TableTabSection
+                  dataBlock={selectedDataBlock}
+                  table={tableToolState.response.table}
+                  tableHeaders={tableToolState.response.tableHeaders}
+                  onDataBlockSave={handleDataBlockSave}
+                />
+              )}
             </TabsSection>,
             <TabsSection title="Chart" key="chart">
-              <ChartBuilderTabSection
-                dataBlock={selectedDataBlock}
-                table={tableToolState.response.table}
-                onDataBlockSave={handleDataBlockSave}
-              />
+              {tableToolState?.response && (
+                <ChartBuilderTabSection
+                  dataBlock={selectedDataBlock}
+                  table={tableToolState.response.table}
+                  onDataBlockSave={handleDataBlockSave}
+                />
+              )}
             </TabsSection>,
           ]}
-      </Tabs>
+        </Tabs>
+      ) : (
+        <WarningMessage>
+          There was a problem loading data block source
+        </WarningMessage>
+      )}
     </div>
   );
 };
