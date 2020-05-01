@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 {
     public interface IPermalinkMigrationService
     {
-        Task<Either<ActionResult, bool>> MigrateAll<T>(Func<T, Task<Either<string, Permalink>>> transformFunc);
+        Task<Either<ActionResult, bool>> MigrateAll<T>(string migrationId,
+            Func<T, Task<Either<string, Permalink>>> transformFunc);
     }
 }

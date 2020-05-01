@@ -41,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public Task<Either<ActionResult, bool>> MigrateAll()
         {
-            return _permalinkMigrationService.MigrateAll<EES17Permalink>(Transform);
+            var migrationId = "EES-17_ChangeTableHeadersAndAddQueryLocation";
+            return _permalinkMigrationService.MigrateAll<EES17Permalink>(migrationId, Transform);
         }
 
         private Task<Either<string, Permalink>> Transform(EES17Permalink source)

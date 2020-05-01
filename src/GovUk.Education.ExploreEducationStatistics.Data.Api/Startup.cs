@@ -133,8 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
-            // TODO EES-17 Prevent this from running more than once
-            //MigratePermalinks(app);
+            MigratePermalinks(app);
 
             if (env.IsDevelopment())
             {

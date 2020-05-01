@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     {
         Task<string> DownloadTextAsync(string containerName, string blobName);
 
+        bool FileExists(string containerName, string blobName);
+
         bool FileExistsAndIsReleased(string containerName, string blobName);
 
         IEnumerable<CloudBlockBlob> ListBlobs(string containerName);

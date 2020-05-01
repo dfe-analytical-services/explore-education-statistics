@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
@@ -16,6 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IFileStorageService _fileStorageService;
         private readonly ILogger _logger;
 
+        private const string PermalinkContainerName = PermalinkService.ContainerName;
+        private const string MigrationContainerName = "permalink-migrations";
+
         public PermalinkMigrationService(IFileStorageService fileStorageService,
             ILogger<PermalinkMigrationService> logger)
         {
@@ -23,42 +28,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger = logger;
         }
 
-        public async Task<Either<ActionResult, bool>> MigrateAll<T>(
+        public async Task<Either<ActionResult, bool>> MigrateAll<T>(string migrationId,
             Func<T, Task<Either<string, Permalink>>> transformFunc)
         {
-            var blobs = _fileStorageService.ListBlobs(PermalinkService.ContainerName);
+            var shouldRun = await CheckMigrationShouldRunAndRecordHistoryAsync(migrationId);
+
+            if (shouldRun)
+            {
+                var source = await DownloadPermalinksAsync<T>();
+
+                var transformed = new List<Permalink>();
+                var errors = new List<string>();
+
+                foreach (var permalink in source)
+                {
+                    var result = await transformFunc.Invoke(permalink);
+                    if (result.IsLeft)
+                    {
+                        errors.Add(result.Left);
+                    }
+                    else
+                    {
+                        transformed.Add(result.Right);
+                    }
+                }
+
+                if (errors.Any())
+                {
+                    errors.ForEach(message => _logger.LogError(message));
+                    return false;
+                }
+
+                await UploadPermalinksAsync(transformed);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private async Task<IEnumerable<T>> DownloadPermalinksAsync<T>()
+        {
+            var blobs = _fileStorageService.ListBlobs(PermalinkContainerName);
             var task = await Task.WhenAll(blobs.Select(blob => blob.DownloadTextAsync()));
-            var permalinks = task.Select(JsonConvert.DeserializeObject<T>);
+            return task.Select(JsonConvert.DeserializeObject<T>);
+        }
 
-            var transformed = new List<Permalink>();
-            var errors = new List<string>();
-
-            foreach (var permalink in permalinks)
-            {
-                var result = await transformFunc.Invoke(permalink);
-                if (result.IsLeft)
-                {
-                    errors.Add(result.Left);
-                }
-                else
-                {
-                    transformed.Add(result.Right);
-                }
-            }
-
-            if (errors.Any())
-            {
-                errors.ForEach(message => _logger.LogError(message));
-                return false;
-            }
-
-            transformed.ForEach(async permalink =>
-            {
-                await _fileStorageService.UploadFromStreamAsync(PermalinkService.ContainerName,
+        private async Task UploadPermalinksAsync(List<Permalink> permalinks)
+        {
+            await Task.WhenAll(permalinks.Select(permalink =>
+                _fileStorageService.UploadFromStreamAsync(PermalinkContainerName,
                     permalink.Id.ToString(),
-                    "application/json", JsonConvert.SerializeObject(permalink));
-            });
-            return true;
+                    MediaTypeNames.Text.Plain,
+                    JsonConvert.SerializeObject(permalink))));
+        }
+
+        private async Task<bool> CheckMigrationShouldRunAndRecordHistoryAsync(string migrationId)
+        {
+            var shouldRun = !_fileStorageService.FileExists(MigrationContainerName, migrationId);
+            if (shouldRun)
+            {
+                await AddMigrationHistoryAsync(migrationId);
+            }
+
+            return shouldRun;
+        }
+
+        private Task AddMigrationHistoryAsync(string migrationId)
+        {
+            var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+            return _fileStorageService.UploadFromStreamAsync(MigrationContainerName,
+                migrationId,
+                MediaTypeNames.Text.Plain,
+                now);
         }
     }
 }
