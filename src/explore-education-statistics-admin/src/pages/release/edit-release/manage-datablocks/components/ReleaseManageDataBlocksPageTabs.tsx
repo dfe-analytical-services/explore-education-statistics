@@ -28,8 +28,6 @@ const ReleaseManageDataBlocksPageTabs = ({
   selectedDataBlock,
   onDataBlockSave,
 }: Props) => {
-  const [activeTab, setActiveTab] = useState<string>('');
-
   const [isLoading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -116,14 +114,8 @@ const ReleaseManageDataBlocksPageTabs = ({
       )}
 
       {!error ? (
-        <Tabs
-          id="manageDataBlocks"
-          openId={activeTab}
-          onToggle={tab => {
-            setActiveTab(tab.id);
-          }}
-        >
-          <TabsSection title="Data source">
+        <Tabs id="manageDataBlocks">
+          <TabsSection title="Data source" id="manageDataBlocks-dataSource">
             {!isLoading && (
               <DataBlockSourceWizard
                 releaseId={releaseId}
@@ -135,7 +127,7 @@ const ReleaseManageDataBlocksPageTabs = ({
           </TabsSection>
 
           {selectedDataBlock && [
-            <TabsSection title="Table" key="table">
+            <TabsSection title="Table" key="table" id="manageDataBlocks-table">
               {tableToolState?.response && (
                 <TableTabSection
                   dataBlock={selectedDataBlock}
@@ -145,7 +137,7 @@ const ReleaseManageDataBlocksPageTabs = ({
                 />
               )}
             </TabsSection>,
-            <TabsSection title="Chart" key="chart">
+            <TabsSection title="Chart" key="chart" id="manageDataBlocks-chart">
               {tableToolState?.response && (
                 <ChartBuilderTabSection
                   dataBlock={selectedDataBlock}

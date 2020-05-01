@@ -228,6 +228,25 @@ describe('Tabs', () => {
     expect(window.location.hash).toBe('#test-tabs-2');
   });
 
+  test('clicking tab does not change location hash if `modifyHash` is false', () => {
+    const { getAllByText } = render(
+      <Tabs id="test-tabs" modifyHash={false}>
+        <TabsSection title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(window.location.hash).toBe('');
+
+    fireEvent.click(getAllByText('Tab 2')[0]);
+
+    expect(window.location.hash).toBe('');
+  });
+
   test('clicking tab renders lazy section', () => {
     const { getAllByText, queryByText } = render(
       <Tabs id="test-tabs">

@@ -17,12 +17,13 @@ import TabsSection, { TabsSectionProps } from './TabsSection';
 
 interface Props {
   children: ReactNode;
+  modifyHash?: boolean;
   id: string;
   onToggle?: (section: { id: string; title: string }) => void;
   openId?: string;
 }
 
-const Tabs = ({ children, id, onToggle }: Props) => {
+const Tabs = ({ children, id, modifyHash = true, onToggle }: Props) => {
   const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -58,7 +59,7 @@ const Tabs = ({ children, id, onToggle }: Props) => {
 
   const selectTab = useCallback(
     (index: number) => {
-      if (sectionElements.current[index]) {
+      if (sectionElements.current[index] && modifyHash) {
         if (window.history.pushState) {
           window.history.pushState(
             null,

@@ -225,7 +225,7 @@ const ChartBuilder = ({
       )}
 
       {definition && (
-        <Tabs id="chartBuilder-tabs">
+        <Tabs id="chartBuilder-tabs" modifyHash={false}>
           {definition.data.length > 0 && (
             <TabsSection
               title="Data"
