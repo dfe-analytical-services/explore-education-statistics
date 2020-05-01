@@ -410,30 +410,32 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="Date uploaded">
                             {format(dataFile.created, 'd/M/yyyy HH:mm')}
                           </SummaryListItem>
-                          {canUpdateRelease && dataFile.canDelete && (
-                            <SummaryListItem
-                              term="Actions"
-                              actions={
-                                <ButtonText
-                                  onClick={() =>
-                                    editReleaseDataService
-                                      .getDeleteDataFilePlan(
-                                        releaseId,
-                                        dataFile,
-                                      )
-                                      .then(plan => {
-                                        setDeleteDataFile({
-                                          plan,
-                                          file: dataFile,
-                                        });
-                                      })
-                                  }
-                                >
-                                  Delete files
-                                </ButtonText>
-                              }
-                            />
-                          )}
+                          {canUpdateRelease &&
+                            canUpdateReleaseDataFiles &&
+                            dataFile.canDelete && (
+                              <SummaryListItem
+                                term="Actions"
+                                actions={
+                                  <ButtonText
+                                    onClick={() =>
+                                      editReleaseDataService
+                                        .getDeleteDataFilePlan(
+                                          releaseId,
+                                          dataFile,
+                                        )
+                                        .then(plan => {
+                                          setDeleteDataFile({
+                                            plan,
+                                            file: dataFile,
+                                          });
+                                        })
+                                    }
+                                  >
+                                    Delete files
+                                  </ButtonText>
+                                }
+                              />
+                            )}
                         </SummaryList>
                       </AccordionSection>
                     );

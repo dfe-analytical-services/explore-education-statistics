@@ -292,13 +292,13 @@ const ChartDataSelector = ({
               {isChartSubmitted && !canSaveChart && (
                 <ErrorSummary
                   title="Cannot save chart"
+                  id={`${formId}-errorSummary`}
                   errors={[
                     {
                       id: `${formId}-submit`,
                       message: 'Ensure that all other tabs are valid first',
                     },
                   ]}
-                  id={`${formId}-errorSummary`}
                 />
               )}
 
