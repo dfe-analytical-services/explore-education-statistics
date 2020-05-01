@@ -412,7 +412,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="Date uploaded">
                             {format(dataFile.created, 'd/M/yyyy HH:mm')}
                           </SummaryListItem>
-                          {canUpdateRelease && dataFile.canDelete && (
+                          {canUpdateRelease && canUpdateReleaseDataFiles && dataFile.canDelete && (
                             <SummaryListItem
                               term="Actions"
                               actions={

@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             {
                 if (release.Version > 0)
                 {
-                    return new ForbidResult();
+                    return Ok(false);
                 }
 
                 return await _userService.CheckCanUpdateRelease(release);
