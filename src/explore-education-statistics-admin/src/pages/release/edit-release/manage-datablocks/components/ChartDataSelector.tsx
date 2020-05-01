@@ -1,6 +1,7 @@
 import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
+import ErrorSummary from '@common/components/ErrorSummary';
 import { Form, FormFieldSelect, Formik } from '@common/components/form';
 import {
   ChartCapabilities,
@@ -69,6 +70,8 @@ const ChartDataSelector = ({
   const [dataSetConfigs, setDataSetConfigs] = useState<DataSetConfiguration[]>([
     ...dataSets,
   ]);
+
+  const [isChartSubmitted, setChartSubmitted] = useState(false);
 
   const removeSelected = (selected: DataSetConfiguration, index: number) => {
     const newDataSets = [...dataSetConfigs];
@@ -286,9 +289,23 @@ const ChartDataSelector = ({
 
               <hr />
 
+              {isChartSubmitted && !canSaveChart && (
+                <ErrorSummary
+                  title="Cannot save chart"
+                  errors={[
+                    {
+                      id: `${formId}-submit`,
+                      message: 'Ensure that all other tabs are valid first',
+                    },
+                  ]}
+                  id={`${formId}-errorSummary`}
+                />
+              )}
+
               <Button
-                disabled={!canSaveChart}
+                id={`${formId}-submit`}
                 onClick={() => {
+                  setChartSubmitted(true);
                   onSubmit(dataSetConfigs);
                 }}
               >

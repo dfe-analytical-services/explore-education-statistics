@@ -5,6 +5,7 @@ import {
 import { generateDeprecatedDataSetKey } from '@common/modules/charts/util/deprecatedDataSetKey';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import { DeprecatedChartLabels } from '@common/services/types/blocks';
+import omit from 'lodash/omit';
 
 /**
  * Combine {@param labels} to matching {@param dataSets}.
@@ -35,7 +36,7 @@ export default function getLabelDataSetConfigurations(
 
       return {
         ...dataSet,
-        config: configuration ?? {},
+        config: omit(configuration ?? {}, ['value']),
       };
     })
     .filter(

@@ -3,16 +3,22 @@ import isEqual from 'lodash/isEqual';
 
 interface Props<T> {
   value: T;
-  onChange: (value: T) => void;
+  onMount?: (value: T) => void;
+  onChange?: (value: T) => void;
 }
 
-const Effect = <T extends unknown>({ onChange, value }: Props<T>) => {
+const Effect = <T extends unknown>({ onChange, onMount, value }: Props<T>) => {
   const rendered = useRef<boolean>(false);
   const previousValue = useRef(value);
 
   useEffect(() => {
     if (!rendered.current) {
       rendered.current = true;
+
+      if (onMount) {
+        onMount(value);
+      }
+
       return;
     }
 
@@ -21,9 +27,11 @@ const Effect = <T extends unknown>({ onChange, value }: Props<T>) => {
       return;
     }
 
-    onChange(value);
-    previousValue.current = value;
-  }, [onChange, value]);
+    if (onChange) {
+      onChange(value);
+      previousValue.current = value;
+    }
+  }, [onChange, onMount, value]);
 
   return null;
 };

@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormNumberInput renders correctly with minimal props 1`] = `
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<input name="test"
+       class="govuk-input"
+       id="test-input"
+       type="number"
+       value
+>
+`;

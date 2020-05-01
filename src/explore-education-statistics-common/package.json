@@ -68,6 +68,7 @@
     "react-highlight-words": "^0.16.0",
     "react-leaflet": "^2.6.3",
     "react-markdown": "^4.3.1",
+    "react-test-renderer": "16.13.1",
     "recharts": "^1.8.5",
     "sanitize-html": "^1.23.0",
     "stylelint": "^13.3.0",
