@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -13,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Query.SubjectMetaQueryContext;
@@ -23,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly IPermalinkMigrationService _permalinkMigrationService;
         private readonly ISubjectMetaService _subjectMetaService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
@@ -30,11 +33,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public EES17PermalinkMigrationService(IPermalinkMigrationService permalinkMigrationService,
             ISubjectMetaService subjectMetaService,
+            IHttpContextAccessor httpContextAccessor,
             ILogger<EES17PermalinkMigrationService> logger,
             IMapper mapper)
         {
             _permalinkMigrationService = permalinkMigrationService;
             _subjectMetaService = subjectMetaService;
+            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _mapper = mapper;
         }
@@ -225,6 +230,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ObservationQueryContext query)
         {
+            _httpContextAccessor.HttpContext = new DefaultHttpContext();;
+            _httpContextAccessor.HttpContext.User = new ClaimsPrincipal();
             return _subjectMetaService.GetSubjectMeta(FromObservationQueryContext(query));
         }
     }
