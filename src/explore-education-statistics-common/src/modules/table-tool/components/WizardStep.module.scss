@@ -77,7 +77,7 @@ $step-padding-top-mobile: govuk-spacing(7);
 .content {
   border-top: 2px solid govuk-colour('light-grey');
   display: block;
-  margin-left: govuk-spacing(6);
+  padding-left: govuk-spacing(6);
   padding-top: $step-padding-top;
   width: 100%;
   @include govuk-media-query($until: tablet) {

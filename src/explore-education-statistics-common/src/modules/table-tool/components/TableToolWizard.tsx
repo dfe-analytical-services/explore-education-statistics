@@ -18,7 +18,11 @@ import TimePeriodForm, {
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import tableBuilderService, {
   LocationLevelKeys,
   locationLevelKeys,
@@ -27,15 +31,20 @@ import tableBuilderService, {
   TableDataQuery,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import omitBy from 'lodash/omitBy';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useImmer } from 'use-immer';
-import {
-  executeTableQuery,
-  getDefaultSubjectMeta,
-} from './utils/tableToolHelpers';
+
+const getDefaultSubjectMeta = (): PublicationSubjectMeta => ({
+  timePeriod: {
+    hint: '',
+    legend: '',
+    options: [],
+  },
+  locations: {},
+  indicators: {},
+  filters: {},
+});
 
 interface Publication {
   id: string;
@@ -53,11 +62,13 @@ export interface TableToolState {
   };
 }
 
-export interface FinalStepProps {
+export interface FinalStepRenderProps {
   publication?: Publication;
-  table?: FullTable;
   query?: TableDataQuery;
-  tableHeaders?: TableHeadersConfig;
+  response?: {
+    table: FullTable;
+    tableHeaders: TableHeadersConfig;
+  };
 }
 
 export interface TableToolWizardProps {
@@ -65,13 +76,8 @@ export interface TableToolWizardProps {
   publicationId?: string;
   releaseId?: string;
   initialState?: TableToolState;
-  finalStep?: (props: FinalStepProps) => ReactElement;
+  finalStep?: (props: FinalStepRenderProps) => ReactElement;
   scrollOnMount?: boolean;
-  onTableCreated?: (response: {
-    query: TableDataQuery;
-    table: FullTable;
-    tableHeaders: TableHeadersConfig;
-  }) => void;
 }
 
 const TableToolWizard = ({
@@ -80,14 +86,13 @@ const TableToolWizard = ({
   releaseId,
   initialState,
   finalStep,
-  onTableCreated,
 }: TableToolWizardProps) => {
   const { withoutErrorHandling } = useErrorControl();
 
   const [publication, setPublication] = useState<Publication>();
   const [subjects, setSubjects] = useState<PublicationSubject[]>([]);
 
-  const [tableToolState, updateTableToolState] = useImmer<TableToolState>(
+  const [state, updateState] = useImmer<TableToolState>(
     initialState ?? {
       initialStep: 1,
       subjectMeta: getDefaultSubjectMeta(),
@@ -138,7 +143,7 @@ const TableToolWizard = ({
       selectedSubjectId,
     );
 
-    updateTableToolState(draft => {
+    updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
 
       draft.query.subjectId = selectedSubjectId;
@@ -151,11 +156,11 @@ const TableToolWizard = ({
     const nextSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
         ...locations,
-        subjectId: tableToolState.query.subjectId,
+        subjectId: state.query.subjectId,
       },
     );
 
-    updateTableToolState(draft => {
+    updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
       draft.query = {
@@ -173,8 +178,8 @@ const TableToolWizard = ({
 
     const nextSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
-        ...tableToolState.query,
-        subjectId: tableToolState.query.subjectId,
+        ...state.query,
+        subjectId: state.query.subjectId,
         timePeriod: {
           startYear,
           startCode,
@@ -184,7 +189,7 @@ const TableToolWizard = ({
       },
     );
 
-    updateTableToolState(draft => {
+    updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
       draft.subjectMeta.filters = nextSubjectMeta.filters;
 
@@ -201,25 +206,28 @@ const TableToolWizard = ({
     filters,
     indicators,
   }) => {
+    updateState(draft => {
+      draft.response = undefined;
+    });
+
     const query: TableDataQuery = {
-      ...tableToolState.query,
+      ...state.query,
       indicators,
       filters: Object.values(filters).flat(),
     };
 
-    const response = await executeTableQuery(query);
+    const tableData = await tableBuilderService.getTableData(query);
 
-    updateTableToolState(draft => {
+    const table = mapFullTable(tableData);
+    const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
+
+    updateState(draft => {
       draft.query = query;
-      draft.response = response;
+      draft.response = {
+        table,
+        tableHeaders,
+      };
     });
-
-    if (onTableCreated) {
-      onTableCreated({
-        ...response,
-        query,
-      });
-    }
   };
 
   return (
@@ -227,7 +235,7 @@ const TableToolWizard = ({
       {({ askConfirm }) => (
         <>
           <Wizard
-            initialStep={tableToolState.initialStep}
+            initialStep={state.initialStep}
             id="tableTool-steps"
             onStepChange={async (nextStep, previousStep) => {
               if (nextStep < previousStep) {
@@ -256,7 +264,7 @@ const TableToolWizard = ({
                 <PublicationSubjectForm
                   {...stepProps}
                   options={subjects}
-                  initialValues={tableToolState.query}
+                  initialValues={state.query}
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
               )}
@@ -265,8 +273,8 @@ const TableToolWizard = ({
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
-                  options={tableToolState.subjectMeta.locations}
-                  initialValues={tableToolState.query}
+                  options={state.subjectMeta.locations}
+                  initialValues={state.query}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
               )}
@@ -275,8 +283,8 @@ const TableToolWizard = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={tableToolState.query}
-                  options={tableToolState.subjectMeta.timePeriod.options}
+                  initialValues={state.query}
+                  options={state.subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
               )}
@@ -286,15 +294,15 @@ const TableToolWizard = ({
                 <FiltersForm
                   {...stepProps}
                   onSubmit={handleFiltersFormSubmit}
-                  initialValues={tableToolState.query}
-                  subjectMeta={tableToolState.subjectMeta}
+                  initialValues={state.query}
+                  subjectMeta={state.subjectMeta}
                 />
               )}
             </WizardStep>
             {finalStep &&
               finalStep({
-                ...tableToolState.response,
-                query: tableToolState.query,
+                query: state.query,
+                response: state.response,
                 publication,
               })}
           </Wizard>
