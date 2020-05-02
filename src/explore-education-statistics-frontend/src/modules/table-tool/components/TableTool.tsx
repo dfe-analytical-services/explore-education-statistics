@@ -61,7 +61,7 @@ const TableToolFinalStep = ({
     setPermalinkLoading(true);
 
     const { id } = await permalinkService.createPermalink({
-      ...query,
+      query,
       configuration: {
         tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
       },

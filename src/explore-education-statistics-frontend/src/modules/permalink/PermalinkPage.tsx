@@ -2,10 +2,9 @@ import FormattedDate from '@common/components/FormattedDate';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import mapPermalink from '@common/modules/table-tool/utils/mapPermalink';
-import permalinkService, {
-  UnmappedPermalink,
-} from '@common/services/permalinkService';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import permalinkService, { Permalink } from '@common/services/permalinkService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
@@ -14,13 +13,16 @@ import React, { useRef } from 'react';
 import styles from './PermalinkPage.module.scss';
 
 interface Props {
-  data: UnmappedPermalink;
+  data: Permalink;
 }
 
 const PermalinkPage: NextPage<Props> = ({ data }) => {
   const tableRef = useRef<HTMLDivElement>(null);
-  const { fullTable, query } = mapPermalink(data);
-  const { configuration } = query;
+  const fullTable = mapFullTable(data.fullTable);
+  const tableHeadersConfig = mapTableHeadersConfig(
+    data.configuration.tableHeaders,
+    fullTable.subjectMeta,
+  );
 
   const publicationSlug = `permalink-${data.created}-${data.title}`;
 
@@ -64,7 +66,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         <TimePeriodDataTable
           fullTable={fullTable}
           source="DfE prototype example statistics"
-          tableHeadersConfig={configuration.tableHeaders}
+          tableHeadersConfig={tableHeadersConfig}
         />
       </div>
 

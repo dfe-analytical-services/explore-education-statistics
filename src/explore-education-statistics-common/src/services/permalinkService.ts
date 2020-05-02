@@ -4,12 +4,15 @@ import {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 
-export interface UnmappedPermalink {
+export interface Permalink {
   id: string;
   title: string;
   created: string;
   fullTable: TableDataResponse;
-  query: UnmappedPermalinkQuery;
+  configuration: {
+    tableHeaders: UnmappedTableHeadersConfig;
+  };
+  query: TableDataQuery;
 }
 
 export type TableHeader =
@@ -30,17 +33,18 @@ export interface UnmappedTableHeadersConfig {
   rows: TableHeader[];
 }
 
-interface UnmappedPermalinkQuery extends TableDataQuery {
+interface CreatePermalink {
+  query: TableDataQuery;
   configuration: {
     tableHeaders: UnmappedTableHeadersConfig;
   };
 }
 
 export default {
-  createPermalink(query: UnmappedPermalinkQuery): Promise<UnmappedPermalink> {
+  createPermalink(query: CreatePermalink): Promise<Permalink> {
     return dataApi.post('/permalink', query);
   },
-  getPermalink(publicationSlug: string): Promise<UnmappedPermalink> {
+  getPermalink(publicationSlug: string): Promise<Permalink> {
     return dataApi.get(`/permalink/${publicationSlug}`);
   },
 };
