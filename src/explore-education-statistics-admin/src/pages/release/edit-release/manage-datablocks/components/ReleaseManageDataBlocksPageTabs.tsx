@@ -30,7 +30,7 @@ const ReleaseManageDataBlocksPageTabs = ({
 }: Props) => {
   const [isSaving, setIsSaving] = useState(false);
 
-  const [tableToolState, setInitialTableToolState] = useState<TableToolState>();
+  const [tableToolState, setTableToolState] = useState<TableToolState>();
 
   const { error, isLoading } = useTableQuery(
     selectedDataBlock
@@ -47,7 +47,7 @@ const ReleaseManageDataBlocksPageTabs = ({
           query,
         );
 
-        setInitialTableToolState({
+        setTableToolState({
           initialStep: 5,
           query,
           subjectMeta,
