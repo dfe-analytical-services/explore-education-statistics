@@ -53,6 +53,7 @@ describe('DataBlockRenderer', () => {
         'unauthorised-absence-rate',
         'overall-absence-rate',
       ],
+      locations: {},
     },
     charts: [],
     tables: [],

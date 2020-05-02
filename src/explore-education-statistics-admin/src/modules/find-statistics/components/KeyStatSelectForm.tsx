@@ -3,11 +3,6 @@ import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import {
-  locationLevelKeys,
-  TimePeriodQuery,
-  LocationLevelKeys,
-} from '@common/services/tableBuilderService';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 
@@ -27,27 +22,18 @@ const KeyStatSelectForm = ({
   const { availableDataBlocks } = useReleaseState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
-  const keyStatDatablocks = useMemo(() => {
-    return availableDataBlocks.filter(db => {
-      const req = db.dataBlockRequest;
-      const timePeriod = req.timePeriod as TimePeriodQuery;
+  const keyStatDataBlocks = useMemo(() => {
+    return availableDataBlocks.filter(dataBlock => {
+      const { timePeriod, locations, indicators } = dataBlock.dataBlockRequest;
 
-      const reqLocationLevels = Object.keys(req).filter(key =>
-        locationLevelKeys.includes(key as LocationLevelKeys),
-      );
+      const locationLevels = Object.values(locations);
+
       const hasSingleLocation =
-        reqLocationLevels.length === 1 &&
-        req[reqLocationLevels[0] as LocationLevelKeys]?.length === 1;
+        locationLevels.length === 1 && locationLevels[0].length === 1;
 
-      if (!locationLevelKeys.some(key => req[key])) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          'dataBlockRequest should contain at least one location level from locationLevelKeys!',
-        );
-      }
       return (
-        req.indicators.length === 1 &&
-        timePeriod.startYear === timePeriod.endYear &&
+        indicators.length === 1 &&
+        timePeriod?.startYear === timePeriod?.endYear &&
         hasSingleLocation
         // NOTE(mark): No check for number of filters because they cannot tell us whether
         // there is a single result
@@ -89,7 +75,7 @@ const KeyStatSelectForm = ({
             value: '',
           },
           ...orderBy(
-            keyStatDatablocks.map(dataBlock => ({
+            keyStatDataBlocks.map(dataBlock => ({
               label: dataBlock.name || '',
               value: dataBlock.id || '',
             })),
