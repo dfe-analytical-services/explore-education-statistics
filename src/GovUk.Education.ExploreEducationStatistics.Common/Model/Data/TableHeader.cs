@@ -6,7 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 {
     public class TableHeader
     {
-        public string Label { get; set; }
         public string Level { get; set; }
         public string Value { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
@@ -16,18 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
         {
         }
 
-        public TableHeader(string label, string value, TableHeaderType type)
+        public TableHeader(string value, TableHeaderType type)
         {
-            Label = label;
             Value = value;
             Type = type;
         }
 
-        public static TableHeader NewLocationHeader(string label, GeographicLevel level, string value)
+        public static TableHeader NewLocationHeader(GeographicLevel level, string value)
         {
             return new TableHeader
             {
-                Label = label,
                 Level = level.ToString().CamelCase(),
                 Value = value,
                 Type = TableHeaderType.Location

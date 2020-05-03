@@ -22,11 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(headers => headers.RowGroups, m => m.MapFrom(headers => headers.rowGroups));
 
             CreateMap<EES17TableOption, TableHeader>()
-                .ForMember(header => header.Label, m => m.MapFrom(option => option.label))
                 .ForMember(header => header.Value, m => m.MapFrom(option => option.value));
 
             CreateMap<EES17TableRowGroupOption, TableHeader>()
-                .ForMember(header => header.Label, m => m.MapFrom(option => option.label))
                 .ForMember(header => header.Level, m => m.MapFrom(option => option.level))
                 .ForMember(header => header.Value, m => m.MapFrom(option => option.value));
 
