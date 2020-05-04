@@ -10,7 +10,7 @@ interface Props {
   onChange: (chart: ChartDefinition) => void;
 }
 
-const ChartTypeSelector = ({
+const ChartDefinitionSelector = ({
   chartDefinitions,
   selectedChartDefinition,
   geoJsonAvailable,
@@ -52,4 +52,4 @@ const ChartTypeSelector = ({
   );
 };
 
-export default ChartTypeSelector;
+export default ChartDefinitionSelector;

@@ -2,7 +2,7 @@ import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
 import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
-import ChartTypeSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartTypeSelector';
+import ChartDefinitionSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDefinitionSelector';
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import ButtonText from '@common/components/ButtonText';
@@ -188,7 +188,7 @@ const ChartBuilder = ({
 
   return (
     <div className={styles.editor} ref={containerRef}>
-      <ChartTypeSelector
+      <ChartDefinitionSelector
         chartDefinitions={chartDefinitions}
         selectedChartDefinition={definition}
         geoJsonAvailable={meta.geoJsonAvailable}
