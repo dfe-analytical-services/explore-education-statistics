@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationId = Guid.NewGuid();
             var publishedDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
             var createdDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2));
-            var originalReleaseId = Guid.NewGuid();
+            var previousVersionReleaseId = Guid.NewGuid();
             var version = 2;
             var createdById = Guid.NewGuid();
             var createdBy = new User
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Published = publishedDate,
                 Status = releaseStatus,
                 Version = version,
-                OriginalId = originalReleaseId,
+                PreviousVersionId = previousVersionReleaseId,
                 Created = createdDate,
                 CreatedBy = createdBy,
                 CreatedById = createdById,
@@ -410,7 +410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var amendment = contentDbContext
                     .Releases
-                    .Include(r => r.Original)
+                    .Include(r => r.PreviousVersion)
                     .Include(r => r.Type)
                     .Include(r => r.CreatedBy)
                     .Include(r => r.Publication)
@@ -430,8 +430,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null( amendment.Published);
                 Assert.Equal(release.Version + 1, amendment.Version);
                 Assert.Equal(ReleaseStatus.Draft, amendment.Status);
-                Assert.Equal(release.Id, amendment.Original.Id);
-                Assert.Equal(release.Id, amendment.OriginalId);
+                Assert.Equal(release.Id, amendment.PreviousVersion.Id);
+                Assert.Equal(release.Id, amendment.PreviousVersionId);
                 Assert.Equal(_userId, amendment.CreatedBy.Id);
                 Assert.Equal(_userId, amendment.CreatedById);
                 Assert.True(amendment.Created.CompareTo(DateTime.UtcNow.AddSeconds(-1)) > 0 
@@ -449,24 +449,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 amendment.RelatedInformation.ForEach(amended =>
                 {
                     var index = amendment.RelatedInformation.IndexOf(amended);
-                    var original = release.RelatedInformation[index];
-                    AssertAmendedLinkCorrect(amended, original);
+                    var previous = release.RelatedInformation[index];
+                    AssertAmendedLinkCorrect(amended, previous);
                 });
                 
                 Assert.Equal(release.Updates.Count, amendment.Updates.Count);
                 amendment.Updates.ForEach(amended =>
                 {
                     var index = amendment.Updates.IndexOf(amended);
-                    var original = release.Updates[index];
-                    AssertAmendedUpdateCorrect(amended, original, amendment);
+                    var previous = release.Updates[index];
+                    AssertAmendedUpdateCorrect(amended, previous, amendment);
                 });
              
                 Assert.Equal(release.Content.Count, amendment.Content.Count);
                 amendment.Content.ForEach(amended =>
                 {
                     var index = amendment.Content.IndexOf(amended);
-                    var original = release.Content[index];
-                    AssertAmendedContentSectionCorrect(amendment, amended, original);
+                    var previous = release.Content[index];
+                    AssertAmendedContentSectionCorrect(amendment, amended, previous);
                 });
                 
                 Assert.Equal(release.ContentBlocks.Count, amendment.ContentBlocks.Count);
@@ -533,69 +533,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
        }
 
-       private static void AssertAmendedLinkCorrect(Link amended, Link original)
+       private static void AssertAmendedLinkCorrect(Link amended, Link previous)
        {
            Assert.True(amended.Id != Guid.Empty);
-           Assert.NotEqual(original.Id, amended.Id);
-           Assert.Equal(original.Description, amended.Description);
-           Assert.Equal(original.Url, amended.Url);
+           Assert.NotEqual(previous.Id, amended.Id);
+           Assert.Equal(previous.Description, amended.Description);
+           Assert.Equal(previous.Url, amended.Url);
        }
 
-       private static void AssertAmendedUpdateCorrect(Update amended, Update original, Release amendment)
+       private static void AssertAmendedUpdateCorrect(Update amended, Update previous, Release amendment)
        {
            Assert.True(amended.Id != Guid.Empty);
-           Assert.NotEqual(original.Id, amended.Id);
-           Assert.Equal(original.On, amended.On);
-           Assert.Equal(original.Reason, amended.Reason);
+           Assert.NotEqual(previous.Id, amended.Id);
+           Assert.Equal(previous.On, amended.On);
+           Assert.Equal(previous.Reason, amended.Reason);
            Assert.Equal(amendment, amended.Release);
            Assert.Equal(amendment.Id, amended.ReleaseId);
        }
 
        private static void AssertAmendedContentSectionCorrect(Release amendment, ReleaseContentSection amended,
-           ReleaseContentSection original)
+           ReleaseContentSection previous)
        {
            Assert.Equal(amendment, amended.Release);
            Assert.Equal(amendment.Id, amended.ReleaseId);
            Assert.True(amended.ContentSectionId != Guid.Empty);
-           Assert.NotEqual(original.ContentSectionId, amended.ContentSectionId);
+           Assert.NotEqual(previous.ContentSectionId, amended.ContentSectionId);
 
-           var originalSection = original.ContentSection;
+           var previousSection = previous.ContentSection;
            var amendedSection = amended.ContentSection;
 
-           Assert.NotEqual(originalSection.Id, amendedSection.Id);
-           Assert.Equal(originalSection.Caption, amendedSection.Caption);
-           Assert.Equal(originalSection.Heading, amendedSection.Heading);
-           Assert.Equal(originalSection.Order, amendedSection.Order);
-           Assert.Equal(originalSection.Type, amendedSection.Type);
-           Assert.Equal(originalSection.Content.Count, amendedSection.Content.Count);
+           Assert.NotEqual(previousSection.Id, amendedSection.Id);
+           Assert.Equal(previousSection.Caption, amendedSection.Caption);
+           Assert.Equal(previousSection.Heading, amendedSection.Heading);
+           Assert.Equal(previousSection.Order, amendedSection.Order);
+           Assert.Equal(previousSection.Type, amendedSection.Type);
+           Assert.Equal(previousSection.Content.Count, amendedSection.Content.Count);
 
            amendedSection.Content.ForEach(amendedBlock =>
            {
-               var originalBlock = originalSection.Content.Find(b => b.Order == amendedBlock.Order);
-               AssertAmendedContentBlockCorrect(originalBlock, amendedBlock, amendedSection);
+               var previousBlock = previousSection.Content.Find(b => b.Order == amendedBlock.Order);
+               AssertAmendedContentBlockCorrect(previousBlock, amendedBlock, amendedSection);
            });
        }
 
-       private static void AssertAmendedContentBlockCorrect(IContentBlock originalBlock, IContentBlock amendedBlock,
+       private static void AssertAmendedContentBlockCorrect(IContentBlock previousBlock, IContentBlock amendedBlock,
            ContentSection amendedSection)
        {
-           Assert.NotEqual(originalBlock.Id, amendedBlock.Id);
-           Assert.Equal(originalBlock.Order, amendedBlock.Order);
-           Assert.Equal(originalBlock.Type, amendedBlock.Type);
+           Assert.NotEqual(previousBlock.Id, amendedBlock.Id);
+           Assert.Equal(previousBlock.Order, amendedBlock.Order);
+           Assert.Equal(previousBlock.Type, amendedBlock.Type);
            Assert.Equal(amendedSection, amendedBlock.ContentSection);
            Assert.Equal(amendedSection.Id, amendedBlock.ContentSectionId);
-           Assert.NotEmpty(originalBlock.Comments);
+           Assert.NotEmpty(previousBlock.Comments);
            Assert.Empty(amendedBlock.Comments);
        }
 
-       private static void AssertAmendedReleaseRoleCorrect(UserReleaseRole original, UserReleaseRole amended,
+       private static void AssertAmendedReleaseRoleCorrect(UserReleaseRole previous, UserReleaseRole amended,
            Release amendment)
        {
-           Assert.NotEqual(original.Id, amended.Id);
+           Assert.NotEqual(previous.Id, amended.Id);
            Assert.Equal(amendment, amended.Release);
            Assert.Equal(amendment.Id, amended.ReleaseId);
-           Assert.Equal(original.UserId, amended.UserId);
-           Assert.Equal(original.Role, amended.Role);
+           Assert.Equal(previous.UserId, amended.UserId);
+           Assert.Equal(previous.Role, amended.Role);
        }
 
        private static void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile, Release amendment)

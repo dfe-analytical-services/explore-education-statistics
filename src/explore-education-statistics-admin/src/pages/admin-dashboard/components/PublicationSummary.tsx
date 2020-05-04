@@ -32,7 +32,9 @@ const PublicationSummary = ({
   >();
   const noAmendmentInProgressFilter = (release: AdminDashboardRelease) =>
     publication &&
-    !publication.releases.some(r => r.amendment && r.originalId === release.id);
+    !publication.releases.some(
+      r => r.amendment && r.previousVersionId === release.id,
+    );
 
   // BAU-404 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
   const showAmendmentButton = () => true;

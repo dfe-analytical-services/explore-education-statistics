@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200501143848_EES-669_Add_PreviousVersionId_Column")]
+    partial class EES669_Add_PreviousVersionId_Column
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1773,6 +1775,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("OriginalId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("PreviousVersionId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1820,6 +1825,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("TypeId");
 
+                    b.HasIndex("OriginalId", "Version");
+
                     b.HasIndex("PreviousVersionId", "Version");
 
                     b.ToTable("Releases");
@@ -1831,7 +1838,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Created = new DateTime(2017, 8, 1, 23, 59, 54, 0, DateTimeKind.Utc),
                             CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"3\",\"Day\":\"22\"}",
-                            PreviousVersionId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                            OriginalId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                            PreviousVersionId = new Guid("00000000-0000-0000-0000-000000000000"),
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             PublishScheduled = new DateTime(2018, 4, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Published = new DateTime(2018, 4, 25, 9, 30, 0, 0, DateTimeKind.Unspecified),
@@ -1849,7 +1857,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Created = new DateTime(2017, 8, 1, 11, 13, 22, 0, DateTimeKind.Utc),
                             CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"7\",\"Day\":\"19\"}",
-                            PreviousVersionId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            OriginalId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            PreviousVersionId = new Guid("00000000-0000-0000-0000-000000000000"),
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             PublishScheduled = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Published = new DateTime(2018, 7, 19, 9, 30, 0, 0, DateTimeKind.Unspecified),
@@ -1868,7 +1877,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Created = new DateTime(2019, 8, 1, 9, 30, 33, 0, DateTimeKind.Utc),
                             CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"6\",\"Day\":\"14\"}",
-                            PreviousVersionId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                            OriginalId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                            PreviousVersionId = new Guid("00000000-0000-0000-0000-000000000000"),
                             PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                             PublishScheduled = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2018",
@@ -4056,6 +4066,12 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Original")
+                        .WithMany()
+                        .HasForeignKey("OriginalId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
