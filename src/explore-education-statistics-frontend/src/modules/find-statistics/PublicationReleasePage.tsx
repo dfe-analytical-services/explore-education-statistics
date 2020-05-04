@@ -299,9 +299,14 @@ class PublicationReleasePage extends Component<Props> {
                       )}
                       {data.publication.externalMethodology && (
                         <li>
-                          <Link to={data.publication.externalMethodology.url}>
+                          <a
+                            className="govuk=link"
+                            href={data.publication.externalMethodology.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             {data.publication.externalMethodology.title}
-                          </Link>
+                          </a>
                         </li>
                       )}
                       {data.relatedInformation &&
