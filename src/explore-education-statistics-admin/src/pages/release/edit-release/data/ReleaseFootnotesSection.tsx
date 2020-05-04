@@ -11,6 +11,7 @@ import {
 } from '@admin/services/release/edit-release/footnotes/types';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';
+import { Form } from '@common/components/form';
 
 interface Props {
   publicationId: string;
@@ -82,22 +83,32 @@ const ReleaseFootnotesSection = ({
     <>
       <h2>Footnotes</h2>
 
+      {!footnotesData.canUpdateRelease &&
+        !footnotesData.canUpdateReleaseFootnotes &&
+        'This release has been approved, and can no longer be updated.'}
+
+      {footnotesData.canUpdateRelease &&
+        !footnotesData.canUpdateReleaseFootnotes &&
+        'This release is an amendment to a live release and so it is not possible to change any footnotes.'}
+
       {footnotesData.footnoteMeta && (
         <>
-          {footnotesData.canUpdateRelease && (
-            <FootnoteForm
-              {...footnoteForm}
-              footnote={undefined}
-              onOpen={footnoteFormControls.create}
-              onCancel={footnoteFormControls.cancel}
-              onSubmit={footnoteFormControls.save}
-              isFirst={
-                footnotesData.footnotes && footnotesData.footnotes.length === 0
-              }
-              footnoteMeta={footnotesData.footnoteMeta}
-              footnoteMetaGetters={footnotesData.footnoteMetaGetters}
-            />
-          )}
+          {footnotesData.canUpdateRelease &&
+            footnotesData.canUpdateReleaseFootnotes && (
+              <FootnoteForm
+                {...footnoteForm}
+                footnote={undefined}
+                onOpen={footnoteFormControls.create}
+                onCancel={footnoteFormControls.cancel}
+                onSubmit={footnoteFormControls.save}
+                isFirst={
+                  footnotesData.footnotes &&
+                  footnotesData.footnotes.length === 0
+                }
+                footnoteMeta={footnotesData.footnoteMeta}
+                footnoteMetaGetters={footnotesData.footnoteMetaGetters}
+              />
+            )}
           <>
             <FootnotesList
               {...footnotesData}

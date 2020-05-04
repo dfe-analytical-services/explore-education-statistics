@@ -19,6 +19,7 @@ export interface FootnotesData {
   footnotes: Footnote[];
   footnoteMetaGetters: FootnoteMetaGetters;
   canUpdateRelease: boolean;
+  canUpdateReleaseFootnotes: boolean;
 }
 
 const ReleaseDataPage = () => {
@@ -31,14 +32,22 @@ const ReleaseDataPage = () => {
     Promise.all([
       footnotesService.getReleaseFootnoteData(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ]).then(([{ meta, footnotes: footnotesList }, canUpdateRelease]) => {
-      setFootnotesData({
-        footnoteMeta: meta,
-        footnotes: footnotesList,
-        footnoteMetaGetters: generateFootnoteMetaMap(meta),
+      permissionService.canUpdateReleaseDataFiles(releaseId),
+    ]).then(
+      ([
+        { meta, footnotes: footnotesList },
         canUpdateRelease,
-      });
-    });
+        canUpdateReleaseFootnotes,
+      ]) => {
+        setFootnotesData({
+          footnoteMeta: meta,
+          footnotes: footnotesList,
+          footnoteMetaGetters: generateFootnoteMetaMap(meta),
+          canUpdateRelease,
+          canUpdateReleaseFootnotes,
+        });
+      },
+    );
   }, [releaseId]);
 
   useEffect(() => {
