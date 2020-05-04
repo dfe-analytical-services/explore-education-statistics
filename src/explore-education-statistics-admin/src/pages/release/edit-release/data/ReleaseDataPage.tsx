@@ -51,15 +51,16 @@ const ReleaseDataPage = () => {
   }, [releaseId]);
 
   useEffect(() => {
-    if (activeTab === 'footnotes') {
-      getFootnoteData();
-    }
+    getFootnoteData();
   }, [activeTab, getFootnoteData]);
 
   return (
     <>
       <Tabs
         onToggle={tab => {
+          if (tab.id === 'footnotes') {
+            getFootnoteData();
+          }
           setActiveTab(tab.id);
         }}
         id="dataUploadTab"

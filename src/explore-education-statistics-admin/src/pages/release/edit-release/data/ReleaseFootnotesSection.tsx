@@ -11,7 +11,6 @@ import {
 } from '@admin/services/release/edit-release/footnotes/types';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';
-import { Form } from '@common/components/form';
 
 interface Props {
   publicationId: string;
@@ -83,13 +82,15 @@ const ReleaseFootnotesSection = ({
     <>
       <h2>Footnotes</h2>
 
-      {!footnotesData.canUpdateRelease &&
-        !footnotesData.canUpdateReleaseFootnotes &&
-        'This release has been approved, and can no longer be updated.'}
+      <p>
+        {!footnotesData.canUpdateRelease &&
+          !footnotesData.canUpdateReleaseFootnotes &&
+          'This release has been approved, and can no longer be updated.'}
 
-      {footnotesData.canUpdateRelease &&
-        !footnotesData.canUpdateReleaseFootnotes &&
-        'This release is an amendment to a live release and so it is not possible to change any footnotes.'}
+        {footnotesData.canUpdateRelease &&
+          !footnotesData.canUpdateReleaseFootnotes &&
+          'This release is an amendment to a live release and so it is not possible to change any footnotes.'}
+      </p>
 
       {footnotesData.footnoteMeta && (
         <>
