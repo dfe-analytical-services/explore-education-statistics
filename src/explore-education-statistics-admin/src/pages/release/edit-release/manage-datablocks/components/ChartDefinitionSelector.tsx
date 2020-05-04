@@ -1,4 +1,6 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDefinitionSelector.module.scss';
+import ButtonText from '@common/components/ButtonText';
+import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import classNames from 'classnames';
 import React from 'react';
@@ -17,38 +19,51 @@ const ChartDefinitionSelector = ({
   onChange,
 }: Props) => {
   return (
-    <div className={styles.chartContainer}>
-      {chartDefinitions.map(definition => (
-        <React.Fragment key={definition.type}>
-          {!definition.capabilities.requiresGeoJson || geoJsonAvailable ? (
+    <>
+      <h3>Choose chart type</h3>
+
+      <div className={styles.buttonContainer}>
+        {chartDefinitions
+          .filter(definition => {
+            if (definition.capabilities.requiresGeoJson) {
+              return geoJsonAvailable;
+            }
+
+            return true;
+          })
+          .map(definition => (
             <button
+              key={definition.type}
+              aria-pressed={selectedChartDefinition === definition}
               type="button"
-              className={classNames(styles.chart, {
-                [styles.selected]: definition === selectedChartDefinition,
-              })}
+              className={styles.button}
               onClick={() => {
-                if (onChange) {
-                  onChange(definition);
-                }
+                onChange(definition);
               }}
             >
-              <span className={styles.title}>{definition.name}</span>
+              {definition.name}
               <span
-                className={classNames(styles.img, styles[definition.type])}
+                className={styles.image}
+                style={{
+                  backgroundImage: `url(/static/images/chart-types/${definition.type}.png)`,
+                }}
               />
             </button>
-          ) : (
-            <div>
-              <span className={styles.title}>
-                <strong>{definition.name}</strong>
-              </span>
-              <p>This chart type is not available.</p>
-              <p>There is no map data for this data block.</p>
-            </div>
-          )}
-        </React.Fragment>
-      ))}
-    </div>
+          ))}
+      </div>
+
+      <div className="dfe-align--right">
+        <ButtonText
+          aria-pressed={selectedChartDefinition === infographicBlockDefinition}
+          className="govuk-body-s"
+          onClick={() => {
+            onChange(infographicBlockDefinition);
+          }}
+        >
+          Choose an infographic as alternative
+        </ButtonText>
+      </div>
+    </>
   );
 };
 

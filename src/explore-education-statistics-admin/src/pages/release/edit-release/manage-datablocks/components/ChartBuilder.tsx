@@ -1,11 +1,10 @@
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder.module.scss';
 import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartDefinitionSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDefinitionSelector';
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder.module.scss';
 import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
-import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
@@ -17,7 +16,6 @@ import {
   horizontalBarBlockDefinition,
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
-import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
 import {
   lineChartBlockDefinition,
   LineChartProps,
@@ -194,15 +192,6 @@ const ChartBuilder = ({
         geoJsonAvailable={meta.geoJsonAvailable}
         onChange={handleChartDefinitionChange}
       />
-      <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
-        <ButtonText
-          onClick={() => {
-            actions.updateChartDefinition(infographicBlockDefinition);
-          }}
-        >
-          Choose an infographic as alternative
-        </ButtonText>
-      </div>
 
       {definition && (
         <Details summary="Chart preview" open>
