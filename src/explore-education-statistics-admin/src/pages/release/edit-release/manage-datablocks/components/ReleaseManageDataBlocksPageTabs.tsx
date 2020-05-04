@@ -16,7 +16,7 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface Props {
   releaseId: string;
@@ -28,42 +28,26 @@ const ReleaseManageDataBlocksPageTabs = ({
   selectedDataBlock,
   onDataBlockSave,
 }: Props) => {
-  const [isLoading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [tableToolState, setInitialTableToolState] = useState<TableToolState>();
+  const [tableToolState, setTableToolState] = useState<TableToolState>();
 
-  const query = useMemo(
-    () =>
-      selectedDataBlock
-        ? {
-            ...selectedDataBlock.dataBlockRequest,
-            includeGeoJson: selectedDataBlock.charts.some(
-              chart => chart.type === 'map',
-            ),
-          }
-        : undefined,
-    [selectedDataBlock],
-  );
+  const { error, isLoading } = useTableQuery(
+    selectedDataBlock
+      ? {
+          ...selectedDataBlock.dataBlockRequest,
+          includeGeoJson: selectedDataBlock.charts.some(
+            chart => chart.type === 'map',
+          ),
+        }
+      : undefined,
+    {
+      onSuccess: async (table, query) => {
+        const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+          query,
+        );
 
-  const { value: table, error } = useTableQuery(query);
-
-  useEffect(() => {
-    if (!query) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-
-    if (!table) {
-      return;
-    }
-
-    tableBuilderService
-      .filterPublicationSubjectMeta(query)
-      .then(subjectMeta => {
-        setInitialTableToolState({
+        setTableToolState({
           initialStep: 5,
           query,
           subjectMeta,
@@ -77,10 +61,9 @@ const ReleaseManageDataBlocksPageTabs = ({
               : getDefaultTableHeaderConfig(table.subjectMeta),
           },
         });
-
-        setLoading(false);
-      });
-  }, [query, selectedDataBlock, table]);
+      },
+    },
+  );
 
   const handleDataBlockSave = useCallback(
     async (dataBlock: SavedDataBlock) => {
