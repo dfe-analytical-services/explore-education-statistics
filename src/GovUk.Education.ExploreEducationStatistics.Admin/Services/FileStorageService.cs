@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return
                             await DataPathsForDeletion(blobContainer, releaseId, dataFileName)
                             .OnSuccess(fileNames =>
-                                DeleteDataFilesAsync(blobContainer, fileNames)
+                                DeleteDataFilesAsync(releaseId, blobContainer, fileNames)
                                     .OnSuccess(() => DeleteFileReference(releaseId, fileNames.dataFileName, ReleaseFileTypes.Data))
                                     .OnSuccess(() => DeleteFileReference(releaseId, fileNames.metadataFileName, ReleaseFileTypes.Metadata))
                                     .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
@@ -382,11 +382,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private static async Task<Either<ActionResult, bool>> DeleteDataFilesAsync(CloudBlobContainer blobContainer,
+        private static async Task<Either<ActionResult, bool>> DeleteDataFilesAsync(Guid releaseId, CloudBlobContainer blobContainer,
             (string, string) fileNames)
         {
-            await DeleteFileAsync(blobContainer, fileNames.Item1);
-            await DeleteFileAsync(blobContainer, fileNames.Item2);
+            await DeleteFileAsync(blobContainer, AdminReleasePath(releaseId, ReleaseFileTypes.Data, fileNames.Item1));
+            await DeleteFileAsync(blobContainer, AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, fileNames.Item2));
             return true;
         }
         

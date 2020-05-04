@@ -514,13 +514,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        private bool CanUpdateDataFiles(Guid releaseId)
+        {
+            var release = _context.Releases.First(r => r.Id == releaseId);
+            return release.Status != ReleaseStatus.Approved && release.Id == release.OriginalId;
+        }
+
         private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string dataFileName)
         {
             var releaseFileReference = _context
                 .ReleaseFiles
-                .Include(r => r.ReleaseFileReference)
-                .Where(r => r.ReleaseId == releaseId && r.ReleaseFileReference.Filename == dataFileName)
-                .Select(r => r.ReleaseFileReference)
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(rf => rf.ReleaseId == releaseId && rf.ReleaseFileReference.Filename == dataFileName)
+                .Select(rf => rf.ReleaseFileReference)
                 .First();
                 
             var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId.ToString(), dataFileName);
@@ -528,6 +534,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!importFinished)
             {
                 return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
+            }
+
+            if (!CanUpdateDataFiles(releaseFileReference.ReleaseId))
+            {
+                return ValidationActionResult(CannotRemoveDataFilesLinkedToAnApprovedRelease);
             }
 
             return true;

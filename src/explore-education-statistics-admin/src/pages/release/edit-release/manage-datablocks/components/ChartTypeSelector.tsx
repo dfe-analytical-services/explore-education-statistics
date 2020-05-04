@@ -1,20 +1,20 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React from 'react';
 
 interface Props {
   chartDefinitions: ChartDefinition[];
   selectedChartDefinition?: ChartDefinition;
   geoJsonAvailable: boolean;
-  onSelectChart: (chart: ChartDefinition) => void | undefined;
+  onChange: (chart: ChartDefinition) => void;
 }
 
 const ChartTypeSelector = ({
   chartDefinitions,
   selectedChartDefinition,
   geoJsonAvailable,
-  onSelectChart,
+  onChange,
 }: Props) => {
   return (
     <div className={styles.chartContainer}>
@@ -23,16 +23,18 @@ const ChartTypeSelector = ({
           {!definition.capabilities.requiresGeoJson || geoJsonAvailable ? (
             <button
               type="button"
-              className={classnames(styles.chart, {
+              className={classNames(styles.chart, {
                 [styles.selected]: definition === selectedChartDefinition,
               })}
               onClick={() => {
-                if (onSelectChart) onSelectChart(definition);
+                if (onChange) {
+                  onChange(definition);
+                }
               }}
             >
               <span className={styles.title}>{definition.name}</span>
               <span
-                className={classnames(styles.img, styles[definition.type])}
+                className={classNames(styles.img, styles[definition.type])}
               />
             </button>
           ) : (
