@@ -1,8 +1,6 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/InfographicChartForm.module.scss';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
@@ -10,6 +8,8 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
@@ -108,15 +108,20 @@ const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
           <Form id={formId}>
             {fileId && selectedFile && (
               <>
-                <div className={styles.deleteInfographicContainer}>
-                  <p className="govuk-!-margin-right-2">{`${selectedFile.label}, ${fileId}`}</p>
-                  <ButtonText
-                    variant="warning"
-                    onClick={() => toggleDeleteFile(true)}
-                  >
-                    Delete infographic
-                  </ButtonText>
-                </div>
+                <SummaryList>
+                  <SummaryListItem term="Name">
+                    {selectedFile.label}
+                  </SummaryListItem>
+                  <SummaryListItem term="Filename">{fileId}</SummaryListItem>
+                </SummaryList>
+
+                <Button
+                  variant="warning"
+                  onClick={() => toggleDeleteFile(true)}
+                >
+                  Delete infographic
+                </Button>
+
                 <ModalConfirm
                   mounted={deleteFile}
                   title="Confirm deletion of infographic"
