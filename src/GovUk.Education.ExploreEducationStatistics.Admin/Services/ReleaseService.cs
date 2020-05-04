@@ -517,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private bool CanUpdateDataFiles(Guid releaseId)
         {
             var release = _context.Releases.First(r => r.Id == releaseId);
-            return release.Status != ReleaseStatus.Approved && release.Id == release.OriginalId;
+            return release.Status != ReleaseStatus.Approved && release.Id == release.PreviousVersionId;
         }
 
         private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string dataFileName)
