@@ -1,5 +1,5 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/InfographicChartForm.module.scss';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';

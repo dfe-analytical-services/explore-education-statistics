@@ -1,4 +1,4 @@
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDefinitionSelector.module.scss';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import classNames from 'classnames';
 import React from 'react';
@@ -38,7 +38,7 @@ const ChartDefinitionSelector = ({
               />
             </button>
           ) : (
-            <div className={styles.chartTypeUnavailable}>
+            <div>
               <span className={styles.title}>
                 <strong>{definition.name}</strong>
               </span>

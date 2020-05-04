@@ -1,4 +1,4 @@
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration.module.scss';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
 import ErrorSummary from '@common/components/ErrorSummary';

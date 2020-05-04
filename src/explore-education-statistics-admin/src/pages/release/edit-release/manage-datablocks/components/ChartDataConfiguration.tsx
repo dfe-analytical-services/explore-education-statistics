@@ -1,4 +1,4 @@
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration.module.scss';
 import {
   FormFieldset,
   FormSelect,

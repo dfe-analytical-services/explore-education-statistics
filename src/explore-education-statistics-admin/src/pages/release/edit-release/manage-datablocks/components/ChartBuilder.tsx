@@ -3,7 +3,7 @@ import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-dat
 import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartDefinitionSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDefinitionSelector';
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder.module.scss';
 import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
@@ -187,7 +187,7 @@ const ChartBuilder = ({
   }, [canSaveChart, chartProps, onChartSave]);
 
   return (
-    <div className={styles.editor} ref={containerRef}>
+    <div ref={containerRef}>
       <ChartDefinitionSelector
         chartDefinitions={chartDefinitions}
         selectedChartDefinition={definition}

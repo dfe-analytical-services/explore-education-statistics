@@ -1,0 +1,22 @@
+.chartDataConfiguration {
+  padding: 0;
+}
+
+.chartDataLabelConfiguration {
+  display: flex;
+  width: 100%;
+
+  label {
+    margin-top: 10px !important;
+  }
+}
+
+.chartDataItem {
+  display: flex;
+  flex-grow: 1;
+
+  label {
+    margin-left: 0.75em;
+    margin-right: 0.5em;
+  }
+}
