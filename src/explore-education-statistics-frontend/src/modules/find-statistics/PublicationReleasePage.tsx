@@ -300,7 +300,6 @@ class PublicationReleasePage extends Component<Props> {
                       {data.publication.externalMethodology && (
                         <li>
                           <a
-                            className="govuk=link"
                             href={data.publication.externalMethodology.url}
                             target="_blank"
                             rel="noopener noreferrer"
