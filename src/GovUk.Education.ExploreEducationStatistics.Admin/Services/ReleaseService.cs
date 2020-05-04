@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     };
                     release.Created = DateTime.UtcNow;
                     release.CreatedById = _userService.GetUserId();
-                    release.OriginalId = release.Id;
+                    release.PreviousVersionId = release.Id;
                     
                     _context.Releases.Add(release);
                     await _context.SaveChangesAsync();
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var statsRelease =_statisticsDbContext
                 .Release
-                .First(r => r.Id == amendment.OriginalId);
+                .First(r => r.Id == amendment.PreviousVersionId);
 
             // TODO BAU-384 - this is currently only possible if a Live release was available
             // without any subjects uploaded for it.  Does this check need to remain?
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 var statsAmendmentSubjectLinks =_statisticsDbContext
                     .ReleaseSubject
-                    .Where(s => s.ReleaseId == amendment.OriginalId)
+                    .Where(s => s.ReleaseId == amendment.PreviousVersionId)
                     .Select(s => new ReleaseSubject
                     {
                         ReleaseId = statsAmendment.Id,
@@ -517,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private bool CanUpdateDataFiles(Guid releaseId)
         {
             var release = _context.Releases.First(r => r.Id == releaseId);
-            return release.Status != ReleaseStatus.Approved && release.Id == release.OriginalId;
+            return release.Status != ReleaseStatus.Approved && release.Id == release.PreviousVersionId;
         }
 
         private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string dataFileName)

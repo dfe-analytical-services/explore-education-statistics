@@ -47,7 +47,7 @@ export interface AdminDashboardRelease {
   draftComments: Comment[];
   higherReviewComments: Comment[];
   amendment: boolean;
-  originalId: string;
+  previousVersionId: string;
   permissions: {
     canUpdateRelease: boolean;
     canDeleteRelease: boolean;
