@@ -24,14 +24,11 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import tableBuilderService, {
-  LocationLevelKeys,
-  locationLevelKeys,
   PublicationSubject,
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import omitBy from 'lodash/omitBy';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useImmer } from 'use-immer';
 
@@ -100,6 +97,7 @@ const TableToolWizard = ({
         subjectId: '',
         indicators: [],
         filters: [],
+        locations: {},
       },
     },
   );
@@ -155,7 +153,7 @@ const TableToolWizard = ({
   }) => {
     const nextSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
-        ...locations,
+        locations,
         subjectId: state.query.subjectId,
       },
     );
@@ -163,12 +161,7 @@ const TableToolWizard = ({
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
-      draft.query = {
-        ...omitBy(draft.query, (values, level) =>
-          locationLevelKeys.includes(level as LocationLevelKeys),
-        ),
-        ...locations,
-      } as TableDataQuery;
+      draft.query.locations = locations;
     });
   };
 
@@ -274,7 +267,7 @@ const TableToolWizard = ({
                 <LocationFiltersForm
                   {...stepProps}
                   options={state.subjectMeta.locations}
-                  initialValues={state.query}
+                  initialValues={state.query.locations}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
               )}

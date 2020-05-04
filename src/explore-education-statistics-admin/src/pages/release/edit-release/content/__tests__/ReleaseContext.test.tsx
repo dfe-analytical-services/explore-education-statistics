@@ -107,7 +107,9 @@ const basicRelease: EditableRelease = {
               '214f5fb8-c12b-411e-fdfb-08d7bec1dd71',
               '99f5bbc3-de9a-4831-fdf8-08d7bec1dd71',
             ],
-            country: ['E92000001'],
+            locations: {
+              country: ['E92000001'],
+            },
             includeGeoJson: true,
           },
           charts: [],
@@ -170,7 +172,9 @@ const basicRelease: EditableRelease = {
           },
           filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
           indicators: ['272f4b12-9dfe-45ef-fdf9-08d7bec1dd71'],
-          country: ['E92000001'],
+          locations: {
+            country: ['E92000001'],
+          },
           includeGeoJson: true,
         },
         charts: [],
@@ -195,7 +199,9 @@ const basicRelease: EditableRelease = {
           },
           filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
           indicators: ['d314e2a9-5069-4d79-fdfa-08d7bec1dd71'],
-          country: ['E92000001'],
+          locations: {
+            country: ['E92000001'],
+          },
           includeGeoJson: true,
         },
         charts: [],
@@ -220,7 +226,9 @@ const basicRelease: EditableRelease = {
           },
           filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
           indicators: ['214f5fb8-c12b-411e-fdfb-08d7bec1dd71'],
-          country: ['E92000001'],
+          locations: {
+            country: ['E92000001'],
+          },
           includeGeoJson: true,
         },
         charts: [],
@@ -258,7 +266,9 @@ const basicRelease: EditableRelease = {
             'd314e2a9-5069-4d79-fdfa-08d7bec1dd71',
             '214f5fb8-c12b-411e-fdfb-08d7bec1dd71',
           ],
-          country: ['E92000001'],
+          locations: {
+            country: ['E92000001'],
+          },
           includeGeoJson: true,
         },
         charts: [],
@@ -295,6 +305,7 @@ const basicDataBlock: DataBlock = {
   dataBlockRequest: {
     filters: [],
     indicators: [],
+    locations: {},
     subjectId: 'subjectId',
   },
 };
@@ -575,7 +586,9 @@ describe('ReleaseContext', () => {
             '214f5fb8-c12b-411e-fdfb-08d7bec1dd71',
             '99f5bbc3-de9a-4831-fdf8-08d7bec1dd71',
           ],
-          country: ['E92000001'],
+          locations: {
+            country: ['E92000001'],
+          },
           includeGeoJson: true,
         },
         charts: [],

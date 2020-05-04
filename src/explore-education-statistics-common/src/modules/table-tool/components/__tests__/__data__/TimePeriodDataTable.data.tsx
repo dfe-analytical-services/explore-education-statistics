@@ -359,11 +359,11 @@ export const testData1 = {
       [
         {
           value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
-          label: 'Ethnicity Major Asian Total',
+          type: 'Filter',
         },
         {
           value: '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
-          label: 'Ethnicity Major Black Total',
+          type: 'Filter',
         },
       ],
     ],
@@ -371,30 +371,30 @@ export const testData1 = {
       [
         {
           value: 'd7e7e412-f462-444f-84ac-3454fa471cb8',
-          label: 'State-funded primary',
+          type: 'Filter',
         },
         {
           value: 'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
-          label: 'State-funded secondary',
+          type: 'Filter',
         },
       ],
       [
-        { value: 'E09000003', label: 'Barnet' },
-        { value: 'E08000016', label: 'Barnsley' },
+        { value: 'E09000003', type: 'Location', level: 'localAuthority' },
+        { value: 'E08000016', type: 'Location', level: 'localAuthority' },
       ],
     ],
     columns: [
-      { value: '2013_AY', label: '2013/14' },
-      { value: '2014_AY', label: '2014/15' },
+      { value: '2013_AY', type: 'TimePeriod' },
+      { value: '2014_AY', type: 'TimePeriod' },
     ],
     rows: [
       {
         value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
-        label: 'Number of authorised absence sessions',
+        type: 'Indicator',
       },
       {
         value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
-        label: 'Number of overall absence sessions',
+        type: 'Indicator',
       },
     ],
   } as UnmappedTableHeadersConfig,
@@ -702,11 +702,11 @@ export const testData2 = {
       [
         {
           value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
-          label: 'Ethnicity Major Asian Total',
+          type: 'Filter',
         },
         {
           value: '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
-          label: 'Ethnicity Major Black Total',
+          type: 'Filter',
         },
       ],
     ],
@@ -714,26 +714,26 @@ export const testData2 = {
       [
         {
           value: 'd7e7e412-f462-444f-84ac-3454fa471cb8',
-          label: 'State-funded primary',
+          type: 'Filter',
         },
         {
           value: 'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
-          label: 'State-funded secondary',
+          type: 'Filter',
         },
       ],
       [
-        { value: 'E09000003', label: 'Barnet' },
-        { value: 'E08000016', label: 'Barnsley' },
+        { value: 'E09000003', type: 'Location', level: 'localAuthority' },
+        { value: 'E08000016', type: 'Location', level: 'localAuthority' },
       ],
     ],
     columns: [
-      { value: '2013_AY', label: '2013/14' },
-      { value: '2014_AY', label: '2014/15' },
+      { value: '2013_AY', type: 'TimePeriod' },
+      { value: '2014_AY', type: 'TimePeriod' },
     ],
     rows: [
       {
         value: 'f9ae4976-7cd3-4718-834a-09349b6eb377',
-        label: 'Authorised absence rate',
+        type: 'Indicator',
       },
     ],
   } as UnmappedTableHeadersConfig,
@@ -926,11 +926,11 @@ export const testData3 = {
       [
         {
           value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
-          label: 'Ethnicity Major Asian Total',
+          type: 'Filter',
         },
         {
           value: '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
-          label: 'Ethnicity Major Black Total',
+          type: 'Filter',
         },
       ],
     ],
@@ -938,23 +938,23 @@ export const testData3 = {
       [
         {
           value: 'd7e7e412-f462-444f-84ac-3454fa471cb8',
-          label: 'State-funded primary',
+          type: 'Filter',
         },
         {
           value: 'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
-          label: 'State-funded secondary',
+          type: 'Filter',
         },
       ],
       [
-        { value: 'E09000003', label: 'Barnet' },
-        { value: 'E08000016', label: 'Barnsley' },
+        { value: 'E09000003', type: 'Location', level: 'localAuthority' },
+        { value: 'E08000016', type: 'Location', level: 'localAuthority' },
       ],
     ],
-    columns: [{ value: '2014_AY', label: '2014/15' }],
+    columns: [{ value: '2014_AY', type: 'TimePeriod' }],
     rows: [
       {
         value: 'f9ae4976-7cd3-4718-834a-09349b6eb377',
-        label: 'Authorised absence rate',
+        type: 'Indicator',
       },
     ],
   } as UnmappedTableHeadersConfig,
@@ -1037,26 +1037,26 @@ export const testDataNoFilters = {
   } as TableDataResponse,
   tableHeadersConfig: {
     columns: [
-      { label: '2014/15', value: '2014_AY' },
-      { label: '2015/16', value: '2015_AY' },
-      { label: '2016/17', value: '2016_AY' },
+      { value: '2014_AY', type: 'TimePeriod' },
+      { value: '2015_AY', type: 'TimePeriod' },
+      { value: '2016_AY', type: 'TimePeriod' },
     ],
     columnGroups: [],
     rows: [
       {
         value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
-        label: 'Authorised absence rate',
+        type: 'Indicator',
       },
       {
         value: 'd1c4a0be-8756-470d-2b51-08d78f6f2b08',
-        label: 'Number of authorised absence sessions',
+        type: 'Indicator',
       },
       {
         value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
-        label: 'Number of overall absence sessions',
+        type: 'Indicator',
       },
     ],
-    rowGroups: [[{ value: 'E92000001', label: 'England' }]],
+    rowGroups: [[{ value: 'E92000001', type: 'Location', level: 'country' }]],
   } as UnmappedTableHeadersConfig,
 };
 

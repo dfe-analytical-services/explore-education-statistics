@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class LabelValue
     {

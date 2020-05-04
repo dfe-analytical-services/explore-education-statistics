@@ -1,15 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Net;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class PermalinkService : IPermalinkService
     {
-        private const string ContainerName = "permalinks";
+        public const string ContainerName = "permalinks";
 
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IFileStorageService _fileStorageService;
@@ -53,13 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(TableBuilderQueryContext query)
+        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request)
         {
-            return await _tableBuilderService.Query(query).OnSuccess(async result =>
+            return await _tableBuilderService.Query(request.Query).OnSuccess(async result =>
             {
-                var permalink = new Permalink(result, query);
+                var permalink = new Permalink(request.Configuration, result, request.Query);
                 await _fileStorageService.UploadFromStreamAsync(ContainerName, permalink.Id.ToString(),
-                    "application/json",
+                    MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink));
                 return BuildViewModel(permalink);
             });

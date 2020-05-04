@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations.EES17
 {
-    public class TableBuilderTableHeadersConfig
+    public class EES17TableBuilderTableHeadersConfig
     {
         public IEnumerable<IEnumerable<LabelValue>> ColumnGroups { get; set; }
         public IEnumerable<LabelValue> Columns { get; set; }

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -26,9 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PermalinkViewModel>> CreateAsync([FromBody] TableBuilderQueryContext query)
+        public async Task<ActionResult<PermalinkViewModel>> CreateAsync([FromBody] CreatePermalinkRequest request)
         {
-            return await _permalinkService.CreateAsync(query).HandleFailuresOrOk();
+            return await _permalinkService.CreateAsync(request).HandleFailuresOrOk();
         }
     }
 }

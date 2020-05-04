@@ -1,5 +1,5 @@
 import { dataApi } from '@common/services/api';
-import { Dictionary, PartialRecord } from '@common/types';
+import { Dictionary } from '@common/types';
 import { Feature, Geometry } from 'geojson';
 
 export interface FilterOption {
@@ -113,24 +113,6 @@ export interface PublicationSubjectMeta {
   };
 }
 
-export const locationLevelKeys = [
-  'country',
-  'institution',
-  'localAuthority',
-  'localAuthorityDistrict',
-  'localEnterprisePartnership',
-  'mayoralCombinedAuthority',
-  'multiAcademyTrust',
-  'opportunityArea',
-  'parliamentaryConstituency',
-  'region',
-  'rscRegion',
-  'sponsor',
-  'ward',
-] as const;
-
-export type LocationLevelKeys = typeof locationLevelKeys[number];
-
 export interface TimePeriodQuery {
   startYear: number;
   startCode: string;
@@ -138,16 +120,17 @@ export interface TimePeriodQuery {
   endCode: string;
 }
 
-export type TableDataQuery = {
+export interface TableDataQuery {
   publicationId?: string;
   subjectId: string;
   filters: string[];
   indicators: string[];
   timePeriod?: TimePeriodQuery;
   geographicLevel?: string;
+  locations: Dictionary<string[]>;
   includeGeoJson?: boolean;
   boundaryLevel?: number;
-} & PartialRecord<LocationLevelKeys, string[]>;
+}
 
 export interface TableDataSubjectMeta {
   publicationName: string;
@@ -201,13 +184,12 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.get(`/meta/subject/${subjectId}`);
   },
-  filterPublicationSubjectMeta(
-    query: {
-      subjectId: string;
-      timePeriod?: TimePeriodQuery;
-      geographicLevel?: string;
-    } & PartialRecord<LocationLevelKeys, string[]>,
-  ): Promise<PublicationSubjectMeta> {
+  filterPublicationSubjectMeta(query: {
+    subjectId: string;
+    timePeriod?: TimePeriodQuery;
+    geographicLevel?: string;
+    locations?: Dictionary<string[]>;
+  }): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
   getTableData(query: TableDataQuery): Promise<TableDataResponse> {

@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageCon
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -569,20 +568,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             if (blockToUpdate.Summary == null)
             {
-                blockToUpdate.Summary = new Summary();
+                blockToUpdate.Summary = new DataBlockSummary();
             }
             
-            blockToUpdate.Summary.dataDefinitionTitle = new List<string>
+            blockToUpdate.Summary.DataDefinitionTitle = new List<string>
             {
                 request.DataDefinitionTitle
             };
             
-            blockToUpdate.Summary.dataDefinition = new List<string>
+            blockToUpdate.Summary.DataDefinition = new List<string>
             {
                 request.DataDefinition
             };
 
-            blockToUpdate.Summary.dataSummary = new List<string>
+            blockToUpdate.Summary.DataSummary = new List<string>
             {
                 request.DataSummary
             };

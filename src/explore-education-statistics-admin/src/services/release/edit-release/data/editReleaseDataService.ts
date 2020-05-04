@@ -1,5 +1,6 @@
-import client from '@admin/services/util/service';
 import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
+import client from '@admin/services/util/service';
+import noop from 'lodash/noop';
 
 interface GetFileResponse {
   extension: string;
@@ -225,6 +226,7 @@ const editReleaseDataService = {
   downloadChartFile(releaseId: string, fileName: string): Promise<Blob> {
     return client.get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
       responseType: 'blob',
+      onError: error => error,
     });
   },
 };

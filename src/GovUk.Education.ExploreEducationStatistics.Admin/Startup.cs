@@ -280,6 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
+            services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
 

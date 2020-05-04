@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -99,14 +100,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ISubjectService, SubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
+            services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>();
             services.AddTransient<IFastTrackService, FastTrackService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IEES17PermalinkMigrationService, EES17PermalinkMigrationService>();
 
             services
-                .AddAuthentication(options=>{
+                .AddAuthentication(options => {
                     options.DefaultAuthenticateScheme = "defaultScheme";
                     options.DefaultForbidScheme = "defaultScheme";
                     options.AddScheme<DefaultAuthenticationHandler>("defaultScheme", "Default Scheme");
@@ -118,6 +121,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
                     policy.Requirements.Add(new ViewSubjectDataRequirement()));
             });
+            
+            // EES-17 Temporarily add HttpContextAccessor so we can set a User used for security checks
+            services.AddHttpContextAccessor();
 
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
 
@@ -131,6 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
+            MigratePermalinks(app).Wait();
 
             if (env.IsDevelopment())
             {
@@ -185,6 +192,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
+            }
+        }
+
+        /**
+         * Temporary method to migrate permalinks for EES-17
+         */
+        private static async Task MigratePermalinks(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var permalinkMigrationService = serviceScope.ServiceProvider.GetRequiredService<IEES17PermalinkMigrationService>();
+                await permalinkMigrationService.MigrateAll();
             }
         }
     }
