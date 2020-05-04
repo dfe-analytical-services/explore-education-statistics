@@ -41,12 +41,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, bool>> MigrateAll()
         {
-            var dbSet = _context.DataBlocks;
+            var dataBlocks = _context.DataBlocks.ToList();
             var errors = new List<string>();
             
-            foreach (var dataBlock in dbSet)
+            foreach (var dataBlock in dataBlocks)
             {
-                dbSet.Update(dataBlock);
+                _context.DataBlocks.Update(dataBlock);
 
                 var result = await Transform(dataBlock);
                 if (result.IsLeft)
@@ -66,10 +66,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private async Task<Either<string, bool>> Transform(DataBlock dataBlock)
+        private Task<Either<string, bool>> Transform(DataBlock dataBlock)
         {
             dataBlock.DataBlockRequest = _mapper.Map<ObservationQueryContext>(dataBlock.EES17DataBlockRequest);
-            return await GetSubjectMeta(dataBlock.DataBlockRequest)
+            return GetSubjectMeta(dataBlock.DataBlockRequest)
                 .OnSuccess(subjectMeta =>
                 {
                     var filters = GetFilterItemIds(subjectMeta);
