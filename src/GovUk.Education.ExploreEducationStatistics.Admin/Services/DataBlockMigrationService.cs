@@ -14,19 +14,20 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Query.SubjectMetaQueryContext;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class DataBlockMigrationService : IDataBlockMigrationService
     {
+        private readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
         private readonly ContentDbContext _context;
         private readonly ISubjectMetaService _subjectMetaService;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
-        
-        private readonly Regex _timePeriodRegex = new Regex("^[0-9]{4}_[A-Z]{2,4}$");
+
+        private readonly Regex _timePeriodRegex = new Regex("^[0-9]{4}_[A-Z0-9]{2,4}$");
 
         public DataBlockMigrationService(ContentDbContext context,
             ISubjectMetaService subjectMetaService,
@@ -43,16 +44,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var dataBlocks = _context.DataBlocks.ToList();
             var errors = new List<string>();
-            
+
+            var index = 1;
+            var totalCount = dataBlocks.Count;
             foreach (var dataBlock in dataBlocks)
             {
+                if (dataBlock.EES17DataBlockRequest == null)
+                {
+                    _logger.LogInformation("Skipping DataBlock, id: {DataBlockId}", dataBlock.Id);
+                    continue;
+                }
+                
                 _context.DataBlocks.Update(dataBlock);
 
                 var result = await Transform(dataBlock);
+
                 if (result.IsLeft)
                 {
+                    _logger.LogInformation(
+                        "Failed to transform DataBlock {Count} out of {TotalCount}, id: {DataBlockId}",
+                        index, totalCount, dataBlock.Id);
                     errors.Add(result.Left);
                 }
+                else
+                {
+                    _logger.LogInformation("Transformed DataBlock {Count} out of {TotalCount}, id: {DataBlockId}",
+                        index, totalCount, dataBlock.Id);
+                }
+
+                index++;
             }
 
             if (errors.Any())
@@ -227,7 +247,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ObservationQueryContext query)
         {
-            return _subjectMetaService.GetSubjectMeta(FromObservationQueryContext(query));
+            return _cache.GetOrCreateAsync(query.SubjectId,
+                entry => _subjectMetaService.GetSubjectMeta(query.SubjectId));
         }
     }
 }
