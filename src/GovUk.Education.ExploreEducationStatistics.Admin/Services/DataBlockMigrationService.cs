@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        private readonly Regex _timePeriodRegex = new Regex("^[0-9]{4}_[A-Z]{2,4}$");
+        private readonly Regex _timePeriodRegex = new Regex("^[0-9]{4}_[A-Z0-9]{2,4}$");
 
         public DataBlockMigrationService(ContentDbContext context,
             ISubjectMetaService subjectMetaService,
@@ -49,6 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var totalCount = dataBlocks.Count;
             foreach (var dataBlock in dataBlocks)
             {
+                if (dataBlock.EES17DataBlockRequest == null)
+                {
+                    _logger.LogInformation("Skipping DataBlock, id: {DataBlockId}", dataBlock.Id);
+                    break;
+                }
+                
                 _context.DataBlocks.Update(dataBlock);
 
                 var result = await Transform(dataBlock);
