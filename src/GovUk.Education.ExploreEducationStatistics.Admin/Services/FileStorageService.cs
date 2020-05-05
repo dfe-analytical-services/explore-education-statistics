@@ -168,12 +168,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return await 
                             DeleteFileAsync(await GetCloudBlobContainer(), AdminReleasePath(releaseId, type, fileName))
-                            .OnSuccess(() => DeleteFileLink(releaseId, fileName, type))
+                            .OnSuccess(() => DeleteFileReference(releaseId, fileName, type))
                             .OnSuccess(() => ListFilesAsync(releaseId, type));
                     }
 
                     return await 
-                        DeleteFileReference(releaseId, fileName, type)
+                        DeleteFileLink(releaseId, fileName, type)
                         .OnSuccess(() => ListFilesAsync(releaseId, type));
                 });
         }
