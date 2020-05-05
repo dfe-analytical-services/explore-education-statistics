@@ -144,14 +144,14 @@ const UserInvitePage = ({
                   />
                 </FormFieldset>
 
-                <FormFieldset
+                {/* <FormFieldset
                   id={`${formId}-role`}
                   legend="Release access"
                   legendSize="m"
                   hint="The releases a user can access within the service."
                 >
-                  <div className="govuk-grid-row">
-                    {/* <div className="govuk-grid-column-one-half">
+                  <div className="govuk-grid-row"> */}
+                {/* <div className="govuk-grid-column-one-half">
                       <FormFieldSelect
                         id={`${formId}-selectedReleaseId`}
                         label="Release"
@@ -163,7 +163,7 @@ const UserInvitePage = ({
                       />
                     </div> */}
 
-                    <div className="govuk-grid-column-one-quarter">
+                {/* <div className="govuk-grid-column-one-quarter">
                       <FormFieldSelect
                         id={`${formId}-releaseRoleId`}
                         label="Release role"
@@ -198,8 +198,8 @@ const UserInvitePage = ({
                         </th>
                       </tr>
                     </thead>
-                  </table>
-                </FormFieldset>
+                  </table> */}
+                {/* </FormFieldset> */}
 
                 <Button type="submit" className="govuk-!-margin-top-6">
                   Send invite
