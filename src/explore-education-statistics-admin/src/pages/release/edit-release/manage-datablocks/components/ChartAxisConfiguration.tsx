@@ -32,12 +32,13 @@ import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { ObjectSchema, Schema } from 'yup';
 
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
 interface Props {
+  buttons?: ReactNode;
   canSaveChart: boolean;
   id: string;
   defaultDataType?: AxisGroupBy;
@@ -52,6 +53,7 @@ interface Props {
 }
 
 const ChartAxisConfiguration = ({
+  buttons,
   canSaveChart,
   id,
   configuration,
@@ -588,6 +590,8 @@ const ChartAxisConfiguration = ({
           <Button type="submit" id={`${id}-submit`}>
             Save chart options
           </Button>
+
+          {buttons}
         </Form>
       )}
     />
