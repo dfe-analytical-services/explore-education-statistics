@@ -21,6 +21,7 @@ import { RouteComponentProps } from 'react-router';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
+import orderBy from 'lodash/orderBy';
 
 const errorCodeMappings = [
   errorCodeToFieldError('USER_DOES_NOT_EXIST', 'userId', 'User does not exist'),
@@ -185,8 +186,8 @@ const ManageUserPage = ({
         />
         <Formik<AddReleaseRoleFormValues>
           initialValues={{
-            selectedReleaseId: '',
-            selectedReleaseRoleId: '',
+            selectedReleaseId: orderBy(releases, release => release)?.[0]?.id ?? '',
+            selectedReleaseRoleId: orderBy(releaseRoles, releaseRole => releaseRole)?.[0]?.value ?? '',
           }}
           enableReinitialize
           onSubmit={addReleaseRole}
@@ -251,7 +252,7 @@ const ManageUserPage = ({
                   </thead>
                   {model?.user && (
                     <tbody className="govuk-table__body">
-                      {model?.user.userReleaseRoles.map(userReleaseRole => (
+                      {model.user.userReleaseRoles.map(userReleaseRole => (
                         <tr
                           className="govuk-table__row"
                           key={userReleaseRole.id}
