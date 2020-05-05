@@ -6,7 +6,7 @@ import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContex
 import logger from '@common/services/logger';
 import { AxiosError } from 'axios';
 import * as H from 'history';
-import React from 'react';
+import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface State {
@@ -18,7 +18,7 @@ interface State {
  * specific types, or a fallback "Service problems" page
  * dependant on the type of error encountered.
  */
-class ErrorBoundary extends React.Component<RouteComponentProps, State> {
+class PageErrorBoundary extends Component<RouteComponentProps, State> {
   public state: State = {};
 
   private unregisterCallback?: H.UnregisterCallback;
@@ -116,4 +116,4 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
   }
 }
 
-export default withRouter(ErrorBoundary);
+export default withRouter(PageErrorBoundary);

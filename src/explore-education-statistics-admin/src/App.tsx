@@ -1,5 +1,5 @@
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
-import ErrorBoundary from '@admin/components/ErrorBoundary';
+import PageErrorBoundary from '@admin/components/PageErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
 import { AuthContextProvider } from '@admin/contexts/AuthContext';
@@ -31,7 +31,7 @@ function App() {
     <ThemeAndTopic>
       <BrowserRouter>
         <AuthContextProvider>
-          <ErrorBoundary>
+          <PageErrorBoundary>
             <Switch>
               {authRoutes}
               {appRoutes}
@@ -40,7 +40,7 @@ function App() {
                 component={PageNotFoundPage}
               />
             </Switch>
-          </ErrorBoundary>
+          </PageErrorBoundary>
         </AuthContextProvider>
       </BrowserRouter>
     </ThemeAndTopic>
