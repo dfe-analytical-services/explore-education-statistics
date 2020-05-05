@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 if (dataBlock.EES17DataBlockRequest == null)
                 {
                     _logger.LogInformation("Skipping DataBlock, id: {DataBlockId}", dataBlock.Id);
-                    break;
+                    continue;
                 }
                 
                 _context.DataBlocks.Update(dataBlock);
