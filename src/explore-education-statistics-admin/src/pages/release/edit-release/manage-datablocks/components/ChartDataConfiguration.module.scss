@@ -1,22 +1,31 @@
-.chartDataConfiguration {
+@import '../../../../../styles/govuk-base';
+
+.configuration {
+  display: flex;
+  flex-wrap: wrap;
   padding: 0;
 }
 
-.chartDataLabelConfiguration {
+.configurationInput {
+  align-items: center;
   display: flex;
-  width: 100%;
+  margin-bottom: govuk-spacing(2);
+  margin-right: govuk-spacing(4);
 
   label {
-    margin-top: 10px !important;
+    margin-right: govuk-spacing(2);
   }
 }
 
-.chartDataItem {
-  display: flex;
+.labelInput {
+  composes: configurationInput;
   flex-grow: 1;
+}
 
-  label {
-    margin-left: 0.75em;
-    margin-right: 0.5em;
+.colourInput {
+  composes: configurationInput;
+
+  input {
+    width: 100px;
   }
 }
