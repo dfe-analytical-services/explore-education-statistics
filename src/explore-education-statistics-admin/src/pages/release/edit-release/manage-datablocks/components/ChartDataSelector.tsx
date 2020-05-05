@@ -13,6 +13,7 @@ import {
 } from '@common/modules/charts/types/dataSet';
 import { colours, symbols } from '@common/modules/charts/util/chartUtils';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import generateDefaultDataSetLabel from '@common/modules/charts/util/generateDefaultDataSetLabel';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -242,7 +243,7 @@ const ChartDataSelector = ({
                   const label = generateDefaultDataSetLabel(expandedDataSet);
 
                   return (
-                    <li key={JSON.stringify(dataSet)}>
+                    <li key={generateDataSetKey(dataSet)}>
                       <div className={styles.dataSetRow}>
                         <span>{label}</span>
 
