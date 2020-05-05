@@ -2,7 +2,6 @@ import styles from '@admin/pages/release/edit-release/manage-datablocks/componen
 import ButtonText from '@common/components/ButtonText';
 import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
-import classNames from 'classnames';
 import React from 'react';
 
 interface Props {
