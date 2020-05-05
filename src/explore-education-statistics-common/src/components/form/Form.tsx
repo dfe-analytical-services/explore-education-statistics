@@ -1,6 +1,7 @@
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
+import useToggle from '@common/hooks/useToggle';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { connect, FormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
@@ -55,7 +56,7 @@ const Form = ({
     touched,
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [hasSummaryFocus, toggleSummaryFocus] = useToggle(false);
   const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
 
   useEffect(() => {
@@ -80,7 +81,7 @@ const Form = ({
 
   const handleSubmit = useCallback(
     async event => {
-      setSubmitted(true);
+      toggleSummaryFocus.off();
       setSubmitError(undefined);
       event.preventDefault();
 
@@ -97,9 +98,11 @@ const Form = ({
             throw error;
           }
         }
+      } finally {
+        toggleSummaryFocus.on();
       }
     },
-    [submitForm, showSubmitError, submitId],
+    [toggleSummaryFocus, submitForm, showSubmitError, submitId],
   );
 
   return (
@@ -107,7 +110,8 @@ const Form = ({
       <ErrorSummary
         errors={allErrors}
         id={`${id}-summary`}
-        focusOnError={submitted}
+        focusOnError={hasSummaryFocus}
+        onFocus={toggleSummaryFocus.off}
       />
 
       {children}
