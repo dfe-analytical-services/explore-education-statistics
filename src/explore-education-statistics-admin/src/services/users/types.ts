@@ -16,9 +16,15 @@ export interface User {
 }
 
 export interface UserReleaseRole {
+  id: string;
   publication: IdTitlePair;
   release: IdTitlePair;
   releaseRole: ReleaseRole;
+}
+
+export interface UserReleaseRoleSubmission {
+  releaseId: string;
+  releaseRole: string;
 }
 
 export interface UserInvite {

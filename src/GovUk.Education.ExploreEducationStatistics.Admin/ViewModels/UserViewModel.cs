@@ -16,11 +16,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         
         public string Role { get; set; }
         
-        public List<UserReleaseRole> UserReleaseRoles { get; set; }
+        public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; }
     }
 
-    public class UserReleaseRole
+    public class UserReleaseRoleSubmission
     {
+        public Guid ReleaseId { get; set; }
+        public ReleaseRole ReleaseRole { get; set; }
+    }
+    public class UserReleaseRoleViewModel
+    {
+        public Guid Id { get; set; }
         public IdTitlePair Publication { get; set; }
         public IdTitlePair Release { get; set; }
         public EnumExtensions.EnumValue ReleaseRole { get; set; }

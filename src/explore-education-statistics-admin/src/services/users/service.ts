@@ -4,14 +4,27 @@ import {
   UserStatus,
   UserInvite,
   Role,
+  UserReleaseRole,
   ReleaseRole,
   UserUpdate,
+  UserReleaseRoleSubmission,
 } from '@admin/services/users/types';
 
 export interface UsersService {
   getRoles(): Promise<Role[]>;
   getReleaseRoles(): Promise<ReleaseRole[]>;
+
   getUser(userId: string): Promise<User>;
+
+  addUserReleaseRole: (
+    userId: string,
+    userReleaseRole: UserReleaseRoleSubmission,
+  ) => Promise<boolean>;
+  removeUserReleaseRole: (
+    userId: string,
+    userReleaseRole: UserReleaseRole,
+  ) => Promise<boolean>;
+
   getUsers(): Promise<UserStatus[]>;
   getPreReleaseUsers(): Promise<UserStatus[]>;
   getInvitedUsers(): Promise<UserStatus[]>;
@@ -30,6 +43,22 @@ const service: UsersService = {
   getUser(userId: string): Promise<User> {
     return client.get<User>(`/bau/users/${userId}`);
   },
+
+  addUserReleaseRole(
+    userId: string,
+    userReleaseRole: UserReleaseRoleSubmission,
+  ): Promise<boolean> {
+    return client.post(`/bau/users/${userId}/release-role`, userReleaseRole);
+  },
+  removeUserReleaseRole(
+    userId: string,
+    userReleaseRole: UserReleaseRole,
+  ): Promise<boolean> {
+    return client.delete(
+      `/bau/users/${userId}/release-role/${userReleaseRole.id}`,
+    );
+  },
+
   getUsers(): Promise<UserStatus[]> {
     return client.get<UserStatus[]>('/bau/users');
   },

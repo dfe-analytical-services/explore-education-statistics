@@ -9,8 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -23,17 +26,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
 
         public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext, ContentDbContext contentDbContext,
             IEmailService emailService,
-            IConfiguration configuration, UserManager<ApplicationUser> userManager)
+            IConfiguration configuration, UserManager<ApplicationUser> userManager, IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
             _emailService = emailService;
             _configuration = configuration;
             _userManager = userManager;
+            _persistenceHelper = persistenceHelper;
         }
 
         public async Task<List<UserViewModel>> ListAsync()
@@ -52,6 +57,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return users.Where(u => u.Role != "Prerelease User").ToList();
+        }
+
+        public async Task<Either<ActionResult, bool>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission userReleaseRole)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(userReleaseRole.ReleaseId)
+                // verify the user does not already have this role
+                .OnSuccessDo(async () =>
+                {
+                    _contentDbContext.Add(new UserReleaseRole
+                    {
+                        ReleaseId = userReleaseRole.ReleaseId,
+                        Role = userReleaseRole.ReleaseRole,
+                        UserId = userId
+                    });
+                    await _contentDbContext.SaveChangesAsync();
+                })
+                .OnSuccess(_ => true);
+        }
+
+        public async Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userId, Guid userReleaseRoleId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<User>(userId)
+                // verify the role belongs to the user
+                .OnSuccessDo(async () =>
+                {
+                    var entityToRemove = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r => r.Id == userReleaseRoleId);
+                    _contentDbContext.Remove(entityToRemove);
+                    await _contentDbContext.SaveChangesAsync();
+                })
+                .OnSuccess(_ => true);
         }
 
         public async Task<List<RoleViewModel>> ListRolesAsync()
@@ -186,12 +223,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private List<UserReleaseRole> GetUserReleaseRoles(string userId)
+        private List<UserReleaseRoleViewModel> GetUserReleaseRoles(string userId)
         {
             return _contentDbContext.UserReleaseRoles
                 .Where(x => x.UserId == Guid.Parse(userId))
-                .Select(x => new UserReleaseRole
+                .Select(x => new UserReleaseRoleViewModel
                 {
+                    Id = x.Id,
                     Publication = _contentDbContext.Publications
                         .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
                         .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),

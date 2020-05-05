@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -63,6 +65,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.U
             AddErrors(ModelState, ValidationResult(UserDoesNotExist));
 
             return ValidationProblem(new ValidationProblemDetails(ModelState));
+        }
+        
+        [HttpPost("bau/users/{userId}/release-role")]
+        public async Task<ActionResult<bool>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission releaseRole)
+        {
+            return await _userManagementService.AddUserReleaseRole(userId, releaseRole).HandleFailuresOrOk();
+        }
+        
+        [HttpDelete("bau/users/{userId}/release-role/{userReleaseRoleId}")]
+        public async Task<ActionResult<bool>> DeleteUserReleaseRole(Guid userId, Guid userReleaseRoleId)
+        {
+            return await _userManagementService.RemoveUserReleaseRole(userId, userReleaseRoleId).HandleFailuresOrOk();
         }
 
 
