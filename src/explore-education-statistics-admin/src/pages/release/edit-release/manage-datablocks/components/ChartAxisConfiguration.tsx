@@ -8,12 +8,12 @@ import {
   FormFieldSelect,
   FormFieldset,
   FormFieldTextInput,
-  FormGroup,
   Formik,
   FormTextInput,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import FormNumberInput from '@common/components/form/FormNumberInput';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
@@ -500,11 +500,12 @@ const ChartAxisConfiguration = ({
                 <tr>
                   <td>
                     {type === 'minor' && (
-                      <FormTextInput
+                      <FormNumberInput
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
-                        label=""
-                        defaultValue={`${referenceLine.position}`}
+                        label="Position"
+                        hideLabel
+                        value={referenceLine.position as number}
                         onChange={e => {
                           setReferenceLine({
                             ...referenceLine,
@@ -517,10 +518,11 @@ const ChartAxisConfiguration = ({
                       <FormSelect
                         name={`referenceLines[${form.values.referenceLines?.length}].position`}
                         id={`${id}-referenceLines-position`}
-                        label=""
+                        label="Position"
+                        hideLabel
                         value={referenceLine.position}
-                        order={[]}
                         placeholder="Select position"
+                        order={FormSelect.unordered}
                         options={referenceOptions}
                         onChange={e => {
                           setReferenceLine({
@@ -535,7 +537,8 @@ const ChartAxisConfiguration = ({
                     <FormTextInput
                       name={`referenceLines[${form.values.referenceLines?.length}].label`}
                       id={`${id}-referenceLines-label`}
-                      label=""
+                      label="Label"
+                      hideLabel
                       defaultValue={referenceLine.label}
                       onChange={e => {
                         setReferenceLine({
@@ -546,13 +549,12 @@ const ChartAxisConfiguration = ({
                     />
                   </td>
                   <td>
-                    <button
+                    <Button
                       disabled={
                         referenceLine.position === '' ||
                         referenceLine.label === ''
                       }
-                      className="govuk-button govuk-!-margin-bottom-0"
-                      type="button"
+                      className="govuk-!-margin-bottom-0 dfe-float--right"
                       onClick={() => {
                         form.setFieldValue('referenceLines', [
                           ...(form.values.referenceLines || []),
@@ -562,8 +564,8 @@ const ChartAxisConfiguration = ({
                         setReferenceLine({ label: '', position: '' });
                       }}
                     >
-                      Add
-                    </button>
+                      Add line
+                    </Button>
                   </td>
                 </tr>
               </tbody>
