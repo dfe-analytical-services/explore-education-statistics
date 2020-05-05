@@ -304,7 +304,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
     [dispatch],
   );
 
-  const updateDataSet = useCallback(
+  const updateDataSets = useCallback(
     (newData: DataSetConfiguration[]) => {
       dispatch({
         type: 'UPDATE_DATA_SETS',
@@ -367,7 +367,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
     () => ({
       addDataSet,
       removeDataSet,
-      updateDataSet,
+      updateDataSets,
       updateChartDefinition,
       updateChartOptions,
       updateChartAxis,
@@ -379,7 +379,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       updateChartAxis,
       updateChartDefinition,
       updateChartOptions,
-      updateDataSet,
+      updateDataSets,
       updateFormState,
     ],
   );

@@ -4,7 +4,10 @@ import styles from '@admin/pages/release/edit-release/manage-datablocks/componen
 import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartDefinitionSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDefinitionSelector';
-import { useChartBuilderReducer } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
+import {
+  ChartOptions,
+  useChartBuilderReducer,
+} from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
@@ -27,10 +30,12 @@ import {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import {
+  AxisConfiguration,
   AxisType,
   ChartDefinition,
   ChartProps,
 } from '@common/modules/charts/types/chart';
+import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import {
@@ -40,7 +45,13 @@ import {
 import { Chart } from '@common/services/types/blocks';
 import parseNumber from '@common/utils/number/parseNumber';
 import omit from 'lodash/omit';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 const chartDefinitions: ChartDefinition[] = [
   lineChartBlockDefinition,
@@ -73,6 +84,7 @@ const ChartBuilder = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [isDataLoading, setDataLoading] = useState(false);
+  const [shouldSave, setShouldSave] = useState(false);
 
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
     initialConfiguration,
@@ -133,6 +145,34 @@ const ChartBuilder = ({
     }
   }, [axes, data, definition, getChartFile, meta, options]);
 
+  // Save the chart using an effect as it's easier to
+  // ensure that the correct `chartProps` are passed
+  // to the `onChartSave` callback.
+  useEffect(() => {
+    if (!shouldSave) {
+      return;
+    }
+
+    if (!canSaveChart || !chartProps) {
+      return;
+    }
+
+    const saveChart = async () => {
+      if (containerRef.current) {
+        containerRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+
+      // We don't want to persist data set labels
+      // anymore in the deprecated format.
+      await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
+    };
+
+    saveChart().then(() => setShouldSave(false));
+  }, [canSaveChart, chartProps, onChartSave, shouldSave]);
+
   const handleChartDefinitionChange = useCallback(
     async (chartDefinition: ChartDefinition) => {
       actions.updateChartDefinition(chartDefinition);
@@ -163,26 +203,29 @@ const ChartBuilder = ({
     [onTableQueryUpdate],
   );
 
-  const handleChartSave = useCallback(async () => {
-    if (chartProps && !isChartRenderable(chartProps)) {
-      return;
-    }
+  const handleChartDataSubmit = useCallback(
+    (nextDataSets: DataSetConfiguration[]) => {
+      actions.updateDataSets(nextDataSets);
+      setShouldSave(true);
+    },
+    [actions],
+  );
 
-    if (!canSaveChart) {
-      return;
-    }
+  const handleChartConfigurationSubmit = useCallback(
+    (nextChartOptions: ChartOptions) => {
+      actions.updateChartOptions(nextChartOptions);
+      setShouldSave(true);
+    },
+    [actions],
+  );
 
-    if (containerRef.current) {
-      containerRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
-
-    // We don't want to persist data set labels
-    // anymore in the deprecated format.
-    await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
-  }, [canSaveChart, chartProps, onChartSave]);
+  const handleAxisConfigurationSubmit = useCallback(
+    (nextAxis: AxisConfiguration) => {
+      actions.updateChartAxis(nextAxis);
+      setShouldSave(true);
+    },
+    [actions],
+  );
 
   return (
     <div ref={containerRef}>
@@ -228,8 +271,8 @@ const ChartBuilder = ({
                 capabilities={definition.capabilities}
                 onDataAdded={actions.addDataSet}
                 onDataRemoved={actions.removeDataSet}
-                onDataChanged={actions.updateDataSet}
-                onSubmit={handleChartSave}
+                onDataChanged={actions.updateDataSets}
+                onSubmit={handleChartDataSubmit}
               />
             </TabsSection>
           )}
@@ -247,7 +290,7 @@ const ChartBuilder = ({
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={actions.updateChartOptions}
               onFormStateChange={actions.updateFormState}
-              onSubmit={handleChartSave}
+              onSubmit={handleChartConfigurationSubmit}
             />
           </TabsSection>
 
@@ -277,7 +320,7 @@ const ChartBuilder = ({
                     meta={meta}
                     onChange={actions.updateChartAxis}
                     onFormStateChange={actions.updateFormState}
-                    onSubmit={handleChartSave}
+                    onSubmit={handleAxisConfigurationSubmit}
                   />
                 </TabsSection>
               );

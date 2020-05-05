@@ -106,17 +106,19 @@ const ChartConfiguration = ({
       {definition.type === 'infographic' && (
         <>
           <InfographicChartForm
+            canSaveChart={canSaveChart}
             releaseId={releaseId}
-            fileId={fileId || ''}
-            onSubmit={nextFileId => {
+            fileId={fileId}
+            onSubmit={async nextFileId => {
               onChange({
                 ...chartOptions,
                 fileId: nextFileId,
               });
-
-              onFormStateChange({
-                form: 'options',
-                isValid: true,
+            }}
+            onDelete={async () => {
+              onSubmit({
+                ...chartOptions,
+                fileId: '',
               });
             }}
           />
