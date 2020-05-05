@@ -158,7 +158,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
     canSize: true,
     canSort: true,
     fixedAxisGroupBy: false,
-    hasAxes: true,
     hasReferenceLines: true,
     hasLegend: true,
     requiresGeoJson: false,
@@ -200,6 +199,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       type: 'minor',
       defaults: {
         min: 0,
+        showGrid: true,
         size: 50,
         tickConfig: 'default',
         tickSpacing: 1,

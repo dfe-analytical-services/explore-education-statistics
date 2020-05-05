@@ -11,7 +11,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
-import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -64,6 +64,16 @@ const errorCodeMappings = [
     'SUBJECT_TITLE_MUST_BE_UNIQUE',
     'subjectTitle',
     'Subject title must be unique',
+  ),
+  errorCodeToFieldError(
+    'DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
+    'dataFile',
+    'Data filename cannot contain spaces or special characters',
+  ),
+  errorCodeToFieldError(
+    'META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
+    'metadataFile',
+    'Meta filename cannot contain spaces or special characters',
   ),
 ];
 
@@ -226,7 +236,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {canUpdateRelease && (
+            {canUpdateRelease && canUpdateReleaseDataFiles && (
               <>
                 {isUploading && (
                   <LoadingSpinner text="Uploading files" overlay />
@@ -266,19 +276,17 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     width={20}
                   />
 
-                  <FormFieldFileSelector<FormValues>
+                  <FormFieldFileInput<FormValues>
                     id={`${formId}-dataFile`}
                     name="dataFile"
                     label="Upload data file"
                     formGroupClass="govuk-!-margin-top-6"
-                    form={form}
                   />
 
-                  <FormFieldFileSelector<FormValues>
+                  <FormFieldFileInput<FormValues>
                     id={`${formId}-metadataFile`}
                     name="metadataFile"
                     label="Upload metadata file"
-                    form={form}
                   />
                 </FormFieldset>
 
@@ -306,7 +314,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
             {typeof canUpdateRelease !== 'undefined' &&
               canUpdateRelease &&
               !canUpdateReleaseDataFiles &&
-              'This release is an amendment to a live release and so cannot change any data files.'}
+              'This release is an amendment to a live release and so it is not possible to change any data files.'}
 
             {dataFiles.length > 0 && (
               <>
@@ -402,30 +410,32 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="Date uploaded">
                             {format(dataFile.created, 'd/M/yyyy HH:mm')}
                           </SummaryListItem>
-                          {canUpdateRelease && dataFile.canDelete && (
-                            <SummaryListItem
-                              term="Actions"
-                              actions={
-                                <ButtonText
-                                  onClick={() =>
-                                    editReleaseDataService
-                                      .getDeleteDataFilePlan(
-                                        releaseId,
-                                        dataFile,
-                                      )
-                                      .then(plan => {
-                                        setDeleteDataFile({
-                                          plan,
-                                          file: dataFile,
-                                        });
-                                      })
-                                  }
-                                >
-                                  Delete files
-                                </ButtonText>
-                              }
-                            />
-                          )}
+                          {canUpdateRelease &&
+                            canUpdateReleaseDataFiles &&
+                            dataFile.canDelete && (
+                              <SummaryListItem
+                                term="Actions"
+                                actions={
+                                  <ButtonText
+                                    onClick={() =>
+                                      editReleaseDataService
+                                        .getDeleteDataFilePlan(
+                                          releaseId,
+                                          dataFile,
+                                        )
+                                        .then(plan => {
+                                          setDeleteDataFile({
+                                            plan,
+                                            file: dataFile,
+                                          });
+                                        })
+                                    }
+                                  >
+                                    Delete files
+                                  </ButtonText>
+                                }
+                              />
+                            )}
                         </SummaryList>
                       </AccordionSection>
                     );

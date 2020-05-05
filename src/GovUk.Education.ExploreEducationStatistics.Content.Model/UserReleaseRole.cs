@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid ReleaseId { get; set; }
         
         public ReleaseRole Role { get; set; }
+        
+        public bool SoftDeleted { get; set; }
 
         public UserReleaseRole CreateReleaseAmendment(Release amendment)
         {

@@ -1,5 +1,6 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -9,7 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public DateTime Created { get; set; }
 
-        public TableBuilderQueryContext Query { get; set; }
+        public TableBuilderConfiguration Configuration { get; set; }
+
+        public ObservationQueryContext Query { get; set; }
 
         public FastTrack()
         {

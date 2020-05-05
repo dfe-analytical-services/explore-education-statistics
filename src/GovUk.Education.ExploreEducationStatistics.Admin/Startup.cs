@@ -222,6 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseMigrationService, ReleaseMigrationService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
@@ -253,8 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IEmailService, EmailService>();
             
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
-            services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
-            services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
+            services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
@@ -270,16 +270,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Data.Model.Services.Interfaces.IReleaseService, Data.Model.Services.ReleaseService>();
             services.AddTransient<ISubjectService, SubjectService>();
-            services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
-            services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
-            services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
+            services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+            services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<IImportStatusService, ImportStatusService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
+            services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
+            services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
 

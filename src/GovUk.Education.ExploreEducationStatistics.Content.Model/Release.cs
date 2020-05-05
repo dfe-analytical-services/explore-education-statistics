@@ -53,6 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [NotMapped] public bool Live => Published.HasValue && (Compare(UtcNow, Published.Value) > 0);
 
+        [NotMapped] public bool Amendment => Version > 0 && !Live;
+
         public string Slug { get; set; }
 
         public Guid PublicationId { get; set; }
@@ -66,6 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore]
         public List<ReleaseContentBlock> ContentBlocks { get; set; }
+        
+        public bool SoftDeleted { get; set; }
 
         [NotMapped]
         [JsonProperty("Content")]
@@ -205,28 +209,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Release CreateReleaseAmendment(DateTime createdDate, Guid createdByUserId)
         {
             var amendment = MemberwiseClone() as Release;
-            amendment.Id = Guid.NewGuid();
-            var ctx = new CreateAmendmentContext(this, amendment);
 
+            // set new values for fields that should be altered in the amended Release rather than copied from the 
+            // original Release
+            amendment.Id = Guid.NewGuid();
             amendment.Published = null;
+            amendment.PublishScheduled = null;
             amendment.Status = ReleaseStatus.Draft;
             amendment.Created = createdDate;
-            amendment.CreatedBy = null;
             amendment.CreatedById = createdByUserId;
             amendment.Version = Version + 1;
+            amendment.PreviousVersionId = Id;
+            amendment.InternalReleaseNote = null;
             
+            var ctx = new CreateAmendmentContext(this, amendment);
+
             amendment.Content = amendment
-                .Content
+                .Content?
                 .Select(content => content.CreateReleaseAmendment(ctx))
+                .ToList();
+
+            amendment.RelatedInformation = amendment
+                .RelatedInformation?
+                .Select(link =>
+                {
+                    var copy = link.CreateCopy();
+                    copy.Id = Guid.NewGuid();
+                    return copy;
+                })
                 .ToList();
             
             amendment.Updates = amendment
-                .Updates
+                .Updates?
                 .Select(update => update.CreateReleaseAmendment(ctx))
                 .ToList();
             
             amendment.ContentBlocks = amendment
-                .ContentBlocks
+                .ContentBlocks?
                 .Select(releaseContentBlock => releaseContentBlock.CreateReleaseAmendment(ctx))
                 .ToList();
             
@@ -236,13 +255,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class CreateAmendmentContext
     {
-        public CreateAmendmentContext(Release original, Release amendment)
+        public CreateAmendmentContext(Release previousVersion, Release amendment)
         {
-            Original = original;
+            PreviousVersion = previousVersion;
             Amendment = amendment;
         }
 
-        public Release Original { get; set; }
+        public Release PreviousVersion { get; set; }
 
         public Release Amendment { get; set; }
         

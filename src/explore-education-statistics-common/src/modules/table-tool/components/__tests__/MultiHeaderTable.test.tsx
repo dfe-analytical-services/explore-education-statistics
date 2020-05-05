@@ -764,7 +764,93 @@ describe('MultiHeaderTable', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders table with `row` header merged with identical subgroup', () => {
+  test('renders table with `rowgroup` header merged with identical parent', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
+        rowHeaders={[
+          new Header('A', 'A').addChild(
+            new Header('B', 'B').addChild(new Header('C', 'C')),
+          ),
+          new Header('D', 'D').addChild(
+            new Header('D', 'D').addChild(new Header('E', 'E')),
+          ),
+          new Header('F', 'F').addChild(
+            new Header('G', 'G').addChild(new Header('H', 'H')),
+          ),
+        ]}
+        rows={[
+          ['ABC1', 'ABC2'],
+          ['DDE1', 'DDE2'],
+          ['FGH1', 'FGH2'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(6);
+
+    // Row 2
+    const row2Headers = container.querySelectorAll('tbody tr:nth-child(2) th');
+    expect(row2Headers).toHaveLength(2);
+
+    expect(row2Headers[0]).toHaveTextContent('D');
+    expect(row2Headers[0]).toHaveAttribute('scope', 'rowgroup');
+    expect(row2Headers[0]).toHaveAttribute('rowspan', '1');
+    expect(row2Headers[0]).toHaveAttribute('colspan', '2');
+
+    expect(row2Headers[1]).toHaveTextContent('E');
+    expect(row2Headers[1]).toHaveAttribute('scope', 'row');
+    expect(row2Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row2Headers[1]).toHaveAttribute('colspan', '1');
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with `rowgroup` header merged with identical parent on first row', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
+        rowHeaders={[
+          new Header('A', 'A').addChild(
+            new Header('A', 'A').addChild(new Header('B', 'B')),
+          ),
+          new Header('C', 'C').addChild(
+            new Header('D', 'D').addChild(new Header('E', 'E')),
+          ),
+          new Header('F', 'F').addChild(
+            new Header('G', 'G').addChild(new Header('H', 'H')),
+          ),
+        ]}
+        rows={[
+          ['AAB1', 'AAB2'],
+          ['CDE1', 'CDE2'],
+          ['FGH1', 'FGH2'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(6);
+
+    // Row 1
+    const row1Headers = container.querySelectorAll('tbody tr:nth-child(1) th');
+    expect(row1Headers).toHaveLength(2);
+
+    expect(row1Headers[0]).toHaveTextContent('A');
+    expect(row1Headers[0]).toHaveAttribute('scope', 'rowgroup');
+    expect(row1Headers[0]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[0]).toHaveAttribute('colspan', '2');
+
+    expect(row1Headers[1]).toHaveTextContent('B');
+    expect(row1Headers[1]).toHaveAttribute('scope', 'row');
+    expect(row1Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[1]).toHaveAttribute('colspan', '1');
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with `row` header merged with identical parent', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
@@ -793,6 +879,44 @@ describe('MultiHeaderTable', () => {
     expect(row2Headers[0]).toHaveAttribute('scope', 'row');
     expect(row2Headers[0]).toHaveAttribute('rowspan', '1');
     expect(row2Headers[0]).toHaveAttribute('colspan', '2');
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with `row` header merged with identical parent on first row', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[new Header('1', '1'), new Header('2', '2')]}
+        rowHeaders={[
+          new Header('A', 'A')
+            .addChild(new Header('B', 'B').addChild(new Header('B', 'B')))
+            .addChild(new Header('C', 'C').addChild(new Header('D', 'D')))
+            .addChild(new Header('E', 'E').addChild(new Header('F', 'F'))),
+        ]}
+        rows={[
+          ['ABB1', 'ABB2'],
+          ['ACD1', 'ACD2'],
+          ['AEF1', 'AEF2'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(6);
+
+    // Row 1
+    const row1Headers = container.querySelectorAll('tbody tr:nth-child(1) th');
+    expect(row1Headers).toHaveLength(2);
+
+    expect(row1Headers[0]).toHaveTextContent('A');
+    expect(row1Headers[0]).toHaveAttribute('scope', 'rowgroup');
+    expect(row1Headers[0]).toHaveAttribute('rowspan', '3');
+    expect(row1Headers[0]).toHaveAttribute('colspan', '1');
+
+    expect(row1Headers[1]).toHaveTextContent('B');
+    expect(row1Headers[1]).toHaveAttribute('scope', 'row');
+    expect(row1Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[1]).toHaveAttribute('colspan', '2');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -1008,7 +1132,7 @@ describe('MultiHeaderTable', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders table with `colgroup` header merged with identical subgroup', () => {
+  test('renders table with `colgroup` header merged with identical parent', () => {
     const { container } = render(
       <MultiHeaderTable
         columnHeaders={[
@@ -1067,6 +1191,195 @@ describe('MultiHeaderTable', () => {
     expect(row2Headers[1]).toHaveAttribute('scope', 'colgroup');
     expect(row2Headers[1]).toHaveAttribute('rowspan', '1');
     expect(row2Headers[1]).toHaveAttribute('colspan', '1');
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with `colgroup` header merged with identical parent on first column', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[
+          new Header('A', 'A').addChild(
+            new Header('A', 'A').addChild(new Header('F', 'F')),
+          ),
+          new Header('B', 'B').addChild(
+            new Header('C', 'C').addChild(new Header('F', 'F')),
+          ),
+          new Header('D', 'D').addChild(
+            new Header('E', 'E').addChild(new Header('F', 'F')),
+          ),
+        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
+        rows={[
+          ['BAF1', 'CCF1', 'DEF1'],
+          ['BAF2', 'CCF2', 'DEF2'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(6);
+
+    expect(container.querySelectorAll('thead tr')).toHaveLength(3);
+
+    // Row 1
+    const row1Headers = container.querySelectorAll('thead tr:nth-child(1) th');
+    expect(row1Headers).toHaveLength(3);
+
+    expect(row1Headers[0]).toHaveTextContent('A');
+    expect(row1Headers[0]).toHaveAttribute('scope', 'colgroup');
+    expect(row1Headers[0]).toHaveAttribute('rowspan', '2');
+    expect(row1Headers[0]).toHaveAttribute('colspan', '1');
+
+    expect(row1Headers[1]).toHaveTextContent('B');
+    expect(row1Headers[1]).toHaveAttribute('scope', 'colgroup');
+    expect(row1Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[1]).toHaveAttribute('colspan', '1');
+
+    expect(row1Headers[2]).toHaveTextContent('D');
+    expect(row1Headers[2]).toHaveAttribute('scope', 'colgroup');
+    expect(row1Headers[2]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[2]).toHaveAttribute('colspan', '1');
+
+    // Row 2
+    const row2Headers = container.querySelectorAll('thead tr:nth-child(2) th');
+    expect(row2Headers).toHaveLength(2);
+
+    expect(row2Headers[0]).toHaveTextContent('C');
+    expect(row2Headers[0]).toHaveAttribute('scope', 'colgroup');
+    expect(row2Headers[0]).toHaveAttribute('rowspan', '1');
+    expect(row2Headers[0]).toHaveAttribute('colspan', '1');
+
+    expect(row2Headers[1]).toHaveTextContent('E');
+    expect(row2Headers[1]).toHaveAttribute('scope', 'colgroup');
+    expect(row2Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row2Headers[1]).toHaveAttribute('colspan', '1');
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with `col` header merged with identical parent', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[
+          new Header('A', 'A').addChild(
+            new Header('B', 'B').addChild(new Header('C', 'C')),
+          ),
+          new Header('D', 'D').addChild(
+            new Header('E', 'E').addChild(new Header('E', 'E')),
+          ),
+          new Header('F', 'F').addChild(
+            new Header('G', 'G').addChild(new Header('H', 'H')),
+          ),
+        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
+        rows={[
+          ['ABC1', 'DEE1', 'FGH1'],
+          ['ABC2', 'DEE2', 'FGH2'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(6);
+
+    expect(container.querySelectorAll('thead tr')).toHaveLength(3);
+
+    // Row 2
+    const row1Headers = container.querySelectorAll('thead tr:nth-child(2) th');
+    expect(row1Headers).toHaveLength(3);
+
+    expect(row1Headers[0]).toHaveTextContent('B');
+    expect(row1Headers[0]).toHaveAttribute('scope', 'colgroup');
+    expect(row1Headers[0]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[0]).toHaveAttribute('colspan', '1');
+
+    expect(row1Headers[1]).toHaveTextContent('E');
+    expect(row1Headers[1]).toHaveAttribute('scope', 'col');
+    expect(row1Headers[1]).toHaveAttribute('rowspan', '2');
+    expect(row1Headers[1]).toHaveAttribute('colspan', '1');
+
+    expect(row1Headers[2]).toHaveTextContent('G');
+    expect(row1Headers[2]).toHaveAttribute('scope', 'colgroup');
+    expect(row1Headers[2]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[2]).toHaveAttribute('colspan', '1');
+
+    // Row 3
+    const row3Headers = container.querySelectorAll('thead tr:nth-child(3) th');
+    expect(row3Headers).toHaveLength(2);
+
+    expect(row3Headers[0]).toHaveTextContent('C');
+    expect(row3Headers[0]).toHaveAttribute('scope', 'col');
+    expect(row3Headers[0]).toHaveAttribute('rowspan', '1');
+    expect(row3Headers[0]).toHaveAttribute('colspan', '1');
+
+    expect(row3Headers[1]).toHaveTextContent('H');
+    expect(row3Headers[1]).toHaveAttribute('scope', 'col');
+    expect(row3Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row3Headers[1]).toHaveAttribute('colspan', '1');
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders table with `col` header merged with identical parent on first column', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[
+          new Header('A', 'A').addChild(
+            new Header('B', 'B').addChild(new Header('B', 'B')),
+          ),
+          new Header('C', 'C').addChild(
+            new Header('D', 'D').addChild(new Header('E', 'E')),
+          ),
+          new Header('F', 'F').addChild(
+            new Header('G', 'G').addChild(new Header('H', 'H')),
+          ),
+        ]}
+        rowHeaders={[new Header('1', '1'), new Header('2', '2')]}
+        rows={[
+          ['ABB1', 'CDE1', 'FGH1'],
+          ['ABB2', 'CDE2', 'FGH2'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(6);
+
+    expect(container.querySelectorAll('thead tr')).toHaveLength(3);
+
+    // Row 2
+    const row1Headers = container.querySelectorAll('thead tr:nth-child(2) th');
+    expect(row1Headers).toHaveLength(3);
+
+    expect(row1Headers[0]).toHaveTextContent('B');
+    expect(row1Headers[0]).toHaveAttribute('scope', 'col');
+    expect(row1Headers[0]).toHaveAttribute('rowspan', '2');
+    expect(row1Headers[0]).toHaveAttribute('colspan', '1');
+
+    expect(row1Headers[1]).toHaveTextContent('D');
+    expect(row1Headers[1]).toHaveAttribute('scope', 'colgroup');
+    expect(row1Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[1]).toHaveAttribute('colspan', '1');
+
+    expect(row1Headers[2]).toHaveTextContent('G');
+    expect(row1Headers[2]).toHaveAttribute('scope', 'colgroup');
+    expect(row1Headers[2]).toHaveAttribute('rowspan', '1');
+    expect(row1Headers[2]).toHaveAttribute('colspan', '1');
+
+    // Row 3
+    const row3Headers = container.querySelectorAll('thead tr:nth-child(3) th');
+    expect(row3Headers).toHaveLength(2);
+
+    expect(row3Headers[0]).toHaveTextContent('E');
+    expect(row3Headers[0]).toHaveAttribute('scope', 'col');
+    expect(row3Headers[0]).toHaveAttribute('rowspan', '1');
+    expect(row3Headers[0]).toHaveAttribute('colspan', '1');
+
+    expect(row3Headers[1]).toHaveTextContent('H');
+    expect(row3Headers[1]).toHaveAttribute('scope', 'col');
+    expect(row3Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(row3Headers[1]).toHaveAttribute('colspan', '1');
 
     expect(container.innerHTML).toMatchSnapshot();
   });

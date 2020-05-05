@@ -1,8 +1,8 @@
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import commonService from '@admin/services/common/service';
 import { EditableContentBlock } from '@admin/services/publicationService';
 import FormattedDate from '@common/components/FormattedDate';
+import Tag from '@common/components/Tag';
 import { Release } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import {
@@ -54,10 +54,10 @@ const BasicReleaseSummary = ({ release }: Props) => {
       {releaseTypeIdsToIcons && (
         <>
           <div className="govuk-grid-column-three-quarters">
-            {release.prerelease && (
-              <span className={`govuk-tag ${styles.ragStatusRed}`}>
-                Pre Release
-              </span>
+            {release.prerelease ? (
+              <Tag className={`${styles.ragStatusRed}`}>Pre Release</Tag>
+            ) : (
+              <Tag>{getReleaseStatusLabel(release.status)}</Tag>
             )}
 
             <dl className="dfe-meta-content">

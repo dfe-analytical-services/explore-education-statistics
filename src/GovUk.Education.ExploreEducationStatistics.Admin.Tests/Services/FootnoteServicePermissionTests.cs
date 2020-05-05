@@ -106,7 +106,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = DbUtils.InMemoryStatisticsDbContext())
             {
-                context.Add(Subject);
+                context.Subject.Add(Subject);
+                context.ReleaseSubject.Add(new ReleaseSubject
+                {
+                    ReleaseId = Release.Id,
+                    SubjectId = Subject.Id
+                });
                 context.SaveChanges();
                 
                 var service = new FootnoteService(

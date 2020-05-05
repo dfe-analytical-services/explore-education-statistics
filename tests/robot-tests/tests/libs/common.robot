@@ -249,6 +249,7 @@ user clicks link
 
 user clicks button
   [Arguments]   ${text}
+  user waits until element is enabled  xpath://button[text()="${text}"]
   click button  ${text}
 
 user checks page contains tag

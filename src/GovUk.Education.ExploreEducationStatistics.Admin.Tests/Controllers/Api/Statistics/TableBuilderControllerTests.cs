@@ -45,9 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         
         private (
             Mock<ILogger<TableBuilderController>>,
-            Mock<IDataService<TableBuilderResultViewModel>>) Mocks()
+            Mock<ITableBuilderService>) Mocks()
         {
-            var tableBuilderService = new Mock<IDataService<TableBuilderResultViewModel>>();
+            var tableBuilderService = new Mock<ITableBuilderService>();
 
             tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query))).ReturnsAsync(
                 new TableBuilderResultViewModel

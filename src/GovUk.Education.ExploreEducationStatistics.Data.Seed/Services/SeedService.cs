@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
@@ -38,27 +37,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
         public void Seed()
         {
-            var subjects = SamplePublications.GetSubjects();
-            foreach (var subject in subjects)
+            var subjectsAndReleases = SamplePublications.GetSubjectsAndReleases();
+            foreach (var subjectAndRelease in subjectsAndReleases)
             {
+                var subject = subjectAndRelease.Key;
+                var release = subjectAndRelease.Value;
+                
                 _logger.LogInformation($"Processing subject {subject.Id}");
                 var file = SamplePublications.SubjectFiles[subject.Id];
-                StoreFilesAndSeed(subject.Release, file, subject.Name, subject);
+                StoreFilesAndSeed(release, file, subject);
             }
         }
         
-        private void StoreFilesAndSeed(Release release, DataCsvFile file, string subjectName, Subject subject)
+        private void StoreFilesAndSeed(Release release, DataCsvFile file, Subject subject)
         {
             var dataFile = CreateFormFile(file.GetCsvLines(), file + ".csv", "file");
             var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
-            _logger.LogInformation("Uploading files for \"{subjectName}\"", subjectName);
-            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName, true).Result;
-            int rows = FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
-            Seed(subject.Id,file + ".csv", subject.Release, rows);
+            _logger.LogInformation("Uploading files for \"{subjectName}\"", subject.Name);
+            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subject.Name, true).Result;
+            Seed(subject.Id,file + ".csv", release);
         }
 
-        private void Seed(Guid subjectId, string dataFileName, Release release, int rows)
+        private void Seed(Guid subjectId, string dataFileName, Release release)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -69,14 +70,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             pQueue.CreateIfNotExists();
 
-            var cloudMessage = BuildCloudMessage(subjectId, dataFileName, release, rows);
+            var cloudMessage = BuildCloudMessage(subjectId, dataFileName, release);
 
             _logger.LogInformation("Adding queue message for file \"{dataFileName}\"", dataFileName);
 
             pQueue.AddMessage(cloudMessage);
         }
 
-        private CloudQueueMessage BuildCloudMessage(Guid subjectId, string dataFileName, Release release, int rows)
+        private CloudQueueMessage BuildCloudMessage(Guid subjectId, string dataFileName, Release release)
         {
             var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
             var message = new ImportMessage

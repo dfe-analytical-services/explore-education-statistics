@@ -1,31 +1,43 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
-import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
-import { AdminDashboardPublication } from '@admin/services/dashboard/types';
+import {
+  AdminDashboardPublication,
+  AdminDashboardRelease,
+} from '@admin/services/dashboard/types';
 import service from '@admin/services/release/create-release/service';
-import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { formatTestId } from '@common/utils/test-utils';
 import React, { useContext, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
+import CancelAmendmentModal from './CancelAmendmentModal';
+import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 
 export interface Props {
   publication: AdminDashboardPublication;
+  onChangePublication: () => void;
 }
 
 const PublicationSummary = ({
   publication,
+  onChangePublication,
   history,
 }: Props & RouteComponentProps) => {
   const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
-  // BAU-324 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
-  const showAmendmentButton = () => false;
+  const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
+    string
+  >();
+  const noAmendmentInProgressFilter = (release: AdminDashboardRelease) =>
+    publication &&
+    !publication.releases.some(
+      r => r.amendment && r.previousVersionId === release.id,
+    );
+
+  // BAU-404 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
+  const showAmendmentButton = () => true;
   return (
     <>
       <SummaryList>
@@ -57,41 +69,19 @@ const PublicationSummary = ({
         </SummaryListItem>
         <SummaryListItem term="Releases" smallKey>
           <ul className="govuk-list dfe-admin">
-            {publication.releases.map(release => (
-              <li key={release.id}>
-                <ReleaseSummary
-                  release={release}
-                  actions={
-                    <>
-                      <ButtonLink
-                        to={summaryRoute.generateLink({
-                          publicationId: publication.id,
-                          releaseId: release.id,
-                        })}
-                        testId={formatTestId(
-                          `Edit release link for ${
-                            publication.title
-                          }, ${getReleaseSummaryLabel(release)}`,
-                        )}
-                      >
-                        {release.permissions.canUpdateRelease
-                          ? 'Edit this release'
-                          : 'View this release'}
-                      </ButtonLink>
-                      {showAmendmentButton() &&
-                        release.permissions.canMakeAmendmentOfRelease && (
-                          <Button
-                            className="govuk-button--secondary govuk-!-margin-left-4"
-                            onClick={() => setAmendReleaseId(release.id)}
-                          >
-                            Amend this release
-                          </Button>
-                        )}
-                    </>
-                  }
-                />
-              </li>
-            ))}
+            {publication.releases
+              .filter(noAmendmentInProgressFilter)
+              .map(release => (
+                <li key={release.id}>
+                  <NonScheduledReleaseSummary
+                    onClickAmendRelease={
+                      showAmendmentButton() ? setAmendReleaseId : undefined
+                    }
+                    onClickCancelAmendment={setCancelAmendmentReleaseId}
+                    release={release}
+                  />
+                </li>
+              ))}
             {publication.releases.length < 1 && <>No releases created</>}
           </ul>
         </SummaryListItem>
@@ -143,6 +133,17 @@ const PublicationSummary = ({
             before updates can be published.
           </p>
         </ModalConfirm>
+      )}
+
+      {cancelAmendmentReleaseId && (
+        <CancelAmendmentModal
+          onConfirm={async () => {
+            await service.deleteRelease(cancelAmendmentReleaseId);
+            setCancelAmendmentReleaseId(undefined);
+            onChangePublication();
+          }}
+          onCancel={() => setCancelAmendmentReleaseId(undefined)}
+        />
       )}
     </>
   );

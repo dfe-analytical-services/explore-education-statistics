@@ -19,18 +19,24 @@ import LazyLoad from 'react-lazyload';
 interface Props {
   release: AdminDashboardRelease;
   actions: ReactNode;
+  secondaryActions?: ReactNode;
   children?: ReactNode;
 }
 
-const ReleaseSummary = ({ release, actions, children }: Props) => {
+const ReleaseSummary = ({
+  release,
+  actions,
+  secondaryActions,
+  children,
+}: Props) => {
   return (
     <Details
       className="govuk-!-margin-bottom-0"
       summary={getReleaseSummaryLabel(release)}
       tag={[
         getReleaseStatusLabel(release.status),
-        // eslint-disable-next-line react/jsx-key
-        release.status !== 'Draft' && release.status !== 'HigherLevelReview' && (
+        release.amendment && 'Amendment',
+        release.status === 'Approved' && (
           <LazyLoad
             scroll={false}
             placeholder={
@@ -84,8 +90,10 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
       {children}
 
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-half">{actions}</div>
-        <div className="govuk-grid-column-one-half dfe-align--right" />
+        <div className="govuk-grid-column-two-thirds">{actions}</div>
+        <div className="govuk-grid-column-one-third dfe-align--right">
+          {secondaryActions}
+        </div>
       </div>
     </Details>
   );

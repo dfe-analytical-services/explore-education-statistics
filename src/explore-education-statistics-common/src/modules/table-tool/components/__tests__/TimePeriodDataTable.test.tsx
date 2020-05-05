@@ -6,6 +6,7 @@ import {
   testDataNoFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataResponse } from '@common/services/tableBuilderService';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
@@ -277,16 +278,18 @@ describe('TimePeriodDataTable', () => {
           [
             {
               value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
-              label: 'Ethnicity Major Asian Total',
+              type: 'Filter',
             },
           ],
         ],
-        rowGroups: [[{ value: 'E92000001', label: 'England' }]],
-        columns: [{ value: '2014_AY', label: '2014/15' }],
+        rowGroups: [
+          [{ value: 'E92000001', type: 'Location', level: 'country' }],
+        ],
+        columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
           {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
-            label: 'Authorised absence rate',
+            type: 'Indicator',
           },
         ],
       },
@@ -365,12 +368,14 @@ describe('TimePeriodDataTable', () => {
     const tableHeadersConfig = mapTableHeadersConfig(
       {
         columnGroups: [],
-        rowGroups: [[{ value: 'E92000001', label: 'England' }]],
-        columns: [{ value: '2014_AY', label: '2014/15' }],
+        rowGroups: [
+          [{ value: 'E92000001', level: 'country', type: 'Location' }],
+        ],
+        columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
           {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
-            label: 'Authorised absence rate',
+            type: 'Indicator',
           },
         ],
       },
@@ -448,12 +453,14 @@ describe('TimePeriodDataTable', () => {
     const tableHeadersConfig = mapTableHeadersConfig(
       {
         columnGroups: [],
-        rowGroups: [[{ value: 'E92000001', label: 'England' }]],
-        columns: [{ value: '2014_AY', label: '2014/15' }],
+        rowGroups: [
+          [{ value: 'E92000001', type: 'Location', level: 'country' }],
+        ],
+        columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
           {
             value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
-            label: 'Authorised absence rate',
+            type: 'Indicator',
           },
         ],
       },
@@ -500,44 +507,44 @@ describe('TimePeriodDataTable', () => {
   test('renders table with completely empty rows removed', () => {
     const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
 
-    const tableHeadersConfig = {
+    const tableHeadersConfig: UnmappedTableHeadersConfig = {
       columnGroups: [
         [
           {
             value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
-            label: 'Special',
+            type: 'Filter',
           },
         ],
       ],
       rowGroups: [
         [
-          { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
-          { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
+          { value: 'E08000026', type: 'Location', level: 'localAuthority' },
+          { value: 'E09000008', type: 'Location', level: 'localAuthority' },
         ],
         [
           {
             value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
-            label: 'First language Known or believed to be other than English',
+            type: 'Filter',
           },
           {
             value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
-            label: 'First language Unclassified',
+            type: 'Filter',
           },
         ],
       ],
       columns: [
-        { value: '2013_AY', label: '2013/14' },
-        { value: '2014_AY', label: '2014/15' },
-        { value: '2015_AY', label: '2015/16' },
+        { value: '2013_AY', type: 'TimePeriod' },
+        { value: '2014_AY', type: 'TimePeriod' },
+        { value: '2015_AY', type: 'TimePeriod' },
       ],
       rows: [
         {
           value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
-          label: 'Number of authorised absence sessions',
+          type: 'Indicator',
         },
         {
           value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
-          label: 'Number of overall absence sessions',
+          type: 'Indicator',
         },
       ],
     };
@@ -579,44 +586,44 @@ describe('TimePeriodDataTable', () => {
   test('renders table with completely empty columns removed', () => {
     const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
 
-    const tableHeadersConfig = {
+    const tableHeadersConfig: UnmappedTableHeadersConfig = {
       columnGroups: [
         [
           {
             value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
-            label: 'First language Known or believed to be other than English',
+            type: 'Filter',
           },
           {
             value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
-            label: 'First language Unclassified',
+            type: 'Filter',
           },
         ],
       ],
       rowGroups: [
         [
-          { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
-          { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
+          { value: 'E08000026', type: 'Location', level: 'localAuthority' },
+          { value: 'E09000008', type: 'Location', level: 'localAuthority' },
         ],
         [
           {
             value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
-            label: 'Special',
+            type: 'Filter',
           },
         ],
       ],
       columns: [
-        { value: '2013_AY', label: '2013/14' },
-        { value: '2014_AY', label: '2014/15' },
-        { value: '2015_AY', label: '2015/16' },
+        { value: '2013_AY', type: 'TimePeriod' },
+        { value: '2014_AY', type: 'TimePeriod' },
+        { value: '2015_AY', type: 'TimePeriod' },
       ],
       rows: [
         {
           value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
-          label: 'Number of authorised absence sessions',
+          type: 'Indicator',
         },
         {
           value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
-          label: 'Number of overall absence sessions',
+          type: 'Indicator',
         },
       ],
     };

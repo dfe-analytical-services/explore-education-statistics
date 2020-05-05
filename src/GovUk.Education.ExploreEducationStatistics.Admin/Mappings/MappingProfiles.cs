@@ -164,6 +164,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Url = legacy.Url
                             })
                             .ToList(),
+                        ExternalMethodology = r.Publication.ExternalMethodology != null
+                            ? new ExternalMethodology
+                            {
+                                Title = r.Publication.ExternalMethodology.Title,
+                                Url = r.Publication.ExternalMethodology.Url
+                            }
+                            : null,
                         Methodology = r.Publication.Methodology != null 
                             ? new MethodologyViewModel
                                 {
@@ -194,6 +201,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
                 .ForMember(dest => dest.Annexes,
                     m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
+
+            CreateMap<Release, ReleasePublicationStatusViewModel>();
         }
     }
 }

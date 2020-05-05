@@ -33,7 +33,7 @@ Error message appears when user clicks continue is title is empty
     [Tags]  HappyPath
     user checks element is not visible  css:#createPublicationForm-publicationTitle-error
     user clicks button   Create publication
-    user checks element is visible  css:#createPublicationForm-publicationTitle-error
+    user waits until element is visible  css:#createPublicationForm-publicationTitle-error
 
 Enter new publication title
     [Tags]  HappyPath
@@ -89,17 +89,16 @@ Click Create new release button
 
 Verify Release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@class, 'current-page')]
+    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
     user checks page contains heading 2    Release summary
     user checks summary list item "Publication title" should be "UI tests - create publication %{RUN_IDENTIFIER}"
     user checks summary list item "Time period" should be "Spring Term"
-    user checks summary list item "Release period" should be "2025 to 2026"  # Correct?
+    user checks summary list item "Release period" should be "2025/26"
     user checks summary list item "Lead statistician" should be "Sean Gibson"
     user checks summary list item "Scheduled release" should be "24 October 2025"
     user checks summary list item "Next release expected" should be "25 October 2026"
     user checks summary list item "Release type" should be "National Statistics"
 
-Edit release
-    [Tags]  HappyPath  UnderConstruction
+# TODO: Edit release
 
 

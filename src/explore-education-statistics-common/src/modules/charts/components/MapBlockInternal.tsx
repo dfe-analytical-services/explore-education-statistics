@@ -24,7 +24,7 @@ import formatPretty from '@common/utils/number/formatPretty';
 import getMinMax from '@common/utils/number/getMinMax';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
-import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
+import { Layer, Path, PathOptions, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import times from 'lodash/times';
 import React, {

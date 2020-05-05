@@ -10,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public Guid CreatedById { get; set; }
         
-        public TSelf Original { get; set; }
+        public TSelf PreviousVersion { get; set; }
 
-        public Guid OriginalId { get; set; }
+        public Guid PreviousVersionId { get; set; }
         
         public int Version { get; set; }
     }

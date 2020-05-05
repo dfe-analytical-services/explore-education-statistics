@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ErrorPrefixPageTitle from './ErrorPrefixPageTitle';
 
 export interface ErrorSummaryMessage {
@@ -21,9 +21,6 @@ const ErrorSummary = ({
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Only
-  const [prevErrors, setPrevErrors] = useState(0);
-
   useEffect(() => {
     import('govuk-frontend/govuk/components/error-summary/error-summary').then(
       ({ default: GovUkErrorSummary }) => {
@@ -33,19 +30,15 @@ const ErrorSummary = ({
   }, [ref]);
 
   useEffect(() => {
-    if (errors.length > 0 && !prevErrors && ref.current) {
-      if (focusOnError) {
-        ref.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+    if (focusOnError && errors.length > 0 && ref.current) {
+      ref.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
 
-        ref.current.focus();
-      }
+      ref.current.focus();
     }
-
-    setPrevErrors(errors.length);
-  }, [errors, prevErrors, focusOnError]);
+  }, [errors, focusOnError]);
 
   const idTitle = `${id}-title`;
 

@@ -1,13 +1,13 @@
+import CollapsibleList from '@common/components/CollapsibleList';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import {
   FilterOption,
-  LocationLevelKeys,
   PublicationSubjectMeta,
 } from '@common/services/tableBuilderService';
-import { Dictionary, PartialRecord } from '@common/types/util';
+import { Dictionary } from '@common/types/util';
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
 import mapValues from 'lodash/mapValues';
@@ -23,12 +23,12 @@ interface FormValues {
 }
 
 export type LocationFiltersFormSubmitHandler = (values: {
-  locations: PartialRecord<LocationLevelKeys, string[]>;
+  locations: Dictionary<string[]>;
 }) => void;
 
 interface Props {
   options: PublicationSubjectMeta['locations'];
-  initialValues?: PartialRecord<LocationLevelKeys, string[]>;
+  initialValues?: Dictionary<string[]>;
   onSubmit: LocationFiltersFormSubmitHandler;
 }
 
@@ -65,7 +65,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       ref={formikRef}
       initialValues={{
         locations: mapValues(options, (levelOptions, level) => {
-          const initialLevel = initialValues[level as LocationLevelKeys] ?? [];
+          const initialLevel = initialValues[level] ?? [];
 
           return initialLevel.filter(
             initialId =>
@@ -86,10 +86,10 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       })}
       onSubmit={async values => {
         const locations = Object.entries(values.locations).reduce<
-          PartialRecord<LocationLevelKeys, string[]>
+          Dictionary<string[]>
         >((acc, [level, levelOptions]) => {
           if (levelOptions.length > 0) {
-            acc[level as LocationLevelKeys] = levelOptions;
+            acc[level] = levelOptions;
           }
 
           return acc;
@@ -167,14 +167,12 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                   <SummaryListItem
                     term={formOptions[levelKey].legend}
                     key={levelKey}
-                    shouldCollapse
                   >
-                    {sortBy(levelOptions, ['label']).map(level => (
-                      <React.Fragment key={level.value}>
-                        {level.label}
-                        <br />
-                      </React.Fragment>
-                    ))}
+                    <CollapsibleList>
+                      {sortBy(levelOptions, ['label']).map(level => (
+                        <li key={level.value}>{level.label}</li>
+                      ))}
+                    </CollapsibleList>
                   </SummaryListItem>
                 ))}
             </SummaryList>

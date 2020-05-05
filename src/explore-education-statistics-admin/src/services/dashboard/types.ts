@@ -46,8 +46,11 @@ export interface AdminDashboardRelease {
   internalReleaseNote?: string;
   draftComments: Comment[];
   higherReviewComments: Comment[];
+  amendment: boolean;
+  previousVersionId: string;
   permissions: {
     canUpdateRelease: boolean;
+    canDeleteRelease: boolean;
     canMakeAmendmentOfRelease: boolean;
   };
 }

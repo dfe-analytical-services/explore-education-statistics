@@ -1,6 +1,6 @@
 import sanitize from 'sanitize-html';
 
-const config = {
+const config: sanitize.IOptions = {
   allowedTags: [
     'p',
     'h2',
@@ -16,13 +16,17 @@ const config = {
     'blockquote',
     'figure',
     'table',
+    'thead',
     'tbody',
     'tr',
     'td',
+    'th',
   ],
   allowedAttributes: {
     figure: ['class'],
     a: ['href'],
+    th: ['colspan', 'rowspan'],
+    td: ['colspan', 'rowspan'],
   },
 };
 

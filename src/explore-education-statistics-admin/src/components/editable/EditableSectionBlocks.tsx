@@ -86,6 +86,7 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
             key={block.id}
             id={`editableSectionBlocks-${block.id}`}
             className="govuk-!-margin-bottom-9"
+            data-testid="EditableSectionBlock"
           >
             <BlockDraggable
               draggable={isReordering}

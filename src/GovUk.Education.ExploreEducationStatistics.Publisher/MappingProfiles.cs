@@ -75,15 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
         {
             CreateMap<DataBlock, DataBlockViewModel>();
 
-            CreateMap<Summary, DataBlockSummaryViewModel>();
-
-            CreateMap<Table, DataBlockTableViewModel>();
-
-            CreateMap<TableHeaders, DataBlockTableHeadersViewModel>();
-
-            CreateMap<TableOption, DataBlockTableOptionViewModel>();
-
-            CreateMap<TableRowGroupOption, DataBlockTableRowGroupOptionViewModel>();
+            CreateMap<DataBlockSummary, DataBlockSummaryViewModel>();
         }
     }
 }

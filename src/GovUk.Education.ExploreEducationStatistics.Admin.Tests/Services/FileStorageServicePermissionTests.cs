@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteFileAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.DeleteFileAsync(
+                    service.DeleteNonDataFileAsync(
                         _release.Id, 
                         ReleaseFileTypes.Ancillary, 
                         ""
@@ -70,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteDataFileAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.DeleteDataFileAsync(
+                    service.RemoveDataFileReleaseLinkAsync(
                         _release.Id, 
                         ""
                         ), 
@@ -113,34 +112,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private void AssertSecurityPoliciesChecked<T>(
             Func<FileStorageService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (configuration, subjectService, userService, releaseHelper, fileTypeService, contentDbContext, importService) = Mocks();
+            var (configuration, userService, releaseHelper, contentDbContext, importService, fileUploadsValidatorService) = Mocks();
 
-            var service = new FileStorageService(configuration.Object, subjectService.Object, 
-                userService.Object, releaseHelper.Object, fileTypeService.Object, contentDbContext.Object, importService.Object);
+            var service = new FileStorageService(configuration.Object,
+                userService.Object, releaseHelper.Object, contentDbContext.Object,
+                importService.Object, fileUploadsValidatorService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
         
         private (
             Mock<IConfiguration>,
-            Mock<ISubjectService>,
             Mock<IUserService>, 
             Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IFileTypeService>,
             Mock<ContentDbContext>,
-            Mock<IImportService>) Mocks()
+            Mock<IImportService>,
+            Mock<IFileUploadsValidatorService>
+            ) Mocks()
         {
             var mockConf= new Mock<IConfiguration>();
             mockConf.Setup(c => c.GetSection(It.IsAny<string>())).Returns(new Mock<IConfigurationSection>().Object);  
             
             return (
                 mockConf,
-                new Mock<ISubjectService>(), 
                 new Mock<IUserService>(), 
                 MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
-                new Mock<IFileTypeService>(),
                 new Mock<ContentDbContext>(),
-                new Mock<IImportService>());
+                new Mock<IImportService>(),
+                new Mock<IFileUploadsValidatorService>());
         }
     }
 }

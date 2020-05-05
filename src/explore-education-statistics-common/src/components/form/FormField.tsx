@@ -1,29 +1,37 @@
+import { FormGroup } from '@common/components/form/index';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { Field, FieldProps } from 'formik';
 import React, {
   ChangeEventHandler,
   ComponentType,
   FocusEventHandler,
+  ReactNode,
 } from 'react';
 
 interface RequiredProps<FormValues> {
   name: keyof FormValues | string;
-  error?: string;
+  error?: ReactNode | string;
   value: unknown;
   onChange?: ChangeEventHandler;
   onBlur?: FocusEventHandler;
 }
 
-type Props<FormValues, P> = {
+export type Props<FormValues, P> = {
+  formGroupClass?: string;
+  error?: ReactNode | string;
   name: keyof FormValues | string;
-  type?: string;
+  type?: 'checkbox' | 'radio' | 'text' | 'number';
   validate?: (value: unknown) => string | Promise<void> | undefined;
   as?: ComponentType<P & RequiredProps<FormValues>>;
+  showError?: boolean;
 } & Omit<P, 'name' | 'value' | 'type'>;
 
 const FormField = <P extends {}, FormValues>({
-  name,
   as,
+  formGroupClass,
+  error,
+  name,
+  showError = true,
   type,
   ...props
 }: Props<FormValues, P>) => {
@@ -34,46 +42,55 @@ const FormField = <P extends {}, FormValues>({
       {({ field, form }: FieldProps) => {
         const { getError } = createErrorHelper(form);
 
-        const error = getError(name);
+        let errorMessage = error || getError(name);
+
+        if (!showError) {
+          errorMessage = '';
+        }
 
         const typeProps: { checked?: boolean } = {};
 
-        if (type === 'checkbox') {
-          typeProps.checked = !!field.value;
-        } else if (type === 'radio') {
-          typeProps.checked = !!field.value;
+        switch (type) {
+          case 'checkbox':
+          case 'radio':
+            typeProps.checked = !!field.value;
+            break;
+          default:
+            break;
         }
 
         return (
-          <Component
-            {...props}
-            {...field}
-            {...typeProps}
-            onChange={event => {
-              const typedProps = props as { onChange?: ChangeEventHandler };
+          <FormGroup hasError={!!errorMessage} className={formGroupClass}>
+            <Component
+              {...props}
+              {...field}
+              {...typeProps}
+              name={name}
+              error={errorMessage}
+              onChange={event => {
+                const typedProps = props as { onChange?: ChangeEventHandler };
 
-              if (typedProps.onChange) {
-                typedProps.onChange(event);
-              }
+                if (typedProps.onChange) {
+                  typedProps.onChange(event);
+                }
 
-              if (!event.isDefaultPrevented()) {
-                field.onChange(event);
-              }
-            }}
-            onBlur={event => {
-              const typedProps = props as { onBlur?: FocusEventHandler };
+                if (!event.isDefaultPrevented()) {
+                  field.onChange(event);
+                }
+              }}
+              onBlur={event => {
+                const typedProps = props as { onBlur?: FocusEventHandler };
 
-              if (typedProps.onBlur) {
-                typedProps.onBlur(event);
-              }
+                if (typedProps.onBlur) {
+                  typedProps.onBlur(event);
+                }
 
-              if (!event.isDefaultPrevented()) {
-                field.onBlur(event);
-              }
-            }}
-            name={name}
-            error={error}
-          />
+                if (!event.isDefaultPrevented()) {
+                  field.onBlur(event);
+                }
+              }}
+            />
+          </FormGroup>
         );
       }}
     </Field>

@@ -19,12 +19,12 @@ Validate Analyst1 can see correct themes and topics
 
 Validate Analyst1 can see correct draft releases
     [Tags]  HappyPath
-    user checks element should contain   css:#draft-releases-tab   View draft releases
+    user checks element should contain   css:#draft-releases-tab   View draft releases (2)
     user clicks element   css:#draft-releases-tab
     user waits until draft releases tab contains publication  Pupil absence in schools in England
-    user checks draft releases tab publication has release   Pupil absence in schools in England    Academic Year, 2016 to 2017 (Live - Latest release)
+    user checks draft releases tab publication has release   Pupil absence in schools in England    Academic Year 2016/17 (Live - Latest release)
     user checks draft releases tab contains publication  Permanent and fixed-period exclusions in England
-    user checks draft releases tab publication has release   Permanent and fixed-period exclusions in England    Academic Year, 2016 to 2017 (Live - Latest release)
+    user checks draft releases tab publication has release   Permanent and fixed-period exclusions in England    Academic Year 2016/17 (Live - Latest release)
 
 Validate Analyst1 can see correct scheduled releases
     [Tags]  HappyPath
@@ -47,13 +47,13 @@ Validate Analyst1 cannot create a release for Pupil absence topic
 
 Validate Analyst1 can see Absence release summary
     [Tags]  HappyPath
-    user opens details dropdown  Academic Year, 2016 to 2017 (Live - Latest release)
-    user clicks element  css:[data-testid="Edit release link for Pupil absence in schools in England, Academic Year, 2016 to 2017 (Live - Latest release)"]
+    user opens details dropdown  Academic Year 2016/17 (Live - Latest release)
+    user clicks element  css:[data-testid="Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)"]
     user waits until page contains heading  Pupil absence in schools in England
     user waits until page contains element  xpath://h2[text()="Release summary"]
     user checks summary list item "Publication title" should be "Pupil absence in schools in England"
     user checks summary list item "Time period" should be "Academic Year"
-    user checks summary list item "Release period" should be "2016 to 2017"
+    user checks summary list item "Release period" should be "2016/17"
     user checks summary list item "Lead statistician" should be "Mark Pearson"
     user checks summary list item "Scheduled release" should be ""
     user checks summary list item "Next release expected" should be ""

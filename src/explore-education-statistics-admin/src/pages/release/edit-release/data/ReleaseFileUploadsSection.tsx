@@ -8,7 +8,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset, Formik } from '@common/components/form';
-import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -35,6 +35,11 @@ const errorCodeMappings = [
     'FILE_TYPE_INVALID',
     'file',
     'Choose a file of an allowed format',
+  ),
+  errorCodeToFieldError(
+    'FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
+    'file',
+    'Filename cannot contain spaces or special characters',
   ),
 ];
 
@@ -159,12 +164,11 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                     width={20}
                   />
 
-                  <FormFieldFileSelector<FormValues>
+                  <FormFieldFileInput<FormValues>
                     id={`${formId}-file`}
                     name="file"
                     label="Upload file"
                     formGroupClass="govuk-!-margin-top-6"
-                    form={form}
                   />
                 </FormFieldset>
 

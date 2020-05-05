@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "749d9233-ce5f-4e35-b07e-413013dd04c8",
+		"_postman_id": "4799d3d0-b73e-449d-bacf-facf858c5d9e",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -17,7 +17,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+										"id": "4269e246-e9c4-494a-94d5-a089bba88356",
 										"exec": [
 											""
 										],
@@ -27,7 +27,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+										"id": "2c8c3141-8917-47c3-8b40-ead636b089e2",
 										"exec": [
 											"var respJson;",
 											"",
@@ -86,7 +86,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "fdf94fcd-b8a1-40a9-b039-5942171528a5",
 												"exec": [
 													"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
 													"pm.globals.set(\"FILT_SchoolType__Total\", \"cb9b57e8-9965-4cb6-b61a-acc6d34b32be\");"
@@ -97,7 +97,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "a03d7c52-e539-421c-8765-39e50530d7d9",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -190,7 +190,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "4ff4ea74-16cb-47dc-b189-26a9dfe4e81a",
 												"exec": [
 													"pm.globals.set(\"FILT_SchoolType__Total\", \"0b0daf53-3dd5-4b9b-913e-f4518f4afb96\");"
 												],
@@ -200,7 +200,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "57af4ba4-ee78-438f-a4df-b8d1926dc80c",
+												"id": "e2f61959-3bd6-4f2a-b9be-3ed372195993",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -276,7 +276,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "abdd07d2-9850-4e0c-a700-153166036ea1",
 												"exec": [
 													""
 												],
@@ -286,7 +286,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "a523c41a-6b1e-4a9b-9f93-32dd1af9874b",
+												"id": "2a13b010-13c8-48cc-92fa-2c8ddfe25c35",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -355,7 +355,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "987a3311-c82a-42b8-8829-892daa7b555e",
 												"exec": [
 													""
 												],
@@ -365,7 +365,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "e2295ce7-38c1-45c6-996b-4ce026c97c1a",
+												"id": "948e567d-3a12-46d6-8a51-3c216e8179c7",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -411,7 +411,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "cd9966bd-88e6-4120-8066-cf4f9886ba2d",
 												"exec": [
 													""
 												],
@@ -421,7 +421,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "1fad1b97-df53-4082-87b4-986fad0ba79f",
+												"id": "d7f15bd3-c971-453c-8f08-6942e0309be7",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -467,7 +467,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "fb8cb505-854f-425e-9116-c2cb97053771",
 												"exec": [
 													""
 												],
@@ -477,7 +477,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "4b0060fe-f9a2-459c-b9b9-eab8c748eb49",
+												"id": "21a7f12b-6e56-4c84-9200-8e3784b79700",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -526,7 +526,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "5eb84735-2dfe-4e86-9b3f-eabd6fa04df2",
 												"exec": [
 													""
 												],
@@ -536,7 +536,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "34849ecd-e386-487e-970e-ca4e28389658",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -581,7 +581,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "236a61ed-5f21-48c6-94da-ca8df8d25535",
 												"exec": [
 													""
 												],
@@ -591,7 +591,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "7f1d66c7-04d7-4d94-94a8-af4b065fcbdc",
 												"exec": [
 													"pm.test(\"Status code is 404\", function () { ",
 													"    pm.response.to.have.status(404); ",
@@ -625,7 +625,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "82f02d3b-ec8e-47d4-bbcd-2681e564e8a9",
 												"exec": [
 													""
 												],
@@ -635,7 +635,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "c516f81c-a304-4c9f-ac64-4495744d1ee5",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -729,7 +729,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "5a06a36e-444c-4020-bb10-2d61488985b1",
 												"exec": [
 													""
 												],
@@ -739,7 +739,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "c3ebcc2e-e8d6-40b4-bda6-e112aae7d03e",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -811,7 +811,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tgeographicLevel: \"Country\"\n}"
+											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tlocations: {\n\t\tgeographicLevel: \"Country\"\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -832,7 +832,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "4b4128b1-da0f-4e6d-ba4f-d22b0cb147f3",
 												"exec": [
 													""
 												],
@@ -842,7 +842,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "b5aa2c70-7f0a-42bd-86c5-facaf92ea409",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -912,7 +912,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tgeographicLevel: \"LocalAuthority\"\n}"
+											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tlocations: {\n\t\tgeographicLevel: \"LocalAuthority\"\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -933,7 +933,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "d4051d67-4d2c-45e1-a789-217abbfbf1ae",
 												"exec": [
 													""
 												],
@@ -943,7 +943,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "cbd3be01-9181-4198-97cb-8eebc3d6fede",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1002,7 +1002,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: \"568576e5-d386-450e-a8db-307b7061d0d8\",\n\ttimePeriod: {\n\t\tstartYear: 2014,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t},\n\tlocalAuthority: [\"E09000001\"]\n}"
+											"raw": "{\n\tsubjectId: \"568576e5-d386-450e-a8db-307b7061d0d8\",\n\ttimePeriod: {\n\t\tstartYear: 2014,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t},\n\tlocations: {\n\t\tlocalAuthority: [\"E09000001\"]\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1023,7 +1023,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "fe60e575-de28-4855-ae75-25b1749254ce",
 												"exec": [
 													""
 												],
@@ -1033,7 +1033,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "52b08f23-7043-4281-b492-29a76d992bf8",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1090,7 +1090,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: \"666cd878-87bb-4f77-9a3f-f5c75078e112\",\n\ttimePeriod: {\n\t\tstartYear: 2012,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t},\n}"
+											"raw": "{\n\tsubjectId: \"666cd878-87bb-4f77-9a3f-f5c75078e112\",\n\ttimePeriod: {\n\t\tstartYear: 2012,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1110,7 +1110,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "a0e957f4-5b18-4986-a053-dd5a9d12ed41",
+										"id": "309de6b3-add2-42b1-baae-8103abd054ec",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -1120,7 +1120,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7f1dd3fe-1ecd-4adc-a95e-a4b3e350146d",
+										"id": "5fe29169-0d89-42c1-b0ce-b8c5c748d31f",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -1140,7 +1140,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "b451441d-8a50-4319-9cfa-bb34ec1c7021",
 												"exec": [
 													""
 												],
@@ -1150,7 +1150,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "42795a29-3613-4e59-950e-f13d48fda259",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1199,7 +1199,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "9dddf875-bba8-4b93-a888-d06f94cbc2c0",
 												"exec": [
 													""
 												],
@@ -1209,7 +1209,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "28f680ec-2614-42fe-8966-087f169e608e",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1259,7 +1259,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "0f27ae14-348c-43dc-8466-7c220677d3f4",
 												"exec": [
 													""
 												],
@@ -1269,7 +1269,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "72786f87-11e9-45f0-b903-bdf1d31477cc",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1321,7 +1321,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "1cacb622-813b-4881-bd26-d87608d03f4d",
 												"exec": [
 													""
 												],
@@ -1331,7 +1331,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "5afcc9e9-e2cc-4610-89eb-c7a31f04fa3e",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1380,7 +1380,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "23dc9cf5-037b-4242-97a8-9e7e6a118cb4",
 												"exec": [
 													""
 												],
@@ -1390,7 +1390,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "54d348c7-8034-47f7-a043-03cb86e7f425",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1441,7 +1441,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "3173e5ec-91e8-4f30-9b35-d1d6ffd99a3a",
 												"exec": [
 													""
 												],
@@ -1451,7 +1451,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "4b71affd-ffa4-41f2-8f87-912b7995a150",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -1510,7 +1510,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "0faac504-5cfc-4eab-af3d-f4c28123d190",
 												"exec": [
 													""
 												],
@@ -1520,7 +1520,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"id": "58dbea3f-edb9-44a8-985c-8e7784ef512e",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -1609,7 +1609,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "e93d3cb7-0e93-4ba1-a52c-b42e3a19ccd2",
 												"exec": [
 													""
 												],
@@ -1619,7 +1619,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "9bd601ae-54ad-4a53-8bc9-105470055943",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -1695,7 +1695,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tSubjectId: \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n\tRegion: [\n\t\t\"E12000008\",\n\t\t\"E12000009\"\n\t]\n}"
+											"raw": "{\n\tSubjectId: \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n\tlocations: {\n\t\tRegion: [\n\t\t\t\"E12000008\",\n\t\t\t\"E12000009\"\n\t\t]\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1716,7 +1716,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "a0e76e9e-7c13-4ca9-a673-665ace411aab",
 												"exec": [
 													""
 												],
@@ -1726,7 +1726,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "9974feea-44eb-444b-ad68-e15cee89d3fd",
 												"exec": [
 													"if(pm.environment.get('env') === 'prod') {",
 													"    pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });",
@@ -1800,7 +1800,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tSubjectId: \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n\tGeographicLevel: \"Country\"\n}"
+											"raw": "{\n\tSubjectId: \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n\tlocations: {\n\t\tGeographicLevel: \"Country\"\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1824,7 +1824,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "595f2dce-cc95-43ef-abfe-be98632b442f",
+								"id": "4e991b50-8471-4053-9f90-b05e23f80cfe",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1834,7 +1834,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f42619e7-fe77-47ac-a97a-0b143cf1d4eb",
+								"id": "f3c9d561-6ce3-4c19-b4be-0eb55220964e",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1854,7 +1854,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+										"id": "3bcd0669-3950-4112-8050-8209f1df7f10",
 										"exec": [
 											"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
 										],
@@ -1864,7 +1864,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ac4b1f03-19f2-44f5-b80f-840e78849333",
+										"id": "c0e77f43-7229-4563-a50c-5ecd65a532a6",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
@@ -1906,7 +1906,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+										"id": "946d0300-9786-45da-b1a8-0b231759c3fb",
 										"exec": [
 											"pm.variables.set('publication_id', '66c8e9db-8bf2-4b0b-b094-cfab25c20b05');"
 										],
@@ -1916,7 +1916,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ac4b1f03-19f2-44f5-b80f-840e78849333",
+										"id": "7edcfe96-9667-4db6-8663-8b73a7dac671",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -1965,7 +1965,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b1bc576e-a31d-4330-ae1d-84416c336e6c",
+								"id": "c5a62182-8d89-4d8b-a09f-11f783a1ed7c",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1975,7 +1975,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b342cb85-fd1c-421c-b348-1ce17d472dde",
+								"id": "af273f53-b4cc-4d50-8bdb-b3780b0bf205",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1991,7 +1991,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ecb99d52-e5cd-4a4d-942b-eb37d390ca34",
+						"id": "c6a43a3f-346c-48a8-8d78-025c410a8931",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2001,7 +2001,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "31fb4c96-88b3-4e61-8c97-88941525fc5a",
+						"id": "aebade1c-3718-4276-a4d9-57fc403a84fc",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2026,7 +2026,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "25b228b2-a5ae-4b3b-a65c-e3c449b7a46d",
+												"id": "43ac7c36-e15c-4070-8c84-c5516d14958b",
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
@@ -2167,7 +2167,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "0c491405-7891-4f02-a4bb-47785d27fa09",
+												"id": "160a5d7d-644f-48bf-8363-222a54fa431b",
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
@@ -2212,7 +2212,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\",\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"geographicLevel\": \"Country\"\n    },\n    \"timePeriod\": {\n        \"startYear\": 2014,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\",\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n\t    \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2232,7 +2232,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "9148b323-2686-466f-9bd1-155a166f0017",
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
@@ -2272,7 +2272,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"geographicLevel\": \"Country\"\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2292,7 +2292,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "be43473c-e6d5-4af2-bd3b-69ab2f3c948c",
+												"id": "fcc3bf88-37d8-41d8-ad24-9a95a9c980d5",
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
@@ -2384,7 +2384,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{IND_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{IND_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"country\": [\n            \"E92000001\"\n        ]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{IND_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{IND_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2404,7 +2404,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "b53968c1-8cc2-481a-bb3c-e84ecb1cacda",
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
@@ -2490,7 +2490,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \"{{FILT_Char__EthMinor_Irish}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{IND_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{IND_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"country\": [\n            \"E92000001\"\n        ]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \"{{FILT_Char__EthMinor_Irish}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{IND_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{IND_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2510,7 +2510,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "17334cf2-1e7d-4c35-9c56-164728356731",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2552,7 +2552,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"geographicLevel\": \"LocalAuthority\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2572,7 +2572,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "a2f93f15-3577-4c87-ae52-685637abbb01",
+												"id": "dd4cb37a-ec20-401e-867a-b6ed32e55031",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2616,7 +2616,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"localAuthority\": [\n    \t\"E08000016\",\n        \"E09000002\",\n        \"E09000003\"\n\n    ],\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\"\n    ],\n    \"filters\": [\n        \"{{FILT_Char__Total}}\",\n        \"{{FILT_SchoolType__Total}}\",\n        ],\n    \"timePeriod\": {\n        \"startYear\": 2013,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\"\n    }\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"localAuthority\": [\n            \"E08000016\",\n            \"E09000002\",\n            \"E09000003\"\n\t    ],\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\"\n    ],\n    \"filters\": [\n        \"{{FILT_Char__Total}}\",\n        \"{{FILT_SchoolType__Total}}\",\n        ],\n    \"timePeriod\": {\n        \"startYear\": 2013,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2636,7 +2636,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "1bf660a9-4831-4364-8328-4ac98ba9cb93",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2685,7 +2685,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"localAuthority\": [\n            \"E09000032\"\n\t    ],\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2705,7 +2705,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "33a1fecd-35d2-40af-bfdd-fb3d357a73fe",
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
@@ -2749,7 +2749,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"LocalAuthorityDistrict\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"geographicLevel\": \"LocalAuthorityDistrict\"\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2769,7 +2769,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "741da397-e0d2-47bd-85b7-222e9c366276",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2817,7 +2817,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"LocalAuthorityDistrict\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n        \"localAuthorityDistrict\": [\n            \"E07000223\"\n        ]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\", \n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\", \n        \"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2836,7 +2836,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1b454eae-43c4-4e92-a06e-1a803aa8858b",
+										"id": "41a2c80e-4ac8-4130-9cdd-3909b8845cc4",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
@@ -2864,7 +2864,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9b07e3a7-08a0-4256-ab4a-53508f6331c5",
+										"id": "548e3d1f-738f-43ea-b083-b3029cd2a398",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -2884,7 +2884,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "07cb3695-7462-4fe1-abf9-01074b3a2931",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2940,7 +2940,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"locations\": {\n        \"geographicLevel\": \"Country\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2960,7 +2960,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ca61e14b-1422-4898-a302-90665970c869",
+												"id": "ee924869-ddef-45a8-9c72-b58d628d56a1",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3023,7 +3023,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"geographicLevel\": \"Country\",\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"568576e5-d386-450e-a8db-307b7061d0d8\",\n\t\"indicators\":[\n\t\t\"{{IND_AbsenceByReason__NumberOfIllnessSessions}}\"\n\t],\n\t\"filters\": [\n\t\t\"{{FILT_SchoolType__Total}}\", \n\t\t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n\t\t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n\t\t\"{{FILT_SchoolType__Special}}\"\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
+											"raw": "{\n\t\"subjectId\":\"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n\t\"indicators\":[\n\t\t\"{{IND_AbsenceByReason__NumberOfIllnessSessions}}\"\n\t],\n\t\"filters\": [\n\t\t\"{{FILT_SchoolType__Total}}\", \n\t\t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n\t\t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n\t\t\"{{FILT_SchoolType__Special}}\"\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3043,7 +3043,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "46d00de4-d0ae-4ed3-93ba-1277895c6919",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3099,7 +3099,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"locations\": {\n        \"geographicLevel\": \"LocalAuthority\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3119,7 +3119,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "47c2767b-c363-4be4-a351-cdc5c210f7b5",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3169,7 +3169,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"locations\": {\n        \"geographicLevel\": \"Region\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3189,7 +3189,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "87271ec4-ecf8-40a0-bc44-5ed4c93eb656",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3234,7 +3234,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"region\": [\n\t\t\"E13000001\"\n\t],\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"locations\": {\n        \"region\": [\n            \"E13000001\"\n        ]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n    \t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n    \t\"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3253,7 +3253,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "6354b6c5-34ad-43c1-b2d7-45f006621e28",
+										"id": "c283f4e5-6582-4b42-9c25-95abefc1a0c3",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_SchoolType__Total\", \"0b0daf53-3dd5-4b9b-913e-f4518f4afb96\");",
@@ -3276,7 +3276,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a06c2178-26b4-4c5d-966b-2bc10331373a",
+										"id": "a56a7237-f19f-49c9-b0d2-ea238a042323",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -3296,7 +3296,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "bbe4e601-b3e0-4cb1-996e-610b0e907106",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3328,7 +3328,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3348,7 +3348,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "f75183ed-a45d-46af-b54e-63448638a5be",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3381,7 +3381,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \"{{FILT_StateFundedSecondary}}\", \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \"{{FILT_StateFundedSecondary}}\", \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3401,7 +3401,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "c6035d30-0ede-4344-859d-ef74054c6d81",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3429,7 +3429,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"country\": [ \"E92000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3449,7 +3449,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "405cbe15-d882-40c2-bc5e-f6bbd3c68304",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3541,7 +3541,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"country\": [ \"E92000001\" ],\n    \"region\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthority\": [ \"E09000001\", \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"locations\": {\n        \"country\": [\"E92000001\"],\n        \"region\": [\"E13000001\", \"E13000002\"],\n        \"localAuthority\": [\"E09000001\", \"E09000002\"]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3561,7 +3561,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "d988fab6-eb6e-4e2a-83db-d9fc8b3b51fa",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3589,7 +3589,173 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"b7bc537b-0c04-4b15-9eb6-4f0e8cc2e70a\",\n    \"locations\": {\n        \"geographicLevel\": \"Region\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSessionsPossible}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Tablebuilder - Absence by geographic level - England - 200607 - all schoolTypes",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "ea549614-9005-4327-848d-fc466a8a264f",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.footnotes\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"results\"));",
+													"});",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.subjectMeta.timePeriodRange.length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"Expect correct number of results\", function() {",
+													"   pm.expect(respJson.results.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Result data should be correct\", function () {",
+													"    for(var i = 0; i < respJson.results.length; i++) {",
+													"        if(respJson.results[i].measures[pm.globals.get(\"IND_AbsenceByReason__NumberOfIllnessSessions\")] == \"67366501\") {",
+													"            pm.expect(respJson.results[i].filters).to.eql([pm.globals.get(\"FILT_SchoolType__Total\")]);",
+													"            continue;",
+													"        }",
+													"        else if(respJson.results[i].measures[pm.globals.get(\"IND_AbsenceByReason__NumberOfIllnessSessions\")] == \"31022269\") {",
+													"            pm.expect(respJson.results[i].filters).to.eql([pm.globals.get(\"FILT_SchoolType__StateFundedPrimary\")]);",
+													"            continue;",
+													"        }",
+													"        else if(respJson.results[i].measures[pm.globals.get(\"IND_AbsenceByReason__NumberOfIllnessSessions\")] == \"35518043\") {",
+													"            pm.expect(respJson.results[i].filters).to.eql([pm.globals.get(\"FILT_SchoolType__StateFundedSecondary\")]);",
+													"            continue;",
+													"        }",
+													"        else if(respJson.results[i].measures[pm.globals.get(\"IND_AbsenceByReason__NumberOfIllnessSessions\")] == \"826189\") {",
+													"            pm.expect(respJson.results[i].filters).to.eql([pm.globals.get(\"FILT_SchoolType__Special\")]);",
+													"            continue;",
+													"        }",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"subjectId\":\"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n\t\"indicators\":[\n\t\t\"{{IND_AbsenceByReason__NumberOfIllnessSessions}}\"\n\t],\n\t\"filters\": [\n\t\t\"{{FILT_SchoolType__Total}}\", \n\t\t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n\t\t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n\t\t\"{{FILT_SchoolType__Special}}\"\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Tablebuilder - Absence by geographic level - England - 200607 - all schoolTypes",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f70e4ec4-4faf-4a88-a31f-38fbf377353b",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.footnotes\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"results\"));",
+													"});",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.subjectMeta.timePeriodRange.length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"Expect correct number of results\", function() {",
+													"   pm.expect(respJson.results.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Result data should be correct\", function () {",
+													"    for(var i = 0; i < respJson.results.length; i++) {",
+													"        if(respJson.results[i].measures[pm.globals.get(\"IND_AbsenceByReason__NumberOfIllnessSessions\")] == \"67366501\") {",
+													"            pm.expect(respJson.results[i].filters).to.eql([pm.globals.get(\"FILT_SchoolType__Total\")]);",
+													"            continue;",
+													"        }",
+													"        else if(respJson.results[i].measures[pm.globals.get(\"IND_AbsenceByReason__NumberOfIllnessSessions\")] == \"31022269\") {",
+													"            pm.expect(respJson.results[i].filters).to.eql([pm.globals.get(\"FILT_SchoolType__StateFundedPrimary\")]);",
+													"            continue;",
+													"        }",
+													"        else if(respJson.results[i].measures[pm.globals.get(\"IND_AbsenceByReason__NumberOfIllnessSessions\")] == \"35518043\") {",
+													"            pm.expect(respJson.results[i].filters).to.eql([pm.globals.get(\"FILT_SchoolType__StateFundedSecondary\")]);",
+													"            continue;",
+													"        }",
+													"        else if(respJson.results[i].measures[pm.globals.get(\"IND_AbsenceByReason__NumberOfIllnessSessions\")] == \"826189\") {",
+													"            pm.expect(respJson.results[i].filters).to.eql([pm.globals.get(\"FILT_SchoolType__Special\")]);",
+													"            continue;",
+													"        }",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"subjectId\":\"568576e5-d386-450e-a8db-307b7061d0d8\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n\t\"indicators\":[\n\t\t\"{{IND_AbsenceByReason__NumberOfIllnessSessions}}\"\n\t],\n\t\"filters\": [\n\t\t\"{{FILT_SchoolType__Total}}\", \n\t\t\"{{FILT_SchoolType__StateFundedPrimary}}\", \n\t\t\"{{FILT_SchoolType__StateFundedSecondary}}\", \n\t\t\"{{FILT_SchoolType__Special}}\"\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3608,7 +3774,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "f28d57d5-c4a2-4c3c-a90c-e672993bec6d",
+										"id": "19cbaa39-799e-49ba-998b-47f4615cef97",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"514b404f-ca0c-4568-9539-9dea79d43bc8\");",
@@ -3625,7 +3791,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f54a546f-c365-4bfc-831e-2e3cbfdef1d6",
+										"id": "398cab34-ac1b-4e3e-9ce5-266ba40e9aec",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -3656,7 +3822,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "56562672-c5ad-4d2d-bf71-8bf8d1f9da70",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3689,7 +3855,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__Special}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__Special}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3709,7 +3875,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "80141bc4-0ba4-4d60-adfc-7d8cbb03147c",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3772,7 +3938,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__StateFundedSecondary}}\", \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n\t\t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__StateFundedSecondary}}\", \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n\t\t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3792,7 +3958,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "6255befe-3bb9-45d9-aef0-79a049093604",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3825,7 +3991,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"region\": [\"E12000005\", \"E12000008\", \"E12000009\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__Total}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"353db5ea-befd-488b-ad16-2ce7963c9bc9\",\n    \"locations\": {\n        \"region\": [\"E12000005\", \"E12000008\", \"E12000009\"],\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_SchoolType__Total}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n\t\t\"{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3844,7 +4010,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
+										"id": "ddbe544a-789d-4f08-be56-db760ba2c477",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_SchoolType__Total\", \"26f7f3d0-b7ad-4517-8815-e0c70295ff3b\");",
@@ -3860,7 +4026,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "540c3551-b43a-4768-a64e-bcdd881d9a7b",
+										"id": "c2137ac7-b1b1-46f2-9598-f240cb3acffa",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -3891,7 +4057,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "16ee4b25-50b1-4656-8f98-c7b49937c3d0",
 												"exec": [
 													"// DFE-998 - If no geographicLevel is provided, respond with all geographicLevels",
 													"var respJson = pm.response.json()",
@@ -3924,7 +4090,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSchools}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"locations\": {\n        \"country\":[\"E92000001\"]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfSchools}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3944,7 +4110,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "2b05c35c-2ac7-47cb-b50a-90080c39dadc",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3979,7 +4145,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"localAuthority\": [\"E06000015\", \"E09000004\", \"E10000002\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"locations\": {\n        \"localAuthority\": [\"E06000015\", \"E09000004\", \"E10000002\"],\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3999,7 +4165,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "c27efb68-c756-44c8-87ab-1704e898c1f8",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4027,7 +4193,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"locations\": {\n        \"geographicLevel\": \"Region\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4047,7 +4213,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "7df5fc81-927d-462d-8e83-8cf6f689efca",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4077,7 +4243,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"localAuthority\": [\"E08000002\", \"E10000008\"],\n    \"region\": [\"E12000006\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"95c7f584-907e-4756-bbf0-4905ceae57df\",\n    \"locations\": {\n        \"localAuthority\": [\"E08000002\", \"E10000008\"],\n        \"region\": [\"E12000006\"],\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4096,7 +4262,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "52135f05-03ae-4080-bbbb-dddcd7ee3e42",
+										"id": "e7c387f6-6229-4dab-9f1e-1c2a0f6aef5b",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfSchools\", \"9472758e-6c4a-4cb2-8270-d0551ce91494\");",
@@ -4109,7 +4275,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6dbbadee-c752-4d88-b613-f2953c175a62",
+										"id": "ed0816a5-198c-43d2-aae4-312824b78867",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -4140,7 +4306,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "1922071f-4e08-4221-8cef-580959ac1033",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4168,7 +4334,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"faf2152e-0a6c-4e97-af02-e9a89d48c47a\",\n    \"geographicLevel\": \"LocalAuthority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"faf2152e-0a6c-4e97-af02-e9a89d48c47a\",\n    \"locations\": {\n        \"geographicLevel\": \"LocalAuthority\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4188,7 +4354,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "34235d12-f999-41b8-aec4-aaccc27ddb75",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4216,7 +4382,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"faf2152e-0a6c-4e97-af02-e9a89d48c47a\",\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"faf2152e-0a6c-4e97-af02-e9a89d48c47a\",\n    \"locations\": {\n        \"geographicLevel\": \"Region\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_StateFundedSecondary}}\", \n        \"{{FILT_Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession}}\",\n    \t\"{{IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneOverallAbsenceSession}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4235,7 +4401,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "e04223f2-1e08-4ff6-9984-732c655dbcdf",
+										"id": "2c886e05-edcb-4f0d-aa8b-db578b485889",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"0089b1b3-626c-4326-a2ec-a4b99b4735bc\");",
@@ -4251,7 +4417,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "368397eb-8cbb-4195-ac61-415b8c3abe28",
+										"id": "78a61364-8404-4cf4-b59a-5f1429831550",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -4282,7 +4448,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "a2b2b1e9-160a-458d-a272-b9a9321c6af0",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4310,7 +4476,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"666cd878-87bb-4f77-9a3f-f5c75078e112\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_Special}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForOverallAbsence}}\",\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForAuthorisedAbsence}}\",\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForUnauthorisedAbsence}}\"\n    ]\n}"
+											"raw": "{\n    \"subjectId\": \"666cd878-87bb-4f77-9a3f-f5c75078e112\",\n    \"locations\": {\n        \"geographicLevel\": \"Country\",\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_StateFundedPrimary}}\", \n        \"{{FILT_Special}}\", \n        \"{{FILT_StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForOverallAbsence}}\",\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForAuthorisedAbsence}}\",\n    \t\"{{IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForUnauthorisedAbsence}}\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4329,7 +4495,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "49522da0-95a0-4ddf-9a8a-9ca103db1df2",
+										"id": "8e538926-b6b5-4616-b181-6cf7617225d3",
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"0af225c6-c70b-4053-b7e7-4e719e2b751f\");",
@@ -4346,7 +4512,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ca434135-2e41-4ff4-806d-48a458f28b61",
+										"id": "7bce1b05-912d-4455-8b44-04e693c8cd69",
 										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -4377,7 +4543,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "fbc8c7a0-54dc-48b7-ac2f-ab840c45cc29",
+						"id": "0448f876-8585-4f80-bf46-a08ca5d99cf4",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -4387,1022 +4553,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8141f36f-4bf9-49a4-822c-0c6087cadbbe",
+						"id": "bab69635-de39-4ef0-adab-26e6dc51eda2",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Data",
-			"item": [
-				{
-					"name": "Pupil absence in schools in England",
-					"item": [
-						{
-							"name": "By characteristic",
-							"item": [
-								{
-									"name": "Data - Absence by characteristic - Country - *",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-												"exec": [
-													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"   pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1); ",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(16); ",
-													"});",
-													"",
-													"pm.test(\"Every result should contain location country England only\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.region`));",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}\n"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Country - * - Male, Female AND Primary, Secondary",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-												"exec": [
-													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1); ",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(4); ",
-													"});",
-													"",
-													"pm.test(\"Every result should contain location country England only\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
-													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.region`));",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__StateFundedPrimary}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Derbyshire - Male AND Secondary",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(1);",
-													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(1);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E10000007.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(1); });",
-													"",
-													"pm.test(\"Every result should contain location country, localAuthority, and region\", function () {",
-													"    pm.expect(respJson.result[0].location.country.name).to.equal(\"England\");",
-													"    pm.expect(pm.response.to.have.jsonBody(`result[${0}].location.localAuthority`));",
-													"    pm.expect(pm.response.to.not.have.jsonBody(`result[${0}].location.localAuthorityDistrict`));",
-													"    pm.expect(pm.response.to.have.jsonBody(`result[${0}].location.region`));",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\n    \t\"E10000007\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_SchoolType__StateFundedSecondary}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Wandsworth",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000032.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(4); });",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__GenderMale}}\", \n        \"{{FILT_Char__GenderFemale}}\", \n        \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Hartlepool",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "7be51e96-5401-48dc-986c-42c7ee78d7e5",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(8);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"Number of boundaryLevels should be correct\", function () {",
-													"    var foundId8 = false;",
-													"    var foundId3 = false;",
-													"    for(var i = 0; i < respJson.metaData.boundaryLevels.length; i++) {",
-													"        if(respJson.metaData.boundaryLevels[i].id === 8) {",
-													"            foundId8 = true;",
-													"            pm.expect(respJson.metaData.boundaryLevels[i].label).to.equal(\"Local Authority Districts (April 2019) Boundaries UK BUC\");",
-													"        }",
-													"        if(respJson.metaData.boundaryLevels[i].id === 3) {",
-													"            foundId3 = true;",
-													"            pm.expect(respJson.metaData.boundaryLevels[i].label).to.equal(\"Local Authority Districts December 2017 Ultra Generalised Clipped Boundaries in United Kingdom WGS84\");",
-													"        }",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 1",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(8);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and not have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\"));",
-													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 1\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 3",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(8);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 3\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 6",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(8);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\"));",
-													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-													"});",
-													"",
-													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t\"{{FILT_Char__Total}}\", \n    \t\"{{FILT_Char__FSMEligible}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ],\n    \"boundaryLevel\": 6\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Adur",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData indicators should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(3); ",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1); ",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"All results should have correction location attributes\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Adur\");",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\", \n        \"{{FILT_SchoolType__Special}}\"\n    ],\n    \"indicators\": [\n        \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__AuthorisedAbsenceRate}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - Adur (LAD) + Wandsworth (LA)",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
-													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
-													"});",
-													"",
-													"pm.test(\"Number of metaData indicators should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(5); ",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(2);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000032\")); // LA Wandsworth",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E07000223\")); // LAD Adur",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(35); // LA 24 + LAD 11",
-													"});",
-													"",
-													"pm.test(\"All results should have correction geographicLevel\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
-													"           return geoLevel === \"LocalAuthority\" || geoLevel === \"LocalAuthorityDistrict\"; ",
-													"        });",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__FSMEligible}}\", \n        \"{{FILT_Char__FSMNotEligible}}\", \n        \"{{FILT_Char__FSMUnclassified}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfNoReasonYetSessions}}\",\n    \t\"{{IND_AbsenceByReason__NumberOfLateSessions}}\"\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								}
-							],
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "ec9d2b73-2598-40e5-abd3-b8598bbf2497",
-										"type": "text/javascript",
-										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"eb6013a7-6e69-4ab6-b51e-b7a3e68256ae\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"ab381336-5e81-4caa-9e59-6e9067e8fb04\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"d7e7e412-f462-444f-84ac-3454fa471cb8\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"a9fe9fa6-e91f-460b-a0b1-66877b97c581\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"b3207d77-143b-43d5-8b48-32d29727e96f\");",
-											"pm.globals.set(\"FILT_Char__FSMEligible\", \"278ce0cb-f1d2-4e8f-84d1-ad794352c925\");",
-											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"bc6e41d5-5078-4207-b0ae-69261ac192e0\");",
-											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"c649015c-8203-43aa-b424-dfb897766391\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"5a18e770-73b9-4b4f-8c3c-b3130b810422\");",
-											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1293b484-93f5-4177-a451-fcf4467b26a2\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"74c8ab3a-0ec3-4348-852c-9055f354f86f\");",
-											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"ccfe716a-6976-4dc3-8fde-a026cd30f3ae\");",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"92d3437a-0a62-4cd7-8dfb-bcceba7eef61\");",
-											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"f9ae4976-7cd3-4718-834a-09349b6eb377\");",
-											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"a93b664a-c537-4bb0-8d06-b4ce9bf60ff9\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"5a59cfeb-19e7-486c-906e-f2ad45f896f6\");",
-											"pm.globals.set(\"IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"71c77c7d-dec5-4c31-baa5-b59f3c8c8f2e\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"a3b1afa4-b3de-44c6-b8b2-0ef59f211a2a\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"71761e61-6a80-400f-8778-a8761306eb77\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfNoReasonYetSessions\", \"b4cc7de4-30f3-495b-a967-0d2a9473583f\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfLateSessions\", \"57452cb9-6bda-495a-a012-7fda71e4bf90\");"
-										]
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"id": "65c89d21-118a-4749-bd42-fa874f4a7be9",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
-						}
-					],
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "d788e097-9c6f-43c3-89bc-db3db49c5404",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "07a946d0-b2d1-44a1-acc5-a04c987e7a69",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Secondary and primary schools applications and offers",
-					"item": [
-						{
-							"name": "Data - Applications and offers by school phase - LA Wirral, York",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-										"exec": [
-											"respJson = pm.response.json()",
-											"",
-											"if(pm.environment.get('env') === 'prod') {",
-											"    pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });",
-											"} else {",
-											"    pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-											"    ",
-											"    pm.test(\"Should have correct fields\", function () {",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-											"        pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"    });",
-											"    ",
-											"    pm.test(\"Number of metaData filters should be correct\", function () {",
-											"       pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(1); ",
-											"    });",
-											"    ",
-											"    pm.test(\"Number of metaData locations should be correct\", function () {",
-											"       pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(2); ",
-											"    });",
-											"    ",
-											"    pm.test(\"Correct metaData locations should be returned\", function () {",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E08000015\"));  // LA Wirral",
-											"        pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000014\"));  // LA York",
-											"    });",
-											"    ",
-											"    pm.test(\"geographicLevel should be same as request\", function () {",
-											"        for(var i = 0; i < respJson.result.length; i++) {",
-											"            pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthority\");",
-											"        }",
-											"    });",
-											"    ",
-											"    pm.test(\"Number of results should be correct\", function () { ",
-											"        pm.expect(respJson.result.length).to.equal(6); ",
-											"    });",
-											"}",
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"subjectId\": \"fa0d7f1d-d181-43fb-955b-fc327da86f2c\",\n    \"localAuthority\": [\"E08000015\", \"E06000014\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Primary__R}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_Applications__NumberOfApplicationsReceived}}\",\n    \t\"{{IND_Applications__NumberOfOnlineApplications}}\",\n    \t\"{{IND_Applications__PercentageOfOnlineApplications}}\"\n    ]\n}"
-								},
-								"url": {
-									"raw": "{{data_api_url}}/data",
-									"host": [
-										"{{data_api_url}}"
-									],
-									"path": [
-										"data"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "06185e19-060d-44b4-9adf-3c424694ae9e",
-								"type": "text/javascript",
-								"exec": [
-									"pm.globals.set(\"FILT_Primary__R\", \"f5ad9114-14b8-4102-89a1-3ab76801ecde\");",
-									"pm.globals.set(\"FILT_Secondary__9\", \"3f101896-1c4a-4153-bb22-1d3888eb61ea\");",
-									"pm.globals.set(\"FILT_Secondary__7\", \"ff8614ba-ec1c-4012-a5e3-2d788a4f5460\");",
-									"",
-									"pm.globals.set(\"IND_Applications__NumberOfApplicationsReceived\", \"020a4da6-1111-443d-af80-3a425c558d14\");",
-									"pm.globals.set(\"IND_Applications__NumberOfOnlineApplications\", \"f472e6cc-9e25-401b-9fca-9dc3755bab2d\");",
-									"pm.globals.set(\"IND_Applications__PercentageOfOnlineApplications\", \"0af5ea39-828f-4afe-9a9f-643dce0112cf\");"
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "a725cb4a-8a8f-477e-85f1-8ead50eacf42",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -5416,7 +4572,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bf224cd6-d62d-4b6b-afd4-8cf2e352fcbd",
+								"id": "7f50fc91-5b6d-46de-942a-5abf19080690",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -5476,7 +4632,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "2cec492a-fc8e-4e42-9663-af2f42ae27c7",
+								"id": "c2977335-5aea-4e3b-b854-85047f888c80",
 								"exec": [
 									"pm.globals.set(\"FILT_Char__Total\", \"183f94c3-b5d7-4868-892d-c948e256744d\");",
 									"pm.globals.set(\"FILT_Char__GenderMale\", \"eb6013a7-6e69-4ab6-b51e-b7a3e68256ae\");",
@@ -5514,7 +4670,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{FILT_Char__Total}}\"\n    ],\n    \"indicators\": [\n    \t\"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n    \t\"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n    \t\"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n    ]\n}"
+							"raw": "{\n    \"query\": {\n        \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n        \"locations\": {\n            \"country\": [\"E92000001\"],\n        },\n        \"timePeriod\": {\n            \"startYear\": 2016,\n            \"startCode\": \"AY\",\n            \"endYear\": 2016,\n            \"endCode\": \"AY\"\n        },\n        \"filters\" : [\n            \"{{FILT_Char__Total}}\"\n        ],\n        \"indicators\": [\n            \"{{IND_AbsenceFields__NumberOfPupilEnrolments}}\",\n            \"{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\",\n            \"{{IND_AbsenceFields__OverallAbsenceRate}}\"\n        ]\n    },\n    \"configuration\": {\n    \t\n    }\n}"
 						},
 						"url": {
 							"raw": "{{data_api_url}}/permalink",
@@ -5534,7 +4690,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
+								"id": "99598cea-0233-4918-9e6e-3259088eef99",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -5627,7 +4783,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "022c9044-3a78-41f6-9476-916e5c92e4b6",
+								"id": "3a04b5c6-f05f-494f-b0d6-5a45371a04db",
 								"exec": [
 									""
 								],
@@ -5637,7 +4793,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c80a67f6-be1b-4a79-89b6-f21275308965",
+								"id": "e404e219-022b-4065-9903-0c80700a992e",
 								"exec": [
 									"pm.test(\"Status code is 404\", function () {",
 									"    pm.response.to.have.status(404);",
@@ -5689,7 +4845,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0eff5d76-4361-43c8-92b1-fcd6f6238f37",
+								"id": "2895cdac-09c7-48c7-a616-0e85ceb1b245",
 								"exec": [
 									"",
 									"/*",
@@ -5795,7 +4951,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "022c9044-3a78-41f6-9476-916e5c92e4b6",
+								"id": "6e5f1083-69a3-42d4-85ea-168261308c38",
 								"exec": [
 									""
 								],
@@ -5805,7 +4961,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c80a67f6-be1b-4a79-89b6-f21275308965",
+								"id": "4b7c586e-015b-45aa-9e8a-07c84cd3a072",
 								"exec": [
 									"pm.test(\"Status code is 404\", function () {",
 									"    pm.response.to.have.status(404);",
@@ -5850,7 +5006,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ed583c2e-33b1-4e58-b324-6c75f5dd0180",
+						"id": "907aa40e-8cac-4c4e-8507-8e71987f99ae",
 						"type": "text/javascript",
 						"exec": [
 							"pm.globals.set(\"FILT_AbsenceForFourYearOlds__SchoolType__StateFundedPrimary\", \"2f219985-8900-4a84-b096-89d133ef8bc6\");",
@@ -5862,7 +5018,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a2fe84e3-f593-456d-be3e-e73aa891f1a8",
+						"id": "1734f33f-ce4e-4739-ad91-91728050a558",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -5881,7 +5037,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a8450e2f-c9ab-49e3-ade8-a3a285209058",
+								"id": "e467c9aa-c6aa-4418-888a-30e608797798",
 								"exec": [
 									"/*",
 									"// EES-562",
@@ -5924,7 +5080,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "134cd34a-d839-401e-bc0b-88090d1b51c9",
+				"id": "ef5b1d2d-f2ae-4e87-a167-516248602967",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -5934,7 +5090,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "9279878e-d394-4bcd-a0d0-a638c88016dc",
+				"id": "13ea984c-5e20-4a98-82f3-a2cccee5777b",
 				"type": "text/javascript",
 				"exec": [
 					""

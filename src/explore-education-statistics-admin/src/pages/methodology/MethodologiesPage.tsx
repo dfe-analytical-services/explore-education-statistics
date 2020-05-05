@@ -6,6 +6,7 @@ import { MethodologyStatusListItem } from '@admin/services/methodology/types';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import Tag from '@common/components/Tag';
 import React, { useEffect, useState } from 'react';
 
 interface Model {
@@ -43,7 +44,7 @@ const MethodologiesTable = ({ methodologies }: MethodologiesTableProps) => {
               </Link>
             </td>
             <td className="govuk-table__cell">
-              <strong className="govuk-tag">{methodology.status}</strong>
+              <Tag strong>{methodology.status}</Tag>
             </td>
             <td className="govuk-table__cell">
               <ul className="govuk-list">

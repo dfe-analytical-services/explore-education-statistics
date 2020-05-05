@@ -21,6 +21,9 @@ const service = {
       createRequest,
     );
   },
+  deleteRelease(releaseId: string): Promise<void> {
+    return client.delete(`/release/${releaseId}`);
+  },
   createReleaseAmendment(releaseId: string): Promise<ReleaseSummaryDetails> {
     return client.post(`/release/${releaseId}/amendment`);
   },

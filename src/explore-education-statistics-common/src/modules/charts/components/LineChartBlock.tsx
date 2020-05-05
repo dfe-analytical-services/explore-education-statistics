@@ -192,7 +192,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
     canSize: true,
     canSort: true,
     fixedAxisGroupBy: false,
-    hasAxes: true,
     hasReferenceLines: true,
     hasLegend: true,
     requiresGeoJson: false,
@@ -234,6 +233,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
       type: 'minor',
       defaults: {
         min: 0,
+        showGrid: true,
         size: 50,
         tickConfig: 'default',
         tickSpacing: 1,

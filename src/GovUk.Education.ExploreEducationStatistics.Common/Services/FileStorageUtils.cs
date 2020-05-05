@@ -44,9 +44,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         
         public static Task<string> DownloadTextAsync(string storageConnectionString, string containerName, string blobName)
         {
+            return GetBlob(storageConnectionString, containerName, blobName).DownloadTextAsync();
+        }
+
+        public static CloudBlockBlob GetBlob(string storageConnectionString, string containerName, string blobName)
+        {
             var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
-            var blob = blobContainer.GetBlockBlobReference(blobName);
-            return blob.DownloadTextAsync();
+            return blobContainer.GetBlockBlobReference(blobName);
         }
         
         public static async Task<CloudBlobContainer> GetCloudBlobContainerAsync(string storageConnectionString,
@@ -109,12 +113,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return files.OrderBy(f => f.Name);
         }
 
+        public static IEnumerable<CloudBlockBlob> ListBlobs(string storageConnectionString, string containerName, string prefix = null)
+        {
+            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
+            return blobContainer.ListBlobs(prefix, true, BlobListingDetails.Metadata)
+                .OfType<CloudBlockBlob>();
+        }
+        
         private static IEnumerable<FileInfo> ListFiles(string storageConnectionString, string containerName,
             string prefix, bool releasedFilesOnly)
         {
-            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
-            var result = blobContainer.ListBlobs(prefix, true, BlobListingDetails.Metadata)
-                .OfType<CloudBlockBlob>()
+            return ListBlobs(storageConnectionString, containerName, prefix)
                 .Where(blob => !IsMetaDataFile(blob) && (!releasedFilesOnly || IsFileReleased(blob)))
                 .Select(file => new FileInfo
                 {
@@ -124,7 +133,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     Size = GetSize(file)
                 })
                 .OrderBy(info => info.Name).ToList();
-            return result;
         }
         
         public static async Task UploadFromStreamAsync(string storageConnectionString, string containerName,

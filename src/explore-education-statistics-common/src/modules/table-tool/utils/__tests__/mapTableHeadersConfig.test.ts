@@ -8,6 +8,7 @@ import {
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 
 describe('mapTableHeadersConfig', () => {
   const testHeaderConfig: UnmappedTableHeadersConfig = {
@@ -15,11 +16,11 @@ describe('mapTableHeadersConfig', () => {
       [
         {
           value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
-          label: 'Ethnicity Major Asian Total',
+          type: 'Filter',
         },
         {
           value: '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
-          label: 'Ethnicity Major Black Total',
+          type: 'Filter',
         },
       ],
     ],
@@ -27,39 +28,47 @@ describe('mapTableHeadersConfig', () => {
       [
         {
           value: 'd7e7e412-f462-444f-84ac-3454fa471cb8',
-          label: 'State-funded primary',
+          type: 'Filter',
         },
         {
           value: 'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
-          label: 'State-funded secondary',
+          type: 'Filter',
         },
       ],
       [
-        { value: 'E09000003', label: 'Barnet' },
-        { value: 'E08000016', label: 'Barnsley' },
+        {
+          value: 'E09000003',
+          type: 'Location',
+          level: 'localAuthority',
+        },
+        {
+          value: 'E08000016',
+          type: 'Location',
+          level: 'localAuthority',
+        },
       ],
     ],
     columns: [
-      { value: '2014_AY', label: '2014/15' },
-      { value: '2015_AY', label: '2015/16' },
+      { value: '2014_AY', type: 'TimePeriod' },
+      { value: '2015_AY', type: 'TimePeriod' },
     ],
     rows: [
       {
         value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
-        label: 'Number of overall absence sessions',
+        type: 'Indicator',
       },
       {
         value: 'd1c4a0be-8756-470d-2b51-08d78f6f2b08',
-        label: 'Number of authorised absence sessions',
+        type: 'Indicator',
       },
       {
         value: '63043c27-f055-472f-2b56-08d78f6f2b08',
-        label: 'Number of persistent absentees',
+        type: 'Indicator',
       },
     ],
   };
 
-  const testTable: FullTable = mapFullTable({
+  const testTableData: TableDataResponse = {
     subjectMeta: {
       filters: {
         Characteristic: {
@@ -143,13 +152,11 @@ describe('mapTableHeadersConfig', () => {
       ],
     },
     results: [],
-  });
+  };
 
   test('maps headers to their classes', () => {
-    const headers = mapTableHeadersConfig(
-      testHeaderConfig,
-      testTable.subjectMeta,
-    );
+    const table: FullTable = mapFullTable(testTableData);
+    const headers = mapTableHeadersConfig(testHeaderConfig, table.subjectMeta);
 
     expect(headers.columnGroups).toEqual([
       [
@@ -234,7 +241,144 @@ describe('mapTableHeadersConfig', () => {
     ]);
   });
 
+  test('correctly maps locations with same `value` but different `level`', () => {
+    const table: FullTable = mapFullTable({
+      results: [],
+      subjectMeta: {
+        publicationName: '',
+        subjectName: '',
+        filters: {},
+        footnotes: [],
+        locations: [
+          {
+            level: 'localAuthority',
+            label: 'Barnet (local authority)',
+            value: 'barnet',
+          },
+          {
+            level: 'localAuthorityDistrict',
+            label: 'Barnet (local authority district)',
+            value: 'barnet',
+          },
+        ],
+        indicators: [],
+        boundaryLevels: [],
+        timePeriodRange: [],
+        geoJsonAvailable: false,
+      },
+    });
+
+    const headers = mapTableHeadersConfig(
+      {
+        columnGroups: [],
+        columns: [],
+        rowGroups: [
+          [
+            {
+              type: 'Location',
+              value: 'barnet',
+              level: 'localAuthorityDistrict',
+            },
+            {
+              type: 'Location',
+              value: 'barnet',
+              level: 'localAuthority',
+            },
+          ],
+        ],
+        rows: [
+          {
+            type: 'Location',
+            value: 'barnet',
+            level: 'localAuthority',
+          },
+          {
+            type: 'Location',
+            value: 'barnet',
+            level: 'localAuthorityDistrict',
+          },
+        ],
+      },
+      table.subjectMeta,
+    );
+
+    expect(headers.rowGroups).toEqual([
+      [
+        new LocationFilter({
+          value: 'barnet',
+          label: 'Barnet (local authority district)',
+          level: 'localAuthorityDistrict',
+        }),
+        new LocationFilter({
+          value: 'barnet',
+          label: 'Barnet (local authority)',
+          level: 'localAuthority',
+        }),
+      ],
+    ]);
+
+    expect(headers.rows).toEqual([
+      new LocationFilter({
+        value: 'barnet',
+        label: 'Barnet (local authority)',
+        level: 'localAuthority',
+      }),
+      new LocationFilter({
+        value: 'barnet',
+        label: 'Barnet (local authority district)',
+        level: 'localAuthorityDistrict',
+      }),
+    ]);
+  });
+
+  test('throws error if there is an invalid header type', () => {
+    const fullTable = mapFullTable(testTableData);
+
+    const headers: UnmappedTableHeadersConfig = {
+      columnGroups: [],
+      columns: [
+        {
+          value: 'abcd',
+          type: 'NotValid' as 'Indicator',
+        },
+      ],
+      rowGroups: [],
+      rows: [],
+    };
+
+    expect(() => {
+      mapTableHeadersConfig(headers, fullTable.subjectMeta);
+    }).toThrowError(
+      `Invalid header type: ${JSON.stringify(headers.columns[0])}`,
+    );
+  });
+
+  test('throws error if could not find header filter', () => {
+    const fullTable = mapFullTable(testTableData);
+
+    const headers: UnmappedTableHeadersConfig = {
+      columnGroups: [],
+      columns: [
+        {
+          value: 'will not find me',
+          type: 'Indicator',
+        },
+      ],
+      rowGroups: [],
+      rows: [],
+    };
+
+    expect(() => {
+      mapTableHeadersConfig(headers, fullTable.subjectMeta);
+    }).toThrowError(
+      `Could not find matching filter for header: ${JSON.stringify(
+        headers.columns[0],
+      )}`,
+    );
+  });
+
   test('does not map any headers', () => {
+    const fullTable = mapFullTable(testTableData);
     const headers = mapTableHeadersConfig(
       {
         columnGroups: [],
@@ -242,7 +386,7 @@ describe('mapTableHeadersConfig', () => {
         rowGroups: [],
         rows: [],
       },
-      testTable.subjectMeta,
+      fullTable.subjectMeta,
     );
 
     expect(headers.columnGroups).toEqual([]);

@@ -28,7 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanSubmitSpecificReleaseToHigherReview,
         CanApproveSpecificRelease,
         CanMakeAmendmentOfSpecificRelease,
+        CanRunReleaseMigrations,
         CanPublishSpecificRelease,
+        CanDeleteSpecificRelease,
 
         /**
          * Pre Release management

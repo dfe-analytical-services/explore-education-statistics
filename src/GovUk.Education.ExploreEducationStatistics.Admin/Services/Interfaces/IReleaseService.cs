@@ -15,18 +15,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release);
 
+        Task<Either<ActionResult, bool>> DeleteReleaseAsync(Guid releaseId);
+
         Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId);
 
         Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id);
         
         Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId);
         
+        Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId);
+        
         Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(Guid releaseId, UpdateReleaseSummaryRequest request);
 
         Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId);
 
-        Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(params ReleaseStatus[] releaseStatuses);
-        
+        Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(params ReleaseStatus[] releaseStatuses);
+
+        Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyScheduledReleasesAsync();
+
         Task<Either<ActionResult, bool>> PublishReleaseAsync(Guid releaseId);
         
         Task<Either<ActionResult, bool>> PublishReleaseContentAsync(Guid releaseId);
@@ -35,6 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string dataFileName, string subjectTitle);
         
-        Task<Either<ActionResult, IEnumerable<FileInfo>>>  DeleteDataFilesAsync(Guid releaseId, string fileName, string subjectTitle);
+        Task<Either<ActionResult, IEnumerable<FileInfo>>>  RemoveDataFileReleaseLinkAsync(Guid releaseId, string fileName, string subjectTitle);
+
+        Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName);
     }
 }

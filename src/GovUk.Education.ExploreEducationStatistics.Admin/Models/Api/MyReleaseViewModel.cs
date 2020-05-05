@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public ReleaseStatus Status { get; set; }
 
         public bool LatestRelease { get; set; }
-
-        public bool Live => Published != null;
         
         public string ReleaseName { get; set; }
 
@@ -36,6 +34,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DateTime? Published { get; set; }
 
+        public bool Live { get; set; }
+        
+        public bool Amendment { get; set; }
+        
+        public Guid PreviousVersionId { get; set; }
+
         public PartialDate NextReleaseDate { get; set; }
 
         public string InternalReleaseNote { get; set; }
@@ -49,6 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public class PermissionsSet
         {
             public bool CanUpdateRelease { get; set; }
+            
+            public bool CanDeleteRelease { get; set; }
             
             public bool CanMakeAmendmentOfRelease { get; set; }
         }

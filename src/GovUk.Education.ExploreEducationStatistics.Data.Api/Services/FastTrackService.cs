@@ -21,18 +21,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private const string ContainerName = "fasttrack";
 
-        private readonly IDataService<TableBuilderResultViewModel> _dataService;
+        private readonly ITableBuilderService _tableBuilderService;
         private readonly IFileStorageService _fileStorageService;
         private readonly ISubjectService _subjectService;
         private readonly IMapper _mapper;
 
         public FastTrackService(
-            IDataService<TableBuilderResultViewModel> dataService,
+            ITableBuilderService tableBuilderService,
             IFileStorageService fileStorageService,
             ISubjectService subjectService,
             IMapper mapper)
         {
-            _dataService = dataService;
+            _tableBuilderService = tableBuilderService;
             _fileStorageService = fileStorageService;
             _subjectService = subjectService;
             _mapper = mapper;
@@ -55,23 +55,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private Task<Either<ActionResult, FastTrackViewModel>> BuildViewModel(FastTrack fastTrack)
         {
-            return _dataService.Query(fastTrack.Query).OnSuccess(result =>
+            return _tableBuilderService.Query(fastTrack.Query).OnSuccess(result =>
             {
                 var viewModel = _mapper.Map<FastTrackViewModel>(fastTrack);
                 viewModel.FullTable = result;
-                viewModel.Query.PublicationId = GetPublicationId(fastTrack);
+                viewModel.Query.PublicationId = 
+                    _subjectService.GetPublicationForSubjectAsync(fastTrack.Query.SubjectId).Result.Id;
                 return viewModel;
             });
-        }
-
-        private Guid GetPublicationId(FastTrack fastTrack)
-        {
-            var subject = _subjectService.Find(fastTrack.Query.SubjectId,
-                new List<Expression<Func<Subject, object>>>
-                {
-                    s => s.Release
-                });
-            return subject.Release.PublicationId;
         }
     }
 }

@@ -16,6 +16,7 @@ import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary, Pair } from '@common/types';
 import cartesian from '@common/utils/cartesian';
 import parseNumber from '@common/utils/number/parseNumber';
+import camelCase from 'lodash/camelCase';
 import difference from 'lodash/difference';
 import groupBy from 'lodash/groupBy';
 import isEqual from 'lodash/isEqual';
@@ -144,11 +145,25 @@ function getCategoryFilters(
   let filters: Filter[] = [];
 
   switch (axisGroupBy) {
-    case 'filters':
-      filters = Object.values(meta.filters).flatMap(
-        filterGroup => filterGroup.options,
-      );
+    case 'filters': {
+      const filterGroups = Object.values(meta.filters);
+
+      // We want to try and remove any filter groups with only
+      // one filter as these don't really make sense to display
+      // on the chart (this is similar to what we do in table tool).
+      const filteredFilters = filterGroups
+        .filter(filterGroup => filterGroup.options.length > 1)
+        .flatMap(filterGroup => filterGroup.options);
+
+      // If there are no filtered filters, we need to at least
+      // try to show something otherwise the chart will just
+      // break due to the major axis having no categories.
+      filters =
+        filteredFilters.length > 0
+          ? filteredFilters
+          : filterGroups.flatMap(filterGroup => filterGroup.options);
       break;
+    }
     case 'timePeriod':
       filters = meta.timePeriodRange;
       break;
@@ -183,7 +198,9 @@ function isResultForDataSet(
 
   if (
     dataSet.location &&
-    dataSet.location.value !== result.location?.[dataSet.location.level]?.code
+    (dataSet.location.level !== camelCase(result.geographicLevel) ||
+      dataSet.location.value !==
+        result.location?.[dataSet.location.level]?.code)
   ) {
     return false;
   }

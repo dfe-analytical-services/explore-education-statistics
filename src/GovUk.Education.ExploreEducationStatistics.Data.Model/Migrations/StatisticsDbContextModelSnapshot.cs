@@ -388,6 +388,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.ToTable("Release");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject", b =>
+                {
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ReleaseId", "SubjectId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("ReleaseSubject");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.School", b =>
                 {
                     b.Property<string>("LaEstab")
@@ -958,10 +973,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", "Release")
-                        .WithMany("Subjects")
+                        .WithMany()
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
