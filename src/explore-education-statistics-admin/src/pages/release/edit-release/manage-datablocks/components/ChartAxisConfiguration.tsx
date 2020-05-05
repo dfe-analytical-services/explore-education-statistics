@@ -291,165 +291,178 @@ const ChartAxisConfiguration = ({
             onChange={onFormStateChange}
           />
 
-          <FormGroup>
-            {validationSchema.fields.groupBy && (
-              <FormFieldSelect<AxisConfiguration>
-                id={`${id}-groupBy`}
-                label="Group data by"
-                name="groupBy"
-                options={groupByOptions}
-              />
-            )}
-
-            {validationSchema.fields.size && (
-              <FormFieldNumberInput<AxisConfiguration>
-                id={`${id}-size`}
-                name="size"
-                min="0"
-                max="100"
-                label="Size of axis (px)"
-                width={3}
-              />
-            )}
-
-            {validationSchema.fields.showGrid && (
-              <FormFieldCheckbox<AxisConfiguration>
-                id={`${id}-showGrid`}
-                name="showGrid"
-                label="Show grid lines"
-              />
-            )}
-
-            {validationSchema.fields.visible && (
-              <FormFieldCheckbox<AxisConfiguration>
-                id={`${id}-visible`}
-                name="visible"
-                label="Show axis labels?"
-                conditional={
-                  <FormFieldTextInput<AxisConfiguration>
-                    id={`${id}-unit`}
-                    label="Override displayed unit"
-                    name="unit"
-                    hint="Leave blank to set default from metadata"
-                    width={10}
-                  />
-                }
-              />
-            )}
-          </FormGroup>
-
-          {type === 'minor' &&
-            (validationSchema.fields.min || validationSchema.fields.max) && (
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
               <FormFieldset
-                id={`${id}-minorAxisRange`}
-                legend="Axis range"
-                legendSize="m"
-                hint="Leaving these values blank will set them to 'auto'"
+                id={`${id}-general`}
+                legend="General"
+                legendSize="s"
               >
-                <div className={styles.axisRange}>
-                  {validationSchema.fields.min && (
-                    <FormFieldNumberInput<AxisConfiguration>
-                      id={`${id}-minorMin`}
-                      name="min"
-                      width={10}
-                      label="Minimum value"
-                      formGroupClass="govuk-!-margin-right-2"
-                    />
-                  )}
-                  {validationSchema.fields.max && (
-                    <FormFieldNumberInput<AxisConfiguration>
-                      id={`${id}-minorMax`}
-                      name="max"
-                      width={10}
-                      label="Maximum value"
-                    />
-                  )}
-                </div>
-              </FormFieldset>
-            )}
-
-          {validationSchema.fields.tickConfig && (
-            <FormFieldRadioGroup<AxisConfiguration>
-              id={`${id}-tickConfig`}
-              name="tickConfig"
-              legend="Tick display type"
-              legendSize="m"
-              order={[]}
-              options={[
-                {
-                  value: 'default',
-                  label: 'Automatic',
-                },
-                {
-                  label: 'Start and end only',
-                  value: 'startEnd',
-                },
-                {
-                  label: 'Custom',
-                  value: 'custom',
-                  conditional: (
-                    <FormFieldNumberInput<AxisConfiguration>
-                      id={`${id}-tickSpacing`}
-                      name="tickSpacing"
-                      width={10}
-                      label="Every nth value"
-                    />
-                  ),
-                },
-              ]}
-            />
-          )}
-
-          {type === 'major' && (
-            <>
-              {validationSchema.fields.sortAsc && (
-                <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="m">
-                  {/* <FormFieldSelect<AxisConfiguration>*/}
-                  {/*  id={`${id}-sortBy`}*/}
-                  {/*  name="sortBy"*/}
-                  {/*  label="Sort data by"*/}
-                  {/*  options={sortOptions}*/}
-                  {/* />*/}
-                  <FormFieldCheckbox<AxisConfiguration>
-                    id={`${id}-sortAsc`}
-                    name="sortAsc"
-                    label="Sort Ascending"
+                {validationSchema.fields.size && (
+                  <FormFieldNumberInput<AxisConfiguration>
+                    id={`${id}-size`}
+                    name="size"
+                    min="0"
+                    max="100"
+                    label="Size of axis (px)"
+                    width={3}
                   />
-                </FormFieldset>
+                )}
+
+                {validationSchema.fields.groupBy && (
+                  <FormFieldSelect<AxisConfiguration>
+                    id={`${id}-groupBy`}
+                    label="Group data by"
+                    name="groupBy"
+                    options={groupByOptions}
+                  />
+                )}
+
+                {validationSchema.fields.showGrid && (
+                  <FormFieldCheckbox<AxisConfiguration>
+                    id={`${id}-showGrid`}
+                    name="showGrid"
+                    label="Show grid lines"
+                  />
+                )}
+
+                {validationSchema.fields.visible && (
+                  <FormFieldCheckbox<AxisConfiguration>
+                    id={`${id}-visible`}
+                    name="visible"
+                    label="Show axis labels"
+                    conditional={
+                      <FormFieldTextInput<AxisConfiguration>
+                        id={`${id}-unit`}
+                        label="Override displayed unit"
+                        name="unit"
+                        hint="Leave blank to set default from metadata"
+                        width={10}
+                      />
+                    }
+                  />
+                )}
+
+                {validationSchema.fields.sortAsc && (
+                  <FormFieldset
+                    id={`${id}-sort`}
+                    legend="Sorting"
+                    legendSize="s"
+                  >
+                    {/* <FormFieldSelect<AxisConfiguration>*/}
+                    {/*  id={`${id}-sortBy`}*/}
+                    {/*  name="sortBy"*/}
+                    {/*  label="Sort data by"*/}
+                    {/*  options={sortOptions}*/}
+                    {/* />*/}
+                    <FormFieldCheckbox<AxisConfiguration>
+                      id={`${id}-sortAsc`}
+                      name="sortAsc"
+                      label="Sort ascending"
+                    />
+                  </FormFieldset>
+                )}
+              </FormFieldset>
+            </div>
+
+            <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
+              {validationSchema.fields.tickConfig && (
+                <FormFieldRadioGroup<AxisConfiguration>
+                  id={`${id}-tickConfig`}
+                  name="tickConfig"
+                  legend="Tick display type"
+                  legendSize="s"
+                  order={[]}
+                  options={[
+                    {
+                      value: 'default',
+                      label: 'Automatic',
+                    },
+                    {
+                      label: 'Start and end only',
+                      value: 'startEnd',
+                    },
+                    {
+                      label: 'Custom',
+                      value: 'custom',
+                      conditional: (
+                        <FormFieldNumberInput<AxisConfiguration>
+                          id={`${id}-tickSpacing`}
+                          name="tickSpacing"
+                          width={10}
+                          label="Every nth value"
+                        />
+                      ),
+                    },
+                  ]}
+                />
               )}
 
-              {(validationSchema.fields.min || validationSchema.fields.max) && (
-                <FormFieldset
-                  id={`${id}-majorAxisRange`}
-                  legend="Limiting data"
-                  legendSize="m"
-                >
-                  {validationSchema.fields.min && (
-                    <FormFieldSelect<AxisConfiguration>
-                      id={`${id}-majorMin`}
-                      label="Minimum"
-                      name="min"
-                      placeholder="Default"
-                      options={limitOptions}
-                    />
-                  )}
-                  {validationSchema.fields.max && (
-                    <FormFieldSelect<AxisConfiguration>
-                      id={`${id}-majorMax`}
-                      label="Maximum"
-                      name="max"
-                      placeholder="Default"
-                      options={limitOptions}
-                    />
-                  )}
-                </FormFieldset>
-              )}
-            </>
-          )}
+              {type === 'minor' &&
+                (validationSchema.fields.min ||
+                  validationSchema.fields.max) && (
+                  <FormFieldset
+                    id={`${id}-minorAxisRange`}
+                    legend="Axis range"
+                    legendSize="s"
+                    hint="Leaving these values blank will set them to 'auto'"
+                  >
+                    <div className={styles.axisRange}>
+                      {validationSchema.fields.min && (
+                        <FormFieldNumberInput<AxisConfiguration>
+                          id={`${id}-minorMin`}
+                          name="min"
+                          width={10}
+                          label="Minimum value"
+                          formGroupClass="govuk-!-margin-right-2"
+                        />
+                      )}
+                      {validationSchema.fields.max && (
+                        <FormFieldNumberInput<AxisConfiguration>
+                          id={`${id}-minorMax`}
+                          name="max"
+                          width={10}
+                          label="Maximum value"
+                        />
+                      )}
+                    </div>
+                  </FormFieldset>
+                )}
+
+              {type === 'major' &&
+                (validationSchema.fields.min ||
+                  validationSchema.fields.max) && (
+                  <FormFieldset
+                    id={`${id}-majorAxisRange`}
+                    legend="Axis range"
+                    legendSize="s"
+                  >
+                    {validationSchema.fields.min && (
+                      <FormFieldSelect<AxisConfiguration>
+                        id={`${id}-majorMin`}
+                        label="Minimum"
+                        name="min"
+                        placeholder="Default"
+                        options={limitOptions}
+                      />
+                    )}
+                    {validationSchema.fields.max && (
+                      <FormFieldSelect<AxisConfiguration>
+                        id={`${id}-majorMax`}
+                        label="Maximum"
+                        name="max"
+                        placeholder="Default"
+                        options={limitOptions}
+                      />
+                    )}
+                  </FormFieldset>
+                )}
+            </div>
+          </div>
 
           {validationSchema.fields.referenceLines && (
             <table className="govuk-table">
-              <caption className="govuk-heading-m">Reference lines</caption>
+              <caption className="govuk-heading-s">Reference lines</caption>
               <thead>
                 <tr>
                   <th>Position</th>
