@@ -186,8 +186,11 @@ const ManageUserPage = ({
         />
         <Formik<AddReleaseRoleFormValues>
           initialValues={{
-            selectedReleaseId: orderBy(releases, release => release)?.[0]?.id ?? '',
-            selectedReleaseRoleId: orderBy(releaseRoles, releaseRole => releaseRole)?.[0]?.value ?? '',
+            selectedReleaseId:
+              orderBy(releases, release => release)?.[0]?.id ?? '',
+            selectedReleaseRoleId:
+              orderBy(releaseRoles, releaseRole => releaseRole)?.[0]?.value ??
+              '',
           }}
           enableReinitialize
           onSubmit={addReleaseRole}
