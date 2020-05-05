@@ -1,6 +1,8 @@
+import { FormFieldTextInput } from '@common/components/form';
 import Yup from '@common/validation/yup';
 import { fireEvent, render, wait } from '@testing-library/react';
 import { Field, Formik } from 'formik';
+import noop from 'lodash/noop';
 import React from 'react';
 import Form from '../Form';
 
@@ -18,7 +20,7 @@ describe('Form', () => {
         })}
         onSubmit={() => {}}
       >
-        {() => <Form id="test-form">The form</Form>}
+        <Form id="test-form">The form</Form>
       </Formik>,
     );
 
@@ -56,7 +58,7 @@ describe('Form', () => {
         })}
         onSubmit={() => {}}
       >
-        {() => <Form id="test-form">The form</Form>}
+        <Form id="test-form">The form</Form>
       </Formik>,
     );
 
@@ -90,7 +92,7 @@ describe('Form', () => {
         })}
         onSubmit={() => {}}
       >
-        {() => <Form id="test-form">The form</Form>}
+        <Form id="test-form">The form</Form>
       </Formik>,
     );
 
@@ -126,7 +128,7 @@ describe('Form', () => {
         })}
         onSubmit={() => {}}
       >
-        {() => <Form id="test-form">The form</Form>}
+        <Form id="test-form">The form</Form>
       </Formik>,
     );
 
@@ -156,7 +158,7 @@ describe('Form', () => {
         })}
         onSubmit={handleSubmit}
       >
-        {() => <Form id="test-form">The form</Form>}
+        <Form id="test-form">The form</Form>
       </Formik>,
     );
 
@@ -185,11 +187,9 @@ describe('Form', () => {
           throw new Error('Something went wrong');
         }}
       >
-        {() => (
-          <Form id="test-form" showSubmitError>
-            The form
-          </Form>
-        )}
+        <Form id="test-form" showSubmitError>
+          The form
+        </Form>
       </Formik>,
     );
 
@@ -225,11 +225,9 @@ describe('Form', () => {
         })}
         onSubmit={onSubmit}
       >
-        {() => (
-          <Form id="test-form" showSubmitError>
-            The form
-          </Form>
-        )}
+        <Form id="test-form" showSubmitError>
+          The form
+        </Form>
       </Formik>,
     );
 
@@ -337,5 +335,130 @@ describe('Form', () => {
     });
 
     expect(queryByText('Something went wrong')).toBeNull();
+  });
+
+  test('focuses error summary on submit', async () => {
+    const { container, getByRole } = render(
+      <Formik
+        initialValues={{
+          firstName: '',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={noop}
+      >
+        <Form id="test-form" showSubmitError>
+          <FormFieldTextInput
+            id="test-form-firstName"
+            label="First name"
+            name="firstName"
+          />
+        </Form>
+      </Formik>,
+    );
+
+    const form = container.querySelector('#test-form') as HTMLFormElement;
+
+    fireEvent.submit(form, {
+      current: form,
+      target: form,
+    });
+
+    await wait();
+
+    expect(getByRole('alert')).toHaveFocus();
+  });
+
+  test('does not re-focus error summary when changing input', async () => {
+    const { container, getByRole, getByLabelText } = render(
+      <Formik
+        initialValues={{
+          firstName: '',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={noop}
+      >
+        <Form id="test-form" showSubmitError>
+          <FormFieldTextInput
+            id="test-form-firstName"
+            label="First name"
+            name="firstName"
+          />
+        </Form>
+      </Formik>,
+    );
+
+    const form = container.querySelector('#test-form') as HTMLFormElement;
+
+    fireEvent.submit(form, {
+      current: form,
+      target: form,
+    });
+
+    await wait();
+
+    expect(getByRole('alert')).toHaveFocus();
+
+    const input = getByLabelText('First name');
+
+    input.focus();
+
+    fireEvent.change(input, {
+      target: {
+        value: 'a first name',
+      },
+    });
+
+    expect(getByRole('alert')).not.toHaveFocus();
+  });
+
+  test('re-focuses error summary on re-submit', async () => {
+    const { container, getByRole, getByLabelText } = render(
+      <Formik
+        initialValues={{
+          firstName: '',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={noop}
+      >
+        {() => (
+          <Form id="test-form" showSubmitError>
+            <FormFieldTextInput
+              id="test-form-firstName"
+              label="First name"
+              name="firstName"
+            />
+          </Form>
+        )}
+      </Formik>,
+    );
+
+    const form = container.querySelector('#test-form') as HTMLFormElement;
+
+    fireEvent.submit(form, {
+      current: form,
+      target: form,
+    });
+
+    await wait();
+
+    expect(getByRole('alert')).toHaveFocus();
+
+    getByLabelText('First name').focus();
+    expect(getByRole('alert')).not.toHaveFocus();
+
+    fireEvent.submit(form, {
+      current: form,
+      target: form,
+    });
+
+    await wait();
+
+    expect(getByRole('alert')).toHaveFocus();
   });
 });
