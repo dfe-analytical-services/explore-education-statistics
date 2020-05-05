@@ -53,6 +53,7 @@ Navigate to Manage data blocks tab
 
 Select subject "UI test subject"
     [Tags]  HappyPath
+    user waits until page contains   UI test subject
     user selects radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
     user waits until element is visible  xpath://h2[text()="Choose locations"]     90
@@ -91,14 +92,14 @@ Select indicators
     user clicks indicator checkbox    Admission Numbers
 
 Create table
-    [Tags]  HappyPath  Failing
+    [Tags]  HappyPath
     [Documentation]   EES-615
     user clicks element   css:#filtersForm-submit
     user waits until results table appears     180
     user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from 'Datablock test %{RUN_IDENTIFIER}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table's column headings
-    [Tags]  HappyPath  Failing
+    [Tags]  HappyPath
     user checks results table column heading contains  css:table  1  1   2005
     user checks results table column heading contains  css:table  1  2   2007
     user checks results table column heading contains  css:table  1  3   2008
@@ -116,7 +117,7 @@ Validate table's column headings
     user checks results table column heading contains  css:table  1  12  2020
 
 Validate table row Bolton 001 (E02000984)
-    [Tags]  HappyPath  Failing
+    [Tags]  HappyPath
     ${row}=  user gets row with heading   Bolton 001 (E02000984)
     user checks row contains heading  ${row}   Bolton 001 (E02000984)
     user checks row cell contains text  ${row}   1    n/a
@@ -133,7 +134,7 @@ Validate table row Bolton 001 (E02000984)
     user checks row cell contains text  ${row}   12   n/a
 
 Validate table row Bolton 001 (E05000364)
-    [Tags]  HappyPath  Failing
+    [Tags]  HappyPath
     ${row}=  user gets row with heading   Bolton 001 (E05000364)
     user checks row contains heading  ${row}   Bolton 001 (E05000364)
     user checks row cell contains text  ${row}   1    n/a
@@ -150,7 +151,7 @@ Validate table row Bolton 001 (E05000364)
     user checks row cell contains text  ${row}   12   n/a
 
 Validate table row Bolton 004 (E02000987)
-    [Tags]  HappyPath  Failing
+    [Tags]  HappyPath
     ${row}=  user gets row with heading   Bolton 004 (E02000987)
     user checks row contains heading  ${row}   Bolton 004 (E02000987)
     user checks row cell contains text  ${row}   1    n/a
@@ -167,7 +168,7 @@ Validate table row Bolton 004 (E02000987)
     user checks row cell contains text  ${row}   12   6,031
 
 Validate table row Bolton 004 (E05010450)
-    [Tags]  HappyPath  Failing
+    [Tags]  HappyPath
     ${row}=  user gets row with heading   Bolton 004 (E05010450)
     user checks row contains heading  ${row}   Bolton 004 (E05010450)
     user checks row cell contains text  ${row}   1    8,557
@@ -184,7 +185,7 @@ Validate table row Bolton 004 (E05010450)
     user checks row cell contains text  ${row}   12   n/a
 
 Validate table row Nailsea Youngwood
-    [Tags]  HappyPath  Failing
+    [Tags]  HappyPath
     ${row}=  user gets row with heading   Nailsea Youngwood
     user checks row contains heading  ${row}   Nailsea Youngwood
     user checks row cell contains text   ${row}    1    3,612
@@ -201,7 +202,7 @@ Validate table row Nailsea Youngwood
     user checks row cell contains text   ${row}    12   n/a
 
 Validate table row Syon
-    [Tags]  HappyPath  Failing
+    [Tags]  HappyPath
     ${row}=  user gets row with heading   Syon
     user checks row contains heading  ${row}   Syon
     user checks row cell contains text   ${row}   1    n/a
@@ -218,13 +219,13 @@ Validate table row Syon
     user checks row cell contains text   ${row}   12   n/a
 
 Save data block
-    [Tags]  HappyPath   Failing
+    [Tags]  HappyPath
     user enters text into element  css:#data-block-name        UI Test data block name
     user clears element text   css:#data-block-title
     user enters text into element  css:#data-block-title       UI Test table title
     user enters text into element  css:#data-block-source      UI Test source
     user clicks button   Save data block
-    user waits until page contains    The Data Block has been saved.
+    user waits until page contains    Delete this data block
 
 Navigate to Create chart tab
     [Tags]  HappyPath   UnderConstruction

@@ -33,7 +33,7 @@ Error message appears when user clicks continue is title is empty
     [Tags]  HappyPath
     user checks element is not visible  css:#createPublicationForm-publicationTitle-error
     user clicks button   Create publication
-    user checks element is visible  css:#createPublicationForm-publicationTitle-error
+    user waits until element is visible  css:#createPublicationForm-publicationTitle-error
 
 Enter new publication title
     [Tags]  HappyPath
