@@ -1,3 +1,4 @@
+import FormLabel, { FormLabelProps } from '@common/components/form/FormLabel';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
@@ -5,7 +6,6 @@ import React, {
   ChangeEventHandler,
   CSSProperties,
   FocusEventHandler,
-  ReactNode,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
 
@@ -18,12 +18,11 @@ export interface SelectOption<Value = string | number> {
   style?: CSSProperties;
 }
 
-export interface FormSelectProps {
+export interface FormSelectProps extends FormLabelProps {
   className?: string;
   disabled?: boolean;
   error?: string;
   id: string;
-  label: ReactNode | string;
   name: string;
   onBlur?: FocusEventHandler;
   onChange?: SelectChangeEventHandler;
@@ -42,6 +41,7 @@ const FormSelect = ({
   disabled,
   error,
   id,
+  hideLabel,
   label,
   name,
   onBlur,
@@ -55,10 +55,10 @@ const FormSelect = ({
 }: FormSelectProps) => {
   return (
     <>
-      <label className="govuk-label" htmlFor={id}>
-        {label}
-      </label>
+      <FormLabel id={id} label={label} hideLabel={hideLabel} />
+
       {error && <ErrorMessage>{error}</ErrorMessage>}
+
       <select
         className={classNames('govuk-select', className, {
           'govuk-select--error': !!error,
