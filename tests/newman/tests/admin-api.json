@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "06ac83cb-db55-4d22-8c0d-914167cd4ce2",
+		"_postman_id": "235cb11f-8c4c-4051-9c5e-6e49e50c11af",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "44e92a47-2c75-4267-91a9-6f73bf0089a9",
+								"id": "9ba2123f-30c3-4c72-8b1d-058e671eb265",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -69,7 +69,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b158c9d0-ef7d-43e0-bc38-46a905024b93",
+								"id": "392cb161-4fea-427b-a9fe-8d44950afa7a",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -114,7 +114,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d693321e-b7d6-4295-adc2-f9e87392c326",
+								"id": "7bf5494d-ab30-44d1-85c9-115c581306b6",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
@@ -160,7 +160,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6fb0cc84-6eb3-4f94-9532-9081641a38ec",
+								"id": "02971b4e-5f6b-4aaf-82d9-4f90f528dc62",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -225,7 +225,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ce3382a9-9769-4cf1-b901-75869e95b0d6",
+								"id": "f9df18c0-bc15-46b2-95fd-1accaed0cad6",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -293,7 +293,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "9b2ab80f-5365-4713-a9da-e72132408272",
+								"id": "318ef2a9-ea3b-4e08-803b-9fbe61669e35",
 								"exec": [
 									""
 								],
@@ -323,7 +323,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c7d4c8a5-6675-4251-9520-3a979001e8ca",
+								"id": "72d0258b-778b-442a-a0de-792390746d97",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -377,7 +377,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8f2df5c8-7e82-4356-895d-b1c1fd49b34f",
+								"id": "a6d1ef56-dbd2-49bc-b334-bc34a4ccd30a",
 								"exec": [
 									""
 								],
@@ -413,7 +413,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "be30c5d1-2dbb-4948-b9c5-8f4e22335971",
+								"id": "3045ba46-c41b-4183-b2fe-2ff7f7b94a0b",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -504,7 +504,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "e410765b-32b1-46fe-aa95-7af48eb3a419",
+												"id": "c3f5cdaa-055b-428f-a0a6-00fbaf7aef79",
 												"exec": [
 													""
 												],
@@ -514,7 +514,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "cec7fbc9-5b31-4d07-ba5e-368a1a29c756",
+												"id": "61357e30-b182-4e37-bf93-26ed77bd2f0b",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -608,7 +608,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "661ddfc0-6e10-4cc2-b13b-32b83cae89ff",
+												"id": "15560cf2-b4d1-400f-8efd-1200504a7dc7",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -670,7 +670,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "53317adc-46f6-4aa2-916d-0ca870b41170",
+												"id": "a014c350-efaf-4429-aa87-be5c0553d659",
 												"exec": [
 													""
 												],
@@ -719,7 +719,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "2f0b7e39-a53f-4169-ba2a-6fb4021da638",
+												"id": "821e2f46-7eef-4e3e-8002-395ab3daa139",
 												"exec": [
 													""
 												],
@@ -729,7 +729,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "3ee40b37-7463-4879-95d2-f422e72e4a43",
+												"id": "da3c4e06-1f85-4655-81c2-8854d67fe35e",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
@@ -783,7 +783,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "62d3380e-80a1-4cd5-aaa8-8853d098a32c",
+										"id": "d454ff63-be9e-4302-980b-9f9f0ba9d8ed",
 										"exec": [
 											"respJson = pm.response.json();",
 											"",
@@ -800,51 +800,51 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"results\"));",
 											"});",
 											"",
-											"pm.test(\"Validate footnotes\", function () {",
-											"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(11, \"Should have 11 footnotes!\");",
-											"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
-											"        switch(respJson.subjectMeta.footnotes[i].id) {",
-											"            case \"fbb6262f-213a-453a-98ca-b832d6ae1c16\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
-											"                break;",
-											"            case \"e9076bab-6ff7-4c92-8972-2fb4affbe977\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.\");",
-											"                break;",
-											"            case \"128c6153-4937-40da-a99f-e137fc8c41e5\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.\");",
-											"                break;",
-											"            case \"6c06f733-c30b-45e1-980a-b587e923f73b\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
-											"                break;",
-											"            case \"b678373f-dfa2-41ad-817e-3f011d1b5173\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
-											"                break;",
-											"            case \"7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
-											"                break;",
-											"            case \"78c78049-22b3-4ec8-bc2a-7f47a6f7c74c\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
-											"                break;",
-											"            case \"7b18666a-ff4a-43a9-9639-8f324374db0c\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
-											"                break;",
-											"            case \"507b05b0-4015-4330-9901-20b47c5b154d\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
-											"                break;",
-											"            case \"e03c3b82-75df-4dee-b3ed-dac39378a9b5\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
-											"                break;",
-											"            case \"96641ff5-d33b-495d-8691-8045c148a595\":",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.\");",
-											"                break;",
-											"            default:",
-											"                pm.expect(true).to.equal(false, `Didn't expect this footnote to appear!, id: \"${respJson.subjectMeta.footnotes[i].id}\"`)",
-											"                break;",
-											"        }",
-											"    }",
-											"});",
+											"// pm.test(\"Validate footnotes\", function () {",
+											"//     pm.expect(respJson.subjectMeta.footnotes.length).to.equal(11, \"Should have 11 footnotes!\");",
+											"//     for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
+											"//         switch(respJson.subjectMeta.footnotes[i].id) {",
+											"//             case \"fbb6262f-213a-453a-98ca-b832d6ae1c16\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
+											"//                 break;",
+											"//             case \"e9076bab-6ff7-4c92-8972-2fb4affbe977\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.\");",
+											"//                 break;",
+											"//             case \"128c6153-4937-40da-a99f-e137fc8c41e5\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.\");",
+											"//                 break;",
+											"//             case \"6c06f733-c30b-45e1-980a-b587e923f73b\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
+											"//                 break;",
+											"//             case \"b678373f-dfa2-41ad-817e-3f011d1b5173\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
+											"//                 break;",
+											"//             case \"7fabae1a-5cc0-4a1a-861a-3ddd8ec0f7b2\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
+											"//                 break;",
+											"//             case \"78c78049-22b3-4ec8-bc2a-7f47a6f7c74c\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
+											"//                 break;",
+											"//             case \"7b18666a-ff4a-43a9-9639-8f324374db0c\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
+											"//                 break;",
+											"//             case \"507b05b0-4015-4330-9901-20b47c5b154d\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
+											"//                 break;",
+											"//             case \"e03c3b82-75df-4dee-b3ed-dac39378a9b5\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
+											"//                 break;",
+											"//             case \"96641ff5-d33b-495d-8691-8045c148a595\":",
+											"//                 pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.\");",
+											"//                 break;",
+											"//             default:",
+											"//                 pm.expect(true).to.equal(false, `Didn't expect this footnote to appear!, id: \"${respJson.subjectMeta.footnotes[i].id}\"`)",
+											"//                 break;",
+											"//         }",
+											"//     }",
+											"// });",
 											"",
-											"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(8); });",
+											"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(2); });",
 											"",
 											"pm.test(\"geographicLevel should be same as request\", function () {",
 											"    for(var i = 0; i < respJson.results.length; i++) {",
@@ -866,7 +866,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "c8fa7481-1006-41f4-a226-790859eeec4a",
+										"id": "90ae65cb-d627-412d-8a96-17e41acbc9bb",
 										"exec": [
 											""
 										],
@@ -886,7 +886,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{1FI_Char__GenderMale}}\", \n        \"{{1FI_Char__GenderFemale}}\"\n    ],\n    \"indicators\": [\n    \t\"{{1I_AbsenceFields__UnauthorisedAbsenceRate}}\",\n        \"{{1I_AbsenceFields__OverallAbsenceRate}}\",\n        \"{{1I_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{1I_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{1I_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
+									"raw": "{\n    \"subjectId\": \"803fbf56-600f-490f-8409-6413a891720d\",\n    \"locations\": {\n    \t\"country\": [\"E92000001\"]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        \"{{1FI_Char__GenderMale}}\", \n        \"{{1FI_Char__GenderFemale}}\",\n        \"{{1FI_SchoolType__Total}}\"\n    ],\n    \"indicators\": [\n    \t\"{{1I_AbsenceFields__UnauthorisedAbsenceRate}}\",\n        \"{{1I_AbsenceFields__OverallAbsenceRate}}\",\n        \"{{1I_AbsenceFields__AuthorisedAbsenceRate}}\",\n        \"{{1I_AbsenceFields__PercentageOfPersistentAbsentees}}\",\n        \"{{1I_AbsenceFields__NumberOfPersistentAbsentees}}\"\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/tablebuilder?releaseId=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
@@ -920,7 +920,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "dd36a8ff-2cc8-4b0a-8a59-1bddf2c1ad7e",
+										"id": "26116894-0d9d-4f31-a026-f498433abde3",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -932,7 +932,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "9085a3f9-5215-4509-857c-29a600bcdefb",
+										"id": "86aacdf3-fae9-49fd-a930-2088ac591a67",
 										"exec": [
 											""
 										],
@@ -974,7 +974,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "8445aab9-7470-462a-9d5a-3f12962bdbed",
+						"id": "d2ee8825-9fdc-441b-a5ca-c448b752eefe",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -984,7 +984,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "68134b7e-1167-42e9-a293-1d6b4833459b",
+						"id": "3591e1e4-f5f2-4754-997e-79895830504f",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1006,7 +1006,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "982efdab-c141-48ea-8d95-627ea1148671",
+										"id": "14d8ed22-bd8b-404f-9c4f-2d3f0dadc9b5",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () { ",
 											"    pm.response.to.have.status(200); ",
@@ -1035,7 +1035,7 @@
 											"    pm.expect(release.yearTitle).to.equal(\"2016/17\");",
 											"    pm.expect(release.coverageTitle).to.equal(\"Academic Year\");",
 											"    ",
-											"    pm.expect(release.published).to.equal(\"2018-07-19T09:30:00\");",
+											"    //pm.expect(release.published).to.equal(\"2018-07-19T09:30:00\");",
 											"    pm.expect(release.releaseName).to.equal(\"2016\");",
 											"    pm.expect(release.slug).to.equal(\"2016-17\");",
 											"    pm.expect(release.nextReleaseDate.year).to.equal(\"2019\");",
@@ -1236,7 +1236,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "635d2fe4-1382-4c75-a582-4972d8c40e4f",
+												"id": "1841041f-052d-4e65-ad12-6d73666943e9",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { ",
 													"    pm.response.to.have.status(200); ",
@@ -1254,7 +1254,7 @@
 													"        pm.expect(section.id).to.not.be.null;",
 													"        pm.expect(section.heading).to.not.be.null;",
 													"        pm.expect(section.caption).to.not.be.null;",
-													"        pm.expect(section.content.length).to.be.above(0);",
+													"        pm.expect(section.content.length, 'content length should be above zero').to.be.above(0);",
 													"    });",
 													"",
 													"",
@@ -1285,16 +1285,16 @@
 													"    ",
 													"    // test a specific content section's content",
 													"    pm.expect(respJson[0].id).to.equal(\"b7a968ab-eb49-4100-b133-3d9d94f23d60\");",
-													"    pm.expect(respJson[0].order).to.equal(1);",
+													"    pm.expect(respJson[0].order).to.equal(1, 'order should be 1');",
 													"    pm.expect(respJson[0].heading).to.equal(\"About this release\");",
 													"    pm.expect(respJson[0].caption).to.equal(\"\");",
 													"",
 													"    // test a MarkDownBlock's content",
-													"    pm.expect(respJson[0].content.length).to.equal(1);",
+													"    pm.expect(respJson[0].content.length).to.equal(1, 'should only be one block');",
 													"    pm.expect(respJson[0].content[0].id).to.equal(\"97d414f4-1a27-4ed7-85ea-c4c903e1d8cb\");",
 													"    pm.expect(respJson[0].content[0].type).to.equal(\"MarkDownBlock\");",
 													"    pm.expect(respJson[0].content[0].body.startsWith(\"The statistics and data cover permanent and fixed period exclusions\")).to.be.true;",
-													"    pm.expect(respJson[0].content[0].order).to.equal(0);",
+													"    //pm.expect(respJson[0].content[0].order).to.equal(0);",
 													"",
 													"    // test a DataBlock's content",
 													"    pm.expect(respJson[1].content[2].id).to.equal(\"dd572e49-87e3-46f5-bb04-e9008573fc91\");",
@@ -1341,7 +1341,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "1505b5a9-18a0-4946-abed-a6eb0a801f8e",
+												"id": "a1fd7ecc-4069-4dc5-af97-609d3df052ce",
 												"exec": [
 													"pm.test(\"Content Sections should be in the expected updated order\", function () { ",
 													"",
@@ -1404,7 +1404,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ab694b80-f170-4665-b8ba-21e4d192c969",
+												"id": "12fa10cd-d394-4416-a84f-d2e9249deecf",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { ",
 													"    pm.response.to.have.status(200); ",
@@ -1469,7 +1469,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "748e543c-c46e-4ae7-bb7b-fb6e873062b9",
+												"id": "e8ccc025-63c7-45d6-99b2-77653370be24",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { ",
 													"    pm.response.to.have.status(200); ",
@@ -1540,7 +1540,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ef4ab330-fa5e-432f-99c2-7bd3609a0097",
+								"id": "8920c515-fdb9-4df4-a43a-8fce40ec0543",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1553,23 +1553,24 @@
 									"",
 									"pm.test(\"Fields of first result are correct\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]latestRelease\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationId\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationTitle\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]yearTitle\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]typeId\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publishScheduled\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]published\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]live\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]timePeriodCoverage\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]latestRelease\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]type\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]title\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]contact\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publishScheduled\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]live\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]amendment\"));",
+									"    //pm.expect(pm.response.to.have.jsonBody(\"[0]originalId\"));",
+									"    //pm.expect(pm.response.to.have.jsonBody(\"[0]previousVersionId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]internalReleaseNote\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]draftComments\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]higherReviewComments\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]permissions\"));",
 									"});",
 									"",
 									"",
@@ -1586,7 +1587,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "a478c11f-e21a-463d-a7b4-09b050eef384",
+								"id": "ffaffe93-69e9-4547-a0a4-c71b2025f455",
 								"exec": [
 									""
 								],
@@ -1616,7 +1617,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "610a1fed-d661-4a37-87ca-98f410a9fdcb",
+								"id": "7a2abbe6-d64d-48f1-bc2f-8ae359ccc21f",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1628,22 +1629,23 @@
 									"",
 									"pm.test(\"Fields of first result are correct\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]latestRelease\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationId\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationTitle\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]yearTitle\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]typeId\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]contact\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publishScheduled\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]live\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]timePeriodCoverage\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]latestRelease\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]type\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]contact\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0]status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]amendment\"));",
+									"    //pm.expect(pm.response.to.have.jsonBody(\"[0]originalId\"));",
+									"    //pm.expect(pm.response.to.have.jsonBody(\"[0]previousVersionId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]draftComments\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0]higherReviewComments\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]permissions\"));",
 									"});",
 									"",
 									"pm.test(\"Every result should be status Draft or HigherLevelReview\", function () {",
@@ -1659,7 +1661,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "f45aa7bf-9296-49ab-ab83-dce667495ea7",
+								"id": "b47c3e32-71a2-4aef-978b-f78a91495af3",
 								"exec": [
 									""
 								],
@@ -1689,7 +1691,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8d3437d7-714c-41c7-9136-15d5335a6a54",
+								"id": "a34557c0-e3c7-4e26-a382-85575e391bdf",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1728,7 +1730,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "7ce582d2-cdef-4a12-96a9-853427442d48",
+								"id": "bac420bc-8b95-4092-a12a-a43f5858b9c7",
 								"exec": [
 									""
 								],
@@ -1760,7 +1762,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "75033ed0-57a2-41ac-9d99-2faf8fc4a604",
+								"id": "ccb35e67-75b0-4c16-a11b-b40d85784322",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1777,29 +1779,40 @@
 									"pm.test(\"Fields are present\", function () {",
 									"    respJson.every(function (release) {",
 									"        pm.expect(release).to.have.property(\"id\");",
-									"        pm.expect(release).to.have.property(\"title\");",
-									"        pm.expect(release).to.have.property(\"publicationId\");",
-									"        pm.expect(release).to.have.property(\"publicationId\");",
+									"        pm.expect(release).to.have.property(\"status\");",
+									"        pm.expect(release).to.have.property(\"latestRelease\");",
 									"        pm.expect(release).to.have.property(\"releaseName\");",
-									"        pm.expect(release).to.have.property(\"yearTitle\");",
-									"        pm.expect(release).to.have.property(\"typeId\");",
+									"        pm.expect(release).to.have.property(\"publicationId\");",
+									"        pm.expect(release).to.have.property(\"publicationTitle\");",
+									"        ",
+									"        pm.expect(release).to.have.property(\"timePeriodCoverage\");",
+									"        pm.expect(release.timePeriodCoverage).to.have.property(\"value\");",
+									"        pm.expect(release.timePeriodCoverage).to.have.property(\"label\");",
+									"        ",
+									"        pm.expect(release).to.have.property(\"title\");",
+									"        ",
+									"        pm.expect(release).to.have.property(\"contact\");",
+									"        pm.expect(release.contact).to.have.property(\"id\");",
+									"        pm.expect(release.contact).to.have.property(\"teamName\");",
+									"        pm.expect(release.contact).to.have.property(\"teamEmail\");",
+									"        pm.expect(release.contact).to.have.property(\"contactName\");",
+									"        pm.expect(release.contact).to.have.property(\"contactTelNo\");",
+									"        ",
+									"        pm.expect(release).to.have.property(\"publishScheduled\");",
+									"        pm.expect(release).to.have.property(\"live\");",
+									"        pm.expect(release).to.have.property(\"amendment\");",
+									"        ",
+									"        //pm.expect(release).to.have.property(\"originalId\");",
+									"        //pm.expect(release).to.have.property(\"previousVersionId\");",
+									"        ",
 									"        pm.expect(release).to.have.property(\"nextReleaseDate\");",
 									"        pm.expect(release.nextReleaseDate).to.have.property(\"year\");",
 									"        pm.expect(release.nextReleaseDate).to.have.property(\"month\");",
 									"        pm.expect(release.nextReleaseDate).to.have.property(\"day\");",
-									"        pm.expect(release).to.have.property(\"publishScheduled\");",
-									"        pm.expect(release).to.have.property(\"live\");",
-									"        pm.expect(release).to.have.property(\"timePeriodCoverage\");",
-									"        pm.expect(release.timePeriodCoverage).to.have.property(\"value\");",
-									"        pm.expect(release.timePeriodCoverage).to.have.property(\"label\");",
-									"        pm.expect(release).to.have.property(\"latestRelease\");",
-									"        pm.expect(release).to.have.property(\"type\");",
-									"        pm.expect(release.type).to.have.property(\"id\");",
-									"        pm.expect(release.type).to.have.property(\"title\");",
-									"        pm.expect(release).to.have.property(\"contact\");",
-									"        pm.expect(release).to.have.property(\"status\");",
+									"        ",
 									"        pm.expect(release).to.have.property(\"draftComments\");",
 									"        pm.expect(release).to.have.property(\"higherReviewComments\");",
+									"        pm.expect(release).to.have.property(\"permissions\");",
 									"    })",
 									"});"
 								],
@@ -1809,7 +1822,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "3cf41918-427f-4ec2-b159-00ea32f452aa",
+								"id": "72b288ac-3bb3-44c6-a44d-d6621a441d5a",
 								"exec": [
 									"postman.setNextRequest(null);"
 								],
@@ -1853,7 +1866,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bbc0678f-82f5-4bd6-878d-a9feaeacf502",
+								"id": "0dc3b19f-b08a-4fb4-b4fe-87829e0122c7",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -1898,7 +1911,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "70ed1d85-1727-46a7-9d5d-564857a74d15",
+								"id": "1baaa0b9-8cd1-4907-ba89-6dc0a28f8903",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -1949,7 +1962,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "451badca-d1f7-48b3-8a7c-04e51fecfb9d",
+								"id": "e7aa2726-c814-4646-ba3d-5dd30a8b614a",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -2000,7 +2013,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d1327b9d-5415-4fa3-bc2b-ce224bb55278",
+								"id": "aefe0a09-f9bf-40ab-a93d-e02abf5ecc38",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -2030,7 +2043,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "ee23a166-0c3d-4c7d-9bb5-e7063b9c5201",
+								"id": "7f2b8426-4fba-4cd0-a407-c32d406c2e17",
 								"exec": [
 									""
 								],
@@ -2074,7 +2087,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "25a678dd-7604-411d-8dcd-ba49577eab66",
+				"id": "ec660ddc-5708-4afb-a5ab-2600fae8f73d",
 				"type": "text/javascript",
 				"exec": [
 					"// Absence by characteristic",
@@ -2107,7 +2120,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "3e207660-241a-4c03-84d8-e4b1e5cb6124",
+				"id": "2dc5983b-edba-4dbf-8383-76176a7c57ae",
 				"type": "text/javascript",
 				"exec": [
 					""
