@@ -22,7 +22,7 @@ interface Props {
   capabilities: ChartCapabilities;
   dataSet: DataSetConfiguration;
   id: string;
-  onConfigurationChange?: (value: DataSetConfigurationOptions) => void;
+  onConfigurationChange: (value: DataSetConfigurationOptions) => void;
 }
 
 const colourOptions: SelectOption[] = colours.map(color => {
@@ -52,12 +52,6 @@ const ChartDataConfiguration = ({
 }: Props) => {
   const { config } = dataSet;
 
-  const updateConfig = (newConfig: DataSetConfigurationOptions) => {
-    if (onConfigurationChange) {
-      onConfigurationChange(newConfig);
-    }
-  };
-
   return (
     <div className={styles.chartDataConfiguration}>
       <datalist id={`${id}-colours`}>
@@ -75,7 +69,7 @@ const ChartDataConfiguration = ({
                 value={config.label}
                 label="Label"
                 onChange={e =>
-                  updateConfig({
+                  onConfigurationChange({
                     ...config,
                     label: e.target.value,
                   })
@@ -92,7 +86,7 @@ const ChartDataConfiguration = ({
               value={config.colour}
               list={`${id}-colours`}
               onChange={e =>
-                updateConfig({
+                onConfigurationChange({
                   ...config,
                   colour: e.target.value,
                 })
@@ -110,7 +104,7 @@ const ChartDataConfiguration = ({
                 placeholder="none"
                 options={symbolOptions}
                 onChange={e =>
-                  updateConfig({
+                  onConfigurationChange({
                     ...config,
                     symbol: e.target.value as ChartSymbol,
                   })
@@ -129,7 +123,7 @@ const ChartDataConfiguration = ({
                 order={[]}
                 options={lineStyleOptions}
                 onChange={e =>
-                  updateConfig({
+                  onConfigurationChange({
                     ...config,
                     lineStyle: e.target.value as LineStyle,
                   })

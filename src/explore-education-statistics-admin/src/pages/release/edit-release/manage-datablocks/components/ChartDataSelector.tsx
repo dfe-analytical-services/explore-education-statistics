@@ -262,12 +262,12 @@ const ChartDataSelector = ({
                               capabilities={capabilities}
                               dataSet={dataSet}
                               id={`${formId}-chartDataConfiguration-${index}`}
-                              onConfigurationChange={updateDataSetConfig => {
+                              onConfigurationChange={updatedDataSetConfig => {
                                 const nextDataSetConfigs = [...dataSetConfigs];
 
                                 nextDataSetConfigs[index] = {
                                   ...nextDataSetConfigs[index],
-                                  ...updateDataSetConfig,
+                                  config: updatedDataSetConfig,
                                 };
 
                                 setDataSetConfigs(nextDataSetConfigs);
