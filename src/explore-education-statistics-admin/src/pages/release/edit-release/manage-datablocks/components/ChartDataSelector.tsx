@@ -109,7 +109,7 @@ const ChartDataSelector = ({
         location: Yup.string(),
         timePeriod: Yup.string(),
       })}
-      onSubmit={(values, form) => {
+      onSubmit={values => {
         const { indicator } = values;
         const filters = Object.values(values.filters);
 
@@ -162,8 +162,6 @@ const ChartDataSelector = ({
         if (onDataAdded) {
           onDataAdded(newDataSetConfig);
         }
-
-        form.resetForm();
       }}
       render={form => (
         <>
