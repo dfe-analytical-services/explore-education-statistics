@@ -121,8 +121,8 @@ const InfographicChartForm = ({
                   onConfirm={async () => {
                     await editReleaseDataService.deleteChartFile(
                       releaseId,
-                      form.values.fileId,
                       subjectName,
+                      form.values.fileId,
                     );
                     await refreshFiles();
 
