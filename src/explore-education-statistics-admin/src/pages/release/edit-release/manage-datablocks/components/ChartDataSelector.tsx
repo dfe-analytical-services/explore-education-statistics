@@ -21,7 +21,7 @@ import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
-import React, { useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import styles from './ChartDataSelector.module.scss';
 
 interface FormValues {
@@ -32,6 +32,7 @@ interface FormValues {
 }
 
 interface Props {
+  buttons?: ReactNode;
   canSaveChart?: boolean;
   chartType: ChartDefinition;
   dataSets?: DataSetConfiguration[];
@@ -46,6 +47,7 @@ interface Props {
 const formId = 'chartDataSelectorForm';
 
 const ChartDataSelector = ({
+  buttons,
   canSaveChart,
   meta,
   capabilities,
@@ -308,6 +310,8 @@ const ChartDataSelector = ({
               >
                 Save chart options
               </Button>
+
+              {buttons}
             </>
           )}
         </>

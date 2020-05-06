@@ -19,8 +19,8 @@ const ModalConfirm = ({
   cancelText = 'Cancel',
   mounted,
   onConfirm,
-  onCancel,
   onExit,
+  onCancel = onExit,
   title,
 }: Props) => {
   return (

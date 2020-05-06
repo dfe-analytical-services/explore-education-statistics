@@ -8,10 +8,13 @@ import {
   ChartOptions,
   useChartBuilderReducer,
 } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
+import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useToggle from '@common/hooks/useToggle';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
@@ -60,6 +63,12 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
+const filterChartProps = (props: ChartProps): Chart => {
+  // We don't want to persist data set labels
+  // anymore in the deprecated format.
+  return omit(props, ['data', 'meta', 'labels']) as Chart;
+};
+
 export type TableQueryUpdateHandler = (
   query: Partial<TableDataQuery>,
 ) => Promise<void>;
@@ -70,6 +79,7 @@ interface Props {
   releaseId: string;
   initialConfiguration?: Chart;
   onChartSave: (chart: Chart) => void;
+  onChartDelete: (chart: Chart) => void;
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
 
@@ -78,10 +88,13 @@ const ChartBuilder = ({
   meta,
   releaseId,
   onChartSave,
+  onChartDelete,
   initialConfiguration,
   onTableQueryUpdate,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const [showDeleteModal, toggleDeleteModal] = useToggle(false);
 
   const [isDataLoading, setDataLoading] = useState(false);
   const [shouldSave, setShouldSave] = useState(false);
@@ -165,13 +178,23 @@ const ChartBuilder = ({
         });
       }
 
-      // We don't want to persist data set labels
-      // anymore in the deprecated format.
-      await onChartSave(omit(chartProps, ['data', 'meta', 'labels']) as Chart);
+      await onChartSave(filterChartProps(chartProps));
     };
 
     saveChart().then(() => setShouldSave(false));
   }, [canSaveChart, chartProps, onChartSave, shouldSave]);
+
+  const handleChartDelete = useCallback(async () => {
+    toggleDeleteModal.off();
+
+    if (!chartProps) {
+      return;
+    }
+
+    await onChartDelete(filterChartProps(chartProps));
+
+    actions.resetState();
+  }, [actions, chartProps, onChartDelete, toggleDeleteModal]);
 
   const handleChartDefinitionChange = useCallback(
     async (chartDefinition: ChartDefinition) => {
@@ -227,6 +250,15 @@ const ChartBuilder = ({
     [actions],
   );
 
+  const deleteButton = useMemo(
+    () => (
+      <Button variant="warning" onClick={toggleDeleteModal.on}>
+        Delete chart
+      </Button>
+    ),
+    [toggleDeleteModal.on],
+  );
+
   return (
     <div ref={containerRef}>
       <ChartDefinitionSelector
@@ -264,6 +296,7 @@ const ChartBuilder = ({
               headingTitle="Add data from the existing dataset to the chart"
             >
               <ChartDataSelector
+                buttons={deleteButton}
                 canSaveChart={canSaveChart}
                 meta={meta}
                 dataSets={axes.major?.dataSets}
@@ -282,6 +315,7 @@ const ChartBuilder = ({
             headingTitle="Chart configuration"
           >
             <ChartConfiguration
+              buttons={deleteButton}
               canSaveChart={canSaveChart}
               definition={definition}
               chartOptions={options}
@@ -311,6 +345,7 @@ const ChartBuilder = ({
                   headingTitle={axis.title}
                 >
                   <ChartAxisConfiguration
+                    buttons={deleteButton}
                     canSaveChart={canSaveChart}
                     id={`chartAxisConfiguration-${type}`}
                     type={type as AxisType}
@@ -327,6 +362,15 @@ const ChartBuilder = ({
             })}
         </Tabs>
       )}
+
+      <ModalConfirm
+        title="Delete chart"
+        mounted={showDeleteModal}
+        onConfirm={handleChartDelete}
+        onExit={toggleDeleteModal.off}
+      >
+        <p>Are you sure you want to delete this chart?</p>
+      </ModalConfirm>
     </div>
   );
 };

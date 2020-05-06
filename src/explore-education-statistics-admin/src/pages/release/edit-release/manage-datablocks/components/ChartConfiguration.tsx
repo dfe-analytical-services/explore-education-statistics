@@ -17,13 +17,14 @@ import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React, { useCallback, useMemo } from 'react';
+import React, { ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema, Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
 
 type FormValues = Partial<ChartOptions>;
 
 interface Props {
+  buttons?: ReactNode;
   canSaveChart: boolean;
   definition: ChartDefinition;
   chartOptions: ChartOptions;
@@ -38,6 +39,7 @@ interface Props {
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
+  buttons,
   canSaveChart,
   chartOptions,
   definition,
@@ -250,6 +252,8 @@ const ChartConfiguration = ({
             <Button type="submit" id={`${formId}-submit`}>
               Save chart options
             </Button>
+
+            {buttons}
           </Form>
         )}
       />
