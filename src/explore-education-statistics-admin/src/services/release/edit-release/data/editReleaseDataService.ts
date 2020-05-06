@@ -218,8 +218,14 @@ const editReleaseDataService = {
     );
   },
 
-  async deleteChartFile(releaseId: string, fileName: string): Promise<null> {
-    return client.delete<null>(`/release/${releaseId}/chart/${fileName}`);
+  async deleteChartFile(
+    releaseId: string,
+    subjectName: string,
+    fileName: string,
+  ): Promise<null> {
+    return client.delete<null>(
+      `/release/${releaseId}/chart/${subjectName}/${fileName}`,
+    );
   },
 
   downloadChartFile(releaseId: string, fileName: string): Promise<Blob> {

@@ -36,6 +36,7 @@ interface Props {
   canSaveChart: boolean;
   releaseId: string;
   fileId?: string;
+  subjectName: string;
   onSubmit: (fileId: string) => void;
   onDelete: (fileId: string) => void;
 }
@@ -46,6 +47,7 @@ const InfographicChartForm = ({
   canSaveChart,
   releaseId,
   fileId = '',
+  subjectName,
   onDelete,
   onSubmit,
 }: Props) => {
@@ -119,6 +121,7 @@ const InfographicChartForm = ({
                   onConfirm={async () => {
                     await editReleaseDataService.deleteChartFile(
                       releaseId,
+                      subjectName,
                       form.values.fileId,
                     );
                     await refreshFiles();

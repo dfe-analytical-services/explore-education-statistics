@@ -111,6 +111,7 @@ const ChartConfiguration = ({
             canSaveChart={canSaveChart}
             releaseId={releaseId}
             fileId={fileId}
+            subjectName={meta.subjectName}
             onSubmit={async nextFileId => {
               onChange({
                 ...chartOptions,
