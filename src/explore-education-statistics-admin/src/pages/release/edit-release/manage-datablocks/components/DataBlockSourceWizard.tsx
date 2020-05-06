@@ -5,6 +5,7 @@ import {
   CreateReleaseDataBlock,
   ReleaseDataBlock,
 } from '@admin/services/release/edit-release/datablocks/service';
+import filterOrphanedDataSets from '@common/modules/charts/util/filterOrphanedDataSets';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
@@ -17,6 +18,7 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import { TableDataQuery } from '@common/services/tableBuilderService';
+import produce from 'immer';
 import React, { createRef, useCallback, useEffect, useState } from 'react';
 
 export type SavedDataBlock = CreateReleaseDataBlock & {
@@ -56,11 +58,22 @@ const DataBlockSourceWizardFinalStep = ({
 
   const handleSubmit = useCallback(
     (values: DataBlockDetailsFormValues) => {
+      const charts = produce(dataBlock?.charts ?? [], draft => {
+        const majorAxis = draft[0]?.axes?.major;
+
+        if (majorAxis?.dataSets) {
+          majorAxis.dataSets = filterOrphanedDataSets(
+            majorAxis.dataSets,
+            table.subjectMeta,
+          );
+        }
+      });
+
       onDataBlockSave({
-        charts: [],
         ...(dataBlock ?? {}),
         ...values,
         dataBlockRequest: query,
+        charts,
         tables: [
           {
             tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
@@ -69,7 +82,7 @@ const DataBlockSourceWizardFinalStep = ({
         ],
       });
     },
-    [currentTableHeaders, dataBlock, onDataBlockSave, query],
+    [currentTableHeaders, dataBlock, onDataBlockSave, query, table.subjectMeta],
   );
 
   return (
