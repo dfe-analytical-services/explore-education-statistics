@@ -30,6 +30,10 @@ const ReleaseManageDataBlocksPageTabs = ({
 }: Props) => {
   const [isSaving, setIsSaving] = useState(false);
 
+  // Track number of saves as we can use this to
+  // force re-rendering of the tab sections.
+  const [saveNumber, setSaveNumber] = useState(0);
+
   const [tableToolState, setTableToolState] = useState<TableToolState>();
 
   const { error, isLoading } = useTableQuery(
@@ -83,8 +87,9 @@ const ReleaseManageDataBlocksPageTabs = ({
       onDataBlockSave(newDataBlock);
 
       setIsSaving(false);
+      setSaveNumber(saveNumber + 1);
     },
-    [onDataBlockSave, releaseId],
+    [onDataBlockSave, releaseId, saveNumber],
   );
 
   return (
@@ -123,6 +128,7 @@ const ReleaseManageDataBlocksPageTabs = ({
             <TabsSection title="Chart" key="chart" id="manageDataBlocks-chart">
               {tableToolState?.response && (
                 <ChartBuilderTabSection
+                  key={saveNumber}
                   dataBlock={selectedDataBlock}
                   table={tableToolState.response.table}
                   onDataBlockSave={handleDataBlockSave}
