@@ -1,4 +1,5 @@
 import ErrorMessage from '@common/components/ErrorMessage';
+import FormLabel, { FormLabelProps } from '@common/components/form/FormLabel';
 import createDescribedBy from '@common/components/form/util/createDescribedBy';
 import classNames from 'classnames';
 import React, {
@@ -9,12 +10,11 @@ import React, {
   memo,
 } from 'react';
 
-export interface FormBaseInputProps {
+export interface FormBaseInputProps extends FormLabelProps {
   disabled?: boolean;
   error?: ReactNode | string;
   hint?: string;
   id: string;
-  label: ReactNode | string;
   name: string;
   percentageWidth?: string;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
@@ -33,6 +33,7 @@ const FormBaseInput = ({
   error,
   hint,
   id,
+  hideLabel,
   label,
   width,
   percentageWidth,
@@ -41,9 +42,8 @@ const FormBaseInput = ({
 }: FormBaseInputProps & HiddenProps) => {
   return (
     <>
-      <label className="govuk-label" htmlFor={id}>
-        {label}
-      </label>
+      <FormLabel id={id} label={label} hideLabel={hideLabel} />
+
       {hint && (
         <span id={`${id}-hint`} className="govuk-hint">
           {hint}

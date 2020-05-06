@@ -816,6 +816,58 @@ describe('chartBuilderReducer', () => {
     });
   });
 
+  describe('RESET', () => {
+    test('resets to correct initial state', () => {
+      const initialState: ChartBuilderState = {
+        axes: {
+          major: {
+            type: 'major',
+            visible: true,
+            referenceLines: [],
+            dataSets: [],
+          },
+        },
+        definition: testChartDefinition,
+        options: {
+          height: 400,
+          title: 'Something',
+        },
+        forms: {
+          options: {
+            isValid: false,
+          },
+          data: {
+            isValid: false,
+          },
+          major: {
+            isValid: false,
+          },
+        },
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialState, {
+        type: 'RESET',
+      });
+
+      expect(nextState).toEqual({
+        axes: {},
+        options: {
+          height: 300,
+          title: '',
+        },
+        definition: undefined,
+        forms: {
+          options: {
+            isValid: true,
+          },
+          data: {
+            isValid: true,
+          },
+        },
+      });
+    });
+  });
+
   describe('useChartBuilderReducer', () => {
     test('has correct state when no initial configuration', () => {
       const { result } = renderHook(() => useChartBuilderReducer());

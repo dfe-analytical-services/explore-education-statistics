@@ -28,18 +28,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IFileStorageService _fileStorageService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IDataBlockService _dataBlockService;
 
         public ReleasesController(
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IReleaseStatusService releaseStatusService,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IDataBlockService dataBlockService
             )
         {
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _releaseStatusService = releaseStatusService;
             _userManager = userManager;
+            _dataBlockService = dataBlockService;
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
@@ -261,15 +264,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/chart/{fileName}")]
+        [HttpDelete("release/{releaseId}/chart/{subjectName}/{fileName}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
-            Guid releaseId, string fileName)
+            Guid releaseId, string subjectName, string fileName)
         {
-            return await _fileStorageService
-                .DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName)
+            return await _dataBlockService.RemoveChartFile(releaseId, subjectName, fileName)
+                .OnSuccess(_ => _fileStorageService.DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpGet("releases/{releaseId}/status")]
         public async Task<ActionResult<ReleaseStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
         {

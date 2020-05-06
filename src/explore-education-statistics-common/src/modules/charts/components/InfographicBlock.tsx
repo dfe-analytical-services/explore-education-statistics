@@ -1,4 +1,5 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ResponsiveImage from '@common/components/ResponsiveImage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import {
   ChartDefinition,
@@ -17,8 +18,8 @@ export interface InfographicChartProps extends ChartProps {
 const InfographicBlock = ({
   fileId,
   getInfographic,
-  width = 0,
-  height = 0,
+  width,
+  height,
 }: InfographicChartProps) => {
   const { value: file, error, isLoading } = useAsyncRetry(async () => {
     if (fileId && getInfographic) {
@@ -41,11 +42,11 @@ const InfographicBlock = ({
   return (
     <LoadingSpinner loading={isLoading}>
       {file && (
-        <img
+        <ResponsiveImage
           alt="infographic"
           src={file}
-          width={width > 0 ? width : undefined}
-          height={height > 0 ? height : undefined}
+          height={height ? `${height}px` : undefined}
+          width={width ? `${width}px` : undefined}
         />
       )}
     </LoadingSpinner>
