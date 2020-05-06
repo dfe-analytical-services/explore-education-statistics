@@ -109,6 +109,7 @@ const ChartConfiguration = ({
           <InfographicChartForm
             releaseId={releaseId}
             fileId={fileId || ''}
+            subjectName={meta.subjectName}
             onSubmit={nextFileId => {
               onChange({
                 ...chartOptions,

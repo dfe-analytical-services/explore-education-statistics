@@ -33,6 +33,7 @@ interface FormValues {
 interface Props {
   releaseId: string;
   fileId?: string;
+  subjectName: string;
   onSubmit: (fileId: string) => void;
 }
 
@@ -53,7 +54,12 @@ const loadChartFilesAndMapToSelectOptionAsync = (
   });
 };
 
-const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
+const InfographicChartForm = ({
+  releaseId,
+  fileId,
+  subjectName,
+  onSubmit,
+}: Props) => {
   const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
 
   const [uploading, setUploading] = useState(false);
@@ -126,7 +132,11 @@ const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
                     // eslint-disable-next-line no-unused-expressions
                     form.values.fileId &&
                       editReleaseDataService
-                        .deleteChartFile(releaseId, form.values.fileId)
+                        .deleteChartFile(
+                          releaseId,
+                          form.values.fileId,
+                          subjectName,
+                        )
                         .then(() =>
                           loadChartFilesAndMapToSelectOptionAsync(releaseId),
                         )
