@@ -61,6 +61,8 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
   };
 
   private handleApiErrors = (error: AxiosError) => {
+    logger.error(error);
+
     this.setState({
       errorCode: error.response?.status || 500,
     });
