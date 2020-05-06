@@ -50,8 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
                 
-                var publishScheduled = new DateTime(2050, 6, 30, 14, 0, 0, DateTimeKind.Utc);
-                var publishScheduledMidnight = new DateTime(2050, 6, 29, 23, 0, 0, DateTimeKind.Utc);
+                var publishScheduled = new DateTime(2050, 6, 30, 14, 0, 0);
+                var publishScheduledMidnight = new DateTime(2050, 6, 30).ToUniversalTime();
                 
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
@@ -290,8 +290,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.SaveChanges();
             }
             
-            var publishScheduledEdited = new DateTime(2051, 6, 30, 14, 0, 0, DateTimeKind.Utc);
-            var publishScheduledEditedMidnight = new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc);
+            var publishScheduledEdited = new DateTime(2051, 6, 30, 14, 0, 0);
+            var publishScheduledEditedMidnight = new DateTime(2051, 6, 30).ToUniversalTime();
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var typeEdited = officialStatisticsReleaseType;
             const string releaseNameEdited = "2035";
