@@ -1,4 +1,3 @@
-import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry, { AsyncRetryState } from '@common/hooks/useAsyncRetry';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -20,30 +19,26 @@ export default function useTableQuery(
 
   optionsRef.current = options;
 
-  const { withoutErrorHandling } = useErrorControl();
-
   return useAsyncRetry(async () => {
     if (!query) {
       return undefined;
     }
 
-    return withoutErrorHandling(async () => {
-      try {
-        const response = await tableBuilderService.getTableData(query);
-        const fullTable = mapFullTable(response);
+    try {
+      const response = await tableBuilderService.getTableData(query);
+      const fullTable = mapFullTable(response);
 
-        if (optionsRef.current?.onSuccess) {
-          await optionsRef.current.onSuccess(fullTable, query);
-        }
-
-        return fullTable;
-      } catch (error) {
-        if (optionsRef.current?.onError) {
-          await optionsRef.current.onError(error);
-        }
-
-        throw error;
+      if (optionsRef.current?.onSuccess) {
+        await optionsRef.current.onSuccess(fullTable, query);
       }
-    });
+
+      return fullTable;
+    } catch (error) {
+      if (optionsRef.current?.onError) {
+        await optionsRef.current.onError(error);
+      }
+
+      throw error;
+    }
   }, [JSON.stringify(query)]);
 }

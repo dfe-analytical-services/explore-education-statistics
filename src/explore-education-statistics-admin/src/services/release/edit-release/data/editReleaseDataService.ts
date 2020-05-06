@@ -226,7 +226,6 @@ const editReleaseDataService = {
   downloadChartFile(releaseId: string, fileName: string): Promise<Blob> {
     return client.get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
       responseType: 'blob',
-      onError: error => error,
     });
   },
 };
