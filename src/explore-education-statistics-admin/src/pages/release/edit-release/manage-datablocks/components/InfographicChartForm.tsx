@@ -1,19 +1,21 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
+import editReleaseDataService, {
+  ChartFile,
+} from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
 import { Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { SelectOption } from '@common/components/form/FormSelect';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
 import { FormikProps } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 const errorCodeMappings = [
   errorCodeToFieldError('FILE_TYPE_INVALID', 'file', 'Choose an image file'),
@@ -31,63 +33,49 @@ interface FormValues {
 }
 
 interface Props {
+  canSaveChart: boolean;
   releaseId: string;
   fileId?: string;
   onSubmit: (fileId: string) => void;
+  onDelete: (fileId: string) => void;
 }
 
-const loadChartFilesAndMapToSelectOptionAsync = (
-  releaseId: string,
-): Promise<SelectOption[]> => {
-  return editReleaseDataService.getChartFiles(releaseId).then(chartFiles => {
-    return [
-      {
-        label: 'Upload a new file',
-        value: '',
-      },
-      ...chartFiles.map(({ title, filename }) => ({
-        label: title,
-        value: filename,
-      })),
-    ];
-  });
-};
+const formId = 'fileUploadForm';
 
-const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
-  const [chartFileOptions, setChartFileOptions] = useState<SelectOption[]>([]);
-
+const InfographicChartForm = ({
+  canSaveChart,
+  releaseId,
+  fileId = '',
+  onDelete,
+  onSubmit,
+}: Props) => {
   const [uploading, setUploading] = useState(false);
   const [deleteFile, toggleDeleteFile] = useToggle(false);
 
-  const formId = 'fileUploadForm';
+  const { value: files = [], retry: refreshFiles } = useAsyncRetry<ChartFile[]>(
+    () => editReleaseDataService.getChartFiles(releaseId),
+    [releaseId],
+  );
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     if (values.file) {
       setUploading(true);
 
-      await editReleaseDataService
-        .uploadChartFile(releaseId, {
+      try {
+        await editReleaseDataService.uploadChartFile(releaseId, {
           name: values.name,
           file: values.file as File,
-        })
-        .then(() => loadChartFilesAndMapToSelectOptionAsync(releaseId))
-        .then(setChartFileOptions)
-        .then(() => onSubmit((values.file as File).name))
-        .finally(() => {
-          setUploading(false);
         });
+        await refreshFiles();
+
+        onSubmit((values.file as File).name);
+      } finally {
+        setUploading(false);
+      }
     }
   }, errorCodeMappings);
 
-  useEffect(() => {
-    loadChartFilesAndMapToSelectOptionAsync(releaseId).then(
-      setChartFileOptions,
-    );
-  }, [releaseId]);
-
-  const selectedFile = chartFileOptions.find(
-    fileOption => fileOption.value === fileId,
-  );
+  const selectedFile = files.find(fileOption => fileOption.filename === fileId);
 
   return (
     <Formik<FormValues>
@@ -108,30 +96,34 @@ const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
           <Form id={formId}>
             {fileId && selectedFile && (
               <>
-                <div className={styles.deleteInfographicContainer}>
-                  <p className="govuk-!-margin-right-2">{`${selectedFile.label}, ${fileId}`}</p>
-                  <ButtonText
-                    variant="warning"
-                    onClick={() => toggleDeleteFile(true)}
-                  >
-                    Delete infographic
-                  </ButtonText>
-                </div>
+                <SummaryList>
+                  <SummaryListItem term="Name">
+                    {selectedFile.title}
+                  </SummaryListItem>
+                  <SummaryListItem term="Filename">{fileId}</SummaryListItem>
+                </SummaryList>
+
+                <Button
+                  disabled={!canSaveChart}
+                  variant="warning"
+                  onClick={toggleDeleteFile.on}
+                >
+                  Delete infographic
+                </Button>
+
                 <ModalConfirm
                   mounted={deleteFile}
                   title="Confirm deletion of infographic"
                   onExit={toggleDeleteFile.off}
                   onCancel={toggleDeleteFile.off}
                   onConfirm={async () => {
-                    // eslint-disable-next-line no-unused-expressions
-                    form.values.fileId &&
-                      editReleaseDataService
-                        .deleteChartFile(releaseId, form.values.fileId)
-                        .then(() =>
-                          loadChartFilesAndMapToSelectOptionAsync(releaseId),
-                        )
-                        .then(setChartFileOptions);
-                    onSubmit('');
+                    await editReleaseDataService.deleteChartFile(
+                      releaseId,
+                      form.values.fileId,
+                    );
+                    await refreshFiles();
+
+                    onDelete(form.values.fileId);
                     toggleDeleteFile.off();
                   }}
                 >
@@ -148,7 +140,7 @@ const InfographicChartForm = ({ releaseId, fileId, onSubmit }: Props) => {
                   id={`${formId}-name`}
                   name="name"
                   label="Select a name to give the file"
-                  width={10}
+                  width={20}
                 />
 
                 <FormFieldFileInput<FormValues>
