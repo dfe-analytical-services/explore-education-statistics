@@ -67,7 +67,7 @@ const ChartBuilderTabSection = ({
         charts: [],
       });
     },
-    [dataBlock, onDataBlockSave, releaseId],
+    [dataBlock, onDataBlockSave, releaseId, meta.subjectName],
   );
 
   const handleTableQueryUpdate: TableQueryUpdateHandler = useCallback(
