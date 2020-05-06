@@ -55,7 +55,11 @@ const ChartBuilderTabSection = ({
     async (chart: Chart) => {
       // Cleanup potential infographic chart file if required
       if (chart.type === 'infographic' && chart.fileId) {
-        await editReleaseDataService.deleteChartFile(releaseId, chart.fileId);
+        await editReleaseDataService.deleteChartFile(
+          releaseId,
+          meta.subjectName,
+          chart.fileId,
+        );
       }
 
       await onDataBlockSave({
@@ -63,7 +67,7 @@ const ChartBuilderTabSection = ({
         charts: [],
       });
     },
-    [dataBlock, onDataBlockSave, releaseId],
+    [dataBlock, onDataBlockSave, releaseId, meta.subjectName],
   );
 
   const handleTableQueryUpdate: TableQueryUpdateHandler = useCallback(
