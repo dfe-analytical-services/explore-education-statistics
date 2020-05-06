@@ -14,9 +14,11 @@ import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
 import { TableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import tableBuilderService from '@common/services/tableBuilderService';
+import tableBuilderService, {
+  TableDataQuery,
+} from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 interface Props {
   releaseId: string;
@@ -36,38 +38,41 @@ const ReleaseManageDataBlocksPageTabs = ({
 
   const [tableToolState, setTableToolState] = useState<TableToolState>();
 
-  const { error, isLoading } = useTableQuery(
-    selectedDataBlock
-      ? {
-          ...selectedDataBlock.dataBlockRequest,
-          includeGeoJson: selectedDataBlock.charts.some(
-            chart => chart.type === 'map',
-          ),
-        }
-      : undefined,
-    {
-      onSuccess: async (table, query) => {
-        const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
-          query,
-        );
-
-        setTableToolState({
-          initialStep: 5,
-          query,
-          subjectMeta,
-          response: {
-            table,
-            tableHeaders: selectedDataBlock
-              ? mapTableHeadersConfig(
-                  selectedDataBlock.tables[0].tableHeaders,
-                  table.subjectMeta,
-                )
-              : getDefaultTableHeaderConfig(table.subjectMeta),
-          },
-        });
-      },
-    },
+  const initialQuery = useMemo<TableDataQuery | undefined>(
+    () =>
+      selectedDataBlock
+        ? {
+            ...selectedDataBlock.dataBlockRequest,
+            includeGeoJson: selectedDataBlock.charts.some(
+              chart => chart.type === 'map',
+            ),
+          }
+        : undefined,
+    [selectedDataBlock],
   );
+
+  const { error, isLoading } = useTableQuery(initialQuery, {
+    onSuccess: async (table, query) => {
+      const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+        query,
+      );
+
+      setTableToolState({
+        initialStep: 5,
+        query,
+        subjectMeta,
+        response: {
+          table,
+          tableHeaders: selectedDataBlock
+            ? mapTableHeadersConfig(
+                selectedDataBlock.tables[0].tableHeaders,
+                table.subjectMeta,
+              )
+            : getDefaultTableHeaderConfig(table.subjectMeta),
+        },
+      });
+    },
+  });
 
   const handleDataBlockSave = useCallback(
     async (dataBlock: SavedDataBlock) => {
@@ -126,10 +131,11 @@ const ReleaseManageDataBlocksPageTabs = ({
               )}
             </TabsSection>,
             <TabsSection title="Chart" key="chart" id="manageDataBlocks-chart">
-              {tableToolState?.response && (
+              {tableToolState?.response && initialQuery && (
                 <ChartBuilderTabSection
                   key={saveNumber}
                   dataBlock={selectedDataBlock}
+                  query={initialQuery}
                   table={tableToolState.response.table}
                   onDataBlockSave={handleDataBlockSave}
                 />

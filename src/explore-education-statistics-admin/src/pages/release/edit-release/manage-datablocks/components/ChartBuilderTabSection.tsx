@@ -15,20 +15,20 @@ import { useParams } from 'react-router';
 
 interface Props {
   dataBlock: ReleaseDataBlock;
+  query: TableDataQuery;
   table: FullTable;
   onDataBlockSave: (dataBlock: ReleaseDataBlock) => void;
 }
 
 const ChartBuilderTabSection = ({
   dataBlock,
+  query: initialQuery,
   table,
   onDataBlockSave,
 }: Props) => {
   const { releaseId } = useParams<{ releaseId: string }>();
 
-  const [tableQuery, setTableQuery] = useState<TableDataQuery>(
-    dataBlock.dataBlockRequest,
-  );
+  const [tableQuery, setTableQuery] = useState<TableDataQuery>(initialQuery);
   const [fullTable, setFullTable] = useState<FullTable>(table);
 
   const meta = useMemo(
