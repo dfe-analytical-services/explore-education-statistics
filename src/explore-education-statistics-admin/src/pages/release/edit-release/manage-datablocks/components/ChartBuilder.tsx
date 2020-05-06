@@ -170,18 +170,16 @@ const ChartBuilder = ({
       return;
     }
 
-    const saveChart = async () => {
-      if (containerRef.current) {
-        containerRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
+    setShouldSave(false);
 
-      await onChartSave(filterChartProps(chartProps));
-    };
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
 
-    saveChart().then(() => setShouldSave(false));
+    onChartSave(filterChartProps(chartProps));
   }, [canSaveChart, chartProps, onChartSave, shouldSave]);
 
   const handleChartDelete = useCallback(async () => {
