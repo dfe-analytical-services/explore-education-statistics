@@ -430,6 +430,10 @@
     "enableSwagger": {
       "type": "bool",
       "defaultValue": false
+    },
+    "timeZone": {
+      "type": "string",
+      "defaultValue": "GMT Standard Time"
     }
   },
   "variables": {
@@ -2361,6 +2365,7 @@
         "ResourceGroupName": "[resourceGroup().name]",
         "SubscriptionId": "[subscription().subscriptionId]",
         "TenantId": "[subscription().tenantId]",
+        "WEBSITE_TIME_ZONE ": "[parameters('timeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~3",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
