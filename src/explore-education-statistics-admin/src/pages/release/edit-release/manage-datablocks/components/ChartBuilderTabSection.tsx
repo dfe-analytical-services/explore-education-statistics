@@ -45,10 +45,11 @@ const ChartBuilderTabSection = ({
     async (chart: Chart) => {
       await onDataBlockSave({
         ...dataBlock,
+        dataBlockRequest: tableQuery,
         charts: [chart],
       });
     },
-    [dataBlock, onDataBlockSave],
+    [dataBlock, onDataBlockSave, tableQuery],
   );
 
   const handleChartDelete = useCallback(

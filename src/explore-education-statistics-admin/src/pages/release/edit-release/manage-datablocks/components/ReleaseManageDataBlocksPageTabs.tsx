@@ -78,15 +78,23 @@ const ReleaseManageDataBlocksPageTabs = ({
     async (dataBlock: SavedDataBlock) => {
       setIsSaving(true);
 
+      const dataBlockToSave: SavedDataBlock = {
+        ...dataBlock,
+        dataBlockRequest: {
+          ...dataBlock.dataBlockRequest,
+          includeGeoJson: dataBlock.charts[0]?.type === 'map',
+        },
+      };
+
       const newDataBlock = await minDelay(() => {
-        if (dataBlock.id) {
+        if (dataBlockToSave.id) {
           return dataBlocksService.putDataBlock(
-            dataBlock.id,
-            dataBlock as ReleaseDataBlock,
+            dataBlockToSave.id,
+            dataBlockToSave as ReleaseDataBlock,
           );
         }
 
-        return dataBlocksService.postDataBlock(releaseId, dataBlock);
+        return dataBlocksService.postDataBlock(releaseId, dataBlockToSave);
       }, 500);
 
       onDataBlockSave(newDataBlock);
