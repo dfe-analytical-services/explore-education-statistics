@@ -1,9 +1,15 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, { MouseEventHandler, ReactNode } from 'react';
 import { ButtonProps } from './Button';
 import styles from './ButtonText.module.scss';
 
-interface Props extends ButtonProps {
+interface Props {
+  children: ReactNode;
+  className?: string;
+  disabled?: boolean;
+  id?: string;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  type?: 'button' | 'submit' | 'reset';
   underline?: boolean;
 }
 

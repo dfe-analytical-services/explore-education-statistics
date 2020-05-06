@@ -1,4 +1,4 @@
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
+import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration.module.scss';
 import {
   FormFieldset,
   FormSelect,
@@ -16,13 +16,14 @@ import {
   DataSetConfigurationOptions,
 } from '@common/modules/charts/types/dataSet';
 import { colours, symbols } from '@common/modules/charts/util/chartUtils';
+import upperFirst from 'lodash/upperFirst';
 import React from 'react';
 
 interface Props {
   capabilities: ChartCapabilities;
   dataSet: DataSetConfiguration;
   id: string;
-  onConfigurationChange?: (value: DataSetConfigurationOptions) => void;
+  onConfigurationChange: (value: DataSetConfigurationOptions) => void;
 }
 
 const colourOptions: SelectOption[] = colours.map(color => {
@@ -34,7 +35,7 @@ const colourOptions: SelectOption[] = colours.map(color => {
 });
 
 const symbolOptions: SelectOption[] = symbols.map<SelectOption>(symbol => ({
-  label: symbol,
+  label: upperFirst(symbol),
   value: symbol,
 }));
 
@@ -52,94 +53,87 @@ const ChartDataConfiguration = ({
 }: Props) => {
   const { config } = dataSet;
 
-  const updateConfig = (newConfig: DataSetConfigurationOptions) => {
-    if (onConfigurationChange) {
-      onConfigurationChange(newConfig);
-    }
-  };
-
   return (
-    <div className={styles.chartDataConfiguration}>
-      <datalist id={`${id}-colours`}>
-        {colourOptions.map(({ value }) => (
-          <option key={value} value={value} />
-        ))}
-      </datalist>
-      <FormFieldset id={id} legend="" legendHidden>
-        <div className={styles.chartDataLabelConfiguration}>
-          {dataSet.timePeriod && dataSet.location && (
-            <div className={styles.chartDataItem}>
-              <FormTextInput
-                id={`${id}-label`}
-                name="label"
-                value={config.label}
-                label="Label"
-                onChange={e =>
-                  updateConfig({
-                    ...config,
-                    label: e.target.value,
-                  })
-                }
-              />
-            </div>
-          )}
-
-          <div className={styles.chartDataItem}>
-            <FormColourInput
-              id={`${id}-colour`}
-              name="colour"
-              label="Colour"
-              value={config.colour}
-              list={`${id}-colours`}
+    <FormFieldset id={id} legend="Styling options" legendHidden>
+      <div className={styles.configuration}>
+        {dataSet.timePeriod && dataSet.location && (
+          <div className={styles.labelInput}>
+            <FormTextInput
+              id={`${id}-label`}
+              name="label"
+              value={config.label}
+              label="Label"
               onChange={e =>
-                updateConfig({
+                onConfigurationChange({
                   ...config,
-                  colour: e.target.value,
+                  label: e.target.value,
                 })
               }
             />
           </div>
+        )}
 
-          {capabilities.dataSymbols && (
-            <div className={styles.chartDataItem}>
-              <FormSelect
-                id={`${id}-symbol`}
-                name="symbol"
-                label="Symbol"
-                value={config.symbol}
-                placeholder="none"
-                options={symbolOptions}
-                onChange={e =>
-                  updateConfig({
-                    ...config,
-                    symbol: e.target.value as ChartSymbol,
-                  })
-                }
-              />
-            </div>
-          )}
+        <div className={styles.colourInput}>
+          <FormColourInput
+            id={`${id}-colour`}
+            name="colour"
+            label="Colour"
+            value={config.colour}
+            list={`${id}-colours`}
+            onChange={e =>
+              onConfigurationChange({
+                ...config,
+                colour: e.target.value,
+              })
+            }
+          />
 
-          {capabilities.lineStyle && (
-            <div className={styles.chartDataItem}>
-              <FormSelect
-                id={`${id}-lineStyle`}
-                name="lineStyle"
-                label="Style"
-                value={config.lineStyle}
-                order={[]}
-                options={lineStyleOptions}
-                onChange={e =>
-                  updateConfig({
-                    ...config,
-                    lineStyle: e.target.value as LineStyle,
-                  })
-                }
-              />
-            </div>
-          )}
+          <datalist id={`${id}-colours`}>
+            {colourOptions.map(({ value }) => (
+              <option key={value} value={value} />
+            ))}
+          </datalist>
         </div>
-      </FormFieldset>
-    </div>
+
+        {capabilities.dataSymbols && (
+          <div className={styles.configurationInput}>
+            <FormSelect
+              id={`${id}-symbol`}
+              name="symbol"
+              label="Symbol"
+              value={config.symbol}
+              placeholder="none"
+              options={symbolOptions}
+              onChange={e =>
+                onConfigurationChange({
+                  ...config,
+                  symbol: e.target.value as ChartSymbol,
+                })
+              }
+            />
+          </div>
+        )}
+
+        {capabilities.lineStyle && (
+          <div className={styles.configurationInput}>
+            <FormSelect
+              id={`${id}-lineStyle`}
+              name="lineStyle"
+              label="Style"
+              value={config.lineStyle}
+              order={[]}
+              options={lineStyleOptions}
+              onChange={e =>
+                onConfigurationChange({
+                  ...config,
+                  lineStyle: e.target.value as LineStyle,
+                })
+              }
+            />
+          </div>
+        )}
+      </div>
+    </FormFieldset>
   );
 };
 

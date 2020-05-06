@@ -1,4 +1,3 @@
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
@@ -107,18 +106,19 @@ const ChartConfiguration = ({
       {definition.type === 'infographic' && (
         <>
           <InfographicChartForm
+            canSaveChart={canSaveChart}
             releaseId={releaseId}
-            fileId={fileId || ''}
-            subjectName={meta.subjectName}
-            onSubmit={nextFileId => {
+            fileId={fileId}
+            onSubmit={async nextFileId => {
               onChange({
                 ...chartOptions,
                 fileId: nextFileId,
               });
-
-              onFormStateChange({
-                form: 'options',
-                isValid: true,
+            }}
+            onDelete={async () => {
+              onSubmit({
+                ...chartOptions,
+                fileId: '',
               });
             }}
           />
@@ -165,7 +165,6 @@ const ChartConfiguration = ({
                 id={`${formId}-stacked`}
                 name="stacked"
                 label="Stacked bars"
-                className={styles['margin-top-30']}
               />
             )}
 

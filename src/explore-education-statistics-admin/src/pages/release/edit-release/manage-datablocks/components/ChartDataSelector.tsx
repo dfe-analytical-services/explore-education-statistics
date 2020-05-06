@@ -13,6 +13,7 @@ import {
 } from '@common/modules/charts/types/dataSet';
 import { colours, symbols } from '@common/modules/charts/util/chartUtils';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import generateDefaultDataSetLabel from '@common/modules/charts/util/generateDefaultDataSetLabel';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -109,7 +110,7 @@ const ChartDataSelector = ({
         location: Yup.string(),
         timePeriod: Yup.string(),
       })}
-      onSubmit={(values, form) => {
+      onSubmit={values => {
         const { indicator } = values;
         const filters = Object.values(values.filters);
 
@@ -162,8 +163,6 @@ const ChartDataSelector = ({
         if (onDataAdded) {
           onDataAdded(newDataSetConfig);
         }
-
-        form.resetForm();
       }}
       render={form => (
         <>
@@ -238,16 +237,17 @@ const ChartDataSelector = ({
             <>
               <hr />
 
-              {dataSetConfigs.map((dataSet, index) => {
-                const expandedDataSet = expandDataSet(dataSet, meta);
-                const label = generateDefaultDataSetLabel(expandedDataSet);
+              <ul className={styles.dataSets}>
+                {dataSetConfigs.map((dataSet, index) => {
+                  const expandedDataSet = expandDataSet(dataSet, meta);
+                  const label = generateDefaultDataSetLabel(expandedDataSet);
 
-                return (
-                  <React.Fragment key={JSON.stringify(dataSet)}>
-                    <ul className={styles.dataSets}>
-                      <li>
-                        <div className={styles.dataSetRow}>
-                          <span>{label}</span>
+                  return (
+                    <li key={generateDataSetKey(dataSet)}>
+                      <div className={styles.dataSetRow}>
+                        <span>{label}</span>
+
+                        <div>
                           <Button
                             onClick={() => removeSelected(dataSet, index)}
                             className="govuk-!-margin-bottom-0 govuk-button--secondary"
@@ -255,39 +255,36 @@ const ChartDataSelector = ({
                             Remove
                           </Button>
                         </div>
-                        <div>
-                          <Details
-                            summary="Change styling"
-                            className="govuk-!-margin-bottom-3 govuk-body-s"
-                          >
-                            <ChartDataConfiguration
-                              capabilities={capabilities}
-                              dataSet={dataSet}
-                              id={`${formId}-chartDataConfiguration-${index}`}
-                              onConfigurationChange={updateDataSetConfig => {
-                                const nextDataSetConfigs = [...dataSetConfigs];
+                      </div>
 
-                                nextDataSetConfigs[index] = {
-                                  ...nextDataSetConfigs[index],
-                                  ...updateDataSetConfig,
-                                };
+                      <Details
+                        summary="Change styling"
+                        className="govuk-!-margin-bottom-3"
+                      >
+                        <ChartDataConfiguration
+                          capabilities={capabilities}
+                          dataSet={dataSet}
+                          id={`${formId}-chartDataConfiguration-${index}`}
+                          onConfigurationChange={updatedDataSetConfig => {
+                            const nextDataSetConfigs = [...dataSetConfigs];
 
-                                setDataSetConfigs(nextDataSetConfigs);
+                            nextDataSetConfigs[index] = {
+                              ...nextDataSetConfigs[index],
+                              config: updatedDataSetConfig,
+                            };
 
-                                if (onDataChanged) {
-                                  onDataChanged(nextDataSetConfigs);
-                                }
-                              }}
-                            />
-                          </Details>
-                        </div>
-                      </li>
-                    </ul>
-                  </React.Fragment>
-                );
-              })}
+                            setDataSetConfigs(nextDataSetConfigs);
 
-              <hr />
+                            if (onDataChanged) {
+                              onDataChanged(nextDataSetConfigs);
+                            }
+                          }}
+                        />
+                      </Details>
+                    </li>
+                  );
+                })}
+              </ul>
 
               {isChartSubmitted && !canSaveChart && (
                 <ErrorSummary
