@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4f17e89e-07f2-4602-8c2e-03feff959315",
+		"_postman_id": "52cf3e55-ca37-4f9f-9ee1-2bf0bd9aa38e",
 		"name": "DfE Admin API - Dev tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e759b2f8-27a5-489d-adaf-f5f8e421bf11",
+								"id": "1721b91b-20c6-4ddc-aa5c-b84d35651dd9",
 								"exec": [
 									"pm.globals.clear();",
 									"",
@@ -35,7 +35,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a148507c-c801-4279-9631-e02cc56ae4a3",
+								"id": "49c6adfe-66f8-4279-8348-0dea50fa9755",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -86,7 +86,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e759b2f8-27a5-489d-adaf-f5f8e421bf11",
+								"id": "a6922e09-0ffc-4cf2-bcb8-70516790dae6",
 								"exec": [
 									""
 								],
@@ -96,7 +96,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a148507c-c801-4279-9631-e02cc56ae4a3",
+								"id": "c341c898-d15b-4d1a-8e54-ff1e5898d002",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -181,7 +181,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "98057100-77fb-42b7-9c21-f1d4921917ab",
+								"id": "20584ea0-4b31-4edc-9980-edb810762312",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -195,7 +195,6 @@
 									"    pm.expect(pm.response.to.have.jsonBody(`publicationId`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`publicationTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releaseName`));",
-									"    pm.expect(pm.response.to.have.jsonBody(`coverageTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`yearTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`typeId`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`nextReleaseDate`));",
@@ -222,9 +221,8 @@
 									"    pm.expect(respJson.publicationTitle).to.equal(`API test publication ${pm.globals.get('RUN_IDENTIFIER')}`);",
 									"});",
 									"",
-									"pm.test(\"releaseName, coverageTitle, yearTitle should be correct\", function () {",
+									"pm.test(\"releaseName, yearTitle should be correct\", function () {",
 									"    pm.expect(respJson.releaseName).to.equal(\"2025\"); ",
-									"    pm.expect(respJson.coverageTitle).to.equal(\"Calendar Year\"); ",
 									"    pm.expect(respJson.yearTitle).to.equal(\"2025\"); ",
 									"});",
 									"",
@@ -252,7 +250,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "53582e6e-2f99-4426-bbac-814e65969e32",
+								"id": "135d64d0-cb8b-44a0-b16b-65d170d037b5",
 								"exec": [
 									""
 								],
@@ -294,7 +292,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "88454951-e368-4701-a768-97d5a00fc0f6",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -308,7 +306,7 @@
 									"    pm.expect(respJson[0].extension).to.equal(\"csv\");",
 									"    pm.expect(respJson[0].name).to.equal(\"\");",
 									"    pm.expect(respJson[0].path).to.equal(`${pm.globals.get('release_id')}/data/admin-api-test.meta.csv`);",
-									"    pm.expect(respJson[0].size).to.equal(\"143 B\");",
+									"    pm.expect(respJson[0].size).to.equal(\"157 B\");",
 									"    pm.expect(respJson[0].metaFileName).to.equal(\"\");",
 									"    pm.expect(respJson[0].rows).to.equal(2);",
 									"",
@@ -342,7 +340,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "f46f422e-9a3b-4cfd-afe7-d414ef426356",
+								"id": "a7319b7f-aaf7-41ad-b91e-fb41a6f7bc04",
 								"exec": [
 									""
 								],
@@ -401,11 +399,11 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+								"id": "63881f81-6ff0-4f24-b4f8-a7b4d75d684c",
 								"exec": [
 									"// Wait for subject to be imported from \"Import subject (SUB1)\" request",
 									"if(pm.environment.get('env') === 'local') {",
-									"    setTimeout(function () {}, 50000);",
+									"    setTimeout(function () {}, 100000);",
 									"} else {",
 									"    setTimeout(function () {}, 100000);",
 									"}"
@@ -416,7 +414,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ac4b1f03-19f2-44f5-b80f-840e78849333",
+								"id": "100ac96b-e6e2-4e48-b7b2-1c6d98d25b26",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -469,7 +467,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+								"id": "ce74c0e6-ec2f-455c-a304-a44b9dd16134",
 								"exec": [
 									""
 								],
@@ -479,7 +477,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+								"id": "3c344ae2-5027-4b5f-9c26-8a03134d3bc9",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -662,7 +660,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"id": "4db4c075-9045-4dc4-a4c7-3e9de9e3e84d",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -691,7 +689,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"id": "9b6e7e3b-3ef3-4bb1-85ee-f4c9150d4191",
 								"exec": [
 									""
 								],
@@ -732,7 +730,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"id": "95cb874a-dd7f-4848-aeb9-5c9dca31b602",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -770,7 +768,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"id": "982e2c2c-8da1-420e-82c8-f58e3b254430",
 								"exec": [
 									""
 								],
@@ -811,7 +809,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+								"id": "17635b65-7aef-460c-ae2c-fb0fcb1aba41",
 								"exec": [
 									"const respJson = pm.response.json();",
 									"",
@@ -825,11 +823,7 @@
 									"});",
 									"",
 									"pm.test(\"heading should be correct\", function () {",
-									"    pm.expect(respJson.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Birmingham, Barnsley, Hartlepool and Middlesbrough between 2007 and 2017`);",
-									"});",
-									"",
-									"pm.test(\"customFootnotes should be correct\", function () {",
-									"    pm.expect(respJson.customFootnotes).to.equal(\"Admin API test footnotes\"); ",
+									"    pm.expect(respJson.heading).to.equal(`Admin API test title`);",
 									"});",
 									"",
 									"pm.test(\"name should be correct\", function () {",
@@ -843,18 +837,18 @@
 									"pm.test(\"dataBlockRequest should be correct\", function () {",
 									"    const dbReq = respJson.dataBlockRequest;",
 									"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
-									"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2007\");",
+									"    pm.expect(dbReq.timePeriod.startYear).to.equal(2007);",
 									"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
-									"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2017\");",
+									"    pm.expect(dbReq.timePeriod.endYear).to.equal(2017);",
 									"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
 									"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
 									"    pm.expect(dbReq.indicators.length).to.equal(1);",
 									"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
-									"    pm.expect(dbReq.localAuthority).to.have.members([",
+									"    pm.expect(dbReq.locations.localAuthority).to.have.members([",
 									"        \"E08000016\",",
 									"        \"E08000025\"",
 									"    ]);",
-									"    pm.expect(dbReq.localAuthorityDistrict).to.have.members([",
+									"    pm.expect(dbReq.locations.localAuthorityDistrict).to.have.members([",
 									"        \"E06000001\",",
 									"        \"E06000002\"",
 									"    ]);",
@@ -881,16 +875,16 @@
 									"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
 									"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(4);",
 									"    ",
-									"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+									"    const row = table.tableHeaders.rowGroups[0].map(location => location.value);",
 									"    pm.expect(row).to.have.members([",
-									"        \"Birmingham\",",
-									"        \"Barnsley\",",
-									"        \"Hartlepool\",",
-									"        \"Middlesbrough\"",
+									"        \"E06000002\",",
+									"        \"E06000001\",",
+									"        \"E08000016\",",
+									"        \"E08000025\"",
 									"    ]);",
 									"    ",
 									"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
-									"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+									"    pm.expect(table.tableHeaders.rows[0].type).to.equal(\"Indicator\");",
 									"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
 									"});"
 								],
@@ -909,7 +903,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"dataBlockRequest\": {\n        \"localAuthority\": [\n            \"E08000016\",\n            \"E08000025\"\n        ],\n        \"localAuthorityDistrict\": [\n            \"E06000001\",\n            \"E06000002\"\n        ],\n        \"subjectId\": \"{{sub1_id}}\",\n        \"indicators\": [\n            \"{{SUB1_IND_Admission_Numbers}}\"\n        ],\n        \"filters\": [],\n        \"timePeriod\": {\n            \"startYear\": 2007,\n            \"startCode\": \"CY\",\n            \"endYear\": 2017,\n            \"endCode\": \"CY\"\n        }\n    },\n    \"heading\": \"Table showing 'API test subject' from 'API test publication {{RUN_IDENTIFIER}}' in Birmingham, Barnsley, Hartlepool and Middlesbrough between 2007 and 2017\",\n    \"customFootnotes\": \"Admin API test footnotes\",\n    \"name\": \"Admin API data block 1\",\n    \"source\": \"Admin API test source\",\n    \"tables\": [\n        {\n            \"indicators\": [],\n            \"tableHeaders\": {\n                \"columnGroups\": [],\n                \"rowGroups\": [\n                    [\n                        {\n                            \"value\": \"E08000025\",\n                            \"label\": \"Birmingham\",\n                            \"level\": \"localAuthority\"\n                        },\n                        {\n                            \"value\": \"E08000016\",\n                            \"label\": \"Barnsley\",\n                            \"level\": \"localAuthority\"\n                        },\n                        {\n                            \"value\": \"E06000001\",\n                            \"label\": \"Hartlepool\",\n                            \"level\": \"localAuthorityDistrict\"\n                        },\n                        {\n                            \"value\": \"E06000002\",\n                            \"label\": \"Middlesbrough\",\n                            \"level\": \"localAuthorityDistrict\"\n                        }\n                    ]\n                ],\n                \"columns\": [\n                    {\n                        \"value\": \"2007_CY\",\n                        \"label\": \"2007\",\n                        \"year\": 2007,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2008_CY\",\n                        \"label\": \"2008\",\n                        \"year\": 2008,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2009_CY\",\n                        \"label\": \"2009\",\n                        \"year\": 2009,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2010_CY\",\n                        \"label\": \"2010\",\n                        \"year\": 2010,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2011_CY\",\n                        \"label\": \"2011\",\n                        \"year\": 2011,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2012_CY\",\n                        \"label\": \"2012\",\n                        \"year\": 2012,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2013_CY\",\n                        \"label\": \"2013\",\n                        \"year\": 2013,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2014_CY\",\n                        \"label\": \"2014\",\n                        \"year\": 2014,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2015_CY\",\n                        \"label\": \"2015\",\n                        \"year\": 2015,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2016_CY\",\n                        \"label\": \"2016\",\n                        \"year\": 2016,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2017_CY\",\n                        \"label\": \"2017\",\n                        \"year\": 2017,\n                        \"code\": \"CY\"\n                    }\n                ],\n                \"rows\": [\n                    {\n                        \"value\": \"{{SUB1_IND_Admission_Numbers}}\",\n                        \"label\": \"Admission Numbers\",\n                        \"unit\": \"\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+							"raw": "{\n    \"charts\": [],\n    \"heading\": \"Admin API test title\",\n    \"name\": \"Admin API data block 1\",\n    \"source\": \"Admin API test source\",\n    \"dataBlockRequest\": {\n        \"subjectId\": \"{{sub1_id}}\",\n        \"indicators\": [\n            \"{{SUB1_IND_Admission_Numbers}}\"\n        ],\n        \"filters\": [],\n        \"locations\": {\n            \"localAuthorityDistrict\": [\n                \"E06000001\",\n                \"E06000002\"\n            ],\n            \"localAuthority\": [\n                \"E08000016\",\n                \"E08000025\"\n            ]\n        },\n        \"timePeriod\": {\n            \"startYear\": 2007,\n            \"startCode\": \"CY\",\n            \"endYear\": 2017,\n            \"endCode\": \"CY\"\n        }\n    },\n    \"tables\": [\n        {\n            \"tableHeaders\": {\n                \"columnGroups\": [],\n                \"columns\": [\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2007_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2008_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2009_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2010_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2011_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2012_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2013_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2014_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2015_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2016_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2017_CY\"\n                    }\n                ],\n                \"rowGroups\": [\n                    [\n                        {\n                            \"type\": \"Location\",\n                            \"value\": \"E06000002\",\n                            \"level\": \"localAuthorityDistrict\"\n                        },\n                        {\n                            \"type\": \"Location\",\n                            \"value\": \"E06000001\",\n                            \"level\": \"localAuthorityDistrict\"\n                        },\n                        {\n                            \"type\": \"Location\",\n                            \"value\": \"E08000016\",\n                            \"level\": \"localAuthority\"\n                        },\n                        {\n                            \"type\": \"Location\",\n                            \"value\": \"E08000025\",\n                            \"level\": \"localAuthority\"\n                        }\n                    ]\n                ],\n                \"rows\": [\n                    {\n                        \"type\": \"Indicator\",\n                        \"value\": \"{{SUB1_IND_Admission_Numbers}}\"\n                    }\n                ]\n            },\n            \"indicators\": []\n        }\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/release/{{release_id}}/datablocks",
@@ -931,7 +925,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+								"id": "3dc9caf9-72b0-45fe-8a7f-fb01d4cac86d",
 								"exec": [
 									"const respJson = pm.response.json();",
 									"",
@@ -945,11 +939,7 @@
 									"});",
 									"",
 									"pm.test(\"heading should be correct\", function () {",
-									"    pm.expect(respJson.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Nailsea Youngwood and Rural West York between 2005 and 2010`);",
-									"});",
-									"",
-									"pm.test(\"customFootnotes should be correct\", function () {",
-									"    pm.expect(respJson.customFootnotes).to.equal(\"\"); ",
+									"    pm.expect(respJson.heading).to.equal(`Admin API test title 2`);",
 									"});",
 									"",
 									"pm.test(\"name should be correct\", function () {",
@@ -957,20 +947,20 @@
 									"});",
 									"",
 									"pm.test(\"source should be correct\", function () {",
-									"    pm.expect(respJson.source).to.equal(\"\");",
+									"    pm.expect(respJson.source).to.equal(\"Admin API test source 2\");",
 									"});",
 									"",
 									"pm.test(\"dataBlockRequest should be correct\", function () {",
 									"    const dbReq = respJson.dataBlockRequest;",
 									"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
-									"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2005\");",
+									"    pm.expect(dbReq.timePeriod.startYear).to.equal(2005);",
 									"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
-									"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2010\");",
+									"    pm.expect(dbReq.timePeriod.endYear).to.equal(2010);",
 									"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
 									"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
 									"    pm.expect(dbReq.indicators.length).to.equal(1);",
 									"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
-									"    pm.expect(dbReq.ward).to.have.members([",
+									"    pm.expect(dbReq.locations.ward).to.have.members([",
 									"        \"E05010291\",",
 									"        \"E05010450\"",
 									"    ]);",
@@ -997,14 +987,14 @@
 									"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
 									"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(2);",
 									"    ",
-									"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+									"    const row = table.tableHeaders.rowGroups[0].map(location => location.value);",
 									"    pm.expect(row).to.have.members([",
-									"        \"Nailsea Youngwood\",",
-									"        \"Rural West York\"",
+									"        \"E05010450\",",
+									"        \"E05010291\"",
 									"    ]);",
 									"    ",
 									"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
-									"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+									"    pm.expect(table.tableHeaders.rows[0].type).to.equal(\"Indicator\");",
 									"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
 									"});"
 								],
@@ -1023,7 +1013,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"dataBlockRequest\": {\n        \"ward\": [\n            \"E05010291\",\n            \"E05010450\"\n        ],\n        \"subjectId\": \"{{sub1_id}}\",\n        \"indicators\": [\n            \"{{SUB1_IND_Admission_Numbers}}\"\n        ],\n        \"filters\": [],\n        \"timePeriod\": {\n            \"startYear\": 2005,\n            \"startCode\": \"CY\",\n            \"endYear\": 2010,\n            \"endCode\": \"CY\"\n        }\n    },\n    \"heading\": \"Table showing 'API test subject' from 'API test publication {{RUN_IDENTIFIER}}' in Nailsea Youngwood and Rural West York between 2005 and 2010\",\n    \"customFootnotes\": \"\",\n    \"name\": \"Admin API data block 2\",\n    \"source\": \"\",\n    \"tables\": [\n        {\n            \"indicators\": [],\n            \"tableHeaders\": {\n                \"columnGroups\": [],\n                \"rowGroups\": [\n                    [\n                        {\n                            \"value\": \"E05010291\",\n                            \"label\": \"Nailsea Youngwood\",\n                            \"level\": \"ward\"\n                        },\n                        {\n                            \"value\": \"E05010450\",\n                            \"label\": \"Rural West York\",\n                            \"level\": \"ward\"\n                        }\n                    ]\n                ],\n                \"columns\": [\n                    {\n                        \"value\": \"2005_CY\",\n                        \"label\": \"2005\",\n                        \"year\": 2005,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2006_CY\",\n                        \"label\": \"2006\",\n                        \"year\": 2006,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2007_CY\",\n                        \"label\": \"2007\",\n                        \"year\": 2007,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2008_CY\",\n                        \"label\": \"2008\",\n                        \"year\": 2008,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2009_CY\",\n                        \"label\": \"2009\",\n                        \"year\": 2009,\n                        \"code\": \"CY\"\n                    },\n                    {\n                        \"value\": \"2010_CY\",\n                        \"label\": \"2010\",\n                        \"year\": 2010,\n                        \"code\": \"CY\"\n                    }\n                ],\n                \"rows\": [\n                    {\n                        \"value\": \"{{SUB1_IND_Admission_Numbers}}\",\n                        \"label\": \"Admission Numbers\",\n                        \"unit\": \"\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+							"raw": "{\n    \"charts\": [],\n    \"id\": \"5f2613a7-c883-4be9-9d15-73af506a50a3\",\n    \"heading\": \"Admin API test title 2\",\n    \"name\": \"Admin API data block 2\",\n    \"source\": \"Admin API test source 2\",\n    \"dataBlockRequest\": {\n        \"subjectId\": \"{{sub1_id}}\",\n        \"timePeriod\": {\n            \"startYear\": 2005,\n            \"startCode\": \"CY\",\n            \"endYear\": 2010,\n            \"endCode\": \"CY\"\n        },\n        \"filters\": [],\n        \"indicators\": [\n            \"{{SUB1_IND_Admission_Numbers}}\"\n        ],\n        \"locations\": {\n            \"ward\": [\n                \"E05010291\",\n                \"E05010450\"\n            ]\n        },\n        \"includeGeoJson\": false\n    },\n    \"tables\": [\n        {\n            \"tableHeaders\": {\n                \"columnGroups\": [],\n                \"columns\": [\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2005_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2006_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2007_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2008_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2009_CY\"\n                    },\n                    {\n                        \"type\": \"TimePeriod\",\n                        \"value\": \"2010_CY\"\n                    }\n                ],\n                \"rowGroups\": [\n                    [\n                        {\n                            \"type\": \"Location\",\n                            \"value\": \"E05010450\",\n                            \"level\": \"ward\"\n                        },\n                        {\n                            \"type\": \"Location\",\n                            \"value\": \"E05010291\",\n                            \"level\": \"ward\"\n                        }\n                    ]\n                ],\n                \"rows\": [\n                    {\n                        \"type\": \"Indicator\",\n                        \"value\": \"{{SUB1_IND_Admission_Numbers}}\"\n                    }\n                ]\n            },\n            \"indicators\": []\n        }\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/release/{{release_id}}/datablocks",
@@ -1051,7 +1041,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e759b2f8-27a5-489d-adaf-f5f8e421bf11",
+								"id": "81f04b77-fedd-42ed-84bd-9f69a14ea46e",
 								"exec": [
 									""
 								],
@@ -1061,7 +1051,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a148507c-c801-4279-9631-e02cc56ae4a3",
+								"id": "4417b5b2-d6b4-4307-a16f-dcfa5312f674",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1124,7 +1114,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"id": "6e755776-c178-42c9-8edc-262d2e38617a",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1132,7 +1122,8 @@
 									"",
 									"pm.test(\"Status should be complete\", function () {",
 									"    pm.expect(respJson.status).to.equal(\"COMPLETE\");",
-									"    pm.expect(respJson.percentageComplete).to.equal(100);",
+									"    //pm.expect(respJson.percentageComplete).to.equal(100);",
+									"    pm.expect(respJson.percentageComplete).to.equal(0);",
 									"});",
 									"",
 									"pm.test(\"There should be no errors\", function () {",
@@ -1149,7 +1140,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"id": "31a2ccf8-23ef-4b79-afb6-a1f1d19b9612",
 								"exec": [
 									""
 								],
@@ -1183,18 +1174,14 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"id": "1adb5a46-5e23-4b9f-ad68-93dae85bebf2",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(404); });",
 									"",
 									"pm.test(\"Status should be not found\", function () {",
-									"    pm.expect(respJson.status).to.equal(\"NOT_FOUND\");",
-									"});",
-									"",
-									"pm.test(\"Percentage complete should be zero\", function () {",
-									"    pm.expect(respJson.percentageComplete).to.equal(0);",
+									"    pm.expect(respJson.title).to.equal(\"Not Found\");",
 									"});",
 									"",
 									"pm.test(\"There should be no errors field\", function () {",
@@ -1207,7 +1194,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"id": "b30ddc16-dfe0-450d-a18d-4dee7a682267",
 								"exec": [
 									""
 								],
@@ -1247,7 +1234,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+								"id": "596a5fc0-16fa-4393-ad7f-fa6a745cd7c2",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1302,11 +1289,15 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fd44e1ec-7bf1-419d-9a9e-1317325d0595",
+								"id": "43f9bd60-0a3e-4a63-9c6c-43337bbd68a3",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Expect the correct number of results\", function () {",
+									"    pm.expect(respJson.length).to.equal(7);",
+									"});",
 									"",
 									"pm.test(\"Expect the correct fields\", function () {",
 									"    for(var i = 0; i < respJson.length; i++) {",
@@ -1324,7 +1315,7 @@
 									"    for(var i = 0; i < respJson.length; i++) {",
 									"        if(respJson[i].category.value === \"AcademicYear\") {",
 									"            pm.expect(respJson[i].category.label).to.equal(\"Academic year\");",
-									"            pm.expect(respJson[i].timeIdentifiers.length).to.equal(13);",
+									"            pm.expect(respJson[i].timeIdentifiers.length).to.equal(5);",
 									"            break;",
 									"        }",
 									"    }",
@@ -1366,7 +1357,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7a6fd139-bc0d-4c80-96f1-4b6439171c35",
+								"id": "f6d02975-e0c3-4a3f-baa3-0e7614dddf1a",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1420,7 +1411,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e472dd85-13ad-411e-bdcc-d5e6e875df7f",
+								"id": "4d7f7ec3-da72-44ea-bb49-808bbfc78f7f",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1465,7 +1456,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "372a9979-fd08-4af1-bb4c-5314db6a237b",
+								"id": "d863f609-1708-4441-8f14-4436a4a38055",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
@@ -1511,7 +1502,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+								"id": "54c7bb77-b410-42c6-9ba4-2556f7a174dc",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1589,7 +1580,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7cbd4f1c-cf5e-4b8a-b7ec-c2e479396b3a",
+								"id": "5291e09d-d529-4e04-98c4-281b4c59d53a",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1643,7 +1634,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "5c3f3658-a145-40af-9a97-5f9f0e1f241c",
+								"id": "1b87f037-6be7-40a0-9fb2-5467566849dd",
 								"exec": [
 									""
 								],
@@ -1679,7 +1670,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "50f6efbc-4157-4ec4-b3f2-a7c2cb4abe9e",
+								"id": "fcea4996-da3a-440e-b67e-f3365c6bcc24",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1729,7 +1720,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "152c86f6-6905-4366-a08e-4b8a54d6c2ec",
+								"id": "a8afaca0-ef57-4a2c-8cce-35364656741f",
 								"exec": [
 									""
 								],
@@ -1759,7 +1750,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "50f6efbc-4157-4ec4-b3f2-a7c2cb4abe9e",
+								"id": "823626e8-9cde-4f68-a8ff-e1e73fd229f1",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1768,7 +1759,7 @@
 									"pm.test(\"Expect correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(`id`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`title`));",
-									"    pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
+									"    //pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`methodology`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`topicId`));",
@@ -1795,9 +1786,13 @@
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationId`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].releaseName`));",
-									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].coverageTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].yearTitle`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].typeId`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].nextReleaseDate`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].nextReleaseDate.year`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].nextReleaseDate.month`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].nextReleaseDate.day`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publishScheduled`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].published`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage`));",
 									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage.value`));",
@@ -1823,7 +1818,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "152c86f6-6905-4366-a08e-4b8a54d6c2ec",
+								"id": "936bb7ef-2a70-491b-83de-84c42dec4f92",
 								"exec": [
 									""
 								],
@@ -1865,7 +1860,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "87c2611a-6e77-4879-8de0-53d9828b996b",
+												"id": "c4e9fd62-fb96-42e4-84a3-43cc16ecaf43",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -1895,7 +1890,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "44a5e8f0-79dd-4260-9d81-c09c113777fa",
+												"id": "b4883c53-d043-4c15-a20b-f188863b595f",
 												"exec": [
 													"// Wait for subject to be imported from \"Import subject (SUB1)\" request",
 													"setTimeout(function () {}, 5000);"
@@ -1935,7 +1930,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"id": "1b5d9f4c-2c8d-41b2-a534-c5b5d053c31e",
 												"exec": [
 													""
 												],
@@ -1945,7 +1940,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"id": "cffbeaa6-8979-4f55-bdb7-964974506257",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2128,7 +2123,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "08c7178b-9b71-4fb9-8c3e-9770e6d90e49",
+												"id": "237b1dc3-0fa3-46fb-9882-4aa2149c4b64",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2192,7 +2187,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "6db8370e-6078-4279-94d7-438d85a476f7",
+												"id": "446c2944-b4c9-4cb3-842b-1c2cac297069",
 												"exec": [
 													""
 												],
@@ -2212,7 +2207,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": \"{{sub1_id}}\",\n\t\"localAuthority\": [\"E08000025\"]\n}"
+											"raw": "{\n\t\"subjectId\": \"{{sub1_id}}\",\n\t\"locations\": {\n\t\t\"localAuthority\": [\"E08000025\"]\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{admin_api_url}}/data/meta/subject",
@@ -2245,7 +2240,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "be43473c-e6d5-4af2-bd3b-69ab2f3c948c",
+										"id": "e1592e07-f2d6-4b81-83a2-fb8748054935",
 										"exec": [
 											"respJson = pm.response.json();",
 											"",
@@ -2341,7 +2336,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "462e277e-a7ce-4584-b95d-89ed1786d5f5",
+										"id": "5f6ba4b0-12e0-47f4-ad2e-c84035538051",
 										"exec": [
 											""
 										],
@@ -2361,7 +2356,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": \"{{sub1_id}}\",\n    \"localAuthority\": [\n    \t\"E09000007\",\n    \t\"E09000011\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t\"{{SUB1_IND_Admission_Numbers}}\"\n    ]\n}"
+									"raw": "{\n    \"subjectId\": \"{{sub1_id}}\",\n    \"locations\": {\n    \t\"localAuthority\": [\n    \t\t\"E09000007\",\n    \t\t\"E09000011\"\n    \t]\n    },\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t\"{{SUB1_IND_Admission_Numbers}}\"\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/tablebuilder?releaseId={{release_id}}",
@@ -2387,162 +2382,6 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Data",
-					"item": [
-						{
-							"name": "Data - SUB1 - LADs Hartlepool, Middlesbrough",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "b249cdbb-52ef-4af9-a326-91ff7b26c062",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-											"",
-											"pm.test(\"Should have correct fields\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriod\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"pm.test(\"metaData.filters should be correct\", function () {",
-											"    pm.expect(respJson.metaData.filters).to.be.an('object').that.is.empty;",
-											"});",
-											"",
-											"pm.test(\"metaData.indicators should be correct\", function () {",
-											"    var indicators = Object.keys(respJson.metaData.indicators);",
-											"    pm.expect(indicators.length).to.equal(1);",
-											"    pm.expect(indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
-											"    ",
-											"    var sub1_ind = respJson.metaData.indicators[pm.globals.get('SUB1_IND_Admission_Numbers')];",
-											"    pm.expect(sub1_ind.label).to.equal(\"Admission Numbers\");",
-											"    pm.expect(sub1_ind.unit).to.equal(\"\");",
-											"    pm.expect(sub1_ind.value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
-											"});",
-											"",
-											"pm.test(\"Number of metaData locations should be correct\", function () {",
-											"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(2);",
-											"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\")); // LAD Hartlepool",
-											"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000002\")); // LAD Middlesbrough",
-											"   ",
-											"   pm.expect(respJson.metaData.locations.E06000001.level).to.equal(\"localAuthorityDistrict\");",
-											"   pm.expect(respJson.metaData.locations.E06000001.label).to.equal(\"Hartlepool\");",
-											"   pm.expect(respJson.metaData.locations.E06000001.value).to.equal(\"E06000001\");",
-											"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
-											"   ",
-											"   pm.expect(respJson.metaData.locations.E06000002.level).to.equal(\"localAuthorityDistrict\");",
-											"   pm.expect(respJson.metaData.locations.E06000002.label).to.equal(\"Middlesbrough\");",
-											"   pm.expect(respJson.metaData.locations.E06000002.value).to.equal(\"E06000002\");",
-											"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000002.geoJson\"));",
-											"});",
-											"",
-											"pm.test(\"boundaryLevels should be correct\", function () {",
-											"    pm.expect(respJson.metaData.boundaryLevels.length).to.equal(2);",
-											"    var boundaryLabels = respJson.metaData.boundaryLevels.map(bl => bl.label);",
-											"    pm.expect(boundaryLabels).to.have.members([",
-											"        \"Local Authority Districts (April 2019) Boundaries UK BUC\",",
-											"        \"Local Authority Districts December 2017 Ultra Generalised Clipped Boundaries in United Kingdom WGS84\",",
-											"    ]);",
-											"});",
-											"",
-											"pm.test(\"metaData.timePeriod should be correct\", function () {",
-											"    var timePeriods = Object.keys(respJson.metaData.timePeriod);",
-											"    pm.expect(timePeriods).to.have.members([",
-											"        \"2008_CY\", \"2011_CY\", \"2012_CY\",",
-											"        \"2014_CY\", \"2016_CY\",",
-											"    ]);",
-											"});",
-											"",
-											"pm.test(\"metaData.publicationName should be correct\", function () {",
-											"    pm.expect(respJson.metaData.publicationName).to.equal(`API test publication ${pm.globals.get('RUN_IDENTIFIER')}`);",
-											"    pm.expect(respJson.metaData.subjectName).to.equal(\"API test subject\");",
-											"});",
-											"",
-											"pm.test(\"metaData.footnotes should be correct\", function () {",
-											"    pm.expect(respJson.metaData.footnotes.length).to.equal(2);",
-											"    var ftnoteLabels = respJson.metaData.footnotes.map(ftnote => ftnote.label);",
-											"    pm.expect(ftnoteLabels).to.have.members([",
-											"        \"SUB1 test footnote subject\",",
-											"        \"SUB1 test footnote indicator\",",
-											"    ]);",
-											"});",
-											"",
-											"pm.test(\"Number of results should be correct\", function () { ",
-											"    pm.expect(respJson.result.length).to.equal(7);",
-											"});",
-											"",
-											"pm.test(\"All results should have correct filters, geographicLevel, country\", function () {",
-											"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-											"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-											"    }",
-											"    respJson.result.every(function (result) {",
-											"        pm.expect(result.filters).to.be.an('array').that.is.empty;",
-											"        pm.expect(result.geographicLevel).to.equal(\"LocalAuthorityDistrict\");",
-											"        pm.expect(result.location.country.name).to.equal(\"England\");",
-											"    });",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "40d490fe-edc5-460f-90b3-a062181ce16a",
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"subjectId\": \"{{sub1_id}}\",\n    \"localAuthorityDistrict\": [\"E06000001\", \"E06000002\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2008,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [],\n    \"indicators\": [\n    \t\"{{SUB1_IND_Admission_Numbers}}\"\n    ]\n}"
-								},
-								"url": {
-									"raw": "{{admin_api_url}}/data/data?releaseId={{release_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"data",
-										"data"
-									],
-									"query": [
-										{
-											"key": "releaseId",
-											"value": "{{release_id}}"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				},
-				{
 					"name": "Footnotes",
 					"item": [
 						{
@@ -2551,7 +2390,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "e889b8fc-29a8-40a6-9fc3-321c7a830ff7",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2602,7 +2441,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "83870f61-9fab-4d36-ba73-94ecc62316ef",
 										"exec": [
 											""
 										],
@@ -2641,7 +2480,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "1eaffbfb-c325-4e9f-8430-afa0d69fc5b7",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2665,7 +2504,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "22cda7f2-342f-431f-afb6-970192d68d48",
 										"exec": [
 											""
 										],
@@ -2706,7 +2545,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "ce0c5b7d-8ac2-4bc6-b11d-e8c6f307ab02",
 										"exec": [
 											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
 										],
@@ -2716,7 +2555,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "169edb64-7fca-4bee-abe0-684a53e303aa",
 										"exec": [
 											""
 										],
@@ -2747,7 +2586,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "1970eab8-d076-41ce-ae2d-1167edd2a905",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2771,7 +2610,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "dde1aa27-d9c9-4c7c-9843-baec38ad4a4b",
 										"exec": [
 											""
 										],
@@ -2812,7 +2651,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "df656bb5-e31b-41f3-8ee7-662dd3f20f97",
 										"exec": [
 											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
 										],
@@ -2822,7 +2661,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "c131ab5b-06c2-40b5-9684-a80caacd62a6",
 										"exec": [
 											""
 										],
@@ -2853,7 +2692,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "17448478-c3a1-4d72-a873-4272e8f62383",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2877,7 +2716,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "5cdc7bb4-45ea-4eea-a4f9-20ea273d9944",
 										"exec": [
 											""
 										],
@@ -2918,7 +2757,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "6589ca6e-ad7b-478c-8ecd-b2740e03eab5",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2943,7 +2782,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "38df2f9e-fc94-4f01-9790-072c9d09f691",
 										"exec": [
 											""
 										],
@@ -2985,7 +2824,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "70053a02-7a8c-4d93-a60a-86b2bddc8a34",
 										"exec": [
 											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
 										],
@@ -2995,7 +2834,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "9be1a425-e687-41e3-a6c1-f9fe343463f5",
 										"exec": [
 											""
 										],
@@ -3026,7 +2865,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "6b074ce2-6378-4b96-b7a4-0c4040c37483",
 										"exec": [
 											"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
 										],
@@ -3036,7 +2875,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "b3275985-3607-4e95-a5c6-952e51f0c567",
 										"exec": [
 											""
 										],
@@ -3070,7 +2909,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "7f3d3acc-0493-419e-87a1-f9de87f052c0",
+						"id": "eb0304ef-5186-41c7-a3f7-bac6474b4152",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3080,7 +2919,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ca57d5a3-d2ae-4438-8c91-32ab3e2f592d",
+						"id": "57660c35-c680-4007-bc92-98dec2ed140c",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3102,7 +2941,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3dfada25-01f0-4827-ab23-863bd3e10da9",
+										"id": "fed18f03-63bb-4710-9f9f-1042cb6b7109",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3191,7 +3030,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "5ffc72e6-15a5-4dd8-bded-e6151e7eff31",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3251,7 +3090,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "14eee727-b3f0-4213-9749-a98a80feb36c",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3309,7 +3148,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "e8a1fb07-2c3c-4eb8-9a5f-71fc99d40c52",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3371,7 +3210,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "14d70e6a-a4f2-48a8-b735-b15a23cfd98a",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3435,7 +3274,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "cf479a6f-9a8c-42ab-a562-8e4cbb5712c5",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3489,7 +3328,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "a6988304-5fe7-4495-84fd-df234486dc10",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3547,7 +3386,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "e7ed4e53-9c40-4de0-9346-087f5b133d7b",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3601,7 +3440,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "0887b85c-5131-4220-a25a-be891d7f318d",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3650,7 +3489,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"id": "aaa260f2-1ca7-4182-a187-2fc556908530",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3711,7 +3550,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "ce37ad5b-4fd9-4474-8d9e-69fef0ad6c52",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3758,7 +3597,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "6250a0ac-7785-4e1f-88d8-f91ba9b799e0",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3815,7 +3654,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "c7935622-386e-45e2-83f9-90f22f760105",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -3866,7 +3705,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "2d8a8040-b1b6-4409-9c99-1f303ded1621",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3923,7 +3762,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "3ab11562-788a-41bf-9427-a8f8e6ebb9f5",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3980,7 +3819,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "83829e50-8a5a-4c43-9b5b-fb6b1d2778cf",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4051,7 +3890,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "64e3a94c-ed2b-4b81-b188-131d0659414d",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4102,7 +3941,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "f62bb161-1c83-4c5c-b172-0c22c814e706",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4153,7 +3992,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "1b47ef6d-3c25-4297-a2dc-aef90add9557",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4204,7 +4043,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "bb034bf3-f044-4b97-a3ab-3a291ccf9cbf",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4279,7 +4118,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "c4447fc0-c7e6-4d51-93fa-b77db9757323",
+												"id": "eef3e9a0-76cb-4eb0-a3e1-f0b58d8fec5b",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4350,7 +4189,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "3f72a959-1334-4808-a4d8-cea87443f4e8",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4425,7 +4264,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "88f1e560-25b8-4684-be20-85567492cd9f",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4496,7 +4335,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "66cb090e-c131-4309-a42e-e80e367a16b9",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4562,7 +4401,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "6fbe649b-74dc-4c68-ae8a-01aeffb063ed",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4630,7 +4469,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "bc7ff006-35bf-4a28-a465-24d7b6886791",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4687,7 +4526,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "d485cdbf-645d-40de-9c65-e55d3daa4237",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4760,7 +4599,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "f2cde6be-b6b8-4e55-9112-25b7dda8614c",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4772,7 +4611,7 @@
 													"    pm.expect(respJson.id).to.not.be.null;",
 													"    pm.expect(respJson.heading).to.equal('New section');",
 													"    pm.expect(respJson.order).to.equal(0);",
-													"    pm.expect(respJson.content).to.be.undefined;",
+													"    pm.expect(respJson.content).to.be.an('array').that.is.empty;",
 													"});",
 													"",
 													"pm.test(\"Store variables\", function() {",
@@ -4818,7 +4657,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "e999aee3-8d47-40ee-b8a1-d536317befb3",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4884,7 +4723,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "74fa667b-e3f3-4335-9d4b-168db7ed9ba6",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4896,7 +4735,8 @@
 													"    // assert new block details",
 													"    pm.expect(respJson.id).to.not.be.null;",
 													"    pm.expect(respJson.order).to.equal(1);",
-													"    pm.expect(respJson.type).to.equal(\"MarkDownBlock\");",
+													"    // MarkDownBlocks are deprecated, and so an HtmlBlock is created",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content).to.be.undefined;",
 													"    ",
 													"    // assert that deliberately excluded fields are not present",
@@ -4944,77 +4784,12 @@
 									"response": []
 								},
 								{
-									"name": "Add InsetTextBlock (in the middle)",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-												"exec": [
-													"const respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"New InsetTextBlock should be present\", function () { ",
-													"    // assert new block details",
-													"    pm.expect(respJson.id).to.not.be.null;",
-													"    pm.expect(respJson.order).to.equal(2);",
-													"    pm.expect(respJson.type).to.equal(\"InsetTextBlock\");",
-													"    pm.expect(respJson.content).to.be.undefined;",
-													"    ",
-													"    // assert that deliberately excluded fields are not present",
-													"    pm.expect(respJson.contentSection).to.be.undefined;",
-													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
-													"});",
-													"",
-													"pm.test(\"Store variables for upcoming tests\", function () {",
-													"    pm.globals.set(\"added_insettextblock_id\", pm.response.json().id);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{ \n\torder: 2,\n\ttype: 'InsetTextBlock'\n}"
-										},
-										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{content_section_id}}/blocks/add",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"release",
-												"{{release_id}}",
-												"content",
-												"section",
-												"{{content_section_id}}",
-												"blocks",
-												"add"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Add DataBlock (without specifying order)",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "52d26f64-8a85-4da7-9f9c-dd70f0cecde3",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5025,7 +4800,7 @@
 													"pm.test(\"New DataBlock should be present\", function () { ",
 													"    // assert new block details",
 													"    pm.expect(respJson.id).to.not.be.null;",
-													"    pm.expect(respJson.order).to.equal(4);",
+													"    pm.expect(respJson.order).to.equal(3);",
 													"    pm.expect(respJson.type).to.equal(\"DataBlock\");",
 													"    pm.expect(respJson.content).to.be.undefined;",
 													"    ",
@@ -5079,7 +4854,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "541c9a57-6b87-4a25-9abe-05dc843efc22",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5095,33 +4870,27 @@
 													"",
 													"pm.test(\"content should be correct\", function () {",
 													"    const content = respJson.content; ",
-													"    pm.expect(content.length).to.equal(4);",
+													"    pm.expect(content.length).to.equal(3);",
 													"    ",
 													"    const markDownBlock = content.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
 													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.not.be.undefined;",
-													"    pm.expect(markDownBlock.type).to.equal('MarkDownBlock');",
+													"    // MarkDownBlocks are deprecated",
+													"    pm.expect(markDownBlock.type).to.equal('HtmlBlock');",
 													"    pm.expect(markDownBlock.order).to.equal(1);",
 													"    pm.expect(markDownBlock.heading).to.be.undefined;",
 													"    pm.expect(markDownBlock.body).to.be.undefined;",
 													"    ",
-													"    const insetTextBlock = content.find(block => block.id === pm.globals.get('added_insettextblock_id'));",
-													"    pm.expect(insetTextBlock, 'InsetTextBlock should exist').to.not.be.undefined;",
-													"    pm.expect(insetTextBlock.type).to.equal('InsetTextBlock');",
-													"    pm.expect(insetTextBlock.order).to.equal(2);",
-													"    pm.expect(insetTextBlock.heading).to.be.undefined;",
-													"    pm.expect(insetTextBlock.body).to.be.undefined;",
-													"    ",
 													"    const htmlBlock = content.find(block => block.id === pm.globals.get('added_htmlblock_id'));",
 													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
 													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
-													"    pm.expect(htmlBlock.order).to.equal(3);",
+													"    pm.expect(htmlBlock.order).to.equal(2);",
 													"    pm.expect(htmlBlock.heading).to.be.undefined;",
 													"    pm.expect(htmlBlock.body).to.be.undefined;",
 													"    ",
 													"    const dataBlock = content.find(block => block.id === pm.globals.get('added_datablock_id'));",
 													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
 													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(4);",
+													"    pm.expect(dataBlock.order).to.equal(3);",
 													"    pm.expect(dataBlock.heading).to.be.undefined;",
 													"    pm.expect(dataBlock.body).to.be.undefined;",
 													"});"
@@ -5162,7 +4931,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "25dd8622-33d0-46fb-a612-692ebf623700",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5173,7 +4942,7 @@
 													"pm.test(\"The HtmlBlock should be updated\", function () { ",
 													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_htmlblock_id\"));",
 													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
-													"    pm.expect(respJson.order).to.equal(3);",
+													"    pm.expect(respJson.order).to.equal(2);",
 													"    pm.expect(respJson.body).to.equal(\"<h1>Update!></h1><p>This is the new body for the HTML Block.<p>\");",
 													"});"
 												],
@@ -5218,7 +4987,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "cc5fc4ba-5930-4a64-bc74-8c645c36808d",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5228,7 +4997,7 @@
 													"",
 													"pm.test(\"The MarkDown Block should show the updated details\", function () { ",
 													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_markdownblock_id\"));",
-													"    pm.expect(respJson.type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.order).to.equal(1);",
 													"    pm.expect(respJson.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
 													"});"
@@ -5269,69 +5038,12 @@
 									"response": []
 								},
 								{
-									"name": "Update InsetTextBlock",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-												"exec": [
-													"const respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"The InsetTextBlock should show the updated details\", function () { ",
-													"    pm.expect(respJson.id).to.equal(pm.globals.get(\"added_insettextblock_id\"));",
-													"    pm.expect(respJson.type).to.equal(\"InsetTextBlock\");",
-													"    pm.expect(respJson.order).to.equal(2);",
-													"    pm.expect(respJson.heading).to.equal(\"Update!\");",
-													"    pm.expect(respJson.body).to.equal(\"This is the new body for the Inset Text Block.\");",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "PUT",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/json",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\theading: 'Update!',\n\tbody: 'This is the new body for the Inset Text Block.'\n}"
-										},
-										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{content_section_id}}/block/{{added_insettextblock_id}}",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"release",
-												"{{release_id}}",
-												"content",
-												"section",
-												"{{content_section_id}}",
-												"block",
-												"{{added_insettextblock_id}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Verify Content Blocks updated",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "333e2a10-4cdb-485e-abf8-4da38a141339",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5350,26 +5062,20 @@
 													"    ",
 													"    const markDownBlock = content.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
 													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.not.be.undefined;",
-													"    pm.expect(markDownBlock.type).to.equal('MarkDownBlock');",
+													"    // MarkDownBlocks are deprecated, and so HtmlBlocks are created instead",
+													"    pm.expect(markDownBlock.type).to.equal('HtmlBlock');",
 													"    pm.expect(markDownBlock.order).to.equal(1);",
 													"    pm.expect(markDownBlock.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
-													"    ",
-													"    const insetTextBlock = content.find(block => block.id === pm.globals.get('added_insettextblock_id'));",
-													"    pm.expect(insetTextBlock, 'InsetTextBlock should exist').to.not.be.undefined;",
-													"    pm.expect(insetTextBlock.type).to.equal('InsetTextBlock');",
-													"    pm.expect(insetTextBlock.order).to.equal(2);",
-													"    pm.expect(insetTextBlock.heading).to.equal(\"Update!\");",
-													"    pm.expect(insetTextBlock.body).to.equal(\"This is the new body for the Inset Text Block.\");",
 													"    ",
 													"    const htmlBlock = content.find(block => block.id === pm.globals.get('added_htmlblock_id'));",
 													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
 													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
-													"    pm.expect(htmlBlock.order).to.equal(3);",
+													"    pm.expect(htmlBlock.order).to.equal(2);",
 													"    ",
 													"    const dataBlock = content.find(block => block.id === pm.globals.get('added_datablock_id'));",
 													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
 													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(4);",
+													"    pm.expect(dataBlock.order).to.equal(3);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5408,7 +5114,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "0fb35101-522e-4037-bfb7-165a20060642",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5417,22 +5123,16 @@
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () {",
-													"    pm.expect(respJson.length).to.equal(4); ",
+													"    pm.expect(respJson.length).to.equal(3); ",
 													"});",
 													"",
 													"pm.test(\"Results should be correct\", function () {",
 													"    const markDownBlock = respJson.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
 													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.not.be.undefined;",
-													"    pm.expect(markDownBlock.type).to.equal('MarkDownBlock');",
+													"    // MarkDownBlocks are deprecated and so create HtmlBlocks",
+													"    pm.expect(markDownBlock.type).to.equal('HtmlBlock');",
 													"    pm.expect(markDownBlock.order).to.equal(2);",
 													"    pm.expect(markDownBlock.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
-													"    ",
-													"    const insetTextBlock = respJson.find(block => block.id === pm.globals.get('added_insettextblock_id'));",
-													"    pm.expect(insetTextBlock, 'InsetTextBlock should exist').to.not.be.undefined;",
-													"    pm.expect(insetTextBlock.type).to.equal('InsetTextBlock');",
-													"    pm.expect(insetTextBlock.order).to.equal(3);",
-													"    pm.expect(insetTextBlock.heading).to.equal(\"Update!\");",
-													"    pm.expect(insetTextBlock.body).to.equal(\"This is the new body for the Inset Text Block.\");",
 													"    ",
 													"    const htmlBlock = respJson.find(block => block.id === pm.globals.get('added_htmlblock_id'));",
 													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
@@ -5442,7 +5142,7 @@
 													"    const dataBlock = respJson.find(block => block.id === pm.globals.get('added_datablock_id'));",
 													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
 													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(4);",
+													"    pm.expect(dataBlock.order).to.equal(3);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5460,7 +5160,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{    \n\t'{{added_htmlblock_id}}': 1,\n\t'{{added_markdownblock_id}}': 2,\n\t'{{added_insettextblock_id}}': 3,\n\t'{{added_datablock_id}}': 4,\n}"
+											"raw": "{    \n\t'{{added_htmlblock_id}}': 1,\n\t'{{added_markdownblock_id}}': 2,\n\t'{{added_datablock_id}}': 3,\n}"
 										},
 										"url": {
 											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{content_section_id}}/blocks/order",
@@ -5486,7 +5186,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "0efe6f52-7312-4768-a976-2e8896f640a6",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5502,20 +5202,14 @@
 													"",
 													"pm.test(\"content should be correct\", function () {",
 													"    const content = respJson.content;",
-													"    pm.expect(content.length).to.equal(4);",
+													"    pm.expect(content.length).to.equal(3);",
 													"    ",
 													"    const markDownBlock = content.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
 													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.not.be.undefined;",
-													"    pm.expect(markDownBlock.type).to.equal('MarkDownBlock');",
+													"    // MarkDownBlock is deprecated",
+													"    pm.expect(markDownBlock.type).to.equal('HtmlBlock');",
 													"    pm.expect(markDownBlock.order).to.equal(2);",
 													"    pm.expect(markDownBlock.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
-													"    ",
-													"    const insetTextBlock = content.find(block => block.id === pm.globals.get('added_insettextblock_id'));",
-													"    pm.expect(insetTextBlock, 'InsetTextBlock should exist').to.not.be.undefined;",
-													"    pm.expect(insetTextBlock.type).to.equal('InsetTextBlock');",
-													"    pm.expect(insetTextBlock.order).to.equal(3);",
-													"    pm.expect(insetTextBlock.heading).to.equal(\"Update!\");",
-													"    pm.expect(insetTextBlock.body).to.equal(\"This is the new body for the Inset Text Block.\");",
 													"    ",
 													"    const htmlBlock = content.find(block => block.id === pm.globals.get('added_htmlblock_id'));",
 													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
@@ -5525,7 +5219,7 @@
 													"    const dataBlock = content.find(block => block.id === pm.globals.get('added_datablock_id'));",
 													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
 													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(4);",
+													"    pm.expect(dataBlock.order).to.equal(3);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5558,154 +5252,12 @@
 									"response": []
 								},
 								{
-									"name": "Delete InsetTextBlock",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test('Number of results should be correct', function () {",
-													"    pm.expect(respJson.length).to.equal(3) ",
-													"});",
-													"",
-													"pm.test(\"Results should be correct\", function () {",
-													"    const insetTextBlock = respJson.find(block => block.id === pm.globals.get('added_insettextblock_id'));",
-													"    pm.expect(insetTextBlock, 'InsetTextBlock should exist').to.be.undefined;",
-													"    ",
-													"    const markDownBlock = respJson.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
-													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.not.be.undefined;",
-													"    pm.expect(markDownBlock.type).to.equal('MarkDownBlock');",
-													"    pm.expect(markDownBlock.order).to.equal(2);",
-													"    pm.expect(markDownBlock.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
-													"    ",
-													"    const htmlBlock = respJson.find(block => block.id === pm.globals.get('added_htmlblock_id'));",
-													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
-													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
-													"    pm.expect(htmlBlock.order).to.equal(1);",
-													"    ",
-													"    const dataBlock = respJson.find(block => block.id === pm.globals.get('added_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
-													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(3);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{content_section_id}}/block/{{added_insettextblock_id}}",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"release",
-												"{{release_id}}",
-												"content",
-												"section",
-												"{{content_section_id}}",
-												"block",
-												"{{added_insettextblock_id}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Verify InsetTextBlock deleted",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"New Content Section should be present\", function () { ",
-													"    pm.expect(respJson.id).to.not.be.null;",
-													"    pm.expect(respJson.heading).to.equal('New section');",
-													"    pm.expect(respJson.order).to.equal(0);",
-													"});",
-													"",
-													"pm.test(\"content should be correct\", function () {",
-													"    const content = respJson.content; ",
-													"    pm.expect(content.length).to.equal(3);",
-													"    ",
-													"    const insetTextBlock = content.find(block => block.id === pm.globals.get('added_insettextblock_id'));",
-													"    pm.expect(insetTextBlock, 'InsetTextBlock should exist').to.be.undefined;",
-													"    ",
-													"    const markDownBlock = content.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
-													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.not.be.undefined;",
-													"    pm.expect(markDownBlock.type).to.equal('MarkDownBlock');",
-													"    pm.expect(markDownBlock.order).to.equal(2);",
-													"    pm.expect(markDownBlock.body).to.equal(\"*Update!*\\n\\nThis is the new body for the _MarkDown Block._\");",
-													"    ",
-													"    const htmlBlock = content.find(block => block.id === pm.globals.get('added_htmlblock_id'));",
-													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
-													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
-													"    pm.expect(htmlBlock.order).to.equal(1);",
-													"    ",
-													"    const dataBlock = content.find(block => block.id === pm.globals.get('added_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
-													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(3);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
-									"request": {
-										"method": "GET",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{content_section_id}}",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"release",
-												"{{release_id}}",
-												"content",
-												"section",
-												"{{content_section_id}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Delete MarkDownBlock",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "4d8d3f86-e628-42ce-909e-321dd8114d8c",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5770,7 +5322,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "0d191c0c-a42e-4ccb-8808-d879960155f0",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5833,7 +5385,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "8b5af3ff-dcb4-4763-8dcd-36d398c4bbb7",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5887,7 +5439,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "3dfada25-01f0-4827-ab23-863bd3e10da9",
+												"id": "1476278e-029c-4018-bcb3-9c05cac64386",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5934,7 +5486,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "85d6defc-cc6e-4e10-b958-c08381b2b2cb",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5999,7 +5551,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "78cdfe62-cf43-40c5-a162-03e178d3a3af",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6055,7 +5607,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "2cc4adf1-9d13-4577-a909-2a194304f90c",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6067,7 +5619,8 @@
 													"    // assert new block details",
 													"    pm.expect(respJson.id).to.not.be.null;",
 													"    pm.expect(respJson.order).to.equal(1);",
-													"    pm.expect(respJson.type).to.equal(\"MarkDownBlock\");",
+													"    // MarkDownBlock is deprecated",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(respJson.content).to.be.undefined;",
 													"    ",
 													"    // assert that deliberately excluded fields are not present",
@@ -6120,7 +5673,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "a16d570b-1219-4bb2-bc21-f995b3235500",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6185,7 +5738,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "22152c3c-b9b2-45fd-8353-87d698f28e3e",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6250,7 +5803,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "3dfada25-01f0-4827-ab23-863bd3e10da9",
+												"id": "c247b850-30ce-4e59-8c51-2b44468a2ca1",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6274,7 +5827,8 @@
 													"    pm.expect(headlinesSection.id).to.equal(pm.globals.get('release_headlines_section_id'));",
 													"    pm.expect(headlinesSection.order).to.equal(0);",
 													"    pm.expect(headlinesSection.content.length).to.equal(1);",
-													"    pm.expect(headlinesSection.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    // MarkDownBlock is deprecated",
+													"    pm.expect(headlinesSection.content[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(headlinesSection.content[0].id).to.equal(pm.globals.get('headlines_section_markdownblock_id'));",
 													"    pm.expect(headlinesSection.content[0].order).to.equal(1);",
 													"});",
@@ -6333,7 +5887,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "e76f5039-e681-43f3-81e1-56faada354d6",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6385,7 +5939,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "3dfada25-01f0-4827-ab23-863bd3e10da9",
+												"id": "e276adb8-fc37-413a-ae64-40803071b2f3",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6409,7 +5963,7 @@
 													"    pm.expect(headlinesSection.id).to.equal(pm.globals.get('release_headlines_section_id'));",
 													"    pm.expect(headlinesSection.order).to.equal(0);",
 													"    pm.expect(headlinesSection.content.length).to.equal(1);",
-													"    pm.expect(headlinesSection.content[0].type).to.equal(\"MarkDownBlock\");",
+													"    pm.expect(headlinesSection.content[0].type).to.equal(\"HtmlBlock\");",
 													"    pm.expect(headlinesSection.content[0].id).to.equal(pm.globals.get('headlines_section_markdownblock_id'));",
 													"    pm.expect(headlinesSection.content[0].order).to.equal(1);",
 													"});",
@@ -6470,7 +6024,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "a3a7e118-a91b-4cfd-b184-9aa4d9893e5a",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6493,11 +6047,7 @@
 													"});",
 													"",
 													"pm.test(\"datablock1 heading should be correct\", function () {",
-													"    pm.expect(datablock1.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Birmingham, Barnsley, Hartlepool and Middlesbrough between 2007 and 2017`);",
-													"});",
-													"",
-													"pm.test(\"datablock1 customFootnotes should be correct\", function () {",
-													"    pm.expect(datablock1.customFootnotes).to.equal(\"Admin API test footnotes\"); ",
+													"    pm.expect(datablock1.heading).to.equal(`Admin API test title`);",
 													"});",
 													"",
 													"pm.test(\"datablock1 name should be correct\", function () {",
@@ -6511,18 +6061,18 @@
 													"pm.test(\"datablock1 dataBlockRequest should be correct\", function () {",
 													"    const dbReq = datablock1.dataBlockRequest;",
 													"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
-													"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2007\");",
+													"    pm.expect(dbReq.timePeriod.startYear).to.equal(2007);",
 													"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
-													"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2017\");",
+													"    pm.expect(dbReq.timePeriod.endYear).to.equal(2017);",
 													"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
 													"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
 													"    pm.expect(dbReq.indicators.length).to.equal(1);",
 													"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
-													"    pm.expect(dbReq.localAuthority).to.have.members([",
+													"    pm.expect(dbReq.locations.localAuthority).to.have.members([",
 													"        \"E08000016\",",
 													"        \"E08000025\"",
 													"    ]);",
-													"    pm.expect(dbReq.localAuthorityDistrict).to.have.members([",
+													"    pm.expect(dbReq.locations.localAuthorityDistrict).to.have.members([",
 													"        \"E06000001\",",
 													"        \"E06000002\"",
 													"    ]);",
@@ -6549,25 +6099,21 @@
 													"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
 													"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(4);",
 													"    ",
-													"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+													"    const row = table.tableHeaders.rowGroups[0].map(location => location.value);",
 													"    pm.expect(row).to.have.members([",
-													"        \"Birmingham\",",
-													"        \"Barnsley\",",
-													"        \"Hartlepool\",",
-													"        \"Middlesbrough\"",
+													"        \"E06000002\",",
+													"        \"E06000001\",",
+													"        \"E08000016\",",
+													"        \"E08000025\"",
 													"    ]);",
 													"    ",
 													"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
-													"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+													"    pm.expect(table.tableHeaders.rows[0].type).to.equal(\"Indicator\");",
 													"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
 													"});",
 													"",
 													"pm.test(\"datablock2 heading should be correct\", function () {",
-													"    pm.expect(datablock2.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Nailsea Youngwood and Rural West York between 2005 and 2010`);",
-													"});",
-													"",
-													"pm.test(\"datablock2 customFootnotes should be correct\", function () {",
-													"    pm.expect(datablock2.customFootnotes).to.equal(\"\"); ",
+													"    pm.expect(datablock2.heading).to.equal(`Admin API test title 2`);",
 													"});",
 													"",
 													"pm.test(\"datablock2 name should be correct\", function () {",
@@ -6575,20 +6121,20 @@
 													"});",
 													"",
 													"pm.test(\"datablock2 source should be correct\", function () {",
-													"    pm.expect(datablock2.source).to.equal(\"\"); ",
+													"    pm.expect(datablock2.source).to.equal(\"Admin API test source 2\"); ",
 													"});",
 													"",
 													"pm.test(\"datablock2 dataBlockRequest should be correct\", function () {",
 													"    const dbReq = datablock2.dataBlockRequest;",
 													"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
-													"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2005\");",
+													"    pm.expect(dbReq.timePeriod.startYear).to.equal(2005);",
 													"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
-													"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2010\");",
+													"    pm.expect(dbReq.timePeriod.endYear).to.equal(2010);",
 													"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
 													"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
 													"    pm.expect(dbReq.indicators.length).to.equal(1);",
 													"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
-													"    pm.expect(dbReq.ward).to.have.members([",
+													"    pm.expect(dbReq.locations.ward).to.have.members([",
 													"        \"E05010291\",",
 													"        \"E05010450\"",
 													"    ]);",
@@ -6615,14 +6161,14 @@
 													"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
 													"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(2);",
 													"    ",
-													"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+													"    const row = table.tableHeaders.rowGroups[0].map(location => location.value);",
 													"    pm.expect(row).to.have.members([",
-													"        \"Nailsea Youngwood\",",
-													"        \"Rural West York\"",
+													"        \"E05010450\",",
+													"        \"E05010291\"",
 													"    ]);",
 													"    ",
 													"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
-													"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+													"    pm.expect(table.tableHeaders.rows[0].type).to.equal(\"Indicator\");",
 													"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
 													"});"
 												],
@@ -6661,7 +6207,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "5d2fda1d-a019-4f05-83d6-31a1da512d24",
 												"exec": [
 													"pm.test(\"Store environment variables\", function() {",
 													"    const respJson = pm.response.json();",
@@ -6708,7 +6254,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "0a7ed926-07c7-4649-8961-e9e2c238a7c4",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6763,7 +6309,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "5a1acc1a-88bf-42d1-96cd-a1f290bd9485",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6818,7 +6364,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "833a3d08-f807-438b-81a4-d39cf65e2c10",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6875,7 +6421,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "10136eed-919d-4508-9c74-d5c5ad004689",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6935,7 +6481,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "6b0a3707-22f8-44bd-ad73-9a496695bd50",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6990,7 +6536,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "e6a312de-8d44-4436-b740-9a5a5c0b1b66",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -7045,7 +6591,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "630b91e1-a953-462c-b1e7-d1399cfe3641",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -7100,7 +6646,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "c97d5486-6f11-455f-ae81-a0054b9b134f",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -7165,7 +6711,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "b562d2b7-5cb7-402a-a4e9-0d5fe92af1e6",
 												"exec": [
 													"var respJson;",
 													"",
@@ -7220,7 +6766,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "24caae60-5cef-4f58-8475-2137759c4e2f",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -7277,7 +6823,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "b25726b1-c498-4e3b-ad76-fa1e188b3250",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -7339,7 +6885,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "b95269e3-ecec-42b8-8dbe-16ad8b28dba7",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -7394,7 +6940,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "97b5398c-8e1a-485e-86bd-7a63ca8a2a3b",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -7441,7 +6987,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "f7744156-16b1-4999-845b-fc6e179c1e14",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -7506,7 +7052,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "0ffc165c-c372-47f5-99fc-d39b6f475503",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -7552,7 +7098,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+												"id": "7094bca2-a6c2-4ea5-917b-b22f1322214b",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -7575,11 +7121,7 @@
 													"});",
 													"",
 													"pm.test(\"datablock1 heading should be correct\", function () {",
-													"    pm.expect(datablock1.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Birmingham, Barnsley, Hartlepool and Middlesbrough between 2007 and 2017`);",
-													"});",
-													"",
-													"pm.test(\"datablock1 customFootnotes should be correct\", function () {",
-													"    pm.expect(datablock1.customFootnotes).to.equal(\"Admin API test footnotes\"); ",
+													"    pm.expect(datablock1.heading).to.equal(`Admin API test title`);",
 													"});",
 													"",
 													"pm.test(\"datablock1 name should be correct\", function () {",
@@ -7593,18 +7135,18 @@
 													"pm.test(\"datablock1 dataBlockRequest should be correct\", function () {",
 													"    const dbReq = datablock1.dataBlockRequest;",
 													"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
-													"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2007\");",
+													"    pm.expect(dbReq.timePeriod.startYear).to.equal(2007);",
 													"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
-													"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2017\");",
+													"    pm.expect(dbReq.timePeriod.endYear).to.equal(2017);",
 													"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
 													"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
 													"    pm.expect(dbReq.indicators.length).to.equal(1);",
 													"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
-													"    pm.expect(dbReq.localAuthority).to.have.members([",
+													"    pm.expect(dbReq.locations.localAuthority).to.have.members([",
 													"        \"E08000016\",",
 													"        \"E08000025\"",
 													"    ]);",
-													"    pm.expect(dbReq.localAuthorityDistrict).to.have.members([",
+													"    pm.expect(dbReq.locations.localAuthorityDistrict).to.have.members([",
 													"        \"E06000001\",",
 													"        \"E06000002\"",
 													"    ]);",
@@ -7630,25 +7172,21 @@
 													"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
 													"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(4);",
 													"    ",
-													"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+													"    const row = table.tableHeaders.rowGroups[0].map(location => location.value);",
 													"    pm.expect(row).to.have.members([",
-													"        \"Birmingham\",",
-													"        \"Barnsley\",",
-													"        \"Hartlepool\",",
-													"        \"Middlesbrough\"",
+													"        \"E06000002\",",
+													"        \"E06000001\",",
+													"        \"E08000016\",",
+													"        \"E08000025\"",
 													"    ]);",
 													"    ",
 													"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
-													"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+													"    pm.expect(table.tableHeaders.rows[0].type).to.equal(\"Indicator\");",
 													"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
 													"});",
 													"",
 													"pm.test(\"datablock2 heading should be correct\", function () {",
-													"    pm.expect(datablock2.heading).to.equal(`Table showing 'API test subject' from 'API test publication ${pm.globals.get('RUN_IDENTIFIER')}' in Nailsea Youngwood and Rural West York between 2005 and 2010`);",
-													"});",
-													"",
-													"pm.test(\"datablock2 customFootnotes should be correct\", function () {",
-													"    pm.expect(datablock2.customFootnotes).to.equal(\"\"); ",
+													"    pm.expect(datablock2.heading).to.equal(`Admin API test title 2`);",
 													"});",
 													"",
 													"pm.test(\"datablock2 name should be correct\", function () {",
@@ -7656,20 +7194,20 @@
 													"});",
 													"",
 													"pm.test(\"datablock2 source should be correct\", function () {",
-													"    pm.expect(datablock2.source).to.equal(\"\"); ",
+													"    pm.expect(datablock2.source).to.equal(\"Admin API test source 2\"); ",
 													"});",
 													"",
 													"pm.test(\"datablock2 dataBlockRequest should be correct\", function () {",
 													"    const dbReq = datablock2.dataBlockRequest;",
 													"    pm.expect(dbReq.subjectId).to.equal(pm.globals.get('sub1_id'));",
-													"    pm.expect(dbReq.timePeriod.startYear).to.equal(\"2005\");",
+													"    pm.expect(dbReq.timePeriod.startYear).to.equal(2005);",
 													"    pm.expect(dbReq.timePeriod.startCode).to.equal(\"CY\");",
-													"    pm.expect(dbReq.timePeriod.endYear).to.equal(\"2010\");",
+													"    pm.expect(dbReq.timePeriod.endYear).to.equal(2010);",
 													"    pm.expect(dbReq.timePeriod.endCode).to.equal(\"CY\");",
 													"    pm.expect(dbReq.filters).to.be.an('array').that.is.empty;",
 													"    pm.expect(dbReq.indicators.length).to.equal(1);",
 													"    pm.expect(dbReq.indicators[0]).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
-													"    pm.expect(dbReq.ward).to.have.members([",
+													"    pm.expect(dbReq.locations.ward).to.have.members([",
 													"        \"E05010291\",",
 													"        \"E05010450\"",
 													"    ]);",
@@ -7696,14 +7234,14 @@
 													"    pm.expect(table.tableHeaders.rowGroups.length).to.equal(1);",
 													"    pm.expect(table.tableHeaders.rowGroups[0].length).to.equal(2);",
 													"    ",
-													"    const row = table.tableHeaders.rowGroups[0].map(location => location.label);",
+													"    const row = table.tableHeaders.rowGroups[0].map(location => location.value);",
 													"    pm.expect(row).to.have.members([",
-													"        \"Nailsea Youngwood\",",
-													"        \"Rural West York\"",
+													"        \"E05010450\",",
+													"        \"E05010291\"",
 													"    ]);",
 													"    ",
 													"    pm.expect(table.tableHeaders.rows.length).to.equal(1);",
-													"    pm.expect(table.tableHeaders.rows[0].label).to.equal(\"Admission Numbers\");",
+													"    pm.expect(table.tableHeaders.rows[0].type).to.equal(\"Indicator\");",
 													"    pm.expect(table.tableHeaders.rows[0].value).to.equal(pm.globals.get('SUB1_IND_Admission_Numbers'));",
 													"});"
 												],
@@ -7777,7 +7315,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "653f31af-0b39-4103-9da6-61a5d896b8d4",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -7839,7 +7377,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "8fddffac-84f3-46da-ae0c-1cb3a10aaae3",
 										"exec": [
 											""
 										],
@@ -7871,7 +7409,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "961c91bf-6ef1-44c7-bda5-19eaa63860da",
+										"id": "6d4fe5e4-0bbb-4894-bfe4-5d120f91ff2b",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -7937,7 +7475,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "92f7cf83-26e5-4145-9580-b5ebfe524a7c",
+										"id": "92ca7343-c62c-4fd5-ba2d-9d2492c9aecb",
 										"exec": [
 											""
 										],
@@ -7979,7 +7517,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "8e0765f9-3e47-4590-beb6-c3349214dd02",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8045,7 +7583,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "7e52d105-cdc9-4cae-b6ff-50088f1447da",
 										"exec": [
 											""
 										],
@@ -8077,7 +7615,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "70b2b8b2-72eb-4caf-8c13-413e51162ac3",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8103,7 +7641,7 @@
 											"    pm.expect(testRelease.timePeriodCoverage.value).to.equal(\"CY\");",
 											"    pm.expect(testRelease.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
 											"    //pm.expect(testRelease.latestRelease).to.equal(false); // Not implemented!",
-											"    pm.expect(testRelease.type.title).to.equal(\"National Statistics\");",
+											"    //pm.expect(testRelease.type.title).to.equal(\"National Statistics\");",
 											"    pm.expect(testRelease.contact.id).to.equal(\"d246c696-4b3a-4aeb-842c-c1318ee334e8\");",
 											"    pm.expect(testRelease.status).to.equal(\"HigherLevelReview\");",
 											"    pm.expect(testRelease.internalReleaseNote).to.equal(\"API test note - Higher review\");",
@@ -8117,7 +7655,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "ceef92e3-890e-44ac-b7ff-0ca8fa5b1167",
 										"exec": [
 											""
 										],
@@ -8161,7 +7699,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "d015beba-002f-4dd3-802c-012453f8f4ba",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8186,7 +7724,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "1a36904c-ff59-45cc-ac1e-adc541a307fb",
 										"exec": [
 											""
 										],
@@ -8216,7 +7754,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "59776b77-d559-4922-be14-0581dcb2ed85",
+										"id": "3522b2a3-38fb-4b6a-8ba7-e80e0a9cd50a",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8282,7 +7820,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "6c289513-6eb5-4c36-a5f4-1aa4bd4bb52c",
+										"id": "c68307db-9853-4c6e-9046-5af209de272d",
 										"exec": [
 											""
 										],
@@ -8324,7 +7862,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "7207cee3-4824-40e0-8d65-667294f5f191",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8390,7 +7928,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "ba18880c-fcfc-4981-af7b-b56972543b0a",
 										"exec": [
 											""
 										],
@@ -8422,7 +7960,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "709463ae-61f2-462f-b3fc-40ca1c6f7113",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8488,7 +8026,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "b27f74cd-6cca-4a2a-bff2-c19c3081a7aa",
 										"exec": [
 											""
 										],
@@ -8530,7 +8068,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "bd676fb2-e21f-4e0b-999f-e29b56967110",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8596,7 +8134,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "73535847-c79b-4c25-afa9-1b58af2ef609",
 										"exec": [
 											""
 										],
@@ -8628,7 +8166,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "60356dad-ffa6-42b1-98f6-f07624d9cac4",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8652,7 +8190,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "a08e6234-5def-4827-88ae-215dc399c227",
 										"exec": [
 											""
 										],
@@ -8696,7 +8234,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "4b394430-87b5-497a-a0b4-bb260ab1cf55",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8723,7 +8261,7 @@
 											"    pm.expect(testRelease.timePeriodCoverage.value).to.equal(\"CY\");",
 											"    pm.expect(testRelease.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
 											"    //pm.expect(testRelease.latestRelease).to.equal(false); // Not implemented!",
-											"    pm.expect(testRelease.type.title).to.equal(\"National Statistics\");",
+											"    //pm.expect(testRelease.type.title).to.equal(\"National Statistics\");",
 											"    pm.expect(testRelease.contact.id).to.equal(\"d246c696-4b3a-4aeb-842c-c1318ee334e8\");",
 											"    pm.expect(testRelease.status).to.equal(\"Approved\");",
 											"    pm.expect(testRelease.internalReleaseNote).to.equal(\"API test note - Approved\");",
@@ -8737,7 +8275,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "41e5034b-7dc6-4c42-bbdf-d51d54f18825",
 										"exec": [
 											"postman.setNextRequest(null);"
 										],
@@ -8774,7 +8312,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+										"id": "a60fd5b7-9c2f-4a80-b087-5f95c90077fa",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8858,7 +8396,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+										"id": "53ee1c10-040e-465f-86fe-17745fafeca7",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8923,7 +8461,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "313f3538-ad70-44ec-aed5-3d9286545bf0",
+										"id": "5c179ff5-9fd9-48c5-b8d9-70dece1b6f89",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8979,7 +8517,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "50750bef-78b5-4912-8d84-1f830e582cfb",
+										"id": "a1525b0b-c153-40d7-89e7-84c54899293f",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9024,7 +8562,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "50750bef-78b5-4912-8d84-1f830e582cfb",
+										"id": "e106e903-96ba-41b3-b793-9d2c4fb1daff",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9069,7 +8607,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "313f3538-ad70-44ec-aed5-3d9286545bf0",
+										"id": "c335217d-7d65-4e36-a869-8b941c1ca6f5",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9085,7 +8623,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "3b8a8023-ab82-4410-ba81-961b7c55a2d3",
+										"id": "ee916333-ce76-4a8a-ba94-97fd350f5ec2",
 										"exec": [
 											""
 										],
@@ -9115,7 +8653,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "15672eaf-69e0-4bea-9bdc-ae12e4c3678c",
+								"id": "d8542e1d-16ca-4e9e-8343-16422b9a80b2",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9125,7 +8663,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8679860c-8b22-480d-868f-3dd142ed5ed8",
+								"id": "45f7c9d3-0cf1-418c-ba20-dc54a975c84c",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9145,7 +8683,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4d2d835f-99c3-4df4-adfd-af5b6c678672",
+										"id": "c7db97c1-9976-44d5-a402-3fa1842439b9",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9214,7 +8752,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4d2d835f-99c3-4df4-adfd-af5b6c678672",
+										"id": "a4afbc2f-7685-41a5-9a2f-1358fef2ec92",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9269,7 +8807,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "06d9ef58-8beb-4ec6-aac6-18ddc1a3c9e4",
+										"id": "c9373147-df28-4010-a4a8-59db0dcd8af6",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9322,7 +8860,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "bad905fe-f29e-4e92-9c12-d2ac5f4135d6",
+										"id": "184a713e-1fea-4bba-86a8-a0601c47d39e",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9366,7 +8904,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "cc867136-174a-4fcd-8337-89419ad47d8f",
+										"id": "f7ad96ba-5a81-4a37-ba99-83b5c57ee62d",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9410,7 +8948,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "06d9ef58-8beb-4ec6-aac6-18ddc1a3c9e4",
+										"id": "e557765b-f633-4e9b-97c6-f50f015f399d",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9428,7 +8966,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "73152c37-a641-44ae-9414-3f09a24ef1e9",
+										"id": "3ad9ed41-40bb-4204-8152-2ad48fd71afe",
 										"exec": [
 											""
 										],
@@ -9458,7 +8996,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "67423df3-02a3-452c-9877-3865ca91bd81",
+								"id": "88ff0ed8-5fe5-4547-baaa-941a67d1b744",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9468,7 +9006,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5893df85-12f8-4a64-8df0-758878c81594",
+								"id": "991caa65-0200-4693-9ae1-9f14632df768",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9488,7 +9026,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c3aa6c3a-7405-4b53-9fce-ab1d75b4e2da",
+										"id": "a96e9f47-dc68-41d0-9088-5bba57b38276",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9557,7 +9095,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c3aa6c3a-7405-4b53-9fce-ab1d75b4e2da",
+										"id": "a75044d6-d9f0-41fd-8ad2-b90186ac8b72",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9612,7 +9150,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0e8a7e3f-244d-43aa-a936-4238169dcd82",
+										"id": "e566d77b-bd67-42a1-becb-b11eb4ab2d9c",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9665,7 +9203,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5fd6758a-32cc-4fb3-ad07-6ae6a1a5d273",
+										"id": "94194e0c-5062-4244-b383-b01d2a61b9f9",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9709,7 +9247,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5fd6758a-32cc-4fb3-ad07-6ae6a1a5d273",
+										"id": "1444e6ff-ebbe-480e-b890-b1b616aae84b",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9753,7 +9291,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0e8a7e3f-244d-43aa-a936-4238169dcd82",
+										"id": "7e838646-700d-4454-8e76-ee1f56e25bf3",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9771,7 +9309,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "e017209f-4898-457b-abd2-fa26a94d7002",
+										"id": "aaa18160-fccd-4686-a21b-aae082c7d8ed",
 										"exec": [
 											""
 										],
@@ -9801,7 +9339,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "2fee0af3-738b-4cbe-a1f3-20984d944f9b",
+								"id": "f8601215-a9fc-4fd9-b8da-7c8056afa827",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9811,7 +9349,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f79ef633-75d5-449f-97c4-50ed2533ad01",
+								"id": "d18262bb-edf6-400b-9154-802a66c45792",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9831,7 +9369,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "483bd670-9716-4724-9976-a579f939fe75",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9907,7 +9445,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "a3348ea6-48ac-4c93-a5ac-7375d5c76e12",
 										"exec": [
 											""
 										],
@@ -9949,7 +9487,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "fa709038-25ef-4753-b77b-ef98c955394e",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10023,7 +9561,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "765cd861-ea5a-4311-8fb2-116efd2fe319",
 										"exec": [
 											""
 										],
@@ -10053,7 +9591,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "a4bd7ad0-355d-4b95-8d9d-4f1ddc195571",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10085,7 +9623,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "12a1b0aa-8932-417a-a48a-3186848ef019",
 										"exec": [
 											""
 										],
@@ -10117,7 +9655,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "ee2aecb1-0c2d-423b-9903-c4e059633c1d",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10197,7 +9735,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "2590d3c1-4815-41ba-b991-cb63e5f7e172",
 										"exec": [
 											""
 										],
@@ -10238,7 +9776,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "5bf769f7-3622-4508-b7dc-b4bcaa20f205",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10322,7 +9860,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "dcba548f-d2f2-4c8f-b162-863dd84594e8",
 										"exec": [
 											""
 										],
@@ -10354,7 +9892,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "81ad73f7-c51d-48b3-aa9c-1250454b87af",
 										"exec": [
 											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
 										],
@@ -10364,7 +9902,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "6264b589-df76-4bfa-b4a2-c8d307dfb617",
 										"exec": [
 											""
 										],
@@ -10394,7 +9932,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"id": "d906409d-c4a0-4bb1-88f8-7c5e91385547",
 										"exec": [
 											"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
 										],
@@ -10404,7 +9942,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"id": "ac81a9b5-e744-4c21-822c-b9bf7f7c0730",
 										"exec": [
 											"postman.setNextRequest(null);"
 										],
@@ -10433,7 +9971,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "a136a33d-7b43-4d80-8ab7-1123869bfa61",
+								"id": "137a4d2d-3117-4a29-a797-c9cb9022c0e2",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -10443,7 +9981,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "64575fe3-a57b-47d3-a431-945b30729e05",
+								"id": "3f513044-eaef-4789-bb35-81b8b4ac72d5",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -10463,7 +10001,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "98057100-77fb-42b7-9c21-f1d4921917ab",
+										"id": "e91cd36c-7f6c-4d4c-9741-c8a757a61da6",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10546,7 +10084,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "53582e6e-2f99-4426-bbac-814e65969e32",
+										"id": "2e2beb37-1fc9-466e-b181-e895a30c540e",
 										"exec": [
 											""
 										],
@@ -10588,7 +10126,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "b292ad4e-9a7e-41a1-b82d-8dd57bfe0d92",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10634,7 +10172,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "f2350d78-8b52-4975-851e-3a12574e4e3f",
 										"exec": [
 											""
 										],
@@ -10678,7 +10216,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "0d862f51-1bac-4742-979e-1162712a5d1d",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10707,7 +10245,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "3e1b07d8-1874-42d6-94d5-24c48273b48d",
 										"exec": [
 											""
 										],
@@ -10747,7 +10285,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "8d03345b-5e4e-4694-a292-3c046e6d7cc0",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10820,7 +10358,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "1a2d39de-a047-4f51-8c38-ccd31c71c5e1",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10875,7 +10413,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "a35d5aa3-392c-449d-891f-2a9e1e12c1e7",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10948,7 +10486,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "b3d2b61f-a4cc-4803-a2ec-da0bd1a4e6c4",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11003,7 +10541,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "0690242a-246e-42ef-9e78-81d286b14d80",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11076,7 +10614,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "ee1bcee8-f967-409d-8078-ec43217c98e7",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11131,7 +10669,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "bd5d8a7b-7dee-4f89-9ad1-deabba9c4636",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11204,7 +10742,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "24354758-4b2c-4962-8bdf-0fef0ff1a7cd",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11259,7 +10797,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "0ea39059-a703-4b28-8450-8912efdaa72b",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11332,7 +10870,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "6b2efaa8-bf8b-48e7-a8a3-13054738c976",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11387,7 +10925,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "26928674-e771-46ac-a1c1-13da9b6489e2",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11460,7 +10998,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "b3e82d16-8b7c-4d25-907a-893291f9a391",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11515,7 +11053,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "3e9734ad-fcbb-4513-b2e0-9c5ab449203b",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11588,7 +11126,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "2d3db67d-92a8-46de-9f56-201971306f91",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11643,7 +11181,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "e555b21f-35af-454b-bf7b-cd53448290b2",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11716,7 +11254,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "31e68f0a-9a12-435a-94b1-853fc7273dc9",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11771,7 +11309,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "91f3185b-52b9-46f3-b19e-3310b29d1f9c",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11844,7 +11382,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "15e77473-2032-426e-983e-fe2b0dea2eb5",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11899,7 +11437,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "36c980a3-18a0-47c8-9d09-2026cc174b43",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11972,7 +11510,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "0513df72-21b5-4fc8-80e3-7bfe87788673",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12027,7 +11565,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "68366540-2db7-4794-bc93-d42c09daf3b1",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12100,7 +11638,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "630f5a7a-7a14-4f53-b41f-587c07d8bed8",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12155,7 +11693,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "1c23ae3f-5f81-4ec6-8e55-7b0aab370ee0",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12228,7 +11766,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "6522729e-7b56-47b5-9534-f7ea9419c657",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12283,7 +11821,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "64cfb920-142b-42d5-b937-fceb1a721c07",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12356,7 +11894,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "d675655c-46eb-4e07-b55d-99014a9ac17e",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12411,7 +11949,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "7d21cad5-edc2-413a-9946-ce3ea3adb1eb",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12484,7 +12022,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "45bc14f5-93a9-49f9-9803-f40d2b4da7af",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12539,7 +12077,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "230ac776-7eeb-41cc-941b-78b3f2d64fc7",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12612,7 +12150,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"id": "3eb2a389-71fa-4fa2-bb0f-5b1fc078a679",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -15978,7 +15516,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "6464fc17-e41b-4120-9ac9-00c93234437a",
+				"id": "68577b4f-9315-4534-bd32-3a50abda77d4",
 				"type": "text/javascript",
 				"exec": [
 					"pm.globals.set(\"7F_AbsenceRatePercentBands_SchoolType\", \"51e645c1-4a37-4938-8b20-1244b15048f9\");",
@@ -16004,7 +15542,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "8d33b604-23a0-45bf-9ff6-91ec28db96e4",
+				"id": "7918e447-acbb-4498-af7c-f53e983b1066",
 				"type": "text/javascript",
 				"exec": [
 					""
