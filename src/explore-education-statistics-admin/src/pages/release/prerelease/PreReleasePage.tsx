@@ -2,32 +2,31 @@ import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { ReleaseProvider } from '@admin/pages/release/edit-release/content/ReleaseContext';
-import commonService from '@admin/services/common/service';
 import permissionService, {
   PreReleaseWindowStatus,
 } from '@admin/services/permissions/permissionService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import preReleaseService from '@admin/services/pre-release/preReleaseService';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import { PreReleaseSummaryViewModel } from '@admin/services/pre-release/types';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { format } from 'date-fns';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { BasicPublicationDetails } from 'src/services/common/types';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
   content: ManageContentPageViewModel;
-  publication: BasicPublicationDetails;
+  preReleaseSummary: PreReleaseSummaryViewModel;
 }
 
 interface MatchProps {
   releaseId: string;
-  publicationId: string;
 }
 
 const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { releaseId, publicationId } = match.params;
+  const { releaseId } = match.params;
 
   const { handleManualErrors } = useErrorControl();
   const { user } = useAuthContext();
@@ -41,17 +40,17 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       return undefined;
     }
 
-    const [publication, content] = await Promise.all([
-      commonService.getBasicPublicationDetails(publicationId),
+    const [content, preReleaseSummary] = await Promise.all([
       releaseContentService.getContent(releaseId),
+      preReleaseService.getPreReleaseSummary(releaseId),
     ]);
 
     return {
-      publication,
       preReleaseWindowStatus,
       content,
+      preReleaseSummary,
     };
-  }, [handleManualErrors, publicationId, releaseId]);
+  }, [handleManualErrors, releaseId]);
 
   return (
     <Page
@@ -64,7 +63,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
     >
       {model?.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
-        model?.content && (
+        model?.preReleaseSummary && (
           <ReleaseProvider
             value={{
               ...model?.content,
@@ -83,8 +82,9 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
           </h1>
           <p className="govuk-body">
             Pre Release access for the{' '}
-            <strong>{model.content.release.title}</strong> release of{' '}
-            <strong>{model.publication.title}</strong> is not yet available.
+            <strong>{model.preReleaseSummary.releaseTitle}</strong> release of{' '}
+            <strong>{model.preReleaseSummary.publicationTitle}</strong> is not
+            yet available.
           </p>
           <p className="govuk-body">
             Pre Release access will be available from{' '}
@@ -118,8 +118,9 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
           <h1 className="govuk-heading-l">Pre Release access has ended</h1>
           <p className="govuk-body">
             Pre Release access for the{' '}
-            <strong>{model.content.release.title}</strong> release of{' '}
-            <strong>{model.publication.title}</strong> is no longer available.
+            <strong>{model.preReleaseSummary.releaseTitle}</strong> release of{' '}
+            <strong>{model.preReleaseSummary.publicationTitle}</strong> is no
+            longer available.
           </p>
         </>
       )}
