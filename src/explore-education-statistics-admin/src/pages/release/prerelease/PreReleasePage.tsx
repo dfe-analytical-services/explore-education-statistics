@@ -2,32 +2,32 @@ import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { ReleaseProvider } from '@admin/pages/release/edit-release/content/ReleaseContext';
-import commonService from '@admin/services/common/service';
 import permissionService, {
   PreReleaseWindowStatus,
 } from '@admin/services/permissions/permissionService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+import preReleaseService, {
+  PreReleaseSummary,
+} from '@admin/services/pre-release/preReleaseService';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { format } from 'date-fns';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { BasicPublicationDetails } from 'src/services/common/types';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
-  content: ManageContentPageViewModel;
-  publication: BasicPublicationDetails;
+  content?: ManageContentPageViewModel;
+  preReleaseSummary?: PreReleaseSummary;
 }
 
 interface MatchProps {
   releaseId: string;
-  publicationId: string;
 }
 
 const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { releaseId, publicationId } = match.params;
+  const { releaseId } = match.params;
 
   const { handleManualErrors } = useErrorControl();
   const { user } = useAuthContext();
@@ -36,22 +36,32 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
     const preReleaseWindowStatus = await permissionService.getPreReleaseWindowStatus(
       releaseId,
     );
+
     if (preReleaseWindowStatus.preReleaseAccess === 'NoneSet') {
       handleManualErrors.forbidden();
       return undefined;
     }
 
-    const [publication, content] = await Promise.all([
-      commonService.getBasicPublicationDetails(publicationId),
-      releaseContentService.getContent(releaseId),
-    ]);
+    if (preReleaseWindowStatus.preReleaseAccess === 'Within') {
+      const content = await releaseContentService.getContent(releaseId);
+
+      return {
+        preReleaseWindowStatus,
+        content,
+      };
+    }
+
+    const preReleaseSummary = await preReleaseService.getPreReleaseSummary(
+      releaseId,
+    );
 
     return {
-      publication,
       preReleaseWindowStatus,
-      content,
+      preReleaseSummary,
     };
-  }, [handleManualErrors, publicationId, releaseId]);
+  }, [handleManualErrors, releaseId]);
+
+  const { content, preReleaseSummary, preReleaseWindowStatus } = model ?? {};
 
   return (
     <Page
@@ -63,64 +73,66 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       }
       includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
     >
-      {model?.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
-        model?.content && (
-          <ReleaseProvider
-            value={{
-              ...model?.content,
-              canUpdateRelease: false,
-              unresolvedComments: [],
-            }}
-          >
-            <PublicationReleaseContent />
-          </ReleaseProvider>
-        )}
+      {preReleaseWindowStatus?.preReleaseAccess === 'Within' && content && (
+        <ReleaseProvider
+          value={{
+            ...content,
+            canUpdateRelease: false,
+            unresolvedComments: [],
+          }}
+        >
+          <PublicationReleaseContent />
+        </ReleaseProvider>
+      )}
 
-      {model?.preReleaseWindowStatus.preReleaseAccess === 'Before' && (
+      {preReleaseWindowStatus?.preReleaseAccess === 'Before' && (
         <>
-          <h1 className="govuk-heading-l">
-            Pre Release access is not yet available
-          </h1>
-          <p className="govuk-body">
-            Pre Release access for the{' '}
-            <strong>{model.content.release.title}</strong> release of{' '}
-            <strong>{model.publication.title}</strong> is not yet available.
-          </p>
-          <p className="govuk-body">
+          <h1>Pre Release access is not yet available</h1>
+
+          {preReleaseSummary && (
+            <p>
+              Pre Release access for the{' '}
+              <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
+              <strong>{preReleaseSummary.publicationTitle}</strong> is not yet
+              available.
+            </p>
+          )}
+
+          <p>
             Pre Release access will be available from{' '}
             {format(
-              model.preReleaseWindowStatus.preReleaseWindowStartTime,
+              preReleaseWindowStatus.preReleaseWindowStartTime,
               'd MMMM yyyy',
             )}
             {' at '}
             {format(
-              model.preReleaseWindowStatus.preReleaseWindowStartTime,
+              preReleaseWindowStatus.preReleaseWindowStartTime,
               'HH:mm',
             )}{' '}
             until{' '}
             {format(
-              model.preReleaseWindowStatus.preReleaseWindowEndTime,
+              preReleaseWindowStatus.preReleaseWindowEndTime,
               'd MMMM yyyy',
             )}
             {' at '}
-            {format(
-              model.preReleaseWindowStatus.preReleaseWindowEndTime,
-              'HH:mm',
-            )}
-            .
+            {format(preReleaseWindowStatus.preReleaseWindowEndTime, 'HH:mm')}.
           </p>
           <p className="govuk-body">Please try again later.</p>
         </>
       )}
 
-      {model?.preReleaseWindowStatus.preReleaseAccess === 'After' && (
+      {preReleaseWindowStatus?.preReleaseAccess === 'After' && (
         <>
-          <h1 className="govuk-heading-l">Pre Release access has ended</h1>
-          <p className="govuk-body">
-            Pre Release access for the{' '}
-            <strong>{model.content.release.title}</strong> release of{' '}
-            <strong>{model.publication.title}</strong> is no longer available.
-          </p>
+          <h1>Pre Release access has ended</h1>
+
+          {preReleaseSummary && (
+            <p>
+              Pre Release access for the{' '}
+              <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
+              <strong>{preReleaseSummary.publicationTitle}</strong> is no longer
+              available.
+            </p>
+          )}
         </>
       )}
     </Page>
