@@ -826,8 +826,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
                     TeamName = "School absence and exclusions team",
                     TeamEmail = "schools.statistics@education.gov.uk",
-                    ContactName = "Mark Pearson",
-                    ContactTelNo = "01142742585"
+                    ContactName = "Sean Gibson",
+                    ContactTelNo = "0370 000 2288"
                 },
                 new Contact
                 {
