@@ -36,6 +36,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
     const preReleaseWindowStatus = await permissionService.getPreReleaseWindowStatus(
       releaseId,
     );
+
     if (preReleaseWindowStatus.preReleaseAccess === 'NoneSet') {
       handleManualErrors.forbidden();
       return undefined;
@@ -60,6 +61,8 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
     };
   }, [handleManualErrors, releaseId]);
 
+  const { content, preReleaseSummary, preReleaseWindowStatus } = model ?? {};
+
   return (
     <Page
       wide
@@ -70,71 +73,64 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       }
       includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
     >
-      {model?.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
-        model.content && (
-          <ReleaseProvider
-            value={{
-              ...model?.content,
-              canUpdateRelease: false,
-              unresolvedComments: [],
-            }}
-          >
-            <PublicationReleaseContent />
-          </ReleaseProvider>
-        )}
+      {preReleaseWindowStatus?.preReleaseAccess === 'Within' && content && (
+        <ReleaseProvider
+          value={{
+            ...content,
+            canUpdateRelease: false,
+            unresolvedComments: [],
+          }}
+        >
+          <PublicationReleaseContent />
+        </ReleaseProvider>
+      )}
 
-      {model?.preReleaseWindowStatus.preReleaseAccess === 'Before' && (
+      {preReleaseWindowStatus?.preReleaseAccess === 'Before' && (
         <>
-          <h1 className="govuk-heading-l">
-            Pre Release access is not yet available
-          </h1>
+          <h1>Pre Release access is not yet available</h1>
 
-          {model.preReleaseSummary && (
-            <p className="govuk-body">
+          {preReleaseSummary && (
+            <p>
               Pre Release access for the{' '}
-              <strong>{model.preReleaseSummary.releaseTitle}</strong> release of{' '}
-              <strong>{model.preReleaseSummary.publicationTitle}</strong> is not
-              yet available.
+              <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
+              <strong>{preReleaseSummary.publicationTitle}</strong> is not yet
+              available.
             </p>
           )}
 
-          <p className="govuk-body">
+          <p>
             Pre Release access will be available from{' '}
             {format(
-              model.preReleaseWindowStatus.preReleaseWindowStartTime,
+              preReleaseWindowStatus.preReleaseWindowStartTime,
               'd MMMM yyyy',
             )}
             {' at '}
             {format(
-              model.preReleaseWindowStatus.preReleaseWindowStartTime,
+              preReleaseWindowStatus.preReleaseWindowStartTime,
               'HH:mm',
             )}{' '}
             until{' '}
             {format(
-              model.preReleaseWindowStatus.preReleaseWindowEndTime,
+              preReleaseWindowStatus.preReleaseWindowEndTime,
               'd MMMM yyyy',
             )}
             {' at '}
-            {format(
-              model.preReleaseWindowStatus.preReleaseWindowEndTime,
-              'HH:mm',
-            )}
-            .
+            {format(preReleaseWindowStatus.preReleaseWindowEndTime, 'HH:mm')}.
           </p>
           <p className="govuk-body">Please try again later.</p>
         </>
       )}
 
-      {model?.preReleaseWindowStatus.preReleaseAccess === 'After' && (
+      {preReleaseWindowStatus?.preReleaseAccess === 'After' && (
         <>
-          <h1 className="govuk-heading-l">Pre Release access has ended</h1>
+          <h1>Pre Release access has ended</h1>
 
-          {model.preReleaseSummary && (
-            <p className="govuk-body">
+          {preReleaseSummary && (
+            <p>
               Pre Release access for the{' '}
-              <strong>{model.preReleaseSummary.releaseTitle}</strong> release of{' '}
-              <strong>{model.preReleaseSummary.publicationTitle}</strong> is no
-              longer available.
+              <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
+              <strong>{preReleaseSummary.publicationTitle}</strong> is no longer
+              available.
             </p>
           )}
         </>
