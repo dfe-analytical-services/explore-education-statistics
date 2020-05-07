@@ -18,8 +18,8 @@ import { RouteComponentProps } from 'react-router';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
-  content: ManageContentPageViewModel;
-  preReleaseSummary: PreReleaseSummary;
+  content?: ManageContentPageViewModel;
+  preReleaseSummary?: PreReleaseSummary;
 }
 
 interface MatchProps {
@@ -41,14 +41,21 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       return undefined;
     }
 
-    const [content, preReleaseSummary] = await Promise.all([
-      releaseContentService.getContent(releaseId),
-      preReleaseService.getPreReleaseSummary(releaseId),
-    ]);
+    if (preReleaseWindowStatus.preReleaseAccess === 'Within') {
+      const content = await releaseContentService.getContent(releaseId);
+
+      return {
+        preReleaseWindowStatus,
+        content,
+      };
+    }
+
+    const preReleaseSummary = await preReleaseService.getPreReleaseSummary(
+      releaseId,
+    );
 
     return {
       preReleaseWindowStatus,
-      content,
       preReleaseSummary,
     };
   }, [handleManualErrors, releaseId]);
@@ -64,7 +71,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
     >
       {model?.preReleaseWindowStatus.preReleaseAccess === 'Within' &&
-        model?.preReleaseSummary && (
+        model.content && (
           <ReleaseProvider
             value={{
               ...model?.content,
@@ -81,12 +88,16 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
           <h1 className="govuk-heading-l">
             Pre Release access is not yet available
           </h1>
-          <p className="govuk-body">
-            Pre Release access for the{' '}
-            <strong>{model.preReleaseSummary.releaseTitle}</strong> release of{' '}
-            <strong>{model.preReleaseSummary.publicationTitle}</strong> is not
-            yet available.
-          </p>
+
+          {model.preReleaseSummary && (
+            <p className="govuk-body">
+              Pre Release access for the{' '}
+              <strong>{model.preReleaseSummary.releaseTitle}</strong> release of{' '}
+              <strong>{model.preReleaseSummary.publicationTitle}</strong> is not
+              yet available.
+            </p>
+          )}
+
           <p className="govuk-body">
             Pre Release access will be available from{' '}
             {format(
@@ -117,12 +128,15 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       {model?.preReleaseWindowStatus.preReleaseAccess === 'After' && (
         <>
           <h1 className="govuk-heading-l">Pre Release access has ended</h1>
-          <p className="govuk-body">
-            Pre Release access for the{' '}
-            <strong>{model.preReleaseSummary.releaseTitle}</strong> release of{' '}
-            <strong>{model.preReleaseSummary.publicationTitle}</strong> is no
-            longer available.
-          </p>
+
+          {model.preReleaseSummary && (
+            <p className="govuk-body">
+              Pre Release access for the{' '}
+              <strong>{model.preReleaseSummary.releaseTitle}</strong> release of{' '}
+              <strong>{model.preReleaseSummary.publicationTitle}</strong> is no
+              longer available.
+            </p>
+          )}
         </>
       )}
     </Page>
