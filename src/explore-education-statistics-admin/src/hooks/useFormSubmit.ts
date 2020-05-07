@@ -26,19 +26,16 @@ const isServerValidationError = (error: AxiosError) => {
     errorDataAsValidationError.title !== undefined
   );
 };
-
 function useFormSubmit<FormValues>(
   onSubmit: UseFormSubmit<FormValues>,
   errorMappers: ServerValidationMessageMapper[] = [],
 ) {
-  const { handleApiErrors, withoutErrorHandling } = useErrorControl();
+  const { handleApiErrors } = useErrorControl();
 
   return useMemo(
     () => async (values: FormValues, actions: FormikActions<FormValues>) => {
       try {
-        await withoutErrorHandling(async () => {
-          await onSubmit(values, actions);
-        });
+        await onSubmit(values, actions);
       } catch (error) {
         const typedError: AxiosError = error;
 
@@ -58,7 +55,7 @@ function useFormSubmit<FormValues>(
         }
       }
     },
-    [withoutErrorHandling, onSubmit, handleApiErrors, errorMappers],
+    [onSubmit, handleApiErrors, errorMappers],
   );
 }
 

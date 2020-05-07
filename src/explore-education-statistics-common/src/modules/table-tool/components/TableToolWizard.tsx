@@ -1,5 +1,5 @@
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
-import { useErrorControl } from '@common/contexts/ErrorControlContext';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@common/modules/table-tool/components/FiltersForm';
@@ -84,10 +84,7 @@ const TableToolWizard = ({
   initialState,
   finalStep,
 }: TableToolWizardProps) => {
-  const { withoutErrorHandling } = useErrorControl();
-
   const [publication, setPublication] = useState<Publication>();
-  const [subjects, setSubjects] = useState<PublicationSubject[]>([]);
 
   const [state, updateState] = useImmer<TableToolState>(
     initialState ?? {
@@ -102,17 +99,16 @@ const TableToolWizard = ({
     },
   );
 
-  useEffect(() => {
+  const { value: subjects = [], setValue: setSubjects } = useAsyncRetry<
+    PublicationSubject[]
+  >(async () => {
     if (releaseId) {
-      withoutErrorHandling(async () => {
-        const {
-          subjects: nextSubjects,
-        } = await tableBuilderService.getReleaseMeta(releaseId);
-
-        setSubjects(nextSubjects);
-      });
+      const meta = await tableBuilderService.getReleaseMeta(releaseId);
+      return meta.subjects;
     }
-  }, [releaseId, withoutErrorHandling]);
+
+    return [];
+  }, [releaseId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
