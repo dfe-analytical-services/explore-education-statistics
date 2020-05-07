@@ -1,11 +1,7 @@
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
-import {
-  CreateReleaseDataBlock,
-  ReleaseDataBlock,
-} from '@admin/services/release/edit-release/datablocks/service';
-import filterOrphanedDataSets from '@common/modules/charts/util/filterOrphanedDataSets';
+import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablocks/service';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
@@ -16,21 +12,31 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
-import { TableDataQuery } from '@common/services/tableBuilderService';
-import produce from 'immer';
-import React, { createRef, useCallback, useEffect, useState } from 'react';
+import {
+  PublicationSubjectMeta,
+  TableDataQuery,
+} from '@common/services/tableBuilderService';
+import React, {
+  createRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-export type SavedDataBlock = CreateReleaseDataBlock & {
-  id?: string;
-};
+export type DataBlockSourceWizardSaveHandler = (params: {
+  details: DataBlockDetailsFormValues;
+  table: FullTable;
+  tableHeaders: TableHeadersConfig;
+  query: TableDataQuery;
+}) => void;
 
 interface DataBlockSourceWizardFinalStepProps {
   dataBlock?: ReleaseDataBlock;
   query: TableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  onDataBlockSave: (dataBlock: SavedDataBlock) => void;
+  onSave: DataBlockSourceWizardSaveHandler;
 }
 
 const DataBlockSourceWizardFinalStep = ({
@@ -38,7 +44,7 @@ const DataBlockSourceWizardFinalStep = ({
   query,
   table,
   tableHeaders,
-  onDataBlockSave,
+  onSave,
 }: DataBlockSourceWizardFinalStepProps) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
@@ -57,32 +63,15 @@ const DataBlockSourceWizardFinalStep = ({
   }, [tableHeaders]);
 
   const handleSubmit = useCallback(
-    (values: DataBlockDetailsFormValues) => {
-      const charts = produce(dataBlock?.charts ?? [], draft => {
-        const majorAxis = draft[0]?.axes?.major;
-
-        if (majorAxis?.dataSets) {
-          majorAxis.dataSets = filterOrphanedDataSets(
-            majorAxis.dataSets,
-            table.subjectMeta,
-          );
-        }
-      });
-
-      onDataBlockSave({
-        ...(dataBlock ?? {}),
-        ...values,
-        dataBlockRequest: query,
-        charts,
-        tables: [
-          {
-            tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
-            indicators: [],
-          },
-        ],
+    (details: DataBlockDetailsFormValues) => {
+      onSave({
+        details,
+        table,
+        tableHeaders: currentTableHeaders,
+        query,
       });
     },
-    [currentTableHeaders, dataBlock, onDataBlockSave, query, table.subjectMeta],
+    [currentTableHeaders, onSave, query, table],
   );
 
   return (
@@ -130,15 +119,38 @@ interface DataBlockSourceWizardProps {
   releaseId: string;
   dataBlock?: ReleaseDataBlock;
   initialTableToolState?: TableToolState;
-  onDataBlockSave: (dataBlock: SavedDataBlock) => void;
+  query?: TableDataQuery;
+  subjectMeta?: PublicationSubjectMeta;
+  table?: FullTable;
+  tableHeaders?: TableHeadersConfig;
+  onSave: DataBlockSourceWizardSaveHandler;
 }
 
 const DataBlockSourceWizard = ({
   releaseId,
   dataBlock,
-  initialTableToolState,
-  onDataBlockSave,
+  query: initialQuery,
+  subjectMeta,
+  table,
+  tableHeaders,
+  onSave,
 }: DataBlockSourceWizardProps) => {
+  const initialTableToolState = useMemo<TableToolState | undefined>(() => {
+    if (!initialQuery || !table || !tableHeaders || !subjectMeta) {
+      return undefined;
+    }
+
+    return {
+      initialStep: 5,
+      query: initialQuery,
+      subjectMeta,
+      response: {
+        table,
+        tableHeaders,
+      },
+    };
+  }, [initialQuery, subjectMeta, table, tableHeaders]);
+
   return (
     <>
       <p>Configure data source for the data block</p>
@@ -161,7 +173,7 @@ const DataBlockSourceWizard = ({
                     query={query}
                     table={response.table}
                     tableHeaders={response.tableHeaders}
-                    onDataBlockSave={onDataBlockSave}
+                    onSave={onSave}
                   />
                 )}
               </>
