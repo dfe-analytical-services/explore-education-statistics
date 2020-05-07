@@ -1275,7 +1275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Graduate labour market statistics",
                     Summary = "",
                     TopicId = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535"),
-                    Slug = "graduate-labour-market-statistics",
+                    Slug = "graduate-labour-markets",
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/graduate-labour-market-quarterly-statistics#documents")
