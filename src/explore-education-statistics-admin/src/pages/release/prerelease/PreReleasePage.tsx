@@ -6,9 +6,10 @@ import permissionService, {
   PreReleaseWindowStatus,
 } from '@admin/services/permissions/permissionService';
 import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import preReleaseService from '@admin/services/pre-release/preReleaseService';
+import preReleaseService, {
+  PreReleaseSummary,
+} from '@admin/services/pre-release/preReleaseService';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import { PreReleaseSummaryViewModel } from '@admin/services/pre-release/types';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { format } from 'date-fns';
@@ -18,7 +19,7 @@ import { RouteComponentProps } from 'react-router';
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
   content: ManageContentPageViewModel;
-  preReleaseSummary: PreReleaseSummaryViewModel;
+  preReleaseSummary: PreReleaseSummary;
 }
 
 interface MatchProps {

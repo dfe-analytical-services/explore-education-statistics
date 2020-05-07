@@ -1,11 +1,13 @@
-import { PreReleaseSummaryViewModel } from '@admin/services/pre-release/types';
 import client from '@admin/services/util/service';
 
+export interface PreReleaseSummary {
+  publicationTitle: string;
+  releaseTitle: string;
+}
+
 const preReleaseService = {
-  getPreReleaseSummary(releaseId: string): Promise<PreReleaseSummaryViewModel> {
-    return client.get<PreReleaseSummaryViewModel>(
-      `/release/${releaseId}/prerelease`,
-    );
+  getPreReleaseSummary(releaseId: string): Promise<PreReleaseSummary> {
+    return client.get<PreReleaseSummary>(`/release/${releaseId}/prerelease`);
   },
 };
 
