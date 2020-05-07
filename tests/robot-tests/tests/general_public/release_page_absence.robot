@@ -26,9 +26,12 @@ Validate URL
     [Tags]  HappyPath
     user checks url contains  %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
-Validate Published date, Next update date, and Email alerts link
-    [Tags]     HappyPath    NotAgainstPreProd
+Validate Published date
+    [Tags]     HappyPath    NotAgainstPreProd   Failing
     user checks element contains  css:[data-testid="published-date"]   25 April 2018
+
+Validate Next update date, and Email alerts link
+    [Tags]     HappyPath    NotAgainstPreProd
     user checks element contains  css:[data-testid="next-update"]      22 March 2019
     user checks page contains link with text and url  Sign up for email alerts    /subscriptions?slug=pupil-absence-in-schools-in-england
 
