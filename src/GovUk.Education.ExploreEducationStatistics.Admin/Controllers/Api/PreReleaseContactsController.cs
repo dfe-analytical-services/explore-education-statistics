@@ -33,14 +33,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}/prerelease")]
+        [HttpGet("release/{releaseId}/prerelease")]
         public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummaryAsync(Guid releaseId)
         {
             return await _preReleaseService
                 .GetPreReleaseSummaryViewModelAsync(releaseId)
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpPost("release/{releaseId}/prerelease-contact")]
         public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToRelease(
             Guid releaseId, [FromBody] PrereleaseAccessRequest request)
