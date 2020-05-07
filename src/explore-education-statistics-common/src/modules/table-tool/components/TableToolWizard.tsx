@@ -144,6 +144,18 @@ const TableToolWizard = ({
     });
   };
 
+  const handleLocationStepBack = async () => {
+    const { subjectId } = state.query;
+
+    const nextSubjectMeta = await tableBuilderService.getPublicationSubjectMeta(
+      subjectId,
+    );
+
+    updateState(draft => {
+      draft.subjectMeta = nextSubjectMeta;
+    });
+  };
+
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
     locations,
   }) => {
@@ -158,6 +170,21 @@ const TableToolWizard = ({
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
       draft.query.locations = locations;
+    });
+  };
+
+  const handleTimePeriodStepBack = async () => {
+    const { subjectId, locations } = state.query;
+
+    const nextSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+      {
+        subjectId,
+        locations,
+      },
+    );
+
+    updateState(draft => {
+      draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
     });
   };
 
@@ -188,6 +215,23 @@ const TableToolWizard = ({
         endYear,
         endCode,
       };
+    });
+  };
+
+  const handleFiltersStepBack = async () => {
+    const { subjectId, locations, timePeriod } = state.query;
+
+    const nextSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+      {
+        subjectId,
+        locations,
+        timePeriod,
+      },
+    );
+
+    updateState(draft => {
+      draft.subjectMeta.indicators = nextSubjectMeta.indicators;
+      draft.subjectMeta.filters = nextSubjectMeta.filters;
     });
   };
 
@@ -258,7 +302,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep>
+            <WizardStep onBack={handleLocationStepBack}>
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
@@ -268,7 +312,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep>
+            <WizardStep onBack={handleTimePeriodStepBack}>
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
@@ -278,7 +322,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep>
+            <WizardStep onBack={handleFiltersStepBack}>
               {stepProps => (
                 <FiltersForm
                   {...stepProps}

@@ -5,6 +5,7 @@ import styles from './WizardStep.module.scss';
 
 export interface WizardStepProps {
   children: ((props: InjectedWizardProps) => ReactNode) | ReactNode;
+  onBack?: () => void;
   id?: string;
 }
 

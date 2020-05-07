@@ -16,6 +16,7 @@ export interface InjectedWizardProps {
   currentStep: number;
   setCurrentStep(step: number): void;
   isActive: boolean;
+  isLoading: boolean;
   goToNextStep(): void;
   goToPreviousStep(): void;
 }
@@ -28,7 +29,7 @@ interface Props {
   onStepChange?: (
     nextStep: number,
     previousStep: number,
-  ) => void | number | Promise<number> | Promise<void>;
+  ) => number | Promise<number>;
 }
 
 const Wizard = ({
@@ -41,6 +42,8 @@ const Wizard = ({
   const [shouldScroll, setShouldScroll] = useState(scrollOnMount);
   const [currentStep, setCurrentStepState] = useState(initialStep);
 
+  const [loading, setLoading] = useState<number>();
+
   const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, WizardStep),
   ) as FunctionComponentElement<WizardStepProps & InjectedWizardProps>[];
@@ -50,12 +53,23 @@ const Wizard = ({
   const setCurrentStep = async (nextStep: number) => {
     setShouldScroll(true);
 
-    if (onStepChange) {
-      const next = await onStepChange(nextStep, currentStep);
+    const current = currentStep;
+    let next = nextStep;
 
-      setCurrentStepState(next || nextStep);
-    } else {
-      setCurrentStepState(nextStep);
+    if (onStepChange) {
+      next = await onStepChange(nextStep, currentStep);
+    }
+
+    setCurrentStepState(next);
+
+    const stepElement = filteredChildren[next - 1];
+
+    if (next < current && stepElement?.props?.onBack) {
+      setLoading(next);
+
+      await stepElement.props.onBack();
+
+      setLoading(undefined);
     }
   };
 
@@ -79,6 +93,7 @@ const Wizard = ({
           },
           id: child.props.id || `${id}-step-${stepNumber}`,
           isActive: stepNumber === currentStep,
+          isLoading: loading === stepNumber,
           async goToPreviousStep() {
             await setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1);
           },

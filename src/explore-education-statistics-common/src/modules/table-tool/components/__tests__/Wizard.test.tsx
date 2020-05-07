@@ -419,4 +419,52 @@ describe('Wizard', () => {
     expect(step2).toHaveClass('stepActive');
     expect(step3).not.toBeVisible();
   });
+
+  test('moving back calls the step `onBack` handler', async () => {
+    const onBack = jest.fn();
+
+    const { getByText } = render(
+      <Wizard id="test-wizard" initialStep={2}>
+        <WizardStep onBack={onBack}>Step 1</WizardStep>
+        <WizardStep>
+          {({ setCurrentStep }) => (
+            <button type="button" onClick={() => setCurrentStep(1)}>
+              Go to step 1
+            </button>
+          )}
+        </WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    fireEvent.click(getByText('Go to step 1'));
+
+    await wait();
+
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  test('moving forward does not call the step `onBack` handler', async () => {
+    const onBack = jest.fn();
+
+    const { getByText } = render(
+      <Wizard id="test-wizard">
+        <WizardStep>
+          {({ setCurrentStep }) => (
+            <button type="button" onClick={() => setCurrentStep(2)}>
+              Go to step 2
+            </button>
+          )}
+        </WizardStep>
+        <WizardStep onBack={onBack}>Step 2</WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    fireEvent.click(getByText('Go to step 2'));
+
+    await wait();
+
+    expect(onBack).not.toHaveBeenCalled();
+  });
 });
