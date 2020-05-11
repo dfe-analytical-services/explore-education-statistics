@@ -1,5 +1,6 @@
 import Link from '@frontend/components/Link';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
+import { AxiosError } from 'axios';
 import { NextPageContext } from 'next';
 import React from 'react';
 import Page from '../components/Page';
@@ -30,9 +31,19 @@ const ErrorPage = ({ statusCode }: Props) => {
 };
 
 ErrorPage.getInitialProps = ({ res, err }: NextPageContext): Props => {
+  let statusCode = res?.statusCode;
+
+  if (err) {
+    const axiosError = err as AxiosError;
+
+    if (axiosError.isAxiosError) {
+      statusCode = axiosError.response?.status;
+    }
+  }
+
   return {
     errorMessage: err?.message ?? '',
-    statusCode: res?.statusCode ?? 500,
+    statusCode: statusCode ?? 500,
   };
 };
 
