@@ -74,7 +74,7 @@ const Tabs = ({ children, id, modifyHash = true, onToggle }: Props) => {
       setLoadedSections(loadedSections.add(index));
       setSelectedTabIndex(index);
     },
-    [loadedSections, sectionElements],
+    [loadedSections, modifyHash],
   );
 
   useEffect(() => {
