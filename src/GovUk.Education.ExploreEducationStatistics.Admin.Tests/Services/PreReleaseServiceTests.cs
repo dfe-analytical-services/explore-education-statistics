@@ -16,10 +16,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPreReleaseSummaryViewModelAsync()
         {
+            var contact = new Contact
+            {
+                Id = Guid.NewGuid(),
+                TeamEmail = "first.last@education.gov.uk"
+            };
+            
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Title = "PreRelease Publication"
+                Title = "PreRelease Publication",
+                ContactId = contact.Id
             };
 
             var release = new Release
@@ -32,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext("PreReleaseSummaryViewModel"))
             {
+                context.Add(contact);
                 context.Add(publication);
                 context.Add(release);
                 await context.SaveChangesAsync();

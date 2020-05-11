@@ -75,8 +75,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, queryable =>
-                    queryable.Include(r => r.Publication))
-                .OnSuccess(release => new PreReleaseSummaryViewModel(release.Publication.Title, release.Title));
+                    queryable.Include(r => r.Publication)
+                        .ThenInclude(publication => publication.Contact))
+                .OnSuccess(release => new PreReleaseSummaryViewModel(
+                    release.Publication.Title,
+                    release.Title,
+                    release.Publication.Contact.TeamEmail));
         }
     }
 

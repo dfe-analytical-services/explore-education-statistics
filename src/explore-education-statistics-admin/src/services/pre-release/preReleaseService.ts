@@ -1,6 +1,7 @@
 import client from '@admin/services/util/service';
 
 export interface PreReleaseSummary {
+  contactEmail: string;
   publicationTitle: string;
   releaseTitle: string;
 }
