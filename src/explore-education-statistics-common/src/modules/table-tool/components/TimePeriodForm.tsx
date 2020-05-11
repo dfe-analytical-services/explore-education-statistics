@@ -96,7 +96,6 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       ref={formikRef}
       initialValues={formInitialValues}
       validateOnBlur={false}
-      validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
         start: Yup.string()
           .required('Start date required')
