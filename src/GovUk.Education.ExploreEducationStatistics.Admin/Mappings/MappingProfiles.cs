@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
-                        .FindAll(r => !r.SoftDeleted && IsLatestVersion(p.Releases, r.Id))))
+                        .FindAll(r => !r.SoftDeleted && IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(
                     dest => dest.ThemeId,
                     m => m.MapFrom(p => p.Topic.ThemeId));   
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(p => p.Topic.ThemeId))
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
-                        .FindAll(r => !r.SoftDeleted && IsLatestVersion(p.Releases, r.Id))))
+                        .FindAll(r => !r.SoftDeleted && IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());   
 
             CreateMap<DataBlock, DataBlockViewModel>();
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         OtherReleases = r.Publication.Releases
                             .FindAll(otherRelease => !otherRelease.SoftDeleted &&
                                                      r.Id != otherRelease.Id &&
-                                                     IsLatestVersion(r.Publication.Releases, otherRelease.Id))  
+                                                     IsLatestVersionOfRelease(r.Publication.Releases, otherRelease.Id))  
                             .OrderByDescending(otherRelease => otherRelease.Year)
                             .ThenByDescending(otherRelease => otherRelease.TimePeriodCoverage)
                             .Select(otherRelease => new PreviousReleaseViewModel
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Release, ReleasePublicationStatusViewModel>();
         }
         
-        private static bool IsLatestVersion(List<Release> releases, Guid releaseId)
+        private static bool IsLatestVersionOfRelease(List<Release> releases, Guid releaseId)
         {
             return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
