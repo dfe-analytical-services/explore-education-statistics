@@ -61,18 +61,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        public async Task AppendFromStreamAsync(string containerName, string blobName, string contentType,
+        public Task AppendFromStreamAsync(string containerName, string blobName, string contentType,
             string content)
         {
-            await FileStorageUtils.AppendFromStreamAsync(_storageConnectionString, containerName, blobName,
+            return FileStorageUtils.AppendFromStreamAsync(_storageConnectionString, containerName, blobName,
                 contentType, content);
         }
         
-        public async Task UploadFromStreamAsync(string containerName, string blobName, string contentType,
+        public Task UploadFromStreamAsync(string containerName, string blobName, string contentType,
             string content)
         {
-            await FileStorageUtils.UploadFromStreamAsync(_storageConnectionString, containerName, blobName,
+            return FileStorageUtils.UploadFromStreamAsync(_storageConnectionString, containerName, blobName,
                 contentType, content);
+        }
+        
+        public Task<bool> TryGetOrCreateAppendBlobAsync(string containerName, string blobName)
+        {
+            return FileStorageUtils.TryGetOrCreateAppendBlobAsync(_storageConnectionString, containerName, blobName);
         }
     }
 }

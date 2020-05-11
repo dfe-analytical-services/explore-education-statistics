@@ -30,7 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<bool> MigrateAll<T>(string migrationId,
             Func<T, Task<Either<string, Permalink>>> transformFunc)
         {
-            var shouldRun = await CheckMigrationShouldRunAndRecordHistoryAsync(migrationId);
+            var migrationHistoryWriter =
+                await MigrationHistoryWriter.CreateAsync(MigrationContainerName, migrationId, _fileStorageService);
+            var shouldRun = await CheckMigrationShouldRunAndRecordHistoryAsync(migrationHistoryWriter);
             if (!shouldRun)
             {
                 _logger.LogInformation("Skipping Permalink migration: {MigrationId}", migrationId);
@@ -42,12 +44,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             if (errors.Any())
             {
-                await AppendMigrationHistoryAsync(migrationId, string.Join(Environment.NewLine, errors));
+                await migrationHistoryWriter.WriteHistoryAsync(string.Join(Environment.NewLine, errors));
                 _logger.LogError("Permalink migration: {MigrationId} finished with errors", migrationId);
                 return false;
             }
 
-            await UploadPermalinksAsync(migrationId, transformed);
+            await UploadPermalinksAsync(migrationHistoryWriter, transformed);
             _logger.LogInformation("Permalink migration: {MigrationId} finished successfully", migrationId);
             return true;
         }
@@ -90,43 +92,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return task.Select(JsonConvert.DeserializeObject<T>);
         }
 
-        private async Task UploadPermalinksAsync(string migrationId, List<Permalink> permalinks)
+        private async Task UploadPermalinksAsync(MigrationHistoryWriter migrationHistoryWriter,
+            List<Permalink> permalinks)
         {
-            await AppendMigrationHistoryAsync(migrationId, $"Uploading {permalinks.Count} Permalinks");
+            await migrationHistoryWriter.WriteHistoryAsync($"Uploading {permalinks.Count} Permalinks");
             await Task.WhenAll(permalinks.Select(permalink =>
                 _fileStorageService.UploadFromStreamAsync(PermalinkContainerName,
                     permalink.Id.ToString(),
                     MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink))));
-            await AppendMigrationHistoryAsync(migrationId, $"Upload complete");
+            await migrationHistoryWriter.WriteHistoryAsync("Upload complete");
         }
 
-        private async Task<bool> CheckMigrationShouldRunAndRecordHistoryAsync(string migrationId)
+        private async Task<bool> CheckMigrationShouldRunAndRecordHistoryAsync(
+            MigrationHistoryWriter migrationHistoryWriter)
         {
-            var shouldRun = !_fileStorageService.FileExists(MigrationContainerName, migrationId);
+            var shouldRun = !migrationHistoryWriter.IsHistoryExists();
             // Presence of history file is used to prevent future executions
             if (shouldRun)
             {
-                await AddMigrationHistoryAsync(migrationId);
+                await migrationHistoryWriter.WriteHistoryAsync("Started");
             }
 
             return shouldRun;
         }
+    }
 
-        private Task AddMigrationHistoryAsync(string migrationId)
+    internal class MigrationHistoryWriter
+    {
+        private readonly string _containerName;
+        private readonly string _migrationId;
+        private readonly IFileStorageService _fileStorageService;
+        private readonly bool _appendSupported;
+
+        private MigrationHistoryWriter(string containerName, string migrationId, IFileStorageService fileStorageService,
+            bool appendSupported)
         {
-            var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            return _fileStorageService.UploadFromStreamAsync(MigrationContainerName,
-                migrationId,
-                MediaTypeNames.Text.Plain,
-                $"{now}: Started");
+            _containerName = containerName;
+            _migrationId = migrationId;
+            _fileStorageService = fileStorageService;
+            _appendSupported = appendSupported;
         }
 
-        private Task AppendMigrationHistoryAsync(string migrationId, string message)
+        internal static async Task<MigrationHistoryWriter> CreateAsync(string containerName, string migrationId,
+            IFileStorageService fileStorageService)
+        {
+            var appendSupported = await fileStorageService.TryGetOrCreateAppendBlobAsync(containerName, migrationId);
+            return new MigrationHistoryWriter(containerName, migrationId, fileStorageService, appendSupported);
+        }
+
+        public bool IsHistoryExists()
+        {
+            return _fileStorageService.FileExists(_containerName, _migrationId);
+        }
+
+        public Task WriteHistoryAsync(string message)
+        {
+            if (_appendSupported)
+            {
+                return AppendMigrationHistoryAsync(message);
+            }
+
+            // Appending is not supported by the Storage Emulator.
+            // Currently history is lost as last log message is replaced instead
+            return UploadMigrationHistoryAsync(message);
+        }
+
+        private Task UploadMigrationHistoryAsync(string message)
         {
             var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            return _fileStorageService.UploadFromStreamAsync(MigrationContainerName,
-                migrationId,
+            return _fileStorageService.UploadFromStreamAsync(_containerName,
+                _migrationId,
+                MediaTypeNames.Text.Plain,
+                $"{now}: {message}");
+        }
+
+        private Task AppendMigrationHistoryAsync(string message)
+        {
+            var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+            return _fileStorageService.AppendFromStreamAsync(_containerName,
+                _migrationId,
                 MediaTypeNames.Text.Plain,
                 $"{now}: {message}");
         }
