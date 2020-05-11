@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 {
     public partial class EES846AddContactToNonProductionEnvironments : Migration
     {
-        private const string MigrationId = "20200323102154";
+        private const string MigrationId = "20200511165307";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
