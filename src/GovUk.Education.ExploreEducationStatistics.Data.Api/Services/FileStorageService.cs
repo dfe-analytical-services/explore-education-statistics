@@ -61,6 +61,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
+        public async Task AppendFromStreamAsync(string containerName, string blobName, string contentType,
+            string content)
+        {
+            await FileStorageUtils.AppendFromStreamAsync(_storageConnectionString, containerName, blobName,
+                contentType, content);
+        }
+        
         public async Task UploadFromStreamAsync(string containerName, string blobName, string contentType,
             string content)
         {

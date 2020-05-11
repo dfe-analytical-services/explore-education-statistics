@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -28,19 +27,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger = logger;
         }
 
-        public async Task<Either<ActionResult, bool>> MigrateAll<T>(string migrationId,
+        public async Task<bool> MigrateAll<T>(string migrationId,
             Func<T, Task<Either<string, Permalink>>> transformFunc)
         {
             var shouldRun = await CheckMigrationShouldRunAndRecordHistoryAsync(migrationId);
-
-            if (shouldRun)
+            if (!shouldRun)
             {
-                var source = await DownloadPermalinksAsync<T>();
+                _logger.LogInformation("Skipping Permalink migration: {MigrationId}", migrationId);
+                return false;
+            }
 
-                var transformed = new List<Permalink>();
-                var errors = new List<string>();
+            var source = await DownloadPermalinksAsync<T>();
+            var (errors, transformed) = await DoTransform(source, transformFunc);
 
-                foreach (var permalink in source)
+            if (errors.Any())
+            {
+                await AppendMigrationHistoryAsync(migrationId, string.Join(Environment.NewLine, errors));
+                _logger.LogError("Permalink migration: {MigrationId} finished with errors", migrationId);
+                return false;
+            }
+
+            await UploadPermalinksAsync(migrationId, transformed);
+            _logger.LogInformation("Permalink migration: {MigrationId} finished successfully", migrationId);
+            return true;
+        }
+
+        private async Task<(List<string> errors, List<Permalink> transformed)> DoTransform<T>(
+            IEnumerable<T> source,
+            Func<T, Task<Either<string, Permalink>>> transformFunc)
+        {
+            var errors = new List<string>();
+            var transformed = new List<Permalink>();
+            foreach (var permalink in source)
+            {
+                try
                 {
                     var result = await transformFunc.Invoke(permalink);
                     if (result.IsLeft)
@@ -52,19 +72,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         transformed.Add(result.Right);
                     }
                 }
-
-                if (errors.Any())
+                catch (Exception e)
                 {
-                    errors.ForEach(message => _logger.LogError(message));
-                    return false;
+                    // TODO Not ideal because this doesn't identify the Permalink in the error
+                    _logger.LogError(e, "Exception occured while transforming Permalink");
+                    errors.Add($"Exception occured while transforming Permalink: {e.GetType()} {e.Message}");
                 }
-
-                await UploadPermalinksAsync(transformed);
-
-                return true;
             }
 
-            return false;
+            return (errors, transformed);
         }
 
         private async Task<IEnumerable<T>> DownloadPermalinksAsync<T>()
@@ -74,18 +90,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return task.Select(JsonConvert.DeserializeObject<T>);
         }
 
-        private async Task UploadPermalinksAsync(List<Permalink> permalinks)
+        private async Task UploadPermalinksAsync(string migrationId, List<Permalink> permalinks)
         {
+            await AppendMigrationHistoryAsync(migrationId, $"Uploading {permalinks.Count} Permalinks");
             await Task.WhenAll(permalinks.Select(permalink =>
                 _fileStorageService.UploadFromStreamAsync(PermalinkContainerName,
                     permalink.Id.ToString(),
                     MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink))));
+            await AppendMigrationHistoryAsync(migrationId, $"Upload complete");
         }
 
         private async Task<bool> CheckMigrationShouldRunAndRecordHistoryAsync(string migrationId)
         {
             var shouldRun = !_fileStorageService.FileExists(MigrationContainerName, migrationId);
+            // Presence of history file is used to prevent future executions
             if (shouldRun)
             {
                 await AddMigrationHistoryAsync(migrationId);
@@ -100,7 +119,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return _fileStorageService.UploadFromStreamAsync(MigrationContainerName,
                 migrationId,
                 MediaTypeNames.Text.Plain,
-                now);
+                $"{now}: Started");
+        }
+
+        private Task AppendMigrationHistoryAsync(string migrationId, string message)
+        {
+            var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+            return _fileStorageService.UploadFromStreamAsync(MigrationContainerName,
+                migrationId,
+                MediaTypeNames.Text.Plain,
+                $"{now}: {message}");
         }
     }
 }
