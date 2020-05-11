@@ -143,15 +143,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationA, PublicationB, PublicationC
         };
         
-        private static readonly Release PublicationARelease1 = new Release
+        private static readonly Release PublicationARelease1V0 = new Release
         {
-            Id = Guid.NewGuid(),
+            Id = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"),
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q1",
-            Status = Approved
+            Status = Approved,
+            Version = 0,
+            PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e")
+        };
+        
+        private static readonly Release PublicationARelease1V1Deleted = new Release
+        {
+            Id = new Guid("cf02f125-91da-4606-bf80-c2058092a653"),
+            PublicationId = PublicationA.Id,
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ1,
+            Published = new DateTime(2019, 1, 01),
+            Slug = "publication-a-release-2018-q1",
+            Status = Approved,
+            Version = 1,
+            PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"),
+            SoftDeleted = true
+        };
+        
+        private static readonly Release PublicationARelease1V1 = new Release
+        {
+            Id = new Guid("9da67d6d-a75f-424d-8b8b-975f151292a4"),
+            PublicationId = PublicationA.Id,
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ1,
+            Published = new DateTime(2019, 1, 01),
+            Slug = "publication-a-release-2018-q1",
+            Status = Approved,
+            Version = 1,
+            PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e")
         };
 
         private static readonly Release PublicationARelease2 = new Release
@@ -162,7 +191,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ2,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q2",
-            Status = Approved
+            Status = Approved,
+            Version = 1
         };
 
         private static readonly Release PublicationARelease3 = new Release
@@ -173,7 +203,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ4,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2017-q4",
-            Status = Approved
+            Status = Approved,
+            Version = 0
         };
 
         private static readonly Release PublicationBRelease1 = new Release
@@ -184,12 +215,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ1,
             Published = null,
             Slug = "publication-b-release-2018-q1",
-            Status = Draft
+            Status = Draft,
+            Version = 0
         };
 
         private static readonly List<Release> Releases = new List<Release>
         {
-            PublicationARelease1,
+            PublicationARelease1V0,
+            PublicationARelease1V1Deleted,
+            PublicationARelease1V1,
             PublicationARelease2,
             PublicationARelease3,
             new Release
@@ -200,11 +234,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 TimePeriodCoverage = AcademicYearQ3,
                 Published = null,
                 Slug = "publication-a-release-2018-q3",
-                Status = Draft
+                Status = Draft,
+                Version = 0
             },
             PublicationBRelease1
         };
-        
+
         [Fact]
         public void GetTree()
         {
@@ -276,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var releaseService = new Mock<IReleaseService>();
 
                 releaseService.Setup(s => s.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>()))
-                    .Returns(PublicationARelease1);
+                    .Returns(PublicationARelease1V1);
 
                 var service =
                     new PublicationService(context, MapperForProfile<MappingProfiles>(), releaseService.Object);
@@ -291,7 +326,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("first publication description", viewModel.Description);
                 Assert.Equal("first publication data source", viewModel.DataSource);
                 Assert.Equal("first publication summary", viewModel.Summary);
-                Assert.Equal(PublicationARelease1.Id, viewModel.LatestReleaseId);
+                Assert.Equal(PublicationARelease1V1.Id, viewModel.LatestReleaseId);
+                Assert.Contains(new Guid("9da67d6d-a75f-424d-8b8b-975f151292a4"), viewModel.Releases.Select(r => r.Id));
+                Assert.DoesNotContain(new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"), viewModel.Releases.Select(r => r.Id));
+                Assert.DoesNotContain(new Guid("cf02f125-91da-4606-bf80-c2058092a653"), viewModel.Releases.Select(r => r.Id));
 
                 Assert.NotNull(viewModel.Topic);
                 var topic = viewModel.Topic;
@@ -335,7 +373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(PublicationARelease2.Id, releases[0].Id);
                 Assert.Equal("publication-a-release-2018-q2", releases[0].Slug);
                 Assert.Equal("Academic Year Q2 2018/19", releases[0].Title);
-                Assert.Equal(PublicationARelease1.Id, releases[1].Id);
+                Assert.Equal(PublicationARelease1V1.Id, releases[1].Id);
                 Assert.Equal("publication-a-release-2018-q1", releases[1].Slug);
                 Assert.Equal("Academic Year Q1 2018/19", releases[1].Title);
                 Assert.Equal(PublicationARelease3.Id, releases[2].Id);
