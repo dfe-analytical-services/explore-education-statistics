@@ -1,6 +1,7 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.MigrationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: false,
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
-            migrationBuilder.SqlFromFile("Migrations/ContentMigrations", $"{MigrationId}_Update_PreviousVersionId.sql");
+            migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_Update_PreviousVersionId.sql");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Releases_PreviousVersionId_Version",
