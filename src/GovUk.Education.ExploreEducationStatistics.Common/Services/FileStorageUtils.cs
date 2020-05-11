@@ -135,11 +135,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 .OrderBy(info => info.Name).ToList();
         }
         
+        public static async Task AppendFromStreamAsync(string storageConnectionString, string containerName,
+            string blobName, string contentType, string content)
+        {
+            var blobContainer = await GetCloudBlobContainerAsync(storageConnectionString, containerName);
+
+            var blob = blobContainer.GetAppendBlobReference(blobName);
+            blob.Properties.ContentType = contentType;
+
+            using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+            {
+                await blob.AppendFromStreamAsync(stream);
+            }
+        }
+        
         public static async Task UploadFromStreamAsync(string storageConnectionString, string containerName,
             string blobName, string contentType, string content)
         {
             var blobContainer = await GetCloudBlobContainerAsync(storageConnectionString, containerName);
-            
+
             var blob = blobContainer.GetBlockBlobReference(blobName);
             blob.Properties.ContentType = contentType;
 

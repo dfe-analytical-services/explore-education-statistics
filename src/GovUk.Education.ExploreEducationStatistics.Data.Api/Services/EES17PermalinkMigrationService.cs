@@ -44,18 +44,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public Task<Either<ActionResult, bool>> MigrateAll()
+        public Task<bool> MigrateAll()
         {
-            var migrationId = "EES-17_ChangeTableHeadersAndAddQueryLocation";
+            const string migrationId = "EES-17_ChangeTableHeadersAndAddQueryLocation";
             return _permalinkMigrationService.MigrateAll<EES17Permalink>(migrationId, Transform);
         }
 
-        private Task<Either<string, Permalink>> Transform(EES17Permalink source)
+        private async Task<Either<string, Permalink>> Transform(EES17Permalink source)
         {
             try
             {
                 var permalink = _mapper.Map<Permalink>(source);
-                return GetSubjectMeta(permalink.Query)
+                return await GetSubjectMeta(permalink.Query)
                     .OnSuccess(subjectMeta =>
                     {
                         var filters = GetFilterItemIds(subjectMeta);
@@ -92,18 +92,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             {
                                 var valuesNotFound = string.Join(", ", notFound.Select(header => header.Value));
                                 return new Either<string, Permalink>(
-                                    $"Table header values not found in Subject meta for Permalink {permalink.Id}: {valuesNotFound}");
+                                    $"Failed to transform Permalink: {source.Id} due to table header values not found in Subject meta: {valuesNotFound}");
                             }
                         }
 
                         return permalink;
                     })
-                    .OrElse(() => $"Failed to get Subject meta for query {permalink.Query}");
+                    .OrElse(() => $"Failed to transform Permalink: {source.Id} due to failure getting Subject meta");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Exception occured while transforming permalink {Id}", source.Id);
-                throw;
+                return $"Failed to transform Permalink: {source.Id} due to error: {e.GetType()} {e.Message}";
             }
         }
 
@@ -155,6 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         "More than one geographic level found in meta data for location id: {Value}, levels: {Levels}",
                         value, string.Join(", ", levels));
                 }
+
                 tableHeader.Level = levels.First();
                 type = TableHeaderType.Location;
             }
@@ -230,9 +230,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ObservationQueryContext query)
         {
-            _httpContextAccessor.HttpContext = new DefaultHttpContext();;
-            _httpContextAccessor.HttpContext.User = new ClaimsPrincipal();
-            return _subjectMetaService.GetSubjectMeta(FromObservationQueryContext(query));
+            _httpContextAccessor.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal()
+            };
+            return  _subjectMetaService.GetSubjectMeta(FromObservationQueryContext(query));
         }
     }
 }
