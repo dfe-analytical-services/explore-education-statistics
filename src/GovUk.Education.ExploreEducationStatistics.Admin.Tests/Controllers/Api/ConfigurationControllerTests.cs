@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var configuration = GetConfiguration();
             var configValue = configuration.GetValue<string>("PublicAppUrl");
-            Assert.Equal("http://localhost:3000/", configValue);
+            Assert.Equal("http://localhost:3000", configValue);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = controller.GetConfig();
             var unboxed = AssertOkResult(result);
             Assert.Equal(string.Empty, unboxed["AppInsightsKey"]);
-            Assert.Equal("http://localhost:3000/", unboxed["PublicAppUrl"]);
+            Assert.Equal("http://localhost:3000", unboxed["PublicAppUrl"]);
         }
 
         private static IConfiguration GetConfiguration()
