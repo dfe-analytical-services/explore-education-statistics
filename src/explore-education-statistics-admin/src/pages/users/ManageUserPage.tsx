@@ -52,27 +52,24 @@ const ManageUserPage = ({
   const [model, setModel] = useState<Model>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorStatus, setErrorStatus] = useState<number>();
-  const { withoutErrorHandling } = useErrorControl();
 
   const { userId } = match.params;
   const formId = userId;
 
   const getUser = useCallback(() => {
     setIsLoading(true);
-    withoutErrorHandling(() =>
-      userService
-        .getUser(userId)
-        .then(u => {
-          setModel({
-            user: u,
-          });
-        })
-        .catch(error => {
-          setErrorStatus(error.response.status);
-        })
-        .then(() => setIsLoading(false)),
-    );
-  }, [withoutErrorHandling]);
+    userService
+      .getUser(userId)
+      .then(u => {
+        setModel({
+          user: u,
+        });
+      })
+      .catch(error => {
+        setErrorStatus(error.response.status);
+      })
+      .then(() => setIsLoading(false));
+  }, []);
 
   const { value: roles } = useAsyncRetry(() => userService.getRoles());
   const { value: releases } = useAsyncRetry(() =>
