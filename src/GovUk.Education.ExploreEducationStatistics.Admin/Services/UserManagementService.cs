@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -31,7 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext, ContentDbContext contentDbContext,
             IEmailService emailService,
-            IConfiguration configuration, UserManager<ApplicationUser> userManager, IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IConfiguration configuration, UserManager<ApplicationUser> userManager,
+            IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -59,22 +62,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return users.Where(u => u.Role != "Prerelease User").ToList();
         }
 
-        public async Task<Either<ActionResult, bool>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission userReleaseRole)
+        public async Task<Either<ActionResult, UserReleaseRole>> AddUserReleaseRole(Guid userId,
+            UserReleaseRoleSubmission userReleaseRole)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(userReleaseRole.ReleaseId)
-                // verify the user does not already have this role
-                .OnSuccessDo(async () =>
+                .OnSuccess(_ => CheckIfUserAlreadyHasReleaseRole(userId, userReleaseRole))
+                .OnSuccess(async _ =>
                 {
-                    _contentDbContext.Add(new UserReleaseRole
+                    var newReleaseRole = new UserReleaseRole
                     {
                         ReleaseId = userReleaseRole.ReleaseId,
                         Role = userReleaseRole.ReleaseRole,
                         UserId = userId
-                    });
+                    };
+
+                    _contentDbContext.Add(newReleaseRole);
+
                     await _contentDbContext.SaveChangesAsync();
-                })
-                .OnSuccess(_ => true);
+
+                    return newReleaseRole;
+                });
         }
 
         public async Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userId, Guid userReleaseRoleId)
@@ -84,7 +92,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 // verify the role belongs to the user
                 .OnSuccessDo(async () =>
                 {
-                    var entityToRemove = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r => r.Id == userReleaseRoleId);
+                    var entityToRemove =
+                        await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r => r.Id == userReleaseRoleId);
                     _contentDbContext.Remove(entityToRemove);
                     await _contentDbContext.SaveChangesAsync();
                 })
@@ -276,6 +285,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var emailValues = new Dictionary<string, dynamic> {{"url", "https://" + uri}};
 
             _emailService.SendEmail(email, template, emailValues);
+        }
+
+        private async Task<Either<ActionResult, bool>> CheckIfUserAlreadyHasReleaseRole(Guid userId,
+            UserReleaseRoleSubmission userReleaseRole)
+        {
+            var existing = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
+                r.UserId == userId && r.ReleaseId == userReleaseRole.ReleaseId && r.Role == userReleaseRole.ReleaseRole);
+
+            if (existing == null)
+            {
+                return true;
+            }
+            
+            return ValidationActionResult(UserAlreadyHasReleaseRole);
         }
     }
 }

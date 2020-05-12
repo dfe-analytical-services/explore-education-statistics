@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<List<UserViewModel>> ListAsync();
 
 
-        Task<Either<ActionResult, bool>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission userReleaseRole);
+        Task<Either<ActionResult, UserReleaseRole>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission userReleaseRole);
 
         Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userId, Guid userReleaseRoleId);
 

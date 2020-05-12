@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.U
         }
         
         [HttpPost("bau/users/{userId}/release-role")]
-        public async Task<ActionResult<bool>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission releaseRole)
+        public async Task<ActionResult<UserReleaseRole>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission releaseRole)
         {
             return await _userManagementService.AddUserReleaseRole(userId, releaseRole).HandleFailuresOrOk();
         }
