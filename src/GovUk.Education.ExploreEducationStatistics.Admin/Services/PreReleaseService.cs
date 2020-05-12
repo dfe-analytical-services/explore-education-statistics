@@ -40,8 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return new PreReleaseWindowStatus
             {
-                PreReleaseWindowStartTime = accessWindowStart,
-                PreReleaseWindowEndTime = accessWindowEnd,
+                PreReleaseWindowStartTime = DateTime.SpecifyKind(accessWindowStart, DateTimeKind.Utc),
+                PreReleaseWindowEndTime = DateTime.SpecifyKind(accessWindowEnd, DateTimeKind.Utc),
                 PreReleaseAccess = GetPreReleaseAccess(release, accessWindowStart, accessWindowEnd, referenceTime)
             };
         }
