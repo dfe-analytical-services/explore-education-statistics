@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +29,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.U
         public async Task<ActionResult<List<UserViewModel>>> GetUserList()
         {
             var users = await _userManagementService.ListAsync();
+
+            if (users.Any())
+            {
+                return Ok(users);
+            }
+
+            return NotFound();
+        }
+        
+        [HttpGet("bau/users/pre-release")]
+        public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
+        {
+            var users = await _userManagementService.ListPreReleaseUsersAsync();
 
             if (users.Any())
             {
@@ -67,6 +79,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.U
             return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
         
+        [HttpGet("bau/users/{userId}/release-role")]
+        public ActionResult<UserReleaseRoleViewModel> GetUserReleaseRoles(Guid userId)
+        {
+            return Ok(_userManagementService.GetUserReleaseRoles(userId.ToString()));
+        }
+        
         [HttpPost("bau/users/{userId}/release-role")]
         public async Task<ActionResult<UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission releaseRole)
         {
@@ -80,18 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.U
         }
 
 
-        [HttpGet("bau/users/pre-release")]
-        public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
-        {
-            var users = await _userManagementService.ListPreReleaseUsersAsync();
 
-            if (users.Any())
-            {
-                return Ok(users);
-            }
-
-            return NotFound();
-        }
 
         [HttpGet("bau/users/roles")]
         [ProducesResponseType(200)]

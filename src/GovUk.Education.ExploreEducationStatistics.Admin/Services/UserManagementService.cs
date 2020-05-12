@@ -100,12 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userId, Guid userReleaseRoleId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<User>(userId)
-                // verify the role belongs to the user
+                .CheckEntityExists<UserReleaseRole>(userReleaseRoleId)
                 .OnSuccessDo(async () =>
                 {
-                    var entityToRemove =
-                        await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r => r.Id == userReleaseRoleId);
+                    var entityToRemove = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r => r.Id == userReleaseRoleId && r.UserId == userId);
                     _contentDbContext.Remove(entityToRemove);
                     await _contentDbContext.SaveChangesAsync();
                 })
@@ -244,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private List<UserReleaseRoleViewModel> GetUserReleaseRoles(string userId)
+        public List<UserReleaseRoleViewModel> GetUserReleaseRoles(string userId)
         {
             return _contentDbContext.UserReleaseRoles
                 .Where(x => x.UserId == Guid.Parse(userId))
