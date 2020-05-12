@@ -75,7 +75,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         }),
       }}
       validateOnBlur={false}
-      validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
         locations: Yup.mixed().test(
           'required',
