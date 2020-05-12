@@ -21,10 +21,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 TeamEmail = "first.last@education.gov.uk"
             };
-            
+
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
+                Slug = "prerelease-publication",
                 Title = "PreRelease Publication",
                 ContactId = contact.Id
             };
@@ -54,6 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PersistenceHelper<ContentDbContext>(context));
 
                 var viewModel = (await preReleaseService.GetPreReleaseSummaryViewModelAsync(release.Id)).Right;
+                Assert.Equal(contact.TeamEmail, viewModel.ContactEmail);
+                Assert.Equal(publication.Slug, viewModel.PublicationSlug);
                 Assert.Equal(publication.Title, viewModel.PublicationTitle);
                 Assert.Equal(release.Title, viewModel.ReleaseTitle);
             }

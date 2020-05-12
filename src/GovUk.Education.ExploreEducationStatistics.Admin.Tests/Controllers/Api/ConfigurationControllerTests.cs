@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var configSection = configuration.GetSection("AppInsights");
             Assert.NotNull(configSection);
             var configValue = configSection.GetValue<string>("InstrumentationKey");
-            Assert.Equal("", configValue);
+            Assert.Equal(string.Empty, configValue);
         }
 
         [Fact]
@@ -27,29 +27,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public void GetInsightsKey()
+        public void GetConfig()
         {
             var controller = new ConfigurationController(GetConfiguration());
-            var result = controller.GetInsightsKey();
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            Assert.Equal("", ((OkObjectResult) result.Result).Value);
-        }
-
-        [Fact]
-        public void GetPublicAppUrl()
-        {
-            var controller = new ConfigurationController(GetConfiguration());
-            var result = controller.GetPublicAppUrl();
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            Assert.Equal("http://localhost:3000/", ((OkObjectResult) result.Result).Value);
-        }
-
-        [Fact]
-        public void GetPublicAppUrl_NotFound()
-        {
-            var controller = new ConfigurationController(GetEmptyConfiguration());
-            var result = controller.GetPublicAppUrl();
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            var result = controller.GetConfig();
+            var unboxed = AssertOkResult(result);
+            Assert.Equal(string.Empty, unboxed["AppInsightsKey"]);
+            Assert.Equal("http://localhost:3000/", unboxed["PublicAppUrl"]);
         }
 
         private static IConfiguration GetConfiguration()
@@ -61,9 +45,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Build();
         }
 
-        private static IConfiguration GetEmptyConfiguration()
+        private static T AssertOkResult<T>(ActionResult<T> result) where T : class
         {
-            return new ConfigurationBuilder().Build();
+            Assert.IsAssignableFrom<ActionResult<T>>(result);
+            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
+            var okObjectResult = result.Result as OkObjectResult;
+            Assert.IsAssignableFrom<T>(okObjectResult?.Value);
+            return okObjectResult?.Value as T;
         }
     }
 }

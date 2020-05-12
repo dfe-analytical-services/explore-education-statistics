@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -27,16 +28,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(value);
         }
 
-        [HttpGet("api/configuration/public-app-url")]
-        public ActionResult<string> GetPublicAppUrl()
+        [HttpGet("api/config")]
+        public ActionResult<Dictionary<string, string>> GetConfig()
         {
-            var value = _configuration.GetValue<string>("PublicAppUrl");
-            if (string.IsNullOrEmpty(value))
-            {
-                return NotFound();
-            }
+            return Ok(BuildConfigurationValues());
+        }
 
-            return Ok(value);
+        private Dictionary<string, string> BuildConfigurationValues()
+        {
+            return new Dictionary<string, string>
+            {
+                {
+                    ExposedKeys.AppInsightsKey.ToString(), GetValue(GetRootSection("AppInsights"), "InstrumentationKey")
+                },
+                {
+                    ExposedKeys.PublicAppUrl.ToString(), GetRootValue("PublicAppUrl")
+                }
+            };
+        }
+
+        private IConfigurationSection GetRootSection(string key)
+        {
+            return _configuration.GetSection(key);
+        }
+
+        private string GetRootValue(string key)
+        {
+            return _configuration.GetValue<string>(key);
+        }
+
+        private static string GetValue(IConfiguration configuration, string key)
+        {
+            return configuration?.GetValue<string>(key);
+        }
+
+        private enum ExposedKeys
+        {
+            AppInsightsKey,
+            PublicAppUrl
         }
     }
 }

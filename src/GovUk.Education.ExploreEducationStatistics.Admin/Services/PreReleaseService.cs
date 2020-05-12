@@ -78,6 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     queryable.Include(r => r.Publication)
                         .ThenInclude(publication => publication.Contact))
                 .OnSuccess(release => new PreReleaseSummaryViewModel(
+                    release.Publication.Slug,
                     release.Publication.Title,
                     release.Title,
                     release.Publication.Contact.TeamEmail));
