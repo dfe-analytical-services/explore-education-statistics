@@ -39,12 +39,12 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       releaseId,
     );
 
-    if (preReleaseWindowStatus.preReleaseAccess === 'NoneSet') {
+    if (preReleaseWindowStatus.access === 'NoneSet') {
       handleManualErrors.forbidden();
       return undefined;
     }
 
-    if (preReleaseWindowStatus.preReleaseAccess === 'Within') {
+    if (preReleaseWindowStatus.access === 'Within') {
       const content = await releaseContentService.getContent(releaseId);
 
       return {
@@ -75,7 +75,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       }
       includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
     >
-      {preReleaseWindowStatus?.preReleaseAccess === 'Within' && content && (
+      {preReleaseWindowStatus?.access === 'Within' && content && (
         <ReleaseProvider
           value={{
             ...content,
@@ -87,7 +87,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
         </ReleaseProvider>
       )}
 
-      {preReleaseWindowStatus?.preReleaseAccess === 'Before' && (
+      {preReleaseWindowStatus?.access === 'Before' && (
         <>
           <h1>Pre Release access is not yet available</h1>
 
@@ -101,26 +101,12 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
               </p>
               <p>
                 Pre Release access will be available from{' '}
-                {format(
-                  preReleaseWindowStatus.preReleaseWindowStartTime,
-                  'd MMMM yyyy',
-                )}
+                {format(preReleaseWindowStatus.start, 'd MMMM yyyy')}
                 {' at '}
-                {format(
-                  preReleaseWindowStatus.preReleaseWindowStartTime,
-                  'HH:mm',
-                )}{' '}
-                until{' '}
-                {format(
-                  preReleaseWindowStatus.preReleaseWindowEndTime,
-                  'd MMMM yyyy',
-                )}
+                {format(preReleaseWindowStatus.start, 'HH:mm')} until{' '}
+                {format(preReleaseWindowStatus.end, 'd MMMM yyyy')}
                 {' at '}
-                {format(
-                  preReleaseWindowStatus.preReleaseWindowEndTime,
-                  'HH:mm',
-                )}
-                .
+                {format(preReleaseWindowStatus.end, 'HH:mm')}.
               </p>
               <p>
                 If you believe that this release should be available and you are
@@ -135,7 +121,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
         </>
       )}
 
-      {preReleaseWindowStatus?.preReleaseAccess === 'After' && (
+      {preReleaseWindowStatus?.access === 'After' && (
         <>
           <h1>Pre Release access has ended</h1>
 
