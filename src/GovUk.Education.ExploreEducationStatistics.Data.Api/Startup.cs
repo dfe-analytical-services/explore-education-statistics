@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
-            MigratePermalinks(app).Wait();
+            MigratePermalinksAsync(app).Wait();
 
             if (env.IsDevelopment())
             {
@@ -198,12 +198,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         /**
          * Temporary method to migrate permalinks for EES-17
          */
-        private static async Task MigratePermalinks(IApplicationBuilder app)
+        private static async Task MigratePermalinksAsync(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var permalinkMigrationService = serviceScope.ServiceProvider.GetRequiredService<IEES17PermalinkMigrationService>();
-                await permalinkMigrationService.MigrateAll();
+                // Intentionally don't await call here
+                permalinkMigrationService.MigrateAll();
             }
         }
     }

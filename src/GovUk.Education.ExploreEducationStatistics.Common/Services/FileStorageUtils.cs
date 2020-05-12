@@ -162,12 +162,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 await blob.UploadFromStreamAsync(stream);
             }
         }
-        
+
         public static string GetExtension(CloudBlob blob)
         {
             return Path.GetExtension(blob.Name).TrimStart('.');
         }
-        
+
         public static string GetName(CloudBlob blob)
         {
             return blob.Metadata.TryGetValue(NameKey, out var name) ? name : string.Empty;
@@ -185,7 +185,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return $"{fileSize:0.##} {unit}";
         }
-        
+
+        /**
+         * Storage Emulator doesn't support AppendBlob. This method checks if AppendBlob can be used.
+         */
+        public static async Task<bool> TryGetOrCreateAppendBlobAsync(string storageConnectionString, string containerName,
+            string blobName)
+        {
+            var blobContainer = await GetCloudBlobContainerAsync(storageConnectionString, containerName);
+            var blob = blobContainer.GetAppendBlobReference(blobName);
+
+            if (blob.Exists())
+            {
+                return true;
+            }
+
+            try
+            {
+                await blob.CreateOrReplaceAsync();
+                return true;
+            }
+            catch (StorageException e)
+            {
+                if (e.Message.Contains("Storage Emulator"))
+                {
+                    // Storage Emulator doesn't support AppendBlob
+                    return false;
+                }
+                throw;
+            }
+        }
+
         public static bool IsFileReleased(CloudBlob blob)
         {
             if (!blob.Exists())

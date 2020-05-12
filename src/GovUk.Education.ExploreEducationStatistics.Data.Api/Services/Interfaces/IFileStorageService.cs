@@ -7,6 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 {
     public interface IFileStorageService
     {
+        Task AppendFromStreamAsync(string containerName, string blobName, string contentType, string content);
+        
         Task<string> DownloadTextAsync(string containerName, string blobName);
 
         bool FileExists(string containerName, string blobName);
@@ -14,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
         bool FileExistsAndIsReleased(string containerName, string blobName);
 
         IEnumerable<CloudBlockBlob> ListBlobs(string containerName);
+
+        Task<bool> TryGetOrCreateAppendBlobAsync(string containerName, string blobName);
 
         Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName);
 
