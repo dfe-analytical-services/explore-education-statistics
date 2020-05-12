@@ -1,5 +1,6 @@
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
+import useConfig from '@admin/hooks/useConfig';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { ReleaseProvider } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import permissionService, {
@@ -29,6 +30,7 @@ interface MatchProps {
 const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
+  const { value: config } = useConfig();
   const { handleManualErrors } = useErrorControl();
   const { user } = useAuthContext();
 
@@ -122,12 +124,11 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
               </p>
               <p>
                 If you believe that this release should be available and you are
-                having problems accessing please contact the production team{' '}
-                <strong>
-                  <a href={`mailto:${preReleaseSummary.contactEmail}`}>
-                    {preReleaseSummary.contactEmail}
-                  </a>
-                </strong>
+                having problems accessing please contact the{' '}
+                <a href={`mailto:${preReleaseSummary.contactEmail}`}>
+                  production team
+                </a>
+                .
               </p>
             </>
           )}
@@ -139,12 +140,26 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
           <h1>Pre Release access has ended</h1>
 
           {preReleaseSummary && (
-            <p>
-              Pre Release access for the{' '}
-              <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
-              <strong>{preReleaseSummary.publicationTitle}</strong> is no longer
-              available.
-            </p>
+            <>
+              <p>
+                The <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
+                <strong>{preReleaseSummary.publicationTitle}</strong> has now
+                been published on the Explore Education Statistics service.
+              </p>
+
+              {config?.PublicAppUrl && (
+                <p>
+                  View this{' '}
+                  <a
+                    href={`${config.PublicAppUrl}/find-statistics/${preReleaseSummary.publicationSlug}/${preReleaseSummary.releaseSlug}`}
+                    rel="noopener noreferrer"
+                  >
+                    release
+                  </a>
+                  .
+                </p>
+              )}
+            </>
           )}
         </>
       )}
