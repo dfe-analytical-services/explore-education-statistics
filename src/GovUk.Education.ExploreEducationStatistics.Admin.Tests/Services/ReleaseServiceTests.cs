@@ -51,8 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
                 
                 var publishScheduled = new DateTime(2050, 6, 30, 14, 0, 0);
-                var publishScheduledMidnight = new DateTime(2050, 6, 30).ToUniversalTime();
-                
+
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
@@ -63,9 +62,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                     });
 
+                var gmtStandardTimeTimezone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+                var publishScheduledStartOfDay = new DateTime(2050, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
+                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
+                var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
+                
                 Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
                 Assert.Null(result.Result.Right.Published);
-                Assert.Equal(publishScheduledMidnight, result.Result.Right.PublishScheduled);
+                Assert.Equal(publishScheduledStartOfDayUtc, result.Result.Right.PublishScheduled);
                 Assert.False(result.Result.Right.LatestRelease); // Most recent - but not published yet.
                 Assert.Equal(TimeIdentifier.AcademicYear, result.Result.Right.TimePeriodCoverage);
             }
@@ -291,7 +295,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
             
             var publishScheduledEdited = new DateTime(2051, 6, 30, 14, 0, 0);
-            var publishScheduledEditedMidnight = new DateTime(2051, 6, 30).ToUniversalTime();
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var typeEdited = officialStatisticsReleaseType;
             const string releaseNameEdited = "2035";
@@ -316,7 +319,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = timePeriodCoverageEdited
                         });
 
-                Assert.Equal(publishScheduledEditedMidnight, edited.Right.PublishScheduled);
+                var gmtStandardTimeTimezone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+                var publishScheduledStartOfDay = new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
+                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
+                var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
+                
+                Assert.Equal(publishScheduledStartOfDayUtc, edited.Right.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, edited.Right.NextReleaseDate);
                 Assert.Equal(typeEdited, edited.Right.Type);
                 Assert.Equal(releaseNameEdited, edited.Right.ReleaseName);
