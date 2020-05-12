@@ -1135,6 +1135,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TeamEmail = "he.leo@education.gov.uk",
                     ContactName = "Daisy Astill",
                     ContactTelNo = "07741 118332"
+                },
+                new Contact
+                {
+                    Id = new Guid("3b263e1d-9df3-45a4-acba-086c820db140"),
+                    TeamName = "Higher education analysis team",
+                    TeamEmail = "HE.statistics@education.gov.uk",
+                    ContactName = "Gabriel Kite",
+                    ContactTelNo = "07796275845"
                 }
             );
 
@@ -1278,7 +1286,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "graduate-labour-markets",
                     LegacyPublicationUrl =
                         new Uri(
-                            "https://www.gov.uk/government/collections/graduate-labour-market-quarterly-statistics#documents")
+                            "https://www.gov.uk/government/collections/graduate-labour-market-quarterly-statistics#documents"),
+                    ContactId = new Guid("3b263e1d-9df3-45a4-acba-086c820db140")
                 },
                 new Publication
                 {
