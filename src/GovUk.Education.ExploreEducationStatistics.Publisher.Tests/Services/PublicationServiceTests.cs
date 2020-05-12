@@ -185,38 +185,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         private static readonly Release PublicationARelease2 = new Release
         {
-            Id = Guid.NewGuid(),
+            Id = new Guid("874d4e4f-5568-482f-a5a4-d41e5bf6632a"),
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ2,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q2",
             Status = Approved,
-            Version = 1
+            Version = 0,
+            PreviousVersionId = new Guid("874d4e4f-5568-482f-a5a4-d41e5bf6632a")
         };
 
         private static readonly Release PublicationARelease3 = new Release
         {
-            Id = Guid.NewGuid(),
+            Id = new Guid("676ff979-9b1d-4bd2-a3f1-f126c4e2e8d4"),
             PublicationId = PublicationA.Id,
             ReleaseName = "2017",
             TimePeriodCoverage = AcademicYearQ4,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2017-q4",
             Status = Approved,
-            Version = 0
+            Version = 0,
+            PreviousVersionId = new Guid("676ff979-9b1d-4bd2-a3f1-f126c4e2e8d4")
         };
 
         private static readonly Release PublicationBRelease1 = new Release
         {
-            Id = Guid.NewGuid(),
+            Id = new Guid("e66247d7-b350-4d81-a223-3080edc55623"),
             PublicationId = PublicationB.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             Published = null,
             Slug = "publication-b-release-2018-q1",
             Status = Draft,
-            Version = 0
+            Version = 0,
+            PreviousVersionId = new Guid("e66247d7-b350-4d81-a223-3080edc55623")
         };
 
         private static readonly List<Release> Releases = new List<Release>
@@ -228,14 +231,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationARelease3,
             new Release
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("3c7b1338-4c41-43b4-b4ae-67c21c8734fb"),
                 PublicationId = PublicationA.Id,
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ3,
                 Published = null,
                 Slug = "publication-a-release-2018-q3",
                 Status = Draft,
-                Version = 0
+                Version = 0,
+                PreviousVersionId = new Guid("3c7b1338-4c41-43b4-b4ae-67c21c8734fb")
             },
             PublicationBRelease1
         };
@@ -327,9 +331,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("first publication data source", viewModel.DataSource);
                 Assert.Equal("first publication summary", viewModel.Summary);
                 Assert.Equal(PublicationARelease1V1.Id, viewModel.LatestReleaseId);
-                Assert.Contains(new Guid("9da67d6d-a75f-424d-8b8b-975f151292a4"), viewModel.Releases.Select(r => r.Id));
-                Assert.DoesNotContain(new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"), viewModel.Releases.Select(r => r.Id));
-                Assert.DoesNotContain(new Guid("cf02f125-91da-4606-bf80-c2058092a653"), viewModel.Releases.Select(r => r.Id));
+                Assert.Contains(PublicationARelease1V1.Id, viewModel.Releases.Select(r => r.Id));
+                Assert.DoesNotContain(PublicationARelease1V0.Id, viewModel.Releases.Select(r => r.Id));
+                Assert.DoesNotContain(PublicationARelease1V1Deleted.Id, viewModel.Releases.Select(r => r.Id));
 
                 Assert.NotNull(viewModel.Topic);
                 var topic = viewModel.Topic;
