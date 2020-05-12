@@ -9,23 +9,12 @@ export interface ManualErrorHandler {
 export interface ErrorControlState {
   handleApiErrors: AxiosErrorHandler;
   handleManualErrors: ManualErrorHandler;
-  /**
-   * Run a {@param callback} in a context where
-   * the context's error handling is disabled and
-   * errors are automatically re-thrown.
-   * This is useful in situations where we want to
-   * handle errors in a different way to the default.
-   */
-  withoutErrorHandling: <T>(callback: () => Promise<T>) => Promise<T>;
 }
 
 export const ErrorControlContext = createContext<ErrorControlState>({
   handleApiErrors: noop,
   handleManualErrors: {
     forbidden: noop,
-  },
-  withoutErrorHandling: async callback => {
-    return callback();
   },
 });
 

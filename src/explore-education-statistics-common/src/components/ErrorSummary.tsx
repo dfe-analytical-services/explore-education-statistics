@@ -11,6 +11,7 @@ interface Props {
   id: string;
   focusOnError?: boolean;
   title?: string;
+  onFocus?: () => void;
 }
 
 const ErrorSummary = ({
@@ -18,6 +19,7 @@ const ErrorSummary = ({
   errors,
   focusOnError = false,
   title = 'There is a problem',
+  onFocus,
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -37,8 +39,12 @@ const ErrorSummary = ({
       });
 
       ref.current.focus();
+
+      if (onFocus) {
+        onFocus();
+      }
     }
-  }, [errors, focusOnError]);
+  }, [errors, focusOnError, onFocus]);
 
   const idTitle = `${id}-title`;
 

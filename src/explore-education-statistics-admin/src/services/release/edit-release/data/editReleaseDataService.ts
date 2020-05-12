@@ -1,6 +1,5 @@
 import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
 import client from '@admin/services/util/service';
-import noop from 'lodash/noop';
 
 interface GetFileResponse {
   extension: string;
@@ -219,14 +218,19 @@ const editReleaseDataService = {
     );
   },
 
-  async deleteChartFile(releaseId: string, fileName: string): Promise<null> {
-    return client.delete<null>(`/release/${releaseId}/chart/${fileName}`);
+  async deleteChartFile(
+    releaseId: string,
+    subjectName: string,
+    fileName: string,
+  ): Promise<null> {
+    return client.delete<null>(
+      `/release/${releaseId}/chart/${subjectName}/${fileName}`,
+    );
   },
 
   downloadChartFile(releaseId: string, fileName: string): Promise<Blob> {
     return client.get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
       responseType: 'blob',
-      onError: error => error,
     });
   },
 };

@@ -1,12 +1,11 @@
 import ForbiddenPage from '@admin/pages/errors/ForbiddenPage';
 import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
-import { clients } from '@admin/services/util/configureAxios';
 import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContext';
 import logger from '@common/services/logger';
 import { AxiosError } from 'axios';
 import * as H from 'history';
-import React from 'react';
+import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface State {
@@ -18,12 +17,10 @@ interface State {
  * specific types, or a fallback "Service problems" page
  * dependant on the type of error encountered.
  */
-class ErrorBoundary extends React.Component<RouteComponentProps, State> {
+class PageErrorBoundary extends Component<RouteComponentProps, State> {
   public state: State = {};
 
   private unregisterCallback?: H.UnregisterCallback;
-
-  private isHandlingErrors = true;
 
   private handleManualErrors = {
     forbidden: () => {
@@ -45,36 +42,30 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
       });
     });
 
-    clients.forEach(client => {
-      // eslint-disable-next-line no-param-reassign
-      client.errorHandler = this.handleApiErrors;
-    });
+    window.addEventListener('unhandledrejection', this.handlePromiseRejections);
   }
 
   public componentWillUnmount() {
     if (this.unregisterCallback) {
       this.unregisterCallback();
     }
+
+    window.removeEventListener(
+      'unhandledrejection',
+      this.handlePromiseRejections,
+    );
   }
 
-  private handleApiErrors = (error: AxiosError) => {
-    if (this.isHandlingErrors) {
-      this.setState({
-        errorCode: error.response?.status || 500,
-      });
-    }
+  private handlePromiseRejections = (event: PromiseRejectionEvent) => {
+    this.handleApiErrors(event.reason);
   };
 
-  private withoutErrorHandling = async <T extends unknown>(
-    callback: () => Promise<T>,
-  ): Promise<T> => {
-    this.isHandlingErrors = false;
+  private handleApiErrors = (error: AxiosError) => {
+    logger.error(error);
 
-    try {
-      return await callback();
-    } finally {
-      this.isHandlingErrors = true;
-    }
+    this.setState({
+      errorCode: error.response?.status || 500,
+    });
   };
 
   public componentDidCatch(error: Error) {
@@ -86,7 +77,7 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
   }
 
   public render() {
-    const { handleApiErrors, handleManualErrors, withoutErrorHandling } = this;
+    const { handleApiErrors, handleManualErrors } = this;
     const { children } = this.props;
     const { errorCode } = this.state;
 
@@ -96,7 +87,6 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
           value={{
             handleApiErrors,
             handleManualErrors,
-            withoutErrorHandling,
           }}
         >
           {children}
@@ -116,4 +106,4 @@ class ErrorBoundary extends React.Component<RouteComponentProps, State> {
   }
 }
 
-export default withRouter(ErrorBoundary);
+export default withRouter(PageErrorBoundary);

@@ -1,6 +1,7 @@
 import ChartBuilder, {
   TableQueryUpdateHandler,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
+import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablocks/service';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -42,12 +43,31 @@ const ChartBuilderTabSection = ({
 
   const handleChartSave = useCallback(
     async (chart: Chart) => {
-      onDataBlockSave({
+      await onDataBlockSave({
         ...dataBlock,
         charts: [chart],
       });
     },
     [dataBlock, onDataBlockSave],
+  );
+
+  const handleChartDelete = useCallback(
+    async (chart: Chart) => {
+      // Cleanup potential infographic chart file if required
+      if (chart.type === 'infographic' && chart.fileId) {
+        await editReleaseDataService.deleteChartFile(
+          releaseId,
+          meta.subjectName,
+          chart.fileId,
+        );
+      }
+
+      await onDataBlockSave({
+        ...dataBlock,
+        charts: [],
+      });
+    },
+    [dataBlock, onDataBlockSave, releaseId, meta.subjectName],
   );
 
   const handleTableQueryUpdate: TableQueryUpdateHandler = useCallback(
@@ -77,6 +97,7 @@ const ChartBuilderTabSection = ({
       meta={meta}
       initialConfiguration={dataBlock.charts[0]}
       onChartSave={handleChartSave}
+      onChartDelete={handleChartDelete}
       onTableQueryUpdate={handleTableQueryUpdate}
     />
   );

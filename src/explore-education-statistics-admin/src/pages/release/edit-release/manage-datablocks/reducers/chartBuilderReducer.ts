@@ -67,6 +67,9 @@ export type ChartBuilderActions =
         form: keyof ChartBuilderState['forms'];
         state: FormState;
       };
+    }
+  | {
+      type: 'RESET';
     };
 
 const defaultOptions: Partial<ChartOptions> = {
@@ -91,6 +94,71 @@ const updateAxis = (
     ...next,
     ...(axisDefinition.constants ?? {}),
     type: axisDefinition.type,
+  };
+};
+
+const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
+  const definition = chartDefinitions.find(
+    ({ type }) => type === initialConfiguration?.type,
+  );
+
+  // Make sure height is never actually 0 or negative
+  // as this wouldn't make sense for any chart.
+  const height =
+    typeof initialConfiguration?.height !== 'undefined' &&
+    initialConfiguration?.height > 0
+      ? initialConfiguration.height
+      : definition?.options?.defaults?.height ?? 300;
+
+  const initialState: ChartBuilderState = {
+    axes: {},
+    definition,
+    options: {
+      ...omit(initialConfiguration ?? {}, ['axes', 'type']),
+      title: initialConfiguration?.title ?? '',
+      height,
+    },
+    forms: {
+      data: { isValid: true },
+      options: { isValid: true },
+    },
+  };
+
+  if (!initialConfiguration) {
+    return initialState;
+  }
+
+  const axes: AxesConfiguration = mapValues(
+    initialState.definition?.axes ?? {},
+    (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
+      return updateAxis(
+        axisDefinition,
+        (initialConfiguration.axes[type] ?? {}) as AxisConfiguration,
+      );
+    },
+  );
+
+  if (
+    axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
+    initialConfiguration.labels
+  ) {
+    axes.major.dataSets = getLabelDataSetConfigurations(
+      initialConfiguration.labels,
+      axes.major.dataSets,
+    );
+  }
+
+  const forms: ChartBuilderState['forms'] = {
+    ...initialState.forms,
+    ...(mapValues(axes, () => ({
+      isValid: true,
+    })) as Dictionary<FormState>),
+  };
+
+  return {
+    ...initialState,
+    axes,
+    forms,
   };
 };
 
@@ -207,81 +275,23 @@ export const chartBuilderReducer: Reducer<
       draft.forms[action.payload.form] = action.payload.state;
 
       break;
+    case 'RESET':
+      return getInitialState();
     default:
       break;
   }
+
+  return draft;
 };
 
 export function useChartBuilderReducer(initialConfiguration?: Chart) {
-  const definition = chartDefinitions.find(
-    ({ type }) => type === initialConfiguration?.type,
-  );
-
-  // Make sure height is never actually 0 or negative
-  // as this wouldn't make sense for any chart.
-  const height =
-    typeof initialConfiguration?.height !== 'undefined' &&
-    initialConfiguration?.height > 0
-      ? initialConfiguration.height
-      : definition?.options?.defaults?.height ?? 300;
-
   const [state, dispatch] = useLoggedImmerReducer<
     ChartBuilderState,
     ChartBuilderActions
   >(
     'Chart builder',
     chartBuilderReducer,
-    {
-      axes: {},
-      definition,
-      options: {
-        ...omit(initialConfiguration ?? {}, ['axes', 'type']),
-        title: initialConfiguration?.title ?? '',
-        height,
-      },
-      forms: {
-        data: { isValid: true },
-        options: { isValid: true },
-      },
-    },
-    (initialState: ChartBuilderState) => {
-      if (!initialConfiguration) {
-        return initialState;
-      }
-
-      const axes: AxesConfiguration = mapValues(
-        initialState.definition?.axes ?? {},
-        (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
-          return updateAxis(
-            axisDefinition,
-            (initialConfiguration.axes[type] ?? {}) as AxisConfiguration,
-          );
-        },
-      );
-
-      if (
-        axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
-        initialConfiguration.labels
-      ) {
-        axes.major.dataSets = getLabelDataSetConfigurations(
-          initialConfiguration.labels,
-          axes.major.dataSets,
-        );
-      }
-
-      const forms: ChartBuilderState['forms'] = {
-        ...initialState.forms,
-        ...(mapValues(axes, () => ({
-          isValid: true,
-        })) as Dictionary<FormState>),
-      };
-
-      return {
-        ...initialState,
-        axes,
-        forms,
-      };
-    },
+    getInitialState(initialConfiguration),
   );
 
   const addDataSet = useCallback(
@@ -304,7 +314,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
     [dispatch],
   );
 
-  const updateDataSet = useCallback(
+  const updateDataSets = useCallback(
     (newData: DataSetConfiguration[]) => {
       dispatch({
         type: 'UPDATE_DATA_SETS',
@@ -363,15 +373,22 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
     [dispatch],
   );
 
+  const resetState = useCallback(() => {
+    dispatch({
+      type: 'RESET',
+    });
+  }, [dispatch]);
+
   const actions = useMemo(
     () => ({
       addDataSet,
       removeDataSet,
-      updateDataSet,
+      updateDataSets,
       updateChartDefinition,
       updateChartOptions,
       updateChartAxis,
       updateFormState,
+      resetState,
     }),
     [
       addDataSet,
@@ -379,8 +396,9 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       updateChartAxis,
       updateChartDefinition,
       updateChartOptions,
-      updateDataSet,
+      updateDataSets,
       updateFormState,
+      resetState,
     ],
   );
 

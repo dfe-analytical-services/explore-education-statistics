@@ -1,11 +1,10 @@
-import ButtonText from '@common/components/ButtonText';
 import Link from '@admin/components/Link';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import Page from '@admin/components/Page';
 import userService from '@admin/services/users/service';
 import { UserStatus } from '@admin/services/users/types';
+import ButtonText from '@common/components/ButtonText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useErrorControl } from '@common/contexts/ErrorControlContext';
 
 interface Model {
   users: UserStatus[];
@@ -15,24 +14,21 @@ const InvitedUsersPage = () => {
   const [model, setModel] = useState<Model>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorStatus, setErrorStatus] = useState<number>();
-  const { withoutErrorHandling } = useErrorControl();
 
   const getPendingInvites = useCallback(() => {
     setIsLoading(true);
-    withoutErrorHandling(() =>
-      userService
-        .getInvitedUsers()
-        .then(updatedInvites => {
-          setModel({
-            users: updatedInvites,
-          });
-        })
-        .catch(error => {
-          setErrorStatus(error.response.status);
-        })
-        .then(() => setIsLoading(false)),
-    );
-  }, [withoutErrorHandling]);
+    userService
+      .getInvitedUsers()
+      .then(updatedInvites => {
+        setModel({
+          users: updatedInvites,
+        });
+      })
+      .catch(error => {
+        setErrorStatus(error.response.status);
+      })
+      .then(() => setIsLoading(false));
+  }, []);
 
   useEffect(() => {
     getPendingInvites();

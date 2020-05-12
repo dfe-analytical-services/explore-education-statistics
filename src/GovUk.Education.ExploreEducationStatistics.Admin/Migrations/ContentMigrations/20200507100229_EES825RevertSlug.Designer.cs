@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200507100229_EES825RevertSlug")]
+    partial class EES825RevertSlug
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,8 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
-                            ContactName = "Sean Gibson",
-                            ContactTelNo = "0370 000 2288",
+                            ContactName = "Mark Pearson",
+                            ContactTelNo = "01142742585",
                             TeamEmail = "schools.statistics@education.gov.uk",
                             TeamName = "School absence and exclusions team"
                         },

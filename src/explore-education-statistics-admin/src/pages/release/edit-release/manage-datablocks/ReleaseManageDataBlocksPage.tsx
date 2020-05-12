@@ -82,6 +82,8 @@ const ReleaseManageDataBlocksPage = ({
       return;
     }
 
+    setDeletePlan(undefined);
+
     await dataBlocksService.deleteDataBlock(releaseId, selectedDataBlock.id);
     await fetchDataBlocks();
 

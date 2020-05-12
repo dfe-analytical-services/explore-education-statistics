@@ -1,4 +1,3 @@
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/graph-builder.module.scss';
 import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
@@ -18,13 +17,14 @@ import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React, { useCallback, useMemo } from 'react';
+import React, { ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema, Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
 
 type FormValues = Partial<ChartOptions>;
 
 interface Props {
+  buttons?: ReactNode;
   canSaveChart: boolean;
   definition: ChartDefinition;
   chartOptions: ChartOptions;
@@ -39,6 +39,7 @@ interface Props {
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
+  buttons,
   canSaveChart,
   chartOptions,
   definition,
@@ -107,17 +108,20 @@ const ChartConfiguration = ({
       {definition.type === 'infographic' && (
         <>
           <InfographicChartForm
+            canSaveChart={canSaveChart}
             releaseId={releaseId}
-            fileId={fileId || ''}
-            onSubmit={nextFileId => {
+            fileId={fileId}
+            subjectName={meta.subjectName}
+            onSubmit={async nextFileId => {
               onChange({
                 ...chartOptions,
                 fileId: nextFileId,
               });
-
-              onFormStateChange({
-                form: 'options',
-                isValid: true,
+            }}
+            onDelete={async () => {
+              onSubmit({
+                ...chartOptions,
+                fileId: '',
               });
             }}
           />
@@ -164,7 +168,6 @@ const ChartConfiguration = ({
                 id={`${formId}-stacked`}
                 name="stacked"
                 label="Stacked bars"
-                className={styles['margin-top-30']}
               />
             )}
 
@@ -249,6 +252,8 @@ const ChartConfiguration = ({
             <Button type="submit" id={`${formId}-submit`}>
               Save chart options
             </Button>
+
+            {buttons}
           </Form>
         )}
       />

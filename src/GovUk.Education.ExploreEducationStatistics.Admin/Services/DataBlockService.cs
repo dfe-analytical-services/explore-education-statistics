@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -27,18 +28,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IFileStorageService _fileStorageService;
+        private readonly ISubjectService _subjectService;
 
         public DataBlockService(
             ContentDbContext context,
             IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IUserService userService,
-            IFileStorageService fileStorageService)
+            IFileStorageService fileStorageService,
+            ISubjectService subjectService)
         {
             _context = context;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _fileStorageService = fileStorageService;
+            _subjectService = subjectService;
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> CreateAsync(Guid releaseId, CreateDataBlockViewModel createDataBlock)
@@ -79,6 +83,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             await DeleteDependentDataBlocks(deletePlan);
             await RemoveChartFileReleaseLinks(deletePlan);
+            return true;
+        }
+        
+        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName, string fileName)
+        {
+            var subject = await _subjectService.GetAsync(releaseId, subjectName);
+            var blocks = GetDataBlocks(releaseId, subject.Id);
+                
+            foreach (var block in blocks)
+            {
+                var infoGraphicChart = block.Charts.FirstOrDefault(c => c.Type == ChartType.infographic.ToString());
+                if (infoGraphicChart != null && ((InfographicChart)infoGraphicChart).FileId == fileName)
+                {
+                    block.Charts.Remove(infoGraphicChart);
+                    _context.DataBlocks.Update(block);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+            }
             return true;
         }
         

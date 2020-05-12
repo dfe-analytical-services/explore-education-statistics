@@ -289,12 +289,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
-            Mock<UserManager<ApplicationUser>> UserManager) Mocks()
+            Mock<UserManager<ApplicationUser>> UserManager,
+            Mock<IDataBlockService> DataBlockService) Mocks()
         {
             return (new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
                     new Mock<IReleaseStatusService>(),
-                    MockUserManager(Users)
+                    MockUserManager(Users),
+                    new Mock<IDataBlockService>()
                 );
         }
 
@@ -302,14 +304,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
-            Mock<UserManager<ApplicationUser>> UserManager
+            Mock<UserManager<ApplicationUser>> UserManager,
+            Mock<IDataBlockService> DataBlockService
             ) mocks)
         {
             return new ReleasesController(
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.ReleaseStatusService.Object,
-                mocks.UserManager.Object);
+                mocks.UserManager.Object,
+                mocks.DataBlockService.Object);
         }
         
         private static Mock<UserManager<TUser>> MockUserManager<TUser>(List<TUser> ls) where TUser : class

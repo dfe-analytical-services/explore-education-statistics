@@ -7,6 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Note: this update was manually written, spot the copy/paste mistake in the slug which was intended to be graduate-labour-market-statistics!
+            // In EES-825 it was requested that the slug isn't changed so it should be reverted back to graduate-labour-markets
+            // This is done in a later migration, see 20200507100229_EES825RevertSlug.
             migrationBuilder.UpdateData(
                 table: "Publications",
                 keyColumn: "Id",

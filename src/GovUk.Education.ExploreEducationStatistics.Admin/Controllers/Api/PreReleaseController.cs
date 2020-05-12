@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class PreReleaseController : ControllerBase
     {
         private readonly IPreReleaseContactsService _preReleaseContactsService;
+        private readonly IPreReleaseService _preReleaseService;
 
-        public PreReleaseController(IPreReleaseContactsService preReleaseContactsService)
+        public PreReleaseController(IPreReleaseContactsService preReleaseContactsService,
+            IPreReleaseService preReleaseService)
         {
             _preReleaseContactsService = preReleaseContactsService;
+            _preReleaseService = preReleaseService;
         }
 
         [HttpGet("release/{releaseId}/prerelease-contacts")]
@@ -26,7 +30,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _preReleaseContactsService
                 .GetPreReleaseContactsForReleaseAsync(releaseId)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("release/{releaseId}/prerelease")]
+        public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummaryAsync(Guid releaseId)
+        {
+            return await _preReleaseService
+                .GetPreReleaseSummaryViewModelAsync(releaseId)
+                .HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId}/prerelease-contact")]
@@ -35,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _preReleaseContactsService
                 .AddPreReleaseContactToReleaseAsync(releaseId, request.Email)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
 
         [HttpDelete("release/{releaseId}/prerelease-contact")]
@@ -44,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _preReleaseContactsService
                 .RemovePreReleaseContactFromReleaseAsync(releaseId, request.Email)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
     }
 

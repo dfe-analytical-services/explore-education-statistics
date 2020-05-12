@@ -826,8 +826,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
                     TeamName = "School absence and exclusions team",
                     TeamEmail = "schools.statistics@education.gov.uk",
-                    ContactName = "Mark Pearson",
-                    ContactTelNo = "01142742585"
+                    ContactName = "Sean Gibson",
+                    ContactTelNo = "0370 000 2288"
                 },
                 new Contact
                 {
@@ -1275,7 +1275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Graduate labour market statistics",
                     Summary = "",
                     TopicId = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535"),
-                    Slug = "graduate-labour-market-statistics",
+                    Slug = "graduate-labour-markets",
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/graduate-labour-market-quarterly-statistics#documents")
