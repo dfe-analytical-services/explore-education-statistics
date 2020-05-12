@@ -37,7 +37,7 @@ const PublicationSummary = ({
     );
 
   // BAU-404 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
-  const showAmendmentButton = () => true;
+  const showAmendmentButton = () => false;
   return (
     <>
       <SummaryList>
