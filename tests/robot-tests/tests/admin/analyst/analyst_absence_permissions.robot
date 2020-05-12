@@ -54,7 +54,7 @@ Validate Analyst1 can see Absence release summary
     user checks summary list item "Publication title" should be "Pupil absence in schools in England"
     user checks summary list item "Time period" should be "Academic Year"
     user checks summary list item "Release period" should be "2016/17"
-    user checks summary list item "Lead statistician" should be "Mark Pearson"
+    user checks summary list item "Lead statistician" should be "Sean Gibson"
     user checks summary list item "Scheduled release" should be ""
     user checks summary list item "Next release expected" should be ""
     user checks summary list item "Release type" should be "Official Statistics"
