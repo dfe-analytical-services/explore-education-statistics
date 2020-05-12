@@ -26,9 +26,11 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
 
   const publicationSlug = `permalink-${data.created}-${data.title}`;
 
+  const { subjectName, publicationName } = fullTable.subjectMeta;
+
   return (
     <Page
-      title={`'${fullTable.subjectMeta.subjectName}' from '${fullTable.subjectMeta.publicationName}'`}
+      title={`'${subjectName}' from '${publicationName}'`}
       caption="Permanent data table"
       className={styles.permalinkPage}
       wide
@@ -65,7 +67,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       <div ref={tableRef}>
         <TimePeriodDataTable
           fullTable={fullTable}
-          source="DfE prototype example statistics"
+          source={`${publicationName}, ${subjectName}`}
           tableHeadersConfig={tableHeadersConfig}
         />
       </div>
