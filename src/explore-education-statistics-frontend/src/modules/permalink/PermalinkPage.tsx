@@ -24,8 +24,6 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
     fullTable.subjectMeta,
   );
 
-  const publicationSlug = `permalink-${data.created}-${data.title}`;
-
   const { subjectName, publicationName } = fullTable.subjectMeta;
 
   return (
@@ -76,14 +74,14 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         <ul className="govuk-list">
           <li>
             <DownloadCsvButton
-              publicationSlug={publicationSlug}
+              fileName={`permalink-${data.id}`}
               fullTable={fullTable}
             />
           </li>
           <li>
             <DownloadExcelButton
               tableRef={tableRef}
-              publicationSlug={publicationSlug}
+              fileName={`permalink-${data.id}`}
               subjectMeta={fullTable.subjectMeta}
             />
           </li>
