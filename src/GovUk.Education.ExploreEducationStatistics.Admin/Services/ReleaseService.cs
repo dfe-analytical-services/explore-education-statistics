@@ -262,8 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     release.Slug = request.Slug;
                     release.TypeId = request.TypeId;
-                    // Ignore the time component and set it to midnight local time as a UTC date
-                    release.PublishScheduled = request.PublishScheduled?.AsMidnightLocalTime().ToUniversalTime();
+                    release.PublishScheduled = request.PublishScheduled?.AsStartOfDayUtc();
                     release.ReleaseName = request.ReleaseName;
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;

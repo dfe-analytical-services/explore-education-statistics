@@ -78,8 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<CreateReleaseViewModel, Release>()
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
-                    // Ignore the time component and set it to midnight local time as a UTC date
-                    model.PublishScheduled.HasValue ? model.PublishScheduled.Value.AsMidnightLocalTime().ToUniversalTime() : (DateTime?) null));
+                    model.PublishScheduled.HasValue ? model.PublishScheduled.Value.AsStartOfDayUtc() : (DateTime?) null));
 
             CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
