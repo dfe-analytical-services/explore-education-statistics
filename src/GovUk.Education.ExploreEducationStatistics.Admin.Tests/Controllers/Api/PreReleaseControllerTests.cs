@@ -15,8 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var (preReleaseContactsService, preReleaseService) = Mocks();
 
-            var preReleaseSummaryViewModel =
-                new PreReleaseSummaryViewModel("PreRelease Publication", "Autumn and Spring Term 2020/21", "first.last@education.gov.uk");
+            var preReleaseSummaryViewModel = new PreReleaseSummaryViewModel();
             var releaseId = Guid.NewGuid();
 
             preReleaseService
@@ -26,11 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = new PreReleaseController(preReleaseContactsService.Object, preReleaseService.Object);
 
             var result = await controller.GetPreReleaseSummaryAsync(releaseId);
-            var unboxed = AssertOkResult(result);
-
-            Assert.Equal(preReleaseSummaryViewModel.PublicationTitle, unboxed.PublicationTitle);
-            Assert.Equal(preReleaseSummaryViewModel.ReleaseTitle, unboxed.ReleaseTitle);
-            Assert.Equal(preReleaseSummaryViewModel.ContactEmail, unboxed.ContactEmail);
+            AssertOkResult(result);
         }
 
         private static (Mock<IPreReleaseContactsService> PreReleaseContactsService,
