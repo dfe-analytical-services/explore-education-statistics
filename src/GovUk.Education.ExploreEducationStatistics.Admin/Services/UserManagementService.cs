@@ -97,6 +97,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<UserReleaseRoleViewModel> GetUserReleaseRole(Guid userId, Guid userReleaseRoleId)
+        {
+            return await _contentDbContext.UserReleaseRoles
+                .Where(x => x.Id == userReleaseRoleId && x.UserId == userId)
+                .Select(x => new UserReleaseRoleViewModel
+                {
+                    Id = x.Id,
+                    Publication = _contentDbContext.Publications
+                        .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
+                        .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
+                    Release = _contentDbContext.Releases
+                        .Where(r => r.Id == x.ReleaseId)
+                        .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
+                    ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
+                }).FirstOrDefaultAsync();
+        }
+
         public async Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userId, Guid userReleaseRoleId)
         {
             return await _persistenceHelper

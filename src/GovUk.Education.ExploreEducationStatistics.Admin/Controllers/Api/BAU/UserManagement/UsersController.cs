@@ -91,6 +91,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU.U
             return await _userManagementService.AddUserReleaseRole(userId, releaseRole).HandleFailuresOrOk();
         }
         
+        [HttpGet("bau/users/{userId}/release-role/{userReleaseRoleId}")]
+        public async Task<ActionResult<UserReleaseRoleViewModel>> GetUserReleaseRole(Guid userId, Guid userReleaseRoleId)
+        {
+            var userReleaseRole = await _userManagementService.GetUserReleaseRole(userId, userReleaseRoleId);
+
+            if (userReleaseRole != null)
+            {
+                return Ok(userReleaseRole);
+            }
+
+            return NotFound();
+        }
+        
         [HttpDelete("bau/users/{userId}/release-role/{userReleaseRoleId}")]
         public async Task<ActionResult<bool>> DeleteUserReleaseRole(Guid userId, Guid userReleaseRoleId)
         {
