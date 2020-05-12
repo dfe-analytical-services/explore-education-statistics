@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -62,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                     });
 
-                var gmtStandardTimeTimezone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+                var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
                 var publishScheduledStartOfDay = new DateTime(2050, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
                 var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
                 var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
@@ -319,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = timePeriodCoverageEdited
                         });
 
-                var gmtStandardTimeTimezone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+                var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
                 var publishScheduledStartOfDay = new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
                 var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
                 var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
@@ -674,6 +675,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result);
             }
+        }
+
+        private static TimeZoneInfo GetGmtStandardTimeTimezone()
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById(
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London");
         }
 
         private (
