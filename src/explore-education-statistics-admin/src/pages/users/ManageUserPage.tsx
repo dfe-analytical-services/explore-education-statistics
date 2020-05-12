@@ -154,7 +154,9 @@ const ManageUserPage = ({
                           {model.user.name}
                         </SummaryListItem>
                         <SummaryListItem term="Email">
-                          <a href={`mailto:${model.user.email}`}>{model.user.email}</a>
+                          <a href={`mailto:${model.user.email}`}>
+                            {model.user.email}
+                          </a>
                         </SummaryListItem>
                         <SummaryListItem term="Phone">-</SummaryListItem>
                       </SummaryList>
