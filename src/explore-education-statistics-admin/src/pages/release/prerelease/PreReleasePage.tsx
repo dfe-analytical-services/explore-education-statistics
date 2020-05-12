@@ -90,34 +90,47 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
           <h1>Pre Release access is not yet available</h1>
 
           {preReleaseSummary && (
-            <p>
-              Pre Release access for the{' '}
-              <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
-              <strong>{preReleaseSummary.publicationTitle}</strong> is not yet
-              available.
-            </p>
+            <>
+              <p>
+                Pre Release access for the{' '}
+                <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
+                <strong>{preReleaseSummary.publicationTitle}</strong> is not yet
+                available.
+              </p>
+              <p>
+                Pre Release access will be available from{' '}
+                {format(
+                  preReleaseWindowStatus.preReleaseWindowStartTime,
+                  'd MMMM yyyy',
+                )}
+                {' at '}
+                {format(
+                  preReleaseWindowStatus.preReleaseWindowStartTime,
+                  'HH:mm',
+                )}{' '}
+                until{' '}
+                {format(
+                  preReleaseWindowStatus.preReleaseWindowEndTime,
+                  'd MMMM yyyy',
+                )}
+                {' at '}
+                {format(
+                  preReleaseWindowStatus.preReleaseWindowEndTime,
+                  'HH:mm',
+                )}
+                .
+              </p>
+              <p>
+                If you believe that this release should be available and you are
+                having problems accessing please contact the production team{' '}
+                <strong>
+                  <a href={`mailto:${preReleaseSummary.contactEmail}`}>
+                    {preReleaseSummary.contactEmail}
+                  </a>
+                </strong>
+              </p>
+            </>
           )}
-
-          <p>
-            Pre Release access will be available from{' '}
-            {format(
-              preReleaseWindowStatus.preReleaseWindowStartTime,
-              'd MMMM yyyy',
-            )}
-            {' at '}
-            {format(
-              preReleaseWindowStatus.preReleaseWindowStartTime,
-              'HH:mm',
-            )}{' '}
-            until{' '}
-            {format(
-              preReleaseWindowStatus.preReleaseWindowEndTime,
-              'd MMMM yyyy',
-            )}
-            {' at '}
-            {format(preReleaseWindowStatus.preReleaseWindowEndTime, 'HH:mm')}.
-          </p>
-          <p className="govuk-body">Please try again later.</p>
         </>
       )}
 
