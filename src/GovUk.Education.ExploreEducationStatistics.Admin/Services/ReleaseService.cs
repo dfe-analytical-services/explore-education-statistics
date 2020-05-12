@@ -172,10 +172,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var statsRelease =_statisticsDbContext
                 .Release
-                .First(r => r.Id == amendment.PreviousVersionId);
+                .FirstOrDefault(r => r.Id == amendment.PreviousVersionId);
 
-            // TODO BAU-384 - this is currently only possible if a Live release was available
-            // without any subjects uploaded for it.  Does this check need to remain?
+            // Release does not have to have stats uploaded but if it has then
+            // create a link row to link back to the original subject
             if (statsRelease != null)
             {
                 var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);

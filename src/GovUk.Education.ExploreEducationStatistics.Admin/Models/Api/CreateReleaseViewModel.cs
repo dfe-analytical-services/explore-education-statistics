@@ -29,14 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
      
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
-
-        public Guid? TemplateReleaseId { get; set; }
         
-        private string _slug;
-        public string Slug
-        {
-            get => IsNullOrEmpty(_slug) ? SlugFromTitle(Format(ReleaseName, TimePeriodCoverage)) : _slug;
-            set => _slug = value; 
-        }
+        public string Slug => SlugFromTitle(Title);
+
+        private string Title => Format(Year, TimePeriodCoverage);
+
+        private int Year => int.Parse(ReleaseName);
+        
+        public Guid? TemplateReleaseId { get; set; }
     }
 }

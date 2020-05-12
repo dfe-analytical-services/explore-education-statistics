@@ -35,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             return await _contentDbContext.Releases
                 .Include(release => release.Publication)
+                .Include(r => r.PreviousVersion)
                 .SingleOrDefaultAsync(release => release.Id == id);
         }
 

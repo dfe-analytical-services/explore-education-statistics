@@ -51,6 +51,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var destinationDirectoryPath =
                 PublicReleaseDirectoryPath(copyReleaseCommand.PublicationSlug, copyReleaseCommand.ReleaseSlug);
 
+            if (copyReleaseCommand.ReleaseSlug != copyReleaseCommand.PreviousReleaseSlug)
+            {
+                var previousDestinationDirectoryPath =
+                    PublicReleaseDirectoryPath(copyReleaseCommand.PublicationSlug,
+                        copyReleaseCommand.PreviousReleaseSlug);
+                await DeleteBlobsAsync(publicContainer, previousDestinationDirectoryPath);
+            }
+
             await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
 
             await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
