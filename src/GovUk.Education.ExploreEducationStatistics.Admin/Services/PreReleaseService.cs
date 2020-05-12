@@ -80,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => new PreReleaseSummaryViewModel(
                     release.Publication.Slug,
                     release.Publication.Title,
+                    release.Slug,
                     release.Title,
                     release.Publication.Contact.TeamEmail));
         }
