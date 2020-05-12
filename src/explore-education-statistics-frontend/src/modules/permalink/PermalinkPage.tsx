@@ -40,11 +40,10 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <dl className="dfe-meta-content govuk-!-margin-bottom-9">
-            <dt className="govuk-caption-m">Created:</dt>
+            <dt className="govuk-caption-m">Created: </dt>
             <dd data-testid="created-date">
               <strong>
-                {' '}
-                <FormattedDate>{data.created}</FormattedDate>{' '}
+                <FormattedDate>{data.created}</FormattedDate>
               </strong>
             </dd>
           </dl>
@@ -57,9 +56,6 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
               action: 'Print this page link selected',
             }}
           />
-          {/* <RelatedAside>
-              <h3>Related content</h3>
-            </RelatedAside> */}
         </div>
       </div>
       <div ref={tableRef}>
