@@ -30,6 +30,11 @@ const errorCodeMappings = [
     'selectedRoleId',
     'Role does not exist',
   ),
+  errorCodeToFieldError(
+    'USER_ALREADY_HAS_RELEASE_ROLE',
+    'selectedReleaseRoleId',
+    'The user already has this release role'
+  )
 ];
 
 interface Model {
@@ -47,7 +52,6 @@ interface AddReleaseRoleFormValues {
 
 const ManageUserPage = ({
   match,
-  history,
 }: RouteComponentProps<{ userId: string }>) => {
   const [model, setModel] = useState<Model>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
