@@ -24,7 +24,6 @@ import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import orderBy from 'lodash/orderBy';
 
 const errorCodeMappings = [
-  errorCodeToFieldError('USER_DOES_NOT_EXIST', 'userId', 'User does not exist'),
   errorCodeToFieldError(
     'ROLE_DOES_NOT_EXIST',
     'selectedRoleId',
