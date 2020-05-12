@@ -74,9 +74,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public Release GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
         {
             return _contentDbContext.Releases
+                .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => IsReleasePublished(release, includedReleaseIds))
+                .Where(release => !release.SoftDeleted && IsReleasePublished(release, includedReleaseIds) && IsLatestVersionOfRelease(release.Publication, release.Id))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
@@ -143,6 +144,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
         {
             return release.Live || includedReleaseIds.Contains(release.Id);
+        }
+        
+        private bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
+        {
+            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
     }
 }
