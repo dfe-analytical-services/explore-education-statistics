@@ -28,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(value);
         }
 
-        [AllowAnonymous]
         [HttpGet("api/config")]
         public ActionResult<Dictionary<string, string>> GetConfig()
         {

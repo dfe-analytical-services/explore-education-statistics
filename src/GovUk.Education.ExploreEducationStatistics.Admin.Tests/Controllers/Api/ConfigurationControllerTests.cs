@@ -47,8 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static T AssertOkResult<T>(ActionResult<T> result) where T : class
         {
-            Assert.IsAssignableFrom<T>(result.Value);
-            return result.Value;
+            Assert.IsAssignableFrom<ActionResult<T>>(result);
+            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
+            var okObjectResult = result.Result as OkObjectResult;
+            Assert.IsAssignableFrom<T>(okObjectResult?.Value);
+            return okObjectResult?.Value as T;
         }
     }
 }
