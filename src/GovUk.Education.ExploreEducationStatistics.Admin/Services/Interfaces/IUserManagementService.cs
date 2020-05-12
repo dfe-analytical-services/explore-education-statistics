@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<List<UserViewModel>> ListAsync();
 
 
-        Task<Either<ActionResult, UserReleaseRole>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission userReleaseRole);
+        Task<Either<ActionResult, UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission userReleaseRole);
 
         Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userId, Guid userReleaseRoleId);
 

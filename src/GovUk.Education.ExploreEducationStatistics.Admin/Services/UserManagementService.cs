@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return users.Where(u => u.Role != "Prerelease User").ToList();
         }
 
-        public async Task<Either<ActionResult, UserReleaseRole>> AddUserReleaseRole(Guid userId,
+        public async Task<Either<ActionResult, UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId,
             UserReleaseRoleSubmission userReleaseRole)
         {
             return await _persistenceHelper
@@ -81,7 +81,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _contentDbContext.SaveChangesAsync();
 
-                    return newReleaseRole;
+                    return await _contentDbContext.UserReleaseRoles
+                        .Where(x => x.Id == newReleaseRole.Id)
+                        .Select(x => new UserReleaseRoleViewModel
+                        {
+                            Id = x.Id,
+                            Publication = _contentDbContext.Publications
+                                .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
+                                .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
+                            Release = _contentDbContext.Releases
+                                .Where(r => r.Id == x.ReleaseId)
+                                .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
+                            ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
+                        }).FirstOrDefaultAsync();
                 });
         }
 
@@ -291,13 +303,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             UserReleaseRoleSubmission userReleaseRole)
         {
             var existing = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
-                r.UserId == userId && r.ReleaseId == userReleaseRole.ReleaseId && r.Role == userReleaseRole.ReleaseRole);
+                r.UserId == userId && r.ReleaseId == userReleaseRole.ReleaseId &&
+                r.Role == userReleaseRole.ReleaseRole);
 
             if (existing == null)
             {
                 return true;
             }
-            
+
             return ValidationActionResult(UserAlreadyHasReleaseRole);
         }
     }
