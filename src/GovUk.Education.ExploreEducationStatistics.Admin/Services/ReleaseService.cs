@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     release.Slug = request.Slug;
                     release.TypeId = request.TypeId;
-                    release.PublishScheduled = request.PublishScheduled?.AsMidnightConvertedToUtc();
+                    release.PublishScheduled = request.PublishScheduled?.AsStartOfDayUtc();
                     release.ReleaseName = request.ReleaseName;
                     release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;

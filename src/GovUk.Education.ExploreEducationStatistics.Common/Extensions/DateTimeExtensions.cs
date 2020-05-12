@@ -6,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
     public static class DateTimeExtensions
     {
         /**
-         * The resulting value corresponds to this DateTime with the time-of-day part set to zero (midnight) GMT/BST as a UTC date
+         * The resulting value corresponds to this DateTime with the time-of-day part set to zero GMT/BST as UTC.
          */
-        public static DateTime AsMidnightConvertedToUtc(this DateTime dateTime)
+        public static DateTime AsStartOfDayUtc(this DateTime dateTime)
         {
             var dateTimeAtMidnight = dateTime.Date;
             return TimeZoneInfo.ConvertTimeToUtc(dateTimeAtMidnight, GetGmtStandardTimeTimezone());
