@@ -51,9 +51,8 @@ const DataBlockDetailsForm = ({
               <FormFieldTextInput<DataBlockDetailsFormValues>
                 id="data-block-name"
                 name="name"
-                label="Data block name"
-                hint=" Name and save your data block before viewing it under the
-                    'View data blocks' tab at the top of this page."
+                label="Name"
+                hint="Name of the data block"
                 percentageWidth="one-half"
               />
 

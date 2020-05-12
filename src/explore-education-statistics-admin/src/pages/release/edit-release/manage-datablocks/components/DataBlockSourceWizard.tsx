@@ -169,7 +169,7 @@ const DataBlockSourceWizard = ({
   );
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className="govuk-!-margin-bottom-8">
       <p>Configure data source for the data block</p>
 
       <TableToolWizard
