@@ -1,6 +1,7 @@
 import ChartBuilder, {
   TableQueryUpdateHandler,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
+import { SavedDataBlock } from '@admin/pages/release/edit-release/manage-datablocks/components/ReleaseManageDataBlocksPageTabs';
 import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
 import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablocks/service';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -10,45 +11,45 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
 import isEqual from 'lodash/isEqual';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 interface Props {
   dataBlock: ReleaseDataBlock;
+  query: TableDataQuery;
   table: FullTable;
-  onDataBlockSave: (dataBlock: ReleaseDataBlock) => void;
+  onDataBlockSave: (dataBlock: SavedDataBlock) => void;
+  onTableUpdate: (params: { table: FullTable; query: TableDataQuery }) => void;
 }
 
 const ChartBuilderTabSection = ({
   dataBlock,
+  query,
   table,
   onDataBlockSave,
+  onTableUpdate,
 }: Props) => {
   const { releaseId } = useParams<{ releaseId: string }>();
 
-  const [tableQuery, setTableQuery] = useState<TableDataQuery>(
-    dataBlock.dataBlockRequest,
-  );
-  const [fullTable, setFullTable] = useState<FullTable>(table);
-
   const meta = useMemo(
     () => ({
-      ...fullTable.subjectMeta,
+      ...table.subjectMeta,
       // Don't render footnotes as they take
       // up too much screen space.
       footnotes: [],
     }),
-    [fullTable.subjectMeta],
+    [table.subjectMeta],
   );
 
   const handleChartSave = useCallback(
     async (chart: Chart) => {
       await onDataBlockSave({
         ...dataBlock,
+        dataBlockRequest: query,
         charts: [chart],
       });
     },
-    [dataBlock, onDataBlockSave],
+    [dataBlock, onDataBlockSave, query],
   );
 
   const handleChartDelete = useCallback(
@@ -71,29 +72,31 @@ const ChartBuilderTabSection = ({
   );
 
   const handleTableQueryUpdate: TableQueryUpdateHandler = useCallback(
-    async query => {
-      const nextTableQuery: TableDataQuery = {
-        ...tableQuery,
+    async updatedQuery => {
+      const nextQuery: TableDataQuery = {
         ...query,
+        ...updatedQuery,
       };
 
       // Don't fetch table data again if queries are the same
-      if (isEqual(tableQuery, nextTableQuery)) {
+      if (isEqual(query, nextQuery)) {
         return;
       }
 
-      const tableData = await tableBuilderService.getTableData(nextTableQuery);
+      const tableData = await tableBuilderService.getTableData(nextQuery);
 
-      setTableQuery(nextTableQuery);
-      setFullTable(mapFullTable(tableData));
+      onTableUpdate({
+        table: mapFullTable(tableData),
+        query: nextQuery,
+      });
     },
-    [tableQuery],
+    [onTableUpdate, query],
   );
 
   return (
     <ChartBuilder
       releaseId={releaseId}
-      data={fullTable.results}
+      data={table.results}
       meta={meta}
       initialConfiguration={dataBlock.charts[0]}
       onChartSave={handleChartSave}

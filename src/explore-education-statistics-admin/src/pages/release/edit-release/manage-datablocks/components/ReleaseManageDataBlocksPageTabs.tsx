@@ -1,91 +1,204 @@
 import ChartBuilderTabSection from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderTabSection';
 import DataBlockSourceWizard, {
-  SavedDataBlock,
+  DataBlockSourceWizardSaveHandler,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockSourceWizard';
 import TableTabSection from '@admin/pages/release/edit-release/manage-datablocks/components/TableTabSection';
 import dataBlocksService, {
+  CreateReleaseDataBlock,
   ReleaseDataBlock,
 } from '@admin/services/release/edit-release/datablocks/service';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
-import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
-import { TableToolState } from '@common/modules/table-tool/components/TableToolWizard';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import filterOrphanedDataSets from '@common/modules/charts/util/filterOrphanedDataSets';
+import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import tableBuilderService from '@common/services/tableBuilderService';
+import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
+import tableBuilderService, {
+  PublicationSubjectMeta,
+  TableDataQuery,
+} from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
+import produce from 'immer';
 import React, { useCallback, useState } from 'react';
+
+export type SavedDataBlock = CreateReleaseDataBlock & {
+  id?: string;
+};
+
+interface TableState {
+  table: FullTable;
+  tableHeaders: TableHeadersConfig;
+  query: TableDataQuery;
+}
 
 interface Props {
   releaseId: string;
   selectedDataBlock?: ReleaseDataBlock;
   onDataBlockSave: (dataBlock: ReleaseDataBlock) => void;
 }
+
 const ReleaseManageDataBlocksPageTabs = ({
   releaseId,
   selectedDataBlock,
   onDataBlockSave,
 }: Props) => {
+  // Track number of saves as we can use this to
+  // force re-rendering of the tab sections.
+  const [saveNumber, setSaveNumber] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [tableToolState, setTableToolState] = useState<TableToolState>();
+  const [subjectMeta, setSubjectMeta] = useState<PublicationSubjectMeta>();
 
-  const { error, isLoading } = useTableQuery(
-    selectedDataBlock
-      ? {
-          ...selectedDataBlock.dataBlockRequest,
-          includeGeoJson: selectedDataBlock.charts.some(
-            chart => chart.type === 'map',
-          ),
-        }
-      : undefined,
-    {
-      onSuccess: async (table, query) => {
-        const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
-          query,
-        );
+  const {
+    value: tableState,
+    setValue: setTableState,
+    error,
+    isLoading,
+  } = useAsyncRetry<TableState | undefined>(async () => {
+    if (!selectedDataBlock) {
+      return undefined;
+    }
 
-        setTableToolState({
-          initialStep: 5,
-          query,
-          subjectMeta,
-          response: {
-            table,
-            tableHeaders: selectedDataBlock
-              ? mapTableHeadersConfig(
-                  selectedDataBlock.tables[0].tableHeaders,
-                  table.subjectMeta,
-                )
-              : getDefaultTableHeaderConfig(table.subjectMeta),
-          },
-        });
-      },
+    const query = {
+      ...selectedDataBlock.dataBlockRequest,
+      includeGeoJson: selectedDataBlock.charts.some(
+        chart => chart.type === 'map',
+      ),
+    };
+
+    const tableData = await tableBuilderService.getTableData(query);
+    const nextSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+      query,
+    );
+
+    const table = mapFullTable(tableData);
+
+    setSubjectMeta(nextSubjectMeta);
+
+    const tableHeaders = selectedDataBlock
+      ? mapTableHeadersConfig(
+          selectedDataBlock.tables[0].tableHeaders,
+          table.subjectMeta,
+        )
+      : getDefaultTableHeaderConfig(table.subjectMeta);
+
+    return {
+      table,
+      tableHeaders,
+      query,
+    };
+  }, []);
+
+  const updateTableState = useCallback(
+    (nextTableState: Partial<TableState>) => {
+      if (!tableState) {
+        throw new Error('Cannot update undefined table state');
+      }
+
+      setTableState({
+        ...tableState,
+        ...nextTableState,
+      });
     },
+    [setTableState, tableState],
   );
 
   const handleDataBlockSave = useCallback(
     async (dataBlock: SavedDataBlock) => {
       setIsSaving(true);
 
+      const dataBlockToSave: SavedDataBlock = {
+        ...dataBlock,
+        dataBlockRequest: {
+          ...dataBlock.dataBlockRequest,
+          includeGeoJson: dataBlock.charts[0]?.type === 'map',
+        },
+      };
+
       const newDataBlock = await minDelay(() => {
-        if (dataBlock.id) {
+        if (dataBlockToSave.id) {
           return dataBlocksService.putDataBlock(
-            dataBlock.id,
-            dataBlock as ReleaseDataBlock,
+            dataBlockToSave.id,
+            dataBlockToSave as ReleaseDataBlock,
           );
         }
 
-        return dataBlocksService.postDataBlock(releaseId, dataBlock);
+        return dataBlocksService.postDataBlock(releaseId, dataBlockToSave);
       }, 500);
 
       onDataBlockSave(newDataBlock);
 
       setIsSaving(false);
+      setSaveNumber(saveNumber + 1);
     },
-    [onDataBlockSave, releaseId],
+    [onDataBlockSave, releaseId, saveNumber],
   );
+
+  const handleDataBlockSourceSave: DataBlockSourceWizardSaveHandler = useCallback(
+    async ({ query, table, tableHeaders, details }) => {
+      const charts = produce(selectedDataBlock?.charts ?? [], draft => {
+        const majorAxis = draft[0]?.axes?.major;
+
+        if (majorAxis?.dataSets) {
+          majorAxis.dataSets = filterOrphanedDataSets(
+            majorAxis.dataSets,
+            table.subjectMeta,
+          );
+        }
+      });
+
+      setTableState({
+        query,
+        table,
+        tableHeaders,
+      });
+
+      await handleDataBlockSave({
+        ...(selectedDataBlock ?? {}),
+        ...details,
+        dataBlockRequest: query,
+        charts,
+        tables: [
+          {
+            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+            indicators: [],
+          },
+        ],
+      });
+    },
+    [handleDataBlockSave, selectedDataBlock, setTableState],
+  );
+
+  const handleTableHeadersSave = useCallback(
+    async (tableHeaders: TableHeadersConfig) => {
+      if (!selectedDataBlock) {
+        throw new Error(
+          'Cannot save table headers when no data block has been selected',
+        );
+      }
+
+      updateTableState({ tableHeaders });
+
+      await handleDataBlockSave({
+        ...selectedDataBlock,
+        tables: [
+          {
+            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+            indicators: [],
+          },
+        ],
+      });
+    },
+    [handleDataBlockSave, selectedDataBlock, updateTableState],
+  );
+
+  const { query, table, tableHeaders } = tableState ?? {};
 
   return (
     <div style={{ position: 'relative' }} className="govuk-!-padding-top-2">
@@ -101,31 +214,37 @@ const ReleaseManageDataBlocksPageTabs = ({
           <TabsSection title="Data source" id="manageDataBlocks-dataSource">
             {!isLoading && (
               <DataBlockSourceWizard
+                key={saveNumber}
                 releaseId={releaseId}
                 dataBlock={selectedDataBlock}
-                initialTableToolState={tableToolState}
-                onDataBlockSave={handleDataBlockSave}
+                query={query}
+                subjectMeta={subjectMeta}
+                table={table}
+                tableHeaders={tableHeaders}
+                onSave={handleDataBlockSourceSave}
               />
             )}
           </TabsSection>
 
           {selectedDataBlock && [
             <TabsSection title="Table" key="table" id="manageDataBlocks-table">
-              {tableToolState?.response && (
+              {table && tableHeaders && (
                 <TableTabSection
-                  dataBlock={selectedDataBlock}
-                  table={tableToolState.response.table}
-                  tableHeaders={tableToolState.response.tableHeaders}
-                  onDataBlockSave={handleDataBlockSave}
+                  table={table}
+                  tableHeaders={tableHeaders}
+                  onSave={handleTableHeadersSave}
                 />
               )}
             </TabsSection>,
             <TabsSection title="Chart" key="chart" id="manageDataBlocks-chart">
-              {tableToolState?.response && (
+              {query && table && (
                 <ChartBuilderTabSection
+                  key={saveNumber}
                   dataBlock={selectedDataBlock}
-                  table={tableToolState.response.table}
+                  query={query}
+                  table={table}
                   onDataBlockSave={handleDataBlockSave}
+                  onTableUpdate={updateTableState}
                 />
               )}
             </TabsSection>,

@@ -1,10 +1,7 @@
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
-import {
-  CreateReleaseDataBlock,
-  ReleaseDataBlock,
-} from '@admin/services/release/edit-release/datablocks/service';
+import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablocks/service';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
@@ -15,20 +12,32 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
-import { TableDataQuery } from '@common/services/tableBuilderService';
-import React, { createRef, useCallback, useEffect, useState } from 'react';
+import {
+  PublicationSubjectMeta,
+  TableDataQuery,
+} from '@common/services/tableBuilderService';
+import React, {
+  createRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-export type SavedDataBlock = CreateReleaseDataBlock & {
-  id?: string;
-};
+export type DataBlockSourceWizardSaveHandler = (params: {
+  details: DataBlockDetailsFormValues;
+  table: FullTable;
+  tableHeaders: TableHeadersConfig;
+  query: TableDataQuery;
+}) => void;
 
 interface DataBlockSourceWizardFinalStepProps {
   dataBlock?: ReleaseDataBlock;
   query: TableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  onDataBlockSave: (dataBlock: SavedDataBlock) => void;
+  onSave: DataBlockSourceWizardSaveHandler;
 }
 
 const DataBlockSourceWizardFinalStep = ({
@@ -36,7 +45,7 @@ const DataBlockSourceWizardFinalStep = ({
   query,
   table,
   tableHeaders,
-  onDataBlockSave,
+  onSave,
 }: DataBlockSourceWizardFinalStepProps) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
@@ -55,21 +64,15 @@ const DataBlockSourceWizardFinalStep = ({
   }, [tableHeaders]);
 
   const handleSubmit = useCallback(
-    (values: DataBlockDetailsFormValues) => {
-      onDataBlockSave({
-        charts: [],
-        ...(dataBlock ?? {}),
-        ...values,
-        dataBlockRequest: query,
-        tables: [
-          {
-            tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
-            indicators: [],
-          },
-        ],
+    (details: DataBlockDetailsFormValues) => {
+      onSave({
+        details,
+        table,
+        tableHeaders: currentTableHeaders,
+        query,
       });
     },
-    [currentTableHeaders, dataBlock, onDataBlockSave, query],
+    [currentTableHeaders, onSave, query, table],
   );
 
   return (
@@ -117,17 +120,56 @@ interface DataBlockSourceWizardProps {
   releaseId: string;
   dataBlock?: ReleaseDataBlock;
   initialTableToolState?: TableToolState;
-  onDataBlockSave: (dataBlock: SavedDataBlock) => void;
+  query?: TableDataQuery;
+  subjectMeta?: PublicationSubjectMeta;
+  table?: FullTable;
+  tableHeaders?: TableHeadersConfig;
+  onSave: DataBlockSourceWizardSaveHandler;
 }
 
 const DataBlockSourceWizard = ({
   releaseId,
   dataBlock,
-  initialTableToolState,
-  onDataBlockSave,
+  query: initialQuery,
+  subjectMeta,
+  table,
+  tableHeaders,
+  onSave,
 }: DataBlockSourceWizardProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const initialTableToolState = useMemo<TableToolState | undefined>(() => {
+    if (!initialQuery || !table || !tableHeaders || !subjectMeta) {
+      return undefined;
+    }
+
+    return {
+      initialStep: 5,
+      query: initialQuery,
+      subjectMeta,
+      response: {
+        table,
+        tableHeaders,
+      },
+    };
+  }, [initialQuery, subjectMeta, table, tableHeaders]);
+
+  const handleSave: DataBlockSourceWizardSaveHandler = useCallback(
+    state => {
+      if (ref.current) {
+        ref.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+
+      onSave(state);
+    },
+    [onSave],
+  );
+
   return (
-    <>
+    <div ref={ref}>
       <p>Configure data source for the data block</p>
 
       <TableToolWizard
@@ -148,7 +190,7 @@ const DataBlockSourceWizard = ({
                     query={query}
                     table={response.table}
                     tableHeaders={response.tableHeaders}
-                    onDataBlockSave={onDataBlockSave}
+                    onSave={handleSave}
                   />
                 )}
               </>
@@ -156,7 +198,7 @@ const DataBlockSourceWizard = ({
           </WizardStep>
         )}
       />
-    </>
+    </div>
   );
 };
 
