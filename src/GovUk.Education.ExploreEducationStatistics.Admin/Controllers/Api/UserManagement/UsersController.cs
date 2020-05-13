@@ -40,21 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
             return NotFound();
         }
-        
-        [HttpGet("user-management/users/pre-release")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
-        {
-            var users = await _userManagementService.ListPreReleaseUsersAsync();
-
-            if (users.Any())
-            {
-                return Ok(users);
-            }
-
-            return NotFound();
-        }
 
         [HttpGet("user-management/users/{userId}")]
         [ProducesResponseType(200)]

@@ -71,7 +71,7 @@ const service: UsersService = {
   },
 
   getPreReleaseUsers(): Promise<UserStatus[]> {
-    return client.get<UserStatus[]>('/user-management/users/pre-release');
+    return client.get<UserStatus[]>('/user-management/pre-release');
   },
 
   getInvitedUsers(): Promise<UserStatus[]> {
