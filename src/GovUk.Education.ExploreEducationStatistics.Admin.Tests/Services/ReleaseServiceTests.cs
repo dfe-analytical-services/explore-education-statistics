@@ -139,7 +139,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         }
                                     }
                                 }
-                            }
+                            },
+                            Version = 0,
+                            PreviousVersionId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2")
                         }
                     }
                 });
@@ -203,20 +205,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var notLatestRelease = new Release
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("a941444a-687a-4364-9f7d-d39c35d91b9e"),
                 ReleaseName = "2019",
                 TimePeriodCoverage = TimeIdentifier.December,
                 PublicationId = publication.Id,
-                Published = DateTime.UtcNow
+                Published = DateTime.UtcNow,
+                Version = 0,
+                PreviousVersionId = new Guid("a941444a-687a-4364-9f7d-d39c35d91b9e")
             };
 
             var latestRelease = new Release
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("8909d1b4-78fc-4070-bb3d-90e055f39b39"),
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.June,
                 PublicationId = publication.Id,
-                Published = DateTime.UtcNow
+                Published = DateTime.UtcNow,
+                Version = 0,
+                PreviousVersionId = new Guid("8909d1b4-78fc-4070-bb3d-90e055f39b39")
             };
 
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
@@ -289,6 +295,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Id = releaseId,
                             TypeId = addHocReleaseTypeId,
+                            Version = 0,
+                            PreviousVersionId = releaseId
                         }
                     }
                 });
@@ -369,6 +377,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = publishScheduled,
                             NextReleaseDate = nextReleaseDate,
                             ReleaseName = releaseName,
+                            Version = 0,
+                            PreviousVersionId = releaseId
                         }
                     }
                 });
@@ -406,20 +416,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var notLatestRelease = new Release
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("1cf74d85-2a20-4b2a-a944-6b74f79e56a4"),
                 Published = DateTime.UtcNow,
                 PublicationId = publication.Id,
                 ReleaseName = "2035",
-                TimePeriodCoverage = TimeIdentifier.December
+                TimePeriodCoverage = TimeIdentifier.December,
+                Version = 0,
+                PreviousVersionId = new Guid("1cf74d85-2a20-4b2a-a944-6b74f79e56a4")
             };
             
-            var latestRelease = new Release
+            var latestReleaseV0 = new Release
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("7ef22424-a66f-47b9-85b0-50bdf2a622fc"),
                 Published = DateTime.UtcNow,
                 PublicationId = publication.Id,
                 ReleaseName = "2036",
-                TimePeriodCoverage = TimeIdentifier.June
+                TimePeriodCoverage = TimeIdentifier.June,
+                Version = 0,
+                PreviousVersionId = new Guid("7ef22424-a66f-47b9-85b0-50bdf2a622fc")
+            };
+            
+            var latestReleaseV1 = new Release
+            {
+                Id = new Guid("d301f5b7-a89b-4d7e-b020-53f8631c72b2"),
+                Published = DateTime.UtcNow,
+                PublicationId = publication.Id,
+                ReleaseName = "2036",
+                TimePeriodCoverage = TimeIdentifier.June,
+                Version = 1,
+                PreviousVersionId = new Guid("7ef22424-a66f-47b9-85b0-50bdf2a622fc")
+            };
+            
+            var latestReleaseV2Deleted = new Release
+            {
+                Id = new Guid("efc6d4bd-9bf4-4179-a1fb-88cdfa2e19f6"),
+                Published = DateTime.UtcNow,
+                PublicationId = publication.Id,
+                ReleaseName = "2036",
+                TimePeriodCoverage = TimeIdentifier.June,
+                Version = 2,
+                PreviousVersionId = new Guid("d301f5b7-a89b-4d7e-b020-53f8631c72b2"),
+                SoftDeleted = true
             };
 
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
@@ -433,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.Add(publication);
                 context.AddRange(new List<Release>
                 {
-                    notLatestRelease, latestRelease
+                    notLatestRelease, latestReleaseV0, latestReleaseV1, latestReleaseV2Deleted
                 });
                 context.SaveChanges();
             }
@@ -447,7 +484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Method under test 
                 var latest = releaseService.GetLatestReleaseAsync(publication.Id).Result.Right;
                 Assert.NotNull(latest);
-                Assert.Equal(latestRelease.Id, latest.Id);
+                Assert.Equal(latestReleaseV1.Id, latest.Id);
                 Assert.Equal("June 2036", latest.Title);
             }
         }
@@ -464,8 +501,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication.Id
+                Id = new Guid("defb0361-5084-43e8-a570-4841657041e2"),
+                PublicationId = publication.Id,
+                Version = 0,
+                PreviousVersionId = new Guid("defb0361-5084-43e8-a570-4841657041e2")
             };
             
             var userReleaseRole = new UserReleaseRole
@@ -483,8 +522,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var anotherRelease = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication.Id
+                Id = new Guid("863cf537-c9cd-48d9-9874-cc222bdab0a7"),
+                PublicationId = publication.Id,
+                Version = 0,
+                PreviousVersionId = new Guid("863cf537-c9cd-48d9-9874-cc222bdab0a7")
             };
             
             var anotherUserReleaseRole = new UserReleaseRole
@@ -607,8 +648,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                Status = ReleaseStatus.Approved
+                Id = new Guid("33c2b77a-6a70-485d-ada3-fc99edac95dd"),
+                Status = ReleaseStatus.Approved,
+                Version = 0,
+                PreviousVersionId = new Guid("33c2b77a-6a70-485d-ada3-fc99edac95dd")
             };
 
             using (var context = InMemoryApplicationDbContext("PublishReleaseAsync"))
@@ -648,8 +691,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                Status = ReleaseStatus.Approved
+                Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
+                Status = ReleaseStatus.Approved,
+                Version = 0,
+                PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
             };
 
             using (var context = InMemoryApplicationDbContext("PublishReleaseContentAsync"))
