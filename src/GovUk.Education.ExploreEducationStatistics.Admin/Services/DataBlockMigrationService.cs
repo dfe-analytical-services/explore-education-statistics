@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var filters = GetFilterItemIds(subjectMeta);
                     var indicators = GetIndicatorItemIds(subjectMeta);
-                    var locations = GetLocationIds(subjectMeta);
+                    var locations = GetLocations(subjectMeta);
                     var timePeriods = GetTimePeriods(subjectMeta);
 
                     dataBlock.Tables = _mapper.Map<List<TableBuilderConfiguration>>(dataBlock.EES17Tables);
@@ -140,29 +140,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private List<List<TableHeader>> TransformTableHeadersGroup(IEnumerable<string> filterIds,
             IEnumerable<string> indicatorIds,
-            IEnumerable<string> locationIds,
+            Dictionary<string, IEnumerable<string>> locations,
             IEnumerable<string> timePeriods,
             IEnumerable<IEnumerable<TableHeader>> group)
         {
             return group
-                .Select(headers => TransformTableHeaders(filterIds, indicatorIds, locationIds, timePeriods, headers))
+                .Select(headers => TransformTableHeaders(filterIds, indicatorIds, locations, timePeriods, headers))
                 .ToList();
         }
 
         private List<TableHeader> TransformTableHeaders(IEnumerable<string> filterIds,
             IEnumerable<string> indicatorIds,
-            IEnumerable<string> locationIds,
+            Dictionary<string, IEnumerable<string>> locations,
             IEnumerable<string> timePeriods,
             IEnumerable<TableHeader> headers)
         {
             return headers
-                .Select(header => PopulateTableHeaderType(filterIds, indicatorIds, locationIds, timePeriods, header))
+                .Select(header => PopulateTableHeaderType(filterIds, indicatorIds, locations, timePeriods, header))
                 .ToList();
         }
 
         private TableHeader PopulateTableHeaderType(IEnumerable<string> filterIds,
             IEnumerable<string> indicatorIds,
-            IEnumerable<string> locationIds,
+            Dictionary<string, IEnumerable<string>> locations,
             IEnumerable<string> timePeriods,
             TableHeader tableHeader)
         {
@@ -176,8 +176,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 type = TableHeaderType.Indicator;
             }
-            else if (locationIds.Contains(value))
+            else if (locations.ContainsKey(value))
             {
+                var levels = locations[value].ToList();
+                if (levels.Count != 1)
+                {
+                    _logger.LogWarning(
+                        "More than one geographic level found in meta data for location id: {Value}, levels: {Levels}",
+                        value, string.Join(", ", levels));
+                }
+
+                tableHeader.Level = levels.First();
                 type = TableHeaderType.Location;
             }
             else if (timePeriods.Contains(value))
@@ -209,10 +218,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return indicators.SelectMany(GetLabelOptionValues).ToList();
         }
 
-        private static List<string> GetLocationIds(SubjectMetaViewModel subjectMetaViewModel)
+        private static Dictionary<string, IEnumerable<string>> GetLocations(SubjectMetaViewModel subjectMetaViewModel)
         {
-            var locations = subjectMetaViewModel.Locations.Select(pair => pair.Value);
-            return locations.SelectMany(GetValuesFromLocationGroups).ToList();
+            return subjectMetaViewModel.Locations
+                .SelectMany(pair => GetValuesFromLocationGroups(pair.Value)
+                    .Select(s => new {LocationId = s, Level = pair.Key}))
+                .GroupBy(tuple => tuple.LocationId)
+                .ToDictionary(
+                    grouping => grouping.Key,
+                    grouping => grouping.Select(tuple => tuple.Level));
         }
 
         private static List<string> GetTimePeriods(SubjectMetaViewModel subjectMetaViewModel)
