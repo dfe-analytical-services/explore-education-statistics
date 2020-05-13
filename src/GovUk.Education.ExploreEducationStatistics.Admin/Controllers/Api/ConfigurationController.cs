@@ -15,19 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _configuration = configuration;
         }
 
-        [AllowAnonymous]
-        [HttpGet("api/configuration/application-insights")]
-        public ActionResult<string> GetInsightsKey()
-        {
-            var value = _configuration.GetSection("AppInsights")?.GetValue<string>("InstrumentationKey");
-            if (string.IsNullOrEmpty(value))
-            {
-                return Ok("");
-            }
-
-            return Ok(value);
-        }
-
         [HttpGet("api/config")]
         public ActionResult<Dictionary<string, string>> GetConfig()
         {

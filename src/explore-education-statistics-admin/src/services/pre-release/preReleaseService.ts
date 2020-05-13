@@ -4,6 +4,7 @@ export interface PreReleaseSummary {
   contactEmail: string;
   publicationSlug: string;
   publicationTitle: string;
+  releaseSlug: string;
   releaseTitle: string;
 }
 

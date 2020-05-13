@@ -34,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
+                Slug = "2020",
                 TimePeriodCoverage = TimeIdentifier.AutumnSpringTerm,
                 PublicationId = publication.Id
             };
@@ -59,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Slug, viewModel.PublicationSlug);
                 Assert.Equal(publication.Title, viewModel.PublicationTitle);
                 Assert.Equal(release.Title, viewModel.ReleaseTitle);
+                Assert.Equal(release.Slug, viewModel.ReleaseSlug);
             }
         }
     }

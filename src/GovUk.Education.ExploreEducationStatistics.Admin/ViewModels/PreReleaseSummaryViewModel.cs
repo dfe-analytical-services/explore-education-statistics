@@ -4,6 +4,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public string PublicationSlug { get; }
 
+        public string ReleaseSlug { get; }
+
         public string PublicationTitle { get; }
 
         public string ReleaseTitle { get; }
@@ -13,11 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public PreReleaseSummaryViewModel()
         {
         }
-        
-        public PreReleaseSummaryViewModel(string publicationSlug, string publicationTitle, string releaseTitle,
+
+        public PreReleaseSummaryViewModel(
+            string publicationSlug,
+            string publicationTitle,
+            string releaseSlug,
+            string releaseTitle,
             string contactEmail)
         {
             PublicationSlug = publicationSlug;
+            ReleaseSlug = releaseSlug;
             PublicationTitle = publicationTitle;
             ReleaseTitle = releaseTitle;
             ContactEmail = contactEmail;

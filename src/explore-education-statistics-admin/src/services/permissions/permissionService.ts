@@ -4,9 +4,9 @@ import client from '@admin/services/util/service';
 export type PreReleaseAccess = 'Before' | 'After' | 'Within' | 'NoneSet';
 
 export interface PreReleaseWindowStatus {
-  preReleaseAccess: PreReleaseAccess;
-  preReleaseWindowStartTime: Date;
-  preReleaseWindowEndTime: Date;
+  access: PreReleaseAccess;
+  start: Date;
+  end: Date;
 }
 
 const permissionService = {
@@ -63,13 +63,15 @@ const permissionService = {
     releaseId: string,
   ): Promise<PreReleaseWindowStatus> => {
     return client
-      .get<PreReleaseWindowStatus>(
-        `/permissions/release/${releaseId}/prerelease/status`,
-      )
+      .get<{
+        preReleaseAccess: PreReleaseAccess;
+        preReleaseWindowStartTime: string;
+        preReleaseWindowEndTime: string;
+      }>(`/permissions/release/${releaseId}/prerelease/status`)
       .then(status => ({
-        ...status,
-        preReleaseWindowStartTime: new Date(status.preReleaseWindowStartTime),
-        preReleaseWindowEndTime: new Date(status.preReleaseWindowEndTime),
+        access: status.preReleaseAccess,
+        start: new Date(status.preReleaseWindowStartTime),
+        end: new Date(status.preReleaseWindowEndTime),
       }));
   },
 };
