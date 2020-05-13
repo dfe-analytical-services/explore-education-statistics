@@ -169,12 +169,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async void GetReleases_Returns_Ok()
         {
             var userManagementService = new Mock<IUserManagementService>();
-
+            userManagementService.Setup(s => s.ListReleasesAsync())
+                .ReturnsAsync(new List<IdTitlePair>
+                {
+                    new IdTitlePair {Title = "Release 1", Id = Guid.NewGuid()},
+                    new IdTitlePair {Title = "Release 2", Id = Guid.NewGuid()}
+                });
+            
             var controller = new UsersController(userManagementService.Object);
 
             var result = await controller.GetReleases();
 
-            Assert.IsAssignableFrom<OkResult>(result.Result);
+            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
+            
+            var model = (List<IdTitlePair>) ((OkObjectResult) result.Result).Value;
+            Assert.IsAssignableFrom<List<IdTitlePair>>(model);
+            Assert.Equal(2, model.Count);
         }
 
         [Fact]
