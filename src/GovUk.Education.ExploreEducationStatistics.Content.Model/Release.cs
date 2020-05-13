@@ -251,6 +251,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             
             return amendment;
         }
+        
+        public void CreateGenericContentFromTemplate(Release amendment)
+        {
+            var ctx = new CreateAmendmentContext(this, amendment);
+
+            amendment.Content = amendment
+                .Content?
+                //.Where(c => c.ContentSection.Type == ContentSectionType.Generic)
+                .Select(content => content.CreateReleaseAmendment(ctx))
+                .ToList();
+
+            amendment.ContentBlocks = amendment
+                .ContentBlocks?
+                //.Where()
+                .Select(releaseContentBlock => releaseContentBlock.CreateReleaseAmendment(ctx))
+                .ToList();
+        }
     }
 
     public class CreateAmendmentContext

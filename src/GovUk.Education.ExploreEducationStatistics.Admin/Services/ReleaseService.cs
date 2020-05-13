@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var release = _mapper.Map<Release>(createRelease);
                     
                     release.Id = Guid.NewGuid();
-                    release.GenericContent = await TemplateFromRelease(createRelease.TemplateReleaseId);
+                    TemplateFromRelease(createRelease.TemplateReleaseId, release);
                     release.SummarySection = new ContentSection
                     {
                         Type = ContentSectionType.ReleaseSummary
@@ -385,25 +385,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        private async Task<List<ContentSection>> TemplateFromRelease(Guid? releaseId)
+        private void TemplateFromRelease(Guid? releaseId, Release newRelease)
         {
             if (releaseId.HasValue)
             {
-                var templateContent = await GetContentAsync(releaseId.Value);
-                if (templateContent != null)
-                {
-                    return templateContent.Select(c => new ContentSection
-                    {
-                        Id = new Guid(),
-                        Caption = c.Caption,
-                        Heading = c.Heading,
-                        Order = c.Order,
-                        // TODO in future do we want to copy across more? Is it possible to do so?
-                    }).ToList();
-                }
+                var templateRelease = _context.Releases.First(r => r.Id == releaseId);
+                templateRelease.CreateGenericContentFromTemplate(newRelease);
             }
-
-            return new List<ContentSection>();
+            else
+            {
+                newRelease.GenericContent = new List<ContentSection>();
+            }
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
