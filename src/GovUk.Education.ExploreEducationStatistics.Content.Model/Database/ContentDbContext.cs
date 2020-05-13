@@ -315,13 +315,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(new EnumToStringConverter<ContentSectionType>());
 
             modelBuilder.Entity<Release>()
-                .Property(b => b.NextReleaseDate)
+                .Property(release => release.NextReleaseDate)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<PartialDate>(v));
 
             modelBuilder.Entity<Release>()
-                .Property(b => b.Status)
+                .Property(release => release.PublishScheduled)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                
+            modelBuilder.Entity<Release>()                
+                .Property(release => release.Status)
                 .HasConversion(new EnumToStringConverter<ReleaseStatus>());
 
             modelBuilder.Entity<DataBlock>()
