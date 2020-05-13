@@ -36,10 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         [HttpPost("user-management/invites")]
-        public async Task<ActionResult> InviteUser(UserInviteViewModel userInviteViewModel)
+        public async Task<ActionResult> InviteUser(UserInviteSubmission userInviteSubmission)
         {
-            var invite = await _userManagementService.InviteAsync(userInviteViewModel.Email, User.Identity.Name,
-                userInviteViewModel.RoleId);
+            var invite = await _userManagementService.InviteAsync(userInviteSubmission.Email, User.Identity.Name,
+                userInviteSubmission.RoleId);
 
             if (invite)
             {

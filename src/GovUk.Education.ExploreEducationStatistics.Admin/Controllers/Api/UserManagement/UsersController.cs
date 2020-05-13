@@ -74,11 +74,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         [HttpGet("user-management/users/{userId}/release-role")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<UserReleaseRoleViewModel> GetUserReleaseRoles(Guid userId)
+        public ActionResult<List<UserReleaseRoleViewModel>> GetUserReleaseRoles(Guid userId)
         {
             var userReleaseRoles = _userManagementService.GetUserReleaseRoles(userId.ToString());
 
-            if (userReleaseRoles != null)
+            if (userReleaseRoles.Any())
             {
                 return Ok(userReleaseRoles);
             }
