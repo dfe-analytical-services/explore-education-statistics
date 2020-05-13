@@ -98,7 +98,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _contentDbContext.SaveChangesAsync();
 
-                    return await GetUserReleaseRole(userId, newReleaseRole.Id);
+                    var response = await GetUserReleaseRole(userId, newReleaseRole.Id);
+
+                    SendNewReleaseRoleEmail(userId, response.Publication, response.Release, response.ReleaseRole);
+
+                    return response;
                 });
         }
 
@@ -121,10 +125,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<IdTitlePair>> ListReleasesAsync()
         {
             return await _contentDbContext.Releases.Select(r => new IdTitlePair
-                {
-                    Id = r.Id,
-                    Title = $"{r.Publication.Title} - {r.Title}",
-                }).ToListAsync();
+            {
+                Id = r.Id,
+                Title = $"{r.Publication.Title} - {r.Title}",
+            }).ToListAsync();
         }
 
         public async Task<List<RoleViewModel>> ListRolesAsync()
@@ -310,6 +314,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
 
             var emailValues = new Dictionary<string, dynamic> {{"url", "https://" + uri}};
+
+            _emailService.SendEmail(email, template, emailValues);
+        }
+
+        private void SendNewReleaseRoleEmail(Guid userId, IdTitlePair publication, IdTitlePair release, EnumExtensions.EnumValue role)
+        {
+            var uri = _configuration.GetValue<string>("AdminUri");
+            var template = _configuration.GetValue<string>("NotifyReleaseRoleTemplateId");
+            var email = _usersAndRolesDbContext.Users.FirstOrDefault(x => x.Id == userId.ToString())?.Email;
+
+            var emailValues = new Dictionary<string, dynamic>
+            {
+                {"url", "https://" + uri + "/publication/" + publication.Id + "/release/" + release.Id + "/summary"},
+                {"role", role.Name},
+                {"publication", publication.Title},
+                {"release", release.Title}
+            };
 
             _emailService.SendEmail(email, template, emailValues);
         }
