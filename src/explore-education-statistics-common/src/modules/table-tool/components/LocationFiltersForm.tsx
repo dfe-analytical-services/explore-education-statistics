@@ -2,6 +2,7 @@ import CollapsibleList from '@common/components/CollapsibleList';
 import { Form, FormFieldset } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import {
   FilterOption,
   PublicationSubjectMeta,
@@ -152,6 +153,12 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         return (
           <>
             {stepHeading}
+
+            <ResetFormOnPreviousStep
+              currentStep={currentStep}
+              stepNumber={stepNumber}
+            />
+
             <SummaryList noBorder>
               {Object.entries(locationLevels)
                 .filter(

@@ -2,6 +2,7 @@ import { Form, FormFieldSelect, FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import {
   PublicationSubjectMeta,
   TimePeriodQuery,
@@ -174,6 +175,12 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             {stepHeading}
+
+            <ResetFormOnPreviousStep
+              currentStep={currentStep}
+              stepNumber={stepNumber}
+            />
+
             <SummaryList noBorder>
               <SummaryListItem term="Start date">
                 {form.values.start && getOptionLabel(form.values.start)}

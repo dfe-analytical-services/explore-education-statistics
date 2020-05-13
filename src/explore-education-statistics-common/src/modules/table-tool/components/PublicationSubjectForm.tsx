@@ -1,6 +1,7 @@
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import { PublicationSubject } from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -88,6 +89,12 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             {stepHeading}
+
+            <ResetFormOnPreviousStep
+              currentStep={currentStep}
+              stepNumber={stepNumber}
+            />
+
             <SummaryList noBorder>
               <SummaryListItem term="Subject">
                 {getSubjectName(form.values.subjectId)}

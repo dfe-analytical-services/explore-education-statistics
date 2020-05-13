@@ -22,6 +22,7 @@ import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
+import ResetFormOnPreviousStep from './ResetFormOnPreviousStep';
 
 export interface FormValues {
   indicators: string[];
@@ -264,6 +265,12 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             {stepHeading}
+
+            <ResetFormOnPreviousStep
+              currentStep={currentStep}
+              stepNumber={stepNumber}
+            />
+
             <SummaryList noBorder>
               <SummaryListItem term="Indicators">
                 <CollapsibleList>
