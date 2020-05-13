@@ -8,7 +8,7 @@ import { CreateMethodologyRequest } from '@admin/services/methodology/types';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset, Formik } from '@common/components/form';
+import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
@@ -25,7 +25,7 @@ import {
   dayMonthYearValuesToInputs,
 } from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -138,7 +138,8 @@ const CreateMethodologyPage = ({
             scheduledPublishDate: validateMandatoryDayMonthYearField,
           })}
           onSubmit={handleSubmit}
-          render={(form: FormikProps<FormValues>) => {
+        >
+          {form => {
             return (
               <Form id={formId}>
                 <FormFieldTextInput
@@ -201,7 +202,7 @@ const CreateMethodologyPage = ({
               </Form>
             );
           }}
-        />
+        </Formik>
       )}
     </Page>
   );

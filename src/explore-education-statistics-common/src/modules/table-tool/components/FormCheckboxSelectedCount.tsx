@@ -1,5 +1,5 @@
 import Tag from '@common/components/Tag';
-import { connect, FormikContext, FormikValues } from 'formik';
+import { useFormikContext } from 'formik';
 import get from 'lodash/get';
 import React from 'react';
 
@@ -7,10 +7,9 @@ interface Props {
   name: string;
 }
 
-const FormCheckboxSelectedCount = ({
-  formik,
-  name,
-}: Props & { formik: FormikContext<FormikValues> }) => {
+const FormCheckboxSelectedCount = ({ name }: Props) => {
+  const formik = useFormikContext();
+
   const value = get(formik.values, name);
   let count = 0;
 
@@ -29,4 +28,4 @@ const FormCheckboxSelectedCount = ({
   );
 };
 
-export default connect<Props, {}>(FormCheckboxSelectedCount);
+export default FormCheckboxSelectedCount;

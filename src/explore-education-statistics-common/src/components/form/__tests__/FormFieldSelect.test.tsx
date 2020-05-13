@@ -15,8 +15,9 @@ describe('FormFieldSelect', () => {
         initialValues={{
           test: '',
         }}
-        onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        onSubmit={() => undefined}
+      >
+        {props => (
           <FormFieldSelect<FormValues>
             name="test"
             id="select"
@@ -30,7 +31,7 @@ describe('FormFieldSelect', () => {
             value={props.values.test}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const select = getByLabelText('Test values') as HTMLInputElement;
@@ -55,11 +56,12 @@ describe('FormFieldSelect', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+        >
+          {props => (
             <FormFieldSelect<FormValues>
               name="test"
               id="select"
@@ -73,7 +75,7 @@ describe('FormFieldSelect', () => {
               value={props.values.test}
             />
           )}
-        />,
+        </Formik>,
       );
 
       expect(queryByText('Select an option')).toBeNull();
@@ -85,11 +87,12 @@ describe('FormFieldSelect', () => {
           initialValues={{
             test: '1',
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
-          render={(props: FormikProps<FormValues>) => {
+        >
+          {(props: FormikProps<FormValues>) => {
             // This is super hacky, but `change` event
             // doesn't seem to trigger touched to change
             // eslint-disable-next-line no-param-reassign
@@ -110,7 +113,7 @@ describe('FormFieldSelect', () => {
               />
             );
           }}
-        />,
+        </Formik>,
       );
 
       const select = getByLabelText('Test values') as HTMLInputElement;
@@ -136,11 +139,12 @@ describe('FormFieldSelect', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+        >
+          {props => (
             <form onSubmit={props.handleSubmit}>
               <FormFieldSelect<FormValues>
                 name="test"
@@ -158,7 +162,7 @@ describe('FormFieldSelect', () => {
               <button type="submit">Submit</button>
             </form>
           )}
-        />,
+        </Formik>,
       );
 
       expect(queryByText('Select an option')).toBeNull();
@@ -176,8 +180,9 @@ describe('FormFieldSelect', () => {
           initialValues={{
             test: '1',
           }}
-          onSubmit={() => null}
-          render={(props: FormikProps<FormValues>) => (
+          onSubmit={() => undefined}
+        >
+          {props => (
             <FormFieldSelect<FormValues>
               name="test"
               id="select"
@@ -191,7 +196,7 @@ describe('FormFieldSelect', () => {
               value={props.values.test}
             />
           )}
-        />,
+        </Formik>,
       );
 
       expect(getByText('Invalid option')).toBeDefined();
@@ -203,11 +208,12 @@ describe('FormFieldSelect', () => {
           initialValues={{
             test: '1',
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
-          render={(props: FormikProps<FormValues>) => {
+        >
+          {(props: FormikProps<FormValues>) => {
             // This is super hacky, but `change` event
             // doesn't seem to trigger touched to change
             // eslint-disable-next-line no-param-reassign
@@ -229,7 +235,7 @@ describe('FormFieldSelect', () => {
               />
             );
           }}
-        />,
+        </Formik>,
       );
 
       const select = getByLabelText('Test values') as HTMLInputElement;
@@ -255,11 +261,12 @@ describe('FormFieldSelect', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+        >
+          {props => (
             <form onSubmit={props.handleSubmit}>
               <FormFieldSelect<FormValues>
                 name="test"
@@ -278,7 +285,7 @@ describe('FormFieldSelect', () => {
               <button type="submit">Submit</button>
             </form>
           )}
-        />,
+        </Formik>,
       );
 
       const select = getByLabelText('Test values') as HTMLInputElement;

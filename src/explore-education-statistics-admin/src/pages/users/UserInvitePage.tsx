@@ -2,18 +2,18 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService from '@admin/services/users/service';
-import { UserInvite, Role } from '@admin/services/users/types';
+import { Role, UserInvite } from '@admin/services/users/types';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset, Formik } from '@common/components/form';
+import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -40,10 +40,6 @@ const UserInvitePage = ({
 }: RouteComponentProps & ErrorControlState) => {
   const [model, setModel] = useState<InviteUserModel>();
   const formId = 'inviteUserForm';
-
-  const { value: releaseRoles } = useAsyncRetry(() =>
-    userService.getReleaseRoles(),
-  );
 
   useEffect(() => {
     userService.getRoles().then(roles => {
@@ -111,7 +107,8 @@ const UserInvitePage = ({
             selectedRoleId: Yup.string().required('Choose role for the user'),
           })}
           onSubmit={handleSubmit}
-          render={_ => {
+        >
+          {() => {
             return (
               <Form id={formId}>
                 <FormFieldset
@@ -154,7 +151,7 @@ const UserInvitePage = ({
               </Form>
             );
           }}
-        />
+        </Formik>
       )}
     </Page>
   );

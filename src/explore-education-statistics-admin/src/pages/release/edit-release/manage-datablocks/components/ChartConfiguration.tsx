@@ -7,7 +7,6 @@ import {
   FormFieldSelect,
   FormFieldTextInput,
   FormGroup,
-  Formik,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
@@ -15,6 +14,7 @@ import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo } from 'react';
@@ -137,7 +137,8 @@ const ChartConfiguration = ({
         }}
         isInitialValid={validationSchema.isValidSync(initialValues)}
         validationSchema={validationSchema}
-        render={form => (
+      >
+        {form => (
           <Form id={formId}>
             <Effect
               value={{
@@ -256,7 +257,7 @@ const ChartConfiguration = ({
             {buttons}
           </Form>
         )}
-      />
+      </Formik>
     </>
   );
 };

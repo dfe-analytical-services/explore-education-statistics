@@ -8,7 +8,6 @@ import {
   FormFieldSelect,
   FormFieldset,
   FormFieldTextInput,
-  Formik,
   FormTextInput,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
@@ -34,6 +33,7 @@ import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { ObjectSchema, Schema } from 'yup';
+import { Formik } from 'formik';
 
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
@@ -274,7 +274,8 @@ const ChartAxisConfiguration = ({
       onSubmit={values => {
         onSubmit(normalizeValues(values));
       }}
-      render={form => (
+    >
+      {form => (
         <Form id={id}>
           <Effect
             value={{
@@ -594,7 +595,7 @@ const ChartAxisConfiguration = ({
           {buttons}
         </Form>
       )}
-    />
+    </Formik>
   );
 };
 

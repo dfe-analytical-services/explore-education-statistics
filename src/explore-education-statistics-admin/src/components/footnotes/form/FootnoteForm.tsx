@@ -8,11 +8,11 @@ import {
 import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import { Form, FormFieldset } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
 import React from 'react';
@@ -113,7 +113,8 @@ const FootnoteForm = ({
             onSubmit && onSubmit(values, footnote ? footnote.id : undefined)
           );
         }}
-        render={(form: FormikProps<FootnoteProps>) => {
+      >
+        {form => {
           const { getError } = createErrorHelper(form);
           return (
             <div className={styles.container}>
@@ -231,7 +232,7 @@ const FootnoteForm = ({
             </div>
           );
         }}
-      />
+      </Formik>
     );
   };
 

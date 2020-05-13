@@ -6,13 +6,13 @@ import permissionService from '@admin/services/permissions/permissionService';
 import service from '@admin/services/release/edit-release/status/service';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
+import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import { ReleaseStatus } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 
 const errorCodeMappings = [
@@ -145,7 +145,8 @@ const ReleaseStatusPage = () => {
               'Provide an internal release note',
             ),
           })}
-          render={(form: FormikProps<FormValues>) => {
+        >
+          {form => {
             return (
               <Form id={formId}>
                 <p>Select and update the release status.</p>
@@ -180,7 +181,7 @@ const ReleaseStatusPage = () => {
               </Form>
             );
           }}
-        />
+        </Formik>
       )}
     </>
   );

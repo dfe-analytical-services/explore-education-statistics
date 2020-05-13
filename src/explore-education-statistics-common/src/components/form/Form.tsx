@@ -3,7 +3,7 @@ import ErrorSummary, {
 } from '@common/components/ErrorSummary';
 import useToggle from '@common/hooks/useToggle';
 import createErrorHelper from '@common/validation/createErrorHelper';
-import { connect, FormikContext } from 'formik';
+import { useFormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
@@ -44,9 +44,9 @@ const Form = ({
   children,
   id,
   submitId = `${id}-submit`,
-  formik,
   showSubmitError = false,
-}: Props & { formik: FormikContext<{}> }) => {
+}: Props) => {
+  const formik = useFormikContext();
   const { errors, touched, values, submitCount, submitForm } = formik;
 
   const previousValues = useRef(values);
@@ -119,4 +119,4 @@ const Form = ({
   );
 };
 
-export default connect<Props, {}>(Form);
+export default Form;

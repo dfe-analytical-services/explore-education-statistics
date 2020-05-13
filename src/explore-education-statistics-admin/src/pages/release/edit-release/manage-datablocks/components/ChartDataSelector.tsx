@@ -2,7 +2,7 @@ import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-dat
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import ErrorSummary from '@common/components/ErrorSummary';
-import { Form, FormFieldSelect, Formik } from '@common/components/form';
+import { Form, FormFieldSelect } from '@common/components/form';
 import {
   ChartCapabilities,
   ChartDefinition,
@@ -19,6 +19,7 @@ import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import React, { ReactNode, useMemo, useState } from 'react';
@@ -166,7 +167,8 @@ const ChartDataSelector = ({
           onDataAdded(newDataSetConfig);
         }
       }}
-      render={form => (
+    >
+      {form => (
         <>
           <Form {...form} id={formId} showSubmitError>
             <div className={styles.formSelectRow}>
@@ -316,7 +318,7 @@ const ChartDataSelector = ({
           )}
         </>
       )}
-    />
+    </Formik>
   );
 };
 

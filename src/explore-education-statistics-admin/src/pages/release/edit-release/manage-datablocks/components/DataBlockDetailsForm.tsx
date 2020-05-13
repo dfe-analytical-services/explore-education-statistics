@@ -1,15 +1,10 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import Button from '@common/components/Button';
-import {
-  Form,
-  FormFieldTextInput,
-  FormGroup,
-  Formik,
-} from '@common/components/form';
+import { Form, FormFieldTextInput, FormGroup } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
-import React, { useRef } from 'react';
+import { Formik } from 'formik';
+import React from 'react';
 
 interface Props {
   initialValues?: DataBlockDetailsFormValues;
@@ -28,13 +23,10 @@ const DataBlockDetailsForm = ({
   onTitleChange,
   onSubmit,
 }: Props) => {
-  const formikRef = useRef<Formik<DataBlockDetailsFormValues>>(null);
-
   const handleSubmit = useFormSubmit(onSubmit, []);
 
   return (
     <Formik<DataBlockDetailsFormValues>
-      ref={formikRef}
       initialValues={initialValues}
       validationSchema={Yup.object<DataBlockDetailsFormValues>({
         name: Yup.string().required('Enter a data block name'),
@@ -42,7 +34,8 @@ const DataBlockDetailsForm = ({
         source: Yup.string(),
       })}
       onSubmit={handleSubmit}
-      render={(form: FormikProps<DataBlockDetailsFormValues>) => {
+    >
+      {form => {
         return (
           <Form {...form} id="dataBlockDetails">
             <h2>Data block details</h2>
@@ -85,7 +78,7 @@ const DataBlockDetailsForm = ({
           </Form>
         );
       }}
-    />
+    </Formik>
   );
 };
 
