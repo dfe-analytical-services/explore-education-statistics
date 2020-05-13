@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
             return ValidationProblem(new ValidationProblemDetails(ModelState));
         }
-        
+
         [HttpGet("user-management/users/{userId}/release-role")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -85,18 +85,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
             return NotFound();
         }
-        
+
         [HttpPost("user-management/users/{userId}/release-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission releaseRole)
+        public async Task<ActionResult<UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId,
+            UserReleaseRoleSubmission releaseRole)
         {
             return await _userManagementService.AddUserReleaseRole(userId, releaseRole).HandleFailuresOrOk();
         }
-        
+
         [HttpGet("user-management/users/{userId}/release-role/{userReleaseRoleId}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<UserReleaseRoleViewModel>> GetUserReleaseRole(Guid userId, Guid userReleaseRoleId)
+        public async Task<ActionResult<UserReleaseRoleViewModel>> GetUserReleaseRole(Guid userId,
+            Guid userReleaseRoleId)
         {
             var userReleaseRole = await _userManagementService.GetUserReleaseRole(userId, userReleaseRoleId);
 
@@ -107,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
             return NotFound();
         }
-        
+
         [HttpDelete("user-management/users/{userId}/release-role/{userReleaseRoleId}")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<bool>> DeleteUserReleaseRole(Guid userId, Guid userReleaseRoleId)
@@ -124,9 +126,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         [ProducesResponseType(404)]
         public async Task<ActionResult<IdTitlePair>> GetReleases()
         {
-            return Ok();
+            var releases = await _userManagementService.ListReleasesAsync();
+
+            if (releases.Any())
+            {
+                return Ok(releases);
+            }
+
+            return NotFound();
         }
-        
+
         /// <summary>
         /// Provides a list of release roles that are available within the service
         /// </summary>
@@ -134,7 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         [HttpGet("user-management/roles")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        
         public async Task<ActionResult<List<RoleViewModel>>> GetRoles()
         {
             var users = await _userManagementService.ListRolesAsync();

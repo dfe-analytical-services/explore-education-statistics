@@ -9,10 +9,12 @@ import {
   UserUpdate,
   UserReleaseRoleSubmission,
 } from '@admin/services/users/types';
+import { IdTitlePair } from '../common/types';
 
 export interface UsersService {
   getRoles(): Promise<Role[]>;
   getReleaseRoles(): Promise<ReleaseRole[]>;
+  getReleases(): Promise<IdTitlePair[]>;
 
   getUser(userId: string): Promise<User>;
 
@@ -39,6 +41,9 @@ const service: UsersService = {
   },
   getReleaseRoles(): Promise<ReleaseRole[]> {
     return client.get<ReleaseRole[]>('/user-management/release-roles');
+  },
+  getReleases(): Promise<IdTitlePair[]> {
+    return client.get<IdTitlePair[]>('/user-management/releases');
   },
   // user-management/releases (ID,Title)
 

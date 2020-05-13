@@ -73,9 +73,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
   }, []);
 
   const { value: roles } = useAsyncRetry(() => userService.getRoles());
-  const { value: releases } = useAsyncRetry(() =>
-    dashboardService.getDraftReleases(),
-  );
+  const { value: releases } = useAsyncRetry(() => userService.getReleases());
   const { value: releaseRoles } = useAsyncRetry(() =>
     userService.getReleaseRoles(),
   );
@@ -217,7 +215,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                             label="Release"
                             name="selectedReleaseId"
                             options={releases?.map(release => ({
-                              label: `${release.publicationTitle} - ${release.releaseName}`,
+                              label: release.title,
                               value: release.id,
                             }))}
                           />
