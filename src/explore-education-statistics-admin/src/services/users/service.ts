@@ -81,7 +81,7 @@ const service: UsersService = {
     return client.post(`/user-management/invites`, invite);
   },
   cancelInvite(email: string): Promise<boolean> {
-    return client.delete(`/user-management/invite/${email}`);
+    return client.delete(`/user-management/invites/${email}`);
   },
 };
 
