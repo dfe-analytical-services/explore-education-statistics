@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
          */
         public static DateTime AsStartOfDayUtc(this DateTime dateTime)
         {
-            var dateTimeAtMidnight = dateTime.Date;
-            return TimeZoneInfo.ConvertTimeToUtc(dateTimeAtMidnight, GetGmtStandardTimeTimezone());
+            var dateTimeStartOfDay = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, 0, 0, 0, DateTimeKind.Unspecified);
+            return TimeZoneInfo.ConvertTimeToUtc(dateTimeStartOfDay, GetGmtStandardTimeTimezone());
         }
 
         private static TimeZoneInfo GetGmtStandardTimeTimezone()
