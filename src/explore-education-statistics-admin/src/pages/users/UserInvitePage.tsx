@@ -137,6 +137,7 @@ const UserInvitePage = ({
                     id={`${formId}-selectedRoleId`}
                     label="Role"
                     name="selectedRoleId"
+                    placeholder="Choose role"
                     options={model?.roles.map(role => ({
                       label: role.name,
                       value: role.id,
