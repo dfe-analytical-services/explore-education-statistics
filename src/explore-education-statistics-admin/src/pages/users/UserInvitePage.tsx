@@ -145,63 +145,6 @@ const UserInvitePage = ({
                   />
                 </FormFieldset>
 
-                {/* <FormFieldset
-                  id={`${formId}-role`}
-                  legend="Release access"
-                  legendSize="m"
-                  hint="The releases a user can access within the service."
-                >
-                  <div className="govuk-grid-row"> */}
-                {/* <div className="govuk-grid-column-one-half">
-                      <FormFieldSelect
-                        id={`${formId}-selectedReleaseId`}
-                        label="Release"
-                        name="selectedReleaseId"
-                        options={releases?.map(release => ({
-                          label: `${release.publicationTitle} - ${release.releaseName}`,
-                          value: release.id,
-                        }))}
-                      />
-                    </div> */}
-
-                {/* <div className="govuk-grid-column-one-quarter">
-                      <FormFieldSelect
-                        id={`${formId}-releaseRoleId`}
-                        label="Release role"
-                        name="releaseRoleId"
-                        options={releaseRoles?.map(releaseRole => ({
-                          label: releaseRole.name,
-                          value: releaseRole.value,
-                        }))}
-                      />
-                    </div>
-                    <div className="govuk-grid-column-one-quarter">
-                      <Button type="submit" className="govuk-!-margin-top-6">
-                        Add release access
-                      </Button>
-                    </div>
-                  </div>
-
-                  <table className="govuk-table">
-                    <thead className="govuk-table__head">
-                      <tr className="govuk-table__row">
-                        <th scope="col" className="govuk-table__header">
-                          Publication
-                        </th>
-                        <th scope="col" className="govuk-table__header">
-                          Release
-                        </th>
-                        <th scope="col" className="govuk-table__header">
-                          Role
-                        </th>
-                        <th scope="col" className="govuk-table__header">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                  </table> */}
-                {/* </FormFieldset> */}
-
                 <Button type="submit" className="govuk-!-margin-top-6">
                   Send invite
                 </Button>
