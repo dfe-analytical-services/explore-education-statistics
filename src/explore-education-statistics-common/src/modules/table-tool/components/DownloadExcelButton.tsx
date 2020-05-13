@@ -8,7 +8,7 @@ import React, { RefObject } from 'react';
 import { CellObject, utils, WorkSheet, writeFile } from 'xlsx';
 
 interface Props {
-  publicationSlug: string;
+  fileName: string;
   subjectMeta: FullTableMeta;
   tableRef: RefObject<HTMLElement>;
 }
@@ -140,11 +140,7 @@ export function appendFootnotes(
   return sheet;
 }
 
-const DownloadExcelButton = ({
-  publicationSlug,
-  subjectMeta,
-  tableRef,
-}: Props) => {
+const DownloadExcelButton = ({ fileName, subjectMeta, tableRef }: Props) => {
   const { footnotes } = subjectMeta;
   return (
     <ButtonText
@@ -173,7 +169,7 @@ const DownloadExcelButton = ({
         appendTitle(sheet, generateTableTitle(subjectMeta));
         appendFootnotes(sheet, footnotes);
 
-        writeFile(workBook, `data-${publicationSlug}.xlsx`, {
+        writeFile(workBook, `${fileName}.xlsx`, {
           type: 'binary',
         });
       }}

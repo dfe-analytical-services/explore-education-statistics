@@ -1,5 +1,6 @@
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
+import useConfig from '@admin/hooks/useConfig';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { ReleaseProvider } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import permissionService, {
@@ -29,6 +30,7 @@ interface MatchProps {
 const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
+  const { value: config } = useConfig();
   const { handleManualErrors } = useErrorControl();
   const { user } = useAuthContext();
 
@@ -37,12 +39,12 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       releaseId,
     );
 
-    if (preReleaseWindowStatus.preReleaseAccess === 'NoneSet') {
+    if (preReleaseWindowStatus.access === 'NoneSet') {
       handleManualErrors.forbidden();
       return undefined;
     }
 
-    if (preReleaseWindowStatus.preReleaseAccess === 'Within') {
+    if (preReleaseWindowStatus.access === 'Within') {
       const content = await releaseContentService.getContent(releaseId);
 
       return {
@@ -73,7 +75,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       }
       includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
     >
-      {preReleaseWindowStatus?.preReleaseAccess === 'Within' && content && (
+      {preReleaseWindowStatus?.access === 'Within' && content && (
         <ReleaseProvider
           value={{
             ...content,
@@ -85,7 +87,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
         </ReleaseProvider>
       )}
 
-      {preReleaseWindowStatus?.preReleaseAccess === 'Before' && (
+      {preReleaseWindowStatus?.access === 'Before' && (
         <>
           <h1>Pre Release access is not yet available</h1>
 
@@ -99,52 +101,51 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
               </p>
               <p>
                 Pre Release access will be available from{' '}
-                {format(
-                  preReleaseWindowStatus.preReleaseWindowStartTime,
-                  'd MMMM yyyy',
-                )}
+                {format(preReleaseWindowStatus.start, 'd MMMM yyyy')}
                 {' at '}
-                {format(
-                  preReleaseWindowStatus.preReleaseWindowStartTime,
-                  'HH:mm',
-                )}{' '}
-                until{' '}
-                {format(
-                  preReleaseWindowStatus.preReleaseWindowEndTime,
-                  'd MMMM yyyy',
-                )}
+                {format(preReleaseWindowStatus.start, 'HH:mm')} until{' '}
+                {format(preReleaseWindowStatus.end, 'd MMMM yyyy')}
                 {' at '}
-                {format(
-                  preReleaseWindowStatus.preReleaseWindowEndTime,
-                  'HH:mm',
-                )}
-                .
+                {format(preReleaseWindowStatus.end, 'HH:mm')}.
               </p>
               <p>
                 If you believe that this release should be available and you are
-                having problems accessing please contact the production team{' '}
-                <strong>
-                  <a href={`mailto:${preReleaseSummary.contactEmail}`}>
-                    {preReleaseSummary.contactEmail}
-                  </a>
-                </strong>
+                having problems accessing please contact the{' '}
+                <a href={`mailto:${preReleaseSummary.contactEmail}`}>
+                  production team
+                </a>
+                .
               </p>
             </>
           )}
         </>
       )}
 
-      {preReleaseWindowStatus?.preReleaseAccess === 'After' && (
+      {preReleaseWindowStatus?.access === 'After' && (
         <>
           <h1>Pre Release access has ended</h1>
 
           {preReleaseSummary && (
-            <p>
-              Pre Release access for the{' '}
-              <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
-              <strong>{preReleaseSummary.publicationTitle}</strong> is no longer
-              available.
-            </p>
+            <>
+              <p>
+                The <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
+                <strong>{preReleaseSummary.publicationTitle}</strong> has now
+                been published on the Explore Education Statistics service.
+              </p>
+
+              {config?.PublicAppUrl && (
+                <p>
+                  View this{' '}
+                  <a
+                    href={`${config.PublicAppUrl}/find-statistics/${preReleaseSummary.publicationSlug}/${preReleaseSummary.releaseSlug}`}
+                    rel="noopener noreferrer"
+                  >
+                    release
+                  </a>
+                  .
+                </p>
+              )}
+            </>
           )}
         </>
       )}

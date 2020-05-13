@@ -24,11 +24,11 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
     fullTable.subjectMeta,
   );
 
-  const publicationSlug = `permalink-${data.created}-${data.title}`;
+  const { subjectName, publicationName } = fullTable.subjectMeta;
 
   return (
     <Page
-      title={`'${fullTable.subjectMeta.subjectName}' from '${fullTable.subjectMeta.publicationName}'`}
+      title={`'${subjectName}' from '${publicationName}'`}
       caption="Permanent data table"
       className={styles.permalinkPage}
       wide
@@ -40,11 +40,10 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <dl className="dfe-meta-content govuk-!-margin-bottom-9">
-            <dt className="govuk-caption-m">Created:</dt>
+            <dt className="govuk-caption-m">Created: </dt>
             <dd data-testid="created-date">
               <strong>
-                {' '}
-                <FormattedDate>{data.created}</FormattedDate>{' '}
+                <FormattedDate>{data.created}</FormattedDate>
               </strong>
             </dd>
           </dl>
@@ -57,15 +56,12 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
               action: 'Print this page link selected',
             }}
           />
-          {/* <RelatedAside>
-              <h3>Related content</h3>
-            </RelatedAside> */}
         </div>
       </div>
       <div ref={tableRef}>
         <TimePeriodDataTable
           fullTable={fullTable}
-          source="DfE prototype example statistics"
+          source={`${publicationName}, ${subjectName}`}
           tableHeadersConfig={tableHeadersConfig}
         />
       </div>
@@ -74,14 +70,14 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         <ul className="govuk-list">
           <li>
             <DownloadCsvButton
-              publicationSlug={publicationSlug}
+              fileName={`permalink-${data.id}`}
               fullTable={fullTable}
             />
           </li>
           <li>
             <DownloadExcelButton
               tableRef={tableRef}
-              publicationSlug={publicationSlug}
+              fileName={`permalink-${data.id}`}
               subjectMeta={fullTable.subjectMeta}
             />
           </li>

@@ -145,13 +145,13 @@ const TableToolFinalStep = ({
           </li>
           <li>
             <DownloadCsvButton
-              publicationSlug={publication.slug}
+              fileName={`data-${publication.slug}`}
               fullTable={table}
             />
           </li>
           <li>
             <DownloadExcelButton
-              publicationSlug={publication.slug}
+              fileName={`data-${publication.slug}`}
               tableRef={dataTableRef}
               subjectMeta={table.subjectMeta}
             />

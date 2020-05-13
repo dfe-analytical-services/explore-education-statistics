@@ -29,7 +29,7 @@ import tableBuilderService, {
   TableDataQuery,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { useImmer } from 'use-immer';
 
 const getDefaultSubjectMeta = (): PublicationSubjectMeta => ({
