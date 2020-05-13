@@ -75,11 +75,11 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
 };
 
 interface Props {
-  publicationSlug: string;
+  fileName: string;
   fullTable: FullTable;
 }
 
-const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
+const DownloadCsvButton = ({ fileName, fullTable }: Props) => {
   return (
     <ButtonText
       onClick={() => {
@@ -87,7 +87,7 @@ const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
         workBook.Sheets.Sheet1 = utils.aoa_to_sheet(getCsvData(fullTable));
         workBook.SheetNames[0] = 'Sheet1';
 
-        writeFile(workBook, `data-${publicationSlug}.csv`, {
+        writeFile(workBook, `${fileName}.csv`, {
           type: 'binary',
         });
       }}

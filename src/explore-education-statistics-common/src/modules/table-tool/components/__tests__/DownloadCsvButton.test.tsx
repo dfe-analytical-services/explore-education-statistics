@@ -73,7 +73,7 @@ describe('DownloadCsvButton', () => {
   test('calls `writeFile` when button is pressed', () => {
     const { getByText } = render(
       <DownloadCsvButton
-        publicationSlug="pupil-absence"
+        fileName="pupil-absence"
         fullTable={{
           subjectMeta: {
             ...basicSubjectMeta,
@@ -140,7 +140,7 @@ describe('DownloadCsvButton', () => {
 
     expect(mockedWriteFile).toHaveBeenCalledTimes(1);
     expect(mockedWriteFile.mock.calls[0][0]).toMatchSnapshot();
-    expect(mockedWriteFile.mock.calls[0][1]).toBe('data-pupil-absence.csv');
+    expect(mockedWriteFile.mock.calls[0][1]).toBe('pupil-absence.csv');
   });
 
   describe('getCsvData', () => {
