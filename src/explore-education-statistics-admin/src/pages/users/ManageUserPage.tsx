@@ -142,7 +142,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                   <Form id={formId}>
                     <FormFieldset
                       id={`${formId}-details`}
-                      legend="Detals"
+                      legend="Details"
                       legendSize="m"
                     >
                       <SummaryList>
