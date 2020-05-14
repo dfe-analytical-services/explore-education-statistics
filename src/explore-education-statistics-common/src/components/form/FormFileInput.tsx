@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
   KeyboardEventHandler,
@@ -5,7 +6,6 @@ import React, {
   ReactNode,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
-import createDescribedBy from './util/createDescribedBy';
 
 export interface FormFileInputProps {
   disabled?: boolean;
@@ -42,11 +42,12 @@ const FormFileInput = ({
       )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <input
-        aria-describedby={createDescribedBy({
-          id,
-          error: !!error,
-          hint: !!hint,
-        })}
+        aria-describedby={
+          classNames({
+            [`${id}-error`]: !!error,
+            [`${id}-hint`]: !!hint,
+          }) || undefined
+        }
         className="govuk-file-upload"
         id={id}
         type="file"

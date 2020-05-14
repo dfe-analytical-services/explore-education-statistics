@@ -1,13 +1,12 @@
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel, { FormLabelProps } from '@common/components/form/FormLabel';
-import createDescribedBy from '@common/components/form/util/createDescribedBy';
 import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
   KeyboardEventHandler,
+  memo,
   MouseEventHandler,
   ReactNode,
-  memo,
 } from 'react';
 
 export interface FormBaseInputProps extends FormLabelProps {
@@ -52,11 +51,12 @@ const FormBaseInput = ({
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <input
         {...props}
-        aria-describedby={createDescribedBy({
-          id,
-          error: !!error,
-          hint: !!hint,
-        })}
+        aria-describedby={
+          classNames({
+            [`${id}-error`]: !!error,
+            [`${id}-hint`]: !!hint,
+          }) || undefined
+        }
         className={classNames('govuk-input', {
           [`govuk-input--width-${width}`]: width !== undefined,
           [`govuk-!-width-${percentageWidth}`]: percentageWidth !== undefined,

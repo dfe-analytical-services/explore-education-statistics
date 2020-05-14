@@ -45,7 +45,7 @@ describe('FormTextInput', () => {
   });
 
   test('aria-describedby is equal to the hint id', () => {
-    const { getByLabelText } = render(
+    const { getByLabelText, getByText } = render(
       <FormBaseInput
         id="test-input"
         label="Test input"
@@ -54,6 +54,7 @@ describe('FormTextInput', () => {
       />,
     );
 
+    expect(getByText('Fill me in')).toHaveAttribute('id', 'test-input-hint');
     expect(getByLabelText('Test input')).toHaveAttribute(
       'aria-describedby',
       'test-input-hint',
@@ -61,7 +62,7 @@ describe('FormTextInput', () => {
   });
 
   test('aria-describedby is equal to the error id', () => {
-    const { getByLabelText } = render(
+    const { getByLabelText, getByText } = render(
       <FormBaseInput
         id="test-input"
         label="Test input"
@@ -70,6 +71,10 @@ describe('FormTextInput', () => {
       />,
     );
 
+    expect(getByText('Field is required')).toHaveAttribute(
+      'id',
+      'test-input-error',
+    );
     expect(getByLabelText('Test input')).toHaveAttribute(
       'aria-describedby',
       'test-input-error',
@@ -77,7 +82,7 @@ describe('FormTextInput', () => {
   });
 
   test('aria-describedby contains both hint and error ids', () => {
-    const { getByLabelText } = render(
+    const { getByLabelText, getByText } = render(
       <FormBaseInput
         id="test-input"
         label="Test input"
@@ -85,6 +90,12 @@ describe('FormTextInput', () => {
         hint="Fill me in"
         error="Field is required"
       />,
+    );
+
+    expect(getByText('Fill me in')).toHaveAttribute('id', 'test-input-hint');
+    expect(getByText('Field is required')).toHaveAttribute(
+      'id',
+      'test-input-error',
     );
 
     const ariaDescribedBy = getByLabelText('Test input').getAttribute(
