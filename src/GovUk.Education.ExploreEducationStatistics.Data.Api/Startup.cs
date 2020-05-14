@@ -137,7 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
-            MigratePermalinksAsync(app).Wait();
+            // Intentionally don't await call here. Long running operation with it's own error handling.
+            var ignoredTask = MigratePermalinksAsync(app);
 
             if (env.IsDevelopment())
             {
@@ -203,8 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var permalinkMigrationService = serviceScope.ServiceProvider.GetRequiredService<IEES17PermalinkMigrationService>();
-                // Intentionally don't await call here
-                permalinkMigrationService.MigrateAll();
+                await permalinkMigrationService.MigrateAll();
             }
         }
     }

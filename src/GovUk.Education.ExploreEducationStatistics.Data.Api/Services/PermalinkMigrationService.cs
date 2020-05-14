@@ -143,7 +143,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public bool IsHistoryExists()
         {
-            return _fileStorageService.FileExists(_containerName, _migrationId);
+            var blob = _fileStorageService.GetBlob(_containerName, _migrationId);
+            if (!blob.Exists())
+            {
+                return false;
+            }
+            blob.FetchAttributes();
+            return blob.Properties.Length > 0;
         }
 
         public Task WriteHistoryAsync(string message)
@@ -173,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return _fileStorageService.AppendFromStreamAsync(_containerName,
                 _migrationId,
                 MediaTypeNames.Text.Plain,
-                $"{now}: {message}");
+                $"{now}: {message}{Environment.NewLine}");
         }
     }
 }
