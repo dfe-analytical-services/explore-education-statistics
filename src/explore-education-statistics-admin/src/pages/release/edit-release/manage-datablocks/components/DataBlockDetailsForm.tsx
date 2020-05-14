@@ -50,14 +50,14 @@ const DataBlockDetailsForm = ({
               />
 
               <FormFieldTextArea<DataBlockDetailsFormValues>
-                id="data-block-title"
                 name="heading"
+                id="data-block-title"
+                className="govuk-!-width-two-thirds"
                 label="Table title"
+                rows={2}
                 onChange={e => {
                   if (onTitleChange) onTitleChange(e.target.value);
                 }}
-                additionalClass="govuk-!-width-two-thirds"
-                rows={2}
               />
 
               <FormFieldTextInput<DataBlockDetailsFormValues>

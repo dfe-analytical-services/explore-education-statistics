@@ -159,10 +159,10 @@ const ReleaseStatusPage = () => {
                 />
                 <FormFieldTextArea
                   name="internalReleaseNote"
+                  className="govuk-!-width-one-half"
                   id={`${formId}-internalReleaseNote`}
                   label="Internal release note"
                   rows={2}
-                  additionalClass="govuk-!-width-one-half"
                 />
                 <div className="govuk-!-margin-top-6">
                   <Button type="submit" className="govuk-!-margin-right-6">
