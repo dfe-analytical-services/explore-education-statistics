@@ -275,6 +275,9 @@ describe('FormFieldCheckboxGroup', () => {
           initialValues={{
             test: ['1'],
           }}
+          initialTouched={{
+            test: true,
+          }}
           onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
@@ -306,33 +309,6 @@ describe('FormFieldCheckboxGroup', () => {
 
       expect(checkbox.checked).toBe(false);
       expect(queryByText('Select at least one option')).not.toBeNull();
-    });
-
-    test('displays custom error message from `error` prop', () => {
-      const { getByText } = render(
-        <Formik
-          initialValues={{
-            test: ['1'],
-          }}
-          onSubmit={() => undefined}
-        >
-          {() => (
-            <FormFieldCheckboxGroup<FormValues>
-              name="test"
-              id="checkboxes"
-              legend="Test checkboxes"
-              error="Invalid checkbox selection"
-              options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-              ]}
-            />
-          )}
-        </Formik>,
-      );
-
-      expect(getByText('Invalid checkbox selection')).toBeDefined();
     });
 
     test('does not display validation message when `showError` is false', async () => {

@@ -1,55 +1,58 @@
-import { OmitStrict } from '@common/types/util';
+import FormField, {
+  FormFieldComponentProps,
+} from '@common/components/form/FormField';
+import { OmitStrict } from '@common/types';
 import React from 'react';
-import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxSearchSubGroups, {
   FormCheckboxSearchSubGroupsProps,
 } from './FormCheckboxSearchSubGroups';
 import FormFieldCheckboxSearchGroup from './FormFieldCheckboxSearchGroup';
-import {
-  handleAllChange,
-  handleChange,
-} from './util/checkboxGroupFieldHelpers';
+import handleAllChange from './util/handleAllCheckboxChange';
 
-export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = {
-  showError?: boolean;
-} & OmitStrict<FormCheckboxSearchSubGroupsProps, 'value'>;
+export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = OmitStrict<
+  FormFieldComponentProps<FormCheckboxSearchSubGroupsProps>,
+  'formGroup'
+>;
 
-const FormFieldCheckboxSearchSubGroups = <T extends {}>(
-  props: FormFieldCheckboxSearchSubGroupsProps<T>,
+const FormFieldCheckboxSearchSubGroups = <FormValues extends {}>(
+  props: FormFieldCheckboxSearchSubGroupsProps<FormValues>,
 ) => {
   const { options } = props;
 
   return (
     <>
       {options.length > 1 && (
-        <FieldCheckboxArray {...props}>
-          {fieldArrayProps => {
+        <FormField<string[]> {...props}>
+          {({ field, helpers }) => {
             return (
               <FormCheckboxSearchSubGroups
                 {...props}
-                {...fieldArrayProps}
+                {...field}
                 small
                 onAllChange={(event, checked, groupOptions) => {
                   if (props.onAllChange) {
                     props.onAllChange(event, checked, groupOptions);
                   }
 
-                  handleAllChange(fieldArrayProps, groupOptions)(
-                    event,
+                  handleAllChange({
                     checked,
-                  );
+                    event,
+                    helpers,
+                    options: groupOptions,
+                    value: field.value,
+                  });
                 }}
                 onChange={(event, option) => {
                   if (props.onChange) {
                     props.onChange(event, option);
                   }
 
-                  handleChange(fieldArrayProps)(event);
+                  field.onChange(event);
                 }}
               />
             );
           }}
-        </FieldCheckboxArray>
+        </FormField>
       )}
 
       {options.length === 1 && (

@@ -14,18 +14,21 @@ export interface FormFileInputProps {
   id: string;
   label: ReactNode | string;
   name: string;
-  value?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onClick?: MouseEventHandler<HTMLInputElement>;
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
 }
 
 const FormFileInput = ({
+  disabled,
   error,
   hint,
   id,
   label,
-  ...props
+  name,
+  onChange,
+  onClick,
+  onKeyPress,
 }: FormFileInputProps) => {
   return (
     <>
@@ -39,7 +42,6 @@ const FormFileInput = ({
       )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <input
-        {...props}
         aria-describedby={createDescribedBy({
           id,
           error: !!error,
@@ -48,6 +50,11 @@ const FormFileInput = ({
         className="govuk-file-upload"
         id={id}
         type="file"
+        disabled={disabled}
+        name={name}
+        onChange={onChange}
+        onClick={onClick}
+        onKeyPress={onKeyPress}
       />
     </>
   );

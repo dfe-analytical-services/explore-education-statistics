@@ -4,20 +4,23 @@ import FormFieldCheckboxSearchGroup from '@common/components/form/FormFieldCheck
 import FormFieldCheckboxSearchSubGroups, {
   FormFieldCheckboxSearchSubGroupsProps,
 } from '@common/components/form/FormFieldCheckboxSearchSubGroups';
+import { useField } from 'formik';
 import React, { useEffect, useState } from 'react';
 import FormCheckboxSelectionCount from './FormCheckboxSelectedCount';
 
 const FormFieldCheckboxGroupsMenu = <T extends {}>(
   props: FormFieldCheckboxSearchSubGroupsProps<T>,
 ) => {
-  const { error, name, options, onAllChange, legend } = props;
+  const { name, options, onAllChange, legend } = props;
   const [open, setOpen] = useState(false);
 
+  const [, meta] = useField(name);
+
   useEffect(() => {
-    if (error) {
+    if (meta.error && meta.touched) {
       setOpen(true);
     }
-  }, [error]);
+  }, [meta.error, meta.touched]);
 
   const renderSingleGroup = () => {
     return options[0].options.length > 1 ? (
@@ -54,7 +57,7 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
       open={open}
       jsRequired
       onToggle={(isOpen, event) => {
-        if (error) {
+        if (meta.error && meta.touched) {
           event.preventDefault();
         }
       }}

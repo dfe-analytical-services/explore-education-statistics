@@ -523,7 +523,7 @@ const ChartAxisConfiguration = ({
                         id={`${id}-referenceLines-position`}
                         label="Position"
                         hideLabel
-                        value={referenceLine.position}
+                        value={referenceLine.position?.toString()}
                         placeholder="Select position"
                         order={FormSelect.unordered}
                         options={referenceOptions}

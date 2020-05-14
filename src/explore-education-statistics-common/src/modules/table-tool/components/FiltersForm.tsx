@@ -187,7 +187,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       legend="Indicators"
                       legendSize="m"
                       hint="Select at least one indicator"
-                      error={getError('indicators')}
                       selectAll
                       disabled={form.isSubmitting}
                       options={Object.entries(subjectMeta.indicators).map(
@@ -219,7 +218,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 id={`${formId}-${camelCase(filterName)}`}
                                 legend={filterGroup.legend}
                                 hint={filterGroup.hint}
-                                error={getError(filterName)}
                                 disabled={form.isSubmitting}
                                 selectAll
                                 options={Object.entries(

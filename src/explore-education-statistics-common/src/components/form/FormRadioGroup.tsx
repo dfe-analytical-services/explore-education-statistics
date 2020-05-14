@@ -25,7 +25,7 @@ export type FormRadioGroupProps = {
     | (keyof RadioOption)[]
     | ((option: RadioOption) => RadioOption[keyof RadioOption])[];
   orderDirection?: ('asc' | 'desc')[];
-  value: string | null;
+  value?: string;
 } & FormFieldsetProps;
 
 class FormRadioGroup extends PureComponent<FormRadioGroupProps> {

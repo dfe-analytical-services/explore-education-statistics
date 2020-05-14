@@ -8,7 +8,7 @@ describe('FormRadioGroup', () => {
   test('renders list of radios in correct order', () => {
     const { container, getAllByLabelText } = render(
       <FormRadioGroup
-        value={null}
+        value=""
         id="test-radios"
         name="test-radios"
         legend="Test radios"
@@ -33,7 +33,7 @@ describe('FormRadioGroup', () => {
   test('renders list of radios in reverse order', () => {
     const { getAllByLabelText } = render(
       <FormRadioGroup
-        value={null}
+        value=""
         id="test-radios"
         name="test-radios"
         legend="Test radios"
@@ -57,7 +57,7 @@ describe('FormRadioGroup', () => {
   test('renders list of radios in custom order', () => {
     const { getAllByLabelText } = render(
       <FormRadioGroup
-        value={null}
+        value=""
         id="test-radios"
         name="test-radios"
         legend="Test radios"
@@ -82,7 +82,7 @@ describe('FormRadioGroup', () => {
   test('clicking a radio checks it', () => {
     class RadioWrapper extends Component {
       public state = {
-        value: null,
+        value: '',
       };
 
       private handleChange: RadioChangeEventHandler = event => {
@@ -120,7 +120,7 @@ describe('FormRadioGroup', () => {
   test('clicking radios toggles between them', () => {
     class RadioWrapper extends Component {
       public state = {
-        value: null,
+        value: '',
       };
 
       private handleChange: RadioChangeEventHandler = event => {
@@ -166,7 +166,7 @@ describe('FormRadioGroup', () => {
   test('renders correctly with legend', () => {
     const { container, getByText } = render(
       <FormRadioGroup
-        value={null}
+        value=""
         legend="Choose a radio"
         id="test-radios"
         name="test-radios"

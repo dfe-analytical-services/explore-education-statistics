@@ -17,7 +17,7 @@ describe('FormFieldSelect', () => {
         }}
         onSubmit={() => undefined}
       >
-        {props => (
+        {() => (
           <FormFieldSelect<FormValues>
             name="test"
             id="select"
@@ -28,7 +28,6 @@ describe('FormFieldSelect', () => {
               { value: '2', label: 'Option 2' },
               { value: '3', label: 'Option 3' },
             ]}
-            value={props.values.test}
           />
         )}
       </Formik>,
@@ -61,7 +60,7 @@ describe('FormFieldSelect', () => {
             test: Yup.string().required('Select an option'),
           })}
         >
-          {props => (
+          {() => (
             <FormFieldSelect<FormValues>
               name="test"
               id="select"
@@ -72,7 +71,6 @@ describe('FormFieldSelect', () => {
                 { value: '2', label: 'Option 2' },
                 { value: '3', label: 'Option 3' },
               ]}
-              value={props.values.test}
             />
           )}
         </Formik>,
@@ -109,7 +107,6 @@ describe('FormFieldSelect', () => {
                   { value: '2', label: 'Option 2' },
                   { value: '3', label: 'Option 3' },
                 ]}
-                value={props.values.test}
               />
             );
           }}
@@ -156,7 +153,6 @@ describe('FormFieldSelect', () => {
                   { value: '2', label: 'Option 2' },
                   { value: '3', label: 'Option 3' },
                 ]}
-                value={props.values.test}
               />
 
               <button type="submit">Submit</button>
@@ -174,34 +170,6 @@ describe('FormFieldSelect', () => {
       expect(queryByText('Select an option')).not.toBeNull();
     });
 
-    test('displays custom error message from `error` prop', async () => {
-      const { getByText } = render(
-        <Formik
-          initialValues={{
-            test: '1',
-          }}
-          onSubmit={() => undefined}
-        >
-          {props => (
-            <FormFieldSelect<FormValues>
-              name="test"
-              id="select"
-              label="Test values"
-              error="Invalid option"
-              options={[
-                { value: '1', label: 'Option 1' },
-                { value: '2', label: 'Option 2' },
-                { value: '3', label: 'Option 3' },
-              ]}
-              value={props.values.test}
-            />
-          )}
-        </Formik>,
-      );
-
-      expect(getByText('Invalid option')).toBeDefined();
-    });
-
     test('does not display validation message when `showError` is false and invalid option is selected', async () => {
       const { getByLabelText, queryByText } = render(
         <Formik
@@ -213,7 +181,7 @@ describe('FormFieldSelect', () => {
             test: Yup.string().required('Select an option'),
           })}
         >
-          {(props: FormikProps<FormValues>) => {
+          {props => {
             // This is super hacky, but `change` event
             // doesn't seem to trigger touched to change
             // eslint-disable-next-line no-param-reassign
@@ -231,7 +199,6 @@ describe('FormFieldSelect', () => {
                   { value: '2', label: 'Option 2' },
                   { value: '3', label: 'Option 3' },
                 ]}
-                value={props.values.test}
               />
             );
           }}
@@ -279,7 +246,6 @@ describe('FormFieldSelect', () => {
                   { value: '2', label: 'Option 2' },
                   { value: '3', label: 'Option 3' },
                 ]}
-                value={props.values.test}
               />
 
               <button type="submit">Submit</button>

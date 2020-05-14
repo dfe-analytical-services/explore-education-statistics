@@ -1,6 +1,6 @@
 import Yup from '@common/validation/yup';
 import { fireEvent, render, wait } from '@testing-library/react';
-import { Formik, FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React from 'react';
 import FormFieldRadioGroup from '../FormFieldRadioGroup';
 
@@ -147,33 +147,6 @@ describe('FormFieldRadioGroup', () => {
       await wait();
 
       expect(queryByText('Select at least one option')).not.toBeNull();
-    });
-
-    test('displays custom error message from `error` prop', async () => {
-      const { getByText } = render(
-        <Formik
-          initialValues={{
-            test: '1',
-          }}
-          onSubmit={() => undefined}
-        >
-          {() => (
-            <FormFieldRadioGroup<FormValues>
-              name="test"
-              id="radios"
-              legend="Test radios"
-              error="Invalid radio selection"
-              options={[
-                { id: 'radio-1', value: '1', label: 'Radio 1' },
-                { id: 'radio-2', value: '2', label: 'Radio 2' },
-                { id: 'radio-3', value: '3', label: 'Radio 3' },
-              ]}
-            />
-          )}
-        </Formik>,
-      );
-
-      expect(getByText('Invalid radio selection')).toBeDefined();
     });
 
     test('does not display validation message when `showError` is false', async () => {
