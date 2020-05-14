@@ -5,7 +5,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Per
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.BAU
 {
-    public class BauUsersControllerPermissionsTests
+    public class UsersControllerPermissionsTests
     {
         [Fact]
         public void PolicyAtControllerLevel()

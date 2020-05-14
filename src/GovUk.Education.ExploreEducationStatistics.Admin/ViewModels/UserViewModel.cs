@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
@@ -19,11 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; }
     }
 
-    public class UserReleaseRoleSubmission
-    {
-        public Guid ReleaseId { get; set; }
-        public ReleaseRole ReleaseRole { get; set; }
-    }
     public class UserReleaseRoleViewModel
     {
         public Guid Id { get; set; }

@@ -80,11 +80,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId,
-            UserReleaseRoleSubmission userReleaseRole)
+            UserReleaseRoleRequest userReleaseRole)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(userReleaseRole.ReleaseId)
-                .OnSuccess(_ => CheckIfUserAlreadyHasReleaseRole(userId, userReleaseRole))
+                .OnSuccess(_ => ValidateUserReleaseRoleCanBeAdded(userId, userReleaseRole))
                 .OnSuccess(async _ =>
                 {
                     var newReleaseRole = new UserReleaseRole
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<IdTitlePair>> ListReleasesAsync()
         {
-            return await _contentDbContext.Releases.Select(r => new IdTitlePair
+            return await _contentDbContext.Releases.Include(r => r.Publication).Select(r => new IdTitlePair
             {
                 Id = r.Id,
                 Title = $"{r.Publication.Title} - {r.Title}",
@@ -326,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", "https://" + uri + "/publication/" + publication.Id + "/release/" + release.Id + "/summary"},
+                {"url", $"https://{uri}/publication/{publication.Id}/release/{release.Id}/summary"},
                 {"role", role.Name},
                 {"publication", publication.Title},
                 {"release", release.Title}
@@ -335,19 +335,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _emailService.SendEmail(email, template, emailValues);
         }
 
-        private async Task<Either<ActionResult, bool>> CheckIfUserAlreadyHasReleaseRole(Guid userId,
-            UserReleaseRoleSubmission userReleaseRole)
+        private async Task<Either<ActionResult, bool>> ValidateUserReleaseRoleCanBeAdded(Guid userId,
+            UserReleaseRoleRequest userReleaseRole)
         {
             var existing = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
                 r.UserId == userId && r.ReleaseId == userReleaseRole.ReleaseId &&
                 r.Role == userReleaseRole.ReleaseRole);
 
-            if (existing == null)
+            if (existing != null)
             {
-                return true;
+                return ValidationActionResult(UserAlreadyHasReleaseRole);
             }
-
-            return ValidationActionResult(UserAlreadyHasReleaseRole);
+            
+            return true;
         }
     }
 }

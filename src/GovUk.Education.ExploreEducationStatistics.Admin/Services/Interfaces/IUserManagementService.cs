@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         List<UserReleaseRoleViewModel> GetUserReleaseRoles(string userId);
         
-        Task<Either<ActionResult, UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId, UserReleaseRoleSubmission userReleaseRole);
+        Task<Either<ActionResult, UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId, UserReleaseRoleRequest userReleaseRole);
 
         Task<List<IdTitlePair>> ListReleasesAsync();
         
