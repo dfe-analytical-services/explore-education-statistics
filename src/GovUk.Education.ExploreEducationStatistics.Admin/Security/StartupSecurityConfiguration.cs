@@ -102,6 +102,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy => 
                     policy.Requirements.Add(new ViewSubjectDataRequirement()));
 
+                // does this user have permission to view a specific PreRelease Summary?
+                options.AddPolicy(SecurityPolicies.CanViewSpecificPreReleaseSummary.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSpecificPreReleaseSummaryRequirement()));
+
                 /**
                  * Pre Release management
                  */
@@ -183,6 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
 
             /**
              * Pre Release management

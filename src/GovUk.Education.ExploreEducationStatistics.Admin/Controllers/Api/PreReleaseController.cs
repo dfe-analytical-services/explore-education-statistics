@@ -16,13 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class PreReleaseController : ControllerBase
     {
         private readonly IPreReleaseContactsService _preReleaseContactsService;
-        private readonly IPreReleaseService _preReleaseService;
+        private readonly IPreReleaseSummaryService _preReleaseSummaryService;
 
         public PreReleaseController(IPreReleaseContactsService preReleaseContactsService,
-            IPreReleaseService preReleaseService)
+            IPreReleaseSummaryService preReleaseSummaryService)
         {
             _preReleaseContactsService = preReleaseContactsService;
-            _preReleaseService = preReleaseService;
+            _preReleaseSummaryService = preReleaseSummaryService;
         }
 
         [HttpGet("release/{releaseId}/prerelease-contacts")]
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("release/{releaseId}/prerelease")]
         public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummaryAsync(Guid releaseId)
         {
-            return await _preReleaseService
+            return await _preReleaseSummaryService
                 .GetPreReleaseSummaryViewModelAsync(releaseId)
                 .HandleFailuresOrOk();
         }
