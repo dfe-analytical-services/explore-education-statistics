@@ -54,7 +54,7 @@ const ChartConfiguration = ({
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
-      title: Yup.string(),
+      title: Yup.string().required('Enter chart title'),
       height: Yup.number()
         .required('Enter chart height')
         .positive('Chart height must be positive'),
