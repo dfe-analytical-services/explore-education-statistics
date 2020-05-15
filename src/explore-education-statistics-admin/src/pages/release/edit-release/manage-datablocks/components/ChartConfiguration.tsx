@@ -161,7 +161,7 @@ const ChartConfiguration = ({
               id={`${formId}-title`}
               name="title"
               label="Chart title"
-              percentageWidth="three-quarters"
+              className="govuk-!-width-three-quarters"
             />
 
             {validationSchema.fields.stacked && (

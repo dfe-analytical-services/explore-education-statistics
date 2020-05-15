@@ -46,7 +46,7 @@ const DataBlockDetailsForm = ({
                 name="name"
                 label="Name"
                 hint="Name of the data block"
-                percentageWidth="one-half"
+                className="govuk-!-width-one-half"
               />
 
               <FormFieldTextArea<DataBlockDetailsFormValues>
@@ -64,7 +64,7 @@ const DataBlockDetailsForm = ({
                 id="data-block-source"
                 name="source"
                 label="Source"
-                percentageWidth="two-thirds"
+                className="govuk-!-width-two-thirds"
               />
 
               <Button

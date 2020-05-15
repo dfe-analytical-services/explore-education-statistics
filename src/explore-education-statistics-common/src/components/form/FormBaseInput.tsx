@@ -10,12 +10,12 @@ import React, {
 } from 'react';
 
 export interface FormBaseInputProps extends FormLabelProps {
+  className?: string;
   disabled?: boolean;
   error?: ReactNode | string;
   hint?: string;
   id: string;
   name: string;
-  percentageWidth?: string;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onClick?: MouseEventHandler<HTMLInputElement>;
@@ -29,13 +29,13 @@ interface HiddenProps {
 }
 
 const FormBaseInput = ({
+  className,
   error,
   hint,
   id,
   hideLabel,
   label,
   width,
-  percentageWidth,
   type = 'text',
   ...props
 }: FormBaseInputProps & HiddenProps) => {
@@ -57,9 +57,8 @@ const FormBaseInput = ({
             [`${id}-hint`]: !!hint,
           }) || undefined
         }
-        className={classNames('govuk-input', {
+        className={classNames('govuk-input', className, {
           [`govuk-input--width-${width}`]: width !== undefined,
-          [`govuk-!-width-${percentageWidth}`]: percentageWidth !== undefined,
         })}
         id={id}
         type={type}
