@@ -148,7 +148,7 @@ const ChartConfiguration = ({
         onSubmit={values => {
           onSubmit(normalizeValues(values));
         }}
-        isInitialValid={validationSchema.isValidSync(initialValues)}
+        validateOnMount
         validationSchema={validationSchema}
       >
         {form => (

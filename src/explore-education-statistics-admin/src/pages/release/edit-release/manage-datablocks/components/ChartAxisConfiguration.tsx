@@ -269,8 +269,8 @@ const ChartAxisConfiguration = ({
     <Formik<FormValues>
       initialValues={initialValues}
       enableReinitialize
+      validateOnMount
       validationSchema={validationSchema}
-      isInitialValid={validationSchema.isValidSync(initialValues)}
       onSubmit={values => {
         onSubmit(normalizeValues(values));
       }}
