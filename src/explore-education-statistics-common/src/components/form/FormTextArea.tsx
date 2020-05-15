@@ -1,3 +1,4 @@
+import FormGroup from '@common/components/form/FormGroup';
 import FormLabel, { FormLabelProps } from '@common/components/form/FormLabel';
 import classNames from 'classnames';
 import React, {
@@ -14,6 +15,7 @@ export interface FormTextAreaProps extends FormLabelProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
+  maxLength?: number;
   name: string;
   rows?: number;
   value?: string;
@@ -30,10 +32,12 @@ const FormTextArea = ({
   id,
   hideLabel,
   label,
+  maxLength,
   rows = 5,
+  value,
   ...props
 }: FormTextAreaProps) => {
-  return (
+  const textArea = (
     <>
       <FormLabel id={id} label={label} hideLabel={hideLabel} />
 
@@ -51,14 +55,48 @@ const FormTextArea = ({
           classNames({
             [`${id}-error`]: !!error,
             [`${id}-hint`]: !!hint,
+            [`${id}-info`]: !!maxLength,
           }) || undefined
         }
-        className={classNames('govuk-textarea', className)}
+        className={classNames('govuk-textarea', className, {
+          'govuk-js-character-count govuk-textarea--error':
+            maxLength && (value?.length ?? 0) > maxLength,
+        })}
         id={id}
         rows={rows}
+        value={value}
       />
     </>
   );
+
+  if (!!maxLength && maxLength > 0) {
+    const remaining = maxLength - (value?.length ?? 0);
+
+    return (
+      <div className="govuk-character-count">
+        <FormGroup>{textArea}</FormGroup>
+
+        <span
+          aria-live="polite"
+          className={classNames('govuk-character-count__message', {
+            'govuk-hint': remaining >= 0,
+            'govuk-error-message': remaining < 0,
+          })}
+          id={`${id}-info`}
+        >
+          {remaining >= 0
+            ? `You have ${remaining} character${
+                remaining !== 1 ? 's' : ''
+              } remaining`
+            : `You have ${Math.abs(remaining)} character${
+                remaining !== -1 ? 's' : ''
+              } too many`}
+        </span>
+      </div>
+    );
+  }
+
+  return textArea;
 };
 
 export default FormTextArea;
