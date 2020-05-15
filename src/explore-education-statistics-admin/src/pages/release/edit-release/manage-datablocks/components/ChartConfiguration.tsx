@@ -146,7 +146,9 @@ const ChartConfiguration = ({
         initialValues={initialValues}
         enableReinitialize
         onSubmit={values => {
-          onSubmit(normalizeValues(values));
+          if (canSaveChart) {
+            onSubmit(normalizeValues(values));
+          }
         }}
         validateOnMount
         validationSchema={validationSchema}

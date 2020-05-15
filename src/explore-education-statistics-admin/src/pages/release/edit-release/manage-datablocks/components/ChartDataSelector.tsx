@@ -295,7 +295,10 @@ const ChartDataSelector = ({
                 showSubmitError={isChartSubmitted && !canSaveChart}
                 onClick={() => {
                   setChartSubmitted(true);
-                  onSubmit(dataSetConfigs);
+
+                  if (canSaveChart) {
+                    onSubmit(dataSetConfigs);
+                  }
                 }}
               />
 

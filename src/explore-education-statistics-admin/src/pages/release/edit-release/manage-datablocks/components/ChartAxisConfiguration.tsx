@@ -272,7 +272,9 @@ const ChartAxisConfiguration = ({
       validateOnMount
       validationSchema={validationSchema}
       onSubmit={values => {
-        onSubmit(normalizeValues(values));
+        if (canSaveChart) {
+          onSubmit(normalizeValues(values));
+        }
       }}
     >
       {form => (
