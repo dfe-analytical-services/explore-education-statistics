@@ -1,7 +1,7 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration.module.scss';
+import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
-import ErrorSummary from '@common/components/ErrorSummary';
 import {
   Form,
   FormFieldRadioGroup,
@@ -29,11 +29,11 @@ import { TableDataResult } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { ObjectSchema, Schema } from 'yup';
-import { Formik } from 'formik';
 
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
@@ -575,22 +575,12 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          {form.isValid && form.submitCount > 0 && !canSaveChart && (
-            <ErrorSummary
-              title="Cannot save chart"
-              id={`${id}-errorSummary`}
-              errors={[
-                {
-                  id: `${id}-submit`,
-                  message: 'Ensure that all other tabs are valid first',
-                },
-              ]}
-            />
-          )}
-
-          <Button type="submit" id={`${id}-submit`}>
-            Save chart options
-          </Button>
+          <ChartBuilderSaveButton
+            formId={id}
+            showSubmitError={
+              form.isValid && form.submitCount > 0 && !canSaveChart
+            }
+          />
 
           {buttons}
         </Form>

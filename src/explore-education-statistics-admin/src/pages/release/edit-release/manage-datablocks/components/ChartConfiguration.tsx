@@ -1,7 +1,6 @@
+import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
 import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
-import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
-import ErrorSummary from '@common/components/ErrorSummary';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
@@ -265,22 +264,12 @@ const ChartConfiguration = ({
               </>
             )}
 
-            {form.isValid && form.submitCount > 0 && !canSaveChart && (
-              <ErrorSummary
-                title="Cannot save chart"
-                id={`${formId}-errorSummary`}
-                errors={[
-                  {
-                    id: `${formId}-submit`,
-                    message: 'Ensure that all other tabs are valid first',
-                  },
-                ]}
-              />
-            )}
-
-            <Button type="submit" id={`${formId}-submit`}>
-              Save chart options
-            </Button>
+            <ChartBuilderSaveButton
+              formId={formId}
+              showSubmitError={
+                form.isValid && form.submitCount > 0 && !canSaveChart
+              }
+            />
 
             {buttons}
           </Form>
