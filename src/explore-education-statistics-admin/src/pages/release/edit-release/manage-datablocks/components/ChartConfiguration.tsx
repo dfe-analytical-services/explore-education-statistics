@@ -2,14 +2,10 @@ import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablock
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
 import ErrorSummary from '@common/components/ErrorSummary';
-import {
-  Form,
-  FormFieldSelect,
-  FormFieldTextInput,
-  FormGroup,
-} from '@common/components/form';
+import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -17,9 +13,14 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema, Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
+
+const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  // eslint-disable-next-line no-param-reassign
+  event.target.value = event.target.value.replace(/\n/g, ' ');
+};
 
 type FormValues = Partial<ChartOptions>;
 
@@ -55,6 +56,19 @@ const ChartConfiguration = ({
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
       title: Yup.string().required('Enter chart title'),
+      alt: Yup.string()
+        .required('Enter chart alt text')
+        .max(125, 'Alt text must be less than 125 characters')
+        .test({
+          name: 'noRepeatTitle',
+          message: 'Alt text should not repeat the title',
+          test(value = '') {
+            // eslint-disable-next-line react/no-this-in-sfc
+            const title: string = this.resolve(Yup.ref('title')) ?? '';
+
+            return value.trim() !== title.trim();
+          },
+        }),
       height: Yup.number()
         .required('Enter chart height')
         .positive('Chart height must be positive'),
@@ -157,11 +171,25 @@ const ChartConfiguration = ({
               onMount={onFormStateChange}
             />
 
-            <FormFieldTextInput<ChartOptions>
+            <FormFieldTextArea<ChartOptions>
               id={`${formId}-title`}
               name="title"
-              label="Chart title"
+              label="Title"
               className="govuk-!-width-three-quarters"
+              rows={3}
+              hint="Use a concise descriptive title that summarises the main message in the chart."
+              onChange={replaceNewLines}
+            />
+
+            <FormFieldTextArea<ChartOptions>
+              id={`${formId}-alt`}
+              className="govuk-!-width-three-quarters"
+              name="alt"
+              label="Alt text"
+              hint="Brief and accurate description of the chart in less than 125 characters. Should not repeat the title."
+              maxLength={125}
+              rows={2}
+              onChange={replaceNewLines}
             />
 
             {validationSchema.fields.stacked && (
@@ -190,7 +218,7 @@ const ChartConfiguration = ({
               <FormFieldNumberInput<ChartOptions>
                 id={`${formId}-height`}
                 name="height"
-                label="Chart height (px)"
+                label="Height (px)"
                 width={5}
               />
             )}
@@ -199,7 +227,7 @@ const ChartConfiguration = ({
               <FormFieldNumberInput<ChartOptions>
                 id={`${formId}-width`}
                 name="width"
-                label="Chart width (px)"
+                label="Width (px)"
                 hint="Leave blank to set as full width"
                 width={5}
               />

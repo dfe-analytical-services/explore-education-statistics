@@ -77,6 +77,8 @@ describe('chartBuilderReducer', () => {
       axes: {},
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
@@ -107,6 +109,7 @@ describe('chartBuilderReducer', () => {
         height: 300,
         legend: 'top',
         title: '',
+        alt: '',
       });
     });
 
@@ -116,6 +119,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 400,
           title: 'Some title',
+          alt: 'Some alt',
           legend: 'bottom',
         },
       };
@@ -128,6 +132,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 400,
         title: 'Some title',
+        alt: 'Some alt',
         legend: 'bottom',
       });
     });
@@ -138,6 +143,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 400,
           title: 'Some title',
+          alt: 'Some alt',
           legend: 'bottom',
         },
       };
@@ -161,6 +167,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 600,
         title: 'Some title',
+        alt: 'Some alt',
         legend: 'top',
       });
     });
@@ -310,6 +317,8 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
@@ -410,6 +419,8 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
@@ -436,6 +447,7 @@ describe('chartBuilderReducer', () => {
         height: 300,
         legend: 'top',
         title: '',
+        alt: '',
       });
     });
 
@@ -445,6 +457,8 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 300,
           width: 400,
+          title: '',
+          alt: '',
         },
       };
 
@@ -462,6 +476,7 @@ describe('chartBuilderReducer', () => {
         height: 300,
         legend: 'top',
         title: '',
+        alt: '',
         width: 400,
       });
     });
@@ -472,6 +487,8 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 300,
           width: 400,
+          title: '',
+          alt: '',
         },
       };
 
@@ -490,6 +507,7 @@ describe('chartBuilderReducer', () => {
         height: 300,
         legend: 'top',
         title: '',
+        alt: '',
       });
     });
 
@@ -503,6 +521,7 @@ describe('chartBuilderReducer', () => {
             constants: {
               height: 400,
               title: 'overrides title',
+              alt: 'overrides alt',
               legend: 'bottom',
             },
           },
@@ -524,6 +543,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 400,
         title: 'overrides title',
+        alt: 'overrides alt',
         legend: 'bottom',
       });
     });
@@ -550,6 +570,8 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
@@ -649,6 +671,8 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
@@ -726,6 +750,8 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
@@ -776,6 +802,8 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
@@ -831,6 +859,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 400,
           title: 'Something',
+          alt: 'Some alt',
         },
         forms: {
           options: {
@@ -849,11 +878,12 @@ describe('chartBuilderReducer', () => {
         type: 'RESET',
       });
 
-      expect(nextState).toEqual({
+      expect(nextState).toEqual<ChartBuilderState>({
         axes: {},
         options: {
           height: 300,
           title: '',
+          alt: '',
         },
         definition: undefined,
         forms: {
@@ -876,6 +906,7 @@ describe('chartBuilderReducer', () => {
         axes: {},
         options: {
           title: '',
+          alt: '',
           height: 300,
         },
         forms: {
@@ -931,6 +962,8 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
+        title: '',
+        alt: '',
       };
 
       const { result } = renderHook(() =>
@@ -983,6 +1016,7 @@ describe('chartBuilderReducer', () => {
           height: 300,
           legend: 'top',
           title: '',
+          alt: '',
         },
         forms: {
           data: {
@@ -1029,6 +1063,8 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
+        title: '',
+        alt: '',
       };
 
       const { result } = renderHook(() =>
@@ -1078,6 +1114,7 @@ describe('chartBuilderReducer', () => {
           height: 300,
           legend: 'top',
           title: '',
+          alt: '',
         },
         forms: {
           data: {
@@ -1118,6 +1155,8 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
+        title: '',
+        alt: '',
       };
 
       const { result } = renderHook(() =>
@@ -1169,6 +1208,8 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
+        title: '',
+        alt: '',
       };
 
       const { result } = renderHook(() =>

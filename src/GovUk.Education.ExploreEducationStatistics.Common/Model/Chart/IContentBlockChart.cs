@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         string Type { get; }
         string Title { get; set; }
+        string Alt { get; set; }
         int Height { get; set; }
         int? Width { get; set; }
     }
