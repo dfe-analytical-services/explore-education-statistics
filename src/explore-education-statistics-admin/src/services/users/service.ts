@@ -4,14 +4,29 @@ import {
   UserStatus,
   UserInvite,
   Role,
+  UserReleaseRole,
   ReleaseRole,
   UserUpdate,
+  UserReleaseRoleSubmission,
 } from '@admin/services/users/types';
+import { IdTitlePair } from '../common/types';
 
 export interface UsersService {
   getRoles(): Promise<Role[]>;
   getReleaseRoles(): Promise<ReleaseRole[]>;
+  getReleases(): Promise<IdTitlePair[]>;
+
   getUser(userId: string): Promise<User>;
+
+  addUserReleaseRole: (
+    userId: string,
+    userReleaseRole: UserReleaseRoleSubmission,
+  ) => Promise<boolean>;
+  removeUserReleaseRole: (
+    userId: string,
+    userReleaseRole: UserReleaseRole,
+  ) => Promise<boolean>;
+
   getUsers(): Promise<UserStatus[]>;
   getPreReleaseUsers(): Promise<UserStatus[]>;
   getInvitedUsers(): Promise<UserStatus[]>;
@@ -22,31 +37,56 @@ export interface UsersService {
 
 const service: UsersService = {
   getRoles(): Promise<Role[]> {
-    return client.get<Role[]>('/bau/users/roles');
+    return client.get<Role[]>('/user-management/roles');
   },
   getReleaseRoles(): Promise<ReleaseRole[]> {
-    return client.get<ReleaseRole[]>('/bau/users/release-roles');
+    return client.get<ReleaseRole[]>('/user-management/release-roles');
+  },
+  getReleases(): Promise<IdTitlePair[]> {
+    return client.get<IdTitlePair[]>('/user-management/releases');
+  },
+  // user-management/releases (ID,Title)
+
+  getUsers(): Promise<UserStatus[]> {
+    return client.get<UserStatus[]>('/user-management/users');
   },
   getUser(userId: string): Promise<User> {
-    return client.get<User>(`/bau/users/${userId}`);
-  },
-  getUsers(): Promise<UserStatus[]> {
-    return client.get<UserStatus[]>('/bau/users');
-  },
-  getPreReleaseUsers(): Promise<UserStatus[]> {
-    return client.get<UserStatus[]>('/bau/users/pre-release');
-  },
-  getInvitedUsers(): Promise<UserStatus[]> {
-    return client.get<UserStatus[]>('/bau/users/invite');
-  },
-  inviteUser(invite: UserInvite): Promise<boolean> {
-    return client.post(`/bau/users/invite`, invite);
-  },
-  cancelInvite(email: string): Promise<boolean> {
-    return client.delete(`/bau/users/invite/${email}`);
+    return client.get<User>(`/user-management/users/${userId}`);
   },
   updateUser(user: UserUpdate): Promise<boolean> {
-    return client.put(`/bau/users/${user.id}`, user);
+    return client.put(`/user-management/users/${user.id}`, user);
+  },
+
+  addUserReleaseRole(
+    userId: string,
+    userReleaseRole: UserReleaseRoleSubmission,
+  ): Promise<boolean> {
+    return client.post(
+      `/user-management/users/${userId}/release-role`,
+      userReleaseRole,
+    );
+  },
+  removeUserReleaseRole(
+    userId: string,
+    userReleaseRole: UserReleaseRole,
+  ): Promise<boolean> {
+    return client.delete(
+      `/user-management/users/${userId}/release-role/${userReleaseRole.id}`,
+    );
+  },
+
+  getPreReleaseUsers(): Promise<UserStatus[]> {
+    return client.get<UserStatus[]>('/user-management/pre-release');
+  },
+
+  getInvitedUsers(): Promise<UserStatus[]> {
+    return client.get<UserStatus[]>('/user-management/invites');
+  },
+  inviteUser(invite: UserInvite): Promise<boolean> {
+    return client.post(`/user-management/invites`, invite);
+  },
+  cancelInvite(email: string): Promise<boolean> {
+    return client.delete(`/user-management/invites/${email}`);
   },
 };
 
