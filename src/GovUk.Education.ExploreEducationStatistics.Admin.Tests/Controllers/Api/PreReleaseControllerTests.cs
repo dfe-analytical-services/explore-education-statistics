@@ -13,26 +13,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void GetPreReleaseSummaryAsync_Returns_Ok()
         {
-            var (preReleaseContactsService, preReleaseService) = Mocks();
+            var (preReleaseContactsService, preReleaseSummaryService) = Mocks();
 
             var preReleaseSummaryViewModel = new PreReleaseSummaryViewModel();
             var releaseId = Guid.NewGuid();
 
-            preReleaseService
+            preReleaseSummaryService
                 .Setup(s => s.GetPreReleaseSummaryViewModelAsync(It.Is<Guid>(id => id == releaseId)))
                 .ReturnsAsync(preReleaseSummaryViewModel);
 
-            var controller = new PreReleaseController(preReleaseContactsService.Object, preReleaseService.Object);
+            var controller =
+                new PreReleaseController(preReleaseContactsService.Object, preReleaseSummaryService.Object);
 
             var result = await controller.GetPreReleaseSummaryAsync(releaseId);
             AssertOkResult(result);
         }
 
         private static (Mock<IPreReleaseContactsService> PreReleaseContactsService,
-            Mock<IPreReleaseService> PreReleaseService) Mocks()
+            Mock<IPreReleaseSummaryService> PreReleaseSummaryService) Mocks()
         {
             return (new Mock<IPreReleaseContactsService>(),
-                new Mock<IPreReleaseService>());
+                new Mock<IPreReleaseSummaryService>());
         }
 
         private static T AssertOkResult<T>(ActionResult<T> result) where T : class

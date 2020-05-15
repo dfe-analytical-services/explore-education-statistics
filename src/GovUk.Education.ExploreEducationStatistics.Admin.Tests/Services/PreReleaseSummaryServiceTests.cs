@@ -5,13 +5,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Options;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class PreReleaseServiceTests
+    public class PreReleaseSummaryServiceTests
     {
         [Fact]
         public async Task GetPreReleaseSummaryViewModelAsync()
@@ -49,13 +48,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext("PreReleaseSummaryViewModel"))
             {
-                var preReleaseService = new PreReleaseService(Options.Create(new PreReleaseOptions
-                    {
-                        PreReleaseAccess = new PreReleaseAccessOptions()
-                    }),
-                    new PersistenceHelper<ContentDbContext>(context));
+                var preReleaseSummaryService = new PreReleaseSummaryService(
+                    new PersistenceHelper<ContentDbContext>(context),
+                    MockUtils.AlwaysTrueUserService().Object);
 
-                var viewModel = (await preReleaseService.GetPreReleaseSummaryViewModelAsync(release.Id)).Right;
+                var viewModel = (await preReleaseSummaryService.GetPreReleaseSummaryViewModelAsync(release.Id)).Right;
                 Assert.Equal(contact.TeamEmail, viewModel.ContactEmail);
                 Assert.Equal(publication.Slug, viewModel.PublicationSlug);
                 Assert.Equal(publication.Title, viewModel.PublicationTitle);
