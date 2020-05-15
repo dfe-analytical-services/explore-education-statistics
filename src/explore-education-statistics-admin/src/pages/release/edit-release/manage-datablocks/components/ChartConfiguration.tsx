@@ -1,5 +1,8 @@
 import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
-import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
+import {
+  ChartOptions,
+  FormState,
+} from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
@@ -10,6 +13,7 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
+import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
@@ -26,13 +30,18 @@ type FormValues = Partial<ChartOptions>;
 interface Props {
   buttons?: ReactNode;
   canSaveChart: boolean;
-  definition: ChartDefinition;
   chartOptions: ChartOptions;
+  definition: ChartDefinition;
+  hasSubmittedChart: boolean;
   releaseId: string;
   meta: FullTableMeta;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
-  onFormStateChange: (state: { form: 'options'; isValid: boolean }) => void;
+  onFormStateChange: (
+    state: {
+      form: 'options';
+    } & FormState,
+  ) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
@@ -43,6 +52,7 @@ const ChartConfiguration = ({
   canSaveChart,
   chartOptions,
   definition,
+  hasSubmittedChart,
   meta,
   releaseId,
   onBoundaryLevelChange,
@@ -143,15 +153,20 @@ const ChartConfiguration = ({
       )}
 
       <Formik<FormValues>
-        initialValues={initialValues}
         enableReinitialize
+        initialValues={initialValues}
+        initialTouched={
+          hasSubmittedChart
+            ? mapValues(validationSchema.fields, () => true)
+            : undefined
+        }
+        validateOnMount
+        validationSchema={validationSchema}
         onSubmit={values => {
           if (canSaveChart) {
             onSubmit(normalizeValues(values));
           }
         }}
-        validateOnMount
-        validationSchema={validationSchema}
       >
         {form => (
           <Form id={formId}>
@@ -167,6 +182,7 @@ const ChartConfiguration = ({
               value={{
                 form: 'options',
                 isValid: form.isValid,
+                submitCount: form.submitCount,
               }}
               onChange={onFormStateChange}
               onMount={onFormStateChange}

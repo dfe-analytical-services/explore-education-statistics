@@ -112,6 +112,11 @@ const ChartBuilder = ({
     [forms],
   );
 
+  const hasSubmittedChart = useMemo(
+    () => Object.values(forms).some(form => form.submitCount > 0),
+    [forms],
+  );
+
   const chartProps = useMemo<ChartRendererProps | undefined>(() => {
     if (!definition) {
       return undefined;
@@ -295,6 +300,7 @@ const ChartBuilder = ({
             <ChartConfiguration
               buttons={deleteButton}
               canSaveChart={canSaveChart}
+              hasSubmittedChart={hasSubmittedChart}
               definition={definition}
               chartOptions={options}
               meta={meta}
@@ -321,6 +327,7 @@ const ChartBuilder = ({
                 onDataAdded={actions.addDataSet}
                 onDataRemoved={actions.removeDataSet}
                 onDataChanged={actions.updateDataSets}
+                onFormStateChange={actions.updateFormState}
                 onSubmit={handleChartDataSubmit}
               />
             </TabsSection>
@@ -345,6 +352,7 @@ const ChartBuilder = ({
                   <ChartAxisConfiguration
                     buttons={deleteButton}
                     canSaveChart={canSaveChart}
+                    hasSubmittedChart={hasSubmittedChart}
                     id={`chartAxisConfiguration-${type}`}
                     type={type as AxisType}
                     configuration={axisConfiguration}

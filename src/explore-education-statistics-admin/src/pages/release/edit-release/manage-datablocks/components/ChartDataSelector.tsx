@@ -1,5 +1,6 @@
 import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
 import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
+import { FormState } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect } from '@common/components/form';
@@ -22,7 +23,7 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import styles from './ChartDataSelector.module.scss';
 
 interface FormValues {
@@ -34,7 +35,7 @@ interface FormValues {
 
 interface Props {
   buttons?: ReactNode;
-  canSaveChart?: boolean;
+  canSaveChart: boolean;
   chartType: ChartDefinition;
   dataSets?: DataSetConfiguration[];
   meta: FullTableMeta;
@@ -42,6 +43,11 @@ interface Props {
   onDataAdded?: (data: DataSetConfiguration) => void;
   onDataRemoved?: (data: DataSetConfiguration, index: number) => void;
   onDataChanged?: (data: DataSetConfiguration[]) => void;
+  onFormStateChange: (
+    state: {
+      form: 'data';
+    } & FormState,
+  ) => void;
   onSubmit: (data: DataSetConfiguration[]) => void;
 }
 
@@ -56,6 +62,7 @@ const ChartDataSelector = ({
   onDataRemoved,
   onDataAdded,
   onDataChanged,
+  onFormStateChange,
   onSubmit,
 }: Props) => {
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
@@ -75,7 +82,15 @@ const ChartDataSelector = ({
     ...dataSets,
   ]);
 
-  const [isChartSubmitted, setChartSubmitted] = useState(false);
+  const [submitCount, setSubmitCount] = useState(0);
+
+  useEffect(() => {
+    onFormStateChange({
+      form: 'data',
+      isValid: true,
+      submitCount,
+    });
+  }, [onFormStateChange, submitCount]);
 
   const removeSelected = (selected: DataSetConfiguration, index: number) => {
     const newDataSets = [...dataSetConfigs];
@@ -292,9 +307,9 @@ const ChartDataSelector = ({
 
               <ChartBuilderSaveButton
                 formId={formId}
-                showSubmitError={isChartSubmitted && !canSaveChart}
+                showSubmitError={submitCount > 0 && !canSaveChart}
                 onClick={() => {
-                  setChartSubmitted(true);
+                  setSubmitCount(submitCount + 1);
 
                   if (canSaveChart) {
                     onSubmit(dataSetConfigs);

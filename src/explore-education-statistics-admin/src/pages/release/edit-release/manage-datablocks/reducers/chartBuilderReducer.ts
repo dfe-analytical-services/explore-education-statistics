@@ -25,6 +25,7 @@ export interface ChartOptions extends ChartDefinitionOptions {
 
 export interface FormState {
   isValid: boolean;
+  submitCount: number;
 }
 
 export interface ChartBuilderState {
@@ -120,8 +121,8 @@ const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
       height,
     },
     forms: {
-      data: { isValid: true },
-      options: { isValid: true },
+      data: { isValid: true, submitCount: 0 },
+      options: { isValid: true, submitCount: 0 },
     },
   };
 
@@ -151,9 +152,14 @@ const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
 
   const forms: ChartBuilderState['forms'] = {
     ...initialState.forms,
-    ...(mapValues(axes, () => ({
-      isValid: true,
-    })) as Dictionary<FormState>),
+    ...mapValues(axes as Required<AxesConfiguration>, () => {
+      const formState: FormState = {
+        isValid: true,
+        submitCount: 0,
+      };
+
+      return formState;
+    }),
   };
 
   return {
@@ -193,6 +199,7 @@ export const chartBuilderReducer: Reducer<
         () => {
           return {
             isValid: true,
+            submitCount: 0,
           };
         },
       );
@@ -358,16 +365,15 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   const updateFormState = useCallback(
     ({
       form,
-      isValid,
+      ...formState
     }: {
       form: keyof ChartBuilderState['forms'];
-      isValid: boolean;
-    }) => {
+    } & FormState) => {
       dispatch({
         type: 'UPDATE_FORM',
         payload: {
           form,
-          state: { isValid },
+          state: formState,
         },
       });
     },

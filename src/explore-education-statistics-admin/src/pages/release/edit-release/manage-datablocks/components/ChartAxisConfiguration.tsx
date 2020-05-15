@@ -1,5 +1,6 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration.module.scss';
 import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
+import { FormState } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
 import {
@@ -34,29 +35,32 @@ import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { ObjectSchema, Schema } from 'yup';
+import mapValues from 'lodash/mapValues';
 
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
 interface Props {
   buttons?: ReactNode;
   canSaveChart: boolean;
-  id: string;
   defaultDataType?: AxisGroupBy;
+  hasSubmittedChart: boolean;
+  id: string;
   type: AxisType;
   configuration: AxisConfiguration;
   data: TableDataResult[];
   meta: FullTableMeta;
   capabilities: ChartCapabilities;
   onChange: (configuration: AxisConfiguration) => void;
-  onFormStateChange: (state: { form: AxisType; isValid: boolean }) => void;
+  onFormStateChange: (state: { form: AxisType } & FormState) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
 
 const ChartAxisConfiguration = ({
   buttons,
   canSaveChart,
-  id,
   configuration,
+  hasSubmittedChart,
+  id,
   data,
   meta,
   type,
@@ -267,8 +271,13 @@ const ChartAxisConfiguration = ({
 
   return (
     <Formik<FormValues>
-      initialValues={initialValues}
       enableReinitialize
+      initialValues={initialValues}
+      initialTouched={
+        hasSubmittedChart
+          ? mapValues(validationSchema.fields, () => true)
+          : undefined
+      }
       validateOnMount
       validationSchema={validationSchema}
       onSubmit={values => {
@@ -291,6 +300,7 @@ const ChartAxisConfiguration = ({
             value={{
               form: type,
               isValid: form.isValid,
+              submitCount: form.submitCount,
             }}
             onMount={onFormStateChange}
             onChange={onFormStateChange}
