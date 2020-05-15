@@ -16,6 +16,7 @@ export interface InfographicChartProps extends ChartProps {
 }
 
 const InfographicBlock = ({
+  alt,
   fileId,
   getInfographic,
   width,
@@ -43,7 +44,7 @@ const InfographicBlock = ({
     <LoadingSpinner loading={isLoading}>
       {file && (
         <ResponsiveImage
-          alt="infographic"
+          alt={alt}
           src={file}
           height={height ? `${height}px` : undefined}
           width={width ? `${width}px` : undefined}

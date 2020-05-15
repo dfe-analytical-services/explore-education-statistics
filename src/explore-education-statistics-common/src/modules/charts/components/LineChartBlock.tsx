@@ -69,6 +69,7 @@ export interface LineChartProps extends ChartProps {
 }
 
 const LineChartBlock = ({
+  alt,
   data,
   meta,
   height,
@@ -100,6 +101,9 @@ const LineChartBlock = ({
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
       <LineChart
+        aria-label={alt}
+        role="img"
+        focusable={false}
         data={chartData}
         margin={{
           left: 30,
