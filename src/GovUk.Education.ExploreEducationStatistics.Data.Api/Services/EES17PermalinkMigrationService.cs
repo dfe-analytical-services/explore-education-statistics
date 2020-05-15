@@ -8,7 +8,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations.EES17;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -47,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public Task<bool> MigrateAll()
         {
             const string migrationId = "EES-17_ChangeTableHeadersAndAddQueryLocation";
+            _logger.LogInformation("Permalink migration: {MigrationId} starting", migrationId);
             return _permalinkMigrationService.MigrateAll<EES17Permalink>(migrationId, Transform);
         }
 
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             try
             {
                 var permalink = _mapper.Map<Permalink>(source);
-                return await GetSubjectMeta(permalink.Query)
+                return await GetSubjectMetaForPermalink(permalink)
                     .OnSuccess(subjectMeta =>
                     {
                         var filters = GetFilterItemIds(subjectMeta);
@@ -102,6 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "Failed to transform Permalink: {Id}", source.Id);
                 return $"Failed to transform Permalink: {source.Id} due to error: {e.GetType()} {e.Message}";
             }
         }
@@ -228,13 +229,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return labelOptions.Options.Select(model => model.Value);
         }
 
-        private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ObservationQueryContext query)
+        private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaForPermalink(Permalink permalink)
         {
+            _logger.LogDebug("Getting Subject Meta For permalink: {Id}", permalink.Id);
             _httpContextAccessor.HttpContext = new DefaultHttpContext
             {
                 User = new ClaimsPrincipal()
             };
-            return  _subjectMetaService.GetSubjectMeta(FromObservationQueryContext(query));
+            return  _subjectMetaService.GetSubjectMeta(FromObservationQueryContext(permalink.Query));
         }
     }
 }
