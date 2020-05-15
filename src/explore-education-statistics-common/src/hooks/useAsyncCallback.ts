@@ -1,3 +1,4 @@
+import logger from '@common/services/logger';
 import { DependencyList, useCallback, useMemo, useRef, useState } from 'react';
 
 export interface AsyncState<T> {
@@ -50,6 +51,8 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
       return result;
     } catch (error) {
       if (currentCall === previousCall.current) {
+        logger.error(error);
+
         setState({
           isLoading: false,
           error,
