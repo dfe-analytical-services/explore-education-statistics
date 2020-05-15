@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore] public ContentSectionType Type { get; set; }
 
-        public ContentSection CreateReleaseAmendment(CreateAmendmentContext ctx, ReleaseContentSection newParent)
+        public ContentSection Clone(CreateClonedContext ctx, ReleaseContentSection newParent)
         {
             var copy = MemberwiseClone() as ContentSection;
             copy.Id = Guid.NewGuid();
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             copy.Content = copy
                 .Content?
-                .Select(content => content.CreateReleaseAmendment(ctx, copy))
+                .Select(content => content.Clone(ctx, copy))
                 .ToList();
 
             return copy;
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Comment> Comments { get; set; }
 
-        public IContentBlock CreateReleaseAmendment(CreateAmendmentContext ctx, ContentSection newParent)
+        public IContentBlock Clone(CreateClonedContext ctx, ContentSection newParent)
         {
             var copy = MemberwiseClone() as IContentBlock;
             copy.Id = Guid.NewGuid();

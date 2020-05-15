@@ -389,7 +389,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (releaseId.HasValue)
             {
-                var templateRelease = _context.Releases.First(r => r.Id == releaseId);
+                var templateRelease = _context.Releases.AsNoTracking()
+                    .Include(r => r.Content)
+                    .ThenInclude(c => c.ContentSection)
+                    .ThenInclude(cs => cs.Content)
+                    .First(r => r.Id == releaseId);
                 templateRelease.CreateGenericContentFromTemplate(newRelease);
             }
             else

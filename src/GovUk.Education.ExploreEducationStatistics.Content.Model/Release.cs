@@ -222,11 +222,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.PreviousVersionId = Id;
             amendment.InternalReleaseNote = null;
             
-            var ctx = new CreateAmendmentContext(this, amendment);
+            var ctx = new CreateClonedContext(this, amendment);
 
             amendment.Content = amendment
                 .Content?
-                .Select(content => content.CreateReleaseAmendment(ctx))
+                .Select(content => content.Clone(ctx))
                 .ToList();
 
             amendment.RelatedInformation = amendment
@@ -241,46 +241,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             
             amendment.Updates = amendment
                 .Updates?
-                .Select(update => update.CreateReleaseAmendment(ctx))
+                .Select(update => update.Clone(ctx))
                 .ToList();
             
             amendment.ContentBlocks = amendment
                 .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.CreateReleaseAmendment(ctx))
+                .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
                 .ToList();
             
             return amendment;
         }
         
-        public void CreateGenericContentFromTemplate(Release amendment)
+        public void CreateGenericContentFromTemplate(Release newRelease)
         {
-            var ctx = new CreateAmendmentContext(this, amendment);
-
-            amendment.Content = amendment
+            var ctx = new CreateClonedContext(this, newRelease);
+            newRelease.Content = Content.Where(c => c.ContentSection.Type == ContentSectionType.Generic).ToList();
+            
+            newRelease.Content = newRelease
                 .Content?
-                //.Where(c => c.ContentSection.Type == ContentSectionType.Generic)
-                .Select(content => content.CreateReleaseAmendment(ctx))
+                .Select(content => content.Clone(ctx))
                 .ToList();
 
-            amendment.ContentBlocks = amendment
+            newRelease.ContentBlocks = newRelease
                 .ContentBlocks?
-                //.Where()
-                .Select(releaseContentBlock => releaseContentBlock.CreateReleaseAmendment(ctx))
+                .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
                 .ToList();
         }
     }
 
-    public class CreateAmendmentContext
+    public class CreateClonedContext
     {
-        public CreateAmendmentContext(Release previousVersion, Release amendment)
+        public CreateClonedContext(Release originalRelease, Release newRelease)
         {
-            PreviousVersion = previousVersion;
-            Amendment = amendment;
+            OriginalRelease = originalRelease;
+            NewRelease = newRelease;
         }
 
-        public Release PreviousVersion { get; set; }
+        public Release OriginalRelease { get; set; }
 
-        public Release Amendment { get; set; }
+        public Release NewRelease { get; set; }
         
         public Dictionary<ContentSection, ContentSection> OldToNewIdContentSectionMappings { get; set; } = new Dictionary<ContentSection, ContentSection>();
         
