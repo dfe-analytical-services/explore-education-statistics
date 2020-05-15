@@ -99,9 +99,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, PermalinkContainerName);
             var strings = await Task.WhenAll(blobs.Select(blob => blob.DownloadTextAsync()));
             _logger.LogDebug("Downloaded {Count} blobs", strings.Length);
-            var permalinks = strings.Select(JsonConvert.DeserializeObject<T>).ToList();
-            _logger.LogDebug("Deserialized {Count} blobs as type {Type}", permalinks.Count, typeof(T).Name);
-            return permalinks;
+            var deserialized = new List<T>();
+            foreach (var s in strings)
+            {
+                try
+                {
+                    deserialized.Add(JsonConvert.DeserializeObject<T>(s));
+                }
+                catch (JsonSerializationException e)
+                {
+                    _logger.LogError(e, "Caught Exception deserializing: {Blob}", s);
+                }
+            }
+            _logger.LogDebug("Deserialized {Count} blobs as type {Type}", deserialized.Count, typeof(T).Name);
+            return deserialized;
         }
 
         private async Task UploadPermalinksAsync(MigrationHistoryWriter migrationHistoryWriter,
