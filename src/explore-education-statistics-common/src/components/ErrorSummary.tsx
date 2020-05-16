@@ -28,7 +28,10 @@ const ErrorSummary = ({
   useEffect(() => {
     import('govuk-frontend/govuk/components/error-summary/error-summary').then(
       ({ default: GovUkErrorSummary }) => {
-        new GovUkErrorSummary(ref.current).init();
+        if (ref.current) {
+          const { handleClick } = new GovUkErrorSummary(ref.current);
+          ref.current.addEventListener('click', handleClick);
+        }
       },
     );
   }, [ref]);
