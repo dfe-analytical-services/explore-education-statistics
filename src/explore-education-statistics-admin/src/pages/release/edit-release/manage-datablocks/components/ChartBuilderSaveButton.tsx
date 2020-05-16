@@ -19,40 +19,42 @@ const ChartBuilderSaveButton = ({
 }: Props) => {
   return (
     <>
-      {showSubmitError && (
-        <ErrorSummary
-          title="Cannot save chart"
-          id={`${formId}-errorSummary`}
-          errors={Object.values(forms)
-            .filter(form => !form.isValid)
-            .map(form => ({
-              id: form.id,
-              message: `${form.title} tab is invalid`,
-            }))}
-          onErrorClick={event => {
-            event.preventDefault();
+      <ErrorSummary
+        title="Cannot save chart"
+        id={`${formId}-errorSummary`}
+        errors={
+          showSubmitError
+            ? Object.values(forms)
+                .filter(form => !form.isValid)
+                .map(form => ({
+                  id: form.id,
+                  message: `${form.title} tab is invalid`,
+                }))
+            : []
+        }
+        onErrorClick={event => {
+          event.preventDefault();
 
-            const tab = document.querySelector<HTMLAnchorElement>(
-              `${event.currentTarget.getAttribute('href')}-tab`,
+          const tab = document.querySelector<HTMLAnchorElement>(
+            `${event.currentTarget.getAttribute('href')}-tab`,
+          );
+
+          if (tab) {
+            tab.click();
+
+            const tabs = document.querySelector<HTMLDivElement>(
+              '#chartBuilder-tabs',
             );
 
-            if (tab) {
-              tab.click();
-
-              const tabs = document.querySelector<HTMLDivElement>(
-                '#chartBuilder-tabs',
-              );
-
-              if (tabs) {
-                tabs.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }
+            if (tabs) {
+              tabs.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
             }
-          }}
-        />
-      )}
+          }
+        }}
+      />
 
       <Button type="submit" id={`${formId}-submit`} onClick={onClick}>
         Save chart options
