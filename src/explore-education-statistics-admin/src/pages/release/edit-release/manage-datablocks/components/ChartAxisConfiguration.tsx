@@ -1,4 +1,5 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration.module.scss';
+import { ChartBuilderForm } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
 import { FormState } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
@@ -20,22 +21,22 @@ import {
   AxisConfiguration,
   AxisGroupBy,
   AxisType,
-  ChartCapabilities,
+  ChartDefinition,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { OmitStrict } from '@common/types';
+import { Dictionary, OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
+import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { ObjectSchema, Schema } from 'yup';
-import mapValues from 'lodash/mapValues';
 
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
@@ -43,13 +44,14 @@ interface Props {
   buttons?: ReactNode;
   canSaveChart: boolean;
   defaultDataType?: AxisGroupBy;
+  forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
   id: string;
   type: AxisType;
   configuration: AxisConfiguration;
+  definition: ChartDefinition;
   data: TableDataResult[];
   meta: FullTableMeta;
-  capabilities: ChartCapabilities;
   onChange: (configuration: AxisConfiguration) => void;
   onFormStateChange: (state: { form: AxisType } & FormState) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
@@ -59,16 +61,19 @@ const ChartAxisConfiguration = ({
   buttons,
   canSaveChart,
   configuration,
+  definition,
+  forms,
   hasSubmittedChart,
   id,
   data,
   meta,
   type,
-  capabilities,
   onChange,
   onFormStateChange,
   onSubmit,
 }: Props) => {
+  const { capabilities } = definition;
+
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
     if (type === 'minor') {
       return [];
@@ -589,6 +594,7 @@ const ChartAxisConfiguration = ({
 
           <ChartBuilderSaveButton
             formId={id}
+            forms={forms}
             showSubmitError={
               form.isValid && form.submitCount > 0 && !canSaveChart
             }

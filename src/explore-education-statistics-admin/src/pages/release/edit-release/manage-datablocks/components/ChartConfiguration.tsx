@@ -1,3 +1,4 @@
+import { ChartBuilderForm } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
 import {
   ChartOptions,
@@ -10,6 +11,7 @@ import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -32,6 +34,7 @@ interface Props {
   canSaveChart: boolean;
   chartOptions: ChartOptions;
   definition: ChartDefinition;
+  forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
   releaseId: string;
   meta: FullTableMeta;
@@ -52,6 +55,7 @@ const ChartConfiguration = ({
   canSaveChart,
   chartOptions,
   definition,
+  forms,
   hasSubmittedChart,
   meta,
   releaseId,
@@ -284,6 +288,7 @@ const ChartConfiguration = ({
 
             <ChartBuilderSaveButton
               formId={formId}
+              forms={forms}
               showSubmitError={
                 form.isValid && form.submitCount > 0 && !canSaveChart
               }

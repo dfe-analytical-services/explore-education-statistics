@@ -195,8 +195,8 @@ export const chartBuilderReducer: Reducer<
       );
 
       const newAxisForms: Dictionary<FormState> = mapValues(
-        draft.axes as Required<AxesConfiguration>,
-        () => {
+        draft.definition.axes as Required<ChartDefinition['axes']>,
+        _ => {
           return {
             isValid: true,
             submitCount: 0,

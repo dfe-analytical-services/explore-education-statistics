@@ -1,15 +1,19 @@
+import { ChartBuilderForm } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import Button from '@common/components/Button';
 import ErrorSummary from '@common/components/ErrorSummary';
+import { Dictionary } from '@common/types';
 import React, { MouseEventHandler } from 'react';
 
 interface Props {
   formId: string;
+  forms: Dictionary<ChartBuilderForm>;
   showSubmitError: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
 const ChartBuilderSaveButton = ({
   formId,
+  forms,
   showSubmitError,
   onClick,
 }: Props) => {
@@ -19,12 +23,12 @@ const ChartBuilderSaveButton = ({
         <ErrorSummary
           title="Cannot save chart"
           id={`${formId}-errorSummary`}
-          errors={[
-            {
+          errors={Object.values(forms)
+            .filter(form => !form.isValid)
+            .map(form => ({
               id: `${formId}-submit`,
-              message: 'Ensure that all other tabs are valid first',
-            },
-          ]}
+              message: `${form.title} tab is invalid`,
+            }))}
         />
       )}
 

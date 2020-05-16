@@ -1,13 +1,11 @@
+import { ChartBuilderForm } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
 import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
 import { FormState } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect } from '@common/components/form';
-import {
-  ChartCapabilities,
-  ChartDefinition,
-} from '@common/modules/charts/types/chart';
+import { ChartDefinition } from '@common/modules/charts/types/chart';
 import {
   DataSet,
   DataSetConfiguration,
@@ -36,10 +34,10 @@ interface FormValues {
 interface Props {
   buttons?: ReactNode;
   canSaveChart: boolean;
-  chartType: ChartDefinition;
   dataSets?: DataSetConfiguration[];
+  definition: ChartDefinition;
+  forms: Dictionary<ChartBuilderForm>;
   meta: FullTableMeta;
-  capabilities: ChartCapabilities;
   onDataAdded?: (data: DataSetConfiguration) => void;
   onDataRemoved?: (data: DataSetConfiguration, index: number) => void;
   onDataChanged?: (data: DataSetConfiguration[]) => void;
@@ -56,15 +54,18 @@ const formId = 'chartDataSelectorForm';
 const ChartDataSelector = ({
   buttons,
   canSaveChart,
+  forms,
   meta,
-  capabilities,
   dataSets = [],
+  definition,
   onDataRemoved,
   onDataAdded,
   onDataChanged,
   onFormStateChange,
   onSubmit,
 }: Props) => {
+  const { capabilities } = definition;
+
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
     meta.indicators,
   ]);
@@ -307,6 +308,7 @@ const ChartDataSelector = ({
 
               <ChartBuilderSaveButton
                 formId={formId}
+                forms={forms}
                 showSubmitError={submitCount > 0 && !canSaveChart}
                 onClick={() => {
                   setSubmitCount(submitCount + 1);
