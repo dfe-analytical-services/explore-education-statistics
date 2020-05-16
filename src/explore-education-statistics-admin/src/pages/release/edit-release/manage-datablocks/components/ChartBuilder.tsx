@@ -74,6 +74,7 @@ const filterChartProps = (props: ChartProps): Chart => {
 
 export interface ChartBuilderForm extends FormState {
   title: string;
+  id: string;
 }
 
 export type TableQueryUpdateHandler = (
@@ -114,7 +115,11 @@ const ChartBuilder = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
-  const forms: Dictionary<ChartBuilderForm> = useMemo(() => {
+  const forms: {
+    options: ChartBuilderForm;
+    data: ChartBuilderForm;
+    [key: string]: ChartBuilderForm;
+  } = useMemo(() => {
     const formTitles: Dictionary<string> = {
       ...mapValues(
         (definition?.axes as Required<ChartDefinition['axes']>) ?? {},
@@ -127,6 +132,7 @@ const ChartBuilder = ({
     return mapValues(formStates, (form, formKey) => ({
       ...form,
       title: formTitles[formKey],
+      id: `chartBuilder-${formKey}`,
     }));
   }, [definition, formStates]);
 
@@ -319,6 +325,7 @@ const ChartBuilder = ({
           <TabsSection
             title="Chart configuration"
             headingTitle="Chart configuration"
+            id={forms.options.id}
           >
             <ChartConfiguration
               buttons={deleteButton}
@@ -340,6 +347,7 @@ const ChartBuilder = ({
             <TabsSection
               title="Data sets"
               headingTitle="Choose data to add to the chart"
+              id={forms.data.id}
             >
               <ChartDataSelector
                 buttons={deleteButton}
@@ -369,7 +377,7 @@ const ChartBuilder = ({
               return (
                 <TabsSection
                   key={type}
-                  id={`${type}-tab`}
+                  id={forms[type].id}
                   title={axis.title}
                   headingTitle={axis.title}
                 >

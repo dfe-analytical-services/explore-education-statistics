@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { MouseEventHandler, useEffect, useRef } from 'react';
 import ErrorPrefixPageTitle from './ErrorPrefixPageTitle';
 
 export interface ErrorSummaryMessage {
@@ -12,6 +12,7 @@ interface Props {
   focusOnError?: boolean;
   title?: string;
   onFocus?: () => void;
+  onErrorClick?: MouseEventHandler<HTMLAnchorElement>;
 }
 
 const ErrorSummary = ({
@@ -20,6 +21,7 @@ const ErrorSummary = ({
   focusOnError = false,
   title = 'There is a problem',
   onFocus,
+  onErrorClick,
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -66,7 +68,9 @@ const ErrorSummary = ({
         <ul className="govuk-list govuk-error-summary__list">
           {errors.map(error => (
             <li key={error.id}>
-              <a href={`#${error.id}`}>{error.message}</a>
+              <a href={`#${error.id}`} onClick={onErrorClick}>
+                {error.message}
+              </a>
             </li>
           ))}
         </ul>

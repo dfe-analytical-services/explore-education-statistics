@@ -26,9 +26,31 @@ const ChartBuilderSaveButton = ({
           errors={Object.values(forms)
             .filter(form => !form.isValid)
             .map(form => ({
-              id: `${formId}-submit`,
+              id: form.id,
               message: `${form.title} tab is invalid`,
             }))}
+          onErrorClick={event => {
+            event.preventDefault();
+
+            const tab = document.querySelector<HTMLAnchorElement>(
+              `${event.currentTarget.getAttribute('href')}-tab`,
+            );
+
+            if (tab) {
+              tab.click();
+
+              const tabs = document.querySelector<HTMLDivElement>(
+                '#chartBuilder-tabs',
+              );
+
+              if (tabs) {
+                tabs.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }
+            }
+          }}
         />
       )}
 
