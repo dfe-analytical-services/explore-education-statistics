@@ -17,7 +17,6 @@ interface Props {
   footnotes: Footnote[];
   footnoteFormControls: FootnoteFormControls;
   canUpdateRelease: boolean;
-  canUpdateReleaseFootnotes: boolean;
 }
 
 const FootnotesList = ({
@@ -26,7 +25,6 @@ const FootnotesList = ({
   footnoteMetaGetters,
   footnoteFormControls,
   canUpdateRelease,
-  canUpdateReleaseFootnotes,
 }: Props) => {
   if (footnotes.length === 0) {
     return null;
@@ -53,7 +51,7 @@ const FootnotesList = ({
           <>
             <div className={styles.row}>
               <div className={styles.row__footnoteContent}>{content}</div>
-              {canUpdateRelease && canUpdateReleaseFootnotes && (
+              {canUpdateRelease && (
                 <div className={styles.row__footnoteActions}>
                   <Button
                     type="button"

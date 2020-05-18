@@ -99,11 +99,6 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
-  // BAU-324 - temporary stopgap until Release Versioning phase 2 is tackled, to prevent data files being changed on a
-  // Release amendment
-  const [canUpdateReleaseDataFiles, setCanUpdateReleaseDataFiles] = useState<
-    boolean
-  >();
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -111,16 +106,13 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     Promise.all([
       editReleaseDataService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-      permissionService.canUpdateReleaseDataFiles(releaseId),
     ]).then(
       ([
         releaseDataFiles,
         canUpdateReleaseResponse,
-        canUpdateReleaseDataFilesResponse,
       ]) => {
         setDataFiles(releaseDataFiles);
         setCanUpdateRelease(canUpdateReleaseResponse);
-        setCanUpdateReleaseDataFiles(canUpdateReleaseDataFilesResponse);
       },
     );
   }, [publicationId, releaseId]);
@@ -236,7 +228,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {canUpdateRelease && canUpdateReleaseDataFiles && (
+            {canUpdateRelease && (
               <>
                 {isUploading && (
                   <LoadingSpinner text="Uploading files" overlay />
@@ -308,13 +300,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
             {typeof canUpdateRelease !== 'undefined' &&
               !canUpdateRelease &&
-              !canUpdateReleaseDataFiles &&
               'This release has been approved, and can no longer be updated.'}
-
-            {typeof canUpdateRelease !== 'undefined' &&
-              canUpdateRelease &&
-              !canUpdateReleaseDataFiles &&
-              'This release is an amendment to a live release and so it is not possible to change any data files.'}
 
             {dataFiles.length > 0 && (
               <>
@@ -411,7 +397,6 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                             {format(dataFile.created, 'd/M/yyyy HH:mm')}
                           </SummaryListItem>
                           {canUpdateRelease &&
-                            canUpdateReleaseDataFiles &&
                             dataFile.canDelete && (
                               <SummaryListItem
                                 term="Actions"

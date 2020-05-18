@@ -84,29 +84,22 @@ const ReleaseFootnotesSection = ({
 
       <p>
         {!footnotesData.canUpdateRelease &&
-          !footnotesData.canUpdateReleaseFootnotes &&
           'This release has been approved, and can no longer be updated.'}
-      </p>
-      <p>
-        {footnotesData.canUpdateRelease &&
-          !footnotesData.canUpdateReleaseFootnotes &&
-          'This release is an amendment to a live release and so it is not possible to change any footnotes.'}
       </p>
 
       {footnotesData.footnoteMeta && (
         <>
-          {footnotesData.canUpdateRelease &&
-            footnotesData.canUpdateReleaseFootnotes && (
-              <FootnoteForm
-                {...footnoteForm}
-                footnote={undefined}
-                onOpen={footnoteFormControls.create}
-                onCancel={footnoteFormControls.cancel}
-                onSubmit={footnoteFormControls.save}
-                isFirst={!footnotesData.footnotes?.length}
-                footnoteMeta={footnotesData.footnoteMeta}
-                footnoteMetaGetters={footnotesData.footnoteMetaGetters}
-              />
+          {footnotesData.canUpdateRelease && (
+          <FootnoteForm
+            {...footnoteForm}
+            footnote={undefined}
+            onOpen={footnoteFormControls.create}
+            onCancel={footnoteFormControls.cancel}
+            onSubmit={footnoteFormControls.save}
+            isFirst={!footnotesData.footnotes?.length}
+            footnoteMeta={footnotesData.footnoteMeta}
+            footnoteMetaGetters={footnotesData.footnoteMetaGetters}
+          />
             )}
           <>
             <FootnotesList

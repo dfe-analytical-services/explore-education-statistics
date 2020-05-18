@@ -455,7 +455,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         
                         FootnoteIds = orphanFootnotes
                            .Select(footnote => footnote.Id)
-                           .ToList()
+                           .ToList(),
+                        
+                        SubjectReleaseId = subject?.ReleaseId ?? Guid.Empty,
                      };
                 });
         }
@@ -473,7 +475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _subjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
 
                     return await _fileStorageService
-                        .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
+                        .RemoveDataFileReleaseLinkAsync(releaseId, fileName, deletePlan.SubjectReleaseId)
                         .OnSuccessDo(() => RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
         }
@@ -517,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private bool CanUpdateDataFiles(Guid releaseId)
         {
             var release = _context.Releases.First(r => r.Id == releaseId);
-            return release.Status != ReleaseStatus.Approved && release.Id == release.PreviousVersionId;
+            return release.Status != ReleaseStatus.Approved;
         }
 
         private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string dataFileName)
@@ -536,9 +538,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
             }
 
-            if (!CanUpdateDataFiles(releaseFileReference.ReleaseId))
+            if (!CanUpdateDataFiles(releaseId))
             {
-                return ValidationActionResult(CannotRemoveDataFilesLinkedToAnApprovedRelease);
+                return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
             return true;
@@ -609,5 +611,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; }
         
         public List<Guid> FootnoteIds { get; set; }
+        
+        [JsonIgnore]
+        public Guid SubjectReleaseId { get; set; }
     }
 }
