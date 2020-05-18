@@ -82,6 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CommentNotFound,
         UserAlreadyExists,
         UserDoesNotExist,
+        UserAlreadyHasReleaseRole,
         RoleDoesNotExist,
         UnableToCancelInvite,
         InvalidEmailAddress,

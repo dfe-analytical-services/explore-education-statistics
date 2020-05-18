@@ -44,10 +44,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         
         public static Task<string> DownloadTextAsync(string storageConnectionString, string containerName, string blobName)
         {
-            return GetBlob(storageConnectionString, containerName, blobName).DownloadTextAsync();
+            return GetBlockBlob(storageConnectionString, containerName, blobName).DownloadTextAsync();
         }
 
-        public static CloudBlockBlob GetBlob(string storageConnectionString, string containerName, string blobName)
+        public static CloudBlob GetBlob(string storageConnectionString, string containerName, string blobName)
+        {
+            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
+            return blobContainer.GetBlobReference(blobName);
+        }
+        
+        public static CloudBlockBlob GetBlockBlob(string storageConnectionString, string containerName, string blobName)
         {
             var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
             return blobContainer.GetBlockBlobReference(blobName);
@@ -187,7 +193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         /**
-         * Storage Emulator doesn't support AppendBlob. This method checks if AppendBlob can be used.
+         * Storage Emulator doesn't support AppendBlob. This method checks if AppendBlob can be used by either checking
+         * for its presence or creating a new one.
          */
         public static async Task<bool> TryGetOrCreateAppendBlobAsync(string storageConnectionString, string containerName,
             string blobName)

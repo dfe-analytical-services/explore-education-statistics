@@ -110,8 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewPreReleaseSummary)
                 .OnSuccess(release => _preReleaseService.GetPreReleaseWindowStatus(release, UtcNow))
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
         
         [HttpGet("methodology/{methodologyId}/update")]

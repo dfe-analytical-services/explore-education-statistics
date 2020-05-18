@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
-    [ExcludeFromCodeCoverage] 
+    [ExcludeFromCodeCoverage]
     public class Program
     {
         public static void Main(string[] args)
@@ -14,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
         private static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureLogging(logging => logging.AddAzureWebAppDiagnostics())
                 .UseApplicationInsights()
                 .UseStartup<Startup>();
     }

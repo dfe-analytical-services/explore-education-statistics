@@ -245,6 +245,10 @@
       "type": "securestring",
       "defaultValue": ""
     },
+    "notifyReleaseRoleTemplateId": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
     "notifyPreReleaseTemplateId": {
       "type": "securestring",
       "defaultValue": "change-me"
@@ -1066,6 +1070,7 @@
         "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]",
         "NotifyInviteTemplateId": "[parameters('notifyInviteTemplateId')]",
+        "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
         "AdminUri": "[parameters('adminUri')]",
         "PublicAppUrl": "[variables('publicAppUrl')]",

@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -9,7 +13,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<UserViewModel> GetAsync(string userId);
         
         Task<List<UserViewModel>> ListAsync();
+
+        List<UserReleaseRoleViewModel> GetUserReleaseRoles(string userId);
         
+        Task<Either<ActionResult, UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId, UserReleaseRoleRequest userReleaseRole);
+
+        Task<List<IdTitlePair>> ListReleasesAsync();
+        
+        Task<UserReleaseRoleViewModel> GetUserReleaseRole(Guid userId, Guid userReleaseRoleId);
+
+        Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userId, Guid userReleaseRoleId);
+
         Task<List<RoleViewModel>> ListRolesAsync();
         
         Task<List<UserViewModel>> ListPreReleaseUsersAsync();
