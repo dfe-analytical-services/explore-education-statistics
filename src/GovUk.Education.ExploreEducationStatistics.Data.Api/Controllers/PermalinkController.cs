@@ -19,9 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PermalinkViewModel>> GetAsync(Guid id)
+        public async Task<ActionResult<PermalinkViewModel>> GetAsync(string id)
         {
-            return await _permalinkService.GetAsync(id).HandleFailuresOrOk();
+            if (Guid.TryParse(id, out var idAsGuid))
+            {
+                return await _permalinkService.GetAsync(idAsGuid).HandleFailuresOrOk();
+            }
+            return NotFound();
         }
 
         [HttpPost]
