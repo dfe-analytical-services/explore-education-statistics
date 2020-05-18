@@ -100,7 +100,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var release = _mapper.Map<Release>(createRelease);
                     
                     release.Id = Guid.NewGuid();
-                    TemplateFromRelease(createRelease.TemplateReleaseId, release);
+                    
+                    if (createRelease.TemplateReleaseId.HasValue)
+                    {
+                        CreateGenericContentFromTemplate(createRelease.TemplateReleaseId.Value, release);
+                    }
+                    else
+                    {
+                        release.GenericContent = new List<ContentSection>();
+                    }
+
                     release.SummarySection = new ContentSection
                     {
                         Type = ContentSectionType.ReleaseSummary
@@ -385,21 +394,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        private void TemplateFromRelease(Guid? releaseId, Release newRelease)
-        {
-            if (releaseId.HasValue)
-            {
-                var templateRelease = _context.Releases.AsNoTracking()
-                    .Include(r => r.Content)
-                    .ThenInclude(c => c.ContentSection)
-                    .ThenInclude(cs => cs.Content)
-                    .First(r => r.Id == releaseId);
-                templateRelease.CreateGenericContentFromTemplate(newRelease);
-            }
-            else
-            {
-                newRelease.GenericContent = new List<ContentSection>();
-            }
+        private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
+        { 
+            var templateRelease = _context.Releases.AsNoTracking()
+                .Include(r => r.Content)
+                .ThenInclude(c => c.ContentSection)
+                .ThenInclude(cs => cs.Content)
+                .First(r => r.Id == releaseId);
+                
+            templateRelease.CreateGenericContentFromTemplate(newRelease);
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(

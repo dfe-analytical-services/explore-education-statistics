@@ -15,8 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public ReleaseContentSection Clone(CreateClonedContext ctx)
         {
             var copy = MemberwiseClone() as ReleaseContentSection;
-            copy.Release = ctx.NewRelease;
-            copy.ReleaseId = ctx.NewRelease.Id;
+            copy.Release = ctx.Target;
+            copy.ReleaseId = ctx.Target.Id;
             
             copy.ContentSection = copy
                 .ContentSection

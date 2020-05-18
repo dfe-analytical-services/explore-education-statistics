@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.PreviousVersionId = Id;
             amendment.InternalReleaseNote = null;
             
-            var ctx = new CreateClonedContext(this, amendment);
+            var ctx = new CreateClonedContext(amendment);
 
             amendment.Content = amendment
                 .Content?
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public void CreateGenericContentFromTemplate(Release newRelease)
         {
-            var ctx = new CreateClonedContext(this, newRelease);
+            var ctx = new CreateClonedContext(newRelease);
             newRelease.Content = Content.Where(c => c.ContentSection.Type == ContentSectionType.Generic).ToList();
             
             newRelease.Content = newRelease
@@ -271,20 +271,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class CreateClonedContext
     {
-        public CreateClonedContext(Release originalRelease, Release newRelease)
+        private readonly Dictionary<Update, Update> _oldToNewIdUpdateMappings = new Dictionary<Update, Update>();
+        private readonly Dictionary<ContentSection, ContentSection> _oldToNewIdContentSectionMappings = new Dictionary<ContentSection, ContentSection>();
+        private readonly Dictionary<IContentBlock, IContentBlock> _oldToNewIdContentBlockMappings = new Dictionary<IContentBlock, IContentBlock>();
+        private readonly Release _target;
+
+        public CreateClonedContext(Release target)
         {
-            OriginalRelease = originalRelease;
-            NewRelease = newRelease;
+            _target = target;
         }
 
-        public Release OriginalRelease { get; set; }
+        public Release Target => _target;
 
-        public Release NewRelease { get; set; }
-        
-        public Dictionary<ContentSection, ContentSection> OldToNewIdContentSectionMappings { get; set; } = new Dictionary<ContentSection, ContentSection>();
-        
-        public Dictionary<IContentBlock, IContentBlock> OldToNewIdContentBlockMappings { get; set; } = new Dictionary<IContentBlock, IContentBlock>();
-        
-        public Dictionary<Update, Update> OldToNewIdUpdateMappings { get; set; } = new Dictionary<Update, Update>();
+        public Dictionary<ContentSection, ContentSection> OldToNewIdContentSectionMappings => _oldToNewIdContentSectionMappings;
+
+        public Dictionary<IContentBlock, IContentBlock> OldToNewIdContentBlockMappings => _oldToNewIdContentBlockMappings;
+
+        public Dictionary<Update, Update> OldToNewIdUpdateMappings => _oldToNewIdUpdateMappings;
     }
 }

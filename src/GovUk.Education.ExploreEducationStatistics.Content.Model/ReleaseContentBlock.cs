@@ -17,8 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         {
             var copy = MemberwiseClone() as ReleaseContentBlock;
             
-            copy.Release = ctx.NewRelease;
-            copy.ReleaseId = ctx.NewRelease.Id;
+            copy.Release = ctx.Target;
+            copy.ReleaseId = ctx.Target.Id;
             
             var newVersionOfContentBlock = 
                 ctx.OldToNewIdContentBlockMappings.GetValueOrDefault(ContentBlock) 

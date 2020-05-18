@@ -21,8 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.Id = Guid.NewGuid();
             ctx.OldToNewIdUpdateMappings.Add(this, copy);
             
-            copy.Release = ctx.NewRelease;
-            copy.ReleaseId = ctx.NewRelease.Id;
+            copy.Release = ctx.Target;
+            copy.ReleaseId = ctx.Target.Id;
             return copy;
         }
     }
