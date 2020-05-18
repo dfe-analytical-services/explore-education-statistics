@@ -6,7 +6,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import functionsService from '@frontend/services/functionsService';
 import classNames from 'classnames';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React, { useState } from 'react';
 import SubscriptionForm, {
   SubscriptionFormSubmitHandler,
@@ -16,15 +16,15 @@ import styles from './SubscriptionPage.module.scss';
 interface Props {
   slug: string;
   data: PublicationTitle;
-  unsubscribed?: string;
-  verified?: string;
+  unsubscribed: string;
+  verified: string;
 }
 
 const SubscriptionPage: NextPage<Props> = ({
   data,
   slug,
-  unsubscribed = '',
-  verified = '',
+  unsubscribed,
+  verified,
 }) => {
   const [subscribed, setSubscribed] = useState(false);
 
@@ -95,18 +95,22 @@ const SubscriptionPage: NextPage<Props> = ({
   );
 };
 
-SubscriptionPage.getInitialProps = async ({ query }) => {
-  const { slug, unsubscribed, verified } = query as Dictionary<string>;
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  query,
+}) => {
+  const { slug, unsubscribed = '', verified = '' } = query as Dictionary<
+    string
+  >;
 
-  const request = publicationService.getPublicationTitle(slug as string);
-
-  const data = await request;
+  const data = await publicationService.getPublicationTitle(slug as string);
 
   return {
-    data,
-    slug,
-    unsubscribed,
-    verified,
+    props: {
+      data,
+      slug,
+      unsubscribed,
+      verified,
+    },
   };
 };
 

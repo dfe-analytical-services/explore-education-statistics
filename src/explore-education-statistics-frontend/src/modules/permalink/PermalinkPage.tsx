@@ -8,7 +8,7 @@ import permalinkService, { Permalink } from '@common/services/permalinkService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
-import { NextPage, NextPageContext } from 'next';
+import { GetServerSideProps, NextPage, NextPageContext } from 'next';
 import React, { useRef } from 'react';
 import styles from './PermalinkPage.module.scss';
 
@@ -98,14 +98,16 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
   );
 };
 
-PermalinkPage.getInitialProps = async ({ query }: NextPageContext) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  query,
+}) => {
   const { permalink } = query;
-  const request = permalinkService.getPermalink(permalink as string);
-
-  const data = await request;
+  const data = await permalinkService.getPermalink(permalink as string);
 
   return {
-    data,
+    props: {
+      data,
+    },
   };
 };
 

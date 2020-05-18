@@ -6,7 +6,7 @@ import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import PublicationDownloadList from './components/PublicationDownloadList';
 import { Topic } from './components/TopicList';
@@ -90,9 +90,14 @@ const DownloadIndexPage: NextPage<Props> = ({ themes = [] }) => {
   );
 };
 
-DownloadIndexPage.getInitialProps = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const themes = await contentApi.get<Props['themes']>('/download/tree');
-  return { themes };
+
+  return {
+    props: {
+      themes,
+    },
+  };
 };
 
 export default DownloadIndexPage;

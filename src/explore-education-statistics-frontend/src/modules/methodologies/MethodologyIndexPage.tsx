@@ -7,7 +7,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import MethodologyList from '@frontend/modules/methodologies/components/MethodologyList';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 
 const accordionIds: string[] = generateIdList(1);
@@ -79,10 +79,14 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
   );
 };
 
-MethodologyIndexPage.getInitialProps = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const themes = await methodologyService.getMethodologies();
 
-  return { themes };
+  return {
+    props: {
+      themes,
+    },
+  };
 };
 
 export default MethodologyIndexPage;

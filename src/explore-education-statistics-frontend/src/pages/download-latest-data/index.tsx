@@ -1,3 +1,4 @@
-import DownloadIndexPage from '@frontend/modules/download/DownloadIndexPage';
-
-export default DownloadIndexPage;
+export {
+  default,
+  getServerSideProps,
+} from '@frontend/modules/download/DownloadIndexPage';

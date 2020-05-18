@@ -22,7 +22,7 @@ import PublicationSectionBlocks from '@frontend/modules/find-statistics/componen
 import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
@@ -30,8 +30,6 @@ import styles from './PublicationReleasePage.module.scss';
 const accordionIds: string[] = generateIdList(2);
 
 interface Props {
-  publication: string;
-  release: string;
   data: Release;
 }
 
@@ -363,22 +361,22 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
   );
 };
 
-PublicationReleasePage.getInitialProps = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  query,
+}) => {
   const { publication, release } = query as {
     publication: string;
     release: string;
   };
 
-  const request = release
+  const data = await (release
     ? publicationService.getPublicationRelease(publication, release)
-    : publicationService.getLatestPublicationRelease(publication);
-
-  const data = await request;
+    : publicationService.getLatestPublicationRelease(publication));
 
   return {
-    data,
-    publication,
-    release,
+    props: {
+      data,
+    },
   };
 };
 

@@ -1,3 +1,4 @@
-import Page from '@frontend/modules/permalink/PermalinkPage';
-
-export default Page;
+export {
+  default,
+  getServerSideProps,
+} from '@frontend/modules/permalink/PermalinkPage';

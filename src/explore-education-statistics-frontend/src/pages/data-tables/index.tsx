@@ -1,3 +1,4 @@
-import Page from '../../modules/table-tool/TableToolPage';
-
-export default Page;
+export {
+  default,
+  getServerSideProps,
+} from '@frontend/modules/table-tool/TableToolPage';

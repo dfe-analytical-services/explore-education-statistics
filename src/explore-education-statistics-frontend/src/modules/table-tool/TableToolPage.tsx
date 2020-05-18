@@ -3,7 +3,7 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import Page from '@frontend/components/Page';
 import TableTool from '@frontend/modules/table-tool/components/TableTool';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 
 interface Props {
@@ -29,7 +29,9 @@ const TableToolPage: NextPage<Props> = ({ themeMeta, publicationId }) => {
   );
 };
 
-TableToolPage.getInitialProps = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  query,
+}) => {
   const themeMeta = await tableBuilderService.getThemes();
 
   const publication = themeMeta
@@ -38,8 +40,10 @@ TableToolPage.getInitialProps = async ({ query }) => {
     .find(option => option.slug === query.publicationSlug);
 
   return {
-    themeMeta,
-    publicationId: publication ? publication.id : '',
+    props: {
+      themeMeta,
+      publicationId: publication ? publication.id : '',
+    },
   };
 };
 

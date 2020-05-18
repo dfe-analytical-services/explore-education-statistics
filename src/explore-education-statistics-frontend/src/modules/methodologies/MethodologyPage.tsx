@@ -12,7 +12,7 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
-import { NextPage, NextPageContext } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 
 const accordionIds: string[] = generateIdList(2);
@@ -141,15 +141,20 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
   );
 };
 
-MethodologyPage.getInitialProps = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  query,
+}) => {
   const { methodologySlug } = query;
-  const request = methodologyService.getMethodology(methodologySlug as string);
 
-  const data = await request;
+  const data = await methodologyService.getMethodology(
+    methodologySlug as string,
+  );
 
   return {
-    data,
-    methodologySlug: methodologySlug as string,
+    props: {
+      data,
+      methodologySlug: methodologySlug as string,
+    },
   };
 };
 

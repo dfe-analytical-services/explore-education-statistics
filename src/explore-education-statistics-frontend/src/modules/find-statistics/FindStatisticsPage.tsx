@@ -6,7 +6,7 @@ import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import PublicationList from './components/PublicationList';
 import { Topic } from './components/TopicList';
@@ -96,11 +96,13 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
   );
 };
 
-FindStatisticsPage.getInitialProps = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const themes = await contentApi.get<Props['themes']>('/content/tree');
 
   return {
-    themes,
+    props: {
+      themes,
+    },
   };
 };
 

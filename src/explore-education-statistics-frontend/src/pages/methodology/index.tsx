@@ -1,3 +1,4 @@
-import MethodologyIndexPage from '@frontend/modules/methodologies/MethodologyIndexPage';
-
-export default MethodologyIndexPage;
+export {
+  default,
+  getServerSideProps,
+} from '@frontend/modules/methodologies/MethodologyIndexPage';
