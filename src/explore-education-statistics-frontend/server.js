@@ -3,10 +3,9 @@ require('core-js/features/array/flat');
 
 const appInsights = require('applicationinsights');
 
-// AI Key should be loaded via enviroment variable APPINSIGHTS_INSTRUMENTATIONKEY
 if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
   appInsights
-    .setup()
+    .setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY)
     .setAutoDependencyCorrelation(true)
     .setAutoCollectRequests(true)
     .setAutoCollectPerformance(true)
