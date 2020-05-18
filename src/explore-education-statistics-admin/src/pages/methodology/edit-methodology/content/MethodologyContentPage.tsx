@@ -74,6 +74,7 @@ const MethodologyContentPage = () => {
               <MethodologyAccordion
                 methodology={methodology}
                 sectionKey="content"
+                title="Content"
               />
               {!isEditing && methodology.annexes.length ? (
                 <h2>Annexes</h2>
@@ -81,6 +82,7 @@ const MethodologyContentPage = () => {
               <MethodologyAccordion
                 methodology={methodology}
                 sectionKey="annexes"
+                title="Annexes"
               />
             </section>
           </div>
