@@ -180,11 +180,7 @@ const PublicationReleaseContent = () => {
                         ...release.publication.legacyReleases.map(
                           ({ id, description, url }) => (
                             <li key={id} data-testid="other-release-item">
-                              {!isEditing ? (
-                                <a href={url}>{description}</a>
-                              ) : (
-                                <a>{description}</a>
-                              )}
+                              <Link to={url}>{description}</Link>
                             </li>
                           ),
                         ),
