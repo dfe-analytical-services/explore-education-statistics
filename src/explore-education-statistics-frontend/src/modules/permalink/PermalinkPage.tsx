@@ -90,9 +90,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           Use our tool to build tables using our range of national and regional
           data.
         </p>
-        <ButtonLink as="/data-tables/" href="/data-tables">
-          Create tables
-        </ButtonLink>
+        <ButtonLink to="/data-tables">Create tables</ButtonLink>
       </div>
     </Page>
   );

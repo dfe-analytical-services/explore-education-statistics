@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   const publication = themeMeta
     .flatMap(option => option.topics)
     .flatMap(option => option.publications)
-    .find(option => option.slug === query.publicationSlug);
+    .find(option => option.slug === query.publication);
 
   return {
     props: {

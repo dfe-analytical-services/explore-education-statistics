@@ -1,3 +1,4 @@
+import Link from '@frontend/components/Link';
 import React from 'react';
 import classNames from 'classnames';
 import useMounted from '@common/hooks/useMounted';
@@ -47,9 +48,9 @@ function CookieBanner({ wide }: Props) {
               Accept Cookies
             </ButtonText>{' '}
             or{' '}
-            <a href="/cookies">
+            <Link to="/cookies">
               find out more about cookies and cookie settings
-            </a>
+            </Link>
             .
           </p>
         </div>

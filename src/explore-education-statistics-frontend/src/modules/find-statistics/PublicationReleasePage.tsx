@@ -72,7 +72,8 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                 <Link
                   className="dfe-print-hidden"
                   unvisited
-                  to={`/find-statistics/${data.publication.slug}`}
+                  to="/find-statistics/[publication]"
+                  as={`/find-statistics/${data.publication.slug}`}
                 >
                   View latest data:{' '}
                   <span className="govuk-!-font-weight-bold">
@@ -147,7 +148,6 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   <li key={path}>
                     <Link
                       to={`${baseUrl.data}/download/${path}`}
-                      className="govuk-link"
                       analytics={{
                         category: 'Downloads',
                         action: `Release page ${name} file downloaded`,
@@ -202,7 +202,8 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                           ({ id, slug, title }) => (
                             <li key={id} data-testid="other-release-item">
                               <Link
-                                to={`/find-statistics/${data.publication.slug}/${slug}`}
+                                to="/find-statistics/[publication]"
+                                as={`/find-statistics/${data.publication.slug}/${slug}`}
                               >
                                 {title}
                               </Link>
@@ -267,7 +268,8 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     {data.publication.methodology && (
                       <li>
                         <Link
-                          to={`/methodology/${data.publication.methodology.slug}`}
+                          to="/methodology/[methodology]"
+                          as={`/methodology/${data.publication.methodology.slug}`}
                         >
                           {`${data.publication.title}: methodology`}
                         </Link>
@@ -345,8 +347,8 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
         data.
       </p>
       <ButtonLink
+        to="/data-tables/[publication]"
         as={`/data-tables/${data.publication.slug}`}
-        href={`/data-tables?publicationSlug=${data.publication.slug}`}
       >
         Create tables
       </ButtonLink>

@@ -288,8 +288,8 @@ function GlossaryIndexPage() {
           <p>
             For further information on this change read our{' '}
             <Link
+              to="/methodology/[methodology]"
               as="/methodology/pupil-absence-in-schools-in-england"
-              to="/methodology/methodology?publication=pupil-absence-in-schools-in-england"
             >
               Pupil absence statistics: methodology
             </Link>{' '}

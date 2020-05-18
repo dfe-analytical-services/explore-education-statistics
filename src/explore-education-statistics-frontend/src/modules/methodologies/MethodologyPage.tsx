@@ -77,7 +77,10 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
               </h2>
               <ul className="govuk-list">
                 <li>
-                  <Link to={`/find-statistics/${data.publication.slug}`}>
+                  <Link
+                    to="/find-statistics/[publication]"
+                    as={`/find-statistics/${data.publication.slug}`}
+                  >
                     {data.publication.title}
                   </Link>{' '}
                 </li>
@@ -144,7 +147,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
 export const getServerSideProps: GetServerSideProps<Props> = async ({
   query,
 }) => {
-  const { methodologySlug } = query;
+  const { methodology: methodologySlug } = query;
 
   const data = await methodologyService.getMethodology(
     methodologySlug as string,
