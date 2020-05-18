@@ -118,10 +118,11 @@ const methodologyService = {
     );
   },
 
-  getMethodologyStatus: (methodologyId: string): Promise<MethodologyStatus> =>
-    client
-      .get<BasicMethodology>(`/methodology/${methodologyId}/summary`)
-      .then(methodology => methodology.status),
+  getMethodologySummary(methodologyId: string): Promise<BasicMethodology> {
+    return client.get<BasicMethodology>(
+      `/methodology/${methodologyId}/summary`,
+    );
+  },
 
   updateMethodologyStatus(
     methodologyId: string,

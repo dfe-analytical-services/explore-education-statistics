@@ -41,10 +41,10 @@ const MethodologyStatusPage = ({
 
   useEffect(() => {
     Promise.all([
-      methodologyService.getMethodologyStatus(methodologyId),
+      methodologyService.getMethodologySummary(methodologyId),
       permissionService.canMarkMethodologyAsDraft(methodologyId),
       permissionService.canApproveMethodology(methodologyId),
-    ]).then(([methodologyStatus, canMarkAsDraft, canApprove]) => {
+    ]).then(([summary, canMarkAsDraft, canApprove]) => {
       const statusOptions: RadioOption[] = [
         {
           label: 'In draft',
@@ -59,7 +59,7 @@ const MethodologyStatusPage = ({
       ];
 
       setModel({
-        methodologyStatus,
+        methodologyStatus: summary.status,
         statusOptions,
         editable: statusOptions.some(option => !option.disabled),
       });
