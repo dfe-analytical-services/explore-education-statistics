@@ -44,6 +44,10 @@ export const publishStatusRoute = createReadonlyRoute(
   MethodologyStatusPage,
 );
 
-const routes: MethodologyRoute[] = [contentRoute, publishStatusRoute];
+const routes: MethodologyRoute[] = [
+  summaryRoute,
+  contentRoute,
+  publishStatusRoute,
+];
 
 export default routes;

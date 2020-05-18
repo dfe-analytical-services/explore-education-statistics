@@ -81,7 +81,7 @@ const CreateMethodologyPage = ({
       submission,
     );
 
-    history.push(`/methodologies/${createdMethodology.id}`);
+    history.push(`/methodologies/${createdMethodology.id}/summary`);
   }, errorCodeMappings);
 
   const formId = 'createMethodologyForm';
