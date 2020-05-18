@@ -46,12 +46,7 @@ const AdminPublicationReleaseHelpAndSupportSection = ({
                 (isEditing ? (
                   <a>{`${publication.title}: methodology`}</a>
                 ) : (
-                  <Link
-                    to=""
-                    rel="external"
-                    target="_blank"
-                    href={publication.externalMethodology.url}
-                  >
+                  <Link to={publication.externalMethodology.url}>
                     {`${publication.title}: methodology`}
                   </Link>
                 ))}{' '}
