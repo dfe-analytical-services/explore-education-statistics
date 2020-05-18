@@ -19,9 +19,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<FastTrackViewModel>> GetAsync(Guid id)
+        public async Task<ActionResult<FastTrackViewModel>> GetAsync(string id)
         {
-            return await _fastTrackService.GetAsync(id).HandleFailuresOrOk();
+            if (Guid.TryParse(id, out var idAsGuid))
+            {
+                return await _fastTrackService.GetAsync(idAsGuid).HandleFailuresOrOk();
+            }
+
+            return NotFound();
         }
     }
 }

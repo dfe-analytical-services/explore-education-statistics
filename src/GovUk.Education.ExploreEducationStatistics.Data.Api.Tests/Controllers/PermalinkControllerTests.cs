@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_Permalink()
         {
-            var result = await _controller.GetAsync(_validId);
+            var result = await _controller.GetAsync(_validId.ToString());
 
             Assert.IsAssignableFrom<PermalinkViewModel>(result.Value);
             Assert.Equal(_validId, result.Value.Id);
@@ -55,7 +55,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_Permalink_NotFound()
         {
-            var result = await _controller.GetAsync(_notFoundId);
+            var result = await _controller.GetAsync(_notFoundId.ToString());
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+        
+        [Fact]
+        public async void Get_Permalink_InvalidId()
+        {
+            var result = await _controller.GetAsync("InvalidGuid");
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
