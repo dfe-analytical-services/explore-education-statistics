@@ -47,8 +47,12 @@ export type MethodologyStatus = 'Draft' | 'Approved';
 export interface BasicMethodology {
   id: string;
   title: string;
+  slug: string;
   status: MethodologyStatus;
+  published?: string;
+  publishScheduled: string;
 }
+
 export interface BasicPublicationDetails {
   id: string;
   title: string;

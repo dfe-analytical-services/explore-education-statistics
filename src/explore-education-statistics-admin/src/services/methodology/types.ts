@@ -23,8 +23,10 @@ export interface CreateMethodologyRequest {
 export interface MethodologyContent {
   id: string;
   title: string;
-  status: string;
+  slug: string;
+  status: MethodologyStatus;
   published?: string;
+  publishScheduled: string;
   content: ContentSection<EditableContentBlock>[];
   annexes: ContentSection<EditableContentBlock>[];
 }

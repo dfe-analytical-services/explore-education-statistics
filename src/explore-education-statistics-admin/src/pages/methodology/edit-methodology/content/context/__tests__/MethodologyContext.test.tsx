@@ -11,6 +11,8 @@ const basicMethodology: MethodologyContent = {
   id: 'methodology-0',
   title: 'Academic Year 2020/21',
   status: 'Draft',
+  slug: '2020-21',
+  publishScheduled: '2019-10-10T00:00:00Z',
   content: [
     {
       id: 'content-section-0',

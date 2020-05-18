@@ -8,10 +8,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
     public class MethodologyStatusViewModel
     {
         public Guid Id { get; set; }
-        
+
+        public string Slug { get; set; }
+
         public string Title { get; set; }
-        
+
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
+
+        public DateTime? Published { get; set; }
+
+        public DateTime PublishScheduled { get; set; }
     }
 }
