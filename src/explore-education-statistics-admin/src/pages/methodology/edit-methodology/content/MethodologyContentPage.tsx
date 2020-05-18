@@ -44,19 +44,6 @@ const MethodologyContentPage = () => {
                         </strong>
                       </dd>
                     </div>
-                    {methodology.lastUpdated &&
-                      methodology.lastUpdated.length > 0 && (
-                        <>
-                          <dt className="govuk-caption-m">Last updated: </dt>
-                          <dd data-testid="last-updated">
-                            <strong>
-                              <FormattedDate>
-                                {methodology.lastUpdated}
-                              </FormattedDate>
-                            </strong>
-                          </dd>
-                        </>
-                      )}
                   </dl>
                   {!isEditing && (
                     <>

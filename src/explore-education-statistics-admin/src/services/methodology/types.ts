@@ -25,7 +25,6 @@ export interface MethodologyContent {
   title: string;
   status: string;
   published?: string;
-  lastUpdated?: string;
   content: ContentSection<EditableContentBlock>[];
   annexes: ContentSection<EditableContentBlock>[];
 }
