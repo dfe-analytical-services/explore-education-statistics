@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Net.Mime;
@@ -7,11 +8,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class PermalinkMigrationService : IPermalinkMigrationService
     {
         private readonly IFileStorageService _fileStorageService;
@@ -44,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             if (errors.Any())
             {
-                await migrationHistoryWriter.WriteHistoryAsync(string.Join(Environment.NewLine, errors));
                 _logger.LogError("Permalink migration: {MigrationId} finished with errors", migrationId);
+                await migrationHistoryWriter.WriteHistoryAsync(string.Join(Environment.NewLine, errors));
                 return false;
             }
 
@@ -55,18 +58,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private async Task<(List<string> errors, List<Permalink> transformed)> DoTransform<T>(
-            IEnumerable<T> source,
+            List<T> source,
             Func<T, Task<Either<string, Permalink>>> transformFunc)
         {
+            var count = source.Count;
             var errors = new List<string>();
             var transformed = new List<Permalink>();
-            foreach (var permalink in source)
+            foreach (var (permalink, index) in source.WithIndex())
             {
                 try
                 {
+                    _logger.LogDebug("Transforming {Type} {Index} of {Count}", typeof(T).Name, index + 1, count);
                     var result = await transformFunc.Invoke(permalink);
                     if (result.IsLeft)
                     {
+                        var error = result.Left;
+                        _logger.LogError("Error while transforming {Index} of {Count}: {Error}", index + 1, count, error);
                         errors.Add(result.Left);
                     }
                     else
@@ -85,26 +92,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return (errors, transformed);
         }
 
-        private async Task<IEnumerable<T>> DownloadPermalinksAsync<T>()
+        private async Task<List<T>> DownloadPermalinksAsync<T>()
         {
-            var blobs = _fileStorageService.ListBlobs(PermalinkContainerName);
-            var task = await Task.WhenAll(blobs.Select(blob => blob.DownloadTextAsync()));
-            return task.Select(JsonConvert.DeserializeObject<T>);
+            _logger.LogDebug("Listing blobs in container: {Container}", PermalinkContainerName);
+            var blobs = _fileStorageService.ListBlobs(PermalinkContainerName).ToList();
+            _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, PermalinkContainerName);
+            var strings = await Task.WhenAll(blobs.Select(blob => blob.DownloadTextAsync()));
+            _logger.LogDebug("Downloaded {Count} blobs", strings.Length);
+            var deserialized = new List<T>();
+            foreach (var s in strings)
+            {
+                try
+                {
+                    deserialized.Add(JsonConvert.DeserializeObject<T>(s));
+                }
+                catch (JsonSerializationException e)
+                {
+                    _logger.LogError(e, "Caught Exception deserializing: {Blob}", s);
+                }
+            }
+            _logger.LogDebug("Deserialized {Count} blobs as type {Type}", deserialized.Count, typeof(T).Name);
+            return deserialized;
         }
 
         private async Task UploadPermalinksAsync(MigrationHistoryWriter migrationHistoryWriter,
             List<Permalink> permalinks)
         {
+            _logger.LogDebug("Uploading {Count} Permalinks", permalinks.Count);
             await migrationHistoryWriter.WriteHistoryAsync($"Uploading {permalinks.Count} Permalinks");
             await Task.WhenAll(permalinks.Select(permalink =>
                 _fileStorageService.UploadFromStreamAsync(PermalinkContainerName,
                     permalink.Id.ToString(),
                     MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink))));
+            _logger.LogDebug("Upload complete");
             await migrationHistoryWriter.WriteHistoryAsync("Upload complete");
         }
 
-        private async Task<bool> CheckMigrationShouldRunAndRecordHistoryAsync(
+        private static async Task<bool> CheckMigrationShouldRunAndRecordHistoryAsync(
             MigrationHistoryWriter migrationHistoryWriter)
         {
             var shouldRun = !migrationHistoryWriter.IsHistoryExists();
@@ -143,7 +168,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public bool IsHistoryExists()
         {
-            return _fileStorageService.FileExists(_containerName, _migrationId);
+            var blob = _fileStorageService.GetBlob(_containerName, _migrationId);
+            if (!blob.Exists())
+            {
+                return false;
+            }
+
+            blob.FetchAttributes();
+            return blob.Properties.Length > 0;
         }
 
         public Task WriteHistoryAsync(string message)
@@ -173,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return _fileStorageService.AppendFromStreamAsync(_containerName,
                 _migrationId,
                 MediaTypeNames.Text.Plain,
-                $"{now}: {message}");
+                $"{now}: {message}{Environment.NewLine}");
         }
     }
 }

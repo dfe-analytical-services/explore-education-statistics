@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(release => release.Publication)
                 .ThenInclude(publication => publication.Topic)
                 .ThenInclude(topic => topic.Theme)
-                .Where(r => r.UserId == userId)
+                .Where(r => r.UserId == userId && r.Role != ReleaseRole.PrereleaseViewer)
                 .Select(r => r.Release.Publication.Topic)
                 .Distinct()
                 .ToListAsync();

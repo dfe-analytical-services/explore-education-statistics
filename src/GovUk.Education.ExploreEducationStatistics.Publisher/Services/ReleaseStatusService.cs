@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var release = await GetReleaseAsync(releaseId);
             var table = await GetTableAsync();
-            var publish = GetPublishDateTime(release, immediate);
+            var publish = immediate ? null : release.PublishScheduled;
             var releaseStatus = new ReleaseStatus(release.Publication.Slug, publish, release.Id,
                 release.Slug, state, immediate, logMessages);
             var tableResult = await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
@@ -98,21 +98,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var releaseStatus = await GetAsync(releaseId, releaseStatusId);
             return releaseStatus.Immediate;
-        }
-
-        private static DateTime? GetPublishDateTime(Release release, bool immediate)
-        {
-            if (immediate)
-            {
-                return null;
-            }
-
-            if (!release.PublishScheduled.HasValue)
-            {
-                return null;
-            }
-            
-            return DateTime.SpecifyKind(release.PublishScheduled.Value, DateTimeKind.Utc);
         }
 
         public Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)

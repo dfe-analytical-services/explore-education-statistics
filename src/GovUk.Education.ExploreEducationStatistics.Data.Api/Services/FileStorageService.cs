@@ -30,21 +30,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return FileStorageUtils.ListBlobs(_storageConnectionString, containerName);
         }
 
-        public bool FileExists(string containerName, string blobName)
+        public CloudBlob GetBlob(string containerName, string blobName)
         {
-            var blob = GetBlob(_storageConnectionString, containerName, blobName);
-            return blob.Exists();
+            return FileStorageUtils.GetBlob(_storageConnectionString, containerName, blobName);
         }
 
         public bool FileExistsAndIsReleased(string containerName, string blobName)
         {
-            var blob = GetBlob(_storageConnectionString, containerName, blobName);
+            var blob = GetBlob(containerName, blobName);
             return blob.Exists() && IsFileReleased(blob);
         }
 
         public async Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName)
         {
-            var blob = GetBlob(_storageConnectionString, containerName, blobName);
+            var blob = GetBlockBlob(_storageConnectionString, containerName, blobName);
 
             if (!blob.Exists())
             {

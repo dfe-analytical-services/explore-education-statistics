@@ -207,6 +207,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(release, SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease);
         }
 
+        public static Task<Either<ActionResult, Release>> CheckCanViewPreReleaseSummary(
+            this IUserService userService, Release release)
+        {
+            return userService.DoCheck(release, SecurityPolicies.CanViewSpecificPreReleaseSummary);
+        }
+
         public static Task<Either<ActionResult, Release>> CheckCanPublishRelease(
             this IUserService userService, Release release)
         {

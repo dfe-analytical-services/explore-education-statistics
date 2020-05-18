@@ -31,36 +31,41 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
   const { value: config } = useConfig();
-  const { handleManualErrors } = useErrorControl();
+  const { handleManualErrors, handleApiErrors } = useErrorControl();
   const { user } = useAuthContext();
 
   const { value: model } = useAsyncRetry<Model | undefined>(async () => {
-    const preReleaseWindowStatus = await permissionService.getPreReleaseWindowStatus(
-      releaseId,
-    );
+    try {
+      const preReleaseWindowStatus = await permissionService.getPreReleaseWindowStatus(
+        releaseId,
+      );
 
-    if (preReleaseWindowStatus.access === 'NoneSet') {
-      handleManualErrors.forbidden();
-      return undefined;
-    }
+      if (preReleaseWindowStatus.access === 'NoneSet') {
+        handleManualErrors.forbidden();
+        return undefined;
+      }
 
-    if (preReleaseWindowStatus.access === 'Within') {
-      const content = await releaseContentService.getContent(releaseId);
+      if (preReleaseWindowStatus.access === 'Within') {
+        const content = await releaseContentService.getContent(releaseId);
+
+        return {
+          preReleaseWindowStatus,
+          content,
+        };
+      }
+
+      const preReleaseSummary = await preReleaseService.getPreReleaseSummary(
+        releaseId,
+      );
 
       return {
         preReleaseWindowStatus,
-        content,
+        preReleaseSummary,
       };
+    } catch (err) {
+      handleApiErrors(err);
+      return undefined;
     }
-
-    const preReleaseSummary = await preReleaseService.getPreReleaseSummary(
-      releaseId,
-    );
-
-    return {
-      preReleaseWindowStatus,
-      preReleaseSummary,
-    };
   }, [handleManualErrors, releaseId]);
 
   const { content, preReleaseSummary, preReleaseWindowStatus } = model ?? {};

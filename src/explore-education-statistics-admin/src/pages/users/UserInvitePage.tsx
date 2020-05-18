@@ -11,6 +11,7 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import Yup from '@common/validation/yup';
 import orderBy from 'lodash/orderBy';
@@ -39,6 +40,10 @@ const UserInvitePage = ({
 }: RouteComponentProps & ErrorControlState) => {
   const [model, setModel] = useState<InviteUserModel>();
   const formId = 'inviteUserForm';
+
+  const { value: releaseRoles } = useAsyncRetry(() =>
+    userService.getReleaseRoles(),
+  );
 
   useEffect(() => {
     userService.getRoles().then(roles => {
@@ -91,71 +96,66 @@ const UserInvitePage = ({
           </RelatedInformation>
         </div>
       </div>
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          {model && (
-            <Formik<FormValues>
-              enableReinitialize
-              initialValues={{
-                userEmail: '',
-                selectedRoleId:
-                  orderBy(model.roles, role => role.name)?.[0]?.id ?? '',
-              }}
-              validationSchema={Yup.object({
-                userEmail: Yup.string()
-                  .required('Provide the users email')
-                  .email('Provide a valid email address'),
-                selectedRoleId: Yup.string().required(
-                  'Choose role for the user',
-                ),
-              })}
-              onSubmit={handleSubmit}
-              render={_ => {
-                return (
-                  <Form id={formId}>
-                    <FormFieldset
-                      id={`${formId}-userEmailFieldset`}
-                      legend="Provide the email address for the user"
-                      legendSize="m"
-                      hint="The invited user must have a @education.gov.uk email address"
-                    >
-                      <FormFieldTextInput
-                        id={`${formId}-userEmail`}
-                        label="User email"
-                        name="userEmail"
-                      />
-                    </FormFieldset>
+      {model && (
+        <Formik<FormValues>
+          enableReinitialize
+          initialValues={{
+            userEmail: '',
+            selectedRoleId:
+              orderBy(model.roles, role => role.name)?.[0]?.id ?? '',
+          }}
+          validationSchema={Yup.object({
+            userEmail: Yup.string()
+              .required('Provide the users email')
+              .email('Provide a valid email address'),
+            selectedRoleId: Yup.string().required('Choose role for the user'),
+          })}
+          onSubmit={handleSubmit}
+          render={_ => {
+            return (
+              <Form id={formId}>
+                <FormFieldset
+                  id={`${formId}-userEmailFieldset`}
+                  legend="Provide the email address for the user"
+                  legendSize="m"
+                  hint="The invited user must have a @education.gov.uk email address"
+                >
+                  <FormFieldTextInput
+                    id={`${formId}-userEmail`}
+                    label="User email"
+                    name="userEmail"
+                  />
+                </FormFieldset>
 
-                    <FormFieldset
-                      id={`${formId}-selectedRoleIdFieldset`}
-                      legend="Select the role of the user within the service"
-                      legendSize="m"
-                      hint="Most users should be added with the analyst role"
-                    >
-                      <FormFieldSelect
-                        id={`${formId}-selectedRoleId`}
-                        label="Role"
-                        name="selectedRoleId"
-                        options={model?.roles.map(role => ({
-                          label: role.name,
-                          value: role.id,
-                        }))}
-                      />
-                    </FormFieldset>
+                <FormFieldset
+                  id={`${formId}-selectedRoleIdFieldset`}
+                  legend="Role"
+                  legendSize="m"
+                  hint="The users role within the service."
+                >
+                  <FormFieldSelect
+                    id={`${formId}-selectedRoleId`}
+                    label="Role"
+                    name="selectedRoleId"
+                    placeholder="Choose role"
+                    options={model?.roles.map(role => ({
+                      label: role.name,
+                      value: role.id,
+                    }))}
+                  />
+                </FormFieldset>
 
-                    <Button type="submit" className="govuk-!-margin-top-6">
-                      Send invite
-                    </Button>
-                    <div className="govuk-!-margin-top-6">
-                      <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
-                    </div>
-                  </Form>
-                );
-              }}
-            />
-          )}
-        </div>
-      </div>
+                <Button type="submit" className="govuk-!-margin-top-6">
+                  Send invite
+                </Button>
+                <div className="govuk-!-margin-top-6">
+                  <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
+                </div>
+              </Form>
+            );
+          }}
+        />
+      )}
     </Page>
   );
 };

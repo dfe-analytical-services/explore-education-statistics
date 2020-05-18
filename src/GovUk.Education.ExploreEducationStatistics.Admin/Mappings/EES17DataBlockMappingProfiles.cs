@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(header => header.Value, m => m.MapFrom(option => option.value));
 
             CreateMap<EES17TableRowGroupOption, TableHeader>()
-                .ForMember(header => header.Level, m => m.MapFrom(option => option.level))
+                .ForMember(header => header.Level, m => m.Ignore())
                 .ForMember(header => header.Value, m => m.MapFrom(option => option.value));
 
             CreateMap<EES17ObservationQueryContext, ObservationQueryContext>()
