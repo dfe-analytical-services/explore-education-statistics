@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using ApiTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.TopicViewModel;
 using ManageContentTopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.TopicViewModel;
@@ -83,10 +84,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
-            CreateMap<Methodology, MethodologyViewModel>();
             CreateMap<Methodology, MethodologyStatusViewModel>();
-            CreateMap<Publication, MethodologyStatusPublications>();
-            
+            CreateMap<Methodology, MethodologySummaryViewModel>();
+            CreateMap<Methodology, MethodologyTitleViewModel>();
+            CreateMap<Methodology, MethodologyPublicationsViewModel>();
+
+            CreateMap<Publication, IdTitlePair>();
+
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
@@ -180,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             }
                             : null,
                         Methodology = r.Publication.Methodology != null 
-                            ? new MethodologyViewModel
+                            ? new MethodologyTitleViewModel
                                 {
                                     Id = r.Publication.Methodology.Id,
                                     Title = r.Publication.Methodology.Title

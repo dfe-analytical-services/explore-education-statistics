@@ -120,7 +120,7 @@ const methodologyService = {
 
   getMethodologyStatus: (methodologyId: string): Promise<MethodologyStatus> =>
     client
-      .get<BasicMethodology>(`/methodology/${methodologyId}/summary`)
+      .get<BasicMethodology>(`/methodology/${methodologyId}/status`)
       .then(methodology => methodology.status),
 
   updateMethodologyStatus(
