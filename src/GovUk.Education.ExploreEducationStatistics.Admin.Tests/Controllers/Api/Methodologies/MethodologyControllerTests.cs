@@ -12,33 +12,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
     public class MethodologyControllerTests
     {
-        [Fact]
-        public async void Topic_Methodology_Returns_Ok()
-        {
-            var methodologyService = new Mock<IMethodologyService>();
+        private readonly Guid _methodologyId = Guid.NewGuid();
 
-            methodologyService.Setup(s => s.GetTopicMethodologiesAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(new Either<ActionResult, List<MethodologyViewModel>>(new List<MethodologyViewModel>()));
-            
-            var controller = new MethodologyController(methodologyService.Object);
-
-            // Method under test
-            var result = await controller.GetTopicMethodologiesAsync(Guid.NewGuid());
-            Assert.IsAssignableFrom<List<MethodologyViewModel>>(result.Value);
-        }
-        
         [Fact]
-        public async void Methodologies_Returns_Ok()
+        public async void GetMethodologiesAsync_Returns_Ok()
         {
             var methodologyService = new Mock<IMethodologyService>();
 
             methodologyService.Setup(s => s.ListAsync())
-                .ReturnsAsync(new Either<ActionResult, List<MethodologyViewModel>>(new List<MethodologyViewModel>()));
+                .ReturnsAsync(
+                    new Either<ActionResult, List<MethodologyStatusViewModel>>(new List<MethodologyStatusViewModel>()));
             var controller = new MethodologyController(methodologyService.Object);
 
             // Method under test
             var result = await controller.GetMethodologiesAsync();
-            Assert.IsAssignableFrom<List<MethodologyViewModel>>(result.Value);
+            AssertOkResult(result);
+        }
+
+        [Fact]
+        public async void GetMethodologyStatusAsync_Returns_Ok()
+        {
+            var methodologyService = new Mock<IMethodologyService>();
+
+            methodologyService.Setup(s => s.GetStatusAsync(_methodologyId))
+                .ReturnsAsync(new MethodologyStatusViewModel());
+            var controller = new MethodologyController(methodologyService.Object);
+
+            // Method under test
+            var result = await controller.GetMethodologyStatusAsync(_methodologyId);
+            AssertOkResult(result);
+        }
+
+        [Fact]
+        public async void GetMethodologyStatusAsync_Returns_NotFound()
+        {
+            var methodologyService = new Mock<IMethodologyService>();
+
+            methodologyService.Setup(s => s.GetStatusAsync(It.Is<Guid>(guid => guid != _methodologyId)))
+                .ReturnsAsync(new NotFoundResult());
+            var controller = new MethodologyController(methodologyService.Object);
+
+            // Method under test
+            var result = await controller.GetMethodologyStatusAsync(Guid.NewGuid());
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async void GetMethodologySummaryAsync_Returns_Ok()
+        {
+            var methodologyService = new Mock<IMethodologyService>();
+
+            methodologyService.Setup(s => s.GetSummaryAsync(_methodologyId))
+                .ReturnsAsync(new MethodologySummaryViewModel());
+            var controller = new MethodologyController(methodologyService.Object);
+
+            // Method under test
+            var result = await controller.GetMethodologySummaryAsync(_methodologyId);
+            AssertOkResult(result);
+        }
+
+        [Fact]
+        public async void GetMethodologySummaryAsync_Returns_NotFound()
+        {
+            var methodologyService = new Mock<IMethodologyService>();
+
+            methodologyService.Setup(s => s.GetSummaryAsync(It.Is<Guid>(guid => guid != _methodologyId)))
+                .ReturnsAsync(new NotFoundResult());
+            var controller = new MethodologyController(methodologyService.Object);
+
+            // Method under test
+            var result = await controller.GetMethodologySummaryAsync(Guid.NewGuid());
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+        }
+
+        private static T AssertOkResult<T>(ActionResult<T> result) where T : class
+        {
+            Assert.IsAssignableFrom<T>(result.Value);
+            return result.Value;
         }
     }
 }

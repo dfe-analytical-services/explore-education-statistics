@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         public Contact Contact { get; set; }
         
-        public MethodologyViewModel Methodology { get; set; }
+        public MethodologyTitleViewModel Methodology { get; set; }
         
         public ExternalMethodology ExternalMethodology { get; set; }
     }

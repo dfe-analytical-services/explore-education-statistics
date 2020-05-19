@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -22,52 +21,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [Produces("application/json")]
-        [HttpGet("api/topic/{topicId}/methodologies")]
-        public Task<ActionResult<List<MethodologyViewModel>>> GetTopicMethodologiesAsync([Required]Guid topicId)
-        {
-            return _methodologyService
-                .GetTopicMethodologiesAsync(topicId)
-                .HandleFailuresOrOk();
-        }
-        
-        [Produces("application/json")]
         [HttpGet("api/methodologies")]
-        public Task<ActionResult<List<MethodologyViewModel>>> GetMethodologiesAsync()
+        public Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologiesAsync()
         {
             return _methodologyService
                 .ListAsync()
                 .HandleFailuresOrOk();
         }
-        
+
         [Produces("application/json")]
-        [ProducesResponseType(typeof(MethodologyViewModel), 200)]
+        [ProducesResponseType(typeof(MethodologyTitleViewModel), 200)]
         [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [HttpPost("api/methodologies")]
-        public Task<ActionResult<MethodologyViewModel>> CreateMethodologyAsync(
-            CreateMethodologyViewModel methodology)
+        public Task<ActionResult<MethodologyTitleViewModel>> CreateMethodologyAsync(
+            CreateMethodologyRequest methodology)
         {
             return _methodologyService
                 .CreateMethodologyAsync(methodology)
                 .HandleFailuresOrOk();
         }
-        
+
         [Produces("application/json")]
-        [HttpGet("api/methodology/{methodologyId}/summary")]
-        public async Task<ActionResult<MethodologyViewModel>> GetMethodologySummaryAsync(Guid methodologyId)
+        [HttpGet("api/methodology/{methodologyId}/status")]
+        public async Task<ActionResult<MethodologyStatusViewModel>> GetMethodologyStatusAsync(Guid methodologyId)
         {
             return await _methodologyService
-                .GetAsync(methodologyId)
-                .HandleFailuresOr(Ok);
+                .GetStatusAsync(methodologyId)
+                .HandleFailuresOrOk();
         }
         
         [Produces("application/json")]
+        [HttpGet("api/methodology/{methodologyId}/summary")]
+        public async Task<ActionResult<MethodologySummaryViewModel>> GetMethodologySummaryAsync(Guid methodologyId)
+        {
+            return await _methodologyService
+                .GetSummaryAsync(methodologyId)
+                .HandleFailuresOrOk();
+        }
+
+        [Produces("application/json")]
         [HttpPut("api/methodology/{methodologyId}/status")]
-        public async Task<ActionResult<MethodologyViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId, 
+        public async Task<ActionResult<MethodologyStatusViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId,
             UpdateMethodologyStatusRequest request)
         {
             return await _methodologyService
                 .UpdateMethodologyStatusAsync(methodologyId, request)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
     }
 }
