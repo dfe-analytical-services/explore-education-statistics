@@ -38,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Type => ChartType.line.ToString();
         public string Title { get; set; }
+        public string Alt { get; set; }
         public int? Width { get; set; }
         public int Height { get; set; }
 
@@ -54,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Type =>  ChartType.horizontalbar.ToString();
         public string Title { get; set; }
+        public string Alt { get; set; }
         public int? Width { get; set; }
         public int Height { get; set; }
 
@@ -74,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
         public bool Stacked;
         public string Title { get; set; }
+        public string Alt { get; set; }
         public int? Width { get; set; }
         public int Height { get; set; }
 
@@ -87,6 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Type =>  ChartType.map.ToString();
         public string Title { get; set; }
+        public string Alt { get; set; }
         public int? Width { get; set; }
         public int Height { get; set; }
         public Dictionary<string, ChartConfiguration> Labels;
@@ -97,6 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Type =>  ChartType.infographic.ToString();
         public string Title { get; set; }
+        public string Alt { get; set; }
         public int? Width { get; set; }
         public int Height { get; set; }
 
