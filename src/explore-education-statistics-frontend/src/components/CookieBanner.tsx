@@ -12,52 +12,41 @@ interface Props {
 
 function CookieBanner({ wide }: Props) {
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
-  useMounted(() => {
+
+  const { isMounted } = useMounted(() => {
     if (getCookie('disableGA') === 'true') {
       setGADisabledCookie(true);
     }
   });
-  const acceptCookies = () => {
-    setBannerSeenCookie(true);
-    if (typeof getCookie('disableGA') === 'undefined') {
-      setGADisabledCookie(false);
-    }
-  };
 
-  function render() {
-    return (
-      <div className={styles.container}>
-        <div
-          className={classNames(
-            'govuk-width-container',
-            'dfe-width-container',
-            {
-              'dfe-width-container--wide': wide,
-            },
-          )}
-        >
-          <p>
-            <span>GOV.UK uses cookies to make the site simpler.</span>{' '}
-            <ButtonText
-              type="button"
-              className={styles.button}
-              onClick={() => {
-                acceptCookies();
-              }}
-            >
-              Accept Cookies
-            </ButtonText>{' '}
-            or{' '}
-            <Link to="/cookies">
-              find out more about cookies and cookie settings
-            </Link>
-            .
-          </p>
-        </div>
+  return isMounted && getCookie('bannerSeen') !== 'true' ? (
+    <div className={styles.container}>
+      <div
+        className={classNames('govuk-width-container', 'dfe-width-container', {
+          'dfe-width-container--wide': wide,
+        })}
+      >
+        <p>
+          <span>GOV.UK uses cookies to make the site simpler.</span>{' '}
+          <ButtonText
+            onClick={() => {
+              setBannerSeenCookie(true);
+              if (typeof getCookie('disableGA') === 'undefined') {
+                setGADisabledCookie(false);
+              }
+            }}
+          >
+            Accept Cookies
+          </ButtonText>{' '}
+          or{' '}
+          <Link to="/cookies">
+            find out more about cookies and cookie settings
+          </Link>
+          .
+        </p>
       </div>
-    );
-  }
-  return getCookie('bannerSeen') === 'true' ? null : render();
+    </div>
+  ) : null;
 }
 
 export default CookieBanner;
