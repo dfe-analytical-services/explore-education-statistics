@@ -5,6 +5,7 @@ export type CommentState = 'open' | 'resolved';
 
 export interface ExtendedComment {
   id: string;
+  userId: string;
   name: string;
   time: Date;
   commentText: string;

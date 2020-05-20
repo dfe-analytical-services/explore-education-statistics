@@ -43,6 +43,7 @@ const Comments = ({
 
     const additionalComment: ExtendedComment = {
       id: '0',
+      userId: user.id,
       name: user.name,
       time: new Date(),
       commentText: comment,

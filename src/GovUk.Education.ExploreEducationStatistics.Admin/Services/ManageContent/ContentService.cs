@@ -393,6 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     {
                         Id = new Guid(),
                         IContentBlockId = contentBlockId,
+                        UserId = comment.UserId,
                         Name = comment.Name,
                         State = comment.State,
                         Time = comment.Time,
@@ -431,6 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationActionResult(CommentNotFound);
                     }
 
+                    comment.UserId = commentRequest.UserId;
                     comment.Name = commentRequest.Name;
                     comment.State = commentRequest.State;
                     comment.Time = commentRequest.Time;
