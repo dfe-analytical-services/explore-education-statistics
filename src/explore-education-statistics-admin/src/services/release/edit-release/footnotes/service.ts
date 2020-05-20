@@ -8,8 +8,14 @@ const service = {
   ): Promise<{ meta: FootnoteMeta; footnotes: Footnote[] }> {
     return client.get(`/data/footnote/release/${releaseId}`);
   },
-  async createFootnote(footnote: FootnoteProps): Promise<Footnote> {
-    return client.post(`/data/footnote`, footnoteToFlatFootnote(footnote));
+  async createFootnote(
+    releaseId: string,
+    footnote: FootnoteProps,
+  ): Promise<Footnote> {
+    return client.post(
+      `/data/footnote/release/${releaseId}`,
+      footnoteToFlatFootnote(footnote),
+    );
   },
   async getFootnote(id: string) {
     return client.get(`/data/footnote/${id}`);

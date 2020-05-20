@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Topic> Topic { get; set; }
         
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; }
-
+        public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureBoundaryLevel(modelBuilder);
@@ -69,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigurePublication(modelBuilder);
             ConfigureRelease(modelBuilder);
             ConfigureReleaseSubject(modelBuilder);
+            ConfigureReleaseFootnote(modelBuilder);
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
@@ -153,6 +154,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             
             modelBuilder.Entity<ReleaseSubject>()
                 .HasOne(r => r.Subject)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+        }
+        
+        private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ReleaseFootnote>()
+                .HasKey(item => new {item.ReleaseId, item.FootnoteId});
+            
+            modelBuilder.Entity<ReleaseFootnote>()
+                .HasOne(r => r.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+            
+            modelBuilder.Entity<ReleaseFootnote>()
+                .HasOne(r => r.Footnote)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
         }

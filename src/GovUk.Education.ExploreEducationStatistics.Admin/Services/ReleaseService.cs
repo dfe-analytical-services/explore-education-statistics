@@ -182,15 +182,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 var statsAmendmentSubjectLinks =_statisticsDbContext
                     .ReleaseSubject
-                    .Where(s => s.ReleaseId == amendment.PreviousVersionId)
-                    .Select(s => new ReleaseSubject
+                    .Where(rs => rs.ReleaseId == amendment.PreviousVersionId)
+                    .Select(rs => new ReleaseSubject
                     {
                         ReleaseId = statsAmendment.Id,
-                        SubjectId = s.SubjectId
+                        SubjectId = rs.SubjectId
+                    });
+  
+                var statsAmendmentFootnoteLinks =_statisticsDbContext
+                    .ReleaseFootnote
+                    .Where(rf => rf.ReleaseId == amendment.PreviousVersionId)
+                    .Select(rf => new ReleaseFootnote
+                    {
+                        ReleaseId = statsAmendment.Id,
+                        FootnoteId = rf.FootnoteId
                     });
 
                 _statisticsDbContext.Release.Add(statsAmendment);
                 _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
+                _statisticsDbContext.ReleaseFootnote.AddRange(statsAmendmentFootnoteLinks);
                 await _statisticsDbContext.SaveChangesAsync();
             }
             
@@ -456,9 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         FootnoteIds = orphanFootnotes
                            .Select(footnote => footnote.Id)
                            .ToList(),
-                        
-                        SubjectReleaseId = subject?.ReleaseId ?? Guid.Empty,
-                     };
+                    };
                 });
         }
 
@@ -475,7 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _subjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
 
                     return await _fileStorageService
-                        .RemoveDataFileReleaseLinkAsync(releaseId, fileName, deletePlan.SubjectReleaseId)
+                        .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
                         .OnSuccessDo(() => RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
         }
@@ -611,8 +619,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; }
         
         public List<Guid> FootnoteIds { get; set; }
-        
-        [JsonIgnore]
-        public Guid SubjectReleaseId { get; set; }
     }
 }

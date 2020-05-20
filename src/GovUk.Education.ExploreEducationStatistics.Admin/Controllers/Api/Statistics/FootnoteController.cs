@@ -40,11 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _mapper = mapper;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(CreateFootnoteViewModel footnote)
+        [HttpPost("release/{releaseId}")]
+        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(CreateFootnoteViewModel footnote, Guid releaseId)
         {
             return await _footnoteService
-                .CreateFootnote(footnote.Content,
+                .CreateFootnote(
+                    footnote.Content,
                     footnote.Filters,
                     footnote.FilterGroups,
                     footnote.FilterItems,

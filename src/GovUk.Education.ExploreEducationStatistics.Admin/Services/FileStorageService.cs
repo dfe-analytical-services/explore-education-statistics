@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> RemoveDataFileReleaseLinkAsync(Guid releaseId,
-            string dataFileName, Guid subjectReleaseId)
+            string dataFileName)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -98,24 +98,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async blobContainer =>
                 {
                     var willOrphanFiles = await CheckFileDeletionWillOrphanFileAsync(releaseId, dataFileName, ReleaseFileTypes.Data);
-
+                    
                     if (willOrphanFiles)
                     {
                         return
-                            await DataPathsForDeletion(blobContainer, subjectReleaseId, dataFileName)
+                            await DataPathsForDeletion(blobContainer, releaseId, dataFileName)
                             .OnSuccess(fileNames =>
-                                DeleteDataFilesAsync(subjectReleaseId, blobContainer, fileNames)
+                                DeleteDataFilesAsync(releaseId, blobContainer, fileNames)
                                     .OnSuccess(() => DeleteFileReference(releaseId, fileNames.dataFileName, ReleaseFileTypes.Data))
                                     .OnSuccess(() => DeleteFileReference(releaseId, fileNames.metadataFileName, ReleaseFileTypes.Metadata))
                                     .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
                     }
 
-                    return
-                        await DataPathsForDeletion(blobContainer, subjectReleaseId, dataFileName)
-                            .OnSuccess(fileNames =>
-                                DeleteFileLink(releaseId, fileNames.dataFileName, ReleaseFileTypes.Data)
-                                    .OnSuccess(() => DeleteFileLink(releaseId, fileNames.metadataFileName, ReleaseFileTypes.Metadata))
-                                    .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
+                    var files = _context.ReleaseFiles.Include(rf => rf.ReleaseFileReference)
+                        .Where(rf => rf.ReleaseId == releaseId);
+
+                    var datafile = files.First(f => f.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data).ReleaseFileReference;
+                    var metafile = files.First(f => f.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Metadata).ReleaseFileReference;
+                    
+                    return await DeleteFileLink(releaseId, datafile.Filename, ReleaseFileTypes.Data)
+                        .OnSuccess(() => DeleteFileLink(releaseId, metafile.Filename, ReleaseFileTypes.Metadata))
+                        .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });
         }
 

@@ -24,6 +24,7 @@ const ReleaseFootnotesSection = ({
   footnotesData,
   onSubmit,
   onDelete,
+  releaseId,
 }: Props) => {
   const [footnoteForm, _setFootnoteForm] = useState<FootnoteFormConfig>({
     state: 'cancel',
@@ -65,7 +66,7 @@ const ReleaseFootnotesSection = ({
           });
       } else {
         footnotesService
-          .createFootnote(footnote)
+          .createFootnote(releaseId, footnote)
           .then((newFootnote: Footnote) => {
             onSubmit({
               ...footnotesData,
@@ -90,17 +91,17 @@ const ReleaseFootnotesSection = ({
       {footnotesData.footnoteMeta && (
         <>
           {footnotesData.canUpdateRelease && (
-          <FootnoteForm
-            {...footnoteForm}
-            footnote={undefined}
-            onOpen={footnoteFormControls.create}
-            onCancel={footnoteFormControls.cancel}
-            onSubmit={footnoteFormControls.save}
-            isFirst={!footnotesData.footnotes?.length}
-            footnoteMeta={footnotesData.footnoteMeta}
-            footnoteMetaGetters={footnotesData.footnoteMetaGetters}
-          />
-            )}
+            <FootnoteForm
+              {...footnoteForm}
+              footnote={undefined}
+              onOpen={footnoteFormControls.create}
+              onCancel={footnoteFormControls.cancel}
+              onSubmit={footnoteFormControls.save}
+              isFirst={!footnotesData.footnotes?.length}
+              footnoteMeta={footnotesData.footnoteMeta}
+              footnoteMetaGetters={footnotesData.footnoteMetaGetters}
+            />
+          )}
           <>
             <FootnotesList
               {...footnotesData}

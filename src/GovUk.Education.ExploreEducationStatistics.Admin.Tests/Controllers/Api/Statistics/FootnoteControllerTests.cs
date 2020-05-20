@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public void Post_CreateFootnote_Returns_Ok()
         {
-            var result = _controller.CreateFootnote(new CreateFootnoteViewModel
+            var result = _controller.CreateFootnote(new CreateFootnoteViewModel()
             {
                 Content = "Sample footnote",
                 Filters = new List<Guid>(),
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 FilterItems = new List<Guid>(),
                 Indicators = new List<Guid>(),
                 Subjects = new List<Guid>()
-            });
+            }, Guid.NewGuid());
 
             Assert.IsAssignableFrom<OkObjectResult>(result.Result.Result);
             Assert.IsAssignableFrom<FootnoteViewModel>(((OkObjectResult)result.Result.Result).Value);

@@ -29,8 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         
         private static readonly Subject Subject = new Subject
         {
-            Id = Guid.NewGuid(),
-            ReleaseId = Release.Id
+            Id = Guid.NewGuid()
         };
         
         private static readonly Footnote Footnote = new Footnote

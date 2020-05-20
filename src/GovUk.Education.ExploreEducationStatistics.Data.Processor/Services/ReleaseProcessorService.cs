@@ -96,9 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var newSubject = context.Subject.Add(new Subject
                 {
                     Id = subjectId,
-                    Name = name,
-                    // TODO BAU-384 - remove after this work goes out
-                    ReleaseId = release.Id
+                    Name = name
                 }
             ).Entity;
             

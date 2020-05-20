@@ -71,8 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AssertSecurityPoliciesChecked(service => 
                     service.RemoveDataFileReleaseLinkAsync(
                         _release.Id, 
-                        "",
-                        new Guid("1719dd35-9376-4c7f-88bd-a2b818e63ebc")
+                        ""
                         ), 
                 CanUpdateSpecificRelease);
         }
