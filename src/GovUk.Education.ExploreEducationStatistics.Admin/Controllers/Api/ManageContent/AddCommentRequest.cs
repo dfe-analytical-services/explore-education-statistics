@@ -10,6 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         public string CommentText { get; set; }
         public string? ResolvedBy { get; set; }
         public DateTime? ResolvedOn { get; set; }
-        public string State { get; set; }
+        public CommentState State { get; set; }
     }
 }

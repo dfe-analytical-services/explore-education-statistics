@@ -394,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         Id = new Guid(),
                         IContentBlockId = contentBlockId,
                         Name = comment.Name,
-                        State = EnumUtil.GetFromString<CommentState>(comment.State),
+                        State = comment.State,
                         Time = comment.Time,
                         CommentText = comment.CommentText,
                         ResolvedBy = comment.ResolvedBy,
@@ -432,7 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     }
 
                     comment.Name = commentRequest.Name;
-                    comment.State = EnumUtil.GetFromString<CommentState>(commentRequest.State);
+                    comment.State = commentRequest.State;
                     comment.Time = commentRequest.Time;
                     comment.CommentText = commentRequest.CommentText;
                     comment.ResolvedBy = commentRequest.ResolvedBy;
