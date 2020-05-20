@@ -406,25 +406,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
-            Guid releaseId, ReleaseStatus status, string internalReleaseNote)
+            Guid releaseId, ReleaseStatus newStatus, string internalReleaseNote)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
-                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, status))
+                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, newStatus))
+                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, newStatus))
                 .OnSuccess(async release =>
                 {
-                    if (status == ReleaseStatus.Approved && !release.PublishScheduled.HasValue)
+                    if (newStatus == ReleaseStatus.Approved && !release.PublishScheduled.HasValue)
                     {
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
                     }
 
-                    release.Status = status;
+                    var oldStatus = release.Status;
+
+                    release.Status = newStatus;
                     release.InternalReleaseNote = internalReleaseNote;
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
 
-                    await _publishingService.QueueValidateReleaseAsync(releaseId);
+                    // Only need to inform Publisher if changing release status to or from Approved
+                    if(oldStatus == ReleaseStatus.Approved || newStatus == ReleaseStatus.Approved)
+                    {
+                        await _publishingService.QueueValidateReleaseAsync(releaseId);
+                    }
 
                     return await GetReleaseSummaryAsync(releaseId);
                 });
