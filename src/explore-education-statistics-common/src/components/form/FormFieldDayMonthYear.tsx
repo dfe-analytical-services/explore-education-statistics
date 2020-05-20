@@ -10,7 +10,7 @@ interface DayMonthYearValues {
   year: string;
 }
 
-interface Props<FormValues> extends DayMonthYearValues {
+interface Props<FormValues> {
   error?: ReactNode | string;
   legend: string;
   legendSize?: 'xl' | 'l' | 'm' | 's';

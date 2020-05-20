@@ -164,18 +164,12 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                   name="scheduledPublishDate"
                   legend="Schedule publish date"
                   legendSize="m"
-                  day={form.values.scheduledPublishDate.day}
-                  month={form.values.scheduledPublishDate.month}
-                  year={form.values.scheduledPublishDate.year}
                 />
                 <FormFieldDayMonthYear<FormValues>
                   id={`${formId}-nextReleaseDate`}
                   name="nextReleaseDate"
                   legend="Next release expected (optional)"
                   legendSize="m"
-                  day={form.values.nextReleaseDate.day}
-                  month={form.values.nextReleaseDate.month}
-                  year={form.values.nextReleaseDate.year}
                 />
                 <div className="govuk-!-margin-top-9">
                   <FormFieldRadioGroup<FormValues>

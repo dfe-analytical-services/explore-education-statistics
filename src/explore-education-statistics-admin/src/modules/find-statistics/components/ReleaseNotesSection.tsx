@@ -190,9 +190,6 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                   name="on"
                   legend="Edit date"
                   legendSize="s"
-                  day={form.values.on.day}
-                  month={form.values.on.month}
-                  year={form.values.on.year}
                 />
                 <FormFieldTextArea
                   id="reason"

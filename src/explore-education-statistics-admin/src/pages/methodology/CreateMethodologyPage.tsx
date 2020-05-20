@@ -152,9 +152,6 @@ const CreateMethodologyPage = ({
                   id={`${formId}-scheduledPublishDate`}
                   name="scheduledPublishDate"
                   legend="Schedule publish date"
-                  day={form.values.scheduledPublishDate.day}
-                  month={form.values.scheduledPublishDate.month}
-                  year={form.values.scheduledPublishDate.year}
                 />
 
                 <FormFieldset
