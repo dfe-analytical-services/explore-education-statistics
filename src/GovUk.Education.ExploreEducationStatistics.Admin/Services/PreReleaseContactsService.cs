@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var emailValues = new Dictionary<string, dynamic>
             {
                 {"newUser", newUser ? "yes" : "no"},
-                {"release name", release.ReleaseName},
+                {"release name", release.Title},
                 {"publication name", release.Publication.Title},
                 {"prerelease link", prereleaseUrl},
                 { "daybeforereleaseday", release.PublishScheduled.Value.AddDays(-1).ToString("dddd dd MMMM yyyy")},
