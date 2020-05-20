@@ -212,6 +212,8 @@ describe('VerticalBarBlock', () => {
 
     const { container } = render(
       <VerticalBarBlock
+        title=""
+        alt=""
         height={300}
         data={invalidData}
         meta={invalidMeta}
