@@ -259,6 +259,8 @@ describe('LineChartBlock', () => {
 
     const { container } = render(
       <LineChartBlock
+        title=""
+        alt=""
         height={300}
         data={invalidData}
         meta={invalidMeta}
