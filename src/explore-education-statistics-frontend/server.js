@@ -23,7 +23,6 @@ const nextApp = require('next');
 const path = require('path');
 const referrerPolicy = require('referrer-policy');
 const url = require('url');
-const cookiesMiddleware = require('universal-cookie-express');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -69,7 +68,6 @@ async function startServer(port = process.env.PORT || 3000) {
   // Use Helmet for configuration of headers and disable express powered by header
   server.disable('x-powered-by');
   server.use(helmet());
-  server.use(cookiesMiddleware());
   server.use(
     helmet.contentSecurityPolicy({
       directives: {

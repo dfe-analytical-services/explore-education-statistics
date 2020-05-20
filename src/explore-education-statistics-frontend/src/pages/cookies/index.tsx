@@ -1,1 +1,4 @@
-export { default } from '@frontend/modules/cookies/CookiesIndexPage';
+export {
+  default,
+  getServerSideProps,
+} from '@frontend/modules/cookies/CookiesIndexPage';

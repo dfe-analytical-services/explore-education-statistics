@@ -4,17 +4,24 @@ import {
   FormFieldset,
   FormGroup,
 } from '@common/components/form';
+import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { useCookies } from '@frontend/hooks/useCookies';
 import { Formik } from 'formik';
+import { GetServerSideProps } from 'next';
+import { parseCookies } from 'nookies';
 import React, { useState } from 'react';
 import styles from './CookiesIndexPage.module.scss';
 
 interface FormValues {
-  [key: string]: string;
+  googleAnalytics: string;
+}
+
+interface Props {
+  cookies: Dictionary<string>;
 }
 
 function CookiesIndexPage() {
@@ -163,5 +170,13 @@ function CookiesIndexPage() {
     </Page>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<Props> = async context => {
+  return {
+    props: {
+      cookies: parseCookies(context),
+    },
+  };
+};
 
 export default CookiesIndexPage;

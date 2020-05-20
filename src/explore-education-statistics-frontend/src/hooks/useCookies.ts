@@ -1,10 +1,17 @@
-import { useCookies as useBaseCookies } from 'react-cookie';
+import useMounted from '@common/hooks/useMounted';
+import { Dictionary } from '@common/types';
 import {
-  enableGA,
   disableGA,
+  enableGA,
   googleAnalyticsCookies,
 } from '@frontend/services/googleAnalyticsService';
 import { addMonths, addYears } from 'date-fns';
+import {
+  destroyCookie,
+  parseCookies,
+  setCookie as setBaseCookie,
+} from 'nookies';
+import { useState } from 'react';
 
 interface Cookie {
   name: string;
@@ -12,17 +19,15 @@ interface Cookie {
   options: {
     expires: Date;
     secure?: boolean;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
   };
 }
 
-interface CookieMap {
+interface AllowedCookies {
   bannerSeen: Cookie;
   disableGA: Cookie;
 }
 
-export const cookieMap: CookieMap = {
+export const allowedCookies: AllowedCookies = {
   bannerSeen: {
     name: 'ees_banner_seen',
     duration: '1 month',
@@ -41,29 +46,61 @@ export const cookieMap: CookieMap = {
   },
 };
 
-export function useCookies() {
-  const [liveCookies, setCookie, removeCookie] = useBaseCookies();
+export function useCookies(initialCookies?: Dictionary<string>) {
+  const [cookies, setCookies] = useState<Dictionary<string>>(
+    initialCookies ?? {},
+  );
+
+  useMounted(() => {
+    if (!initialCookies) {
+      setCookies(parseCookies());
+    }
+  });
+
+  const setCookie = (
+    name: string,
+    value: string,
+    options: Cookie['options'],
+  ) => {
+    setBaseCookie(null, name, value, options);
+
+    setCookies({
+      ...cookies,
+      [name]: value,
+    });
+  };
 
   return {
-    getCookie(cookieKey: keyof CookieMap) {
-      return liveCookies[cookieMap[cookieKey].name];
+    getCookie(cookieKey: keyof AllowedCookies): string {
+      if (!allowedCookies[cookieKey]) {
+        throw new Error(`Invalid cookie key: '${cookieKey}'`);
+      }
+
+      return cookies[allowedCookies[cookieKey].name];
     },
     setBannerSeenCookie(isSeen: boolean) {
+      const value = isSeen ? 'true' : 'false';
+
       setCookie(
-        cookieMap.bannerSeen.name,
-        isSeen,
-        cookieMap.bannerSeen.options,
+        allowedCookies.bannerSeen.name,
+        value,
+        allowedCookies.bannerSeen.options,
       );
     },
     setGADisabledCookie(isDisabled: boolean) {
+      const value = isDisabled ? 'true' : 'false';
+
       setCookie(
-        cookieMap.disableGA.name,
-        isDisabled,
-        cookieMap.disableGA.options,
+        allowedCookies.disableGA.name,
+        value,
+        allowedCookies.disableGA.options,
       );
+
       if (isDisabled) {
         disableGA();
-        googleAnalyticsCookies.forEach(cookieName => removeCookie(cookieName));
+        googleAnalyticsCookies.forEach(cookieName =>
+          destroyCookie(null, cookieName),
+        );
       } else {
         enableGA();
       }
