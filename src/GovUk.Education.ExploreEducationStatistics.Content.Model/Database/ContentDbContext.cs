@@ -249,6 +249,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
             modelBuilder.Entity<Methodology>()
+                .Property(methodology => methodology.PublishScheduled)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<Methodology>()
                 .Property(b => b.Status)
                 .HasConversion(new EnumToStringConverter<MethodologyStatus>())
                 .HasDefaultValue(MethodologyStatus.Draft);

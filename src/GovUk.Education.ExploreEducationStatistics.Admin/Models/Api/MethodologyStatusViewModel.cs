@@ -1,24 +1,17 @@
 using System;
-using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
     public class MethodologyStatusViewModel
     {
         public Guid Id { get; set; }
-
-        public string Title { get; set; }
-        
-        public string Status { get; set; }
-
-        public List<MethodologyStatusPublications> Publications { get; set; }
-    }
-
-    public class MethodologyStatusPublications
-    {
-        public Guid Id { get; set; }
         
         public string Title { get; set; }
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public MethodologyStatus Status { get; set; }
     }
 }
