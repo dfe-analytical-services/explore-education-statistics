@@ -186,10 +186,10 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                 legendSize="m"
               >
                 <FormFieldDayMonthYear<EditFormValues>
-                  formId={formId}
-                  fieldName="on"
-                  fieldsetLegend="Edit date"
-                  fieldsetLegendSize="s"
+                  id={`${formId}-on`}
+                  name="on"
+                  legend="Edit date"
+                  legendSize="s"
                   day={form.values.on.day}
                   month={form.values.on.month}
                   year={form.values.on.year}
