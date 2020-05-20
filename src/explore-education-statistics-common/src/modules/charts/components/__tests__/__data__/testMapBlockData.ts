@@ -45,6 +45,7 @@ export const testMapConfiguration: Chart = {
   },
   type: 'map',
   title: '',
+  alt: '',
   height: 600,
 };
 

@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Migrations.EES17;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Migrations.EES17;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -38,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore] public ContentSectionType Type { get; set; }
 
-        public ContentSection CreateReleaseAmendment(CreateAmendmentContext ctx, ReleaseContentSection newParent)
+        public ContentSection Clone(CreateClonedContext ctx, ReleaseContentSection newParent)
         {
             var copy = MemberwiseClone() as ContentSection;
             copy.Id = Guid.NewGuid();
@@ -48,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             copy.Content = copy
                 .Content?
-                .Select(content => content.CreateReleaseAmendment(ctx, copy))
+                .Select(content => content.Clone(ctx, copy))
                 .ToList();
 
             return copy;
@@ -91,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Comment> Comments { get; set; }
 
-        public IContentBlock CreateReleaseAmendment(CreateAmendmentContext ctx, ContentSection newParent)
+        public IContentBlock Clone(CreateClonedContext ctx, ContentSection newParent)
         {
             var copy = MemberwiseClone() as IContentBlock;
             copy.Id = Guid.NewGuid();
@@ -144,16 +142,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Source { get; set; }
 
         public ObservationQueryContext DataBlockRequest { get; set; }
-        
-        public EES17ObservationQueryContext EES17DataBlockRequest { get; set; }
 
         public List<IContentBlockChart> Charts { get; set; }
 
         public DataBlockSummary Summary { get; set; }
-        
+
         public List<TableBuilderConfiguration> Tables { get; set; }
-        
-        public List<EES17Table> EES17Tables { get; set; }
 
         public override string Type { get; set; } = ContentBlockType.DataBlock.ToString();
     }

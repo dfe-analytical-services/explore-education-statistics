@@ -15,14 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [Required] public string Reason { get; set; }
 
-        public Update CreateReleaseAmendment(CreateAmendmentContext ctx)
+        public Update Clone(CreateClonedContext ctx)
         {
             var copy = MemberwiseClone() as Update;
             copy.Id = Guid.NewGuid();
             ctx.OldToNewIdUpdateMappings.Add(this, copy);
             
-            copy.Release = ctx.Amendment;
-            copy.ReleaseId = ctx.Amendment.Id;
+            copy.Release = ctx.Target;
+            copy.ReleaseId = ctx.Target.Id;
             return copy;
         }
     }

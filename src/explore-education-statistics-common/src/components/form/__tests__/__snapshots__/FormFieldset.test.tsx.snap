@@ -2,9 +2,9 @@
 
 exports[`FormFieldset renders correctly with error 1`] = `
 <div class="govuk-form-group govuk-form-group--error">
-  <fieldset class="govuk-fieldset"
+  <fieldset aria-describedby="test-fieldset-error"
+            class="govuk-fieldset"
             id="test-fieldset"
-            aria-describedby="test-fieldset-error"
   >
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Fill the form
@@ -26,9 +26,9 @@ exports[`FormFieldset renders correctly with error 1`] = `
 
 exports[`FormFieldset renders correctly with hint 1`] = `
 <div class="govuk-form-group">
-  <fieldset class="govuk-fieldset"
+  <fieldset aria-describedby="test-fieldset-hint"
+            class="govuk-fieldset"
             id="test-fieldset"
-            aria-describedby="test-fieldset-hint"
   >
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Fill the form

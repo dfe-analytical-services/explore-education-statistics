@@ -222,11 +222,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.PreviousVersionId = Id;
             amendment.InternalReleaseNote = null;
             
-            var ctx = new CreateAmendmentContext(this, amendment);
+            var ctx = new CreateClonedContext(amendment);
 
             amendment.Content = amendment
                 .Content?
-                .Select(content => content.CreateReleaseAmendment(ctx))
+                .Select(content => content.Clone(ctx))
                 .ToList();
 
             amendment.RelatedInformation = amendment
@@ -241,34 +241,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             
             amendment.Updates = amendment
                 .Updates?
-                .Select(update => update.CreateReleaseAmendment(ctx))
+                .Select(update => update.Clone(ctx))
                 .ToList();
             
             amendment.ContentBlocks = amendment
                 .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.CreateReleaseAmendment(ctx))
+                .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
                 .ToList();
             
             return amendment;
         }
+        
+        public void CreateGenericContentFromTemplate(Release newRelease)
+        {
+            var ctx = new CreateClonedContext(newRelease);
+            newRelease.Content = Content.Where(c => c.ContentSection.Type == ContentSectionType.Generic).ToList();
+            
+            newRelease.Content = newRelease
+                .Content?
+                .Select(content => content.Clone(ctx))
+                .ToList();
+
+            newRelease.ContentBlocks = newRelease
+                .ContentBlocks?
+                .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
+                .ToList();
+        }
     }
 
-    public class CreateAmendmentContext
+    public class CreateClonedContext
     {
-        public CreateAmendmentContext(Release previousVersion, Release amendment)
+        private readonly Dictionary<Update, Update> _oldToNewIdUpdateMappings = new Dictionary<Update, Update>();
+        private readonly Dictionary<ContentSection, ContentSection> _oldToNewIdContentSectionMappings = new Dictionary<ContentSection, ContentSection>();
+        private readonly Dictionary<IContentBlock, IContentBlock> _oldToNewIdContentBlockMappings = new Dictionary<IContentBlock, IContentBlock>();
+        private readonly Release _target;
+
+        public CreateClonedContext(Release target)
         {
-            PreviousVersion = previousVersion;
-            Amendment = amendment;
+            _target = target;
         }
 
-        public Release PreviousVersion { get; set; }
+        public Release Target => _target;
 
-        public Release Amendment { get; set; }
-        
-        public Dictionary<ContentSection, ContentSection> OldToNewIdContentSectionMappings { get; set; } = new Dictionary<ContentSection, ContentSection>();
-        
-        public Dictionary<IContentBlock, IContentBlock> OldToNewIdContentBlockMappings { get; set; } = new Dictionary<IContentBlock, IContentBlock>();
-        
-        public Dictionary<Update, Update> OldToNewIdUpdateMappings { get; set; } = new Dictionary<Update, Update>();
+        public Dictionary<ContentSection, ContentSection> OldToNewIdContentSectionMappings => _oldToNewIdContentSectionMappings;
+
+        public Dictionary<IContentBlock, IContentBlock> OldToNewIdContentBlockMappings => _oldToNewIdContentBlockMappings;
+
+        public Dictionary<Update, Update> OldToNewIdUpdateMappings => _oldToNewIdUpdateMappings;
     }
 }

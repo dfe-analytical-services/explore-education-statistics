@@ -68,6 +68,7 @@ export const testChartConfiguration: Chart = {
   },
   type: 'line',
   title: 'Aggregated results chart',
+  alt: 'Some alt text',
   height: 300,
   width: 600,
 };
@@ -147,6 +148,7 @@ export const testDeprecatedChartConfiguration: Chart = {
   },
   type: 'line',
   title: 'Aggregated results chart',
+  alt: 'Some alt text',
   height: 300,
   width: 600,
 };

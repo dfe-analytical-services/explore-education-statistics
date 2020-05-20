@@ -2,7 +2,7 @@ import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-dat
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import ErrorSummary from '@common/components/ErrorSummary';
-import { Form, FormFieldSelect, Formik } from '@common/components/form';
+import { Form, FormFieldSelect } from '@common/components/form';
 import {
   ChartCapabilities,
   ChartDefinition,
@@ -19,6 +19,7 @@ import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import React, { ReactNode, useMemo, useState } from 'react';
@@ -166,7 +167,8 @@ const ChartDataSelector = ({
           onDataAdded(newDataSetConfig);
         }
       }}
-      render={form => (
+    >
+      {form => (
         <>
           <Form {...form} id={formId} showSubmitError>
             <div className={styles.formSelectRow}>
@@ -178,7 +180,7 @@ const ChartDataSelector = ({
                     id={`${formId}-filters-${categoryName}`}
                     name={`filters.${categoryName}`}
                     label={categoryName}
-                    groupClass={styles.formSelectGroup}
+                    formGroupClass={styles.formSelectGroup}
                     className="govuk-!-width-full"
                     placeholder={
                       filters.options.length > 1
@@ -194,7 +196,7 @@ const ChartDataSelector = ({
                   id={`${formId}-indicator`}
                   name="indicator"
                   label="Indicator"
-                  groupClass={styles.formSelectGroup}
+                  formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
                   placeholder="Select indicator"
                   options={indicatorOptions}
@@ -206,7 +208,7 @@ const ChartDataSelector = ({
                   id={`${formId}-location`}
                   name="location"
                   label="Location"
-                  groupClass={styles.formSelectGroup}
+                  formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
                   placeholder="Any location"
                   options={locationOptions}
@@ -218,7 +220,7 @@ const ChartDataSelector = ({
                   id={`${formId}-timePeriod`}
                   name="timePeriod"
                   label="Time period"
-                  groupClass={styles.formSelectGroup}
+                  formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
                   placeholder="Any time period"
                   options={meta.timePeriodRange}
@@ -316,7 +318,7 @@ const ChartDataSelector = ({
           )}
         </>
       )}
-    />
+    </Formik>
   );
 };
 

@@ -16,11 +16,7 @@ jest.mock('next/router', () => {
 describe('PublicationReleasePage', () => {
   test('renders national statistics image', () => {
     const { container } = render(
-      <PublicationReleasePage
-        publication=""
-        release=""
-        data={(NationalStats as unknown) as Release}
-      />,
+      <PublicationReleasePage data={(NationalStats as unknown) as Release} />,
     );
 
     expect(
@@ -32,11 +28,7 @@ describe('PublicationReleasePage', () => {
 
   test('renders national statistics section', () => {
     const { container } = render(
-      <PublicationReleasePage
-        publication=""
-        release=""
-        data={(NationalStats as unknown) as Release}
-      />,
+      <PublicationReleasePage data={(NationalStats as unknown) as Release} />,
     );
 
     const elements = [
@@ -56,11 +48,7 @@ describe('PublicationReleasePage', () => {
 
   test('renders official statistics image', () => {
     const { container } = render(
-      <PublicationReleasePage
-        publication=""
-        release=""
-        data={(OfficialStats as unknown) as Release}
-      />,
+      <PublicationReleasePage data={(OfficialStats as unknown) as Release} />,
     );
 
     expect(
@@ -72,11 +60,7 @@ describe('PublicationReleasePage', () => {
 
   test('renders official statistics section', () => {
     const { container } = render(
-      <PublicationReleasePage
-        publication=""
-        release=""
-        data={(OfficialStats as unknown) as Release}
-      />,
+      <PublicationReleasePage data={(OfficialStats as unknown) as Release} />,
     );
 
     const elements = [

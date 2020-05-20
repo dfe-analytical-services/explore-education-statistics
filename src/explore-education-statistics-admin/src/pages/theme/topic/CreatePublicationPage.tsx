@@ -13,7 +13,7 @@ import service from '@admin/services/edit-publication/service';
 import { Dictionary } from '@admin/types';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset, FormGroup, Formik } from '@common/components/form';
+import { FormFieldset, FormGroup } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
@@ -23,7 +23,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -166,7 +166,8 @@ const CreatePublicationPage = ({
             }),
           })}
           onSubmit={handleSubmit}
-          render={(form: FormikProps<FormValues>) => {
+        >
+          {form => {
             return (
               <Form id={formId}>
                 <FormFieldTextInput
@@ -330,7 +331,7 @@ const CreatePublicationPage = ({
               </Form>
             );
           }}
-        />
+        </Formik>
       )}
     </Page>
   );

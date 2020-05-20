@@ -1,3 +1,1 @@
-import GlossaryIndexPage from '@frontend/modules/glossary/GlossaryIndexPage';
-
-export default GlossaryIndexPage;
+export { default } from '@frontend/modules/glossary/GlossaryIndexPage';

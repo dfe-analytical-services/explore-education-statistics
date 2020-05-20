@@ -1,44 +1,50 @@
-import { OmitStrict } from '@common/types/util';
+import FormField, {
+  FormFieldComponentProps,
+} from '@common/components/form/FormField';
+import { OmitStrict } from '@common/types';
 import React from 'react';
-import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
-import {
-  handleAllChange,
-  handleChange,
-} from './util/checkboxGroupFieldHelpers';
+import handleAllChange from './util/handleAllCheckboxChange';
 
-type Props<FormValues> = {
-  name: keyof FormValues | string;
-  showError?: boolean;
-} & OmitStrict<FormCheckboxGroupProps, 'value'>;
+type Props<FormValues> = OmitStrict<
+  FormFieldComponentProps<FormCheckboxGroupProps>,
+  'formGroup'
+>;
 
-const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
+const FormFieldCheckboxGroup = <FormValues extends {}>(
+  props: Props<FormValues>,
+) => {
   const { options } = props;
 
   return (
-    <FieldCheckboxArray {...props}>
-      {fieldArrayProps => (
+    <FormField<string[]> {...props} formGroup={false}>
+      {({ field, helpers }) => (
         <FormCheckboxGroup
           {...props}
-          {...fieldArrayProps}
-          options={options}
+          {...field}
           onAllChange={(event, checked) => {
             if (props.onAllChange) {
               props.onAllChange(event, checked);
             }
 
-            handleAllChange(fieldArrayProps, options)(event, checked);
+            handleAllChange({
+              event,
+              value: field.value,
+              checked,
+              options,
+              helpers,
+            });
           }}
           onChange={(event, option) => {
             if (props.onChange) {
               props.onChange(event, option);
             }
 
-            handleChange(fieldArrayProps)(event);
+            field.onChange(event);
           }}
         />
       )}
-    </FieldCheckboxArray>
+    </FormField>
   );
 };
 

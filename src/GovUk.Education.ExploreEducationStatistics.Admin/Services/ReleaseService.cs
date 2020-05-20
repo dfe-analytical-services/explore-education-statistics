@@ -100,7 +100,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var release = _mapper.Map<Release>(createRelease);
                     
                     release.Id = Guid.NewGuid();
-                    release.GenericContent = await TemplateFromRelease(createRelease.TemplateReleaseId);
+                    
+                    if (createRelease.TemplateReleaseId.HasValue)
+                    {
+                        CreateGenericContentFromTemplate(createRelease.TemplateReleaseId.Value, release);
+                    }
+                    else
+                    {
+                        release.GenericContent = new List<ContentSection>();
+                    }
+
                     release.SummarySection = new ContentSection
                     {
                         Type = ContentSectionType.ReleaseSummary
@@ -385,47 +394,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        private async Task<List<ContentSection>> TemplateFromRelease(Guid? releaseId)
-        {
-            if (releaseId.HasValue)
-            {
-                var templateContent = await GetContentAsync(releaseId.Value);
-                if (templateContent != null)
-                {
-                    return templateContent.Select(c => new ContentSection
-                    {
-                        Id = new Guid(),
-                        Caption = c.Caption,
-                        Heading = c.Heading,
-                        Order = c.Order,
-                        // TODO in future do we want to copy across more? Is it possible to do so?
-                    }).ToList();
-                }
-            }
-
-            return new List<ContentSection>();
+        private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
+        { 
+            var templateRelease = _context.Releases.AsNoTracking()
+                .Include(r => r.Content)
+                .ThenInclude(c => c.ContentSection)
+                .ThenInclude(cs => cs.Content)
+                .First(r => r.Id == releaseId);
+                
+            templateRelease.CreateGenericContentFromTemplate(newRelease);
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
-            Guid releaseId, ReleaseStatus status, string internalReleaseNote)
+            Guid releaseId, ReleaseStatus newStatus, string internalReleaseNote)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, status))
-                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, status))
+                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, newStatus))
+                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, newStatus))
                 .OnSuccess(async release =>
                 {
-                    if (status == ReleaseStatus.Approved && !release.PublishScheduled.HasValue)
+                    if (newStatus == ReleaseStatus.Approved && !release.PublishScheduled.HasValue)
                     {
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
                     }
 
-                    release.Status = status;
+                    var oldStatus = release.Status;
+
+                    release.Status = newStatus;
                     release.InternalReleaseNote = internalReleaseNote;
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
 
-                    await _publishingService.QueueValidateReleaseAsync(releaseId);
+                    // Only need to inform Publisher if changing release status to or from Approved
+                    if(oldStatus == ReleaseStatus.Approved || newStatus == ReleaseStatus.Approved)
+                    {
+                        await _publishingService.QueueValidateReleaseAsync(releaseId);
+                    }
 
                     return await GetReleaseSummaryAsync(releaseId);
                 });

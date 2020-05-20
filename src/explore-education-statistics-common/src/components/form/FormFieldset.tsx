@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import ErrorMessage from '../ErrorMessage';
 import FormGroup from './FormGroup';
-import createDescribedBy from './util/createDescribedBy';
 
 export interface FormFieldsetProps {
   children?: ReactNode;
@@ -28,15 +27,14 @@ const FormFieldset = ({
   return (
     <FormGroup hasError={!!error}>
       <fieldset
-        className={classNames('govuk-fieldset', {
-          [className || '']: className,
-        })}
+        aria-describedby={
+          classNames({
+            [`${id}-error`]: !!error,
+            [`${id}-hint`]: !!hint,
+          }) || undefined
+        }
+        className={classNames('govuk-fieldset', className)}
         id={id}
-        aria-describedby={createDescribedBy({
-          id,
-          error: !!error,
-          hint: !!hint,
-        })}
       >
         <legend
           className={classNames(

@@ -4,7 +4,6 @@ import {
   FormFieldRadioGroup,
   FormFieldset,
   FormGroup,
-  Formik,
   FormTextSearchInput,
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
@@ -12,7 +11,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import { ThemeMeta } from '@common/services/tableBuilderService';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
@@ -68,7 +67,8 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         await onSubmit(values);
         goToNextStep();
       }}
-      render={(form: FormikProps<FormValues>) => {
+    >
+      {form => {
         const { values } = form;
         const { getError } = createErrorHelper(form);
 
@@ -206,7 +206,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
           </>
         );
       }}
-    />
+    </Formik>
   );
 };
 

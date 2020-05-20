@@ -80,7 +80,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void CreateReleaseWithTemplate()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+            
+            var dataBlock1 = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Name = "Data Block 1",
+                Order = 2,
+                Comments = new List<Comment>
+                {
+                    new Comment
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Comment 1",
+                        CommentText = "Comment 1 Text"
+                    },
+                    new Comment
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Comment 2",
+                        CommentText = "Comment 2 Text"
+                    }
+                }
+            };
 
+            var dataBlock2 = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Name = "Data Block 2"
+            };
+            
+            var templateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f");
+            
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 context.Add(new ReleaseType {Id = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8"), Title = "Ad Hoc",});
@@ -92,56 +122,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         new Release // Template release
                         {
-                            Id = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
+                            Id = templateReleaseId,
                             ReleaseName = "2018",
                             Content = new List<ReleaseContentSection>
                             {
                                 new ReleaseContentSection
                                 {
-                                    ReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
+                                    ReleaseId = Guid.NewGuid(),
                                     ContentSection = new ContentSection
                                     {
-                                        Id = new Guid("3cb10587-7b05-4c30-9f13-9f2025aca6a0"),
-                                        Caption = "Template caption index 0", // Should be copied 
-                                        Heading = "Template heading index 0", // Should be copied
+                                        Id = Guid.NewGuid(),
+                                        Caption = "Template caption index 0",
+                                        Heading = "Template heading index 0",
                                         Type = ContentSectionType.Generic,
                                         Order = 1,
                                         Content = new List<IContentBlock>
                                         {
-                                            // TODO currently is not copied - should it be?
-                                            new MarkDownBlock
+                                            new HtmlBlock
                                             {
-                                                Id = new Guid("e2b96bea-fbbb-4089-ad9c-fecba58ee054"),
-                                                Body = SampleMarkDownContent.Content[new Guid("7eeb1478-ab26-4b70-9128-b976429efa2f")]
-                                            }
+                                                Id = Guid.NewGuid(),
+                                                Body = @"<div></div>",
+                                                Order = 1,
+                                                Comments = new List<Comment>
+                                                {
+                                                    new Comment
+                                                    {
+                                                        Id = Guid.NewGuid(),
+                                                        Name = "Html Comment 1",
+                                                        CommentText = "Comment 1 Text"
+                                                    },
+                                                    new Comment
+                                                    {
+                                                        Id = Guid.NewGuid(),
+                                                        Name = "Html Comment 2",
+                                                        CommentText = "Comment 2 Text"
+                                                    }
+                                                }
+                                            },
+                                            dataBlock1
                                         }
                                     }
                                 },
-                    
-                                new ReleaseContentSection
-                                {
-                                    ReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
-                                    ContentSection = new ContentSection
-                                    {
-                                        Id = new Guid("8e804c94-61b3-4955-9d71-83a56d133a89"),
-                                        Caption = "Template caption index 1", // Should be copied 
-                                        Heading = "Template heading index 1", // Should be copied
-                                        Type = ContentSectionType.Generic,
-                                        Order = 2,
-                                        Content = new List<IContentBlock>
-                                        {
-                                            // TODO currently is not copied - should it be?
-                                            new MarkDownBlock
-                                            {
-                                                Id = new Guid("e4e88dd8-eef7-4ed5-a3f2-a92e5a328e05"),
-                                                Body = SampleMarkDownContent.Content[new Guid("7eeb1478-ab26-4b70-9128-b976429efa2f")]
-                                            }
-                                        }
-                                    }
-                                }
                             },
                             Version = 0,
-                            PreviousVersionId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2")
+                            PreviousVersionId = templateReleaseId,
+                            ContentBlocks = new List<ReleaseContentBlock>
+                            {
+                                new ReleaseContentBlock
+                                {
+                                    ReleaseId = templateReleaseId,
+                                    ContentBlock = dataBlock1,
+                                    ContentBlockId = dataBlock1.Id,
+                                },
+                                new ReleaseContentBlock
+                                {
+                                    ReleaseId = templateReleaseId,
+                                    ContentBlock = dataBlock2,
+                                    ContentBlockId = dataBlock2.Id,
+                                }
+                            }
                         }
                     }
                 });
@@ -159,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new CreateReleaseViewModel
                     {
                         PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
-                        TemplateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
+                        TemplateReleaseId = templateReleaseId,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = DateTime.Parse("2050/01/01"),
@@ -167,29 +206,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
 
                 // Do an in depth check of the saved release
-                var release = context.Releases
+                var newRelease = context.Releases
                     .Include(r => r.Content)
                     .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
                     .Single(r => r.Id == result.Result.Right.Id);
 
-                var contentSections = release.GenericContent.ToList();
+                var contentSections = newRelease.GenericContent.ToList();
                 
-                Assert.Equal(2, contentSections.Count);
-                Assert.Equal("Template caption index 0", release.Content[0].ContentSection.Caption);
-                Assert.Equal("Template heading index 0", release.Content[0].ContentSection.Heading);
-                Assert.Equal(1, release.Content[0].ContentSection.Order);
-                Assert.Empty(contentSections[0].Content); // TODO currently is not copied - should it be?
+                Assert.Single(contentSections);
+                Assert.Equal("Template caption index 0", contentSections[0].Caption);
+                Assert.Equal("Template heading index 0", contentSections[0].Heading);
+                Assert.Single(contentSections);
+                Assert.Equal(1, contentSections[0].Order);
+                Assert.Equal(2, contentSections[0].Content.Count);
+                Assert.Equal(2, contentSections[0].Content.AsReadOnly().Count);
 
-                Assert.Equal("Template caption index 1", release.Content[1].ContentSection.Caption);
-                Assert.Equal("Template heading index 1", release.Content[1].ContentSection.Heading);
-                Assert.Equal(2, release.Content[1].ContentSection.Order);
-                Assert.Empty(contentSections[1].Content); // TODO currently is not copied - should it be?
-                
-                Assert.Equal(ContentSectionType.ReleaseSummary, release.SummarySection.Type);
-                Assert.Equal(ContentSectionType.Headlines, release.HeadlinesSection.Type);
-                Assert.Equal(ContentSectionType.KeyStatistics, release.KeyStatisticsSection.Type);
-                Assert.Equal(ContentSectionType.KeyStatisticsSecondary, release.KeyStatisticsSecondarySection.Type);
+                Assert.Equal(ContentSectionType.ReleaseSummary, newRelease.SummarySection.Type);
+                Assert.Equal(ContentSectionType.Headlines, newRelease.HeadlinesSection.Type);
+                Assert.Equal(ContentSectionType.KeyStatistics, newRelease.KeyStatisticsSection.Type);
+                Assert.Equal(ContentSectionType.KeyStatisticsSecondary, newRelease.KeyStatisticsSecondarySection.Type);
             }
         }
 

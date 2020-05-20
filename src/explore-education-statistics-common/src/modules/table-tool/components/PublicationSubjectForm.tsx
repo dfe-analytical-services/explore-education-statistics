@@ -1,11 +1,11 @@
-import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
+import { Form, FormFieldRadioGroup } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import { PublicationSubject } from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
-import React, { useRef } from 'react';
+import { Formik } from 'formik';
+import React from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -39,10 +39,6 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     },
   } = props;
 
-  const formikRef = useRef<Formik<FormValues>>(null);
-
-  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
-
   const getSubjectName = (subjectId: string): string => {
     const matching = options.find(({ id }) => subjectId === id);
     return matching?.label ?? '';
@@ -57,7 +53,6 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   return (
     <Formik<FormValues>
       enableReinitialize
-      ref={formikRef}
       initialValues={initialValues}
       validateOnBlur={false}
       validationSchema={Yup.object<FormValues>({
@@ -69,7 +64,8 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
         });
         goToNextStep();
       }}
-      render={(form: FormikProps<FormValues>) => {
+    >
+      {form => {
         return isActive ? (
           <Form {...form} id={formId} showSubmitError>
             <FormFieldRadioGroup<FormValues>
@@ -93,6 +89,12 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             {stepHeading}
+
+            <ResetFormOnPreviousStep
+              currentStep={currentStep}
+              stepNumber={stepNumber}
+            />
+
             <SummaryList noBorder>
               <SummaryListItem term="Subject">
                 {getSubjectName(form.values.subjectId)}
@@ -101,7 +103,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
           </>
         );
       }}
-    />
+    </Formik>
   );
 };
 

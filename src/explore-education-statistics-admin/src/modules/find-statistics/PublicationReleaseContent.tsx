@@ -1,6 +1,7 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import { useEditingContext } from '@admin/contexts/EditingContext';
+import useConfig from '@admin/hooks/useConfig';
 import AdminPublicationReleaseHelpAndSupportSection from '@admin/modules/find-statistics/components/AdminPublicationReleaseHelpAndSupportSection';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
@@ -19,6 +20,7 @@ import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
 
 const PublicationReleaseContent = () => {
+  const { value: config } = useConfig();
   const { isEditing } = useEditingContext();
   const { release } = useReleaseState();
   const {
@@ -165,20 +167,20 @@ const PublicationReleaseContent = () => {
                     <ul className="govuk-list">
                       {[
                         ...release.publication.otherReleases.map(
-                          ({ id, title }) => (
+                          ({ id, title, slug }) => (
                             <li key={id} data-testid="other-release-item">
-                              <Link to="#">{title}</Link>
+                              <Link
+                                to={`${config?.PublicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
+                              >
+                                {title}
+                              </Link>
                             </li>
                           ),
                         ),
                         ...release.publication.legacyReleases.map(
                           ({ id, description, url }) => (
                             <li key={id} data-testid="other-release-item">
-                              {!isEditing ? (
-                                <a href={url}>{description}</a>
-                              ) : (
-                                <a>{description}</a>
-                              )}
+                              <Link to={url}>{description}</Link>
                             </li>
                           ),
                         ),

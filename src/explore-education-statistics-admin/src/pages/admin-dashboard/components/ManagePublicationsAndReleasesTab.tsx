@@ -224,8 +224,9 @@ const ManagePublicationsAndReleasesTab = ({
         ) : (
           <>
             <h3 className="govuk-heading-s">
-              You do not currently have permission to view any releases within
-              the service
+              You do not currently have permission to edit any releases within
+              the service. To view a prerelease, please use the link provided to
+              you by email.
             </h3>
             <p>
               To request access to a release, contact your team leader or the

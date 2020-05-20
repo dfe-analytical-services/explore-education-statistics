@@ -32,8 +32,7 @@ function PublicationList({ publications }: Props) {
             <div className="govuk-grid-row govuk-!-margin-bottom-3">
               <div className="govuk-grid-column-one-third govuk-!-margin-bottom-1">
                 <Link
-                  className="govuk-link"
-                  to={`/find-statistics/publication?publication=${slug}`}
+                  to="/find-statistics/[publication]"
                   as={`/find-statistics/${slug}`}
                   data-testid={`view-stats-${slug}`}
                 >
@@ -41,10 +40,11 @@ function PublicationList({ publications }: Props) {
                   <span className="govuk-visually-hidden">for {title}</span>
                 </Link>
               </div>
+
               <div className="govuk-grid-column-one-third">
                 <Link
-                  className="govuk-link"
-                  to={`/data-tables/${slug}`}
+                  to="/data-tables/[publication]"
+                  as={`/data-tables/${slug}`}
                   data-testid={`create-table-${slug}`}
                 >
                   Create your own tables online{' '}

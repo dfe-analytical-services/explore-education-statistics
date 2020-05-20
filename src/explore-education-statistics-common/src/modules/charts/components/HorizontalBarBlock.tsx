@@ -22,6 +22,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  LineChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -37,6 +38,7 @@ export interface HorizontalBarProps extends StackedBarProps {
 }
 
 const HorizontalBarBlock = ({
+  alt,
   data,
   meta,
   height,
@@ -69,6 +71,9 @@ const HorizontalBarBlock = ({
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
       <BarChart
+        aria-label={alt}
+        role="img"
+        focusable={false}
         data={chartData}
         layout="vertical"
         stackOffset={stacked ? 'sign' : undefined}
