@@ -4,7 +4,6 @@ import debounce from 'lodash/debounce';
 import React, { ChangeEvent } from 'react';
 import ErrorMessage from '../ErrorMessage';
 import styles from './FormTextSearchInput.module.scss';
-import createDescribedBy from './util/createDescribedBy';
 
 interface Props extends FormTextInputProps {
   debounce?: number;
@@ -46,11 +45,12 @@ const FormTextSearchInput = ({
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <input
         {...props}
-        aria-describedby={createDescribedBy({
-          id,
-          error: !!error,
-          hint: !!hint,
-        })}
+        aria-describedby={
+          classNames({
+            [`${id}-error`]: !!error,
+            [`${id}-hint`]: !!hint,
+          }) || undefined
+        }
         className={classNames('govuk-input', styles.searchInput, {
           [`govuk-input--width-${width}`]: width !== undefined,
         })}

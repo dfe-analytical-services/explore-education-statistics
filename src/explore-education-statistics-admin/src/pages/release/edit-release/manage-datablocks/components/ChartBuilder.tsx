@@ -288,26 +288,6 @@ const ChartBuilder = ({
 
       {definition && (
         <Tabs id="chartBuilder-tabs" modifyHash={false}>
-          {definition.data.length > 0 && (
-            <TabsSection
-              title="Data"
-              headingTitle="Add data from the existing dataset to the chart"
-            >
-              <ChartDataSelector
-                buttons={deleteButton}
-                canSaveChart={canSaveChart}
-                meta={meta}
-                dataSets={axes.major?.dataSets}
-                chartType={definition}
-                capabilities={definition.capabilities}
-                onDataAdded={actions.addDataSet}
-                onDataRemoved={actions.removeDataSet}
-                onDataChanged={actions.updateDataSets}
-                onSubmit={handleChartDataSubmit}
-              />
-            </TabsSection>
-          )}
-
           <TabsSection
             title="Chart configuration"
             headingTitle="Chart configuration"
@@ -325,6 +305,26 @@ const ChartBuilder = ({
               onSubmit={handleChartConfigurationSubmit}
             />
           </TabsSection>
+
+          {definition.data.length > 0 && (
+            <TabsSection
+              title="Data sets"
+              headingTitle="Choose data to add to the chart"
+            >
+              <ChartDataSelector
+                buttons={deleteButton}
+                canSaveChart={canSaveChart}
+                meta={meta}
+                dataSets={axes.major?.dataSets}
+                chartType={definition}
+                capabilities={definition.capabilities}
+                onDataAdded={actions.addDataSet}
+                onDataRemoved={actions.removeDataSet}
+                onDataChanged={actions.updateDataSets}
+                onSubmit={handleChartDataSubmit}
+              />
+            </TabsSection>
+          )}
 
           {Object.entries(definition.axes as Required<ChartDefinition['axes']>)
             .filter(([, axis]) => !axis.hide)

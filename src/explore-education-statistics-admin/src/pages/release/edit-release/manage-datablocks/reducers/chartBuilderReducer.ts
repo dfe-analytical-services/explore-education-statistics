@@ -116,6 +116,7 @@ const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
     options: {
       ...omit(initialConfiguration ?? {}, ['axes', 'type']),
       title: initialConfiguration?.title ?? '',
+      alt: initialConfiguration?.alt ?? '',
       height,
     },
     forms: {
