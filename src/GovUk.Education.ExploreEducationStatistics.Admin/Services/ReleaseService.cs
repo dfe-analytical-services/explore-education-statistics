@@ -428,7 +428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync();
 
                     // Only need to inform Publisher if changing release status to or from Approved
-                    if(ReleaseStatus.Approved.Equals(oldStatus) || ReleaseStatus.Approved.Equals(newStatus))
+                    if(oldStatus == ReleaseStatus.Approved || newStatus == ReleaseStatus.Approved)
                     {
                         await _publishingService.QueueValidateReleaseAsync(releaseId);
                     }
