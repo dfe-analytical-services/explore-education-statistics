@@ -105,15 +105,15 @@ const TableToolFinalStep = ({
                 datatestid="permalink-generated-url"
               />
               <div>
-                <a
-                  className="govuk-link"
-                  href={`/data-tables/permalink/${permalinkId}`}
+                <Link
+                  to="/data-tables/permalink/[permalink]"
+                  as={`/data-tables/permalink/${permalinkId}`}
                   title="View created table permalink"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   View permanent link
-                </a>
+                </Link>
               </div>
             </>
           ) : (
@@ -137,8 +137,8 @@ const TableToolFinalStep = ({
         <ul className="govuk-list">
           <li>
             <Link
+              to="/find-statistics/[publication]"
               as={`/find-statistics/${publication.slug}`}
-              to={`/find-statistics/publication?publication=${publication.slug}`}
             >
               View the release for this data
             </Link>
@@ -159,8 +159,8 @@ const TableToolFinalStep = ({
           <li>
             {pubMethodology?.methodology?.slug && (
               <Link
+                to="/methodology/[methodology]"
                 as={`/methodology/${pubMethodology.methodology.slug}`}
-                to={`/methodology/methodology?methodologySlug=${pubMethodology.methodology.slug}`}
               >
                 Go to methodology
               </Link>

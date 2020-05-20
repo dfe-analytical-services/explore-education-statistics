@@ -1,3 +1,1 @@
-import CookiesIndexPage from '@frontend/modules/cookies/CookiesIndexPage';
-
-export default CookiesIndexPage;
+export { default } from '@frontend/modules/cookies/CookiesIndexPage';

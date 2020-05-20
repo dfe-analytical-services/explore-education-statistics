@@ -1,3 +1,4 @@
-import Page from '@frontend/modules/subscriptions/SubscriptionPage';
-
-export default Page;
+export {
+  default,
+  getServerSideProps,
+} from '@frontend/modules/subscriptions/SubscriptionPage';
