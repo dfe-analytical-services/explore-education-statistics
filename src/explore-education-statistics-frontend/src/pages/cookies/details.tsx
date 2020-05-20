@@ -178,7 +178,7 @@ function CookiesPage() {
                 {allowedCookies.disableGA.name}
               </td>
               <td className="govuk-table__cell">
-                Saves cookie settings, so they remain upon return
+                Disables Google Analytics tracking
               </td>
               <td className="govuk-table__cell">
                 {allowedCookies.disableGA.duration}
@@ -217,7 +217,7 @@ function CookiesPage() {
             <tr className="govuk-table__row">
               <td className="govuk-table__cell">ai_user</td>
               <td className="govuk-table__cell">
-                Used to identify returning users.
+                Used to identify returning users
               </td>
               <td className="govuk-table__cell">1 year</td>
             </tr>
