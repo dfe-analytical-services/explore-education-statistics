@@ -94,7 +94,7 @@ const Tabs = ({ children, id, modifyHash = true, onToggle }: Props) => {
   }, [sections, selectTab]);
 
   return (
-    <div className={classNames('govuk-tabs', styles.tabs)}>
+    <div className={classNames('govuk-tabs', styles.tabs)} id={id}>
       <ul className="govuk-tabs__list" role="tablist">
         {sections.map(({ props }, index) => {
           const sectionId = props.id || `${id}-${index + 1}`;

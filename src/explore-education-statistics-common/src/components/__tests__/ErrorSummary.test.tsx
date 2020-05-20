@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, wait } from '@testing-library/react';
 import ErrorSummary from '../ErrorSummary';
 
 describe('ErrorSummary', () => {
@@ -20,7 +20,7 @@ describe('ErrorSummary', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('does not gain focus or scroll into view when there are errors by default', () => {
+  test('does not gain focus or scroll into view when there are errors by default', async () => {
     const { container } = render(
       <ErrorSummary
         id="test-errors"
@@ -34,6 +34,8 @@ describe('ErrorSummary', () => {
     const summary = container.querySelector(
       '.govuk-error-summary',
     ) as HTMLElement;
+
+    await wait();
 
     expect(summary).not.toHaveFocus();
     expect(summary).not.toHaveScrolledIntoView();

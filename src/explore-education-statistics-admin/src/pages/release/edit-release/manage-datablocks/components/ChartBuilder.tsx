@@ -6,6 +6,7 @@ import ChartDataSelector from '@admin/pages/release/edit-release/manage-databloc
 import ChartDefinitionSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDefinitionSelector';
 import {
   ChartOptions,
+  FormState,
   useChartBuilderReducer,
 } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
@@ -46,7 +47,9 @@ import {
   TableDataResult,
 } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
+import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
+import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import React, {
   useCallback,
@@ -68,6 +71,11 @@ const filterChartProps = (props: ChartProps): Chart => {
   // anymore in the deprecated format.
   return omit(props, ['data', 'meta', 'labels']) as Chart;
 };
+
+export interface ChartBuilderForm extends FormState {
+  title: string;
+  id: string;
+}
 
 export type TableQueryUpdateHandler = (
   query: Partial<TableDataQuery>,
@@ -103,12 +111,38 @@ const ChartBuilder = ({
     initialConfiguration,
   );
 
-  const { axes, definition, options, forms } = chartBuilderState;
+  const { axes, definition, options, forms: formStates } = chartBuilderState;
 
   const getChartFile = useGetChartFile(releaseId);
 
+  const forms: {
+    options: ChartBuilderForm;
+    data: ChartBuilderForm;
+    [key: string]: ChartBuilderForm;
+  } = useMemo(() => {
+    const formTitles: Dictionary<string> = {
+      ...mapValues(
+        (definition?.axes as Required<ChartDefinition['axes']>) ?? {},
+        axis => axis.title,
+      ),
+      data: 'Data sets',
+      options: 'Chart configuration',
+    };
+
+    return mapValues(formStates, (form, formKey) => ({
+      ...form,
+      title: formTitles[formKey],
+      id: `chartBuilder-${formKey}`,
+    }));
+  }, [definition, formStates]);
+
   const canSaveChart = useMemo(
     () => Object.values(forms).every(form => form.isValid),
+    [forms],
+  );
+
+  const hasSubmittedChart = useMemo(
+    () => Object.values(forms).some(form => form.submitCount > 0),
     [forms],
   );
 
@@ -291,10 +325,13 @@ const ChartBuilder = ({
           <TabsSection
             title="Chart configuration"
             headingTitle="Chart configuration"
+            id={forms.options.id}
           >
             <ChartConfiguration
               buttons={deleteButton}
               canSaveChart={canSaveChart}
+              hasSubmittedChart={hasSubmittedChart}
+              forms={forms}
               definition={definition}
               chartOptions={options}
               meta={meta}
@@ -310,17 +347,19 @@ const ChartBuilder = ({
             <TabsSection
               title="Data sets"
               headingTitle="Choose data to add to the chart"
+              id={forms.data.id}
             >
               <ChartDataSelector
                 buttons={deleteButton}
                 canSaveChart={canSaveChart}
+                forms={forms}
                 meta={meta}
                 dataSets={axes.major?.dataSets}
-                chartType={definition}
-                capabilities={definition.capabilities}
+                definition={definition}
                 onDataAdded={actions.addDataSet}
                 onDataRemoved={actions.removeDataSet}
                 onDataChanged={actions.updateDataSets}
+                onFormStateChange={actions.updateFormState}
                 onSubmit={handleChartDataSubmit}
               />
             </TabsSection>
@@ -338,17 +377,19 @@ const ChartBuilder = ({
               return (
                 <TabsSection
                   key={type}
-                  id={`${type}-tab`}
+                  id={forms[type].id}
                   title={axis.title}
                   headingTitle={axis.title}
                 >
                   <ChartAxisConfiguration
                     buttons={deleteButton}
                     canSaveChart={canSaveChart}
+                    hasSubmittedChart={hasSubmittedChart}
+                    forms={forms}
                     id={`chartAxisConfiguration-${type}`}
                     type={type as AxisType}
                     configuration={axisConfiguration}
-                    capabilities={definition.capabilities}
+                    definition={definition}
                     data={data}
                     meta={meta}
                     onChange={actions.updateChartAxis}

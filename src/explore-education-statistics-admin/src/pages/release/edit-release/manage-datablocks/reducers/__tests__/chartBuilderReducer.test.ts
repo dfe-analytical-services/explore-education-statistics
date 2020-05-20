@@ -83,9 +83,11 @@ describe('chartBuilderReducer', () => {
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -290,15 +292,19 @@ describe('chartBuilderReducer', () => {
       expect(nextState.forms).toEqual<ChartBuilderState['forms']>({
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
         minor: {
           isValid: true,
+          submitCount: 0,
         },
       });
     });
@@ -323,12 +329,15 @@ describe('chartBuilderReducer', () => {
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -425,12 +434,15 @@ describe('chartBuilderReducer', () => {
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -576,12 +588,15 @@ describe('chartBuilderReducer', () => {
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -624,6 +639,7 @@ describe('chartBuilderReducer', () => {
             ...initialState.forms,
             data: {
               isValid: false,
+              submitCount: 0,
             },
           },
         },
@@ -677,12 +693,15 @@ describe('chartBuilderReducer', () => {
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -756,12 +775,15 @@ describe('chartBuilderReducer', () => {
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -808,9 +830,11 @@ describe('chartBuilderReducer', () => {
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -836,11 +860,15 @@ describe('chartBuilderReducer', () => {
           form: 'options',
           state: {
             isValid: false,
+            submitCount: 1,
           },
         },
       } as ChartBuilderActions);
 
-      expect(nextState.forms.options.isValid).toBe(false);
+      expect(nextState.forms.options).toEqual({
+        isValid: false,
+        submitCount: 1,
+      });
     });
   });
 
@@ -864,12 +892,15 @@ describe('chartBuilderReducer', () => {
         forms: {
           options: {
             isValid: false,
+            submitCount: 1,
           },
           data: {
             isValid: false,
+            submitCount: 1,
           },
           major: {
             isValid: false,
+            submitCount: 1,
           },
         },
       };
@@ -889,9 +920,11 @@ describe('chartBuilderReducer', () => {
         forms: {
           options: {
             isValid: true,
+            submitCount: 0,
           },
           data: {
             isValid: true,
+            submitCount: 0,
           },
         },
       });
@@ -912,9 +945,11 @@ describe('chartBuilderReducer', () => {
         forms: {
           data: {
             isValid: true,
+            submitCount: 0,
           },
           options: {
             isValid: true,
+            submitCount: 0,
           },
         },
       });
@@ -1021,15 +1056,19 @@ describe('chartBuilderReducer', () => {
         forms: {
           data: {
             isValid: true,
+            submitCount: 0,
           },
           options: {
             isValid: true,
+            submitCount: 0,
           },
           major: {
             isValid: true,
+            submitCount: 0,
           },
           minor: {
             isValid: true,
+            submitCount: 0,
           },
         },
       });
@@ -1119,15 +1158,19 @@ describe('chartBuilderReducer', () => {
         forms: {
           data: {
             isValid: true,
+            submitCount: 0,
           },
           options: {
             isValid: true,
+            submitCount: 0,
           },
           major: {
             isValid: true,
+            submitCount: 0,
           },
           minor: {
             isValid: true,
+            submitCount: 0,
           },
         },
       });

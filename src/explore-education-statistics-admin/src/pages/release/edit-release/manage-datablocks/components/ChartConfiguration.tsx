@@ -1,16 +1,21 @@
-import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
-import Button from '@common/components/Button';
+import { ChartBuilderForm } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
+import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
+import {
+  ChartOptions,
+  FormState,
+} from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
-import ErrorSummary from '@common/components/ErrorSummary';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
+import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
@@ -27,13 +32,19 @@ type FormValues = Partial<ChartOptions>;
 interface Props {
   buttons?: ReactNode;
   canSaveChart: boolean;
-  definition: ChartDefinition;
   chartOptions: ChartOptions;
+  definition: ChartDefinition;
+  forms: Dictionary<ChartBuilderForm>;
+  hasSubmittedChart: boolean;
   releaseId: string;
   meta: FullTableMeta;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
-  onFormStateChange: (state: { form: 'options'; isValid: boolean }) => void;
+  onFormStateChange: (
+    state: {
+      form: 'options';
+    } & FormState,
+  ) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
@@ -44,6 +55,8 @@ const ChartConfiguration = ({
   canSaveChart,
   chartOptions,
   definition,
+  forms,
+  hasSubmittedChart,
   meta,
   releaseId,
   onBoundaryLevelChange,
@@ -144,13 +157,20 @@ const ChartConfiguration = ({
       )}
 
       <Formik<FormValues>
-        initialValues={initialValues}
         enableReinitialize
-        onSubmit={values => {
-          onSubmit(normalizeValues(values));
-        }}
-        isInitialValid={validationSchema.isValidSync(initialValues)}
+        initialValues={initialValues}
+        initialTouched={
+          hasSubmittedChart
+            ? mapValues(validationSchema.fields, () => true)
+            : undefined
+        }
+        validateOnMount
         validationSchema={validationSchema}
+        onSubmit={values => {
+          if (canSaveChart) {
+            onSubmit(normalizeValues(values));
+          }
+        }}
       >
         {form => (
           <Form id={formId}>
@@ -166,6 +186,7 @@ const ChartConfiguration = ({
               value={{
                 form: 'options',
                 isValid: form.isValid,
+                submitCount: form.submitCount,
               }}
               onChange={onFormStateChange}
               onMount={onFormStateChange}
@@ -265,22 +286,13 @@ const ChartConfiguration = ({
               </>
             )}
 
-            {form.isValid && form.submitCount > 0 && !canSaveChart && (
-              <ErrorSummary
-                title="Cannot save chart"
-                id={`${formId}-errorSummary`}
-                errors={[
-                  {
-                    id: `${formId}-submit`,
-                    message: 'Ensure that all other tabs are valid first',
-                  },
-                ]}
-              />
-            )}
-
-            <Button type="submit" id={`${formId}-submit`}>
-              Save chart options
-            </Button>
+            <ChartBuilderSaveButton
+              formId={formId}
+              forms={forms}
+              showSubmitError={
+                form.isValid && form.submitCount > 0 && !canSaveChart
+              }
+            />
 
             {buttons}
           </Form>
