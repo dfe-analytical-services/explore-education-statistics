@@ -30,7 +30,7 @@ describe('Link', () => {
     expect(link).toMatchSnapshot();
   });
 
-  test('anchor href is correct', () => {
+  test('links to relative URL correctly', () => {
     const { getByText } = render(
       <MemoryRouter>
         <Link to="/the-link">Test Link</Link>
@@ -39,6 +39,20 @@ describe('Link', () => {
 
     const link = getByText('Test Link') as HTMLLinkElement;
 
-    expect(link.href).toBe('http://localhost/the-link');
+    expect(link).toHaveAttribute('href', '/the-link');
+  });
+
+  test('links to absolute URL correctly', () => {
+    const { getByText } = render(
+      <MemoryRouter>
+        <Link to="https://www.gov.uk">Test Link</Link>
+      </MemoryRouter>,
+    );
+
+    const link = getByText('Test Link');
+
+    expect(link).toHaveAttribute('href', 'https://www.gov.uk');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(link).toHaveAttribute('target', '_blank');
   });
 });

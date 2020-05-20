@@ -1,3 +1,4 @@
+import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import {
@@ -9,19 +10,24 @@ export type LinkProps = {
   children: ReactNode;
   className?: string;
   unvisited?: boolean;
-} & RouterLinkProps;
+} & OmitStrict<RouterLinkProps, 'href'>;
 
 const Link = ({
   children,
   className,
   to,
   unvisited = false,
-  href,
   ...props
 }: LinkProps) => {
-  if (href && !to) {
+  const isAbsolute = typeof to === 'string' && to.startsWith('http');
+
+  if (isAbsolute) {
     return (
       <a
+        rel="noopener noreferrer"
+        target="_blank"
+        {...props}
+        href={to as string}
         className={classNames(
           'govuk-link',
           {
@@ -29,15 +35,12 @@ const Link = ({
           },
           className,
         )}
-        href={href}
-        {...props}
-        rel="noopener noreferrer"
-        target="_blank"
       >
         {children}
       </a>
     );
   }
+
   return (
     <RouterLink
       {...props}

@@ -115,12 +115,7 @@ const RelatedInformationSection = ({ release }: Props) => {
               (isEditing ? (
                 <a>{release.publication.externalMethodology.title}</a>
               ) : (
-                <Link
-                  to=""
-                  href={release.publication.externalMethodology.url}
-                  target="_blank"
-                  rel="external"
-                >
+                <Link to={release.publication.externalMethodology.url}>
                   {release.publication.externalMethodology.title}
                 </Link>
               ))}

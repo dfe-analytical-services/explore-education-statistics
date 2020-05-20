@@ -17,25 +17,13 @@ const EditableLink = ({
   const { isEditing } = useEditingContext();
 
   return !isEditing ? (
-    <Link
-      to=""
-      href={href}
-      {...props}
-      rel="noopener noreferrer"
-      target="_blank"
-    >
+    <Link {...props} to={href}>
       {children}
     </Link>
   ) : (
     <div>
       <div>
-        <Link
-          to=""
-          href={href}
-          {...props}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
+        <Link {...props} to={href}>
           {children}
         </Link>
       </div>
