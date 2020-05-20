@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
 
         [Produces("application/json")]
         [HttpGet("api/methodologies")]
-        public Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologiesAsync()
+        public Task<ActionResult<List<MethodologySummaryViewModel>>> GetMethodologiesAsync()
         {
             return _methodologyService
                 .ListAsync()

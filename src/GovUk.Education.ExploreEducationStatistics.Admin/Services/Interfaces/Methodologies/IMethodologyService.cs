@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyService
     {
-        Task<Either<ActionResult, List<MethodologyStatusViewModel>>> ListAsync();
+        Task<Either<ActionResult, List<MethodologySummaryViewModel>>> ListAsync();
 
         Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync();
 

@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService.Setup(s => s.ListAsync())
                 .ReturnsAsync(
-                    new Either<ActionResult, List<MethodologyStatusViewModel>>(new List<MethodologyStatusViewModel>()));
+                    new Either<ActionResult, List<MethodologySummaryViewModel>>(new List<MethodologySummaryViewModel>()));
             var controller = new MethodologyController(methodologyService.Object);
 
             // Method under test

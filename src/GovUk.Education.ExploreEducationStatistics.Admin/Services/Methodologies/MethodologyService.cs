@@ -67,13 +67,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
 
-        public async Task<Either<ActionResult, List<MethodologyStatusViewModel>>> ListAsync()
+        public async Task<Either<ActionResult, List<MethodologySummaryViewModel>>> ListAsync()
         {
             return await _userService.CheckCanViewAllMethodologies()
                 .OnSuccess(async () =>
                 {
                     var result = await _context.Methodologies.ToListAsync();
-                    return _mapper.Map<List<MethodologyStatusViewModel>>(result);
+                    return _mapper.Map<List<MethodologySummaryViewModel>>(result);
                 });
         }
 
