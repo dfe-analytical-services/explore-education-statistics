@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
     {
         public Guid Id { get; set; }
 
+        public string InternalReleaseNote { get; set; }
+        
         public DateTime? Published { get; set; }
 
         public DateTime? PublishScheduled { get; set; }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -19,6 +18,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.DateTimeExtensions;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -720,12 +720,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result);
             }
-        }
-
-        private static TimeZoneInfo GetGmtStandardTimeTimezone()
-        {
-            return TimeZoneInfo.FindSystemTimeZoneById(
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London");
         }
 
         private (

@@ -30,10 +30,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [Produces("application/json")]
-        [ProducesResponseType(typeof(MethodologyTitleViewModel), 200)]
+        [ProducesResponseType(typeof(MethodologySummaryViewModel), 200)]
         [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [HttpPost("api/methodologies")]
-        public Task<ActionResult<MethodologyTitleViewModel>> CreateMethodologyAsync(
+        public Task<ActionResult<MethodologySummaryViewModel>> CreateMethodologyAsync(
             CreateMethodologyRequest methodology)
         {
             return _methodologyService
@@ -41,15 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [Produces("application/json")]
-        [HttpGet("api/methodology/{methodologyId}/status")]
-        public async Task<ActionResult<MethodologyStatusViewModel>> GetMethodologyStatusAsync(Guid methodologyId)
-        {
-            return await _methodologyService
-                .GetStatusAsync(methodologyId)
-                .HandleFailuresOrOk();
-        }
-        
         [Produces("application/json")]
         [HttpGet("api/methodology/{methodologyId}/summary")]
         public async Task<ActionResult<MethodologySummaryViewModel>> GetMethodologySummaryAsync(Guid methodologyId)
@@ -66,6 +57,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         {
             return await _methodologyService
                 .UpdateMethodologyStatusAsync(methodologyId, request)
+                .HandleFailuresOrOk();
+        }
+
+        [Produces("application/json")]
+        [HttpPut("api/methodology/{methodologyId}")]
+        public async Task<ActionResult<MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid methodologyId,
+            UpdateMethodologyRequest request)
+        {
+            return await _methodologyService
+                .UpdateMethodologyAsync(methodologyId, request)
                 .HandleFailuresOrOk();
         }
     }

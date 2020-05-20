@@ -1,37 +1,74 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.DateTimeExtensions;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
     public class MethodologyServiceTests
     {
         [Fact]
+        public async Task CreateAsync()
+        {
+            var request = new CreateMethodologyRequest
+            {
+                PublishScheduled = new DateTime(2020, 6, 1),
+                Title = "Pupil absence statistics: methodology"
+            };
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext("Create"))
+            {
+                var viewModel = (await new MethodologyService(
+                        context,
+                        AdminMapper(),
+                        MockUtils.AlwaysTrueUserService().Object,
+                        new PersistenceHelper<ContentDbContext>(context))
+                    .CreateMethodologyAsync(request)).Right;
+
+                var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
+                var publishScheduledStartOfDay = new DateTime(2020, 6, 1, 0, 0, 0, DateTimeKind.Unspecified);
+                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
+                var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
+                
+                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.Published);
+                Assert.Equal(publishScheduledStartOfDayUtc, viewModel.PublishScheduled);
+                Assert.Equal(Draft, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
+            }
+        }
+
+        [Fact]
         public void ListAsync()
         {
+            var methodology1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Title = "Methodology 1",
+                Published = DateTime.UtcNow,
+                Status = Approved
+            };
+
+            var methodology2 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Title = "Methodology 2",
+                Status = Draft
+            };
+
             using (var context = DbUtils.InMemoryApplicationDbContext("List"))
             {
                 var methodologies = new List<Methodology>
                 {
-                    new Methodology
-                    {
-                        Id = new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"),
-                        Title = "Methodology 1",
-                        Published = DateTime.UtcNow,
-                        Status = MethodologyStatus.Approved
-                    },
-                    new Methodology
-                    {
-                        Id = new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba"),
-                        Title = "Methodology 2",
-                        Status = MethodologyStatus.Draft
-                    },
+                    methodology1, methodology2
                 };
 
                 context.AddRange(methodologies);
@@ -49,54 +86,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .ListAsync().Result.Right;
 
                 Assert.Contains(methodologies,
-                    m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46") && m.Title == "Methodology 1" &&
-                         m.Status == MethodologyStatus.Approved);
-                
+                    m => m.Id == methodology1.Id
+                         && m.Title == methodology1.Title
+                         && m.Status == methodology1.Status);
+
                 Assert.Contains(methodologies,
-                    m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba") && m.Title == "Methodology 2" &&
-                         m.Status == MethodologyStatus.Draft);
+                    m => m.Id == methodology2.Id
+                         && m.Title == methodology2.Title
+                         && m.Status == methodology2.Status);
             }
         }
 
-        [Fact]
-        public async Task GetStatusAsync()
-        {
-            var methodology = new Methodology
-            {
-                Id = Guid.NewGuid(),
-                Status = MethodologyStatus.Approved,
-                Title = "Pupil absence statistics: methodology"
-            };
-
-            await using (var context = DbUtils.InMemoryApplicationDbContext("GetStatus"))
-            {
-                context.Add(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = DbUtils.InMemoryApplicationDbContext("GetStatus"))
-            {
-                var viewModel = (await new MethodologyService(
-                        context,
-                        AdminMapper(),
-                        MockUtils.AlwaysTrueUserService().Object,
-                        new PersistenceHelper<ContentDbContext>(context))
-                    .GetStatusAsync(methodology.Id)).Right;
-                Assert.Equal(methodology.Id, viewModel.Id);
-                Assert.Equal(methodology.Status, viewModel.Status);
-                Assert.Equal(methodology.Title, viewModel.Title);
-            }
-        }
-        
         [Fact]
         public async Task GetSummaryAsync()
         {
             var methodology = new Methodology
             {
                 Id = Guid.NewGuid(),
+                InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishScheduled = new DateTime(2020, 6, 1),
-                Status = MethodologyStatus.Approved,
+                Status = Approved,
                 Title = "Pupil absence statistics: methodology"
             };
 
@@ -114,11 +124,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         MockUtils.AlwaysTrueUserService().Object,
                         new PersistenceHelper<ContentDbContext>(context))
                     .GetSummaryAsync(methodology.Id)).Right;
+
                 Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
                 Assert.Equal(methodology.Published, viewModel.Published);
                 Assert.Equal(methodology.PublishScheduled, viewModel.PublishScheduled);
                 Assert.Equal(methodology.Status, viewModel.Status);
                 Assert.Equal(methodology.Title, viewModel.Title);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateAsync()
+        {
+            var methodology = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                InternalReleaseNote = "Test approval",
+                Published = new DateTime(2020, 5, 25),
+                PublishScheduled = new DateTime(2020, 6, 1),
+                Status = Approved,
+                Title = "Pupil absence statistics: methodology"
+            };
+
+            var request = new UpdateMethodologyRequest
+            {
+                InternalReleaseNote = null,
+                PublishScheduled = new DateTime(2020, 7, 1),
+                Status = Draft,
+                Title = "Pupil absence statistics (updated): methodology"
+            };
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
+            {
+                context.Add(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
+            {
+                var viewModel = (await new MethodologyService(
+                        context,
+                        AdminMapper(),
+                        MockUtils.AlwaysTrueUserService().Object,
+                        new PersistenceHelper<ContentDbContext>(context))
+                    .UpdateMethodologyAsync(methodology.Id, request)).Right;
+
+                var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
+                var publishScheduledStartOfDay = new DateTime(2020, 7, 1, 0, 0, 0, DateTimeKind.Unspecified);
+                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
+                var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
+                
+                Assert.Equal(methodology.Id, viewModel.Id);
+                // TODO EES-331 is this correct?
+                // Original release note is not cleared if the update is not altering it
+                Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
+                Assert.Equal(methodology.Published, viewModel.Published);
+                Assert.Equal(publishScheduledStartOfDayUtc, viewModel.PublishScheduled);
+                Assert.Equal(request.Status, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
             }
         }
     }

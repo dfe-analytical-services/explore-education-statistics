@@ -14,14 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync();
 
-        Task<Either<ActionResult, MethodologyStatusViewModel>> GetStatusAsync(Guid id);
-
         Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id);
 
-        Task<Either<ActionResult, MethodologyTitleViewModel>> CreateMethodologyAsync(
-            CreateMethodologyRequest methodology);
+        Task<Either<ActionResult, MethodologySummaryViewModel>>
+            CreateMethodologyAsync(CreateMethodologyRequest request);
 
-        Task<Either<ActionResult, MethodologyStatusViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId,
+        Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
+            UpdateMethodologyRequest request);
+
+        Task<Either<ActionResult, MethodologyStatusViewModel>> UpdateMethodologyStatusAsync(Guid id,
             UpdateMethodologyStatusRequest request);
     }
 }
