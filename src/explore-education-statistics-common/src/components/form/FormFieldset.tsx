@@ -28,9 +28,7 @@ const FormFieldset = ({
   return (
     <FormGroup hasError={!!error}>
       <fieldset
-        className={classNames('govuk-fieldset', {
-          [className || '']: className,
-        })}
+        className={classNames('govuk-fieldset', className)}
         id={id}
         aria-describedby={createDescribedBy({
           id,

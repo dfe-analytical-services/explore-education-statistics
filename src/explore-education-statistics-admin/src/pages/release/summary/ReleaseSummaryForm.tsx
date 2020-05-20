@@ -11,7 +11,7 @@ import {
 } from '@admin/validation/validation';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset, Formik } from '@common/components/form';
+import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
@@ -22,7 +22,7 @@ import { Dictionary } from '@common/types';
 import { DayMonthYearInputs } from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid } from 'date-fns';
-import { FormikActions, FormikProps } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
@@ -44,7 +44,7 @@ interface Props<FormValues extends EditFormValues> {
   ) => ObjectSchemaDefinition<FormValues>;
   onSubmitHandler: (
     values: FormValues,
-    actions: FormikActions<FormValues>,
+    actions: FormikHelpers<FormValues>,
   ) => void;
   onCancelHandler: () => void;
   additionalFields?: React.ReactNode;
@@ -123,7 +123,8 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
               : (baseValidationRules as ObjectSchemaDefinition<FormValues>),
           )}
           onSubmit={onSubmitHandler}
-          render={(form: FormikProps<FormValues>) => {
+        >
+          {form => {
             const timePeriodLabel = findTimePeriodCoverageGroup(
               form.values.timePeriodCoverageCode,
               model.timePeriodCoverageGroups,
@@ -199,7 +200,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
               </Form>
             );
           }}
-        />
+        </Formik>
       )}
     </>
   );

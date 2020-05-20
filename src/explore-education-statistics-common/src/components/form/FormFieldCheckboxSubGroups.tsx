@@ -1,45 +1,51 @@
-import { OmitStrict } from '@common/types/util';
+import FormField, {
+  FormFieldComponentProps,
+} from '@common/components/form/FormField';
+import handleAllChange from '@common/components/form/util/handleAllCheckboxChange';
+import { OmitStrict } from '@common/types';
 import React from 'react';
-import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxSubGroups, {
   FormCheckboxSubGroupsProps,
 } from './FormCheckboxSubGroups';
-import {
-  handleAllChange,
-  handleChange,
-} from './util/checkboxGroupFieldHelpers';
 
-export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = {
-  showError?: boolean;
-} & OmitStrict<FormCheckboxSubGroupsProps, 'value'>;
+export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = OmitStrict<
+  FormFieldComponentProps<FormCheckboxSubGroupsProps>,
+  'formGroup'
+>;
 
-const FormFieldCheckboxSubGroups = <T extends {}>(
-  props: FormFieldCheckboxSearchSubGroupsProps<T>,
+const FormFieldCheckboxSubGroups = <FormValues extends {}>(
+  props: FormFieldCheckboxSearchSubGroupsProps<FormValues>,
 ) => {
   return (
-    <FieldCheckboxArray {...props}>
-      {fieldArrayProps => (
+    <FormField<string[]> {...props}>
+      {({ field, helpers }) => (
         <FormCheckboxSubGroups
           {...props}
-          {...fieldArrayProps}
+          {...field}
           small
           onAllChange={(event, checked, groupOptions) => {
             if (props.onAllChange) {
               props.onAllChange(event, checked, groupOptions);
             }
 
-            handleAllChange(fieldArrayProps, groupOptions)(event, checked);
+            handleAllChange({
+              helpers,
+              options: groupOptions,
+              event,
+              checked,
+              value: field.value,
+            });
           }}
           onChange={(event, option) => {
             if (props.onChange) {
               props.onChange(event, option);
             }
 
-            handleChange(fieldArrayProps)(event);
+            field.onChange(event);
           }}
         />
       )}
-    </FieldCheckboxArray>
+    </FormField>
   );
 };
 

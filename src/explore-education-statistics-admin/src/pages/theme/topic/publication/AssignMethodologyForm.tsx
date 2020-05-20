@@ -8,11 +8,10 @@ import {
   FormFieldSelect,
   FormFieldTextInput,
   FormGroup,
-  Formik,
 } from '@common/components/form';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/validation/yup';
-import { Form, FormikProps } from 'formik';
+import { Form, Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 
@@ -164,7 +163,8 @@ const AssignMethodologyForm = ({
           onSubmit={(values, actions) => {
             handleSubmit(values, actions).then(refreshPublication);
           }}
-          render={(form: FormikProps<AssignMethodologyFormValues>) => (
+        >
+          {form => (
             <Form id={formId}>
               <FormFieldRadioGroup
                 id={`${formId}-methodologyChoice`}
@@ -253,7 +253,7 @@ const AssignMethodologyForm = ({
               </div>
             </Form>
           )}
-        />
+        </Formik>
       </div>
     </>
   );

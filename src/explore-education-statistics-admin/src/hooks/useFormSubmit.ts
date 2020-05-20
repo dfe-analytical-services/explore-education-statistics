@@ -4,12 +4,12 @@ import handleServerSideValidation, {
 } from '@common/components/form/util/serverValidationHandler';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import { AxiosError } from 'axios';
-import { FormikActions } from 'formik';
+import { FormikHelpers } from 'formik';
 import { useMemo } from 'react';
 
 export type UseFormSubmit<FormValues> = (
   values: FormValues,
-  formikActions: FormikActions<FormValues>,
+  formikActions: FormikHelpers<FormValues>,
 ) => Promise<void> | void;
 
 const isServerValidationError = (error: AxiosError) => {
@@ -33,7 +33,7 @@ function useFormSubmit<FormValues>(
   const { handleApiErrors } = useErrorControl();
 
   return useMemo(
-    () => async (values: FormValues, actions: FormikActions<FormValues>) => {
+    () => async (values: FormValues, actions: FormikHelpers<FormValues>) => {
       try {
         await onSubmit(values, actions);
       } catch (error) {
@@ -46,7 +46,7 @@ function useFormSubmit<FormValues>(
             errorMappers,
             typedError.response?.data,
             actions.setFieldError,
-            actions.setError,
+            actions.setStatus,
           );
 
           if (!isErrorHandled) {

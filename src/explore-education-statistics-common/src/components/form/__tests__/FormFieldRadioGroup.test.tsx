@@ -1,6 +1,6 @@
 import Yup from '@common/validation/yup';
 import { fireEvent, render, wait } from '@testing-library/react';
-import { Formik, FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React from 'react';
 import FormFieldRadioGroup from '../FormFieldRadioGroup';
 
@@ -15,8 +15,9 @@ describe('FormFieldRadioGroup', () => {
         initialValues={{
           test: '',
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldRadioGroup<FormValues>
             name="test"
             id="radios"
@@ -28,7 +29,7 @@ describe('FormFieldRadioGroup', () => {
             ]}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const radio = getByLabelText('Radio 1') as HTMLInputElement;
@@ -48,8 +49,9 @@ describe('FormFieldRadioGroup', () => {
         initialValues={{
           test: '1',
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldRadioGroup<FormValues>
             name="test"
             id="radios"
@@ -61,7 +63,7 @@ describe('FormFieldRadioGroup', () => {
             ]}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const radio1 = getByLabelText('Radio 1') as HTMLInputElement;
@@ -85,11 +87,12 @@ describe('FormFieldRadioGroup', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={() => (
+        >
+          {() => (
             <FormFieldRadioGroup<FormValues>
               name="test"
               id="radios"
@@ -101,7 +104,7 @@ describe('FormFieldRadioGroup', () => {
               ]}
             />
           )}
-        />,
+        </Formik>,
       );
 
       expect(queryByText('Select at least one option')).toBeNull();
@@ -113,11 +116,12 @@ describe('FormFieldRadioGroup', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+        >
+          {props => (
             <form onSubmit={props.handleSubmit}>
               <FormFieldRadioGroup<FormValues>
                 name="test"
@@ -133,7 +137,7 @@ describe('FormFieldRadioGroup', () => {
               <button type="submit">Submit</button>
             </form>
           )}
-        />,
+        </Formik>,
       );
 
       expect(queryByText('Select at least one option')).toBeNull();
@@ -145,43 +149,18 @@ describe('FormFieldRadioGroup', () => {
       expect(queryByText('Select at least one option')).not.toBeNull();
     });
 
-    test('displays custom error message from `error` prop', async () => {
-      const { getByText } = render(
-        <Formik
-          initialValues={{
-            test: '1',
-          }}
-          onSubmit={() => null}
-          render={() => (
-            <FormFieldRadioGroup<FormValues>
-              name="test"
-              id="radios"
-              legend="Test radios"
-              error="Invalid radio selection"
-              options={[
-                { id: 'radio-1', value: '1', label: 'Radio 1' },
-                { id: 'radio-2', value: '2', label: 'Radio 2' },
-                { id: 'radio-3', value: '3', label: 'Radio 3' },
-              ]}
-            />
-          )}
-        />,
-      );
-
-      expect(getByText('Invalid radio selection')).toBeDefined();
-    });
-
     test('does not display validation message when `showError` is false', async () => {
       const { getByLabelText, getByText, queryByText } = render(
         <Formik
           initialValues={{
             test: '',
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+        >
+          {props => (
             <form onSubmit={props.handleSubmit}>
               <FormFieldRadioGroup<FormValues>
                 name="test"
@@ -198,7 +177,7 @@ describe('FormFieldRadioGroup', () => {
               <button type="submit">Submit</button>
             </form>
           )}
-        />,
+        </Formik>,
       );
 
       const radio = getByLabelText('Radio 1') as HTMLInputElement;

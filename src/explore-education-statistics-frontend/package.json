@@ -15,7 +15,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-basic-auth": "^1.1.6",
-    "formik": "^1.5.7",
+    "formik": "^2.1.4",
     "govuk-frontend": "^3.6.0",
     "helmet": "^3.22.0",
     "immer": "^6.0.3",

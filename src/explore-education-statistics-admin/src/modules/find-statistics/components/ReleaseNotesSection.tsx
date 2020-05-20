@@ -5,7 +5,7 @@ import { validateMandatoryDayMonthYearField } from '@admin/validation/validation
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import { Form, FormFieldset } from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
@@ -17,7 +17,7 @@ import {
   dayMonthYearInputsToDate,
 } from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import merge from 'lodash/merge';
 import React, { useState } from 'react';
 
@@ -108,7 +108,8 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
             setAddFormOpen(false);
           })
         }
-        render={(form: FormikProps<AddFormValues>) => {
+      >
+        {form => {
           return (
             <Form {...form} id="create-new-release-note-form">
               <FormFieldset
@@ -141,7 +142,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
             </Form>
           );
         }}
-      />
+      </Formik>
     );
   };
 

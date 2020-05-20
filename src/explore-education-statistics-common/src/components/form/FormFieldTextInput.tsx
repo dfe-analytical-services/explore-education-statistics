@@ -1,14 +1,14 @@
-import FormField from '@common/components/form/FormField';
+import FormField, {
+  FormFieldComponentProps,
+} from '@common/components/form/FormField';
 import React from 'react';
 import FormTextInput, { FormTextInputProps } from './FormTextInput';
 
-type Props<FormValues> = {
-  name: keyof FormValues | string;
-  showError?: boolean;
-  formGroupClass?: string;
-} & FormTextInputProps;
+type Props<FormValues> = FormFieldComponentProps<FormTextInputProps>;
 
-const FormFieldTextInput = <T extends {}>(props: Props<T>) => {
+const FormFieldTextInput = <FormValues extends {}>(
+  props: Props<FormValues>,
+) => {
   return <FormField {...props} as={FormTextInput} />;
 };
 

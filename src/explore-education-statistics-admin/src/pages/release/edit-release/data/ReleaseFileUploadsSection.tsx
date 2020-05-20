@@ -7,7 +7,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import { Form, FormFieldset } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
@@ -16,7 +16,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/validation/yup';
-import { FormikActions, FormikProps } from 'formik';
+import { Formik, FormikHelpers, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
 
@@ -72,7 +72,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
     });
   }, [publicationId, releaseId]);
 
-  const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
+  const resetPage = async ({ resetForm }: FormikHelpers<FormValues>) => {
     resetForm();
     document
       .querySelectorAll(`#${formId} input[type='file']`)
@@ -118,7 +118,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   const handleDelete = async (
     ancillaryFileToDelete: string,
-    form: FormikActions<{}>,
+    form: FormikProps<FormValues>,
   ) => {
     setDeleting(ancillaryFileToDelete, true);
     setDeleteFileName('');
@@ -145,7 +145,8 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
         name: Yup.string().required('Enter a name'),
         file: Yup.mixed().required('Choose a file'),
       })}
-      render={(form: FormikProps<FormValues>) => {
+    >
+      {form => {
         return (
           <Form id={formId}>
             {canUpdateRelease && (
@@ -273,7 +274,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
           </Form>
         );
       }}
-    />
+    </Formik>
   );
 };
 

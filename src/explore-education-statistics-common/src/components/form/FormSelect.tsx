@@ -33,7 +33,7 @@ export interface FormSelectProps extends FormLabelProps {
     | ((option: SelectOption) => SelectOption[keyof SelectOption])[];
   orderDirection?: ('asc' | 'desc')[];
   placeholder?: string;
-  value?: string | number;
+  value?: string;
 }
 
 const FormSelect = ({

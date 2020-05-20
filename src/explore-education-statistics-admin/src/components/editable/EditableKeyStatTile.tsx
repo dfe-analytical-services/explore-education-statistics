@@ -3,7 +3,7 @@ import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
-import { Form, FormFieldTextInput, Formik } from '@common/components/form';
+import { Form, FormFieldTextInput } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import KeyStatTile, {
   KeyStatConfig,
@@ -15,7 +15,7 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import formatPretty from '@common/utils/number/formatPretty';
 import classNames from 'classnames';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 
 export interface KeyStatsFormValues {
@@ -117,7 +117,8 @@ const EditableKeyStatTile = ({
               });
               setShowForm(false);
             }}
-            render={(form: FormikProps<KeyStatsFormValues>) => {
+          >
+            {form => {
               return (
                 <Form id={`key-stats-form-${id}`}>
                   <h3 className="govuk-heading-s">{name}</h3>
@@ -184,7 +185,7 @@ const EditableKeyStatTile = ({
                 </Form>
               );
             }}
-          />
+          </Formik>
         </div>
       ) : (
         <KeyStatTile

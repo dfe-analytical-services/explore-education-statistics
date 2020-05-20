@@ -5,11 +5,11 @@ import methodologyService from '@admin/services/methodology/methodologyService';
 import permissionService from '@admin/services/permissions/permissionService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
+import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -118,7 +118,8 @@ const MethodologyStatusPage = ({
               'Provide an internal release note',
             ),
           })}
-          render={(form: FormikProps<FormValues>) => {
+        >
+          {form => {
             return (
               <Form id={formId}>
                 <p>Select and update the methodology status.</p>
@@ -153,7 +154,7 @@ const MethodologyStatusPage = ({
               </Form>
             );
           }}
-        />
+        </Formik>
       )}
     </>
   );
