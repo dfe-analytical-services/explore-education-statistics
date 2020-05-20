@@ -28,10 +28,13 @@ exports[`FormSelect renders with error message 1`] = `
 >
   Test select
 </label>
-<span class="govuk-error-message">
+<span class="govuk-error-message"
+      id="test-select-error"
+>
   Something went wrong
 </span>
-<select class="govuk-select govuk-select--error"
+<select aria-describedby="test-select-error"
+        class="govuk-select govuk-select--error"
         id="test-select"
         name="testSelect"
 >

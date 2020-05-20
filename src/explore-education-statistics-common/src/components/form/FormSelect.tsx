@@ -23,6 +23,7 @@ export interface FormSelectProps extends FormLabelProps {
   disabled?: boolean;
   error?: string;
   id: string;
+  hint?: string;
   name: string;
   onBlur?: FocusEventHandler;
   onChange?: SelectChangeEventHandler;
@@ -41,6 +42,7 @@ const FormSelect = ({
   disabled,
   error,
   id,
+  hint,
   hideLabel,
   label,
   name,
@@ -57,9 +59,21 @@ const FormSelect = ({
     <>
       <FormLabel id={id} label={label} hideLabel={hideLabel} />
 
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {hint && (
+        <span id={`${id}-hint`} className="govuk-hint">
+          {hint}
+        </span>
+      )}
+
+      {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
 
       <select
+        aria-describedby={
+          classNames({
+            [`${id}-error`]: !!error,
+            [`${id}-hint`]: !!hint,
+          }) || undefined
+        }
         className={classNames('govuk-select', className, {
           'govuk-select--error': !!error,
         })}
