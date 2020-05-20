@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -106,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IEES17PermalinkMigrationService, EES17PermalinkMigrationService>();
 
             services
                 .AddAuthentication(options => {
@@ -114,16 +112,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     options.DefaultForbidScheme = "defaultScheme";
                     options.AddScheme<DefaultAuthenticationHandler>("defaultScheme", "Default Scheme");
                 });
-            
+
             services.AddAuthorization(options =>
             {
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
                     policy.Requirements.Add(new ViewSubjectDataRequirement()));
             });
-            
-            // EES-17 Temporarily add HttpContextAccessor so we can set a User used for security checks
-            services.AddHttpContextAccessor();
 
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
 
@@ -137,8 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
-            // Intentionally don't await call here. Long running operation with it's own error handling.
-            var ignoredTask = MigratePermalinksAsync(app);
 
             if (env.IsDevelopment())
             {
@@ -193,18 +186,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
-            }
-        }
-
-        /**
-         * Temporary method to migrate permalinks for EES-17
-         */
-        private static async Task MigratePermalinksAsync(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            {
-                var permalinkMigrationService = serviceScope.ServiceProvider.GetRequiredService<IEES17PermalinkMigrationService>();
-                await permalinkMigrationService.MigrateAll();
             }
         }
     }
