@@ -9,7 +9,7 @@ import FormCheckboxSubGroups, {
 } from './FormCheckboxSubGroups';
 
 export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = OmitStrict<
-  FormFieldComponentProps<FormCheckboxSubGroupsProps>,
+  FormFieldComponentProps<FormCheckboxSubGroupsProps, FormValues>,
   'formGroup'
 >;
 

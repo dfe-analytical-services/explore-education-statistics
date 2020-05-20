@@ -4,7 +4,7 @@ import FormField, {
 import React from 'react';
 import FormSelect, { FormSelectProps } from './FormSelect';
 
-type Props<FormValues> = FormFieldComponentProps<FormSelectProps>;
+type Props<FormValues> = FormFieldComponentProps<FormSelectProps, FormValues>;
 
 const FormFieldSelect = <FormValues extends {}>(props: Props<FormValues>) => {
   return <FormField {...props} as={FormSelect} />;
