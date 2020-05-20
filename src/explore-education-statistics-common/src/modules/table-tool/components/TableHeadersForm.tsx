@@ -1,13 +1,13 @@
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
-import { FormGroup, Formik } from '@common/components/form';
+import { FormGroup } from '@common/components/form';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { PickByType } from '@common/types';
 import reorder from '@common/utils/reorder';
 import Yup from '@common/validation/yup';
 import classNames from 'classnames';
-import { Form, FormikProps } from 'formik';
+import { Form, Formik } from 'formik';
 import React, { useMemo } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
@@ -86,7 +86,8 @@ const TableHeadersForm = ({
             .ensure(),
         })}
         onSubmit={onSubmit}
-        render={(form: FormikProps<TableHeadersConfig>) => {
+      >
+        {form => {
           return (
             <Form>
               <FormGroup>
@@ -252,7 +253,7 @@ const TableHeadersForm = ({
             </Form>
           );
         }}
-      />
+      </Formik>
     </Details>
   );
 };

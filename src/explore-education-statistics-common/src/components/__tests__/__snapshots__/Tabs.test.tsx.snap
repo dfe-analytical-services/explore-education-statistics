@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Tabs renders multiple tabs correctly with titles 1`] = `
-<div class="govuk-tabs tabs">
+<div class="govuk-tabs tabs"
+     id="test-tabs"
+>
   <ul class="govuk-tabs__list"
       role="tablist"
   >
@@ -63,7 +65,9 @@ exports[`Tabs renders multiple tabs correctly with titles 1`] = `
 `;
 
 exports[`Tabs renders multiple tabs correctly without titles 1`] = `
-<div class="govuk-tabs tabs">
+<div class="govuk-tabs tabs"
+     id="test-tabs"
+>
   <ul class="govuk-tabs__list"
       role="tablist"
   >
@@ -119,7 +123,9 @@ exports[`Tabs renders multiple tabs correctly without titles 1`] = `
 `;
 
 exports[`Tabs renders single tab correctly 1`] = `
-<div class="govuk-tabs tabs">
+<div class="govuk-tabs tabs"
+     id="test-tabs"
+>
   <ul class="govuk-tabs__list"
       role="tablist"
   >

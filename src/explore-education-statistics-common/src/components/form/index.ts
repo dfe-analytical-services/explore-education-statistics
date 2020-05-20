@@ -18,4 +18,3 @@ export { default as FormSelect } from './FormSelect';
 export { default as FormTextInput } from './FormTextInput';
 export { default as FormTextSearchInput } from './FormTextSearchInput';
 export { default as FormFieldTextInput } from './FormFieldTextInput';
-export { default as Formik } from './Formik';

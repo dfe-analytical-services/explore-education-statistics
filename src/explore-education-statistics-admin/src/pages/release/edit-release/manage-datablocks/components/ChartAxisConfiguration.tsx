@@ -1,14 +1,15 @@
 import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration.module.scss';
+import { ChartBuilderForm } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
+import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
+import { FormState } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
-import ErrorSummary from '@common/components/ErrorSummary';
 import {
   Form,
   FormFieldRadioGroup,
   FormFieldSelect,
   FormFieldset,
   FormFieldTextInput,
-  Formik,
   FormTextInput,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
@@ -20,16 +21,18 @@ import {
   AxisConfiguration,
   AxisGroupBy,
   AxisType,
-  ChartCapabilities,
+  ChartDefinition,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { OmitStrict } from '@common/types';
+import { Dictionary, OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
+import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
@@ -40,31 +43,37 @@ type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 interface Props {
   buttons?: ReactNode;
   canSaveChart: boolean;
-  id: string;
   defaultDataType?: AxisGroupBy;
+  forms: Dictionary<ChartBuilderForm>;
+  hasSubmittedChart: boolean;
+  id: string;
   type: AxisType;
   configuration: AxisConfiguration;
+  definition: ChartDefinition;
   data: TableDataResult[];
   meta: FullTableMeta;
-  capabilities: ChartCapabilities;
   onChange: (configuration: AxisConfiguration) => void;
-  onFormStateChange: (state: { form: AxisType; isValid: boolean }) => void;
+  onFormStateChange: (state: { form: AxisType } & FormState) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
 
 const ChartAxisConfiguration = ({
   buttons,
   canSaveChart,
-  id,
   configuration,
+  definition,
+  forms,
+  hasSubmittedChart,
+  id,
   data,
   meta,
   type,
-  capabilities,
   onChange,
   onFormStateChange,
   onSubmit,
 }: Props) => {
+  const { capabilities } = definition;
+
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
     if (type === 'minor') {
       return [];
@@ -267,14 +276,22 @@ const ChartAxisConfiguration = ({
 
   return (
     <Formik<FormValues>
-      initialValues={initialValues}
       enableReinitialize
+      initialValues={initialValues}
+      initialTouched={
+        hasSubmittedChart
+          ? mapValues(validationSchema.fields, () => true)
+          : undefined
+      }
+      validateOnMount
       validationSchema={validationSchema}
-      isInitialValid={validationSchema.isValidSync(initialValues)}
       onSubmit={values => {
-        onSubmit(normalizeValues(values));
+        if (canSaveChart) {
+          onSubmit(normalizeValues(values));
+        }
       }}
-      render={form => (
+    >
+      {form => (
         <Form id={id}>
           <Effect
             value={{
@@ -288,6 +305,7 @@ const ChartAxisConfiguration = ({
             value={{
               form: type,
               isValid: form.isValid,
+              submitCount: form.submitCount,
             }}
             onMount={onFormStateChange}
             onChange={onFormStateChange}
@@ -522,7 +540,7 @@ const ChartAxisConfiguration = ({
                         id={`${id}-referenceLines-position`}
                         label="Position"
                         hideLabel
-                        value={referenceLine.position}
+                        value={referenceLine.position?.toString()}
                         placeholder="Select position"
                         order={FormSelect.unordered}
                         options={referenceOptions}
@@ -574,27 +592,18 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          {form.isValid && form.submitCount > 0 && !canSaveChart && (
-            <ErrorSummary
-              title="Cannot save chart"
-              id={`${id}-errorSummary`}
-              errors={[
-                {
-                  id: `${id}-submit`,
-                  message: 'Ensure that all other tabs are valid first',
-                },
-              ]}
-            />
-          )}
-
-          <Button type="submit" id={`${id}-submit`}>
-            Save chart options
-          </Button>
+          <ChartBuilderSaveButton
+            formId={id}
+            forms={forms}
+            showSubmitError={
+              form.isValid && form.submitCount > 0 && !canSaveChart
+            }
+          />
 
           {buttons}
         </Form>
       )}
-    />
+    </Formik>
   );
 };
 

@@ -1,18 +1,18 @@
 import CollapsibleList from '@common/components/CollapsibleList';
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import { Form, FormFieldset } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import {
   FilterOption,
   PublicationSubjectMeta,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import mapValues from 'lodash/mapValues';
 import sortBy from 'lodash/sortBy';
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -43,12 +43,9 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     initialValues = {},
   } = props;
 
-  const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'locationFiltersForm';
 
   const formOptions = useMemo(() => options, [options]);
-
-  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
 
   const stepHeading = useMemo(
     () => (
@@ -62,7 +59,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   return (
     <Formik<FormValues>
       enableReinitialize
-      ref={formikRef}
       initialValues={{
         locations: mapValues(options, (levelOptions, level) => {
           const initialLevel = initialValues[level] ?? [];
@@ -97,7 +93,8 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         await onSubmit({ locations });
         goToNextStep();
       }}
-      render={(form: FormikProps<FormValues>) => {
+    >
+      {form => {
         if (isActive) {
           return (
             <Form {...form} id={formId} showSubmitError>
@@ -156,6 +153,12 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         return (
           <>
             {stepHeading}
+
+            <ResetFormOnPreviousStep
+              currentStep={currentStep}
+              stepNumber={stepNumber}
+            />
+
             <SummaryList noBorder>
               {Object.entries(locationLevels)
                 .filter(
@@ -178,7 +181,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
           </>
         );
       }}
-    />
+    </Formik>
   );
 };
 

@@ -9,11 +9,10 @@ import {
   Form,
   FormFieldset,
   FormFieldTextInput,
-  Formik,
 } from '@common/components/form';
 import { BasicLink } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React, { useState } from 'react';
 
 interface Props {
@@ -56,7 +55,8 @@ const RelatedInformationSection = ({ release }: Props) => {
             setFormOpen(false);
           })
         }
-        render={(form: FormikProps<Omit<BasicLink, 'id'>>) => {
+      >
+        {form => {
           return (
             <Form {...form} id="create-new-link-form">
               <FormFieldset
@@ -89,7 +89,7 @@ const RelatedInformationSection = ({ release }: Props) => {
             </Form>
           );
         }}
-      />
+      </Formik>
     );
   };
 
@@ -115,12 +115,7 @@ const RelatedInformationSection = ({ release }: Props) => {
               (isEditing ? (
                 <a>{release.publication.externalMethodology.title}</a>
               ) : (
-                <Link
-                  to=""
-                  href={release.publication.externalMethodology.url}
-                  target="_blank"
-                  rel="external"
-                >
+                <Link to={release.publication.externalMethodology.url}>
                   {release.publication.externalMethodology.title}
                 </Link>
               ))}

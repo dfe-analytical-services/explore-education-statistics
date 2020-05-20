@@ -17,8 +17,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
         initialValues={{
           test: [],
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -30,7 +31,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
             ]}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -50,8 +51,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
         initialValues={{
           test: ['1'],
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -63,7 +65,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
             ]}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -83,8 +85,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
         initialValues={{
           test: [],
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -97,7 +100,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
             selectAll
           />
         )}
-      />,
+      </Formik>,
     );
 
     fireEvent.click(getByText('Select all 3 options'));
@@ -119,8 +122,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
         initialValues={{
           test: ['1', '2', '3'],
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -133,7 +137,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
             ]}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -157,8 +161,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
         initialValues={{
           test: [],
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -171,7 +176,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
             ]}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -202,8 +207,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
         initialValues={{
           test: ['1', '2', '3'],
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -216,7 +222,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
             ]}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -241,11 +247,12 @@ describe('FormFieldCheckboxSearchGroup', () => {
           initialValues={{
             test: [],
           }}
-          onSubmit={() => null}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={() => (
+        >
+          {() => (
             <FormFieldCheckboxSearchGroup<FormValues>
               name="test"
               id="checkboxes"
@@ -257,7 +264,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
               ]}
             />
           )}
-        />,
+        </Formik>,
       );
 
       expect(queryByText('Select at least one option')).toBeNull();
@@ -269,11 +276,15 @@ describe('FormFieldCheckboxSearchGroup', () => {
           initialValues={{
             test: ['1'],
           }}
-          onSubmit={() => null}
+          initialTouched={{
+            test: true,
+          }}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={() => (
+        >
+          {() => (
             <FormFieldCheckboxSearchGroup<FormValues>
               name="test"
               id="checkboxes"
@@ -285,7 +296,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
               ]}
             />
           )}
-        />,
+        </Formik>,
       );
 
       const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -301,43 +312,21 @@ describe('FormFieldCheckboxSearchGroup', () => {
       expect(queryByText('Select at least one option')).not.toBeNull();
     });
 
-    test('displays custom error message from `error` prop', () => {
-      const { getByText } = render(
-        <Formik
-          initialValues={{
-            test: ['1'],
-          }}
-          onSubmit={() => null}
-          render={() => (
-            <FormFieldCheckboxSearchGroup<FormValues>
-              name="test"
-              id="checkboxes"
-              legend="Test checkboxes"
-              error="Invalid checkbox selection"
-              options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-              ]}
-            />
-          )}
-        />,
-      );
-
-      expect(getByText('Invalid checkbox selection')).toBeDefined();
-    });
-
     test('does not display validation message when `showError` is false', async () => {
       const { getByLabelText, queryByText } = render(
         <Formik
           initialValues={{
             test: ['1'],
           }}
-          onSubmit={() => null}
+          initialTouched={{
+            test: true,
+          }}
+          onSubmit={() => undefined}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={() => (
+        >
+          {() => (
             <FormFieldCheckboxSearchGroup<FormValues>
               name="test"
               id="checkboxes"
@@ -350,7 +339,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
               ]}
             />
           )}
-        />,
+        </Formik>,
       );
 
       const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -375,8 +364,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
         initialValues={{
           test: ['1'],
         }}
-        onSubmit={() => null}
-        render={() => (
+        onSubmit={() => undefined}
+      >
+        {() => (
           <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -389,7 +379,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
             ]}
           />
         )}
-      />,
+      </Formik>,
     );
 
     const searchInput = getByLabelText('Search options') as HTMLInputElement;

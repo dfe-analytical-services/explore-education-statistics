@@ -10,7 +10,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import { Form, FormFieldset } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
@@ -20,7 +20,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
-import { FormikActions, FormikProps } from 'formik';
+import { Formik, FormikHelpers, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
 
@@ -117,7 +117,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     );
   }, [publicationId, releaseId]);
 
-  const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
+  const resetPage = async ({ resetForm }: FormikHelpers<FormValues>) => {
     resetForm();
 
     document
@@ -183,7 +183,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   const handleDelete = async (
     dataFileToDelete: DeleteDataFile,
-    form: FormikActions<{}>,
+    form: FormikProps<FormValues>,
   ) => {
     setDeleting(dataFileToDelete, true);
     setDeleteDataFile(undefined);
@@ -225,7 +225,8 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         dataFile: Yup.mixed().required('Choose a data file'),
         metadataFile: Yup.mixed().required('Choose a metadata file'),
       })}
-      render={(form: FormikProps<FormValues>) => {
+    >
+      {form => {
         return (
           <Form id={formId}>
             {canUpdateRelease && (
@@ -487,7 +488,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
           </Form>
         );
       }}
-    />
+    </Formik>
   );
 };
 

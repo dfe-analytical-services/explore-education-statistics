@@ -1,20 +1,15 @@
-import {
-  Form,
-  FormFieldSelect,
-  FormFieldset,
-  Formik,
-} from '@common/components/form';
+import { Form, FormFieldSelect, FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
+import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import {
   PublicationSubjectMeta,
   TimePeriodQuery,
 } from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
-import React, { useMemo, useRef } from 'react';
+import { Formik } from 'formik';
+import React, { useMemo } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -43,10 +38,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     initialValues = { timePeriod: undefined },
   } = props;
 
-  const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'timePeriodForm';
-
-  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
 
   const timePeriodOptions: SelectOption[] = [
     {
@@ -93,7 +85,6 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
   return (
     <Formik<FormValues>
       enableReinitialize
-      ref={formikRef}
       initialValues={formInitialValues}
       validateOnBlur={false}
       validationSchema={Yup.object<FormValues>({
@@ -156,7 +147,8 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         await onSubmit(values);
         goToNextStep();
       }}
-      render={(form: FormikProps<FormValues>) => {
+    >
+      {form => {
         return isActive ? (
           <Form id={formId} showSubmitError>
             <FormFieldset id={`${formId}-timePeriod`} legend={stepHeading}>
@@ -183,6 +175,12 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             {stepHeading}
+
+            <ResetFormOnPreviousStep
+              currentStep={currentStep}
+              stepNumber={stepNumber}
+            />
+
             <SummaryList noBorder>
               <SummaryListItem term="Start date">
                 {form.values.start && getOptionLabel(form.values.start)}
@@ -194,7 +192,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
           </>
         );
       }}
-    />
+    </Formik>
   );
 };
 

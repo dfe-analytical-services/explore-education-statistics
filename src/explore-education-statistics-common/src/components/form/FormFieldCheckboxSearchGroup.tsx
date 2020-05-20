@@ -1,50 +1,54 @@
-import { OmitStrict } from '@common/types/util';
+import FormField, {
+  FormFieldComponentProps,
+} from '@common/components/form/FormField';
+import { OmitStrict } from '@common/types';
 import React from 'react';
-import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxSearchGroup, {
   FormCheckboxSearchGroupProps,
 } from './FormCheckboxSearchGroup';
-import {
-  handleAllChange,
-  handleChange,
-} from './util/checkboxGroupFieldHelpers';
+import handleAllChange from './util/handleAllCheckboxChange';
 
-export type FormFieldCheckboxSearchGroupProps<FormValues> = {
-  name: keyof FormValues | string;
-  showError?: boolean;
-} & OmitStrict<FormCheckboxSearchGroupProps, 'value'>;
+export type FormFieldCheckboxSearchGroupProps<FormValues> = OmitStrict<
+  FormFieldComponentProps<FormCheckboxSearchGroupProps>,
+  'formGroup'
+>;
 
-const FormFieldCheckboxSearchGroup = <T extends {}>(
-  props: FormFieldCheckboxSearchGroupProps<T>,
+const FormFieldCheckboxSearchGroup = <FormValues extends {}>(
+  props: FormFieldCheckboxSearchGroupProps<FormValues>,
 ) => {
   const { options } = props;
 
   return (
-    <FieldCheckboxArray {...props}>
-      {fieldArrayProps => {
+    <FormField<string[]> {...props}>
+      {({ field, helpers }) => {
         return (
           <FormCheckboxSearchGroup
             {...props}
-            {...fieldArrayProps}
-            options={options}
+            {...field}
             onAllChange={(event, checked) => {
               if (props.onAllChange) {
                 props.onAllChange(event, checked);
               }
 
-              handleAllChange(fieldArrayProps, options)(event, checked);
+              handleAllChange({
+                checked,
+                helpers,
+                event,
+                options,
+                value: field.value,
+              });
             }}
             onChange={(event, option) => {
               if (props.onChange) {
                 props.onChange(event, option);
               }
 
-              handleChange(fieldArrayProps)(event);
+              field.onChange(event);
             }}
           />
         );
       }}
-    </FieldCheckboxArray>
+    </FormField>
   );
 };
 

@@ -54,8 +54,10 @@ const HelpAndSupport = ({
             headingTag="h3"
           >
             <p className="govuk-!-margin-bottom-9">
-              <Link to={methodologyUrl}>View methodology</Link> for{' '}
-              {publicationTitle}.
+              <Link to="/methodology/[methodology]" as={methodologyUrl}>
+                View methodology
+              </Link>{' '}
+              for {publicationTitle}.
             </p>
           </AccordionSection>
         )}

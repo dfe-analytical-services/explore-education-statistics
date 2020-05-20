@@ -1,59 +1,13 @@
 import FormTextArea, {
   FormTextAreaProps,
 } from '@common/components/form/FormTextArea';
-import createErrorHelper from '@common/validation/createErrorHelper';
-import classNames from 'classnames';
-import { Field, FieldProps } from 'formik';
 import React from 'react';
-import FormGroup from './FormGroup';
+import FormField, { FormFieldComponentProps } from './FormField';
 
-type Props<FormValues> = {
-  name: keyof FormValues | string;
-  showError?: boolean;
-  formGroupClass?: string;
-} & FormTextAreaProps;
+type Props<FormValues> = FormFieldComponentProps<FormTextAreaProps>;
 
-const FormFieldTextArea = <T extends {}>(props: Props<T>) => {
-  const { error, name, showError = true } = props;
-
-  return (
-    <Field name={name}>
-      {({ field, form }: FieldProps) => {
-        const { getError } = createErrorHelper(form);
-
-        let errorMessage = error || getError(name);
-
-        if (!showError) {
-          errorMessage = '';
-        }
-
-        const { formGroupClass, ...childProps } = props;
-
-        return (
-          <FormGroup
-            hasError={!!errorMessage}
-            className={classNames({
-              [formGroupClass || '']: formGroupClass,
-            })}
-          >
-            <FormTextArea
-              {...childProps}
-              {...field}
-              onChange={e => {
-                if (childProps.onChange) {
-                  childProps.onChange(e);
-                }
-                if (!e.isDefaultPrevented()) {
-                  field.onChange(e);
-                }
-              }}
-              error={errorMessage}
-            />
-          </FormGroup>
-        );
-      }}
-    </Field>
-  );
+const FormFieldTextArea = <FormValues extends {}>(props: Props<FormValues>) => {
+  return <FormField {...props} as={FormTextArea} />;
 };
 
 export default FormFieldTextArea;

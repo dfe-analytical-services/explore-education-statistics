@@ -32,7 +32,11 @@ declare module 'govuk-frontend/govuk/components/details/details' {
 }
 
 declare module 'govuk-frontend/govuk/components/error-summary/error-summary' {
-  export default GovUkModule;
+  export class ErrorSummary extends GovUkModule {
+    public handleClick(event: MouseEvent): void;
+  }
+
+  export default ErrorSummary;
 }
 
 declare module 'govuk-frontend/govuk/components/radios/radios' {

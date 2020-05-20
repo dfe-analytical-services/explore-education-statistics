@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormTextArea renders correctly with error 1`] = `
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<span class="govuk-error-message"
+      id="test-input-error"
+>
+  Field is required
+</span>
+<textarea name="testInput"
+          aria-describedby="test-input-error"
+          class="govuk-textarea"
+          id="test-input"
+          rows="5"
+>
+</textarea>
+`;
+
+exports[`FormTextArea renders correctly with hint 1`] = `
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<span id="test-input-hint"
+      class="govuk-hint"
+>
+  Fill me in
+</span>
+<textarea name="testInput"
+          aria-describedby="test-input-hint"
+          class="govuk-textarea"
+          id="test-input"
+          rows="5"
+>
+</textarea>
+`;
+
+exports[`FormTextArea renders correctly with required props 1`] = `
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<textarea name="testInput"
+          class="govuk-textarea"
+          id="test-input"
+          rows="5"
+>
+</textarea>
+`;

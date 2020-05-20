@@ -3,14 +3,13 @@ import {
   FormFieldRadioGroup,
   FormFieldset,
   FormGroup,
-  Formik,
 } from '@common/components/form';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { useCookies } from '@frontend/hooks/useCookies';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React, { useState } from 'react';
 import styles from './CookiesIndexPage.module.scss';
 
@@ -79,7 +78,8 @@ function CookiesIndexPage() {
             validationSchema={Yup.object<FormValues>({
               googleAnalytics: Yup.string().required('Select'),
             })}
-            render={(form: FormikProps<FormValues>) => {
+          >
+            {form => {
               const { getError } = createErrorHelper(form);
 
               return (
@@ -157,7 +157,7 @@ function CookiesIndexPage() {
                 </Form>
               );
             }}
-          />
+          </Formik>
         </div>
       </div>
     </Page>

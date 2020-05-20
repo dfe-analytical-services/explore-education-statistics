@@ -77,13 +77,17 @@ describe('chartBuilderReducer', () => {
       axes: {},
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -107,6 +111,7 @@ describe('chartBuilderReducer', () => {
         height: 300,
         legend: 'top',
         title: '',
+        alt: '',
       });
     });
 
@@ -116,6 +121,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 400,
           title: 'Some title',
+          alt: 'Some alt',
           legend: 'bottom',
         },
       };
@@ -128,6 +134,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 400,
         title: 'Some title',
+        alt: 'Some alt',
         legend: 'bottom',
       });
     });
@@ -138,6 +145,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 400,
           title: 'Some title',
+          alt: 'Some alt',
           legend: 'bottom',
         },
       };
@@ -161,6 +169,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 600,
         title: 'Some title',
+        alt: 'Some alt',
         legend: 'top',
       });
     });
@@ -283,15 +292,19 @@ describe('chartBuilderReducer', () => {
       expect(nextState.forms).toEqual<ChartBuilderState['forms']>({
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
         minor: {
           isValid: true,
+          submitCount: 0,
         },
       });
     });
@@ -310,16 +323,21 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -410,16 +428,21 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -436,6 +459,7 @@ describe('chartBuilderReducer', () => {
         height: 300,
         legend: 'top',
         title: '',
+        alt: '',
       });
     });
 
@@ -445,6 +469,8 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 300,
           width: 400,
+          title: '',
+          alt: '',
         },
       };
 
@@ -462,6 +488,7 @@ describe('chartBuilderReducer', () => {
         height: 300,
         legend: 'top',
         title: '',
+        alt: '',
         width: 400,
       });
     });
@@ -472,6 +499,8 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 300,
           width: 400,
+          title: '',
+          alt: '',
         },
       };
 
@@ -490,6 +519,7 @@ describe('chartBuilderReducer', () => {
         height: 300,
         legend: 'top',
         title: '',
+        alt: '',
       });
     });
 
@@ -503,6 +533,7 @@ describe('chartBuilderReducer', () => {
             constants: {
               height: 400,
               title: 'overrides title',
+              alt: 'overrides alt',
               legend: 'bottom',
             },
           },
@@ -524,6 +555,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 400,
         title: 'overrides title',
+        alt: 'overrides alt',
         legend: 'bottom',
       });
     });
@@ -550,16 +582,21 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -602,6 +639,7 @@ describe('chartBuilderReducer', () => {
             ...initialState.forms,
             data: {
               isValid: false,
+              submitCount: 0,
             },
           },
         },
@@ -649,16 +687,21 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -726,16 +769,21 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
         major: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -776,13 +824,17 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        title: '',
+        alt: '',
       },
       forms: {
         options: {
           isValid: true,
+          submitCount: 0,
         },
         data: {
           isValid: true,
+          submitCount: 0,
         },
       },
     };
@@ -808,11 +860,15 @@ describe('chartBuilderReducer', () => {
           form: 'options',
           state: {
             isValid: false,
+            submitCount: 1,
           },
         },
       } as ChartBuilderActions);
 
-      expect(nextState.forms.options.isValid).toBe(false);
+      expect(nextState.forms.options).toEqual({
+        isValid: false,
+        submitCount: 1,
+      });
     });
   });
 
@@ -831,16 +887,20 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 400,
           title: 'Something',
+          alt: 'Some alt',
         },
         forms: {
           options: {
             isValid: false,
+            submitCount: 1,
           },
           data: {
             isValid: false,
+            submitCount: 1,
           },
           major: {
             isValid: false,
+            submitCount: 1,
           },
         },
       };
@@ -849,19 +909,22 @@ describe('chartBuilderReducer', () => {
         type: 'RESET',
       });
 
-      expect(nextState).toEqual({
+      expect(nextState).toEqual<ChartBuilderState>({
         axes: {},
         options: {
           height: 300,
           title: '',
+          alt: '',
         },
         definition: undefined,
         forms: {
           options: {
             isValid: true,
+            submitCount: 0,
           },
           data: {
             isValid: true,
+            submitCount: 0,
           },
         },
       });
@@ -876,14 +939,17 @@ describe('chartBuilderReducer', () => {
         axes: {},
         options: {
           title: '',
+          alt: '',
           height: 300,
         },
         forms: {
           data: {
             isValid: true,
+            submitCount: 0,
           },
           options: {
             isValid: true,
+            submitCount: 0,
           },
         },
       });
@@ -931,6 +997,8 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
+        title: '',
+        alt: '',
       };
 
       const { result } = renderHook(() =>
@@ -983,19 +1051,24 @@ describe('chartBuilderReducer', () => {
           height: 300,
           legend: 'top',
           title: '',
+          alt: '',
         },
         forms: {
           data: {
             isValid: true,
+            submitCount: 0,
           },
           options: {
             isValid: true,
+            submitCount: 0,
           },
           major: {
             isValid: true,
+            submitCount: 0,
           },
           minor: {
             isValid: true,
+            submitCount: 0,
           },
         },
       });
@@ -1029,6 +1102,8 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
+        title: '',
+        alt: '',
       };
 
       const { result } = renderHook(() =>
@@ -1078,19 +1153,24 @@ describe('chartBuilderReducer', () => {
           height: 300,
           legend: 'top',
           title: '',
+          alt: '',
         },
         forms: {
           data: {
             isValid: true,
+            submitCount: 0,
           },
           options: {
             isValid: true,
+            submitCount: 0,
           },
           major: {
             isValid: true,
+            submitCount: 0,
           },
           minor: {
             isValid: true,
+            submitCount: 0,
           },
         },
       });
@@ -1118,6 +1198,8 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
+        title: '',
+        alt: '',
       };
 
       const { result } = renderHook(() =>
@@ -1169,6 +1251,8 @@ describe('chartBuilderReducer', () => {
         },
         type: 'line',
         height: 300,
+        title: '',
+        alt: '',
       };
 
       const { result } = renderHook(() =>

@@ -1,13 +1,12 @@
+import CollapsibleList from '@common/components/CollapsibleList';
 import {
   Form,
   FormFieldCheckboxSearchSubGroups,
   FormFieldset,
   FormGroup,
-  Formik,
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import {
   FilterOption,
   PublicationSubjectMeta,
@@ -15,15 +14,15 @@ import {
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';
-import CollapsibleList from '@common/components/CollapsibleList';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
+import ResetFormOnPreviousStep from './ResetFormOnPreviousStep';
 
 export interface FormValues {
   indicators: string[];
@@ -122,7 +121,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'filtersForm';
 
   const parsedMeta: {
@@ -139,8 +137,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     [subjectMeta],
   );
 
-  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
-
   const stepHeading = (
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
@@ -152,7 +148,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   return (
     <Formik<FormValues>
       enableReinitialize
-      ref={formikRef}
       initialValues={initialFormValues}
       validateOnBlur={false}
       validationSchema={Yup.object<FormValues>({
@@ -174,7 +169,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         await onSubmit(submittedValues);
         goToNextStep();
       }}
-      render={(form: FormikProps<FormValues>) => {
+    >
+      {form => {
         const { getError } = createErrorHelper(form);
 
         return isActive ? (
@@ -191,7 +187,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       legend="Indicators"
                       legendSize="m"
                       hint="Select at least one indicator"
-                      error={getError('indicators')}
                       selectAll
                       disabled={form.isSubmitting}
                       options={Object.entries(subjectMeta.indicators).map(
@@ -223,7 +218,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 id={`${formId}-${camelCase(filterName)}`}
                                 legend={filterGroup.legend}
                                 hint={filterGroup.hint}
-                                error={getError(filterName)}
                                 disabled={form.isSubmitting}
                                 selectAll
                                 options={Object.entries(
@@ -269,6 +263,12 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             {stepHeading}
+
+            <ResetFormOnPreviousStep
+              currentStep={currentStep}
+              stepNumber={stepNumber}
+            />
+
             <SummaryList noBorder>
               <SummaryListItem term="Indicators">
                 <CollapsibleList>
@@ -297,7 +297,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           </>
         );
       }}
-    />
+    </Formik>
   );
 };
 

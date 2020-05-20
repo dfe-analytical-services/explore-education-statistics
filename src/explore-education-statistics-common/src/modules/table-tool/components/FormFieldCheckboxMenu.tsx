@@ -4,20 +4,23 @@ import {
   FormFieldCheckboxSearchGroup,
 } from '@common/components/form';
 import { FormFieldCheckboxSearchGroupProps } from '@common/components/form/FormFieldCheckboxSearchGroup';
+import { useField } from 'formik';
 import React, { useEffect, useState } from 'react';
 import FormCheckboxSelectionCount from './FormCheckboxSelectedCount';
 
 const FormFieldCheckboxMenu = <T extends {}>(
   props: FormFieldCheckboxSearchGroupProps<T>,
 ) => {
-  const { error, name, options, legend } = props;
+  const { name, options, legend } = props;
   const [open, setOpen] = useState(false);
 
+  const [, meta] = useField(name);
+
   useEffect(() => {
-    if (error) {
+    if (meta.error && meta.touched) {
       setOpen(true);
     }
-  }, [error]);
+  }, [meta.error, meta.touched]);
 
   return (
     <DetailsMenu

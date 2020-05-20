@@ -1,16 +1,16 @@
-import FormField from '@common/components/form/FormField';
+import FormField, {
+  FormFieldComponentProps,
+} from '@common/components/form/FormField';
 import FormNumberInput, {
   FormNumberInputProps,
 } from '@common/components/form/FormNumberInput';
 import React from 'react';
 
-type Props<FormValues> = {
-  name: keyof FormValues | string;
-  showError?: boolean;
-  formGroupClass?: string;
-} & FormNumberInputProps;
+type Props<FormValues> = FormFieldComponentProps<FormNumberInputProps>;
 
-const FormFieldNumberInput = <T extends {}>(props: Props<T>) => {
+const FormFieldNumberInput = <FormValues extends {}>(
+  props: Props<FormValues>,
+) => {
   return <FormField {...props} as={FormNumberInput} type="number" />;
 };
 

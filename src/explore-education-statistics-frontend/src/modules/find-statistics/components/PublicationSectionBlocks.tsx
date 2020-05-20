@@ -1,10 +1,10 @@
-import ButtonLink from '@common/components/ButtonLink';
 import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';
 import { Release } from '@common/services/publicationService';
 import React from 'react';
+import ButtonLink from '@frontend/components/ButtonLink';
 
 export interface PublicationSectionBlocksProps extends SectionBlocksProps {
   release: Release;
@@ -28,16 +28,13 @@ const PublicationSectionBlocks = ({
           <p>Use our table tool to explore this data.</p>
           {publication ? (
             <ButtonLink
+              to="/data-tables/[publication]"
               as={`/data-tables/${publication.slug}`}
-              to={`/data-tables?publicationSlug=${publication.slug}`}
-              href={`/data-tables?publicationSlug=${publication.slug}`}
             >
               Explore data
             </ButtonLink>
           ) : (
-            <ButtonLink as="/data-tables" to="/data-tables" href="/data-tables">
-              Explore data
-            </ButtonLink>
+            <ButtonLink href="/data-tables">Explore data</ButtonLink>
           )}
         </div>
       }

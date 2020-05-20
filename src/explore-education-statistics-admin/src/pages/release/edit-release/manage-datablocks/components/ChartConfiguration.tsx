@@ -1,38 +1,50 @@
-import { ChartOptions } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
-import Button from '@common/components/Button';
-import Effect from '@common/components/Effect';
-import ErrorSummary from '@common/components/ErrorSummary';
+import { ChartBuilderForm } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
+import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
 import {
-  Form,
-  FormFieldSelect,
-  FormFieldTextInput,
-  FormGroup,
-  Formik,
-} from '@common/components/form';
+  ChartOptions,
+  FormState,
+} from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
+import Effect from '@common/components/Effect';
+import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
+import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema, Schema } from 'yup';
 import InfographicChartForm from './InfographicChartForm';
+
+const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  // eslint-disable-next-line no-param-reassign
+  event.target.value = event.target.value.replace(/\n/g, ' ');
+};
 
 type FormValues = Partial<ChartOptions>;
 
 interface Props {
   buttons?: ReactNode;
   canSaveChart: boolean;
-  definition: ChartDefinition;
   chartOptions: ChartOptions;
+  definition: ChartDefinition;
+  forms: Dictionary<ChartBuilderForm>;
+  hasSubmittedChart: boolean;
   releaseId: string;
   meta: FullTableMeta;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
-  onFormStateChange: (state: { form: 'options'; isValid: boolean }) => void;
+  onFormStateChange: (
+    state: {
+      form: 'options';
+    } & FormState,
+  ) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
@@ -43,6 +55,8 @@ const ChartConfiguration = ({
   canSaveChart,
   chartOptions,
   definition,
+  forms,
+  hasSubmittedChart,
   meta,
   releaseId,
   onBoundaryLevelChange,
@@ -54,7 +68,20 @@ const ChartConfiguration = ({
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
-      title: Yup.string(),
+      title: Yup.string().required('Enter chart title'),
+      alt: Yup.string()
+        .required('Enter chart alt text')
+        .max(125, 'Alt text must be less than 125 characters')
+        .test({
+          name: 'noRepeatTitle',
+          message: 'Alt text should not repeat the title',
+          test(value = '') {
+            // eslint-disable-next-line react/no-this-in-sfc
+            const title: string = this.resolve(Yup.ref('title')) ?? '';
+
+            return value.trim() !== title.trim();
+          },
+        }),
       height: Yup.number()
         .required('Enter chart height')
         .positive('Chart height must be positive'),
@@ -130,14 +157,22 @@ const ChartConfiguration = ({
       )}
 
       <Formik<FormValues>
-        initialValues={initialValues}
         enableReinitialize
-        onSubmit={values => {
-          onSubmit(normalizeValues(values));
-        }}
-        isInitialValid={validationSchema.isValidSync(initialValues)}
+        initialValues={initialValues}
+        initialTouched={
+          hasSubmittedChart
+            ? mapValues(validationSchema.fields, () => true)
+            : undefined
+        }
+        validateOnMount
         validationSchema={validationSchema}
-        render={form => (
+        onSubmit={values => {
+          if (canSaveChart) {
+            onSubmit(normalizeValues(values));
+          }
+        }}
+      >
+        {form => (
           <Form id={formId}>
             <Effect
               value={{
@@ -151,16 +186,31 @@ const ChartConfiguration = ({
               value={{
                 form: 'options',
                 isValid: form.isValid,
+                submitCount: form.submitCount,
               }}
               onChange={onFormStateChange}
               onMount={onFormStateChange}
             />
 
-            <FormFieldTextInput<ChartOptions>
+            <FormFieldTextArea<ChartOptions>
               id={`${formId}-title`}
               name="title"
-              label="Chart title"
-              percentageWidth="three-quarters"
+              label="Title"
+              className="govuk-!-width-three-quarters"
+              rows={3}
+              hint="Use a concise descriptive title that summarises the main message in the chart."
+              onChange={replaceNewLines}
+            />
+
+            <FormFieldTextArea<ChartOptions>
+              id={`${formId}-alt`}
+              className="govuk-!-width-three-quarters"
+              name="alt"
+              label="Alt text"
+              hint="Brief and accurate description of the chart in less than 125 characters. Should not repeat the title."
+              maxLength={125}
+              rows={2}
+              onChange={replaceNewLines}
             />
 
             {validationSchema.fields.stacked && (
@@ -189,7 +239,7 @@ const ChartConfiguration = ({
               <FormFieldNumberInput<ChartOptions>
                 id={`${formId}-height`}
                 name="height"
-                label="Chart height (px)"
+                label="Height (px)"
                 width={5}
               />
             )}
@@ -198,7 +248,7 @@ const ChartConfiguration = ({
               <FormFieldNumberInput<ChartOptions>
                 id={`${formId}-width`}
                 name="width"
-                label="Chart width (px)"
+                label="Width (px)"
                 hint="Leave blank to set as full width"
                 width={5}
               />
@@ -236,27 +286,18 @@ const ChartConfiguration = ({
               </>
             )}
 
-            {form.isValid && form.submitCount > 0 && !canSaveChart && (
-              <ErrorSummary
-                title="Cannot save chart"
-                id={`${formId}-errorSummary`}
-                errors={[
-                  {
-                    id: `${formId}-submit`,
-                    message: 'Ensure that all other tabs are valid first',
-                  },
-                ]}
-              />
-            )}
-
-            <Button type="submit" id={`${formId}-submit`}>
-              Save chart options
-            </Button>
+            <ChartBuilderSaveButton
+              formId={formId}
+              forms={forms}
+              showSubmitError={
+                form.isValid && form.submitCount > 0 && !canSaveChart
+              }
+            />
 
             {buttons}
           </Form>
         )}
-      />
+      </Formik>
     </>
   );
 };

@@ -13,16 +13,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid ContentBlockId { get; set; }
 
-        public ReleaseContentBlock CreateReleaseAmendment(CreateAmendmentContext ctx)
+        public ReleaseContentBlock Clone(CreateClonedContext ctx)
         {
             var copy = MemberwiseClone() as ReleaseContentBlock;
             
-            copy.Release = ctx.Amendment;
-            copy.ReleaseId = ctx.Amendment.Id;
+            copy.Release = ctx.Target;
+            copy.ReleaseId = ctx.Target.Id;
             
             var newVersionOfContentBlock = 
                 ctx.OldToNewIdContentBlockMappings.GetValueOrDefault(ContentBlock) 
-                ?? ContentBlock.CreateReleaseAmendment(ctx, null);
+                ?? ContentBlock.Clone(ctx, null);
 
             copy.ContentBlock = newVersionOfContentBlock;
             copy.ContentBlockId = newVersionOfContentBlock.Id;

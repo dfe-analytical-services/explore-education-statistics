@@ -1,12 +1,11 @@
+import { ChartBuilderForm } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
+import ChartBuilderSaveButton from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderSaveButton';
 import ChartDataConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataConfiguration';
+import { FormState } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
-import ErrorSummary from '@common/components/ErrorSummary';
-import { Form, FormFieldSelect, Formik } from '@common/components/form';
-import {
-  ChartCapabilities,
-  ChartDefinition,
-} from '@common/modules/charts/types/chart';
+import { Form, FormFieldSelect } from '@common/components/form';
+import { ChartDefinition } from '@common/modules/charts/types/chart';
 import {
   DataSet,
   DataSetConfiguration,
@@ -19,9 +18,10 @@ import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import styles from './ChartDataSelector.module.scss';
 
 interface FormValues {
@@ -33,14 +33,19 @@ interface FormValues {
 
 interface Props {
   buttons?: ReactNode;
-  canSaveChart?: boolean;
-  chartType: ChartDefinition;
+  canSaveChart: boolean;
   dataSets?: DataSetConfiguration[];
+  definition: ChartDefinition;
+  forms: Dictionary<ChartBuilderForm>;
   meta: FullTableMeta;
-  capabilities: ChartCapabilities;
   onDataAdded?: (data: DataSetConfiguration) => void;
   onDataRemoved?: (data: DataSetConfiguration, index: number) => void;
   onDataChanged?: (data: DataSetConfiguration[]) => void;
+  onFormStateChange: (
+    state: {
+      form: 'data';
+    } & FormState,
+  ) => void;
   onSubmit: (data: DataSetConfiguration[]) => void;
 }
 
@@ -49,14 +54,18 @@ const formId = 'chartDataSelectorForm';
 const ChartDataSelector = ({
   buttons,
   canSaveChart,
+  forms,
   meta,
-  capabilities,
   dataSets = [],
+  definition,
   onDataRemoved,
   onDataAdded,
   onDataChanged,
+  onFormStateChange,
   onSubmit,
 }: Props) => {
+  const { capabilities } = definition;
+
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
     meta.indicators,
   ]);
@@ -74,7 +83,15 @@ const ChartDataSelector = ({
     ...dataSets,
   ]);
 
-  const [isChartSubmitted, setChartSubmitted] = useState(false);
+  const [submitCount, setSubmitCount] = useState(0);
+
+  useEffect(() => {
+    onFormStateChange({
+      form: 'data',
+      isValid: true,
+      submitCount,
+    });
+  }, [onFormStateChange, submitCount]);
 
   const removeSelected = (selected: DataSetConfiguration, index: number) => {
     const newDataSets = [...dataSetConfigs];
@@ -166,7 +183,8 @@ const ChartDataSelector = ({
           onDataAdded(newDataSetConfig);
         }
       }}
-      render={form => (
+    >
+      {form => (
         <>
           <Form {...form} id={formId} showSubmitError>
             <div className={styles.formSelectRow}>
@@ -178,7 +196,7 @@ const ChartDataSelector = ({
                     id={`${formId}-filters-${categoryName}`}
                     name={`filters.${categoryName}`}
                     label={categoryName}
-                    groupClass={styles.formSelectGroup}
+                    formGroupClass={styles.formSelectGroup}
                     className="govuk-!-width-full"
                     placeholder={
                       filters.options.length > 1
@@ -194,7 +212,7 @@ const ChartDataSelector = ({
                   id={`${formId}-indicator`}
                   name="indicator"
                   label="Indicator"
-                  groupClass={styles.formSelectGroup}
+                  formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
                   placeholder="Select indicator"
                   options={indicatorOptions}
@@ -206,7 +224,7 @@ const ChartDataSelector = ({
                   id={`${formId}-location`}
                   name="location"
                   label="Location"
-                  groupClass={styles.formSelectGroup}
+                  formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
                   placeholder="Any location"
                   options={locationOptions}
@@ -218,7 +236,7 @@ const ChartDataSelector = ({
                   id={`${formId}-timePeriod`}
                   name="timePeriod"
                   label="Time period"
-                  groupClass={styles.formSelectGroup}
+                  formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
                   placeholder="Any time period"
                   options={meta.timePeriodRange}
@@ -288,35 +306,25 @@ const ChartDataSelector = ({
                 })}
               </ul>
 
-              {isChartSubmitted && !canSaveChart && (
-                <ErrorSummary
-                  title="Cannot save chart"
-                  id={`${formId}-errorSummary`}
-                  errors={[
-                    {
-                      id: `${formId}-submit`,
-                      message: 'Ensure that all other tabs are valid first',
-                    },
-                  ]}
-                />
-              )}
-
-              <Button
-                id={`${formId}-submit`}
+              <ChartBuilderSaveButton
+                formId={formId}
+                forms={forms}
+                showSubmitError={submitCount > 0 && !canSaveChart}
                 onClick={() => {
-                  setChartSubmitted(true);
-                  onSubmit(dataSetConfigs);
+                  setSubmitCount(submitCount + 1);
+
+                  if (canSaveChart) {
+                    onSubmit(dataSetConfigs);
+                  }
                 }}
-              >
-                Save chart options
-              </Button>
+              />
 
               {buttons}
             </>
           )}
         </>
       )}
-    />
+    </Formik>
   );
 };
 

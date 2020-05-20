@@ -1,99 +1,117 @@
 import { FormGroup } from '@common/components/form/index';
-import createErrorHelper from '@common/validation/createErrorHelper';
-import { Field, FieldProps } from 'formik';
+import {
+  FieldHelperProps,
+  FieldInputProps,
+  FieldMetaProps,
+  useField,
+} from 'formik';
 import React, {
+  ChangeEvent,
   ChangeEventHandler,
   ComponentType,
+  FocusEvent,
   FocusEventHandler,
   ReactNode,
+  useMemo,
 } from 'react';
 
-interface RequiredProps<FormValues> {
-  name: keyof FormValues | string;
-  error?: ReactNode | string;
-  value: unknown;
-  onChange?: ChangeEventHandler;
-  onBlur?: FocusEventHandler;
+export type FormFieldComponentProps<Props> = FormFieldProps &
+  Omit<Props, 'value' | 'error'>;
+
+export interface FormFieldProps {
+  formGroup?: boolean;
+  formGroupClass?: string;
+  name: string;
+  showError?: boolean;
 }
 
-export type Props<FormValues, P> = {
-  formGroupClass?: string;
+interface FormFieldInputProps<Value> extends FieldInputProps<Value> {
   error?: ReactNode | string;
-  name: keyof FormValues | string;
-  type?: 'checkbox' | 'radio' | 'text' | 'number';
-  validate?: (value: unknown) => string | Promise<void> | undefined;
-  as?: ComponentType<P & RequiredProps<FormValues>>;
-  showError?: boolean;
-} & Omit<P, 'name' | 'value' | 'type'>;
+}
 
-const FormField = <P extends {}, FormValues>({
+type InternalFormFieldProps<P, Value> = Omit<P, 'value' | 'error'> & {
+  as?: ComponentType<FormFieldInputProps<Value> & P>;
+  children?:
+    | ((props: {
+        field: FieldInputProps<Value> & { error?: string };
+        meta: FieldMetaProps<Value>;
+        helpers: FieldHelperProps<Value>;
+      }) => ReactNode)
+    | ReactNode;
+  type?: 'checkbox' | 'radio' | 'text' | 'number';
+};
+
+const FormField = <Value, Props extends {} = {}>({
   as,
+  children,
+  formGroup = true,
   formGroupClass,
-  error,
   name,
   showError = true,
   type,
   ...props
-}: Props<FormValues, P>) => {
-  const Component = as as ComponentType<RequiredProps<FormValues>>;
+}: FormFieldProps & InternalFormFieldProps<Props, Value>) => {
+  const [field, meta, helpers] = useField({
+    name,
+    type,
+  });
 
-  return (
-    <Field name={name}>
-      {({ field, form }: FieldProps) => {
-        const { getError } = createErrorHelper(form);
+  const error = showError && meta.error && meta.touched ? meta.error : '';
 
-        let errorMessage = error || getError(name);
+  const component = useMemo(() => {
+    const typedProps = props as {
+      onBlur?: FocusEventHandler;
+      onChange?: ChangeEventHandler;
+    };
+    const Component = as as ComponentType<FormFieldInputProps<Value>>;
 
-        if (!showError) {
-          errorMessage = '';
-        }
+    if (Component) {
+      return (
+        <Component
+          {...props}
+          {...field}
+          name={name}
+          error={error}
+          onChange={(event: ChangeEvent) => {
+            if (typedProps.onChange) {
+              typedProps.onChange(event);
+            }
 
-        const typeProps: { checked?: boolean } = {};
+            if (!event.isDefaultPrevented()) {
+              field.onChange(event);
+            }
+          }}
+          onBlur={(event: FocusEvent) => {
+            if (typedProps.onBlur) {
+              typedProps.onBlur(event);
+            }
 
-        switch (type) {
-          case 'checkbox':
-          case 'radio':
-            typeProps.checked = !!field.value;
-            break;
-          default:
-            break;
-        }
+            if (!event.isDefaultPrevented()) {
+              field.onBlur(event);
+            }
+          }}
+        />
+      );
+    }
 
-        return (
-          <FormGroup hasError={!!errorMessage} className={formGroupClass}>
-            <Component
-              {...props}
-              {...field}
-              {...typeProps}
-              name={name}
-              error={errorMessage}
-              onChange={event => {
-                const typedProps = props as { onChange?: ChangeEventHandler };
+    return typeof children === 'function'
+      ? children({
+          field: {
+            ...field,
+            error,
+          },
+          helpers,
+          meta,
+        })
+      : children;
+  }, [as, children, error, field, helpers, meta, name, props]);
 
-                if (typedProps.onChange) {
-                  typedProps.onChange(event);
-                }
-
-                if (!event.isDefaultPrevented()) {
-                  field.onChange(event);
-                }
-              }}
-              onBlur={event => {
-                const typedProps = props as { onBlur?: FocusEventHandler };
-
-                if (typedProps.onBlur) {
-                  typedProps.onBlur(event);
-                }
-
-                if (!event.isDefaultPrevented()) {
-                  field.onBlur(event);
-                }
-              }}
-            />
-          </FormGroup>
-        );
-      }}
-    </Field>
+  return formGroup ? (
+    <FormGroup hasError={!!error} className={formGroupClass}>
+      {component}
+    </FormGroup>
+  ) : (
+    component
   );
 };
 

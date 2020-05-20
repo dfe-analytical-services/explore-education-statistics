@@ -3,7 +3,6 @@ import editReleaseDataService, {
   ChartFile,
 } from '@admin/services/release/edit-release/data/editReleaseDataService';
 import Button from '@common/components/Button';
-import { Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -14,7 +13,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
-import { FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React, { useState } from 'react';
 
 const errorCodeMappings = [
@@ -93,7 +92,8 @@ const InfographicChartForm = ({
         fileId: Yup.string(),
       })}
       onSubmit={handleSubmit}
-      render={(form: FormikProps<FormValues>) => {
+    >
+      {form => {
         return (
           <Form id={formId}>
             {fileId && selectedFile && (
@@ -163,7 +163,7 @@ const InfographicChartForm = ({
           </Form>
         );
       }}
-    />
+    </Formik>
   );
 };
 

@@ -3,10 +3,9 @@ require('core-js/features/array/flat');
 
 const appInsights = require('applicationinsights');
 
-// AI Key should be loaded via enviroment variable APPINSIGHTS_INSTRUMENTATIONKEY
 if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
   appInsights
-    .setup()
+    .setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY)
     .setAutoDependencyCorrelation(true)
     .setAutoCollectRequests(true)
     .setAutoCollectPerformance(true)
@@ -134,31 +133,6 @@ async function startServer(port = process.env.PORT || 3000) {
       }),
     );
   }
-
-  server.get('/find-statistics/:publication/:release?', (req, res) => {
-    return app.render(req, res, '/find-statistics/publication', {
-      publication: req.params.publication,
-      release: req.params.release,
-    });
-  });
-
-  server.get('/methodology/:methodologySlug', (req, res) => {
-    return app.render(req, res, '/methodology/methodology', {
-      methodologySlug: req.params.methodologySlug,
-    });
-  });
-
-  server.get('/data-tables/permalink/:permalink/', (req, res) => {
-    return app.render(req, res, '/data-tables/permalink', {
-      permalink: req.params.permalink,
-    });
-  });
-
-  server.get('/data-tables/:publicationSlug?', (req, res) => {
-    return app.render(req, res, '/data-tables', {
-      publicationSlug: req.params.publicationSlug,
-    });
-  });
 
   server.get('*', (req, res) => handleRequest(req, res));
 

@@ -1,12 +1,13 @@
 import publicationService, {
   PublicationTitle,
 } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import functionsService from '@frontend/services/functionsService';
-import { NextPageContext } from 'next-server/dist/lib/utils';
-import React, { Component } from 'react';
-import Link from '@frontend/components/Link';
 import classNames from 'classnames';
+import { GetServerSideProps, NextPage } from 'next';
+import React, { useState } from 'react';
 import SubscriptionForm, {
   SubscriptionFormSubmitHandler,
 } from './components/SubscriptionForm';
@@ -19,42 +20,17 @@ interface Props {
   verified: string;
 }
 
-interface State {
-  subscribed: boolean;
-}
+const SubscriptionPage: NextPage<Props> = ({
+  data,
+  slug,
+  unsubscribed,
+  verified,
+}) => {
+  const [subscribed, setSubscribed] = useState(false);
 
-class SubscriptionPage extends Component<Props> {
-  public state: State = {
-    subscribed: false,
-  };
-
-  public static async getInitialProps({ query }: NextPageContext) {
-    const { slug, unsubscribed, verified } = query as {
-      slug: string;
-      unsubscribed?: string;
-      verified?: string;
-    };
-
-    const request = publicationService.getPublicationTitle(slug);
-
-    const data = await request;
-
-    return {
-      data,
-      slug,
-      unsubscribed,
-      verified,
-    };
-  }
-
-  private handleFormSubmit: SubscriptionFormSubmitHandler = async ({
-    email,
-  }) => {
+  const handleFormSubmit: SubscriptionFormSubmitHandler = async ({ email }) => {
     if (email !== '') {
-      const {
-        data: { id, title },
-        slug,
-      } = this.props;
+      const { id, title } = data;
 
       await functionsService.subscribeToPublication({
         email,
@@ -62,66 +38,85 @@ class SubscriptionPage extends Component<Props> {
         slug,
         title,
       });
-      this.setState({
-        subscribed: true,
-      });
+
+      setSubscribed(true);
     }
   };
 
-  public render() {
-    const { subscribed } = this.state;
-    const { data, slug, unsubscribed, verified } = this.props;
-    let message;
-    let title;
+  let message;
+  let title;
 
-    if (unsubscribed) {
-      title = 'Unsubscribed';
-      message = 'You have successfully unsubscribed from these updates.';
-    } else if (verified) {
-      title = 'Subscription verified';
-      message = 'You have successfully subscribed to these updates.';
-    } else if (subscribed) {
-      title = 'Subscribed';
-      message = 'Thank you. Check your email to confirm your subscription.';
-    }
-
-    return (
-      <Page
-        title={data.title}
-        caption="Notify me"
-        breadcrumbLabel="Notify me"
-        breadcrumbs={[
-          { name: 'Find statistics and data', link: '/find-statistics' },
-          { name: data.title, link: `/find-statistics/${slug}` },
-        ]}
-      >
-        {message ? (
-          <div
-            className={classNames(
-              'govuk-panel',
-              'govuk-panel--confirmation',
-              styles.panelContainer,
-            )}
-          >
-            <h1 className="govuk-panel__title">{title}</h1>
-            <div className="govuk-panel__body">{message}</div>
-            {verified && (
-              <Link to={`/find-statistics/${slug}`}>View {data.title}</Link>
-            )}
-          </div>
-        ) : (
-          <>
-            <p>Subscribe to receive updates when:</p>
-            <ul className="govuk-list govuk-list--bullet">
-              <li>new statistics and data are released</li>
-              <li>existing statistics and data are changed or corrected</li>
-            </ul>
-            <SubscriptionForm onSubmit={this.handleFormSubmit} />
-          </>
-        )}
-      </Page>
-    );
+  if (unsubscribed) {
+    title = 'Unsubscribed';
+    message = 'You have successfully unsubscribed from these updates.';
+  } else if (verified) {
+    title = 'Subscription verified';
+    message = 'You have successfully subscribed to these updates.';
+  } else if (subscribed) {
+    title = 'Subscribed';
+    message = 'Thank you. Check your email to confirm your subscription.';
   }
-}
+
+  return (
+    <Page
+      title={data.title}
+      caption="Notify me"
+      breadcrumbLabel="Notify me"
+      breadcrumbs={[
+        { name: 'Find statistics and data', link: '/find-statistics' },
+        { name: data.title, link: `/find-statistics/${slug}` },
+      ]}
+    >
+      {message ? (
+        <div
+          className={classNames(
+            'govuk-panel',
+            'govuk-panel--confirmation',
+            styles.panelContainer,
+          )}
+        >
+          <h1 className="govuk-panel__title">{title}</h1>
+          <div className="govuk-panel__body">{message}</div>
+          {verified && (
+            <Link
+              to="/find-statistics/[publication]"
+              as={`/find-statistics/${slug}`}
+            >
+              View {data.title}
+            </Link>
+          )}
+        </div>
+      ) : (
+        <>
+          <p>Subscribe to receive updates when:</p>
+          <ul className="govuk-list govuk-list--bullet">
+            <li>new statistics and data are released</li>
+            <li>existing statistics and data are changed or corrected</li>
+          </ul>
+          <SubscriptionForm onSubmit={handleFormSubmit} />
+        </>
+      )}
+    </Page>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  query,
+}) => {
+  const { slug, unsubscribed = '', verified = '' } = query as Dictionary<
+    string
+  >;
+
+  const data = await publicationService.getPublicationTitle(slug as string);
+
+  return {
+    props: {
+      data,
+      slug,
+      unsubscribed,
+      verified,
+    },
+  };
+};
 
 export default SubscriptionPage;

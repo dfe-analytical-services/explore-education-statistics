@@ -4,7 +4,6 @@ import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -12,6 +11,7 @@ import { errorCodeToFieldError } from '@common/components/form/util/serverValida
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 
 interface Model {
@@ -92,7 +92,8 @@ const PrereleaseAccessManagement = ({ release }: Props) => {
               email: Yup.string().email('Enter a valid email address'),
             })}
             onSubmit={handleSubmit}
-            render={() => {
+          >
+            {() => {
               return (
                 <Form id={formId}>
                   <FormFieldset
@@ -119,7 +120,7 @@ const PrereleaseAccessManagement = ({ release }: Props) => {
                 </Form>
               );
             }}
-          />
+          </Formik>
 
           <SummaryList>
             {model.preReleaseContactsForRelease.map(existingContact => (

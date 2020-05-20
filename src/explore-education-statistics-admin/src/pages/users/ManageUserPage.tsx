@@ -1,27 +1,26 @@
-import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
-import { FormFieldset, FormFieldSelect, Formik } from '@common/components/form';
 import Link from '@admin/components/Link';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import Form from '@common/components/form/Form';
 import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService from '@admin/services/users/service';
-import dashboardService from '@admin/services/dashboard/service';
 import {
-  UserUpdate,
-  UserReleaseRoleSubmission,
   User,
+  UserReleaseRoleSubmission,
+  UserUpdate,
 } from '@admin/services/users/types';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import Yup from '@common/validation/yup';
-import React, { useCallback, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
+import { FormFieldSelect, FormFieldset } from '@common/components/form';
+import Form from '@common/components/form/Form';
+import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { useErrorControl } from '@common/contexts/ErrorControlContext';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
+import React, { useCallback, useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -52,7 +51,7 @@ interface AddReleaseRoleFormValues {
 const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
   const [model, setModel] = useState<Model>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorStatus, setErrorStatus] = useState<number>();
+  const [, setErrorStatus] = useState<number>();
 
   const { userId } = match.params;
   const formId = userId;
@@ -70,7 +69,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
         setErrorStatus(error.response.status);
       })
       .then(() => setIsLoading(false));
-  }, []);
+  }, [userId]);
 
   const { value: roles } = useAsyncRetry(() => userService.getRoles());
   const { value: releases } = useAsyncRetry(() => userService.getReleases());
@@ -94,9 +93,6 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
         releaseId: values.selectedReleaseId,
         releaseRole: values.selectedReleaseRoleId,
       };
-
-      console.log(values.selectedReleaseId);
-      console.log(submission);
 
       await userService.addUserReleaseRole(userId, submission);
 
@@ -137,7 +133,8 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                 ),
               })}
               onSubmit={handleSubmit}
-              render={_ => {
+            >
+              {() => {
                 return (
                   <Form id={formId}>
                     <FormFieldset
@@ -188,7 +185,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                   </Form>
                 );
               }}
-            />
+            </Formik>
             <Formik<AddReleaseRoleFormValues>
               initialValues={{
                 selectedReleaseId:
@@ -199,7 +196,8 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
               }}
               enableReinitialize
               onSubmit={addReleaseRole}
-              render={() => {
+            >
+              {() => {
                 return (
                   <Form id={`${formId}-releaseRole`}>
                     <FormFieldset
@@ -298,7 +296,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                   </Form>
                 );
               }}
-            />
+            </Formik>
           </>
         )}
       </LoadingSpinner>

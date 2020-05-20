@@ -37,6 +37,7 @@ export interface VerticalBarProps extends StackedBarProps {
 }
 
 const VerticalBarBlock = ({
+  alt,
   data,
   meta,
   height,
@@ -69,6 +70,9 @@ const VerticalBarBlock = ({
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
       <BarChart
+        aria-label={alt}
+        role="img"
+        focusable={false}
         data={chartData}
         margin={{
           left: 30,

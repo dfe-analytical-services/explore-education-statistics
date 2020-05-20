@@ -18,7 +18,10 @@ function MethodologyList({ publications }: Props) {
                   {publication.title}
                 </h3>
                 <div>
-                  <Link to={`/methodology/${publication.methodology.slug}`}>
+                  <Link
+                    to="/methodology/[methodology]"
+                    as={`/methodology/${publication.methodology.slug}`}
+                  >
                     View methodology
                   </Link>
                 </div>

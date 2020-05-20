@@ -1,56 +1,41 @@
+import FormField, {
+  FormFieldComponentProps,
+} from '@common/components/form/FormField';
 import FormFileInput, {
   FormFileInputProps,
 } from '@common/components/form/FormFileInput';
-import createErrorHelper from '@common/validation/createErrorHelper';
-import { Field, FieldProps } from 'formik';
 import React from 'react';
-import FormGroup from './FormGroup';
 
-interface Props<FormValues> extends FormFileInputProps {
-  name: keyof FormValues & string;
-  formGroupClass?: string;
-}
+type Props<FormValues> = FormFieldComponentProps<FormFileInputProps>;
 
-const FormFieldFileInput = <T extends {}>({
-  name,
-  error,
-  formGroupClass,
-  ...props
-}: Props<T>) => {
+const FormFieldFileInput = <FormValues extends {}>(
+  props: Props<FormValues>,
+) => {
   return (
-    <Field name={name}>
-      {({ form }: FieldProps) => {
-        const { getError } = createErrorHelper(form);
+    <FormField<File | null> {...props}>
+      {({ field, helpers }) => (
+        <FormFileInput
+          {...props}
+          {...field}
+          onChange={event => {
+            if (props.onChange) {
+              props.onChange(event);
+            }
 
-        const errorMessage = error || getError(name);
+            if (event.isDefaultPrevented()) {
+              return;
+            }
 
-        return (
-          <FormGroup hasError={!!errorMessage} className={formGroupClass}>
-            <FormFileInput
-              {...props}
-              name={name.toString()}
-              onChange={event => {
-                if (props.onChange) {
-                  props.onChange(event);
-                }
+            const file =
+              event.target.files && event.target.files.length > 0
+                ? event.target.files[0]
+                : null;
 
-                if (event.isDefaultPrevented()) {
-                  return;
-                }
-
-                const file =
-                  event.target.files && event.target.files.length > 0
-                    ? event.target.files[0]
-                    : null;
-
-                form.setFieldValue(name, file);
-              }}
-              error={errorMessage}
-            />
-          </FormGroup>
-        );
-      }}
-    </Field>
+            helpers.setValue(file);
+          }}
+        />
+      )}
+    </FormField>
   );
 };
 
