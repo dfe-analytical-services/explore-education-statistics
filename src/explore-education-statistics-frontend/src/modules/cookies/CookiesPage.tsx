@@ -14,7 +14,7 @@ import { Formik } from 'formik';
 import { GetServerSideProps } from 'next';
 import { parseCookies } from 'nookies';
 import React, { useState } from 'react';
-import styles from './CookiesIndexPage.module.scss';
+import styles from './CookiesPage.module.scss';
 
 interface FormValues {
   googleAnalytics: string;
@@ -24,16 +24,12 @@ interface Props {
   cookies: Dictionary<string>;
 }
 
-function CookiesIndexPage() {
+function CookiesPage({ cookies }: Props) {
   const [submitted, setSubmitted] = useState(false);
-  const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
 
-  const submitCookieSettings = (values: { [key: string]: string }) => {
-    setSubmitted(true);
-    window.scrollTo(0, 0);
-    setBannerSeenCookie(true);
-    setGADisabledCookie(values.googleAnalytics !== 'on');
-  };
+  const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies(
+    cookies,
+  );
 
   return (
     <Page
@@ -74,16 +70,23 @@ function CookiesIndexPage() {
             We use 2 types of cookie. You can choose which cookies you're happy
             for us to use.
           </p>
+
           <Formik<FormValues>
             enableReinitialize
             initialValues={{
               googleAnalytics: getCookie('disableGA') === 'true' ? 'off' : 'on',
             }}
             onSubmit={values => {
-              submitCookieSettings(values);
+              setSubmitted(true);
+              window.scrollTo(0, 0);
+
+              setBannerSeenCookie(true);
+              setGADisabledCookie(values.googleAnalytics !== 'on');
             }}
             validationSchema={Yup.object<FormValues>({
-              googleAnalytics: Yup.string().required('Select'),
+              googleAnalytics: Yup.string()
+                .required('Select an option for Google analytics and cookies')
+                .oneOf(['on', 'off']),
             })}
           >
             {form => {
@@ -179,4 +182,4 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   };
 };
 
-export default CookiesIndexPage;
+export default CookiesPage;
