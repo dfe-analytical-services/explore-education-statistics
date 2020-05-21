@@ -202,6 +202,46 @@ export const releaseReducer: Reducer<
     default: {
       return draft;
     }
+    case 'UPDATE_BLOCK_COMMENTS': {
+      const { comments, meta } = action.payload;
+      const { sectionId, sectionKey, blockId } = meta;
+
+      const matchingSection = draft.release[sectionKey] as
+        | ContentSection<EditableBlock>
+        | ContentSection<EditableBlock>[];
+
+      if (!matchingSection) {
+        throw new Error(
+          `${action.type}: Section "${sectionKey}" could not be found.`,
+        );
+      }
+
+      let matchingBlock;
+      if (Array.isArray(matchingSection)) {
+        const matchingContentSection = matchingSection.find(
+          section => section.id === sectionId,
+        );
+
+        if (matchingContentSection) {
+          matchingBlock = matchingContentSection.content.find(
+            block => block.id === blockId,
+          );
+        }
+      } else {
+        matchingBlock = matchingSection.content.find(
+          block => block.id === blockId,
+        );
+      }
+
+      if (!matchingBlock) {
+        throw new Error(
+          `${action.type}: Block "${blockId}" could not be found with sectionKey "${sectionKey}" and sectionId "${sectionId}".`,
+        );
+      } else {
+        matchingBlock.comments = comments;
+      }
+      return draft;
+    }
   }
 };
 

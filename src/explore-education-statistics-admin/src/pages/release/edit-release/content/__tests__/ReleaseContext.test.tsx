@@ -2,6 +2,7 @@ import {
   EditableBlock,
   EditableContentBlock,
   EditableRelease,
+  ExtendedComment,
 } from '@admin/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 import { produce } from 'immer';
@@ -72,6 +73,7 @@ const basicRelease: EditableRelease = {
           comments: [
             {
               id: '814e3272-1a3e-4849-d53b-08d7c40dd247',
+              userId: '3d149c98-c369-4d87-afbd-42c5c9a269c0',
               name: 'Bau1',
               time: new Date('2020-03-09T09:39:53.736'),
               commentText: 'A comment',
@@ -79,6 +81,7 @@ const basicRelease: EditableRelease = {
             },
             {
               id: 'a4a6bd84-992b-44a0-d53c-08d7c40dd247',
+              userId: '3d149c98-c369-4d87-afbd-42c5c9a269c0',
               name: 'Bau1',
               time: new Date('2020-03-09T09:40:16.534'),
               commentText: 'another comment',
@@ -606,6 +609,7 @@ describe('ReleaseContext', () => {
         comments: [
           {
             id: '814e3272-1a3e-4849-d53b-08d7c40dd247',
+            userId: '3d149c98-c369-4d87-afbd-42c5c9a269c0',
             name: 'Bau1',
             time: new Date('2020-03-09T09:39:53.736'),
             commentText: 'A comment',
@@ -613,6 +617,7 @@ describe('ReleaseContext', () => {
           },
           {
             id: 'a4a6bd84-992b-44a0-d53c-08d7c40dd247',
+            userId: '3d149c98-c369-4d87-afbd-42c5c9a269c0',
             name: 'Bau1',
             time: new Date('2020-03-09T09:40:16.534'),
             commentText: 'another comment',
@@ -730,5 +735,70 @@ describe('ReleaseContext', () => {
     expect(release?.content[0].id).toEqual(basicSection.id);
     expect(release?.content[0].caption).toEqual('updated caption');
     expect(release?.content[0].heading).toEqual('updated heading');
+  });
+
+  test("UPDATE_BLOCK_COMMENTS updates a block's comments", () => {
+    const sectionKey = 'content';
+    const basicSection = basicRelease[sectionKey][0];
+    const basicBlock = basicSection.content[0];
+    const basicComments = basicBlock.comments;
+
+    const newComment: ExtendedComment = {
+      id: 'ef2c02d3-41a0-4b34-82e5-939c7537bf31',
+      userId: 'd19da768-17b3-4217-9aec-33dee83c6695',
+      name: 'Test name',
+      time: new Date('2020-12-25T05:00:00.000'),
+      commentText: 'added comment',
+      state: 'open',
+    };
+
+    const updatedComments = [...basicComments, newComment];
+
+    const { release } = releaseReducer(
+      {
+        release: basicRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+        unresolvedComments: [],
+      },
+      {
+        type: 'UPDATE_BLOCK_COMMENTS',
+        payload: {
+          meta: {
+            sectionId: basicSection.id,
+            blockId: basicBlock.id,
+            sectionKey,
+          },
+          comments: [...updatedComments],
+        },
+      },
+    );
+
+    expect(release?.content[0].content[0].comments).toEqual([
+      {
+        id: '814e3272-1a3e-4849-d53b-08d7c40dd247',
+        userId: '3d149c98-c369-4d87-afbd-42c5c9a269c0',
+        name: 'Bau1',
+        time: new Date('2020-03-09T09:39:53.736'),
+        commentText: 'A comment',
+        state: 'open',
+      },
+      {
+        id: 'a4a6bd84-992b-44a0-d53c-08d7c40dd247',
+        userId: '3d149c98-c369-4d87-afbd-42c5c9a269c0',
+        name: 'Bau1',
+        time: new Date('2020-03-09T09:40:16.534'),
+        commentText: 'another comment',
+        state: 'open',
+      },
+      {
+        id: 'ef2c02d3-41a0-4b34-82e5-939c7537bf31',
+        userId: 'd19da768-17b3-4217-9aec-33dee83c6695',
+        name: 'Test name',
+        time: new Date('2020-12-25T05:00:00.000'),
+        commentText: 'added comment',
+        state: 'open',
+      },
+    ]);
   });
 });

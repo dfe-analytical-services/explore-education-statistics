@@ -6,6 +6,7 @@ import {
 } from '@admin/services/release/edit-release/content/types';
 import { Dictionary } from '@admin/types';
 import { useCallback } from 'react';
+import { ExtendedComment } from 'src/services/publicationService';
 import { useReleaseDispatch } from './ReleaseContext';
 import { ContentSectionKeys } from './ReleaseContextActionTypes';
 
@@ -284,6 +285,29 @@ export default function useReleaseActions() {
     [dispatch],
   );
 
+  const updateBlockComments = useCallback(
+    async ({
+      sectionId,
+      blockId,
+      sectionKey,
+      comments,
+    }: {
+      sectionId: string;
+      blockId: string;
+      sectionKey: ContentSectionKeys;
+      comments: ExtendedComment[];
+    }) => {
+      dispatch({
+        type: 'UPDATE_BLOCK_COMMENTS',
+        payload: {
+          meta: { sectionId, blockId, sectionKey },
+          comments,
+        },
+      });
+    },
+    [dispatch],
+  );
+
   return {
     updateAvailableDataBlocks,
     deleteContentSectionBlock,
@@ -296,5 +320,6 @@ export default function useReleaseActions() {
     updateContentSectionsOrder,
     removeContentSection,
     updateContentSectionHeading,
+    updateBlockComments,
   };
 }
