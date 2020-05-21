@@ -1,4 +1,5 @@
 ﻿using System;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.Extensions.Options;
@@ -14,6 +15,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _preReleaseOptions = config.Value.PreReleaseAccess.AccessWindow;
         }
 
+        public PreReleaseWindow GetPreReleaseWindow(Release release)
+        {
+            if (!release.PublishScheduled.HasValue)
+            {
+                throw new ArgumentException("Release has no PublishScheduled value", nameof(release));
+            }
+
+            var publishScheduled = release.PublishScheduled.Value;
+
+            return new PreReleaseWindow
+            {
+                PreReleaseWindowStartTime = GetAccessWindowStart(publishScheduled),
+                PreReleaseWindowEndTime = GetAccessWindowEnd(publishScheduled)
+            };
+        }
+
         public PreReleaseWindowStatus GetPreReleaseWindowStatus(Release release, DateTime referenceTime)
         {
             if (!release.PublishScheduled.HasValue)
@@ -24,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 };
             }
 
-            var publishDate = release.PublishScheduled.Value;
-            var accessWindowStart = publishDate.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
-            var accessWindowEnd = publishDate.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeEnd);
+            var publishScheduled = release.PublishScheduled.Value;
+            var accessWindowStart = GetAccessWindowStart(publishScheduled);
+            var accessWindowEnd = GetAccessWindowEnd(publishScheduled);
 
             return new PreReleaseWindowStatus
             {
@@ -34,6 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 PreReleaseWindowEndTime = accessWindowEnd,
                 PreReleaseAccess = GetPreReleaseAccess(release, accessWindowStart, accessWindowEnd, referenceTime)
             };
+        }
+
+        private DateTime GetAccessWindowStart(DateTime publishScheduled)
+        {
+            return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
+        }
+
+        private DateTime GetAccessWindowEnd(DateTime publishScheduled)
+        {
+            return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeEnd);
         }
 
         private static PreReleaseAccess GetPreReleaseAccess(

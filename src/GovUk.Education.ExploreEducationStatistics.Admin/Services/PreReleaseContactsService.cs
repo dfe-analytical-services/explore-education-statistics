@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -28,20 +29,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly IPreReleaseService _preReleaseService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PreReleaseContactsService(ContentDbContext context, IUserService userService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper, UsersAndRolesDbContext usersAndRolesDbContext,
-            IEmailService emailService, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public PreReleaseContactsService(ContentDbContext context, 
+            UsersAndRolesDbContext usersAndRolesDbContext,
+            IConfiguration configuration,
+            IEmailService emailService,
+            IPreReleaseService preReleaseService,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IUserService userService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
-            _userService = userService;
-            _persistenceHelper = persistenceHelper;
             _usersAndRolesDbContext = usersAndRolesDbContext;
-            _emailService = emailService;
             _configuration = configuration;
+            _emailService = emailService;
+            _preReleaseService = preReleaseService;
+            _persistenceHelper = persistenceHelper;
+            _userService = userService;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -278,20 +286,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host;
-            
+
             var prereleaseUrl = $"{scheme}://{host}/publication/{release.PublicationId}/release/{releaseId}/prerelease";
-                
+
+            var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(release);
+            var preReleaseWindowStart = preReleaseWindow.PreReleaseWindowStartTime.ConvertTimeFromUtcToGmt();
+            var publishScheduled = release.PublishScheduled?.ConvertTimeFromUtcToGmt();
+            // TODO EES-828 This time should depend on the Publisher schedule
+            var publishScheduledTime = new TimeSpan(9, 30, 0);
+
+            var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
+            var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
+            var publishDay = FormatDayForEmail(publishScheduled);
+            var publishTime = FormatTimeForEmail(publishScheduledTime);
+
             var emailValues = new Dictionary<string, dynamic>
             {
                 {"newUser", newUser ? "yes" : "no"},
                 {"release name", release.Title},
                 {"publication name", release.Publication.Title},
                 {"prerelease link", prereleaseUrl},
-                { "daybeforereleaseday", release.PublishScheduled.Value.AddDays(-1).ToString("dddd dd MMMM yyyy")},
-                { "releaseday", release.PublishScheduled.Value.ToString("dddd dd MMMM yyyy")},
+                {"prerelease day", preReleaseDay},
+                {"prerelease time", preReleaseTime},
+                {"publish day", publishDay},
+                {"publish time", publishTime}
             };
 
             _emailService.SendEmail(email, template, emailValues);
+        }
+
+        private static string FormatTimeForEmail(DateTime dateTime)
+        {
+            return dateTime.ToString("HH:mm");
+        }
+
+        private static string FormatTimeForEmail(TimeSpan timeSpan)
+        {
+            return timeSpan.ToString(@"hh\:mm");
+        }
+
+        private static string FormatDayForEmail(DateTime? dateTime)
+        {
+            return dateTime?.ToString("dddd dd MMMM yyyy");
         }
     }
 

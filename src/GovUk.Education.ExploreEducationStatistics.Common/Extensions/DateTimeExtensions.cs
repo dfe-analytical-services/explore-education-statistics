@@ -14,6 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return TimeZoneInfo.ConvertTimeToUtc(dateTimeStartOfDay, GetGmtStandardTimeTimezone());
         }
 
+        public static DateTime ConvertTimeFromUtcToGmt(this DateTime dateTime)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(dateTime, GetGmtStandardTimeTimezone());
+        }
+        
         public static TimeZoneInfo GetGmtStandardTimeTimezone()
         {
             return TimeZoneInfo.FindSystemTimeZoneById(
