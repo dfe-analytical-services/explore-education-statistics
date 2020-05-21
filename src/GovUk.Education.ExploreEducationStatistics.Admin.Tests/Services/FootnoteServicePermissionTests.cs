@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -22,41 +21,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class FootnoteServicePermissionTests
     {
-        private static readonly Release Release = new Release
+        private static readonly Release release = new Release
         {
             Id = Guid.NewGuid()
         };
         
-        private static readonly Subject Subject = new Subject
+        private static readonly Subject subject = new Subject
         {
             Id = Guid.NewGuid()
         };
         
-        private static readonly Footnote Footnote = new Footnote
+        private static readonly Footnote footnote = new Footnote
         {
             Id = Guid.NewGuid(),
             Subjects = new List<SubjectFootnote>
             {
                 new SubjectFootnote
                 {
-                    SubjectId = Subject.Id 
+                    SubjectId = subject.Id 
                 }
             }
         };
 
         private static readonly IReadOnlyCollection<Guid> SubjectIdsList = new List<Guid>
         {
-            Subject.Id    
+            subject.Id    
         };
         
         private static readonly IReadOnlyCollection<Guid> GuidList = new List<Guid>();
+        
+        private readonly Task<Either<ActionResult, Release>> _releaseExistsResult 
+            = Task.FromResult(new Either<ActionResult, Release>(new Release()));
         
         [Fact]
         public void CreateFootnote()
         {
             AssertSecurityPoliciesChecked(service => service
                 .CreateFootnote(
-                    Guid.NewGuid(),
+                    release.Id,
                     "", 
                     GuidList, 
                     GuidList, 
@@ -71,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             AssertSecurityPoliciesChecked(service => service
                     .UpdateFootnote(
-                        Guid.NewGuid(), 
-                        Footnote.Id,
+                        release.Id, 
+                        footnote.Id,
                         "", 
                         GuidList, 
                         GuidList, 
@@ -86,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteFootnote()
         {
             AssertSecurityPoliciesChecked(service => service
-                    .DeleteFootnote(Guid.NewGuid(), Footnote.Id), 
+                    .DeleteFootnote(release.Id, footnote.Id), 
                 CanUpdateSpecificRelease);
         }
         
@@ -104,17 +106,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService, 
                 footnoteHelper
                 ) = Mocks();
-
+            
             using (var context = DbUtils.InMemoryStatisticsDbContext())
             {
-                context.Subject.Add(Subject);
-                context.ReleaseSubject.Add(new ReleaseSubject
-                {
-                    ReleaseId = Release.Id,
-                    SubjectId = Subject.Id
-                });
-                context.SaveChanges();
-                
                 var service = new FootnoteService(
                     context, 
                     logger.Object, 
@@ -128,10 +122,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     footnoteHelper.Object
                 );
 
-                PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, Release, userService, service, policies);
+                PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, release, userService, service, policies);
             }
         }
-        
+
         private (
             Mock<ILogger<FootnoteService>>,
             Mock<IFilterService>, 
@@ -143,6 +137,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IUserService>,
             Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
         {
+            var contentPersistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
+            MockUtils.SetupCall(contentPersistenceHelper, release.Id, release);
+            
             return (
                 new Mock<ILogger<FootnoteService>>(), 
                 new Mock<IFilterService>(), 
@@ -150,9 +147,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IFilterItemService>(), 
                 new Mock<IIndicatorService>(), 
                 new Mock<ISubjectService>(), 
-                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(Release.Id, Release),
+                contentPersistenceHelper,
                 new Mock<IUserService>(), 
-                MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote));
+                MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(footnote.Id, footnote));
         }
     }
 }

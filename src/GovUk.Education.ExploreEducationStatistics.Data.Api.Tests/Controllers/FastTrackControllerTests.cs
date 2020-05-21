@@ -15,12 +15,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private readonly Guid _validId = Guid.NewGuid();
         private readonly Guid _notFoundId = Guid.NewGuid();
-
+        private readonly Guid _releaseId = new Guid("03730cff-22d5-446c-8971-68921e933b50");
+        
         public FastTrackControllerTests()
         {
             var fastTrackService = new Mock<IFastTrackService>();
 
-            fastTrackService.Setup(s => s.GetAsync(_validId)).ReturnsAsync(
+            fastTrackService.Setup(s => s.GetAsync(_releaseId, _validId)).ReturnsAsync(
                 new FastTrackViewModel
                 {
                     Id = _validId,
@@ -28,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 }
             );
 
-            fastTrackService.Setup(s => s.GetAsync(_notFoundId)).ReturnsAsync(new NotFoundResult());
+            fastTrackService.Setup(s => s.GetAsync(_releaseId, _notFoundId)).ReturnsAsync(new NotFoundResult());
 
             _controller = new FastTrackController(fastTrackService.Object);
         }
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_FastTrack()
         {
-            var result = await _controller.GetAsync(_validId.ToString());
+            var result = await _controller.GetAsync(_releaseId, _validId.ToString());
 
             Assert.IsType<FastTrackViewModel>(result.Value);
             Assert.Equal(_validId, result.Value.Id);
@@ -45,14 +46,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_FastTrack_NotFound()
         {
-            var result = await _controller.GetAsync(_notFoundId.ToString());
+            var result = await _controller.GetAsync(_releaseId, _notFoundId.ToString());
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
         public async void Get_FastTrack_InvalidId()
         {
-            var result = await _controller.GetAsync("InvalidGuid");
+            var result = await _controller.GetAsync(_releaseId, "InvalidGuid");
             Assert.IsType<NotFoundResult>(result.Result);
         }
     }

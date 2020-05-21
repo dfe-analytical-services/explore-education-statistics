@@ -28,10 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return NotFound();
         }
 
-        [HttpPost]
-        public async Task<ActionResult<PermalinkViewModel>> CreateAsync([FromBody] CreatePermalinkRequest request)
+        [HttpPost("release/{releaseId}")]
+        public async Task<ActionResult<PermalinkViewModel>> CreateAsync(Guid releaseId, [FromBody] CreatePermalinkRequest request)
         {
-            return await _permalinkService.CreateAsync(request).HandleFailuresOrOk();
+            return await _permalinkService.CreateAsync(releaseId, request).HandleFailuresOrOk();
         }
     }
 }

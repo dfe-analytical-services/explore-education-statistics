@@ -15,13 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             ILogger<FootnoteService> logger) : base(context, logger)
         {}
 
-        public IEnumerable<Footnote> GetFootnotes(Guid subjectId,
+        public IEnumerable<Footnote> GetFootnotes(
+            Guid releaseId,
+            Guid subjectId,
             IQueryable<Observation> observations,
             IEnumerable<Guid> indicators)
         {
             var filterItems = observations.SelectMany(observation => observation.FilterItems)
                 .Select(item => item.FilterItem.Id).Distinct();
 
+            var releaseIdParam = new SqlParameter("releaseId", releaseId);
             var subjectIdParam = new SqlParameter("subjectId", subjectId);
             var indicatorListParam = CreateIdListType("indicatorList", indicators);
             var filterItemListParam = CreateIdListType("filterItemList", filterItems);
@@ -30,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Footnote
                 .FromSqlRaw(
                     "EXEC dbo.FilteredFootnotes " +
+                    "@releaseId," +
                     "@subjectId," +
                     "@indicatorList," +
                     "@filterItemList",

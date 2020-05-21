@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface IResultSubjectMetaService
     {
-        Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(SubjectMetaQueryContext query,
+        Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, SubjectMetaQueryContext query,
             IQueryable<Observation> observations);
     }
 }

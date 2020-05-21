@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _userService = userService;
         }
 
-        public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
+        public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(Guid releaseId, ObservationQueryContext queryContext)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     return _resultSubjectMetaService
-                        .GetSubjectMeta(SubjectMetaQueryContext.FromObservationQueryContext(queryContext), observations)
+                        .GetSubjectMeta(releaseId, SubjectMetaQueryContext.FromObservationQueryContext(queryContext), observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {
                             return new TableBuilderResultViewModel

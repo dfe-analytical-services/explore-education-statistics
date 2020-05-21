@@ -51,9 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request)
+        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(Guid releaseId, CreatePermalinkRequest request)
         {
-            return await _tableBuilderService.Query(request.Query).OnSuccess(async result =>
+            return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
                 var permalink = new Permalink(request.Configuration, result, request.Query);
                 await _fileStorageService.UploadFromStreamAsync(ContainerName, permalink.Id.ToString(),

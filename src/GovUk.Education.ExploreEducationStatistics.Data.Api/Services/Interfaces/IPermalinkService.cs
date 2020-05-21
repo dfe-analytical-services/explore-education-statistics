@@ -14,6 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     {
         Task<Either<ActionResult, PermalinkViewModel>> GetAsync(Guid id);
 
-        Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request);
+        Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(Guid releaseId, CreatePermalinkRequest request);
     }
 }

@@ -38,13 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, FastTrackViewModel>> GetAsync(Guid fastTrackId)
+        public async Task<Either<ActionResult, FastTrackViewModel>> GetAsync(Guid releaseId, Guid fastTrackId)
         {
             try
             {
                 var text = await _fileStorageService.DownloadTextAsync(ContainerName, fastTrackId.ToString());
                 var fastTrack = JsonConvert.DeserializeObject<FastTrack>(text);
-                return await BuildViewModel(fastTrack);
+                return await BuildViewModel(releaseId, fastTrack);
             }
             catch (StorageException e)
                 when ((HttpStatusCode) e.RequestInformation.HttpStatusCode == HttpStatusCode.NotFound)
@@ -53,9 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        private Task<Either<ActionResult, FastTrackViewModel>> BuildViewModel(FastTrack fastTrack)
+        private Task<Either<ActionResult, FastTrackViewModel>> BuildViewModel(Guid releaseId, FastTrack fastTrack)
         {
-            return _tableBuilderService.Query(fastTrack.Query).OnSuccess(result =>
+            return _tableBuilderService.Query(releaseId, fastTrack.Query).OnSuccess(result =>
             {
                 var viewModel = _mapper.Map<FastTrackViewModel>(fastTrack);
                 viewModel.FullTable = result;
