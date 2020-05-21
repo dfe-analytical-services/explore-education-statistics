@@ -197,6 +197,7 @@ const Comments = ({
                 (
                   {
                     id,
+                    userId,
                     name,
                     time,
                     commentText,
@@ -270,7 +271,7 @@ const Comments = ({
                         </a>
                       </>
                     )}
-                    {canComment && (
+                    {canComment && user?.id === userId && (
                       <>
                         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
                         <a
@@ -289,9 +290,9 @@ const Comments = ({
                             ? 'Cancel'
                             : 'Edit'}
                         </a>
-                        <hr />
                       </>
                     )}
+                    <hr />
                   </div>
                 ),
               )}
