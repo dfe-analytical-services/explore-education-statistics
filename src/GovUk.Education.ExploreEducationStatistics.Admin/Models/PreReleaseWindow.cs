@@ -4,8 +4,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
     public class PreReleaseWindow
     {
-        public DateTime PreReleaseWindowStartTime { get; set; }
+        public DateTime Start { get; set; }
 
-        public DateTime PreReleaseWindowEndTime { get; set; }
+        public DateTime End { get; set; }
     }
 }

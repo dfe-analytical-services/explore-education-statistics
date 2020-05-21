@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var prereleaseUrl = $"{scheme}://{host}/publication/{release.PublicationId}/release/{releaseId}/prerelease";
 
             var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(release);
-            var preReleaseWindowStart = preReleaseWindow.PreReleaseWindowStartTime.ConvertTimeFromUtcToGmt();
+            var preReleaseWindowStart = preReleaseWindow.Start.ConvertTimeFromUtcToGmt();
             var publishScheduled = release.PublishScheduled?.ConvertTimeFromUtcToGmt();
             // TODO EES-828 This time should depend on the Publisher schedule
             var publishScheduledTime = new TimeSpan(9, 30, 0);

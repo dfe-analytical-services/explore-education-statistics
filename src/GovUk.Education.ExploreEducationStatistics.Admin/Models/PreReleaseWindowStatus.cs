@@ -7,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
     public class PreReleaseWindowStatus
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public PreReleaseAccess PreReleaseAccess { get; set; }
+        public PreReleaseAccess Access { get; set; }
 
-        public DateTime PreReleaseWindowStartTime { get; set; }
+        public DateTime Start { get; set; }
 
-        public DateTime PreReleaseWindowEndTime { get; set; }
+        public DateTime End { get; set; }
     }
 
     public enum PreReleaseAccess
