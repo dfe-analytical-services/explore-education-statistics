@@ -8,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.DateTimeExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
@@ -35,14 +37,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
                 var publishScheduledStartOfDay = new DateTime(2020, 6, 1, 0, 0, 0, DateTimeKind.Unspecified);
-                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
+                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay,
+                    gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
                 var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
-                
+
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(publishScheduledStartOfDayUtc, viewModel.PublishScheduled);
                 Assert.Equal(Draft, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
+            }
+        }
+
+        [Fact]
+        public async Task CreateAsync_SlugNotUnique()
+        {
+            var request = new CreateMethodologyRequest
+            {
+                PublishScheduled = new DateTime(2020, 6, 1),
+                Title = "Pupil absence statistics: methodology"
+            };
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext("CreateSlugNotUnique"))
+            {
+                var createResult = await new MethodologyService(
+                        context,
+                        AdminMapper(),
+                        MockUtils.AlwaysTrueUserService().Object,
+                        new PersistenceHelper<ContentDbContext>(context))
+                    .CreateMethodologyAsync(request);
+
+                Assert.True(createResult.IsRight);
+
+                var repeatedCreateResult = await new MethodologyService(
+                        context,
+                        AdminMapper(),
+                        MockUtils.AlwaysTrueUserService().Object,
+                        new PersistenceHelper<ContentDbContext>(context))
+                    .CreateMethodologyAsync(request);
+
+                Assert.True(repeatedCreateResult.IsLeft);
+                AssertValidationProblem(repeatedCreateResult.Left, SlugNotUnique);
             }
         }
 
@@ -53,7 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Id = Guid.NewGuid(),
                 Title = "Methodology 1",
-                Published = DateTime.UtcNow,
                 Status = Approved
             };
 
@@ -66,12 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             using (var context = DbUtils.InMemoryApplicationDbContext("List"))
             {
-                var methodologies = new List<Methodology>
+                context.AddRange(new List<Methodology>
                 {
                     methodology1, methodology2
-                };
-
-                context.AddRange(methodologies);
+                });
                 context.SaveChanges();
             }
 
@@ -106,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishScheduled = new DateTime(2020, 6, 1),
+                Slug = "pupil-absence-statistics-methodology",
                 Status = Approved,
                 Title = "Pupil absence statistics: methodology"
             };
@@ -143,7 +176,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishScheduled = new DateTime(2020, 6, 1),
-                Status = Approved,
+                Slug = "pupil-absence-statistics-methodology",
+                Status = Draft,
                 Title = "Pupil absence statistics: methodology"
             };
 
@@ -172,9 +206,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
                 var publishScheduledStartOfDay = new DateTime(2020, 7, 1, 0, 0, 0, DateTimeKind.Unspecified);
-                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
+                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay,
+                    gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
                 var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
-                
+
                 Assert.Equal(methodology.Id, viewModel.Id);
                 // TODO EES-331 is this correct?
                 // Original release note is not cleared if the update is not altering it
@@ -183,6 +218,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(publishScheduledStartOfDayUtc, viewModel.PublishScheduled);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateAsync_SlugNotUnique()
+        {
+            var methodology1 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                InternalReleaseNote = "Test approval",
+                Published = new DateTime(2020, 5, 25),
+                PublishScheduled = new DateTime(2020, 6, 1),
+                Slug = "pupil-absence-statistics-methodology",
+                Status = Draft,
+                Title = "Pupil absence statistics: methodology"
+            };
+
+            var methodology2 = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                InternalReleaseNote = "Test approval",
+                Published = new DateTime(2020, 5, 25),
+                PublishScheduled = new DateTime(2020, 6, 1),
+                Slug = "pupil-exclusion-statistics-methodology",
+                Status = Draft,
+                Title = "Pupil exclusion statistics: methodology"
+            };
+
+            var request = new UpdateMethodologyRequest
+            {
+                InternalReleaseNote = null,
+                PublishScheduled = new DateTime(2020, 6, 1),
+                Status = Draft,
+                Title = "Pupil exclusion statistics: methodology"
+            };
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext("UpdateSlugNotUnique"))
+            {
+                await context.AddRangeAsync(new List<Methodology>
+                {
+                    methodology1, methodology2
+                });
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext("UpdateSlugNotUnique"))
+            {
+                var result = await new MethodologyService(
+                        context,
+                        AdminMapper(),
+                        MockUtils.AlwaysTrueUserService().Object,
+                        new PersistenceHelper<ContentDbContext>(context))
+                    .UpdateMethodologyAsync(methodology1.Id, request);
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, SlugNotUnique);
             }
         }
     }

@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
@@ -266,23 +266,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             Assert.IsAssignableFrom<T>(result.Value);
             return result.Value;
-        }
-        
-        private static ValidationProblemDetails AssertValidationProblem<T>(ActionResult<T> result) where T : class
-        {
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
-            var badRequestObjectResult = result.Result as BadRequestObjectResult;
-            Assert.IsAssignableFrom<ValidationProblemDetails>(badRequestObjectResult?.Value);
-            var validationProblemDetails = badRequestObjectResult.Value as ValidationProblemDetails;
-            return validationProblemDetails;
-        }
-        
-        private static ValidationProblemDetails AssertValidationProblem<T>(ActionResult<T> result, ValidationErrorMessages message) where T : class
-        {
-            var validationProblem = AssertValidationProblem(result);
-            Assert.True(validationProblem.Errors.ContainsKey(string.Empty));
-            Assert.Contains(ValidationResult(message).ErrorMessage, validationProblem.Errors[string.Empty]);
-            return validationProblem;
         }
 
         private static (
