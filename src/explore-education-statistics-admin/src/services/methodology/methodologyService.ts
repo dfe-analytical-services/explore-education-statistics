@@ -27,8 +27,11 @@ const methodologyService = {
     return client.post(`/methodologies/`, data);
   },
 
-  updateMethodology(methodologyId: string, data: UpdateMethodology) {
-    return client.put<BasicMethodology>(`/methodology/${methodologyId}`, data);
+  updateMethodology(
+    methodologyId: string,
+    data: UpdateMethodology,
+  ): Promise<BasicMethodology> {
+    return client.put(`/methodology/${methodologyId}`, data);
   },
 
   getMethodologyContent(methodologyId: string): Promise<MethodologyContent> {

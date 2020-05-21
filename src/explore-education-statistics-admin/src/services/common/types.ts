@@ -49,6 +49,8 @@ export interface BasicMethodology {
   title: string;
   slug: string;
   status: MethodologyStatus;
+  // TODO: EES-899 methodology should have a contact attached
+  contact?: ContactDetails;
   published?: string;
   publishScheduled: string;
 }
