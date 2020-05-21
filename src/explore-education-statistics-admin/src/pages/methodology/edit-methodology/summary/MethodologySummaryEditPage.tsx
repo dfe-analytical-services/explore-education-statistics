@@ -7,6 +7,7 @@ import {
   dateToDayMonthYear,
   dayMonthYearToDate,
 } from '@common/utils/date/dayMonthYear';
+import { formatISO } from 'date-fns';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -40,7 +41,9 @@ const MethodologySummaryEditPage = ({
               await methodologyService.updateMethodology(methodologyId, {
                 ...methodology,
                 title: values.title,
-                publishScheduled: dayMonthYearToDate(values.publishScheduled),
+                publishScheduled: formatISO(
+                  dayMonthYearToDate(values.publishScheduled),
+                ),
                 contactId: values.contactId,
               });
 

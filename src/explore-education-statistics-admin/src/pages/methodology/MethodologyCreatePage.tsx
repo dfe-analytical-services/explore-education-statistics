@@ -2,6 +2,7 @@ import Page from '@admin/components/Page';
 import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
 import methodologyService from '@admin/services/methodology/methodologyService';
 import { dayMonthYearToDate } from '@common/utils/date/dayMonthYear';
+import { formatISO } from 'date-fns';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -28,7 +29,9 @@ const MethodologyCreatePage = ({ history }: RouteComponentProps) => {
           const createdMethodology = await methodologyService.createMethodology(
             {
               title: values.title,
-              publishScheduled: dayMonthYearToDate(values.publishScheduled),
+              publishScheduled: formatISO(
+                dayMonthYearToDate(values.publishScheduled),
+              ),
               contactId: values.contactId,
             },
           );

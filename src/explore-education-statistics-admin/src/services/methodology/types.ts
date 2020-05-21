@@ -16,7 +16,7 @@ export interface MethodologyStatusPublication {
 
 interface SaveMethodologySummary {
   title: string;
-  publishScheduled: Date;
+  publishScheduled: string;
   contactId: string;
 }
 
