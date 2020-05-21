@@ -2,7 +2,7 @@
 
 exports[`Button renders correctly with required props 1`] = `
 <button aria-disabled="false"
-        class="govuk-button marginRight"
+        class="govuk-button button"
         type="button"
 >
   Test button

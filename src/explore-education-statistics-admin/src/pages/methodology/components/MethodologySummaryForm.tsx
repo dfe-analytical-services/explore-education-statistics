@@ -2,6 +2,7 @@ import useFormSubmit from '@admin/hooks/useFormSubmit';
 import service from '@admin/services/edit-publication/service';
 import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { FormGroup } from '@common/components/form';
 import Form from '@common/components/form/Form';
@@ -116,13 +117,11 @@ const MethodologySummaryForm = ({
               </SummaryList>
             )}
 
-            <FormGroup>
-              <div>
-                <Button type="submit">{submitText}</Button>
-              </div>
+            <ButtonGroup>
+              <Button type="submit">{submitText}</Button>
 
               <ButtonText onClick={onCancel}>Cancel</ButtonText>
-            </FormGroup>
+            </ButtonGroup>
           </Form>
         );
       }}

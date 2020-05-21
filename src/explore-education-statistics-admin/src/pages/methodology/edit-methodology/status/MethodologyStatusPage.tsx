@@ -5,6 +5,7 @@ import { MethodologyStatus } from '@admin/services/common/types';
 import methodologyService from '@admin/services/methodology/methodologyService';
 import permissionService from '@admin/services/permissions/permissionService';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
@@ -150,15 +151,10 @@ const MethodologyStatusPage = ({
                         ]}
                         orderDirection={[]}
                       />
-                      <div className="govuk-!-margin-top-6">
-                        <Button
-                          type="submit"
-                          className="govuk-!-margin-right-6"
-                        >
-                          Update
-                        </Button>
+
+                      <ButtonGroup>
+                        <Button type="submit">Update status</Button>
                         <ButtonText
-                          className="govuk-button govuk-button--secondary"
                           onClick={() => {
                             form.resetForm();
                             toggleForm.off();
@@ -166,7 +162,7 @@ const MethodologyStatusPage = ({
                         >
                           Cancel
                         </ButtonText>
-                      </div>
+                      </ButtonGroup>
                     </Form>
                   );
                 }}
