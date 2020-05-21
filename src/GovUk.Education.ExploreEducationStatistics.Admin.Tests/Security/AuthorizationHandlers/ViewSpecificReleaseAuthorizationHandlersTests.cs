@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -44,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .Setup(s => s.GetPreReleaseWindowStatus(release, It.IsAny<DateTime>()))
                 .Returns(new PreReleaseWindowStatus
                 {
-                    PreReleaseAccess = PreReleaseAccess.Within
+                    Access = PreReleaseAccess.Within
                 });
             
             // Assert that a User who specifically has the Pre Release role will cause this handler to pass 
@@ -95,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetPreReleaseWindowStatus(release, It.IsAny<DateTime>()))
                         .Returns(new PreReleaseWindowStatus
                         {
-                            PreReleaseAccess = access
+                            Access = access
                         });
             
                     // Assert that a User who specifically has the Pre Release role will cause this handler to fail 
