@@ -45,9 +45,11 @@ const MethodologySummaryPage = () => {
               </SummaryListItem>
             </SummaryList>
 
-            <ButtonLink to={`/methodologies/${methodology.id}/summary/edit`}>
-              Edit summary
-            </ButtonLink>
+            {currentMethodology.status !== 'Approved' && (
+              <ButtonLink to={`/methodologies/${methodology.id}/summary/edit`}>
+                Edit summary
+              </ButtonLink>
+            )}
           </>
         ) : (
           <WarningMessage>

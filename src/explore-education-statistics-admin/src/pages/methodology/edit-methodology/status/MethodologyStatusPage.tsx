@@ -100,13 +100,12 @@ const MethodologyStatusPage = ({
                     className="govuk-!-margin-top-2"
                     onClick={toggleForm.on}
                   >
-                    Update methodology status
+                    Update status
                   </Button>
                 )}
               </>
             ) : (
               <Formik<FormValues>
-                enableReinitialize
                 initialValues={{
                   status: model.summary.status,
                   internalReleaseNote: '',
@@ -125,9 +124,9 @@ const MethodologyStatusPage = ({
                 {form => {
                   return (
                     <Form id={formId}>
-                      <p>Select and update the methodology status.</p>
                       <FormFieldRadioGroup<FormValues, MethodologyStatus>
                         legend="Status"
+                        hint="Once approved, the status cannot be reverted."
                         name="status"
                         id={`${formId}-status`}
                         options={[
