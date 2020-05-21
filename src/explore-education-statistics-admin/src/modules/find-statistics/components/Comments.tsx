@@ -2,7 +2,7 @@ import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { ExtendedComment } from '@admin/services/publicationService';
 import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
-import { User } from '@admin/services/sign-in/types';
+import { Authentication } from '@admin/services/sign-in/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import classNames from 'classnames';
@@ -36,11 +36,12 @@ const Comments = ({
   const [editableCommentText, setEditableCommentText] = useState<string>('');
 
   const { releaseId } = useManageReleaseContext();
-  const context = useAuthContext();
+  const { user }: Authentication = useAuthContext();
+  if (!user) {
+    throw new Error('User not returned from useAuthContext');
+  }
 
   const addComment = (comment: string) => {
-    const user = context.user as User;
-
     const additionalComment: ExtendedComment = {
       id: '0',
       userId: user.id,
@@ -87,11 +88,12 @@ const Comments = ({
   };
 
   const resolveComment = (index: number) => {
-    const resolvedComment = { ...comments[index] };
-
-    resolvedComment.state = 'resolved';
-    resolvedComment.resolvedOn = new Date();
-    resolvedComment.resolvedBy = context.user && context.user.name;
+    const resolvedComment: ExtendedComment = {
+      ...comments[index],
+      state: 'resolved',
+      resolvedOn: new Date(),
+      resolvedBy: user.name,
+    };
 
     if (releaseId && sectionId) {
       service
