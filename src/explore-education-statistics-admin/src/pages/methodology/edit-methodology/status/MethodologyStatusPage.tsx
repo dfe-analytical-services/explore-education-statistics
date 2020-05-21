@@ -43,7 +43,7 @@ const MethodologyStatusPage = ({
     isLoading,
   } = useAsyncRetry(async () => {
     const [summary, canApprove] = await Promise.all([
-      methodologyService.getMethodologySummary(methodologyId),
+      methodologyService.getMethodology(methodologyId),
       permissionService.canApproveMethodology(methodologyId),
     ]);
 

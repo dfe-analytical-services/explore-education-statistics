@@ -14,7 +14,7 @@ const MethodologySummaryPage = () => {
   const { methodology } = useMethodologyState();
 
   const { value: currentMethodology, isLoading } = useAsyncHandledRetry(() =>
-    methodologyService.getMethodologySummary(methodology.id),
+    methodologyService.getMethodology(methodology.id),
   );
 
   return (

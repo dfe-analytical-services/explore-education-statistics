@@ -3,7 +3,6 @@ import {
   CreateMethodology,
   MethodologyContent,
   MethodologyStatusListItem,
-  UpdateMethodologyStatusRequest,
   UpdateMethodology,
 } from '@admin/services/methodology/types';
 import {
@@ -32,6 +31,12 @@ const methodologyService = {
     data: UpdateMethodology,
   ): Promise<BasicMethodology> {
     return client.put(`/methodology/${methodologyId}`, data);
+  },
+
+  getMethodology(methodologyId: string): Promise<BasicMethodology> {
+    return client.get<BasicMethodology>(
+      `/methodology/${methodologyId}/summary`,
+    );
   },
 
   getMethodologyContent(methodologyId: string): Promise<MethodologyContent> {
@@ -118,19 +123,6 @@ const methodologyService = {
     return client.delete(
       `methodology/${methodologyId}/content/section/${sectionId}?type=${sectionKey}`,
     );
-  },
-
-  getMethodologySummary(methodologyId: string): Promise<BasicMethodology> {
-    return client.get<BasicMethodology>(
-      `/methodology/${methodologyId}/summary`,
-    );
-  },
-
-  updateMethodologyStatus(
-    methodologyId: string,
-    updateRequest: UpdateMethodologyStatusRequest,
-  ): Promise<BasicMethodology> {
-    return client.put(`/methodology/${methodologyId}/status`, updateRequest);
   },
 
   addContentSectionBlock({

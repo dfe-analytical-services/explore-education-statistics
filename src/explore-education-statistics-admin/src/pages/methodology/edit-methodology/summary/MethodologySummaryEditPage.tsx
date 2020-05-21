@@ -18,7 +18,7 @@ const MethodologySummaryEditPage = ({
   const { methodologyId } = match.params;
 
   const { value: methodology, isLoading } = useAsyncHandledRetry(async () => {
-    return methodologyService.getMethodologySummary(methodologyId);
+    return methodologyService.getMethodology(methodologyId);
   });
 
   return (
