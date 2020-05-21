@@ -4,13 +4,16 @@ import FormField, {
 import React from 'react';
 import FormRadioGroup, { FormRadioGroupProps } from './FormRadioGroup';
 
-type Props<FormValues> = FormFieldComponentProps<
-  FormRadioGroupProps,
+type Props<FormValues, Value extends string> = FormFieldComponentProps<
+  FormRadioGroupProps<Value>,
   FormValues
 >;
 
-const FormFieldRadioGroup = <FormValues extends {}>(
-  props: Props<FormValues>,
+const FormFieldRadioGroup = <
+  FormValues extends {},
+  Value extends string = string
+>(
+  props: Props<FormValues, Value>,
 ) => {
   return (
     <FormField<string> {...props}>
