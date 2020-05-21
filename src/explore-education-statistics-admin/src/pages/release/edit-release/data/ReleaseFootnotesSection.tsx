@@ -45,7 +45,7 @@ const ReleaseFootnotesSection = ({
       if (!footnotesData) return;
       if (footnoteId) {
         footnotesService
-          .updateFootnote(footnoteId, footnote)
+          .updateFootnote(releaseId, footnoteId, footnote)
           .then(updatedFootnote => {
             const index = footnotesData.footnotes.findIndex(
               (searchElement: Footnote) => {
@@ -114,7 +114,10 @@ const ReleaseFootnotesSection = ({
                 onCancel={() => setFootnoteToBeDeleted(undefined)}
                 onConfirm={() => {
                   footnotesService
-                    .deleteFootnote((footnoteToBeDeleted as Footnote).id)
+                    .deleteFootnote(
+                      releaseId,
+                      (footnoteToBeDeleted as Footnote).id,
+                    )
                     .then(() => setFootnoteToBeDeleted(undefined))
                     .then(onDelete);
                 }}

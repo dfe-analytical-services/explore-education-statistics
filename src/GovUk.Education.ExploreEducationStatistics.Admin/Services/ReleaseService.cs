@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefault(r => r.Id == amendment.PreviousVersionId);
 
             // Release does not have to have stats uploaded but if it has then
-            // create a link row to link back to the original subject
+            // create a link row to link back to the original subject & footnotes
             if (statsRelease != null)
             {
                 var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
@@ -210,6 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 _statisticsDbContext.Release.Add(statsAmendment);
                 _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
                 _statisticsDbContext.ReleaseFootnote.AddRange(statsAmendmentFootnoteLinks);
+                
                 await _statisticsDbContext.SaveChangesAsync();
             }
             

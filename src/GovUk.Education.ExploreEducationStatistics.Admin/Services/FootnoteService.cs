@@ -53,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Footnote>> CreateFootnote(
+            Guid releaseId,
             string content,
             IReadOnlyCollection<Guid> filterIds,
             IReadOnlyCollection<Guid> filterGroupIds,
@@ -91,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteFootnote(Guid id)
+        public async Task<Either<ActionResult, bool>> DeleteFootnote(Guid releaseId, Guid id)
         {
             return await _statisticsPersistenceHelper
                 .CheckEntityExists<Footnote>(id, HydrateFootnote)
@@ -110,7 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, Footnote>> UpdateFootnote(Guid id,
+        public Task<Either<ActionResult, Footnote>> UpdateFootnote(
+            Guid releaseId,
+            Guid id,
             string content,
             IReadOnlyCollection<Guid> filterIds,
             IReadOnlyCollection<Guid> filterGroupIds,

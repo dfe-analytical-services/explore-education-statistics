@@ -9,18 +9,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFootnoteService
     {
-        Task<Either<ActionResult, Footnote>> CreateFootnote(string content,
+        Task<Either<ActionResult, Footnote>> CreateFootnote(
+            Guid releaseId,
+            string content,
             IReadOnlyCollection<Guid> filterIds,
             IReadOnlyCollection<Guid> filterGroupIds,
             IReadOnlyCollection<Guid> filterItemIds,
             IReadOnlyCollection<Guid> indicatorIds,
             IReadOnlyCollection<Guid> subjectIds);
 
-        Task<Either<ActionResult, bool>> DeleteFootnote(Guid id);
+        Task<Either<ActionResult, bool>> DeleteFootnote(Guid releaseId, Guid id);
 
         Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId);
 
-        Task<Either<ActionResult, Footnote>> UpdateFootnote(Guid id,
+        Task<Either<ActionResult, Footnote>> UpdateFootnote(
+            Guid releaseId,
+            Guid id,
             string content,
             IReadOnlyCollection<Guid> filterIds,
             IReadOnlyCollection<Guid> filterGroupIds,

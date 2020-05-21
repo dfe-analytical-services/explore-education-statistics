@@ -56,6 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             AssertSecurityPoliciesChecked(service => service
                 .CreateFootnote(
+                    Guid.NewGuid(),
                     "", 
                     GuidList, 
                     GuidList, 
@@ -70,6 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             AssertSecurityPoliciesChecked(service => service
                     .UpdateFootnote(
+                        Guid.NewGuid(), 
                         Footnote.Id,
                         "", 
                         GuidList, 
@@ -84,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteFootnote()
         {
             AssertSecurityPoliciesChecked(service => service
-                    .DeleteFootnote(Footnote.Id), 
+                    .DeleteFootnote(Guid.NewGuid(), Footnote.Id), 
                 CanUpdateSpecificRelease);
         }
         

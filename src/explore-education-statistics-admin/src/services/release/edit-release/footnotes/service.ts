@@ -17,17 +17,18 @@ const service = {
       footnoteToFlatFootnote(footnote),
     );
   },
-  async getFootnote(id: string) {
-    return client.get(`/data/footnote/${id}`);
-  },
   async updateFootnote(
+    releaseId: string,
     id: string,
     footnote: FootnoteProps | Footnote,
   ): Promise<Footnote> {
-    return client.put(`/data/footnote/${id}`, footnoteToFlatFootnote(footnote));
+    return client.put(
+      `/data/footnote/release/${releaseId}/${id}`,
+      footnoteToFlatFootnote(footnote),
+    );
   },
-  async deleteFootnote(id: string): Promise<void> {
-    return client.delete(`/data/footnote/${id}`);
+  async deleteFootnote(releaseId: string, id: string): Promise<void> {
+    return client.delete(`/data/footnote/release/${releaseId}/${id}`);
   },
 };
 
