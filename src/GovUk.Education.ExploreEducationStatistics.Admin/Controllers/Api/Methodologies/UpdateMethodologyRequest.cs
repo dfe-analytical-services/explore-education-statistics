@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies
 {
@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
 
         public DateTime? PublishScheduled { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter<,,>))]
+        [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus? Status { get; set; }
     }
 }
