@@ -7,16 +7,12 @@ import methodologyRoutes, {
   navRoutes,
 } from '@admin/routes/edit-methodology/routes';
 import methodologyService from '@admin/services/methodology/methodologyService';
-import permissionService from '@admin/services/permissions/permissionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import WarningMessage from '@common/components/WarningMessage';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
-import {
-  MethodologyContextState,
-  MethodologyProvider,
-} from './content/context/MethodologyContext';
 
 const MethodologyPage = ({
   match,
@@ -24,21 +20,10 @@ const MethodologyPage = ({
 }: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
-  const { value, isLoading } = useAsyncRetry<
-    MethodologyContextState
-  >(async () => {
-    const methodology = await methodologyService.getMethodologyContent(
-      methodologyId,
-    );
-    const canUpdateMethodology = await permissionService.canUpdateMethodology(
-      methodologyId,
-    );
-
-    return {
-      methodology,
-      canUpdateMethodology,
-    };
-  }, [methodologyId]);
+  const { value, isLoading } = useAsyncHandledRetry(
+    () => methodologyService.getMethodology(methodologyId),
+    [methodologyId],
+  );
 
   const currentRouteIndex =
     methodologyRoutes.findIndex(
@@ -84,7 +69,7 @@ const MethodologyPage = ({
               <div className="govuk-grid-column-two-thirds">
                 <h1 className="govuk-heading-xl">
                   <span className="govuk-caption-xl">Edit methodology</span>
-                  {value?.methodology.title}
+                  {value?.title}
                 </h1>
               </div>
 
@@ -109,18 +94,16 @@ const MethodologyPage = ({
               }))}
             />
 
-            <MethodologyProvider value={value}>
-              <Switch>
-                {methodologyRoutes.map(route => (
-                  <Route
-                    exact
-                    key={route.path}
-                    path={route.path}
-                    component={route.component}
-                  />
-                ))}
-              </Switch>
-            </MethodologyProvider>
+            <Switch>
+              {methodologyRoutes.map(route => (
+                <Route
+                  exact
+                  key={route.path}
+                  path={route.path}
+                  component={route.component}
+                />
+              ))}
+            </Switch>
 
             <PreviousNextLinks
               previousSection={previousSection}
@@ -128,7 +111,7 @@ const MethodologyPage = ({
             />
           </>
         ) : (
-          <p>Could not load methodology</p>
+          <WarningMessage>Could not load methodology</WarningMessage>
         )}
       </LoadingSpinner>
     </Page>

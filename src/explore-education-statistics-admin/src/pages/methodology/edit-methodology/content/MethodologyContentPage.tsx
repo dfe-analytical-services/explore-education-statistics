@@ -1,13 +1,24 @@
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
+import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
+import methodologyService from '@admin/services/methodology/methodologyService';
+import permissionService from '@admin/services/permissions/permissionService';
 import FormattedDate from '@common/components/FormattedDate';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import PageSearchForm from '@common/components/PageSearchForm';
+import WarningMessage from '@common/components/WarningMessage';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
+import { RouteComponentProps } from 'react-router';
 import MethodologyAccordion from './components/MethodologyAccordion';
-import { useMethodologyState } from './context/MethodologyContext';
+import {
+  MethodologyContextState,
+  MethodologyProvider,
+  useMethodologyState,
+} from './context/MethodologyContext';
 
-const MethodologyContentPage = () => {
+const MethodologyContentPageInternal = () => {
   const { methodology } = useMethodologyState();
 
   return (
@@ -76,6 +87,40 @@ const MethodologyContentPage = () => {
         </>
       )}
     </EditingContextProvider>
+  );
+};
+
+const MethodologyContentPage = ({
+  match,
+}: RouteComponentProps<MethodologyRouteParams>) => {
+  const { methodologyId } = match.params;
+
+  const { value, isLoading } = useAsyncHandledRetry<
+    MethodologyContextState
+  >(async () => {
+    const methodology = await methodologyService.getMethodologyContent(
+      methodologyId,
+    );
+    const canUpdateMethodology = await permissionService.canUpdateMethodology(
+      methodologyId,
+    );
+
+    return {
+      methodology,
+      canUpdateMethodology,
+    };
+  }, [methodologyId]);
+
+  return (
+    <LoadingSpinner loading={isLoading}>
+      {value ? (
+        <MethodologyProvider value={value}>
+          <MethodologyContentPageInternal />
+        </MethodologyProvider>
+      ) : (
+        <WarningMessage>Could not load methodology</WarningMessage>
+      )}
+    </LoadingSpinner>
   );
 };
 
