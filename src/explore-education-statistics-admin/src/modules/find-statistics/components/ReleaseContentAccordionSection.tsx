@@ -12,6 +12,7 @@ import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import AddDataBlockButton from './AddDataBlockButton';
+import { CommentsChangeHandler } from './Comments';
 
 export interface ReleaseContentAccordionSectionProps {
   id: string;
@@ -26,15 +27,7 @@ const ReleaseContentAccordionSection = ({
 }: ReleaseContentAccordionSectionProps) => {
   const { isEditing } = useEditingContext();
 
-  const {
-    addContentSectionBlock,
-    attachContentSectionBlock,
-    deleteContentSectionBlock,
-    updateContentSectionBlock,
-    updateSectionBlockOrder,
-    updateContentSectionHeading,
-    removeContentSection,
-  } = useReleaseActions();
+  const actions = useReleaseActions();
 
   const [isReordering, setIsReordering] = useState(false);
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
@@ -45,8 +38,8 @@ const ReleaseContentAccordionSection = ({
 
   const getChartFile = useGetChartFile(release.id);
 
-  const addBlockToAccordionSection = useCallback(async () => {
-    await addContentSectionBlock({
+  const addBlock = useCallback(async () => {
+    await actions.addContentSectionBlock({
       releaseId: release.id,
       sectionId,
       sectionKey: 'content',
@@ -56,11 +49,11 @@ const ReleaseContentAccordionSection = ({
         body: '',
       },
     });
-  }, [release.id, sectionId, sectionContent.length, addContentSectionBlock]);
+  }, [actions, release.id, sectionId, sectionContent.length]);
 
-  const attachDataBlockToAccordionSection = useCallback(
+  const attachDataBlock = useCallback(
     async (contentBlockId: string) => {
-      await attachContentSectionBlock({
+      await actions.attachContentSectionBlock({
         releaseId: release.id,
         sectionId,
         sectionKey: 'content',
@@ -70,12 +63,12 @@ const ReleaseContentAccordionSection = ({
         },
       });
     },
-    [release.id, sectionId, sectionContent.length, attachContentSectionBlock],
+    [actions, release.id, sectionId, sectionContent.length],
   );
 
-  const updateBlockInAccordionSection = useCallback(
+  const updateBlock = useCallback(
     async (blockId, bodyContent) => {
-      await updateContentSectionBlock({
+      await actions.updateContentSectionBlock({
         releaseId: release.id,
         sectionId,
         blockId,
@@ -83,51 +76,63 @@ const ReleaseContentAccordionSection = ({
         bodyContent,
       });
     },
-    [release.id, sectionId, updateContentSectionBlock],
+    [actions, release.id, sectionId],
   );
 
-  const removeBlockFromAccordionSection = useCallback(
+  const removeBlock = useCallback(
     (blockId: string) =>
-      deleteContentSectionBlock({
+      actions.deleteContentSectionBlock({
         releaseId: release.id,
         sectionId,
         blockId,
         sectionKey: 'content',
       }),
-    [release.id, sectionId, deleteContentSectionBlock],
+    [actions, release.id, sectionId],
   );
 
-  const reorderBlocksInAccordionSection = useCallback(async () => {
+  const reorderBlocks = useCallback(async () => {
     const order = blocks.reduce<Dictionary<number>>((acc, block, newIndex) => {
       acc[block.id] = newIndex;
       return acc;
     }, {});
 
-    await updateSectionBlockOrder({
+    await actions.updateSectionBlockOrder({
       releaseId: release.id,
       sectionId,
       sectionKey: 'content',
       order,
     });
-  }, [blocks, release.id, sectionId, updateSectionBlockOrder]);
+  }, [blocks, actions, release.id, sectionId]);
 
   const handleHeadingChange = useCallback(
-    title =>
-      updateContentSectionHeading({
+    (title: string) =>
+      actions.updateContentSectionHeading({
         sectionId,
         title,
         releaseId: release.id,
       }),
-    [release.id, sectionId, updateContentSectionHeading],
+    [actions, sectionId, release.id],
   );
 
   const handleRemoveSection = useCallback(
     () =>
-      removeContentSection({
+      actions.removeContentSection({
         sectionId,
         releaseId: release.id,
       }),
-    [release.id, removeContentSection, sectionId],
+    [actions, sectionId, release.id],
+  );
+
+  const updateBlockComments: CommentsChangeHandler = useCallback(
+    async (blockId, comments) => {
+      await actions.updateBlockComments({
+        sectionId,
+        blockId,
+        sectionKey: 'content',
+        comments,
+      });
+    },
+    [actions, sectionId],
   );
 
   return (
@@ -142,7 +147,7 @@ const ReleaseContentAccordionSection = ({
           variant={!isReordering ? 'secondary' : undefined}
           onClick={async () => {
             if (isReordering) {
-              await reorderBlocksInAccordionSection();
+              await reorderBlocks();
               setIsReordering(false);
             } else {
               setIsReordering(true);
@@ -160,19 +165,18 @@ const ReleaseContentAccordionSection = ({
         sectionId={sectionId}
         getInfographic={getChartFile}
         content={blocks}
-        onBlockContentSave={updateBlockInAccordionSection}
-        onBlockDelete={removeBlockFromAccordionSection}
+        onBlockContentSave={updateBlock}
+        onBlockDelete={removeBlock}
         onBlocksChange={setBlocks}
+        onBlockCommentsChange={updateBlockComments}
       />
 
       {isEditing && !isReordering && (
         <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-          <Button variant="secondary" onClick={addBlockToAccordionSection}>
+          <Button variant="secondary" onClick={addBlock}>
             Add text block
           </Button>
-          <AddDataBlockButton
-            onAddDataBlock={attachDataBlockToAccordionSection}
-          />
+          <AddDataBlockButton onAddDataBlock={attachDataBlock} />
         </div>
       )}
     </EditableAccordionSection>
