@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
                 .OnSuccess(_userService.CheckCanUpdateMethodology)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
-                .OnSuccessDo(() => ValidateMethodologySlugUnique(slug))
+                .OnSuccessDo(() => ValidateMethodologySlugUniqueForUpdate(id, slug))
                 .OnSuccess(async methodology =>
                 {
                     _context.Methodologies.Update(methodology);
@@ -154,6 +154,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUnique(string slug)
         {
             if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug))
+            {
+                return ValidationActionResult(SlugNotUnique);
+            }
+
+            return true;
+        }
+        
+        private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
+        {
+            if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug && methodology.Id != id))
             {
                 return ValidationActionResult(SlugNotUnique);
             }
