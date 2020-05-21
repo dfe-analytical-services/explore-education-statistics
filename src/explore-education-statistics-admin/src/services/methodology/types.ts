@@ -14,11 +14,14 @@ export interface MethodologyStatusPublication {
   title: string;
 }
 
-export interface CreateMethodologyRequest {
+interface SaveMethodologySummary {
   title: string;
   publishScheduled: Date;
   contactId: string;
 }
+
+export type CreateMethodology = SaveMethodologySummary;
+export type UpdateMethodology = SaveMethodologySummary;
 
 export interface MethodologyContent {
   id: string;

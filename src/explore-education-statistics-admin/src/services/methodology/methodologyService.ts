@@ -1,9 +1,10 @@
 import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContextActionTypes';
 import {
-  CreateMethodologyRequest,
+  CreateMethodology,
   MethodologyContent,
   MethodologyStatusListItem,
   UpdateMethodologyStatusRequest,
+  UpdateMethodology,
 } from '@admin/services/methodology/types';
 import {
   ContentBlockPostModel,
@@ -12,11 +13,7 @@ import {
 import client from '@admin/services/util/service';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import {
-  BasicMethodology,
-  IdTitlePair,
-  MethodologyStatus,
-} from '../common/types';
+import { BasicMethodology, IdTitlePair } from '../common/types';
 import { EditableContentBlock } from '../publicationService';
 
 type ContentSectionViewModel = ContentSection<EditableContentBlock>;
@@ -26,10 +23,12 @@ const methodologyService = {
     return client.get<MethodologyStatusListItem[]>('/bau/methodology');
   },
 
-  createMethodology(
-    createRequest: CreateMethodologyRequest,
-  ): Promise<IdTitlePair> {
-    return client.post(`/methodologies/`, createRequest);
+  createMethodology(data: CreateMethodology): Promise<IdTitlePair> {
+    return client.post(`/methodologies/`, data);
+  },
+
+  updateMethodology(methodologyId: string, data: UpdateMethodology) {
+    return client.put<BasicMethodology>(`/methodology/${methodologyId}`, data);
   },
 
   getMethodologyContent(methodologyId: string): Promise<MethodologyContent> {

@@ -7,18 +7,15 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 
 const MethodologySummaryPage = () => {
   const { methodology } = useMethodologyState();
 
-  const { value: currentMethodology, isLoading } = useAsyncRetry(() =>
+  const { value: currentMethodology, isLoading } = useAsyncHandledRetry(() =>
     methodologyService.getMethodologySummary(methodology.id),
   );
-
-  // TODO: Implement endpoint to update summary
-  const canEditSummary = false;
 
   return (
     <>
@@ -48,11 +45,9 @@ const MethodologySummaryPage = () => {
               </SummaryListItem>
             </SummaryList>
 
-            {canEditSummary && (
-              <ButtonLink to={`/methodologies/${methodology.id}/edit-summary`}>
-                Edit summary
-              </ButtonLink>
-            )}
+            <ButtonLink to={`/methodologies/${methodology.id}/summary/edit`}>
+              Edit summary
+            </ButtonLink>
           </>
         ) : (
           <WarningMessage>
