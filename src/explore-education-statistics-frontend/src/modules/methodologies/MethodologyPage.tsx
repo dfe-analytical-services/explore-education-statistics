@@ -119,6 +119,26 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         </Accordion>
       )}
 
+      {data.annexes && data.annexes.length > 0 && (
+        <>
+          <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
+
+          <Accordion id={accordionIds[1]}>
+            {data.annexes.map(({ heading, caption, order, content }) => {
+              return (
+                <AccordionSection
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                >
+                  <SectionBlocks content={content} />
+                </AccordionSection>
+              );
+            })}
+          </Accordion>
+        </>
+      )}
+
       <PrintThisPage
         analytics={{
           category: 'Page print',
