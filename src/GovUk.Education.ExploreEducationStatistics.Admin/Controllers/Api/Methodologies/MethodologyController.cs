@@ -51,16 +51,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [Produces("application/json")]
-        [HttpPut("api/methodology/{methodologyId}/status")]
-        public async Task<ActionResult<MethodologyStatusViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId,
-            UpdateMethodologyStatusRequest request)
-        {
-            return await _methodologyService
-                .UpdateMethodologyStatusAsync(methodologyId, request)
-                .HandleFailuresOrOk();
-        }
-
-        [Produces("application/json")]
         [HttpPut("api/methodology/{methodologyId}")]
         public async Task<ActionResult<MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid methodologyId,
             UpdateMethodologyRequest request)

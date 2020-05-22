@@ -28,45 +28,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
-                .ForMember(dest => dest.Contact, 
+                .ForMember(dest => dest.Contact,
                     m => m.MapFrom(r => r.Publication.Contact))
-                .ForMember(dest => dest.PublicationTitle, 
+                .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title))
-                .ForMember(dest => dest.PublicationId, 
+                .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
                 // TODO return real Comments as soon as commenting on Releases has been implemented
-                .ForMember(dest => dest.DraftComments, 
+                .ForMember(dest => dest.DraftComments,
                     m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
                     {
                         new ReleaseViewModel.Comment() { Message = "Message 1\nSome multiline content\nSpanning several lines", AuthorName = "TODO User", CreatedDate = DateTime.Now.AddMonths(-2)},
                         new ReleaseViewModel.Comment() { Message = "Message 2", AuthorName = "TODO User 2", CreatedDate = DateTime.Now.AddMonths(-3)},
                         new ReleaseViewModel.Comment() { Message = "Message 3", AuthorName = "TODO User 3", CreatedDate = DateTime.Now.AddMonths(-4)},
                     }))
-                .ForMember(dest => dest.HigherReviewComments, 
+                .ForMember(dest => dest.HigherReviewComments,
                     m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
                     {
                         new ReleaseViewModel.Comment() { Message = "Message 4", AuthorName = "TODO Responsible Statistician 4", CreatedDate = DateTime.Now.AddDays(-2)},
                     }));
-            
+
             CreateMap<Release, MyReleaseViewModel>()
                 .ForMember(
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
-                .ForMember(dest => dest.Contact, 
+                .ForMember(dest => dest.Contact,
                     m => m.MapFrom(r => r.Publication.Contact))
-                .ForMember(dest => dest.PublicationTitle, 
+                .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title))
-                .ForMember(dest => dest.PublicationId, 
+                .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
                 // TODO return real Comments as soon as commenting on Releases has been implemented
-                .ForMember(dest => dest.DraftComments, 
+                .ForMember(dest => dest.DraftComments,
                     m => m.MapFrom(_ => new List<MyReleaseViewModel.Comment>()
                     {
                         new MyReleaseViewModel.Comment() { Message = "Message 1\nSome multiline content\nSpanning several lines", AuthorName = "TODO User", CreatedDate = DateTime.Now.AddMonths(-2)},
                         new MyReleaseViewModel.Comment() { Message = "Message 2", AuthorName = "TODO User 2", CreatedDate = DateTime.Now.AddMonths(-3)},
                         new MyReleaseViewModel.Comment() { Message = "Message 3", AuthorName = "TODO User 3", CreatedDate = DateTime.Now.AddMonths(-4)},
                     }))
-                .ForMember(dest => dest.HigherReviewComments, 
+                .ForMember(dest => dest.HigherReviewComments,
                     m => m.MapFrom(_ => new List<MyReleaseViewModel.Comment>()
                     {
                         new MyReleaseViewModel.Comment() { Message = "Message 4", AuthorName = "TODO Responsible Statistician 4", CreatedDate = DateTime.Now.AddDays(-2)},
@@ -84,7 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
-            CreateMap<Methodology, MethodologyStatusViewModel>();
             CreateMap<Methodology, MethodologySummaryViewModel>();
             CreateMap<Methodology, MethodologyTitleViewModel>();
             CreateMap<Methodology, MethodologyPublicationsViewModel>();
@@ -97,16 +96,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => !r.SoftDeleted && IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(
                     dest => dest.ThemeId,
-                    m => m.MapFrom(p => p.Topic.ThemeId));   
-            
+                    m => m.MapFrom(p => p.Topic.ThemeId));
+
             CreateMap<Publication, MyPublicationViewModel>()
-                .ForMember(  
+                .ForMember(
                     dest => dest.ThemeId,
                     m => m.MapFrom(p => p.Topic.ThemeId))
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
                         .FindAll(r => !r.SoftDeleted && IsLatestVersionOfRelease(p.Releases, r.Id))))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());   
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());
 
             CreateMap<DataBlock, DataBlockViewModel>();
             CreateMap<CreateDataBlockViewModel, DataBlock>();
@@ -117,22 +116,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<CommentState, string>().ConvertUsing(s => s.GetEnumValue());
 
             CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
-                .ForMember(dest => dest.Content, 
-                    m => m.MapFrom(r => 
+                .ForMember(dest => dest.Content,
+                    m => m.MapFrom(r =>
                         r.GenericContent
                             .Select(ContentSectionViewModel.ToViewModel)
                             .OrderBy(s => s.Order)))
-                .ForMember(dest => dest.SummarySection, 
-                    m => m.MapFrom(r => 
+                .ForMember(dest => dest.SummarySection,
+                    m => m.MapFrom(r =>
                         ContentSectionViewModel.ToViewModel(r.SummarySection)))
-                .ForMember(dest => dest.HeadlinesSection, 
-                    m => m.MapFrom(r => 
+                .ForMember(dest => dest.HeadlinesSection,
+                    m => m.MapFrom(r =>
                         ContentSectionViewModel.ToViewModel(r.HeadlinesSection)))
-                .ForMember(dest => dest.KeyStatisticsSection, 
-                    m => m.MapFrom(r => 
+                .ForMember(dest => dest.KeyStatisticsSection,
+                    m => m.MapFrom(r =>
                         ContentSectionViewModel.ToViewModel(r.KeyStatisticsSection)))
-                .ForMember(dest => dest.KeyStatisticsSecondarySection, 
-                    m => m.MapFrom(r => 
+                .ForMember(dest => dest.KeyStatisticsSecondarySection,
+                    m => m.MapFrom(r =>
                         ContentSectionViewModel.ToViewModel(r.KeyStatisticsSecondarySection)))
                 .ForMember(
                     dest => dest.Updates,
@@ -152,12 +151,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             Theme = new ThemeViewModel
                             {
                                 Title = r.Publication.Topic.Theme.Title
-                            } 
+                            }
                         },
                         OtherReleases = r.Publication.Releases
                             .FindAll(otherRelease => !otherRelease.SoftDeleted &&
                                                      r.Id != otherRelease.Id &&
-                                                     IsLatestVersionOfRelease(r.Publication.Releases, otherRelease.Id))  
+                                                     IsLatestVersionOfRelease(r.Publication.Releases, otherRelease.Id))
                             .OrderByDescending(otherRelease => otherRelease.Year)
                             .ThenByDescending(otherRelease => otherRelease.TimePeriodCoverage)
                             .Select(otherRelease => new PreviousReleaseViewModel
@@ -183,12 +182,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Url = r.Publication.ExternalMethodology.Url
                             }
                             : null,
-                        Methodology = r.Publication.Methodology != null 
+                        Methodology = r.Publication.Methodology != null
                             ? new MethodologyTitleViewModel
                                 {
                                     Id = r.Publication.Methodology.Id,
                                     Title = r.Publication.Methodology.Title
-                                } 
+                                }
                             : null
                     }))
                 .ForMember(
@@ -196,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(r => r.TimePeriodCoverage.GetEnumLabel()));
-            
+
             CreateMap<Update, ReleaseNoteViewModel>();
 
             CreateMap<Comment, CommentViewModel>()
@@ -204,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     dest => dest.State,
                     m => m.MapFrom(c => c.State.GetEnumValue())
                 );
-            
+
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
@@ -216,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Release, ReleasePublicationStatusViewModel>();
         }
-        
+
         private static bool IsLatestVersionOfRelease(List<Release> releases, Guid releaseId)
         {
             return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
