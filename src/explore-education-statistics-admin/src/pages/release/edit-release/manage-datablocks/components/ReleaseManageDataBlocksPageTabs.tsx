@@ -72,7 +72,7 @@ const ReleaseManageDataBlocksPageTabs = ({
       ),
     };
 
-    const tableData = await tableBuilderService.getTableData(query);
+    const tableData = await tableBuilderService.getTableData(releaseId, query);
     const nextSubjectMeta = await tableBuilderService.getPublicationSubjectMeta(
       query.subjectId,
     );

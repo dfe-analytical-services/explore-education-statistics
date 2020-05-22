@@ -250,7 +250,10 @@ const TableToolWizard = ({
     };
 
     if (releaseId) {
-      const tableData = await tableBuilderService.getTableData(releaseId, query);
+      const tableData = await tableBuilderService.getTableData(
+        releaseId,
+        query,
+      );
 
       const table = mapFullTable(tableData);
       const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);

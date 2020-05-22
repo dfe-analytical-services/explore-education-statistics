@@ -28,12 +28,14 @@ interface EditableKeyStatProps extends KeyStatProps {
   isEditing?: boolean;
   onRemove?: () => void;
   onSubmit: (values: KeyStatsFormValues) => void;
+  releaseId: string;
 }
 
 const EditableKeyStatTile = ({
   isEditing = false,
   onRemove,
   onSubmit,
+  releaseId,
   dataBlockRequest,
   id,
   name,
@@ -53,7 +55,7 @@ const EditableKeyStatTile = ({
   useEffect(() => {
     if (!dataBlockResponse) {
       tableBuilderService
-        .getTableData({
+        .getTableData(releaseId, {
           ...dataBlockRequest,
           includeGeoJson: false,
         })

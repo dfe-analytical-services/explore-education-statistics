@@ -83,7 +83,10 @@ const ChartBuilderTabSection = ({
         return;
       }
 
-      const tableData = await tableBuilderService.getTableData(nextQuery);
+      const tableData = await tableBuilderService.getTableData(
+        releaseId,
+        nextQuery,
+      );
 
       onTableUpdate({
         table: mapFullTable(tableData),

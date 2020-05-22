@@ -57,6 +57,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                   values,
                 })
               }
+              releaseId={release.id}
             />
           ) : null;
         })}
