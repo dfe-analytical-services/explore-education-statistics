@@ -13,13 +13,13 @@ $envs: (
     'Development',
   ),
   test: (
-    govuk-colour('yellow'),
+    govuk-colour('light-pink'),
     govuk-colour('black'),
     'Test',
   ),
   pre-prod: (
-    govuk-colour('red'),
-    govuk-colour('white'),
+    govuk-colour('yellow'),
+    govuk-colour('black'),
     'Pre-production',
   ),
   prod: (
