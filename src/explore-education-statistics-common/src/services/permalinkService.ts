@@ -41,8 +41,8 @@ interface CreatePermalink {
 }
 
 export default {
-  createPermalink(query: CreatePermalink): Promise<Permalink> {
-    return dataApi.post('/permalink', query);
+  createPermalink(releaseId: string, query: CreatePermalink): Promise<Permalink> {
+    return dataApi.post(`/release/${releaseId}/permalink`, query);
   },
   getPermalink(publicationSlug: string): Promise<Permalink> {
     return dataApi.get(`/permalink/${publicationSlug}`);

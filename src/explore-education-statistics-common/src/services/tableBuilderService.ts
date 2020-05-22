@@ -192,7 +192,7 @@ export default {
   }): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(query: TableDataQuery): Promise<TableDataResponse> {
-    return dataApi.post('/tablebuilder', query);
+  getTableData(releaseUuid: string, query: TableDataQuery): Promise<TableDataResponse> {
+    return dataApi.post(`/tablebuilder/release/${releaseUuid}`, query);
   },
 };

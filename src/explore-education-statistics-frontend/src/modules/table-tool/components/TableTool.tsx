@@ -27,6 +27,7 @@ interface TableToolFinalStepProps {
   query: TableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
+  releaseId?: string;
 }
 
 const TableToolFinalStep = ({
@@ -34,6 +35,7 @@ const TableToolFinalStep = ({
   tableHeaders,
   publication,
   query,
+  releaseId,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [permalinkId, setPermalinkId] = useState<string>('');
@@ -55,12 +57,12 @@ const TableToolFinalStep = ({
   }, [publication]);
 
   const handlePermalinkClick = async () => {
-    if (!currentTableHeaders) {
+    if (!currentTableHeaders || !releaseId) {
       return;
     }
     setPermalinkLoading(true);
 
-    const { id } = await permalinkService.createPermalink({
+    const { id } = await permalinkService.createPermalink(releaseId, {
       query,
       configuration: {
         tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
@@ -200,6 +202,7 @@ const TableTool = (props: TableToolProps) => (
                 query={query}
                 table={response?.table}
                 tableHeaders={response?.tableHeaders}
+                releaseId={props.releaseId}
               />
             )}
           </>

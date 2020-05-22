@@ -249,18 +249,20 @@ const TableToolWizard = ({
       filters: Object.values(filters).flat(),
     };
 
-    const tableData = await tableBuilderService.getTableData(query);
+    if (releaseId) {
+      const tableData = await tableBuilderService.getTableData(releaseId, query);
 
-    const table = mapFullTable(tableData);
-    const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
+      const table = mapFullTable(tableData);
+      const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
 
-    updateState(draft => {
-      draft.query = query;
-      draft.response = {
-        table,
-        tableHeaders,
-      };
-    });
+      updateState(draft => {
+        draft.query = query;
+        draft.response = {
+          table,
+          tableHeaders,
+        };
+      });
+    }
   };
 
   return (
