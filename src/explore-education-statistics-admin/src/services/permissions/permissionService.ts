@@ -59,14 +59,14 @@ const permissionService = {
   ): Promise<PreReleaseWindowStatus> => {
     return client
       .get<{
-        preReleaseAccess: PreReleaseAccess;
-        preReleaseWindowStartTime: string;
-        preReleaseWindowEndTime: string;
+        access: PreReleaseAccess;
+        start: string;
+        end: string;
       }>(`/permissions/release/${releaseId}/prerelease/status`)
       .then(status => ({
-        access: status.preReleaseAccess,
-        start: new Date(status.preReleaseWindowStartTime),
-        end: new Date(status.preReleaseWindowEndTime),
+        access: status.access,
+        start: new Date(status.start),
+        end: new Date(status.end),
       }));
   },
 };

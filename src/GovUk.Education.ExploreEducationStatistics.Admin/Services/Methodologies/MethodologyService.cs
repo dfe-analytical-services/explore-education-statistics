@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodolo
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -15,7 +15,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -26,7 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
 
-        public MethodologyService(ContentDbContext context, IMapper mapper, IUserService userService, IPersistenceHelper<ContentDbContext> persistenceHelper)
+        public MethodologyService(ContentDbContext context,
+            IMapper mapper,
+            IUserService userService,
+            IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
@@ -34,59 +39,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<Either<ActionResult, MethodologyViewModel>> CreateMethodologyAsync(
-            CreateMethodologyViewModel methodology)
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAsync(
+            CreateMethodologyRequest request)
         {
-            return await _userService
-                .CheckCanCreateMethodology()
-                .OnSuccess(() => ValidateMethodologySlugUnique(methodology.Slug))
-                .OnSuccess(() => ValidateAssignedPublication(methodology.PublicationId))
+            var slug = SlugFromTitle(request.Title);
+            return await _userService.CheckCanCreateMethodology()
+                .OnSuccess(() => ValidateMethodologySlugUnique(slug))
                 .OnSuccess(async () =>
                 {
                     var model = new Methodology
                     {
-                        Title = methodology.Title,
-                        Slug = methodology.Slug,
-                        PublishScheduled = methodology.PublishScheduled
+                        Title = request.Title,
+                        Slug = slug,
+                        PublishScheduled = request.PublishScheduled?.AsStartOfDayUtc()
                     };
 
-                    var saved = _context.Methodologies.Add(model);
+                    var saved = await _context.Methodologies.AddAsync(model);
                     await _context.SaveChangesAsync();
-
-                    if (methodology.PublicationId != null)
-                    {
-                        var publication =
-                            await _context.Publications.FirstOrDefaultAsync(p => p.Id == methodology.PublicationId);
-
-                        publication.MethodologyId = saved.Entity.Id;
-                        _context.Publications.Update(publication);
-                        await _context.SaveChangesAsync();
-                    }
-
-                    return await GetAsync(saved.Entity.Id);
+                    return await GetSummaryAsync(saved.Entity.Id);
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologyViewModel>> GetAsync(Guid id)
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Methodology>(id)
+            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
                 .OnSuccess(_userService.CheckCanViewMethodology)
-                .OnSuccess(_mapper.Map<MethodologyViewModel>);
+                .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
 
-        public async Task<Either<ActionResult, List<MethodologyViewModel>>> ListAsync()
+        public async Task<Either<ActionResult, List<MethodologySummaryViewModel>>> ListAsync()
         {
-            return await _userService
-                .CheckCanViewAllMethodologies()
+            return await _userService.CheckCanViewAllMethodologies()
                 .OnSuccess(async () =>
                 {
                     var result = await _context.Methodologies.ToListAsync();
-                    return _mapper.Map<List<MethodologyViewModel>>(result);
+                    return _mapper.Map<List<MethodologySummaryViewModel>>(result);
                 });
         }
 
-        public async Task<Either<ActionResult, List<MethodologyStatusViewModel>>> ListStatusAsync()
+        public async Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync()
         {
             return await _userService
                 .CheckCanViewAllMethodologies()
@@ -98,70 +89,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .OrderBy(m => m.Title)
                         .ToListAsync();
 
-                    return _mapper.Map<List<MethodologyStatusViewModel>>(result);
+                    return _mapper.Map<List<MethodologyPublicationsViewModel>>(result);
                 });
         }
 
-        public async Task<Either<ActionResult, List<MethodologyViewModel>>> GetTopicMethodologiesAsync(Guid topicId)
+        public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
+            UpdateMethodologyRequest request)
         {
-            return await _userService
-                .CheckCanViewAllMethodologies()
-                .OnSuccess(async () =>
+            var slug = SlugFromTitle(request.Title);
+            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
+                .OnSuccess(_userService.CheckCanUpdateMethodology)
+                .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
+                .OnSuccessDo(() => ValidateMethodologySlugUniqueForUpdate(id, slug))
+                .OnSuccess(async methodology =>
                 {
-                    var methodologies = await _context.Publications
-                        .Where(p => p.TopicId == topicId)
-                        .Include(p => p.Methodology)
-                        .Select(p => p.Methodology)
-                        .Distinct()
-                        .ToListAsync();
-                    
-                    return _mapper.Map<List<MethodologyViewModel>>(methodologies);
+                    _context.Methodologies.Update(methodology);
+                    methodology.InternalReleaseNote = request.InternalReleaseNote ?? methodology.InternalReleaseNote;
+                    methodology.PublishScheduled = request.PublishScheduled?.AsStartOfDayUtc();
+                    methodology.Status = request.Status ?? methodology.Status;
+                    methodology.Title = request.Title;
+                    methodology.Slug = slug;
+
+                    await _context.SaveChangesAsync();
+                    return await GetSummaryAsync(id);
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologyViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId,
+        public async Task<Either<ActionResult, MethodologyStatusViewModel>> UpdateMethodologyStatusAsync(Guid id,
             UpdateMethodologyStatusRequest request)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Methodology>(methodologyId)
+            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
                 .OnSuccess(methodology => _userService.CheckCanUpdateMethodologyStatus(methodology, request.Status))
                 .OnSuccess(async methodology =>
                 {
                     methodology.Status = request.Status;
                     methodology.InternalReleaseNote = request.InternalReleaseNote;
-                    
+
                     _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
 
-                    return await GetAsync(methodologyId);
+                    return await GetStatusAsync(id);
                 });
+        }
+
+        private async Task<Either<ActionResult, MethodologyStatusViewModel>> GetStatusAsync(Guid id)
+        {
+            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
+                .OnSuccess(_userService.CheckCanViewMethodology)
+                .OnSuccess(_mapper.Map<MethodologyStatusViewModel>);
+        }
+
+        private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodologyStatus(Methodology methodology,
+            MethodologyStatus? status)
+        {
+            if (!status.HasValue || methodology.Status == status.Value)
+            {
+                // Status unchanged
+                return Task.FromResult(new Either<ActionResult, Methodology>(methodology));
+            }
+
+            return _userService.CheckCanUpdateMethodologyStatus(methodology, status.Value);
         }
 
         private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUnique(string slug)
         {
-            if (await _context.Methodologies.AnyAsync(r => r.Slug == slug))
+            if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug))
             {
-                return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
+                return ValidationActionResult(SlugNotUnique);
             }
 
             return true;
         }
-
-        private async Task<Either<ActionResult, bool>> ValidateAssignedPublication(Guid? publicationId)
+        
+        private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
         {
-            if (publicationId != null)
+            if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug && methodology.Id != id))
             {
-                var publication = await _context.Publications.FirstOrDefaultAsync(p => p.Id == publicationId);
-
-                if (publication == null)
-                {
-                    return ValidationActionResult(ValidationErrorMessages.PublicationDoesNotExist);
-                }
-                
-                if (publication.MethodologyId != null)
-                {
-                    return ValidationActionResult(ValidationErrorMessages.PublicationHasMethodologyAssigned);
-                }
+                return ValidationActionResult(SlugNotUnique);
             }
 
             return true;
