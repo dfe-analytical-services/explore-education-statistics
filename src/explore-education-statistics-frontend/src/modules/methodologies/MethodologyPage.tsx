@@ -94,7 +94,12 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         <Accordion id={accordionIds[0]}>
           {data.content.map(({ heading, caption, order, content }) => {
             return (
-              <AccordionSection heading={heading} caption={caption} key={order}>
+              <AccordionSection
+                id={`${accordionIds[0]}-${order}`}
+                heading={heading}
+                caption={caption}
+                key={order}
+              >
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-quarter">
                     <MethodologyHeader>
@@ -112,26 +117,6 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
             );
           })}
         </Accordion>
-      )}
-
-      {data.annexes && data.annexes.length > 0 && (
-        <>
-          <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
-
-          <Accordion id={accordionIds[1]}>
-            {data.annexes.map(({ heading, caption, order, content }) => {
-              return (
-                <AccordionSection
-                  heading={heading}
-                  caption={caption}
-                  key={order}
-                >
-                  <SectionBlocks content={content} />
-                </AccordionSection>
-              );
-            })}
-          </Accordion>
-        </>
       )}
 
       <PrintThisPage
