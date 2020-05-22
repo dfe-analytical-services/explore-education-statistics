@@ -14,7 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return TimeZoneInfo.ConvertTimeToUtc(dateTimeStartOfDay, GetGmtStandardTimeTimezone());
         }
 
-        private static TimeZoneInfo GetGmtStandardTimeTimezone()
+        public static DateTime ConvertTimeFromUtcToGmt(this DateTime dateTime)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(dateTime, GetGmtStandardTimeTimezone());
+        }
+        
+        public static TimeZoneInfo GetGmtStandardTimeTimezone()
         {
             return TimeZoneInfo.FindSystemTimeZoneById(
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London");

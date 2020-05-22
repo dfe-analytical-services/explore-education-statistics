@@ -10,18 +10,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyService
     {
-        Task<Either<ActionResult, List<MethodologyViewModel>>> ListAsync();
-        
-        Task<Either<ActionResult, List<MethodologyStatusViewModel>>> ListStatusAsync();
-        
-        Task<Either<ActionResult, MethodologyViewModel>> GetAsync(Guid id);
-        
-        Task<Either<ActionResult, List<MethodologyViewModel>>> GetTopicMethodologiesAsync(Guid topicId);
-        
-        Task<Either<ActionResult, MethodologyViewModel>> CreateMethodologyAsync(
-            CreateMethodologyViewModel methodology);
-        
-        Task<Either<ActionResult, MethodologyViewModel>> UpdateMethodologyStatusAsync(Guid methodologyId,
+        Task<Either<ActionResult, List<MethodologySummaryViewModel>>> ListAsync();
+
+        Task<Either<ActionResult, List<MethodologyPublicationsViewModel>>> ListWithPublicationsAsync();
+
+        Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id);
+
+        Task<Either<ActionResult, MethodologySummaryViewModel>>
+            CreateMethodologyAsync(CreateMethodologyRequest request);
+
+        Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
+            UpdateMethodologyRequest request);
+
+        Task<Either<ActionResult, MethodologyStatusViewModel>> UpdateMethodologyStatusAsync(Guid id,
             UpdateMethodologyStatusRequest request);
     }
 }

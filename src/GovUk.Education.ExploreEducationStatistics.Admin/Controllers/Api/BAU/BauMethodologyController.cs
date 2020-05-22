@@ -14,17 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
     public class BauMethodologyController : ControllerBase
     {
         private readonly IMethodologyService _methodologyService;
-        
+
         public BauMethodologyController(IMethodologyService methodologyService)
         {
             _methodologyService = methodologyService;
         }
-        
+
         [HttpGet("bau/methodology")]
-        public async Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologyList()
+        public async Task<ActionResult<List<MethodologyPublicationsViewModel>>> GetMethodologyList()
         {
             return await _methodologyService
-                .ListStatusAsync()
+                .ListWithPublicationsAsync()
                 .HandleFailuresOr(Ok);
         }
     }

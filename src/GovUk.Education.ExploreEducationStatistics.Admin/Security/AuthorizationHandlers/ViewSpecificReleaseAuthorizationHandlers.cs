@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     }
 
                     var windowStatus = preReleaseService.GetPreReleaseWindowStatus(ctx.Release, UtcNow);
-                    return windowStatus.PreReleaseAccess == PreReleaseAccess.Within;
+                    return windowStatus.Access == PreReleaseAccess.Within;
                 })
             {}
         }
