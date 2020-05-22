@@ -1,5 +1,6 @@
 import Button from '@common/components/Button';
-import { Form, FormFieldTextInput } from '@common/components/form';
+import { FormFieldTextInput, Form } from '@common/components/form';
+import useMounted from '@common/hooks/useMounted';
 import publicationService, {
   PublicationTitle,
 } from '@common/services/publicationService';
@@ -34,6 +35,8 @@ const SubscriptionPage: NextPage<Props> = ({
   verified,
 }) => {
   const [subscribed, setSubscribed] = useState(false);
+
+  const { isMounted } = useMounted();
 
   const handleFormSubmit = async ({ email }: FormValues) => {
     if (email !== '') {
@@ -101,19 +104,19 @@ const SubscriptionPage: NextPage<Props> = ({
             <li>existing statistics and data are changed or corrected</li>
           </ul>
 
-          <Formik<FormValues>
-            initialValues={{
-              email: '',
-            }}
-            validationSchema={Yup.object({
-              email: Yup.string()
-                .required('Email is required')
-                .email('Enter a valid email'),
-            })}
-            onSubmit={handleFormSubmit}
-          >
-            {form => {
-              return (
+          {isMounted && (
+            <Formik<FormValues>
+              initialValues={{
+                email: '',
+              }}
+              validationSchema={Yup.object({
+                email: Yup.string()
+                  .required('Email is required')
+                  .email('Enter a valid email'),
+              })}
+              onSubmit={handleFormSubmit}
+            >
+              {form => (
                 <Form id={formId} showSubmitError>
                   <FormFieldTextInput<FormValues>
                     id={`${formId}-email`}
@@ -129,9 +132,9 @@ const SubscriptionPage: NextPage<Props> = ({
                       : 'Subscribe'}
                   </Button>
                 </Form>
-              );
-            }}
-          </Formik>
+              )}
+            </Formik>
+          )}
         </>
       )}
     </Page>
