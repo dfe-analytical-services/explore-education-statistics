@@ -61,6 +61,9 @@ const MethodologySummaryForm = ({
     errorCodeMappings,
   );
 
+  // TODO EES-899 - Save methodology contact in backend
+  const isContactEnabled = false;
+
   return (
     <Formik<MethodologySummaryFormValues>
       enableReinitialize
@@ -73,7 +76,9 @@ const MethodologySummaryForm = ({
       }
       validationSchema={Yup.object<MethodologySummaryFormValues>({
         title: Yup.string().required('Enter a methodology title'),
-        contactId: Yup.string().required('Choose a methodology contact'),
+        contactId: isContactEnabled
+          ? Yup.string().required('Choose a methodology contact')
+          : Yup.string(),
         publishScheduled: validateMandatoryDayMonthYearField,
       })}
       onSubmit={handleSubmit}
@@ -94,17 +99,19 @@ const MethodologySummaryForm = ({
               legendSize="s"
             />
 
-            <FormFieldSelect<MethodologySummaryFormValues>
-              id={`${id}-contactId`}
-              hint="They will be the main point of contact for this methodology and its associated publications."
-              label="Choose the contact for this methodology"
-              name="contactId"
-              placeholder="Select a contact"
-              options={contacts.map(contact => ({
-                label: contact.contactName,
-                value: contact.id,
-              }))}
-            />
+            {isContactEnabled && (
+              <FormFieldSelect<MethodologySummaryFormValues>
+                id={`${id}-contactId`}
+                hint="They will be the main point of contact for this methodology and its associated publications."
+                label="Choose the contact for this methodology"
+                name="contactId"
+                placeholder="Select a contact"
+                options={contacts.map(contact => ({
+                  label: contact.contactName,
+                  value: contact.id,
+                }))}
+              />
+            )}
 
             {form.values.contactId && (
               <SummaryList>
