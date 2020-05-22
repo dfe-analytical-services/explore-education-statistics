@@ -19,24 +19,25 @@ import {
 } from './context/MethodologyContext';
 
 const MethodologyContentPageInternal = () => {
-  const { methodology } = useMethodologyState();
+  const { methodology, canUpdateMethodology } = useMethodologyState();
 
   return (
-    <EditingContextProvider>
+    <EditingContextProvider value={{ isEditing: canUpdateMethodology }}>
       {({ isEditing }) => (
         <>
-          <EditablePageModeToggle />
+          {canUpdateMethodology && <EditablePageModeToggle />}
 
           <div className="govuk-width-container">
             <section
               className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
             >
-              <h1
-                className="govuk-heading-xl"
+              <h2
+                aria-hidden
+                className="govuk-heading-lg"
                 data-testid={`page-title ${methodology.title}`}
               >
                 {methodology.title}
-              </h1>
+              </h2>
 
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
