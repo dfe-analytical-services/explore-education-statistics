@@ -10,50 +10,50 @@ interface DayMonthYearValues {
   year: string;
 }
 
-interface Props<FormValues> extends DayMonthYearValues {
+interface Props<FormValues> {
   error?: ReactNode | string;
-  fieldsetLegend: string;
-  fieldsetLegendSize?: 'xl' | 'l' | 'm' | 's';
-  formId: string;
-  fieldName: keyof FormValues;
+  legend: string;
+  legendSize?: 'xl' | 'l' | 'm' | 's';
+  id: string;
+  name: keyof FormValues | string;
   showError?: boolean;
 }
 
 const FormFieldDayMonthYear = <FormValues extends {}>({
-  fieldsetLegend,
-  formId,
-  fieldName,
+  id,
+  name,
   showError = true,
-  fieldsetLegendSize = 'l',
+  legend,
+  legendSize = 'l',
 }: Props<FormValues>) => {
   return (
-    <Field name={fieldName}>
+    <Field name={name}>
       {({ form }: FieldProps) => {
         const { getError } = createErrorHelper<FormValues>(form);
         return (
           <FormFieldset
-            id={`${formId}-${fieldName}`}
-            legend={fieldsetLegend}
-            legendSize={fieldsetLegendSize}
-            error={showError ? getError(fieldName) : ''}
+            id={id}
+            legend={legend}
+            legendSize={legendSize}
+            error={showError ? getError(name) : ''}
           >
             <FormFieldNumberInput<DayMonthYearValues>
-              id={`${fieldName}.day`}
-              name={`${fieldName}.day`}
+              id={`${name}.day`}
+              name={`${name}.day`}
               label="Day"
               width={2}
               formGroupClass="govuk-date-input__item"
             />
             <FormFieldNumberInput<DayMonthYearValues>
-              id={`${fieldName}.month`}
-              name={`${fieldName}.month`}
+              id={`${name}.month`}
+              name={`${name}.month`}
               label="Month"
               width={2}
               formGroupClass="govuk-date-input__item"
             />
             <FormFieldNumberInput<DayMonthYearValues>
-              id={`${fieldName}.year`}
-              name={`${fieldName}.year`}
+              id={`${name}.year`}
+              name={`${name}.year`}
               label="Year"
               width={4}
               formGroupClass="govuk-date-input__item"

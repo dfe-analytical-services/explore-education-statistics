@@ -1,16 +1,22 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
+import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
 import { MethodologyStatus } from '@admin/services/common/types';
 import methodologyService from '@admin/services/methodology/methodologyService';
 import permissionService from '@admin/services/permissions/permissionService';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import { RadioOption } from '@common/components/form/FormRadioGroup';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import WarningMessage from '@common/components/WarningMessage';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useToggle from '@common/hooks/useToggle';
+import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 interface FormValues {
@@ -18,144 +24,154 @@ interface FormValues {
   internalReleaseNote: string;
 }
 
-interface Model {
-  methodologyStatus: MethodologyStatus;
-  statusOptions: RadioOption[];
-  editable: boolean;
-}
-
-const statusMap: {
-  [keyof: string]: string;
-} = {
+const statusMap: Dictionary<string> = {
   Draft: 'In Draft',
   Approved: 'Approved',
 };
 
+const formId = 'methodologyStatusForm';
+
 const MethodologyStatusPage = ({
   match,
-}: RouteComponentProps<{ methodologyId: string }>) => {
+}: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
-  const [model, setModel] = useState<Model>();
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, toggleForm] = useToggle(false);
 
-  useEffect(() => {
-    Promise.all([
-      methodologyService.getMethodologyStatus(methodologyId),
-      permissionService.canMarkMethodologyAsDraft(methodologyId),
+  const {
+    value: model,
+    setValue: setModel,
+    isLoading,
+  } = useAsyncRetry(async () => {
+    const [summary, canApprove] = await Promise.all([
+      methodologyService.getMethodology(methodologyId),
       permissionService.canApproveMethodology(methodologyId),
-    ]).then(([methodologyStatus, canMarkAsDraft, canApprove]) => {
-      const statusOptions: RadioOption[] = [
-        {
-          label: 'In draft',
-          value: 'Draft',
-          disabled: !canMarkAsDraft,
-        },
-        {
-          label: 'Approved for publication',
-          value: 'Approved',
-          disabled: !canApprove,
-        },
-      ];
+    ]);
 
-      setModel({
-        methodologyStatus,
-        statusOptions,
-        editable: statusOptions.some(option => !option.disabled),
-      });
-    });
-  }, [methodologyId, showForm]);
+    return {
+      summary,
+      canApprove,
+    };
+  }, [methodologyId]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
-    await methodologyService
-      .updateMethodologyStatus(methodologyId, values)
-      .then(() => {
-        if (model) {
-          setModel({
-            ...model,
-            methodologyStatus: values.status,
-          });
-        }
+    if (!model) {
+      return;
+    }
 
-        setShowForm(false);
-      });
+    const nextSummary = await methodologyService.updateMethodology(
+      methodologyId,
+      {
+        ...model.summary,
+        // TODO: EES-899 Contact should be attached
+        contactId: model.summary?.contact?.id ?? '',
+        ...values,
+      },
+    );
+
+    setModel({
+      ...model,
+      summary: {
+        ...nextSummary,
+      },
+    });
+
+    toggleForm.off();
   });
 
-  if (!model) return null;
-
-  const formId = 'methodologyStatusForm';
+  const isEditable = model?.canApprove && model?.summary.status !== 'Approved';
 
   return (
     <>
-      <h2 className="govuk-heading-m">Methodology Status</h2>
-      {!showForm ? (
-        <>
-          <div className="govuk-!-margin-bottom-6">
-            The current methodology status is:{' '}
-            <StatusBlock text={statusMap[model.methodologyStatus]} />
-          </div>
+      <h2>Methodology status</h2>
 
-          {model.editable && (
-            <Button
-              className="govuk-!-margin-top-2"
-              onClick={() => setShowForm(true)}
-            >
-              Update methodology status
-            </Button>
-          )}
-        </>
-      ) : (
-        <Formik<FormValues>
-          enableReinitialize
-          initialValues={{
-            status: model.methodologyStatus,
-            internalReleaseNote: '',
-          }}
-          onSubmit={handleSubmit}
-          validationSchema={Yup.object<FormValues>({
-            status: Yup.mixed().required('Choose a status'),
-            internalReleaseNote: Yup.string().required(
-              'Provide an internal release note',
-            ),
-          })}
-        >
-          {form => {
-            return (
-              <Form id={formId}>
-                <p>Select and update the methodology status.</p>
-                <FormFieldRadioGroup<FormValues>
-                  legend="Status"
-                  name="status"
-                  id={`${formId}-status`}
-                  options={model.statusOptions}
-                  orderDirection={[]}
-                />
-                <FormFieldTextArea
-                  name="internalReleaseNote"
-                  className="govuk-!-width-one-half"
-                  id={`${formId}-internalReleaseNote`}
-                  label="Internal release note"
-                  rows={2}
-                />
-                <div className="govuk-!-margin-top-6">
-                  <Button type="submit" className="govuk-!-margin-right-6">
-                    Update
-                  </Button>
-                  <ButtonText
-                    onClick={() => {
-                      form.resetForm();
-                      setShowForm(false);
-                    }}
-                    className="govuk-button govuk-button--secondary"
-                  >
-                    Cancel
-                  </ButtonText>
+      <LoadingSpinner loading={isLoading}>
+        {model ? (
+          <>
+            {!showForm ? (
+              <>
+                <div className="govuk-!-margin-bottom-6">
+                  The current methodology status is:{' '}
+                  <StatusBlock text={statusMap[model.summary.status]} />
                 </div>
-              </Form>
-            );
-          }}
-        </Formik>
-      )}
+
+                {isEditable && (
+                  <Button
+                    className="govuk-!-margin-top-2"
+                    onClick={toggleForm.on}
+                  >
+                    Update status
+                  </Button>
+                )}
+              </>
+            ) : (
+              <Formik<FormValues>
+                initialValues={{
+                  status: model.summary.status,
+                  internalReleaseNote: '',
+                }}
+                onSubmit={handleSubmit}
+                validationSchema={Yup.object<FormValues>({
+                  status: Yup.mixed().required('Choose a status'),
+                  internalReleaseNote: Yup.string().when('status', {
+                    is: 'Approved',
+                    then: Yup.string().required(
+                      'Enter an internal release note',
+                    ),
+                  }),
+                })}
+              >
+                {form => {
+                  return (
+                    <Form id={formId}>
+                      <FormFieldRadioGroup<FormValues, MethodologyStatus>
+                        legend="Status"
+                        hint="Once approved, the status cannot be reverted."
+                        name="status"
+                        id={`${formId}-status`}
+                        options={[
+                          {
+                            label: 'In draft',
+                            value: 'Draft',
+                          },
+                          {
+                            label: 'Approved for publication',
+                            value: 'Approved',
+                            conditional: (
+                              <FormFieldTextArea<FormValues>
+                                name="internalReleaseNote"
+                                className="govuk-!-width-one-half"
+                                id={`${formId}-internalReleaseNote`}
+                                label="Internal release note"
+                                rows={2}
+                              />
+                            ),
+                          },
+                        ]}
+                        orderDirection={[]}
+                      />
+
+                      <ButtonGroup>
+                        <Button type="submit">Update status</Button>
+                        <ButtonText
+                          onClick={() => {
+                            form.resetForm();
+                            toggleForm.off();
+                          }}
+                        >
+                          Cancel
+                        </ButtonText>
+                      </ButtonGroup>
+                    </Form>
+                  );
+                }}
+              </Formik>
+            )}
+          </>
+        ) : (
+          <WarningMessage>Could not load methodology status</WarningMessage>
+        )}
+      </LoadingSpinner>
     </>
   );
 };

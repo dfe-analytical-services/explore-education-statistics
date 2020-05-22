@@ -6,7 +6,10 @@ import FormFileInput, {
 } from '@common/components/form/FormFileInput';
 import React from 'react';
 
-type Props<FormValues> = FormFieldComponentProps<FormFileInputProps>;
+type Props<FormValues> = FormFieldComponentProps<
+  FormFileInputProps,
+  FormValues
+>;
 
 const FormFieldFileInput = <FormValues extends {}>(
   props: Props<FormValues>,

@@ -10,7 +10,7 @@ import FormFieldCheckboxSearchGroup from './FormFieldCheckboxSearchGroup';
 import handleAllChange from './util/handleAllCheckboxChange';
 
 export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = OmitStrict<
-  FormFieldComponentProps<FormCheckboxSearchSubGroupsProps>,
+  FormFieldComponentProps<FormCheckboxSearchSubGroupsProps, FormValues>,
   'formGroup'
 >;
 

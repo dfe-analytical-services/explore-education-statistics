@@ -107,4 +107,69 @@ describe('FormSelect', () => {
     expect(getByLabelText('Test select')).toHaveClass('govuk-select--error');
     expect(container.innerHTML).toMatchSnapshot();
   });
+
+  test('aria-describedby is equal to the hint id', () => {
+    const { getByLabelText, getByText } = render(
+      <FormSelect
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        hint="Fill me in"
+        options={[{ value: 'option-1', label: 'Option 1' }]}
+      />,
+    );
+
+    expect(getByText('Fill me in')).toHaveAttribute('id', 'test-input-hint');
+    expect(getByLabelText('Test input')).toHaveAttribute(
+      'aria-describedby',
+      'test-input-hint',
+    );
+  });
+
+  test('aria-describedby is equal to the error id', () => {
+    const { getByLabelText, getByText } = render(
+      <FormSelect
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        error="Field is required"
+        options={[{ value: 'option-1', label: 'Option 1' }]}
+      />,
+    );
+
+    expect(getByText('Field is required')).toHaveAttribute(
+      'id',
+      'test-input-error',
+    );
+    expect(getByLabelText('Test input')).toHaveAttribute(
+      'aria-describedby',
+      'test-input-error',
+    );
+  });
+
+  test('aria-describedby contains both hint and error ids', () => {
+    const { getByLabelText, getByText } = render(
+      <FormSelect
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        hint="Fill me in"
+        error="Field is required"
+        options={[{ value: 'option-1', label: 'Option 1' }]}
+      />,
+    );
+
+    expect(getByText('Fill me in')).toHaveAttribute('id', 'test-input-hint');
+    expect(getByText('Field is required')).toHaveAttribute(
+      'id',
+      'test-input-error',
+    );
+
+    const ariaDescribedBy = getByLabelText('Test input').getAttribute(
+      'aria-describedby',
+    );
+
+    expect(ariaDescribedBy).toContain('test-input-error');
+    expect(ariaDescribedBy).toContain('test-input-hint');
+  });
 });

@@ -6,7 +6,10 @@ import FormNumberInput, {
 } from '@common/components/form/FormNumberInput';
 import React from 'react';
 
-type Props<FormValues> = FormFieldComponentProps<FormNumberInputProps>;
+type Props<FormValues> = FormFieldComponentProps<
+  FormNumberInputProps,
+  FormValues
+>;
 
 const FormFieldNumberInput = <FormValues extends {}>(
   props: Props<FormValues>,

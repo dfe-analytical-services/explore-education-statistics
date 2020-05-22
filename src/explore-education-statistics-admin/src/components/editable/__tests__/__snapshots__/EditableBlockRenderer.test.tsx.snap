@@ -18,13 +18,13 @@ exports[`EditableBlockRenderer MarkDownBlock renders editable version correctly 
   </div>
   <div class="buttons">
     <button aria-disabled="false"
-            class="govuk-button marginRight govuk-button--secondary"
+            class="govuk-button button govuk-button--secondary"
             type="button"
     >
       Edit block
     </button>
     <button aria-disabled="false"
-            class="govuk-button marginRight govuk-button--warning"
+            class="govuk-button button govuk-button--warning"
             type="button"
     >
       Remove block
