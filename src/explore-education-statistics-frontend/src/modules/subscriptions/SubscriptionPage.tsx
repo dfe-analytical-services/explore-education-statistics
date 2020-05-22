@@ -1,17 +1,24 @@
+import Button from '@common/components/Button';
+import { Form, FormFieldTextInput } from '@common/components/form';
 import publicationService, {
   PublicationTitle,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import Yup from '@common/validation/yup';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import functionsService from '@frontend/services/functionsService';
 import classNames from 'classnames';
+import { Formik } from 'formik';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useState } from 'react';
-import SubscriptionForm, {
-  SubscriptionFormSubmitHandler,
-} from './components/SubscriptionForm';
 import styles from './SubscriptionPage.module.scss';
+
+interface FormValues {
+  email: string;
+}
+
+const formId = 'subscriptionForm';
 
 interface Props {
   slug: string;
@@ -28,7 +35,7 @@ const SubscriptionPage: NextPage<Props> = ({
 }) => {
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleFormSubmit: SubscriptionFormSubmitHandler = async ({ email }) => {
+  const handleFormSubmit = async ({ email }: FormValues) => {
     if (email !== '') {
       const { id, title } = data;
 
@@ -93,7 +100,38 @@ const SubscriptionPage: NextPage<Props> = ({
             <li>new statistics and data are released</li>
             <li>existing statistics and data are changed or corrected</li>
           </ul>
-          <SubscriptionForm onSubmit={handleFormSubmit} />
+
+          <Formik<FormValues>
+            initialValues={{
+              email: '',
+            }}
+            validationSchema={Yup.object({
+              email: Yup.string()
+                .required('Email is required')
+                .email('Enter a valid email'),
+            })}
+            onSubmit={handleFormSubmit}
+          >
+            {form => {
+              return (
+                <Form id={formId} showSubmitError>
+                  <FormFieldTextInput<FormValues>
+                    id={`${formId}-email`}
+                    label="Enter your email address"
+                    hint="This will only be used to subscribe you to updates. You can unsubscribe at any time"
+                    name="email"
+                    width={20}
+                  />
+
+                  <Button type="submit" disabled={form.isSubmitting}>
+                    {form.isSubmitting && form.isValid
+                      ? 'Submitting'
+                      : 'Subscribe'}
+                  </Button>
+                </Form>
+              );
+            }}
+          </Formik>
         </>
       )}
     </Page>
