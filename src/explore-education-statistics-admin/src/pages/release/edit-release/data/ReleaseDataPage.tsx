@@ -31,19 +31,14 @@ const ReleaseDataPage = () => {
     Promise.all([
       footnotesService.getReleaseFootnoteData(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ]).then(
-      ([
-        { meta, footnotes: footnotesList },
+    ]).then(([{ meta, footnotes: footnotesList }, canUpdateRelease]) => {
+      setFootnotesData({
+        footnoteMeta: meta,
+        footnotes: footnotesList,
+        footnoteMetaGetters: generateFootnoteMetaMap(meta),
         canUpdateRelease,
-      ]) => {
-        setFootnotesData({
-          footnoteMeta: meta,
-          footnotes: footnotesList,
-          footnoteMetaGetters: generateFootnoteMetaMap(meta),
-          canUpdateRelease,
-        });
-      },
-    );
+      });
+    });
   }, [releaseId]);
 
   useEffect(() => {
