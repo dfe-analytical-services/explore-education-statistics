@@ -1,6 +1,6 @@
 import Page from '@frontend/components/Page';
 import React from 'react';
-import { cookieMap } from '@frontend/hooks/useCookies';
+import { allowedCookies } from '@frontend/hooks/useCookies';
 import Link from '@frontend/components/Link';
 
 function CookiesPage() {
@@ -137,13 +137,15 @@ function CookiesPage() {
           </thead>
           <tbody className="govuk-table__body">
             <tr className="govuk-table__row">
-              <td className="govuk-table__cell">{cookieMap.bannerSeen.name}</td>
+              <td className="govuk-table__cell">
+                {allowedCookies.bannerSeen.name}
+              </td>
               <td className="govuk-table__cell">
                 Saves a message to let us know that you’ve seen our cookie
                 message
               </td>
               <td className="govuk-table__cell">
-                {cookieMap.bannerSeen.duration}
+                {allowedCookies.bannerSeen.duration}
               </td>
             </tr>
           </tbody>
@@ -172,12 +174,14 @@ function CookiesPage() {
           </thead>
           <tbody className="govuk-table__body">
             <tr className="govuk-table__row">
-              <td className="govuk-table__cell">{cookieMap.disableGA.name}</td>
               <td className="govuk-table__cell">
-                Saves cookie settings, so they remain upon return
+                {allowedCookies.disableGA.name}
               </td>
               <td className="govuk-table__cell">
-                {cookieMap.disableGA.duration}
+                Disables Google Analytics tracking
+              </td>
+              <td className="govuk-table__cell">
+                {allowedCookies.disableGA.duration}
               </td>
             </tr>
           </tbody>
@@ -213,7 +217,7 @@ function CookiesPage() {
             <tr className="govuk-table__row">
               <td className="govuk-table__cell">ai_user</td>
               <td className="govuk-table__cell">
-                Used to identify returning users.
+                Used to identify returning users
               </td>
               <td className="govuk-table__cell">1 year</td>
             </tr>
