@@ -22,7 +22,7 @@ import { DayMonthYear } from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid } from 'date-fns';
 import { Formik, FormikHelpers } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
 export interface ReleaseSummaryFormValues {
@@ -33,20 +33,19 @@ export interface ReleaseSummaryFormValues {
   nextReleaseDate?: DayMonthYear;
 }
 
+const formId = 'releaseSummaryForm';
+
 interface Props<FormValues extends ReleaseSummaryFormValues> {
-  submitButtonText: string;
-  initialValuesSupplier: (
+  additionalFields?: ReactNode;
+  submitText: string;
+  initialValues: (
     timePeriodCoverageGroups: TimePeriodCoverageGroup[],
   ) => FormValues;
-  validationRulesSupplier?: (
+  validationRules?: (
     baseValidationRules: ObjectSchemaDefinition<ReleaseSummaryFormValues>,
   ) => ObjectSchemaDefinition<FormValues>;
-  onSubmitHandler: (
-    values: FormValues,
-    actions: FormikHelpers<FormValues>,
-  ) => void;
-  onCancelHandler: () => void;
-  additionalFields?: React.ReactNode;
+  onSubmit: (values: FormValues, actions: FormikHelpers<FormValues>) => void;
+  onCancel: () => void;
 }
 
 interface ReleaseSummaryFormModel {
@@ -57,12 +56,12 @@ interface ReleaseSummaryFormModel {
 const ReleaseSummaryForm = <
   FormValues extends ReleaseSummaryFormValues = ReleaseSummaryFormValues
 >({
-  submitButtonText,
-  initialValuesSupplier,
-  validationRulesSupplier,
-  onSubmitHandler,
-  onCancelHandler,
   additionalFields,
+  submitText,
+  initialValues,
+  validationRules,
+  onSubmit,
+  onCancel,
 }: Props<FormValues>) => {
   const [model, setModel] = useState<ReleaseSummaryFormModel>();
 
@@ -112,20 +111,18 @@ const ReleaseSummaryForm = <
     nextReleaseDate: validateOptionalPartialDayMonthYearField,
   };
 
-  const formId = 'releaseSummaryForm';
-
   return (
     <>
       {model && (
         <Formik<FormValues>
           enableReinitialize
-          initialValues={initialValuesSupplier(model.timePeriodCoverageGroups)}
+          initialValues={initialValues(model.timePeriodCoverageGroups)}
           validationSchema={Yup.object<FormValues>(
-            validationRulesSupplier
-              ? validationRulesSupplier(baseValidationRules)
+            validationRules
+              ? validationRules(baseValidationRules)
               : (baseValidationRules as ObjectSchemaDefinition<FormValues>),
           )}
-          onSubmit={onSubmitHandler}
+          onSubmit={onSubmit}
         >
           {form => {
             const timePeriodLabel = findTimePeriodCoverageGroup(
@@ -188,12 +185,10 @@ const ReleaseSummaryForm = <
                 </div>
                 {additionalFields}
                 <Button type="submit" className="govuk-!-margin-top-9">
-                  {submitButtonText}
+                  {submitText}
                 </Button>
                 <div className="govuk-!-margin-top-6">
-                  <ButtonText onClick={onCancelHandler}>
-                    Cancel update
-                  </ButtonText>
+                  <ButtonText onClick={onCancel}>Cancel</ButtonText>
                 </div>
               </Form>
             );

@@ -87,7 +87,7 @@ const CreateReleasePage = ({
     );
   }, errorCodeMappings);
 
-  const cancelHandler = () =>
+  const handleCancel = () =>
     history.push(appRouteList.adminDashboard.path as string);
 
   return (
@@ -126,8 +126,8 @@ const CreateReleasePage = ({
         </div>
       </div>
       <ReleaseSummaryForm<CreateReleaseFormValues>
-        submitButtonText="Create new release"
-        initialValuesSupplier={(
+        submitText="Create new release"
+        initialValues={(
           timePeriodCoverageGroups: TimePeriodCoverageGroup[],
         ): CreateReleaseFormValues =>
           ({
@@ -138,7 +138,7 @@ const CreateReleasePage = ({
             templateReleaseId: '',
           } as CreateReleaseFormValues)
         }
-        validationRulesSupplier={(
+        validationRules={(
           baseValidationRules: ObjectSchemaDefinition<ReleaseSummaryFormValues>,
         ): ObjectSchemaDefinition<CreateReleaseFormValues> => ({
           ...baseValidationRules,
@@ -147,8 +147,8 @@ const CreateReleasePage = ({
               ? Yup.string().required('Choose a template')
               : Yup.string(),
         })}
-        onSubmitHandler={handleSubmit}
-        onCancelHandler={cancelHandler}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
         additionalFields={
           model &&
           model.templateRelease && (

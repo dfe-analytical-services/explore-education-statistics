@@ -53,7 +53,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     );
   }, errorCodeMappings);
 
-  const cancelHandler = () =>
+  const handleCancel = () =>
     history.push(
       summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
     );
@@ -65,8 +65,8 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
           <h2 className="govuk-heading-l">Edit release summary</h2>
 
           <ReleaseSummaryForm
-            submitButtonText="Update release summary"
-            initialValuesSupplier={(): ReleaseSummaryFormValues => ({
+            submitText="Update release summary"
+            initialValues={(): ReleaseSummaryFormValues => ({
               timePeriodCoverageCode:
                 releaseSummaryDetails.timePeriodCoverage.value,
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),
@@ -76,8 +76,8 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
               ),
               nextReleaseDate: releaseSummaryDetails?.nextReleaseDate,
             })}
-            onSubmitHandler={handleSubmit}
-            onCancelHandler={cancelHandler}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
           />
         </>
       )}
