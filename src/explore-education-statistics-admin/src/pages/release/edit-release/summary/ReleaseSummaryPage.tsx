@@ -74,7 +74,7 @@ const ReleaseSummaryPage = () => {
             </SummaryListItem>
             <SummaryListItem term="Scheduled release">
               <FormattedDate>
-                {new Date(model.releaseSummaryDetails.publishScheduled)}
+                {model.releaseSummaryDetails.publishScheduled}
               </FormattedDate>
             </SummaryListItem>
             <SummaryListItem term="Next release expected">

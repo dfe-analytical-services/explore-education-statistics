@@ -1,22 +1,16 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import service from '@admin/services/edit-publication/service';
-import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { FormGroup } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
+import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import {
-  dateToDayMonthYear,
-  DayMonthYearValues,
-} from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React from 'react';
@@ -28,7 +22,7 @@ const errorCodeMappings = [
 export interface MethodologySummaryFormValues {
   title: string;
   contactId: string;
-  publishScheduled: DayMonthYearValues;
+  publishScheduled: Date;
 }
 
 interface Props {
@@ -56,7 +50,7 @@ const MethodologySummaryForm = ({
 
   const handleSubmit = useFormSubmit<MethodologySummaryFormValues>(
     async values => {
-      onSubmit(values);
+      onSubmit(values as MethodologySummaryFormValues);
     },
     errorCodeMappings,
   );
@@ -68,18 +62,20 @@ const MethodologySummaryForm = ({
     <Formik<MethodologySummaryFormValues>
       enableReinitialize
       initialValues={
-        initialValues ?? {
+        initialValues ??
+        ({
           title: '',
           contactId: '',
-          publishScheduled: dateToDayMonthYear(new Date('')),
-        }
+        } as MethodologySummaryFormValues)
       }
       validationSchema={Yup.object<MethodologySummaryFormValues>({
         title: Yup.string().required('Enter a methodology title'),
         contactId: isContactEnabled
           ? Yup.string().required('Choose a methodology contact')
           : Yup.string(),
-        publishScheduled: validateMandatoryDayMonthYearField,
+        publishScheduled: Yup.date().required(
+          'Enter a valid scheduled publish date',
+        ),
       })}
       onSubmit={handleSubmit}
     >
@@ -92,7 +88,7 @@ const MethodologySummaryForm = ({
               name="title"
             />
 
-            <FormFieldDayMonthYear<MethodologySummaryFormValues>
+            <FormFieldDateInput<MethodologySummaryFormValues>
               id={`${id}-publishScheduled`}
               name="publishScheduled"
               legend="Schedule publish date"

@@ -2,7 +2,7 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ReleaseSummaryForm, {
-  EditFormValues,
+  ReleaseSummaryFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import appRouteList from '@admin/routes/dashboard/routes';
@@ -20,7 +20,6 @@ import {
 } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import { Publication } from '@common/services/publicationService';
-import { emptyDayMonthYear } from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -44,9 +43,9 @@ interface MatchProps {
   publicationId: string;
 }
 
-export type FormValues = {
+export type CreateReleaseFormValues = {
   templateReleaseId: string;
-} & EditFormValues;
+} & ReleaseSummaryFormValues;
 
 interface Model {
   templateRelease: IdTitlePair | undefined;
@@ -73,7 +72,7 @@ const CreateReleasePage = ({
     });
   }, [publicationId]);
 
-  const handleSubmit = useFormSubmit<FormValues>(async values => {
+  const handleSubmit = useFormSubmit<CreateReleaseFormValues>(async values => {
     const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
       publicationId,
       values,
@@ -126,22 +125,22 @@ const CreateReleasePage = ({
           </RelatedInformation>
         </div>
       </div>
-      <ReleaseSummaryForm<FormValues>
+      <ReleaseSummaryForm<CreateReleaseFormValues>
         submitButtonText="Create new release"
         initialValuesSupplier={(
           timePeriodCoverageGroups: TimePeriodCoverageGroup[],
-        ): FormValues => ({
-          timePeriodCoverageCode:
-            timePeriodCoverageGroups[0].timeIdentifiers[0].identifier.value,
-          timePeriodCoverageStartYear: '',
-          releaseTypeId: '',
-          scheduledPublishDate: emptyDayMonthYear(),
-          nextReleaseDate: emptyDayMonthYear(),
-          templateReleaseId: '',
-        })}
+        ): CreateReleaseFormValues =>
+          ({
+            timePeriodCoverageCode:
+              timePeriodCoverageGroups[0].timeIdentifiers[0].identifier.value,
+            timePeriodCoverageStartYear: '',
+            releaseTypeId: '',
+            templateReleaseId: '',
+          } as CreateReleaseFormValues)
+        }
         validationRulesSupplier={(
-          baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
-        ): ObjectSchemaDefinition<FormValues> => ({
+          baseValidationRules: ObjectSchemaDefinition<ReleaseSummaryFormValues>,
+        ): ObjectSchemaDefinition<CreateReleaseFormValues> => ({
           ...baseValidationRules,
           templateReleaseId:
             model && model.templateRelease
@@ -154,7 +153,7 @@ const CreateReleasePage = ({
           model &&
           model.templateRelease && (
             <div className="govuk-!-margin-top-9">
-              <FormFieldRadioGroup<FormValues>
+              <FormFieldRadioGroup<CreateReleaseFormValues>
                 id="releaseSummaryForm-templateReleaseId"
                 legend="Select template"
                 name="templateReleaseId"

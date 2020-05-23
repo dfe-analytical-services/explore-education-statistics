@@ -1,24 +1,17 @@
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
 import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
-import { validateMandatoryDayMonthYearField } from '@admin/validation/validation';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import { Form, FormFieldset } from '@common/components/form';
-import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
+import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
 import { ReleaseNote } from '@common/services/publicationService';
-import {
-  dateToDayMonthYear,
-  DayMonthYearInputs,
-  dayMonthYearInputsToDate,
-} from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
-import { Formik, FormikProps } from 'formik';
-import merge from 'lodash/merge';
+import { Formik } from 'formik';
 import React, { useState } from 'react';
 
 interface Props {
@@ -26,12 +19,12 @@ interface Props {
   logEvent?: (...params: string[]) => void;
 }
 
-export interface AddFormValues {
+interface AddFormValues {
   reason: string;
 }
 
-export interface EditFormValues {
-  on: DayMonthYearInputs;
+interface EditFormValues {
+  on: Date;
   reason: string;
 }
 
@@ -73,7 +66,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
     return new Promise(resolve => {
       releaseNoteService
         .edit(id, release.id, {
-          on: dayMonthYearInputsToDate(releaseNote.on),
+          on: releaseNote.on,
           reason: releaseNote.reason,
         })
         .then(newReleaseNotes => {
@@ -149,35 +142,32 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
   const renderEditForm = () => {
     const formId = 'edit-release-note-form';
 
-    const generateInitialValues = () => {
-      const initialValue: EditFormValues = {
-        on: {
-          day: '',
-          month: '',
-          year: '',
-        },
-        reason: '',
-      };
-
-      return merge(initialValue, {
-        on: dateToDayMonthYear(new Date(selectedReleaseNote.on)),
-        reason: selectedReleaseNote.reason,
-      });
-    };
-
     return (
       <Formik<EditFormValues>
-        initialValues={generateInitialValues()}
+        initialValues={
+          selectedReleaseNote
+            ? {
+                on: new Date(selectedReleaseNote.on),
+                reason: selectedReleaseNote.reason,
+              }
+            : ({
+                reason: '',
+              } as EditFormValues)
+        }
         validationSchema={Yup.object<EditFormValues>({
-          on: validateMandatoryDayMonthYearField,
+          on: Yup.date().required('Enter a valid edit date'),
           reason: Yup.string().required('Release note must be provided'),
         })}
         onSubmit={releaseNote =>
-          editReleaseNote(selectedReleaseNote.id, releaseNote).then(() => {
+          editReleaseNote(
+            selectedReleaseNote.id,
+            releaseNote as EditFormValues,
+          ).then(() => {
             setEditFormOpen(false);
           })
         }
-        render={(form: FormikProps<EditFormValues>) => {
+      >
+        {form => {
           return (
             <Form {...form} id={formId}>
               <FormFieldset
@@ -185,13 +175,13 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                 legend="Edit release note"
                 legendSize="m"
               >
-                <FormFieldDayMonthYear<EditFormValues>
+                <FormFieldDateInput<EditFormValues>
                   id={`${formId}-on`}
                   name="on"
                   legend="Edit date"
                   legendSize="s"
                 />
-                <FormFieldTextArea
+                <FormFieldTextArea<EditFormValues>
                   id="reason"
                   label="Edit release note"
                   name="reason"
@@ -216,7 +206,7 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
             </Form>
           );
         }}
-      />
+      </Formik>
     );
   };
 

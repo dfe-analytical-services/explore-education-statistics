@@ -1,7 +1,7 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import ReleaseSummaryForm, {
-  EditFormValues,
+  ReleaseSummaryFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleUpdateReleaseSummaryRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
@@ -11,10 +11,6 @@ import {
   errorCodeAndFieldNameToFieldError,
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
-import {
-  dateToDayMonthYear,
-  dayMonthYearValuesToInputs,
-} from '@common/utils/date/dayMonthYear';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -45,7 +41,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     });
   }, [releaseId]);
 
-  const handleSubmit = useFormSubmit<EditFormValues>(async values => {
+  const handleSubmit = useFormSubmit<ReleaseSummaryFormValues>(async values => {
     const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
       releaseId,
       values,
@@ -70,19 +66,15 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
 
           <ReleaseSummaryForm
             submitButtonText="Update release summary"
-            initialValuesSupplier={(): EditFormValues => ({
+            initialValuesSupplier={(): ReleaseSummaryFormValues => ({
               timePeriodCoverageCode:
                 releaseSummaryDetails.timePeriodCoverage.value,
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),
               releaseTypeId: releaseSummaryDetails.type.id,
-              scheduledPublishDate: dayMonthYearValuesToInputs(
-                dateToDayMonthYear(
-                  new Date(releaseSummaryDetails.publishScheduled),
-                ),
+              scheduledPublishDate: new Date(
+                releaseSummaryDetails.publishScheduled,
               ),
-              nextReleaseDate: dayMonthYearValuesToInputs(
-                releaseSummaryDetails.nextReleaseDate,
-              ),
+              nextReleaseDate: releaseSummaryDetails?.nextReleaseDate,
             })}
             onSubmitHandler={handleSubmit}
             onCancelHandler={cancelHandler}

@@ -4,30 +4,26 @@ import { CreateReleaseRequest } from '@admin/services/release/create-release/typ
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
 import { ReleaseStatus } from '@common/services/publicationService';
-import {
-  dayMonthYearInputsToDate,
-  dayMonthYearInputsToValues,
-} from '@common/utils/date/dayMonthYear';
-import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
-import { EditFormValues } from '../summary/ReleaseSummaryForm';
+import { CreateReleaseFormValues } from '../create-release/CreateReleasePage';
+import { ReleaseSummaryFormValues } from '../summary/ReleaseSummaryForm';
 
 export const assembleBaseReleaseSummaryRequestFromForm = (
-  values: EditFormValues,
+  values: ReleaseSummaryFormValues,
 ): BaseReleaseSummaryDetailsRequest => {
   return {
     timePeriodCoverage: {
       value: values.timePeriodCoverageCode,
     },
     releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
-    publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
-    nextReleaseDate: dayMonthYearInputsToValues(values.nextReleaseDate),
+    publishScheduled: values.scheduledPublishDate,
+    nextReleaseDate: values.nextReleaseDate,
     typeId: values.releaseTypeId,
   };
 };
 
 export const assembleCreateReleaseRequestFromForm = (
   publicationId: string,
-  values: CreateFormValues,
+  values: CreateReleaseFormValues,
 ): CreateReleaseRequest => {
   return {
     publicationId,
@@ -39,7 +35,7 @@ export const assembleCreateReleaseRequestFromForm = (
 
 export const assembleUpdateReleaseSummaryRequestFromForm = (
   releaseId: string,
-  values: EditFormValues,
+  values: ReleaseSummaryFormValues,
 ): UpdateReleaseSummaryDetailsRequest => {
   return {
     releaseId,
@@ -85,5 +81,3 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
 
 export const getReleaseSummaryLabel = (release: AdminDashboardRelease) =>
   `${release.title} ${getLiveLatestLabel(release.live, release.latestRelease)}`;
-
-export default {};

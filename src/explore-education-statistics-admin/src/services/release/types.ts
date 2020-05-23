@@ -1,6 +1,6 @@
 import { IdTitlePair } from '@admin/services/common/types';
 import { ReleaseStatus } from '@common/services/publicationService';
-import { DayMonthYearValues } from '@common/utils/date/dayMonthYear';
+import { DayMonthYear } from '@common/utils/date/dayMonthYear';
 
 export interface ReleaseSummaryDetails {
   id: string;
@@ -11,7 +11,7 @@ export interface ReleaseSummaryDetails {
   releaseName: string;
   type: IdTitlePair;
   publishScheduled: string;
-  nextReleaseDate?: DayMonthYearValues;
+  nextReleaseDate?: DayMonthYear;
   status: ReleaseStatus;
   yearTitle: string;
 }
@@ -23,7 +23,7 @@ export interface BaseReleaseSummaryDetailsRequest {
   releaseName: number;
   typeId: string;
   publishScheduled: Date;
-  nextReleaseDate: DayMonthYearValues;
+  nextReleaseDate?: DayMonthYear;
 }
 
 export interface ReleasePublicationStatus {

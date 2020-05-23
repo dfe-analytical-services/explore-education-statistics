@@ -6,41 +6,40 @@ import {
 } from '@admin/services/common/types';
 import {
   parseDate,
-  validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
+import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { Dictionary } from '@common/types';
-import { DayMonthYearInputs } from '@common/utils/date/dayMonthYear';
+import { DayMonthYear } from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid } from 'date-fns';
 import { Formik, FormikHelpers } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
-export interface EditFormValues {
+export interface ReleaseSummaryFormValues {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
   releaseTypeId: string;
-  scheduledPublishDate: DayMonthYearInputs;
-  nextReleaseDate: DayMonthYearInputs;
+  scheduledPublishDate: Date;
+  nextReleaseDate?: DayMonthYear;
 }
 
-interface Props<FormValues extends EditFormValues> {
+interface Props<FormValues extends ReleaseSummaryFormValues> {
   submitButtonText: string;
   initialValuesSupplier: (
     timePeriodCoverageGroups: TimePeriodCoverageGroup[],
   ) => FormValues;
   validationRulesSupplier?: (
-    baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
+    baseValidationRules: ObjectSchemaDefinition<ReleaseSummaryFormValues>,
   ) => ObjectSchemaDefinition<FormValues>;
   onSubmitHandler: (
     values: FormValues,
@@ -55,7 +54,9 @@ interface ReleaseSummaryFormModel {
   releaseTypes: IdTitlePair[];
 }
 
-const ReleaseSummaryForm = <FormValues extends EditFormValues>({
+const ReleaseSummaryForm = <
+  FormValues extends ReleaseSummaryFormValues = ReleaseSummaryFormValues
+>({
   submitButtonText,
   initialValuesSupplier,
   validationRulesSupplier,
@@ -89,23 +90,25 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
     return optGroups;
   };
 
-  const baseValidationRules: ObjectSchemaDefinition<EditFormValues> = {
+  const baseValidationRules: ObjectSchemaDefinition<ReleaseSummaryFormValues> = {
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
     releaseTypeId: Yup.string().required('Choose a release type'),
-    scheduledPublishDate: validateMandatoryDayMonthYearField.test(
-      'validDateIfAfterToday',
-      `Schedule publish date can't be before ${format(
-        new Date(),
-        'do MMMM yyyy',
-      )}`,
-      value => {
-        return (
-          isValid(parseDate({ value })) &&
-          endOfDay(parseDate({ value })) >= endOfDay(new Date())
-        );
-      },
-    ),
+    scheduledPublishDate: Yup.date()
+      .required('Enter a valid scheduled publish date')
+      .test({
+        name: 'validDateIfAfterToday',
+        message: `Scheduled publish date can't be before ${format(
+          new Date(),
+          'do MMMM yyyy',
+        )}`,
+        test(value) {
+          return (
+            isValid(parseDate({ value })) &&
+            endOfDay(parseDate({ value })) >= endOfDay(new Date())
+          );
+        },
+      }),
     nextReleaseDate: validateOptionalPartialDayMonthYearField,
   };
 
@@ -159,17 +162,18 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                     width={4}
                   />
                 </FormFieldset>
-                <FormFieldDayMonthYear<FormValues>
+                <FormFieldDateInput<FormValues>
                   id={`${formId}-scheduledPublishDate`}
                   name="scheduledPublishDate"
                   legend="Schedule publish date"
                   legendSize="m"
                 />
-                <FormFieldDayMonthYear<FormValues>
+                <FormFieldDateInput<FormValues>
                   id={`${formId}-nextReleaseDate`}
                   name="nextReleaseDate"
                   legend="Next release expected (optional)"
                   legendSize="m"
+                  type="dayMonthYear"
                 />
                 <div className="govuk-!-margin-top-9">
                   <FormFieldRadioGroup<FormValues>

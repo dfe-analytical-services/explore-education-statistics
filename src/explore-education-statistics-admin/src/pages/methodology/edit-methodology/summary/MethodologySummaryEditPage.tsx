@@ -3,10 +3,6 @@ import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
 import methodologyService from '@admin/services/methodology/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import {
-  dateToDayMonthYear,
-  dayMonthYearToDate,
-} from '@common/utils/date/dayMonthYear';
 import { formatISO } from 'date-fns';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -32,18 +28,14 @@ const MethodologySummaryEditPage = ({
             initialValues={{
               contactId: '',
               title: methodology.title,
-              publishScheduled: dateToDayMonthYear(
-                new Date(methodology.publishScheduled),
-              ),
+              publishScheduled: new Date(methodology.publishScheduled),
             }}
             submitText="Update methodology"
             onSubmit={async values => {
               await methodologyService.updateMethodology(methodologyId, {
                 ...methodology,
                 title: values.title,
-                publishScheduled: formatISO(
-                  dayMonthYearToDate(values.publishScheduled),
-                ),
+                publishScheduled: formatISO(values.publishScheduled),
                 contactId: values.contactId,
               });
 
