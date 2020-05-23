@@ -14,7 +14,7 @@ const service = {
     const summary: Overwrite<
       ReleaseSummaryDetails,
       {
-        nextReleaseDate: {
+        nextReleaseDate?: {
           day: string;
           month: string;
           year: string;
@@ -24,11 +24,13 @@ const service = {
 
     return {
       ...summary,
-      nextReleaseDate: {
-        day: parseNumber(summary.nextReleaseDate.day),
-        month: parseNumber(summary.nextReleaseDate.month),
-        year: parseNumber(summary.nextReleaseDate.year),
-      },
+      nextReleaseDate: summary.nextReleaseDate
+        ? {
+            day: parseNumber(summary.nextReleaseDate?.day) ?? null,
+            month: parseNumber(summary.nextReleaseDate?.month) ?? null,
+            year: parseNumber(summary.nextReleaseDate?.year) ?? null,
+          }
+        : undefined,
     };
   },
   updateReleaseSummaryDetails(

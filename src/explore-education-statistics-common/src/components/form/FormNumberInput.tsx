@@ -7,7 +7,7 @@ export interface FormNumberInputProps extends FormBaseInputProps {
   defaultValue?: number;
   min?: number;
   max?: number;
-  value?: number;
+  value?: number | null;
 }
 
 const FormNumberInput = ({ value, ...props }: FormNumberInputProps) => {

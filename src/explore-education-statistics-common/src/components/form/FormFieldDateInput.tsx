@@ -2,6 +2,7 @@ import FormFieldset from '@common/components/form/FormFieldset';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { FormGroup } from '@common/components/form/index';
 import { DayMonthYear } from '@common/utils/date/dayMonthYear';
+import parseNumber from '@common/utils/number/parseNumber';
 import { isValid, parse } from 'date-fns';
 import { FormikErrors, useField } from 'formik';
 import last from 'lodash/last';
@@ -33,18 +34,16 @@ const FormFieldDateInput = <FormValues extends {}>({
   const [values, setValues] = useState<DayMonthYear>(() => {
     if (field.value instanceof Date) {
       return {
-        day: field.value?.getDate(),
-        month: field.value?.getMonth()
-          ? field.value?.getMonth() + 1
-          : undefined,
-        year: field.value?.getFullYear(),
+        day: field.value?.getDate() ?? null,
+        month: field.value?.getMonth() ? field.value?.getMonth() + 1 : null,
+        year: field.value?.getFullYear() ?? null,
       };
     }
 
     return {
-      day: field.value?.day,
-      month: field.value?.month,
-      year: field.value?.year,
+      day: field.value?.day ?? null,
+      month: field.value?.month ?? null,
+      year: field.value?.year ?? null,
     };
   });
 
@@ -64,7 +63,7 @@ const FormFieldDateInput = <FormValues extends {}>({
         throw new Error(`Invalid key for day/month/year field: ${key}`);
       }
 
-      const inputValue = parseInt(event.target.value, 10);
+      const inputValue = parseNumber(event.target.value) ?? null;
 
       const day = key === 'day' ? inputValue : values.day;
       const month = key === 'month' ? inputValue : values.month;

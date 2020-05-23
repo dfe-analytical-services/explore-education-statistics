@@ -1,7 +1,9 @@
+import { parse } from 'date-fns';
+
 export interface DayMonthYear {
-  day?: number;
-  month?: number;
-  year?: number;
+  day: number | null;
+  month: number | null;
+  year: number | null;
 }
 
 export const dayMonthYearIsComplete = (dmy?: DayMonthYear) => {
@@ -13,15 +15,15 @@ export const dayMonthYearIsEmpty = (dmy?: DayMonthYear) => {
 };
 
 export const dayMonthYearToDate = (dmy?: DayMonthYear) => {
-  if (!dmy) {
-    throw Error(`Couldn't convert undefined DayMonthYearValues to Date`);
-  }
-  if (!dayMonthYearIsComplete(dmy)) {
+  if (!dmy || !dayMonthYearIsComplete(dmy)) {
     throw Error(
-      `Couldn't convert DayMonthYearValues ${JSON.stringify(
-        dmy,
-      )} to Date - missing required value`,
+      `Could not convert invalid DayMonthYear to date: ${JSON.stringify(dmy)}`,
     );
   }
-  return new Date(Date.UTC(dmy.year || 0, (dmy.month || 0) - 1, dmy.day));
+
+  return parse(
+    `${dmy.year}-${dmy.month}-${dmy.day}`,
+    'yyyy-M-d',
+    new Date(Date.UTC(dmy.year || 0, (dmy.month || 0) - 1, dmy.day || 0)),
+  );
 };

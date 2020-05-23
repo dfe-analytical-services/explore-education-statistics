@@ -4,10 +4,6 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import {
-  parseDate,
-  validateOptionalPartialDayMonthYearField,
-} from '@admin/validation/validation';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
@@ -18,11 +14,16 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { Dictionary } from '@common/types';
-import { DayMonthYear } from '@common/utils/date/dayMonthYear';
+import {
+  DayMonthYear,
+  dayMonthYearIsComplete,
+  dayMonthYearIsEmpty,
+  dayMonthYearToDate,
+} from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid } from 'date-fns';
 import { Formik, FormikHelpers } from 'formik';
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
 export interface ReleaseSummaryFormValues {
@@ -102,13 +103,32 @@ const ReleaseSummaryForm = <
           'do MMMM yyyy',
         )}`,
         test(value) {
-          return (
-            isValid(parseDate({ value })) &&
-            endOfDay(parseDate({ value })) >= endOfDay(new Date())
-          );
+          return endOfDay(value) >= endOfDay(new Date());
         },
       }),
-    nextReleaseDate: validateOptionalPartialDayMonthYearField,
+    nextReleaseDate: Yup.object({
+      day: Yup.number().nullable(),
+      month: Yup.number().nullable(),
+      year: Yup.number().nullable(),
+    }).test({
+      name: 'validDate',
+      message: 'Enter a valid next release date',
+      test(value: DayMonthYear) {
+        if (dayMonthYearIsEmpty(value)) {
+          return true;
+        }
+
+        if (value.year && value.month && !value.day) {
+          return true;
+        }
+
+        if (dayMonthYearIsComplete(value)) {
+          return isValid(dayMonthYearToDate(value));
+        }
+
+        return false;
+      },
+    }),
   };
 
   return (
