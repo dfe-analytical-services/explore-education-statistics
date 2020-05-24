@@ -1,10 +1,7 @@
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { FormGroup } from '@common/components/form/index';
-import {
-  DayMonthYear,
-  isValidDayMonthYear,
-} from '@common/utils/date/dayMonthYear';
+import { DayMonthYear } from '@common/utils/date/dayMonthYear';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isValid, parse } from 'date-fns';
 import { FormikErrors, useField } from 'formik';
@@ -105,7 +102,7 @@ const FormFieldDateInput = <FormValues extends {}>({
           name={`${name}.day`}
           label="Day"
           width={2}
-          value={values.day}
+          value={parseNumber(values.day)}
           onChange={handleChange}
         />
       </FormGroup>
@@ -117,7 +114,7 @@ const FormFieldDateInput = <FormValues extends {}>({
           name={`${name}.month`}
           label="Month"
           width={2}
-          value={values.month}
+          value={parseNumber(values.month)}
           onChange={handleChange}
         />
       </FormGroup>
@@ -129,7 +126,7 @@ const FormFieldDateInput = <FormValues extends {}>({
           name={`${name}.year`}
           label="Year"
           width={4}
-          value={values.year}
+          value={parseNumber(values.year)}
           onChange={handleChange}
         />
       </FormGroup>

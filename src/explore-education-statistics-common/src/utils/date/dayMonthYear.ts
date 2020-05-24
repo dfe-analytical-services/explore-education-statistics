@@ -1,9 +1,9 @@
 import { format, parse } from 'date-fns';
 
 export interface DayMonthYear {
-  day?: number;
-  month?: number;
-  year: number;
+  day?: number | string;
+  month?: number | string;
+  year: number | string;
 }
 
 export const isDayMonthYearEmpty = (dmy?: DayMonthYear): boolean => {
@@ -24,7 +24,7 @@ export const parseDayMonthYearToUtcDate = (dmy: DayMonthYear): Date => {
   }
 
   if (!dmy.month && !dmy.day) {
-    return parse(`${dmy.year.toString()}Z`, 'yyyyX', new Date());
+    return parse(`${dmy.year}Z`, 'yyyyX', new Date());
   }
 
   if (!dmy.day) {
