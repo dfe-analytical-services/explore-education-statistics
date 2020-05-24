@@ -24,7 +24,7 @@ import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid } from 'date-fns';
 import { Formik, FormikHelpers } from 'formik';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { ObjectSchemaDefinition } from 'yup';
+import { ObjectSchema } from 'yup';
 
 export interface ReleaseSummaryFormValues {
   timePeriodCoverageCode: string;
@@ -42,9 +42,9 @@ interface Props<FormValues extends ReleaseSummaryFormValues> {
   initialValues: (
     timePeriodCoverageGroups: TimePeriodCoverageGroup[],
   ) => FormValues;
-  validationRules?: (
-    baseValidationRules: ObjectSchemaDefinition<ReleaseSummaryFormValues>,
-  ) => ObjectSchemaDefinition<FormValues>;
+  validationSchema?: (
+    baseSchema: ObjectSchema<ReleaseSummaryFormValues>,
+  ) => ObjectSchema<FormValues>;
   onSubmit: (values: FormValues, actions: FormikHelpers<FormValues>) => void;
   onCancel: () => void;
 }
@@ -60,7 +60,7 @@ const ReleaseSummaryForm = <
   additionalFields,
   submitText,
   initialValues,
-  validationRules,
+  validationSchema,
   onSubmit,
   onCancel,
 }: Props<FormValues>) => {
@@ -90,7 +90,7 @@ const ReleaseSummaryForm = <
     return optGroups;
   };
 
-  const baseValidationRules: ObjectSchemaDefinition<ReleaseSummaryFormValues> = {
+  const baseSchema = Yup.object<ReleaseSummaryFormValues>({
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
     releaseTypeId: Yup.string().required('Choose a release type'),
@@ -106,7 +106,7 @@ const ReleaseSummaryForm = <
           return endOfDay(value) >= endOfDay(new Date());
         },
       }),
-    nextReleaseDate: Yup.object({
+    nextReleaseDate: Yup.object<DayMonthYear>({
       day: Yup.number().notRequired(),
       month: Yup.number(),
       year: Yup.number(),
@@ -127,7 +127,7 @@ const ReleaseSummaryForm = <
           return isValid(parseDayMonthYearToUtcDate(value));
         },
       }),
-  };
+  });
 
   return (
     <>
@@ -135,11 +135,9 @@ const ReleaseSummaryForm = <
         <Formik<FormValues>
           enableReinitialize
           initialValues={initialValues(model.timePeriodCoverageGroups)}
-          validationSchema={Yup.object<FormValues>(
-            validationRules
-              ? validationRules(baseValidationRules)
-              : (baseValidationRules as ObjectSchemaDefinition<FormValues>),
-          )}
+          validationSchema={
+            validationSchema ? validationSchema(baseSchema) : baseSchema
+          }
           onSubmit={onSubmit}
         >
           {form => {

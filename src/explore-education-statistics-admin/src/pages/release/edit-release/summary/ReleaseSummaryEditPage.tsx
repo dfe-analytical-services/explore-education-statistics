@@ -64,9 +64,9 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
         <>
           <h2 className="govuk-heading-l">Edit release summary</h2>
 
-          <ReleaseSummaryForm
+          <ReleaseSummaryForm<ReleaseSummaryFormValues>
             submitText="Update release summary"
-            initialValues={(): ReleaseSummaryFormValues => ({
+            initialValues={() => ({
               timePeriodCoverageCode:
                 releaseSummaryDetails.timePeriodCoverage.value,
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),

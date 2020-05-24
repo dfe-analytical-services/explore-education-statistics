@@ -127,9 +127,7 @@ const CreateReleasePage = ({
       </div>
       <ReleaseSummaryForm<CreateReleaseFormValues>
         submitText="Create new release"
-        initialValues={(
-          timePeriodCoverageGroups: TimePeriodCoverageGroup[],
-        ): CreateReleaseFormValues =>
+        initialValues={timePeriodCoverageGroups =>
           ({
             timePeriodCoverageCode:
               timePeriodCoverageGroups[0].timeIdentifiers[0].identifier.value,
@@ -138,15 +136,14 @@ const CreateReleasePage = ({
             templateReleaseId: '',
           } as CreateReleaseFormValues)
         }
-        validationRules={(
-          baseValidationRules: ObjectSchemaDefinition<ReleaseSummaryFormValues>,
-        ): ObjectSchemaDefinition<CreateReleaseFormValues> => ({
-          ...baseValidationRules,
-          templateReleaseId:
-            model && model.templateRelease
-              ? Yup.string().required('Choose a template')
-              : Yup.string(),
-        })}
+        validationSchema={baseRules =>
+          baseRules.shape({
+            templateReleaseId:
+              model && model.templateRelease
+                ? Yup.string().required('Choose a template')
+                : Yup.string(),
+          })
+        }
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         additionalFields={
