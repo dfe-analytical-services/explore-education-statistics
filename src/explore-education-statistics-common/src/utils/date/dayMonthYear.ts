@@ -1,9 +1,9 @@
 import { format } from 'date-fns';
 
 export interface DayMonthYear {
-  day: number | null;
-  month: number | null;
-  year: number | null;
+  day?: number;
+  month?: number;
+  year: number;
 }
 
 export const isDayMonthYearEmpty = (dmy?: DayMonthYear): boolean => {
@@ -11,8 +11,8 @@ export const isDayMonthYearEmpty = (dmy?: DayMonthYear): boolean => {
 };
 
 export const isValidDayMonthYear = (
-  dmy?: DayMonthYear,
-): dmy is DayMonthYear & { year: number } => {
+  dmy?: DayMonthYear | Partial<DayMonthYear>,
+): dmy is DayMonthYear => {
   return !!dmy?.year;
 };
 

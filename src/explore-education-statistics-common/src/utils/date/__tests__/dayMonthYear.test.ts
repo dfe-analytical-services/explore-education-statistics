@@ -19,8 +19,6 @@ describe('dayMonthYear', () => {
       expect(
         parseDayMonthYearToUtcDate({
           year: 2020,
-          month: null,
-          day: null,
         }),
       ).toEqual(new Date('2020-01-01'));
     });
@@ -30,7 +28,6 @@ describe('dayMonthYear', () => {
         parseDayMonthYearToUtcDate({
           year: 2020,
           month: 7,
-          day: null,
         }),
       ).toEqual(new Date('2020-07-01'));
     });
@@ -38,7 +35,7 @@ describe('dayMonthYear', () => {
     test('throw error if missing year', () => {
       expect(() =>
         parseDayMonthYearToUtcDate({
-          year: null,
+          year: 0,
           month: 7,
           day: 13,
         }),
@@ -77,7 +74,6 @@ describe('dayMonthYear', () => {
         formatDayMonthYear({
           year: 2020,
           month: 7,
-          day: null,
         }),
       ).toBe('July 2020');
     });
@@ -88,7 +84,6 @@ describe('dayMonthYear', () => {
           {
             year: 2020,
             month: 7,
-            day: null,
           },
           { monthYearFormat: 'yyyy-MM' },
         ),
@@ -99,8 +94,6 @@ describe('dayMonthYear', () => {
       expect(
         formatDayMonthYear({
           year: 2020,
-          month: null,
-          day: null,
         }),
       ).toBe('2020');
     });

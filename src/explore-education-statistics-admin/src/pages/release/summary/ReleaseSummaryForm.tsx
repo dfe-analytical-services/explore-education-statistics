@@ -17,6 +17,7 @@ import { Dictionary } from '@common/types';
 import {
   DayMonthYear,
   isDayMonthYearEmpty,
+  isValidDayMonthYear,
   parseDayMonthYearToUtcDate,
 } from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
@@ -106,20 +107,26 @@ const ReleaseSummaryForm = <
         },
       }),
     nextReleaseDate: Yup.object({
-      day: Yup.number().nullable(),
-      month: Yup.number().nullable(),
-      year: Yup.number().nullable(),
-    }).test({
-      name: 'validDate',
-      message: 'Enter a valid next release date',
-      test(value: DayMonthYear) {
-        if (isDayMonthYearEmpty(value)) {
-          return true;
-        }
+      day: Yup.number().notRequired(),
+      month: Yup.number(),
+      year: Yup.number(),
+    })
+      .notRequired()
+      .test({
+        name: 'validDate',
+        message: 'Enter a valid next release date',
+        test(value: DayMonthYear) {
+          if (isDayMonthYearEmpty(value)) {
+            return true;
+          }
 
-        return isValid(parseDayMonthYearToUtcDate(value));
-      },
-    }),
+          if (!isValidDayMonthYear(value)) {
+            return false;
+          }
+
+          return isValid(parseDayMonthYearToUtcDate(value));
+        },
+      }),
   };
 
   return (

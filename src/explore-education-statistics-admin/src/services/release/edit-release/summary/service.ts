@@ -26,9 +26,9 @@ const service = {
       ...summary,
       nextReleaseDate: summary.nextReleaseDate
         ? {
-            day: parseNumber(summary.nextReleaseDate?.day) ?? null,
-            month: parseNumber(summary.nextReleaseDate?.month) ?? null,
-            year: parseNumber(summary.nextReleaseDate?.year) ?? null,
+            day: parseNumber(summary.nextReleaseDate?.day),
+            month: parseNumber(summary.nextReleaseDate?.month),
+            year: Number(summary.nextReleaseDate?.year),
           }
         : undefined,
     };
