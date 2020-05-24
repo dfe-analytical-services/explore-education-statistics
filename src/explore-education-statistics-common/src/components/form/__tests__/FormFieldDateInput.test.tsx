@@ -1,9 +1,9 @@
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import { DayMonthYear } from '@common/utils/date/dayMonthYear';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Formik } from 'formik';
-import React from 'react';
 import noop from 'lodash/noop';
+import React from 'react';
 
 describe('FormFieldDateInput', () => {
   test('renders correctly', () => {

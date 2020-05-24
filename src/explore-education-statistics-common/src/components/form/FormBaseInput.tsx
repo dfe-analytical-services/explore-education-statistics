@@ -3,6 +3,7 @@ import FormLabel, { FormLabelProps } from '@common/components/form/FormLabel';
 import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
+  FocusEventHandler,
   KeyboardEventHandler,
   memo,
   MouseEventHandler,
@@ -17,6 +18,7 @@ export interface FormBaseInputProps extends FormLabelProps {
   id: string;
   name: string;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onClick?: MouseEventHandler<HTMLInputElement>;
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;

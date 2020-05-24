@@ -2,11 +2,12 @@ import FormFieldset from '@common/components/form/FormFieldset';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { FormGroup } from '@common/components/form/index';
 import { DayMonthYear } from '@common/utils/date/dayMonthYear';
+import delay from '@common/utils/delay';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isValid, parse } from 'date-fns';
 import { FormikErrors, useField } from 'formik';
 import last from 'lodash/last';
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useRef, useState } from 'react';
 
 interface Props<FormValues> {
   hint?: string;
@@ -27,6 +28,8 @@ const FormFieldDateInput = <FormValues extends {}>({
   legendSize = 'l',
   type = 'date',
 }: Props<FormValues>) => {
+  const isFocused = useRef(false);
+
   const [field, meta, helpers] = useField<
     Date | Partial<DayMonthYear> | undefined
   >(name as string);
@@ -94,10 +97,25 @@ const FormFieldDateInput = <FormValues extends {}>({
       legendSize={legendSize}
       hint={hint}
       error={errorMessage}
+      onBlur={async event => {
+        event.persist();
+
+        if (isFocused.current) {
+          isFocused.current = false;
+        }
+
+        await delay();
+
+        if (!isFocused.current) {
+          field.onBlur(event);
+        }
+      }}
+      onFocus={() => {
+        isFocused.current = true;
+      }}
     >
       <FormGroup className="govuk-date-input__item">
         <FormNumberInput
-          {...field}
           id={`${id}-day`}
           name={`${name}.day`}
           label="Day"
@@ -109,7 +127,6 @@ const FormFieldDateInput = <FormValues extends {}>({
 
       <FormGroup className="govuk-date-input__item">
         <FormNumberInput
-          {...field}
           id={`${id}-month`}
           name={`${name}.month`}
           label="Month"
@@ -121,7 +138,6 @@ const FormFieldDateInput = <FormValues extends {}>({
 
       <FormGroup className="govuk-date-input__item">
         <FormNumberInput
-          {...field}
           id={`${id}-year`}
           name={`${name}.year`}
           label="Year"
