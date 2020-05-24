@@ -1,4 +1,3 @@
-import { findTimePeriodCoverageGroup } from '@admin/pages/release/util/releaseSummaryUtil';
 import service from '@admin/services/common/service';
 import {
   IdTitlePair,
@@ -88,6 +87,19 @@ const ReleaseSummaryForm = <
       );
     });
     return optGroups;
+  };
+
+  const findTimePeriodCoverageGroup = (
+    code: string,
+    timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+  ) => {
+    return (
+      timePeriodCoverageGroups.find(group =>
+        group.timeIdentifiers
+          .map(option => option.identifier.value)
+          .some(id => id === code),
+      ) || timePeriodCoverageGroups[0]
+    );
   };
 
   const baseSchema = Yup.object<ReleaseSummaryFormValues>({

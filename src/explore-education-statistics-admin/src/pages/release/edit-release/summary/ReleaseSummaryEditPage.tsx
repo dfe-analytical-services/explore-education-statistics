@@ -3,9 +3,9 @@ import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseConte
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
-import { assembleUpdateReleaseSummaryRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/summary/service';
+import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import {
   errorCodeAndFieldNameToFieldError,
@@ -42,12 +42,19 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
   }, [releaseId]);
 
   const handleSubmit = useFormSubmit<ReleaseSummaryFormValues>(async values => {
-    const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
+    const release: UpdateReleaseSummaryDetailsRequest = {
+      timePeriodCoverage: {
+        value: values.timePeriodCoverageCode,
+      },
+      releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
+      publishScheduled: values.scheduledPublishDate,
+      nextReleaseDate: values.nextReleaseDate,
+      typeId: values.releaseTypeId,
       releaseId,
-      values,
-    );
+    };
 
-    await service.updateReleaseSummaryDetails(updatedReleaseDetails);
+    await service.updateReleaseSummaryDetails(release);
+
     history.push(
       summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
     );

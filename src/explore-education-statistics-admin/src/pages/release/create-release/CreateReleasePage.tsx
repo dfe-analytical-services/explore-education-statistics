@@ -4,13 +4,9 @@ import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
-import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import appRouteList from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import {
-  IdTitlePair,
-  TimePeriodCoverageGroup,
-} from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
@@ -23,7 +19,6 @@ import { Publication } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { ObjectSchemaDefinition } from 'yup';
 
 const errorCodeMappings = [
   errorCodeToFieldError(
@@ -73,12 +68,21 @@ const CreateReleasePage = ({
   }, [publicationId]);
 
   const handleSubmit = useFormSubmit<CreateReleaseFormValues>(async values => {
-    const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
+    const release: CreateReleaseRequest = {
+      timePeriodCoverage: {
+        value: values.timePeriodCoverageCode,
+      },
+      releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
+      publishScheduled: values.scheduledPublishDate,
+      nextReleaseDate: values.nextReleaseDate,
+      typeId: values.releaseTypeId,
       publicationId,
-      values,
-    );
+      templateReleaseId:
+        values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
+    };
 
-    const createdRelease = await service.createRelease(createReleaseDetails);
+    const createdRelease = await service.createRelease(release);
+
     history.push(
       summaryRoute.generateLink({
         publicationId,
