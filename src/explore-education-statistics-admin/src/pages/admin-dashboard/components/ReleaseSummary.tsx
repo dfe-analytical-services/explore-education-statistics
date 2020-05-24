@@ -10,8 +10,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
+  formatDayMonthYear,
+  isValidDayMonthYear,
 } from '@common/utils/date/dayMonthYear';
 import React, { ReactNode } from 'react';
 import LazyLoad from 'react-lazyload';
@@ -56,11 +56,9 @@ const ReleaseSummary = ({
           </FormattedDate>
         </SummaryListItem>
 
-        {dayMonthYearIsComplete(release.nextReleaseDate) && (
+        {isValidDayMonthYear(release.nextReleaseDate) && (
           <SummaryListItem term="Next release date">
-            <FormattedDate>
-              {dayMonthYearToDate(release.nextReleaseDate)}
-            </FormattedDate>
+            <time>{formatDayMonthYear(release.nextReleaseDate)}</time>
           </SummaryListItem>
         )}
         {release.status === 'Approved' && (

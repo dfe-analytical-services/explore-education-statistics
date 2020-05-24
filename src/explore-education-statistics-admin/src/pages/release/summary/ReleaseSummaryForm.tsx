@@ -16,9 +16,8 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import { Dictionary } from '@common/types';
 import {
   DayMonthYear,
-  dayMonthYearIsComplete,
-  dayMonthYearIsEmpty,
-  dayMonthYearToDate,
+  isDayMonthYearEmpty,
+  parseDayMonthYearToUtcDate,
 } from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid } from 'date-fns';
@@ -114,19 +113,11 @@ const ReleaseSummaryForm = <
       name: 'validDate',
       message: 'Enter a valid next release date',
       test(value: DayMonthYear) {
-        if (dayMonthYearIsEmpty(value)) {
+        if (isDayMonthYearEmpty(value)) {
           return true;
         }
 
-        if (value.year && value.month && !value.day) {
-          return true;
-        }
-
-        if (dayMonthYearIsComplete(value)) {
-          return isValid(dayMonthYearToDate(value));
-        }
-
-        return false;
+        return isValid(parseDayMonthYearToUtcDate(value));
       },
     }),
   };
