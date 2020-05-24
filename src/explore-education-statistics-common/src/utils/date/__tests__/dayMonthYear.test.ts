@@ -2,6 +2,7 @@ import {
   formatDayMonthYear,
   parseDayMonthYearToUtcDate,
 } from '@common/utils/date/dayMonthYear';
+import { isValid } from 'date-fns';
 
 describe('dayMonthYear', () => {
   describe('parseDayMonthYearToUtcDate', () => {
@@ -30,6 +31,29 @@ describe('dayMonthYear', () => {
           month: 7,
         }),
       ).toEqual(new Date('2020-07-01'));
+    });
+
+    test('returns invalid UTC date when month is invalid number', () => {
+      expect(
+        isValid(
+          parseDayMonthYearToUtcDate({
+            year: 2020,
+            month: 40,
+          }),
+        ),
+      ).toBe(false);
+    });
+
+    test('returns invalid UTC date when day is invalid number', () => {
+      expect(
+        isValid(
+          parseDayMonthYearToUtcDate({
+            year: 2020,
+            month: 7,
+            day: 40,
+          }),
+        ),
+      ).toBe(false);
     });
 
     test('throw error if missing year', () => {

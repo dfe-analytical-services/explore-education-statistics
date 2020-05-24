@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 export interface DayMonthYear {
   day?: number;
@@ -23,7 +23,19 @@ export const parseDayMonthYearToUtcDate = (dmy: DayMonthYear): Date => {
     );
   }
 
-  return new Date(Date.UTC(dmy.year, (dmy.month ?? 1) - 1, dmy.day ?? 1));
+  if (!dmy.month && !dmy.day) {
+    return parse(`${dmy.year.toString()}Z`, 'yyyyX', new Date());
+  }
+
+  if (!dmy.day) {
+    return parse(`${dmy.year}-${dmy.month}Z`, `yyyy-MX`, new Date());
+  }
+
+  return parse(
+    `${dmy.year}-${dmy.month}-${dmy.day}Z`,
+    `yyyy-M-ddX`,
+    new Date(),
+  );
 };
 
 export const formatDayMonthYear = (
