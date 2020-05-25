@@ -1,6 +1,6 @@
 import Modal from '@common/components/Modal';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
-import { fireEvent, render, wait } from '@testing-library/react';
 
 describe('Modal', () => {
   const originalAppRootId = process.env.APP_ROOT_ID;
@@ -79,15 +79,17 @@ describe('Modal', () => {
       </Modal>,
     );
 
-    await wait();
-
-    expect(onExit).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onExit).not.toHaveBeenCalled();
+    });
 
     fireEvent.keyDown(container, {
       key: 'Esc',
     });
 
-    expect(onExit).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onExit).toHaveBeenCalled();
+    });
   });
 
   test('mouseDown on underlay of modal calls `onExit` handler', async () => {
@@ -122,12 +124,12 @@ describe('Modal', () => {
       </div>,
     );
 
-    await wait();
-
-    expect(container.querySelector('#root')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
+    await waitFor(() => {
+      expect(container.querySelector('#root')).toHaveAttribute(
+        'aria-hidden',
+        'true',
+      );
+    });
   });
 
   test('when unmounted, root element has aria-hidden=false', async () => {
@@ -141,12 +143,12 @@ describe('Modal', () => {
       </div>,
     );
 
-    await wait();
-
-    expect(container.querySelector('#root')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
+    await waitFor(() => {
+      expect(container.querySelector('#root')).toHaveAttribute(
+        'aria-hidden',
+        'true',
+      );
+    });
 
     rerender(
       <div id="root">
@@ -156,9 +158,11 @@ describe('Modal', () => {
       </div>,
     );
 
-    expect(container.querySelector('#root')).toHaveAttribute(
-      'aria-hidden',
-      'false',
-    );
+    await waitFor(() => {
+      expect(container.querySelector('#root')).toHaveAttribute(
+        'aria-hidden',
+        'false',
+      );
+    });
   });
 });
