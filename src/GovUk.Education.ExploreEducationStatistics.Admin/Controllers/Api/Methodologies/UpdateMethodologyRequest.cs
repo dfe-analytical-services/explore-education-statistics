@@ -15,6 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         public DateTime? PublishScheduled { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public MethodologyStatus? Status { get; set; }
+        public MethodologyStatus Status { get; set; }
     }
 }
