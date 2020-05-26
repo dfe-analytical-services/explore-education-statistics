@@ -10,6 +10,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         public DateTime? PublishScheduled { get; set; }
         
         // TODO EES-899 Contact in the request is being ignored!
-        [Required] public Guid ContactId { get; set; }
     }
 }
