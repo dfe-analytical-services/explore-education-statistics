@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             try
             {
                 await _contentService.UpdateContentAsync(new[] {message.ReleaseId}, false);
-                await _releaseService.SetPublishedDateAsync(message.ReleaseId);
+                await _releaseService.SetPublishedDatesAsync(message.ReleaseId);
                 await _notificationsService.NotifySubscribersAsync(new[] {message.ReleaseId});
                 await UpdateStage(message.ReleaseId, releaseStatusId, Stage.Complete);
             }
