@@ -98,15 +98,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             var slug = SlugFromTitle(request.Title);
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
-                .OnSuccess(_userService.CheckCanUpdateMethodology)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
+                .OnSuccess(methodology => _userService.CheckCanUpdateMethodology(methodology))
                 .OnSuccessDo(() => ValidateMethodologySlugUniqueForUpdate(id, slug))
                 .OnSuccess(async methodology =>
                 {
                     _context.Methodologies.Update(methodology);
                     methodology.InternalReleaseNote = request.InternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.PublishScheduled = request.PublishScheduled?.AsStartOfDayUtc();
-                    methodology.Status = request.Status ?? methodology.Status;
+                    methodology.Status = request.Status;
                     methodology.Title = request.Title;
                     methodology.Slug = slug;
 
@@ -115,40 +115,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologyStatusViewModel>> UpdateMethodologyStatusAsync(Guid id,
-            UpdateMethodologyStatusRequest request)
-        {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
-                .OnSuccess(methodology => _userService.CheckCanUpdateMethodologyStatus(methodology, request.Status))
-                .OnSuccess(async methodology =>
-                {
-                    methodology.Status = request.Status;
-                    methodology.InternalReleaseNote = request.InternalReleaseNote;
-
-                    _context.Methodologies.Update(methodology);
-                    await _context.SaveChangesAsync();
-
-                    return await GetStatusAsync(id);
-                });
-        }
-
-        private async Task<Either<ActionResult, MethodologyStatusViewModel>> GetStatusAsync(Guid id)
-        {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
-                .OnSuccess(_userService.CheckCanViewMethodology)
-                .OnSuccess(_mapper.Map<MethodologyStatusViewModel>);
-        }
-
         private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodologyStatus(Methodology methodology,
-            MethodologyStatus? status)
+            MethodologyStatus status)
         {
-            if (!status.HasValue || methodology.Status == status.Value)
+            if (methodology.Status == status)
             {
                 // Status unchanged
                 return Task.FromResult(new Either<ActionResult, Methodology>(methodology));
             }
 
-            return _userService.CheckCanUpdateMethodologyStatus(methodology, status.Value);
+            return status switch
+            {
+                MethodologyStatus.Draft => _userService.CheckCanMarkMethodologyAsDraft(methodology),
+                MethodologyStatus.Approved => _userService.CheckCanApproveMethodology(methodology),
+                _ => throw new ArgumentOutOfRangeException(nameof(status), "Unexpected status")
+            };
         }
 
         private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUnique(string slug)
@@ -160,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             return true;
         }
-        
+
         private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
         {
             if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug && methodology.Id != id))

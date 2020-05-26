@@ -1,4 +1,3 @@
-import { AxiosErrorHandler } from '@common/services/api/Client';
 import noop from 'lodash/noop';
 import React, { createContext, ReactNode, useContext } from 'react';
 
@@ -7,7 +6,7 @@ export interface ManualErrorHandler {
 }
 
 export interface ErrorControlState {
-  handleApiErrors: AxiosErrorHandler;
+  handleApiErrors: (error: Error) => void;
   handleManualErrors: ManualErrorHandler;
 }
 

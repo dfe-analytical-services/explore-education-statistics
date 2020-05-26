@@ -322,8 +322,8 @@ const ChartAxisConfiguration = ({
                   <FormFieldNumberInput<AxisConfiguration>
                     id={`${id}-size`}
                     name="size"
-                    min="0"
-                    max="100"
+                    min={0}
+                    max={100}
                     label="Size of axis (px)"
                     width={3}
                   />

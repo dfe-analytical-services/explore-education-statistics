@@ -1,31 +1,43 @@
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
+import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
+import methodologyService from '@admin/services/methodology/methodologyService';
+import permissionService from '@admin/services/permissions/permissionService';
 import FormattedDate from '@common/components/FormattedDate';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import PageSearchForm from '@common/components/PageSearchForm';
+import WarningMessage from '@common/components/WarningMessage';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
+import { RouteComponentProps } from 'react-router';
 import MethodologyAccordion from './components/MethodologyAccordion';
-import { useMethodologyState } from './context/MethodologyContext';
+import {
+  MethodologyContextState,
+  MethodologyProvider,
+  useMethodologyState,
+} from './context/MethodologyContext';
 
-const MethodologyContentPage = () => {
-  const { methodology } = useMethodologyState();
+const MethodologyContentPageInternal = () => {
+  const { methodology, canUpdateMethodology } = useMethodologyState();
 
   return (
-    <EditingContextProvider>
+    <EditingContextProvider value={{ isEditing: canUpdateMethodology }}>
       {({ isEditing }) => (
         <>
-          <EditablePageModeToggle />
+          {canUpdateMethodology && <EditablePageModeToggle />}
 
           <div className="govuk-width-container">
             <section
               className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
             >
-              <h1
-                className="govuk-heading-xl"
+              <h2
+                aria-hidden
+                className="govuk-heading-lg"
                 data-testid={`page-title ${methodology.title}`}
               >
                 {methodology.title}
-              </h1>
+              </h2>
 
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
@@ -44,19 +56,6 @@ const MethodologyContentPage = () => {
                         </strong>
                       </dd>
                     </div>
-                    {methodology.lastUpdated &&
-                      methodology.lastUpdated.length > 0 && (
-                        <>
-                          <dt className="govuk-caption-m">Last updated: </dt>
-                          <dd data-testid="last-updated">
-                            <strong>
-                              <FormattedDate>
-                                {methodology.lastUpdated}
-                              </FormattedDate>
-                            </strong>
-                          </dd>
-                        </>
-                      )}
                   </dl>
                   {!isEditing && (
                     <>
@@ -74,6 +73,7 @@ const MethodologyContentPage = () => {
               <MethodologyAccordion
                 methodology={methodology}
                 sectionKey="content"
+                title="Content"
               />
               {!isEditing && methodology.annexes.length ? (
                 <h2>Annexes</h2>
@@ -81,12 +81,47 @@ const MethodologyContentPage = () => {
               <MethodologyAccordion
                 methodology={methodology}
                 sectionKey="annexes"
+                title="Annexes"
               />
             </section>
           </div>
         </>
       )}
     </EditingContextProvider>
+  );
+};
+
+const MethodologyContentPage = ({
+  match,
+}: RouteComponentProps<MethodologyRouteParams>) => {
+  const { methodologyId } = match.params;
+
+  const { value, isLoading } = useAsyncHandledRetry<
+    MethodologyContextState
+  >(async () => {
+    const methodology = await methodologyService.getMethodologyContent(
+      methodologyId,
+    );
+    const canUpdateMethodology = await permissionService.canUpdateMethodology(
+      methodologyId,
+    );
+
+    return {
+      methodology,
+      canUpdateMethodology,
+    };
+  }, [methodologyId]);
+
+  return (
+    <LoadingSpinner loading={isLoading}>
+      {value ? (
+        <MethodologyProvider value={value}>
+          <MethodologyContentPageInternal />
+        </MethodologyProvider>
+      ) : (
+        <WarningMessage>Could not load methodology</WarningMessage>
+      )}
+    </LoadingSpinner>
   );
 };
 

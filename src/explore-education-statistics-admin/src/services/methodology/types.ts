@@ -14,18 +14,22 @@ export interface MethodologyStatusPublication {
   title: string;
 }
 
-export interface CreateMethodologyRequest {
+interface SaveMethodologySummary {
   title: string;
-  publishScheduled: Date;
+  publishScheduled: string;
   contactId: string;
 }
+
+export type CreateMethodology = SaveMethodologySummary;
+export type UpdateMethodology = SaveMethodologySummary;
 
 export interface MethodologyContent {
   id: string;
   title: string;
-  status: string;
+  slug: string;
+  status: MethodologyStatus;
   published?: string;
-  lastUpdated?: string;
+  publishScheduled: string;
   content: ContentSection<EditableContentBlock>[];
   annexes: ContentSection<EditableContentBlock>[];
 }

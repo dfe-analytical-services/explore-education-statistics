@@ -1,5 +1,7 @@
 @import '../styles/govuk-base';
 
-.marginRight:not(:last-child) {
-  margin-right: govuk-spacing(1);
+.button:not(:last-of-type) {
+  @include govuk-media-query($from: tablet) {
+    margin-right: govuk-spacing(2);
+  }
 }

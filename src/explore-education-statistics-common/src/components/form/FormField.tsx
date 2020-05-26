@@ -15,13 +15,15 @@ import React, {
   useMemo,
 } from 'react';
 
-export type FormFieldComponentProps<Props> = FormFieldProps &
+export type FormFieldComponentProps<Props, FormValues> = FormFieldProps<
+  FormValues
+> &
   Omit<Props, 'value' | 'error'>;
 
-export interface FormFieldProps {
+export interface FormFieldProps<FormValues = {}> {
   formGroup?: boolean;
   formGroupClass?: string;
-  name: string;
+  name: string | keyof FormValues;
   showError?: boolean;
 }
 

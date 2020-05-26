@@ -7,7 +7,7 @@ import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
 import handleAllChange from './util/handleAllCheckboxChange';
 
 type Props<FormValues> = OmitStrict<
-  FormFieldComponentProps<FormCheckboxGroupProps>,
+  FormFieldComponentProps<FormCheckboxGroupProps, FormValues>,
   'formGroup'
 >;
 

@@ -1,20 +1,16 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import ReleaseSummaryForm, {
-  EditFormValues,
+  ReleaseSummaryFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
-import { assembleUpdateReleaseSummaryRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/summary/service';
+import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import {
   errorCodeAndFieldNameToFieldError,
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
-import {
-  dateToDayMonthYear,
-  dayMonthYearValuesToInputs,
-} from '@common/utils/date/dayMonthYear';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -45,19 +41,26 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     });
   }, [releaseId]);
 
-  const handleSubmit = useFormSubmit<EditFormValues>(async values => {
-    const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
+  const handleSubmit = useFormSubmit<ReleaseSummaryFormValues>(async values => {
+    const release: UpdateReleaseSummaryDetailsRequest = {
+      timePeriodCoverage: {
+        value: values.timePeriodCoverageCode,
+      },
+      releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
+      publishScheduled: values.scheduledPublishDate,
+      nextReleaseDate: values.nextReleaseDate,
+      typeId: values.releaseTypeId,
       releaseId,
-      values,
-    );
+    };
 
-    await service.updateReleaseSummaryDetails(updatedReleaseDetails);
+    await service.updateReleaseSummaryDetails(release);
+
     history.push(
       summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
     );
   }, errorCodeMappings);
 
-  const cancelHandler = () =>
+  const handleCancel = () =>
     history.push(
       summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
     );
@@ -68,24 +71,20 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
         <>
           <h2 className="govuk-heading-l">Edit release summary</h2>
 
-          <ReleaseSummaryForm
-            submitButtonText="Update release summary"
-            initialValuesSupplier={(): EditFormValues => ({
+          <ReleaseSummaryForm<ReleaseSummaryFormValues>
+            submitText="Update release summary"
+            initialValues={() => ({
               timePeriodCoverageCode:
                 releaseSummaryDetails.timePeriodCoverage.value,
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),
               releaseTypeId: releaseSummaryDetails.type.id,
-              scheduledPublishDate: dayMonthYearValuesToInputs(
-                dateToDayMonthYear(
-                  new Date(releaseSummaryDetails.publishScheduled),
-                ),
+              scheduledPublishDate: new Date(
+                releaseSummaryDetails.publishScheduled,
               ),
-              nextReleaseDate: dayMonthYearValuesToInputs(
-                releaseSummaryDetails.nextReleaseDate,
-              ),
+              nextReleaseDate: releaseSummaryDetails?.nextReleaseDate,
             })}
-            onSubmitHandler={handleSubmit}
-            onCancelHandler={cancelHandler}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
           />
         </>
       )}

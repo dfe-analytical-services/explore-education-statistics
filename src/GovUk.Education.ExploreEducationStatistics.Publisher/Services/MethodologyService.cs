@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.CronScheduleUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -28,7 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var methodology = await _context.Methodologies
                 .SingleOrDefaultAsync(m => m.Id == id);
 
-            return _mapper.Map<MethodologyViewModel>(methodology);
+            var methodologyViewModel =  _mapper.Map<MethodologyViewModel>(methodology);
+            
+            if (!methodologyViewModel.Published.HasValue)
+            {
+                // Methodology isn't live yet. Set the published date based on what we expect it to be
+                methodologyViewModel.Published = GetNextScheduledPublishingTime();
+            }
+            
+            return methodologyViewModel;
         }
 
         public List<ThemeTree<MethodologyTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)

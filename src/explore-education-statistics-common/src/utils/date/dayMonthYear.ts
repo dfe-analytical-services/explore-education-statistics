@@ -1,66 +1,71 @@
-export interface DayMonthYearValues {
-  day?: number;
-  month?: number;
-  year?: number;
+import { format, parse } from 'date-fns';
+
+export interface DayMonthYear {
+  day?: number | string;
+  month?: number | string;
+  year: number | string;
 }
 
-export interface DayMonthYearInputs {
-  day: string;
-  month: string;
-  year: string;
-}
-
-export const dayMonthYearValuesToInputs = (
-  dmy?: DayMonthYearValues,
-): DayMonthYearInputs => ({
-  day: dmy && dmy.day ? dmy.day.toString() : '',
-  month: dmy && dmy.month ? dmy.month.toString() : '',
-  year: dmy && dmy.year ? dmy.year.toString() : '',
-});
-
-export const dayMonthYearInputsToValues = (
-  dmy: DayMonthYearInputs,
-): DayMonthYearValues => ({
-  day: dmy.day ? parseInt(dmy.day, 10) : undefined,
-  month: dmy.month ? parseInt(dmy.month, 10) : undefined,
-  year: dmy.year ? parseInt(dmy.year, 10) : undefined,
-});
-
-export const dateToDayMonthYear = (date?: Date) => {
-  return {
-    day: date && date.getDate(),
-    month: date && date.getMonth() + 1,
-    year: date && date.getFullYear(),
-  };
-};
-
-export const emptyDayMonthYear = (): DayMonthYearInputs => ({
-  day: '',
-  month: '',
-  year: '',
-});
-
-export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
-  return dmy && dmy.day && dmy.month && dmy.year;
-};
-
-export const dayMonthYearIsEmpty = (dmy?: DayMonthYearValues) => {
+export const isDayMonthYearEmpty = (dmy?: DayMonthYear): boolean => {
   return !dmy || (!dmy.day && !dmy.month && !dmy.year);
 };
 
-export const dayMonthYearToDate = (dmy?: DayMonthYearValues) => {
-  if (!dmy) {
-    throw Error(`Couldn't convert undefined DayMonthYearValues to Date`);
-  }
-  if (!dayMonthYearIsComplete(dmy)) {
-    throw Error(
-      `Couldn't convert DayMonthYearValues ${JSON.stringify(
-        dmy,
-      )} to Date - missing required value`,
-    );
-  }
-  return new Date(Date.UTC(dmy.year || 0, (dmy.month || 0) - 1, dmy.day));
+export const isValidDayMonthYear = (
+  dmy?: DayMonthYear | Partial<DayMonthYear>,
+): dmy is DayMonthYear => {
+  return !!dmy?.year;
 };
 
-export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
-  dayMonthYearToDate(dayMonthYearInputsToValues(dmy));
+export const parseDayMonthYearToUtcDate = (dmy: DayMonthYear): Date => {
+  if (!isValidDayMonthYear(dmy)) {
+    throw new Error(
+      `Could not parse invalid DayMonthYear to date: ${JSON.stringify(dmy)}`,
+    );
+  }
+
+  if (!dmy.month && !dmy.day) {
+    return parse(`${dmy.year}Z`, 'yyyyX', new Date());
+  }
+
+  if (!dmy.day) {
+    return parse(`${dmy.year}-${dmy.month}Z`, `yyyy-MX`, new Date());
+  }
+
+  return parse(
+    `${dmy.year}-${dmy.month}-${dmy.day}Z`,
+    `yyyy-M-ddX`,
+    new Date(),
+  );
+};
+
+export const formatDayMonthYear = (
+  dmy: DayMonthYear,
+  options: {
+    monthYearFormat?: string;
+    fullFormat?: string;
+  } = {},
+): string => {
+  const opts = {
+    monthYearFormat: 'MMMM yyyy',
+    fullFormat: 'dd MMMM yyyy',
+    ...options,
+  };
+
+  const date = parseDayMonthYearToUtcDate(dmy);
+
+  try {
+    if (!dmy.month && !dmy.day) {
+      return format(date, 'yyyy');
+    }
+
+    if (!dmy.day) {
+      return format(date, opts.monthYearFormat);
+    }
+
+    return format(date, opts.fullFormat);
+  } catch (err) {
+    throw new Error(
+      `Could not format invalid date from DayMonthYear: ${JSON.stringify(dmy)}`,
+    );
+  }
+};

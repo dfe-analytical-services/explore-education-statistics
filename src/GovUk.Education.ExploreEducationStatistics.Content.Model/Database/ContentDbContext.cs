@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.DateTimeExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 
@@ -5614,6 +5615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
                     Title = "Pupil absence statistics: methodology",
+                    PublishScheduled = new DateTime(2018, 3, 22).AsStartOfDayUtc(),
                     Published = new DateTime(2018, 3, 22),
                     LastUpdated = new DateTime(2019, 6, 26),
                     Slug = "pupil-absence-in-schools-in-england",
@@ -5886,6 +5888,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
                     Title = "Secondary and primary school applications and offers: methodology",
+                    PublishScheduled = new DateTime(2018, 6, 14).AsStartOfDayUtc(),
                     Published = new DateTime(2018, 6, 14),
                     Slug = "secondary-and-primary-schools-applications-and-offers",
                     Summary = "",
@@ -5981,6 +5984,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("c8c911e3-39c1-452b-801f-25bb79d1deb7"),
                     Title = "Pupil exclusion statistics: methodology",
+                    PublishScheduled = new DateTime(2018, 8, 25).AsStartOfDayUtc(),
                     Published = new DateTime(2018, 8, 25),
                     Slug = "permanent-and-fixed-period-exclusions-in-england",
                     Summary = "",

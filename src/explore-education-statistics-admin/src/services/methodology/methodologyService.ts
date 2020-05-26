@@ -1,9 +1,9 @@
 import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContextActionTypes';
 import {
-  CreateMethodologyRequest,
+  CreateMethodology,
   MethodologyContent,
   MethodologyStatusListItem,
-  UpdateMethodologyStatusRequest,
+  UpdateMethodology,
 } from '@admin/services/methodology/types';
 import {
   ContentBlockPostModel,
@@ -12,11 +12,7 @@ import {
 import client from '@admin/services/util/service';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import {
-  BasicMethodology,
-  IdTitlePair,
-  MethodologyStatus,
-} from '../common/types';
+import { BasicMethodology, IdTitlePair } from '../common/types';
 import { EditableContentBlock } from '../publicationService';
 
 type ContentSectionViewModel = ContentSection<EditableContentBlock>;
@@ -26,10 +22,21 @@ const methodologyService = {
     return client.get<MethodologyStatusListItem[]>('/bau/methodology');
   },
 
-  createMethodology(
-    createRequest: CreateMethodologyRequest,
-  ): Promise<IdTitlePair> {
-    return client.post(`/methodologies/`, createRequest);
+  createMethodology(data: CreateMethodology): Promise<IdTitlePair> {
+    return client.post(`/methodologies/`, data);
+  },
+
+  updateMethodology(
+    methodologyId: string,
+    data: UpdateMethodology,
+  ): Promise<BasicMethodology> {
+    return client.put(`/methodology/${methodologyId}`, data);
+  },
+
+  getMethodology(methodologyId: string): Promise<BasicMethodology> {
+    return client.get<BasicMethodology>(
+      `/methodology/${methodologyId}/summary`,
+    );
   },
 
   getMethodologyContent(methodologyId: string): Promise<MethodologyContent> {
@@ -116,18 +123,6 @@ const methodologyService = {
     return client.delete(
       `methodology/${methodologyId}/content/section/${sectionId}?type=${sectionKey}`,
     );
-  },
-
-  getMethodologyStatus: (methodologyId: string): Promise<MethodologyStatus> =>
-    client
-      .get<BasicMethodology>(`/methodology/${methodologyId}/summary`)
-      .then(methodology => methodology.status),
-
-  updateMethodologyStatus(
-    methodologyId: string,
-    updateRequest: UpdateMethodologyStatusRequest,
-  ): Promise<BasicMethodology> {
-    return client.put(`/methodology/${methodologyId}/status`, updateRequest);
   },
 
   addContentSectionBlock({

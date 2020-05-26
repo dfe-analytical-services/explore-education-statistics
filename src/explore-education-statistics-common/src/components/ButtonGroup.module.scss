@@ -1,0 +1,21 @@
+@import '../styles/govuk-base';
+
+.group {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: govuk-spacing(6);
+
+  button {
+    margin-bottom: govuk-spacing(4);
+  }
+
+  // stylelint-disable-next-line order/order
+  @include govuk-media-query($from: tablet) {
+    flex-direction: row;
+
+    button {
+      margin-bottom: 0;
+    }
+  }
+}

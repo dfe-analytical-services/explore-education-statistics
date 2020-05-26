@@ -18,6 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         
         CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds);
 
-        Task SetPublishedDateAsync(Guid id);
+        Task SetPublishedDatesAsync(Guid id);
     }
 }

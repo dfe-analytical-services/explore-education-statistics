@@ -27,7 +27,7 @@ const Button = ({
       aria-disabled={disabled}
       className={classNames(
         'govuk-button',
-        styles.marginRight,
+        styles.button,
         {
           'govuk-button--disabled': disabled,
           'govuk-button--secondary': variant === 'secondary',

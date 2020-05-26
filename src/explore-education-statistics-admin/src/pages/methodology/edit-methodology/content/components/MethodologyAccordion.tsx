@@ -10,6 +10,7 @@ import MethodologyAccordionSection from './MethodologyAccordionSection';
 export interface MethodologyAccordionProps {
   id?: string;
   sectionKey: ContentSectionKeys;
+  title: string;
   methodology: MethodologyContent;
 }
 
@@ -17,6 +18,7 @@ const MethodologyAccordion = ({
   sectionKey,
   methodology,
   id = `methodologyAccordion-${sectionKey}`,
+  title,
 }: MethodologyAccordionProps) => {
   const { isEditing } = useEditingContext();
   const {
@@ -58,7 +60,7 @@ const MethodologyAccordion = ({
   return (
     <EditableAccordion
       id={id}
-      sectionName={sectionKey}
+      sectionName={title}
       onAddSection={onAddSection}
       onReorder={reorderAccordionSections}
     >

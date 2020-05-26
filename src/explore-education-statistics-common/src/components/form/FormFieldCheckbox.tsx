@@ -5,7 +5,7 @@ import FormField, {
 import { FormCheckbox } from '@common/components/form/index';
 import React from 'react';
 
-type Props<FormValues> = FormFieldComponentProps<FormCheckboxProps>;
+type Props<FormValues> = FormFieldComponentProps<FormCheckboxProps, FormValues>;
 
 const FormFieldCheckbox = <FormValues extends {}>(props: Props<FormValues>) => {
   return <FormField {...props} as={FormCheckbox} type="checkbox" />;

@@ -13,8 +13,8 @@ import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
+  formatDayMonthYear,
+  isValidDayMonthYear,
 } from '@common/utils/date/dayMonthYear';
 import React, { useEffect, useState } from 'react';
 
@@ -74,18 +74,18 @@ const ReleaseSummaryPage = () => {
             </SummaryListItem>
             <SummaryListItem term="Scheduled release">
               <FormattedDate>
-                {new Date(model.releaseSummaryDetails.publishScheduled)}
+                {model.releaseSummaryDetails.publishScheduled}
               </FormattedDate>
             </SummaryListItem>
             <SummaryListItem term="Next release expected">
-              {dayMonthYearIsComplete(
+              {isValidDayMonthYear(
                 model.releaseSummaryDetails.nextReleaseDate,
               ) && (
-                <FormattedDate>
-                  {dayMonthYearToDate(
+                <time>
+                  {formatDayMonthYear(
                     model.releaseSummaryDetails.nextReleaseDate,
                   )}
-                </FormattedDate>
+                </time>
               )}
             </SummaryListItem>
             <SummaryListItem term="Release type">

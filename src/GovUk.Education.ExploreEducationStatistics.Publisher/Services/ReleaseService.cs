@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using NCrontab;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.CronScheduleUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -90,25 +90,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return GetReleaseViewModel(latestRelease.Id);
         }
 
-        public async Task SetPublishedDateAsync(Guid id)
+        public async Task SetPublishedDatesAsync(Guid id)
         {
             var publishedDate = DateTime.UtcNow;
-            
+
             var contentRelease = await _contentDbContext.Releases
+                .Include(release => release.Publication)
+                .ThenInclude(publication => publication.Methodology)
                 .SingleOrDefaultAsync(r => r.Id == id);
 
             var statisticsRelease = await _statisticsDbContext.Release
                 .SingleOrDefaultAsync(r => r.Id == id);
-            
+
+            var methodology = contentRelease.Publication.Methodology;
+
             if (contentRelease == null)
             {
                 throw new ArgumentException("Content Release does not exist", nameof(id));
             }
-            
+
             _contentDbContext.Releases.Update(contentRelease);
             contentRelease.Published = publishedDate;
+
+            // TODO EES-913 Remove this when methodologies are published independently 
+            if (methodology != null)
+            {
+                _contentDbContext.Methodologies.Update(methodology);
+                methodology.Published = publishedDate;
+            }
+
             await _contentDbContext.SaveChangesAsync();
-            
+
             // The Release in the statistics database can be absent if no Subjects were created
             if (statisticsRelease != null)
             {
@@ -118,35 +130,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private static DateTime GetNextScheduledPublishingTime()
-        {
-            var publishReleasesCronSchedule = Environment.GetEnvironmentVariable("PublishReleaseContentCronSchedule");
-            return TryParseCronSchedule(publishReleasesCronSchedule, out var cronSchedule)
-                ? cronSchedule.GetNextOccurrence(DateTime.UtcNow)
-                : DateTime.UtcNow;
-        }
-
-        private static bool TryParseCronSchedule(string cronExpression, out CrontabSchedule cronSchedule)
-        {
-            // ReSharper disable once IdentifierTypo
-            cronSchedule = CrontabSchedule.TryParse(cronExpression, new CrontabSchedule.ParseOptions
-            {
-                IncludingSeconds = CronExpressionHasSeconds(cronExpression)
-            });
-            return cronSchedule != null;
-        }
-
-        private static bool CronExpressionHasSeconds(string cronExpression)
-        {
-            return cronExpression.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Length != 5;
-        }
-
         private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
         {
             return release.Live || includedReleaseIds.Contains(release.Id);
         }
-        
-        private bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
+
+        private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
         {
             return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }

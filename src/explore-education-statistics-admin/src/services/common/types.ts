@@ -47,8 +47,14 @@ export type MethodologyStatus = 'Draft' | 'Approved';
 export interface BasicMethodology {
   id: string;
   title: string;
+  slug: string;
   status: MethodologyStatus;
+  // TODO: EES-899 methodology should have a contact attached
+  contact?: ContactDetails;
+  published?: string;
+  publishScheduled: string;
 }
+
 export interface BasicPublicationDetails {
   id: string;
   title: string;

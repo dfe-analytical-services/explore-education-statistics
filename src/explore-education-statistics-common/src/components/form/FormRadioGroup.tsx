@@ -9,17 +9,19 @@ import FormRadio, {
   RadioChangeEventHandler,
 } from './FormRadio';
 
-export type RadioOption = PartialBy<
+export type RadioOption<Value extends string = string> = PartialBy<
   OmitStrict<FormRadioProps, 'checked' | 'name' | 'onChange'>,
   'id'
->;
+> & {
+  value: Value;
+};
 
-export type FormRadioGroupProps = {
+export type FormRadioGroupProps<Value extends string = string> = {
   disabled?: boolean;
   inline?: boolean;
   name: string;
   onChange?: RadioChangeEventHandler;
-  options: RadioOption[];
+  options: RadioOption<Value>[];
   small?: boolean;
   order?:
     | (keyof RadioOption)[]
@@ -28,7 +30,9 @@ export type FormRadioGroupProps = {
   value?: string;
 } & FormFieldsetProps;
 
-class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
+class FormRadioGroup<Value extends string = string> extends PureComponent<
+  FormRadioGroupProps<Value>
+> {
   public static defaultProps = {
     inline: false,
     legendSize: 'm',
