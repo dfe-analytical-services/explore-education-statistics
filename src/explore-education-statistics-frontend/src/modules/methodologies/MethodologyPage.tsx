@@ -94,7 +94,12 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         <Accordion id={accordionIds[0]}>
           {data.content.map(({ heading, caption, order, content }) => {
             return (
-              <AccordionSection heading={heading} caption={caption} key={order}>
+              <AccordionSection
+                id={`${accordionIds[0]}-${order}`}
+                heading={heading}
+                caption={caption}
+                key={order}
+              >
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-quarter">
                     <MethodologyHeader>
