@@ -9,7 +9,7 @@ import VerticalBarBlock, {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
@@ -435,5 +435,31 @@ describe('VerticalBarBlock', () => {
     );
 
     expectTicks(container, 'x', '2012/13', '2013/14');
+  });
+
+  test('can add axis labels', () => {
+    render(
+      <VerticalBarBlock
+        {...props}
+        axes={{
+          ...axes,
+          major: {
+            ...axes.major,
+            label: {
+              text: 'Test axis label 1',
+            },
+          },
+          minor: {
+            ...axes.minor,
+            label: {
+              text: 'Test axis label 2',
+            },
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Test axis label 1')).toBeInTheDocument();
+    expect(screen.getByText('Test axis label 2')).toBeInTheDocument();
   });
 });

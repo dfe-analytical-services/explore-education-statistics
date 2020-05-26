@@ -1,3 +1,4 @@
+import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import {
   AxisConfiguration,
@@ -22,7 +23,6 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  LineChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -68,87 +68,98 @@ const HorizontalBarBlock = ({
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
 
+  const yAxisWidth = parseNumber(axes.major.size);
+  const xAxisHeight = parseNumber(axes.minor.size);
+
   return (
-    <ResponsiveContainer width={width || '100%'} height={height || 300}>
-      <BarChart
-        aria-label={alt}
-        role="img"
-        focusable={false}
-        data={chartData}
-        layout="vertical"
-        stackOffset={stacked ? 'sign' : undefined}
-        margin={{
-          left: 30,
-        }}
-      >
-        <CartesianGrid
-          strokeDasharray="3 3"
-          horizontal={axes.minor?.showGrid !== false}
-          vertical={axes.major.showGrid !== false}
-        />
-
-        <XAxis
-          {...minorDomainTicks}
-          type="number"
-          hide={!axes.minor.visible}
-          unit={axes.minor.unit}
-          height={parseNumber(axes.minor.size)}
-          padding={{ left: 20, right: 20 }}
-          tickMargin={10}
-        />
-
-        <YAxis
-          {...majorDomainTicks}
-          type="category"
-          dataKey="name"
-          hide={!axes.major.visible}
-          unit={axes.major.unit}
-          width={parseNumber(axes.major.size)}
-          tickFormatter={getCategoryLabel(dataSetCategories)}
-        />
-
-        <Tooltip
-          content={<CustomTooltip dataSetCategories={dataSetCategories} />}
-          wrapperStyle={{ zIndex: 1000 }}
-        />
-
-        {legend && legend !== 'none' && (
-          <Legend content={renderLegend} align="left" layout="vertical" />
-        )}
-
-        {getCategoryDataSetConfigurations(
-          dataSetCategories,
-          axes.major,
-          meta,
-        ).map(({ config, dataKey, dataSet }) => (
-          <Bar
-            key={dataKey}
-            dataKey={dataKey}
-            isAnimationActive={false}
-            name={config.label}
-            fill={config.colour}
-            unit={dataSet.indicator.unit}
-            stackId={stacked ? 'a' : undefined}
+    <ChartContainer
+      height={height || 300}
+      yAxisWidth={yAxisWidth}
+      yAxisLabel={axes.major.label}
+      xAxisHeight={xAxisHeight}
+      xAxisLabel={axes.minor.label}
+    >
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
+        <BarChart
+          aria-label={alt}
+          role="img"
+          focusable={false}
+          data={chartData}
+          layout="vertical"
+          stackOffset={stacked ? 'sign' : undefined}
+          margin={{
+            left: 30,
+          }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            horizontal={axes.minor?.showGrid !== false}
+            vertical={axes.major.showGrid !== false}
           />
-        ))}
 
-        {axes.major.referenceLines?.map(referenceLine => (
-          <ReferenceLine
-            key={`${referenceLine.position}_${referenceLine.label}`}
-            y={referenceLine.position}
-            label={referenceLine.label}
+          <XAxis
+            {...minorDomainTicks}
+            type="number"
+            hide={!axes.minor.visible}
+            unit={axes.minor.unit}
+            height={xAxisHeight}
+            padding={{ left: 20, right: 20 }}
+            tickMargin={10}
           />
-        ))}
 
-        {axes.minor.referenceLines?.map(referenceLine => (
-          <ReferenceLine
-            key={`${referenceLine.position}_${referenceLine.label}`}
-            x={referenceLine.position}
-            label={referenceLine.label}
+          <YAxis
+            {...majorDomainTicks}
+            type="category"
+            dataKey="name"
+            hide={!axes.major.visible}
+            unit={axes.major.unit}
+            width={yAxisWidth}
+            tickFormatter={getCategoryLabel(dataSetCategories)}
           />
-        ))}
-      </BarChart>
-    </ResponsiveContainer>
+
+          <Tooltip
+            content={<CustomTooltip dataSetCategories={dataSetCategories} />}
+            wrapperStyle={{ zIndex: 1000 }}
+          />
+
+          {legend && legend !== 'none' && (
+            <Legend content={renderLegend} align="left" layout="vertical" />
+          )}
+
+          {getCategoryDataSetConfigurations(
+            dataSetCategories,
+            axes.major,
+            meta,
+          ).map(({ config, dataKey, dataSet }) => (
+            <Bar
+              key={dataKey}
+              dataKey={dataKey}
+              isAnimationActive={false}
+              name={config.label}
+              fill={config.colour}
+              unit={dataSet.indicator.unit}
+              stackId={stacked ? 'a' : undefined}
+            />
+          ))}
+
+          {axes.major.referenceLines?.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              y={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
+
+          {axes.minor.referenceLines?.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              x={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartContainer>
   );
 };
 

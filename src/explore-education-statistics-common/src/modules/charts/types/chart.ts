@@ -7,7 +7,7 @@ import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { ReactNode } from 'react';
-import { LegendProps, PositionType } from 'recharts';
+import { LegendProps } from 'recharts';
 
 export type ChartType =
   | 'line'
@@ -29,12 +29,17 @@ export type LineStyle = 'solid' | 'dashed' | 'dotted';
 
 export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 export type AxisType = 'major' | 'minor';
-export type LabelPosition = 'axis' | 'graph' | PositionType;
 export type TickConfig = 'default' | 'startEnd' | 'custom';
 
 export interface ReferenceLine {
   label: string;
   position: number | string;
+}
+
+export interface Label {
+  text: string;
+  rotated?: boolean;
+  width?: number;
 }
 
 export interface AxisConfiguration {
@@ -47,7 +52,7 @@ export interface AxisConfiguration {
   visible: boolean;
   unit?: string;
   showGrid?: boolean;
-  labelPosition?: LabelPosition;
+  label?: Label;
   size?: number;
   min?: number;
   max?: number;
