@@ -1,5 +1,5 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
-import { DayMonthYearValues } from '@common/utils/date/dayMonthYear';
+import { DayMonthYear } from '@common/utils/date/dayMonthYear';
 import { contentApi } from './api';
 
 export type ReleaseStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
@@ -107,7 +107,7 @@ export interface Release<
   publication: PublicationType;
   latestRelease: boolean;
   publishScheduled?: string;
-  nextReleaseDate: DayMonthYearValues;
+  nextReleaseDate: DayMonthYear;
   status: ReleaseStatus;
   relatedInformation: BasicLink[];
   type: {

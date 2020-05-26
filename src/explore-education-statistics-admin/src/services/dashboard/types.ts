@@ -5,7 +5,7 @@ import {
   UserDetails,
 } from '@admin/services/common/types';
 import { ReleaseStatus } from '@common/services/publicationService';
-import { DayMonthYearValues } from '@common/utils/date/dayMonthYear';
+import { DayMonthYear } from '@common/utils/date/dayMonthYear';
 
 export interface ThemeAndTopics {
   title: string;
@@ -42,7 +42,7 @@ export interface AdminDashboardRelease {
   lastEditedDateTime: string;
   publishScheduled: Date;
   published?: string;
-  nextReleaseDate: DayMonthYearValues;
+  nextReleaseDate: DayMonthYear;
   internalReleaseNote?: string;
   draftComments: Comment[];
   higherReviewComments: Comment[];

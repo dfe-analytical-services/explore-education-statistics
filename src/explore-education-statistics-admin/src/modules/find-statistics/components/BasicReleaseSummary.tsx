@@ -6,8 +6,8 @@ import Tag from '@common/components/Tag';
 import { Release } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
+  formatDayMonthYear,
+  isValidDayMonthYear,
 } from '@common/utils/date/dayMonthYear';
 import React, { useEffect, useState } from 'react';
 import styles from './BasicReleaseSummary.module.scss';
@@ -69,14 +69,12 @@ const BasicReleaseSummary = ({ release }: Props) => {
                   </strong>
                 )}
               </dd>
-              {dayMonthYearIsComplete(release.nextReleaseDate) && (
+              {isValidDayMonthYear(release.nextReleaseDate) && (
                 <div>
                   <dt className="govuk-caption-m">Next update: </dt>
                   <dd>
                     <strong>
-                      <FormattedDate>
-                        {dayMonthYearToDate(release.nextReleaseDate)}
-                      </FormattedDate>
+                      <time>{formatDayMonthYear(release.nextReleaseDate)}</time>
                     </strong>
                   </dd>
                 </div>

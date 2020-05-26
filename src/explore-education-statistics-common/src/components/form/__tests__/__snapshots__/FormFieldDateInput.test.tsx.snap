@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormFieldDateInput renders correctly 1`] = `
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="startDate"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      Start date
+    </legend>
+    <div class="govuk-form-group govuk-date-input__item">
+      <label class="govuk-label"
+             for="startDate-day"
+      >
+        Day
+      </label>
+      <input name="startDate.day"
+             class="govuk-input govuk-input--width-2"
+             id="startDate-day"
+             type="number"
+             value
+      >
+    </div>
+    <div class="govuk-form-group govuk-date-input__item">
+      <label class="govuk-label"
+             for="startDate-month"
+      >
+        Month
+      </label>
+      <input name="startDate.month"
+             class="govuk-input govuk-input--width-2"
+             id="startDate-month"
+             type="number"
+             value
+      >
+    </div>
+    <div class="govuk-form-group govuk-date-input__item">
+      <label class="govuk-label"
+             for="startDate-year"
+      >
+        Year
+      </label>
+      <input name="startDate.year"
+             class="govuk-input govuk-input--width-4"
+             id="startDate-year"
+             type="number"
+             value
+      >
+    </div>
+  </fieldset>
+</div>
+`;

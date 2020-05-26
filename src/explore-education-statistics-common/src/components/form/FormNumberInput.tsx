@@ -5,9 +5,9 @@ import React from 'react';
 
 export interface FormNumberInputProps extends FormBaseInputProps {
   defaultValue?: number;
-  min?: string;
-  max?: string;
-  value?: number;
+  min?: number;
+  max?: number;
+  value?: number | null;
 }
 
 const FormNumberInput = ({ value, ...props }: FormNumberInputProps) => {

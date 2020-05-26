@@ -10,8 +10,8 @@ import publicationService, {
   ReleaseType,
 } from '@common/services/publicationService';
 import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
+  formatDayMonthYear,
+  isValidDayMonthYear,
 } from '@common/utils/date/dayMonthYear';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
@@ -88,14 +88,12 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     <FormattedDate>{data.published}</FormattedDate>
                   </strong>
                 </dd>
-                {dayMonthYearIsComplete(data.nextReleaseDate) && (
+                {isValidDayMonthYear(data.nextReleaseDate) && (
                   <div>
                     <dt className="govuk-caption-m">Next update: </dt>
                     <dd data-testid="next-update">
                       <strong>
-                        <FormattedDate>
-                          {dayMonthYearToDate(data.nextReleaseDate)}
-                        </FormattedDate>
+                        <time>{formatDayMonthYear(data.nextReleaseDate)}</time>
                       </strong>
                     </dd>
                   </div>

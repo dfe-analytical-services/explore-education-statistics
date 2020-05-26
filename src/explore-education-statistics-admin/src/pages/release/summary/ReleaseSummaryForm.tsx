@@ -1,53 +1,51 @@
-import { findTimePeriodCoverageGroup } from '@admin/pages/release/util/releaseSummaryUtil';
 import service from '@admin/services/common/service';
 import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import {
-  parseDate,
-  validateMandatoryDayMonthYearField,
-  validateOptionalPartialDayMonthYearField,
-} from '@admin/validation/validation';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
+import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { Dictionary } from '@common/types';
-import { DayMonthYearInputs } from '@common/utils/date/dayMonthYear';
+import {
+  DayMonthYear,
+  isDayMonthYearEmpty,
+  isValidDayMonthYear,
+  parseDayMonthYearToUtcDate,
+} from '@common/utils/date/dayMonthYear';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid } from 'date-fns';
 import { Formik, FormikHelpers } from 'formik';
-import React, { useEffect, useState } from 'react';
-import { ObjectSchemaDefinition } from 'yup';
+import React, { ReactNode, useEffect, useState } from 'react';
+import { ObjectSchema } from 'yup';
 
-export interface EditFormValues {
+export interface ReleaseSummaryFormValues {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
   releaseTypeId: string;
-  scheduledPublishDate: DayMonthYearInputs;
-  nextReleaseDate: DayMonthYearInputs;
+  scheduledPublishDate: Date;
+  nextReleaseDate?: DayMonthYear;
 }
 
-interface Props<FormValues extends EditFormValues> {
-  submitButtonText: string;
-  initialValuesSupplier: (
+const formId = 'releaseSummaryForm';
+
+interface Props<FormValues extends ReleaseSummaryFormValues> {
+  additionalFields?: ReactNode;
+  submitText: string;
+  initialValues: (
     timePeriodCoverageGroups: TimePeriodCoverageGroup[],
   ) => FormValues;
-  validationRulesSupplier?: (
-    baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
-  ) => ObjectSchemaDefinition<FormValues>;
-  onSubmitHandler: (
-    values: FormValues,
-    actions: FormikHelpers<FormValues>,
-  ) => void;
-  onCancelHandler: () => void;
-  additionalFields?: React.ReactNode;
+  validationSchema?: (
+    baseSchema: ObjectSchema<ReleaseSummaryFormValues>,
+  ) => ObjectSchema<FormValues>;
+  onSubmit: (values: FormValues, actions: FormikHelpers<FormValues>) => void;
+  onCancel: () => void;
 }
 
 interface ReleaseSummaryFormModel {
@@ -55,13 +53,15 @@ interface ReleaseSummaryFormModel {
   releaseTypes: IdTitlePair[];
 }
 
-const ReleaseSummaryForm = <FormValues extends EditFormValues>({
-  submitButtonText,
-  initialValuesSupplier,
-  validationRulesSupplier,
-  onSubmitHandler,
-  onCancelHandler,
+const ReleaseSummaryForm = <
+  FormValues extends ReleaseSummaryFormValues = ReleaseSummaryFormValues
+>({
   additionalFields,
+  submitText,
+  initialValues,
+  validationSchema,
+  onSubmit,
+  onCancel,
 }: Props<FormValues>) => {
   const [model, setModel] = useState<ReleaseSummaryFormModel>();
 
@@ -89,40 +89,68 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
     return optGroups;
   };
 
-  const baseValidationRules: ObjectSchemaDefinition<EditFormValues> = {
+  const findTimePeriodCoverageGroup = (
+    code: string,
+    timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+  ) => {
+    return (
+      timePeriodCoverageGroups.find(group =>
+        group.timeIdentifiers
+          .map(option => option.identifier.value)
+          .some(id => id === code),
+      ) || timePeriodCoverageGroups[0]
+    );
+  };
+
+  const baseSchema = Yup.object<ReleaseSummaryFormValues>({
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
     releaseTypeId: Yup.string().required('Choose a release type'),
-    scheduledPublishDate: validateMandatoryDayMonthYearField.test(
-      'validDateIfAfterToday',
-      `Schedule publish date can't be before ${format(
-        new Date(),
-        'do MMMM yyyy',
-      )}`,
-      value => {
-        return (
-          isValid(parseDate({ value })) &&
-          endOfDay(parseDate({ value })) >= endOfDay(new Date())
-        );
-      },
-    ),
-    nextReleaseDate: validateOptionalPartialDayMonthYearField,
-  };
+    scheduledPublishDate: Yup.date()
+      .required('Enter a valid scheduled publish date')
+      .test({
+        name: 'validDateIfAfterToday',
+        message: `Scheduled publish date can't be before ${format(
+          new Date(),
+          'do MMMM yyyy',
+        )}`,
+        test(value) {
+          return endOfDay(value) >= endOfDay(new Date());
+        },
+      }),
+    nextReleaseDate: Yup.object<DayMonthYear>({
+      day: Yup.number().notRequired(),
+      month: Yup.number(),
+      year: Yup.number(),
+    })
+      .notRequired()
+      .test({
+        name: 'validDate',
+        message: 'Enter a valid next release date',
+        test(value: DayMonthYear) {
+          if (isDayMonthYearEmpty(value)) {
+            return true;
+          }
 
-  const formId = 'releaseSummaryForm';
+          if (!isValidDayMonthYear(value)) {
+            return false;
+          }
+
+          return isValid(parseDayMonthYearToUtcDate(value));
+        },
+      }),
+  });
 
   return (
     <>
       {model && (
         <Formik<FormValues>
           enableReinitialize
-          initialValues={initialValuesSupplier(model.timePeriodCoverageGroups)}
-          validationSchema={Yup.object<FormValues>(
-            validationRulesSupplier
-              ? validationRulesSupplier(baseValidationRules)
-              : (baseValidationRules as ObjectSchemaDefinition<FormValues>),
-          )}
-          onSubmit={onSubmitHandler}
+          initialValues={initialValues(model.timePeriodCoverageGroups)}
+          validationSchema={
+            validationSchema ? validationSchema(baseSchema) : baseSchema
+          }
+          onSubmit={onSubmit}
         >
           {form => {
             const timePeriodLabel = findTimePeriodCoverageGroup(
@@ -159,17 +187,18 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                     width={4}
                   />
                 </FormFieldset>
-                <FormFieldDayMonthYear<FormValues>
+                <FormFieldDateInput<FormValues>
                   id={`${formId}-scheduledPublishDate`}
                   name="scheduledPublishDate"
                   legend="Schedule publish date"
                   legendSize="m"
                 />
-                <FormFieldDayMonthYear<FormValues>
+                <FormFieldDateInput<FormValues>
                   id={`${formId}-nextReleaseDate`}
                   name="nextReleaseDate"
                   legend="Next release expected (optional)"
                   legendSize="m"
+                  type="dayMonthYear"
                 />
                 <div className="govuk-!-margin-top-9">
                   <FormFieldRadioGroup<FormValues>
@@ -184,12 +213,10 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                 </div>
                 {additionalFields}
                 <Button type="submit" className="govuk-!-margin-top-9">
-                  {submitButtonText}
+                  {submitText}
                 </Button>
                 <div className="govuk-!-margin-top-6">
-                  <ButtonText onClick={onCancelHandler}>
-                    Cancel update
-                  </ButtonText>
+                  <ButtonText onClick={onCancel}>Cancel</ButtonText>
                 </div>
               </Form>
             );
