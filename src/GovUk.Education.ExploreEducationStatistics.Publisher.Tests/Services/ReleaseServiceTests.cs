@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
-using Assert = Xunit.Assert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -473,11 +473,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Release2KeyStatsDataBlock
         };
 
-        public ReleaseServiceTests()
-        {
-            SetEnvironmentVariables();
-        }
-
         [Fact]
         public void GetLatestRelease()
         {
@@ -534,7 +529,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     fileStorageService.Object,
                     MapperForProfile<MappingProfiles>());
 
-                var result = service.GetLatestReleaseViewModel(PublicationA.Id, Enumerable.Empty<Guid>());
+                var result =
+                    service.GetLatestReleaseViewModel(PublicationA.Id, Enumerable.Empty<Guid>(), PublishContext());
 
                 Assert.Equal(PublicationARelease2.Id, result.Id);
                 Assert.Equal("Academic Year Q2 2018/19", result.Title);
@@ -616,7 +612,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     fileStorageService.Object,
                     MapperForProfile<MappingProfiles>());
 
-                var result = service.GetReleaseViewModel(PublicationARelease1V1.Id);
+                var result = service.GetReleaseViewModel(PublicationARelease1V1.Id, PublishContext());
 
                 Assert.Equal(PublicationARelease1V1.Id, result.Id);
                 Assert.Equal("Academic Year Q1 2018/19", result.Title);
@@ -698,33 +694,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     fileStorageService.Object,
                     MapperForProfile<MappingProfiles>());
 
-                var result = service.GetReleaseViewModel(PublicationARelease3.Id);
-                
+                var context = PublishContext();
+                var result = service.GetReleaseViewModel(PublicationARelease3.Id, context);
+
                 Assert.Equal(PublicationARelease3.Id, result.Id);
                 Assert.Equal("Academic Year Q3 2018/19", result.Title);
-                Assert.True(result.Published.HasValue);
-                
-                // The published date is set based on what we expect it to be using the PublishReleaseContentCronSchedule
-                var nineThirty = new TimeSpan(9, 30, 0);
-                if (DateTime.UtcNow.TimeOfDay > nineThirty)
-                {
-                    Assert.True(result.Published.Value == DateTime.Today.AddDays(1).Add(nineThirty));
-                }
-                else
-                {
-                    Assert.True(result.Published.Value == DateTime.Today.Add(nineThirty));
-                }
-
+                Assert.Equal(context.Published, result.Published);
                 Assert.Null(result.KeyStatisticsSection);
                 Assert.Null(result.SummarySection);
                 Assert.Empty(result.Content);
                 Assert.Empty(result.RelatedInformation);
             }
         }
-        
-        private static void SetEnvironmentVariables()
+
+        private static PublishContext PublishContext()
         {
-            Environment.SetEnvironmentVariable("PublishReleaseContentCronSchedule","0 30 9 * * *");
+            var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+            return new PublishContext(published, true);
         }
 
         private static (Mock<IFileStorageService>,
