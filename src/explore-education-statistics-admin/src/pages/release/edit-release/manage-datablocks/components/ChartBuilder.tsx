@@ -15,6 +15,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
 import ChartRenderer, {
   ChartRendererProps,
@@ -101,6 +102,8 @@ const ChartBuilder = ({
   onTableQueryUpdate,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const [renderCount, setRenderCount] = useState(0);
 
   const [showDeleteModal, toggleDeleteModal] = useToggle(false);
 
@@ -245,6 +248,33 @@ const ChartBuilder = ({
     [actions, onTableQueryUpdate],
   );
 
+  const [updateChartOptions] = useDebouncedCallback(
+    actions.updateChartOptions,
+    200,
+  );
+
+  const [updateChartAxis] = useDebouncedCallback(actions.updateChartAxis, 200);
+
+  const [rerenderChart] = useDebouncedCallback(() => {
+    setRenderCount(renderCount + 1);
+  }, 300);
+
+  const handleChartConfigurationChange = useCallback(
+    (chartOptions: ChartOptions) => {
+      updateChartOptions(chartOptions);
+      rerenderChart();
+    },
+    [rerenderChart, updateChartOptions],
+  );
+
+  const handleAxisConfigurationChange = useCallback(
+    (axisConfiguration: AxisConfiguration) => {
+      updateChartAxis(axisConfiguration);
+      rerenderChart();
+    },
+    [rerenderChart, updateChartAxis],
+  );
+
   const handleBoundaryLevelChange = useCallback(
     async (boundaryLevel: string) => {
       setDataLoading(true);
@@ -305,7 +335,7 @@ const ChartBuilder = ({
           <div className="govuk-width-container">
             {isChartRenderable(chartProps) ? (
               <LoadingSpinner loading={isDataLoading} text="Loading chart data">
-                <ChartRenderer {...chartProps} />
+                <ChartRenderer {...chartProps} key={renderCount} />
               </LoadingSpinner>
             ) : (
               <div className={styles.previewPlaceholder}>
@@ -337,7 +367,7 @@ const ChartBuilder = ({
               meta={meta}
               releaseId={releaseId}
               onBoundaryLevelChange={handleBoundaryLevelChange}
-              onChange={actions.updateChartOptions}
+              onChange={handleChartConfigurationChange}
               onFormStateChange={actions.updateFormState}
               onSubmit={handleChartConfigurationSubmit}
             />
@@ -392,7 +422,7 @@ const ChartBuilder = ({
                     definition={definition}
                     data={data}
                     meta={meta}
-                    onChange={actions.updateChartAxis}
+                    onChange={handleAxisConfigurationChange}
                     onFormStateChange={actions.updateFormState}
                     onSubmit={handleAxisConfigurationSubmit}
                   />

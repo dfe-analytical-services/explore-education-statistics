@@ -14,9 +14,9 @@ import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelD
 import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
+import omit from 'lodash/omit';
 import { useCallback, useMemo } from 'react';
 import { Reducer } from 'use-immer';
-import omit from 'lodash/omit';
 
 export interface ChartOptions extends ChartDefinitionOptions {
   fileId?: string;
