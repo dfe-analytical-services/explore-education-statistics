@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             return userService.DoCheck(methodology, SecurityPolicies.CanUpdateSpecificMethodology);
         }
-        
+
         public static Task<Either<ActionResult, Methodology>> CheckCanMarkMethodologyAsDraft(
             this IUserService userService, Methodology methodology)
         {
@@ -67,26 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Methodology methodology)
         {
             return userService.DoCheck(methodology, SecurityPolicies.CanApproveSpecificMethodology);
-        }
-        
-        public static Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodologyStatus(
-            this IUserService userService, Methodology methodology, MethodologyStatus status)
-        {
-            switch (status)
-            {
-                case MethodologyStatus.Draft:
-                {
-                    return userService.CheckCanMarkMethodologyAsDraft(methodology);
-                }
-                case MethodologyStatus.Approved:
-                {
-                    return userService.CheckCanApproveMethodology(methodology);
-                }
-                default:
-                {
-                    return Task.FromResult(new Either<ActionResult, Methodology>(methodology));
-                }
-            }
         }
 
         public static Task<Either<ActionResult, bool>> CheckCanViewAllTopics(this IUserService userService)
