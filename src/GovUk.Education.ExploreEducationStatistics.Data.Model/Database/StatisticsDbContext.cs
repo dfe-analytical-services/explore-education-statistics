@@ -164,13 +164,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasKey(item => new {item.ReleaseId, item.FootnoteId});
             
             modelBuilder.Entity<ReleaseFootnote>()
-                .HasOne(r => r.Release)
-                .WithMany()
+                .HasOne(rf => rf.Release)
+                .WithMany(release => release.Footnotes)
+                .HasForeignKey(releaseFootnote => releaseFootnote.ReleaseId)
                 .OnDelete(DeleteBehavior.NoAction);
             
             modelBuilder.Entity<ReleaseFootnote>()
-                .HasOne(r => r.Footnote)
-                .WithMany()
+                .HasOne(rf => rf.Footnote)
+                .WithMany(footnote => footnote.Releases)
+                .HasForeignKey(releaseFootnote => releaseFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
 

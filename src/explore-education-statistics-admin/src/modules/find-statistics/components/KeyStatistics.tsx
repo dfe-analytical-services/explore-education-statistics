@@ -37,6 +37,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         {release.keyStatisticsSection.content.map(stat => {
           return stat.type === 'DataBlock' ? (
             <EditableKeyStatTile
+              releaseUuid={release.id}
               key={stat.id}
               {...stat}
               isEditing={isEditing}
@@ -92,6 +93,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
     <>
       {isFormOpen ? (
         <KeyStatSelectForm
+          releaseId={release.id}
           onSelect={addKeyStatToSection}
           onCancel={() => setIsFormOpen(false)}
         />

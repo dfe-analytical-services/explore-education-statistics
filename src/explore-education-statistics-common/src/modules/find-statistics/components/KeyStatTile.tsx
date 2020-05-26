@@ -11,6 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import styles from './KeyStatTile.module.scss';
 
 export interface KeyStatProps extends Omit<DataBlock, 'type'> {
+  releaseUuid: string;
   children?: ReactNode;
   handleApiErrors?: AxiosErrorHandler;
 }
@@ -20,14 +21,19 @@ export interface KeyStatConfig {
   value: string;
 }
 
-const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
+const KeyStatTile = ({
+  releaseUuid,
+  dataBlockRequest,
+  summary,
+  children,
+}: KeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     TableDataResponse | undefined
   >();
 
   useEffect(() => {
     tableBuilderService
-      .getTableData({
+      .getTableData(releaseUuid, {
         ...dataBlockRequest,
         includeGeoJson: false,
       })

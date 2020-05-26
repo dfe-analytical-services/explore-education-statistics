@@ -13,6 +13,7 @@ import { DataBlock } from '@common/services/types/blocks';
 import React, { MouseEvent, ReactNode } from 'react';
 
 export interface DataBlockRendererProps {
+  releaseId: string;
   additionalTabContent?: ReactNode;
   dataBlock?: DataBlock;
   firstTabs?: ReactNode;
@@ -27,6 +28,7 @@ export interface DataBlockRendererProps {
 }
 
 const DataBlockRenderer = ({
+  releaseId,
   additionalTabContent,
   dataBlock,
   firstTabs,
@@ -36,6 +38,7 @@ const DataBlockRenderer = ({
   onToggle,
 }: DataBlockRendererProps) => {
   const { value: fullTable, isLoading } = useTableQuery(
+    releaseId,
     dataBlock
       ? {
           ...dataBlock.dataBlockRequest,

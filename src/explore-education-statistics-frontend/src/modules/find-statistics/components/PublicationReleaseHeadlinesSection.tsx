@@ -15,6 +15,7 @@ interface Props {
 
 const PublicationReleaseHeadlinesSection = ({
   release: {
+    id,
     keyStatisticsSecondarySection,
     keyStatisticsSection,
     headlinesSection,
@@ -26,6 +27,7 @@ const PublicationReleaseHeadlinesSection = ({
 
   return (
     <DataBlockRenderer
+      releaseId={id}
       id="releaseHeadlines-dataBlock"
       getInfographic={getChartFile}
       dataBlock={keyStatisticsSecondarySection.content?.[0]}
@@ -39,7 +41,7 @@ const PublicationReleaseHeadlinesSection = ({
 
               const block = keyStat as DataBlock;
 
-              return <KeyStatTile key={block.id} {...block} />;
+              return <KeyStatTile releaseUuid={id} key={block.id} {...block} />;
             })}
           </div>
 

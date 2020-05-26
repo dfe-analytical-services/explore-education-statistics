@@ -66,6 +66,7 @@ describe('DataBlockRenderer', () => {
 
     const { container } = render(
       <DataBlockRenderer
+        releaseId=""
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -76,7 +77,7 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith({
+    expect(getDataBlockForSubject).toBeCalledWith('', {
       ...testDataBlock.dataBlockRequest,
       includeGeoJson: false,
     } as TableDataQuery);
@@ -95,6 +96,7 @@ describe('DataBlockRenderer', () => {
 
     const { container } = render(
       <DataBlockRenderer
+        releaseId=""
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -110,7 +112,7 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith({
+    expect(getDataBlockForSubject).toBeCalledWith('', {
       ...testDataBlock.dataBlockRequest,
       includeGeoJson: false,
     } as TableDataQuery);
@@ -124,13 +126,14 @@ describe('DataBlockRenderer', () => {
 
   test('renders vertical chart', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      (_: DataBlockRequest) => {
+      (releaseId: string, _: DataBlockRequest) => {
         return Promise.resolve(testChartTableData);
       },
     );
 
     const { container } = render(
       <DataBlockRenderer
+        releaseId=""
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -146,7 +149,7 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith({
+    expect(getDataBlockForSubject).toBeCalledWith('', {
       ...testDataBlock.dataBlockRequest,
       includeGeoJson: false,
     } as TableDataQuery);
@@ -160,7 +163,7 @@ describe('DataBlockRenderer', () => {
 
   test('renders table', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      (_: DataBlockRequest) => {
+      (releaseId: string, _: DataBlockRequest) => {
         return Promise.resolve(testChartTableData);
       },
     );
@@ -169,6 +172,7 @@ describe('DataBlockRenderer', () => {
 
     const { container } = render(
       <DataBlockRenderer
+        releaseId=""
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -190,7 +194,7 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith({
+    expect(getDataBlockForSubject).toBeCalledWith('', {
       ...testDataBlock.dataBlockRequest,
       includeGeoJson: false,
     } as TableDataQuery);
@@ -200,13 +204,14 @@ describe('DataBlockRenderer', () => {
 
   test('renders map', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      (_: DataBlockRequest) => {
+      (releaseId: string, _: DataBlockRequest) => {
         return Promise.resolve(testMapTableData);
       },
     );
 
     const { container } = render(
       <DataBlockRenderer
+        releaseId=""
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -217,7 +222,7 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith({
+    expect(getDataBlockForSubject).toBeCalledWith('', {
       ...testDataBlock.dataBlockRequest,
       includeGeoJson: true,
     } as TableDataQuery);
@@ -232,6 +237,7 @@ describe('DataBlockRenderer', () => {
 
     const { container } = render(
       <DataBlockRenderer
+        releaseId=""
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -242,7 +248,7 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith({
+    expect(getDataBlockForSubject).toBeCalledWith('', {
       ...testDataBlock.dataBlockRequest,
       includeGeoJson: false,
     } as TableDataQuery);

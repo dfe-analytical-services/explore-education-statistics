@@ -13,5 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public ICollection<FilterGroupFootnote> FilterGroups { get; set; }
         public ICollection<FilterItemFootnote> FilterItems { get; set; }
         public ICollection<SubjectFootnote> Subjects { get; set; }
+        public ICollection<ReleaseFootnote> Releases { get; set; }
     }
 }

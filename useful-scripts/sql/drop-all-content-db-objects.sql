@@ -19,12 +19,12 @@ ALTER TABLE ReleaseContentSections
     DROP CONSTRAINT FK_ReleaseContentSections_ContentSections_ContentSectionId;
 ALTER TABLE ReleaseContentSections
     DROP CONSTRAINT FK_ReleaseContentSections_Releases_ReleaseId;
-DROP TABLE Link;
 DROP TABLE [Update];
 DROP TABLE ReleaseSummaries;
 DROP TABLE ContentSections;
 DROP TABLE Releases;
 DROP TABLE ReleaseTypes;
+DROP TABLE LegacyRelease;
 DROP TABLE Publications;
 DROP TABLE Methodologies;
 DROP TABLE Topics;

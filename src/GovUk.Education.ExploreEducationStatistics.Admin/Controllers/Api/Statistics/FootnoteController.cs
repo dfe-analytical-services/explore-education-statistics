@@ -89,7 +89,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     {
                         Footnotes = viewModels,
                         Meta = subjects
-
                     };
                 })
                 .HandleFailuresOr(Ok);

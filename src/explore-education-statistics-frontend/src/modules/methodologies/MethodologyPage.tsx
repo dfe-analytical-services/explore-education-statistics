@@ -105,7 +105,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                   </div>
 
                   <div className="govuk-grid-column-three-quarters">
-                    <SectionBlocks content={content} />
+                    <SectionBlocks releaseId="" content={content} />
                   </div>
                 </div>
               </AccordionSection>
@@ -126,7 +126,8 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                   caption={caption}
                   key={order}
                 >
-                  <SectionBlocks content={content} />
+                  2
+                  <SectionBlocks releaseId="" content={content} />
                 </AccordionSection>
               );
             })}
