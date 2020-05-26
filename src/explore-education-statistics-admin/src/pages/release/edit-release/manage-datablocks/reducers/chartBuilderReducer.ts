@@ -81,6 +81,9 @@ const defaultAxisOptions: Partial<AxisConfiguration> = {
   dataSets: [],
   referenceLines: [],
   visible: true,
+  label: {
+    text: '',
+  },
 };
 
 const updateAxis = (

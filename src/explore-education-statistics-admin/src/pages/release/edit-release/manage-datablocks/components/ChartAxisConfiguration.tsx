@@ -22,6 +22,7 @@ import {
   AxisGroupBy,
   AxisType,
   ChartDefinition,
+  Label,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
@@ -211,6 +212,8 @@ const ChartAxisConfiguration = ({
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    const axisDefinition = definition.axes[type];
+
     let schema: ObjectSchema<FormValues> = Yup.object({
       size: Yup.number()
         .required('Enter size of axis')
@@ -242,6 +245,23 @@ const ChartAxisConfiguration = ({
       });
     }
 
+    if (axisDefinition?.capabilities.canRotateLabel) {
+      schema = schema.shape({
+        label: Yup.object<Label>({
+          text: Yup.string(),
+          rotated: Yup.boolean(),
+          width: Yup.number(),
+        }),
+      });
+    } else {
+      schema = schema.shape({
+        label: Yup.object<Label>({
+          text: Yup.string(),
+          width: Yup.number(),
+        }),
+      });
+    }
+
     if (capabilities.canSort) {
       schema = schema.shape({
         sortAsc: Yup.boolean(),
@@ -266,6 +286,7 @@ const ChartAxisConfiguration = ({
     capabilities.fixedAxisGroupBy,
     capabilities.gridLines,
     capabilities.hasReferenceLines,
+    definition.axes,
     type,
   ]);
 
@@ -350,42 +371,64 @@ const ChartAxisConfiguration = ({
                   <FormFieldCheckbox<AxisConfiguration>
                     id={`${id}-visible`}
                     name="visible"
-                    label="Show axis labels"
+                    label="Show axis"
                     conditional={
-                      <FormFieldTextInput<AxisConfiguration>
-                        id={`${id}-unit`}
-                        label="Override displayed unit"
-                        name="unit"
-                        hint="Leave blank to set default from metadata"
-                        width={10}
-                      />
+                      <>
+                        <FormFieldTextInput<AxisConfiguration>
+                          id={`${id}-unit`}
+                          label="Displayed unit"
+                          name="unit"
+                          hint="Leave blank to set default from metadata"
+                          width={10}
+                        />
+                      </>
                     }
                   />
                 )}
 
-                {validationSchema.fields.sortAsc && (
-                  <FormFieldset
-                    id={`${id}-sort`}
-                    legend="Sorting"
-                    legendSize="s"
-                  >
-                    {/* <FormFieldSelect<AxisConfiguration>*/}
-                    {/*  id={`${id}-sortBy`}*/}
-                    {/*  name="sortBy"*/}
-                    {/*  label="Sort data by"*/}
-                    {/*  options={sortOptions}*/}
-                    {/* />*/}
+                <FormFieldset id={`${id}-axis`} legend="Labels" legendSize="s">
+                  <FormFieldTextInput<AxisConfiguration>
+                    id={`${id}-label-text`}
+                    label="Label"
+                    name="label.text"
+                  />
+
+                  <FormFieldNumberInput<AxisConfiguration>
+                    id={`${id}-label-width`}
+                    label="Width (px)"
+                    name="label.width"
+                    width={5}
+                  />
+
+                  {(validationSchema.fields.label as ObjectSchema<Label>).fields
+                    .rotated && (
                     <FormFieldCheckbox<AxisConfiguration>
-                      id={`${id}-sortAsc`}
-                      name="sortAsc"
-                      label="Sort ascending"
+                      id={`${id}-label-rotated`}
+                      name="label.rotated"
+                      label="Rotate 90 degrees"
                     />
-                  </FormFieldset>
-                )}
+                  )}
+                </FormFieldset>
               </FormFieldset>
             </div>
 
             <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
+              {validationSchema.fields.sortAsc && (
+                <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="s">
+                  {/* <FormFieldSelect<AxisConfiguration>*/}
+                  {/*  id={`${id}-sortBy`}*/}
+                  {/*  name="sortBy"*/}
+                  {/*  label="Sort data by"*/}
+                  {/*  options={sortOptions}*/}
+                  {/* />*/}
+                  <FormFieldCheckbox<AxisConfiguration>
+                    id={`${id}-sortAsc`}
+                    name="sortAsc"
+                    label="Sort ascending"
+                  />
+                </FormFieldset>
+              )}
+
               {validationSchema.fields.tickConfig && (
                 <FormFieldRadioGroup<AxisConfiguration>
                   id={`${id}-tickConfig`}
@@ -559,7 +602,7 @@ const ChartAxisConfiguration = ({
                       id={`${id}-referenceLines-label`}
                       label="Label"
                       hideLabel
-                      defaultValue={referenceLine.label}
+                      value={referenceLine.label}
                       onChange={e => {
                         setReferenceLine({
                           ...referenceLine,

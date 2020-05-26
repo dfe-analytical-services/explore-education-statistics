@@ -195,6 +195,9 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       id: 'major',
       title: 'X Axis (major axis)',
       type: 'major',
+      capabilities: {
+        canRotateLabel: false,
+      },
       defaults: {
         groupBy: 'timePeriod',
         min: 0,
@@ -211,6 +214,9 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       id: 'minor',
       title: 'Y Axis (minor axis)',
       type: 'minor',
+      capabilities: {
+        canRotateLabel: true,
+      },
       defaults: {
         min: 0,
         showGrid: true,

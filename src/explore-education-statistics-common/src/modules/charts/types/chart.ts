@@ -132,11 +132,16 @@ export interface ChartDefinition {
   };
 }
 
+export interface ChartDefinitionAxisCapabilities {
+  canRotateLabel: boolean;
+}
+
 export interface ChartDefinitionAxis {
   id: string;
   title: string;
   type: AxisType;
   hide?: boolean;
+  capabilities: ChartDefinitionAxisCapabilities;
   defaults?: Partial<AxisConfiguration>;
   constants?: Partial<AxisConfiguration>;
 }
