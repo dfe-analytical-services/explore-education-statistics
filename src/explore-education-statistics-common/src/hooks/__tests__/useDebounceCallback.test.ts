@@ -17,11 +17,9 @@ describe('useDebounceCallback', () => {
     expect(callback).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(9);
-
     expect(callback).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(1);
-
     expect(callback).toHaveBeenCalled();
   });
 
@@ -36,17 +34,14 @@ describe('useDebounceCallback', () => {
     expect(callback).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(5);
-
     expect(callback).not.toHaveBeenCalled();
 
     run();
 
     jest.advanceTimersByTime(5);
-
     expect(callback).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(5);
-
     expect(callback).toHaveBeenCalled();
   });
 
@@ -68,7 +63,6 @@ describe('useDebounceCallback', () => {
     expect(callback1).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(5);
-
     expect(callback1).not.toHaveBeenCalled();
 
     const callback2 = jest.fn();
@@ -78,12 +72,10 @@ describe('useDebounceCallback', () => {
     run();
 
     jest.advanceTimersByTime(5);
-
     expect(callback1).not.toHaveBeenCalled();
     expect(callback2).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(5);
-
     expect(callback1).not.toHaveBeenCalled();
     expect(callback2).toHaveBeenCalled();
   });
@@ -97,13 +89,11 @@ describe('useDebounceCallback', () => {
     run();
 
     expect(callback).not.toHaveBeenCalled();
-
     jest.advanceTimersByTime(9);
 
     cancel();
 
     jest.advanceTimersByTime(20);
-
     expect(callback).not.toHaveBeenCalled();
   });
 });
