@@ -1,4 +1,6 @@
 begin
+    declare @releaseId uniqueidentifier = '4FA4FE8E-9A15-46BB-823F-49BF8E0CDEC5'
+
     declare @subjectId uniqueidentifier = '803FBF56-600F-490F-8409-6413A891720D'
 
     declare @filterItemList IdListGuidType
@@ -10,6 +12,7 @@ begin
     declare @result int
     exec
         @result = FilteredFootnotes
+                  @releaseId,
                   @subjectId,
                   @indicatorList,
                   @filterItemList

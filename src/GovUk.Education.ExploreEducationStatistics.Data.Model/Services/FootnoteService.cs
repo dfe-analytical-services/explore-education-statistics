@@ -36,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     "@releaseId," +
                     "@subjectId," +
                     "@indicatorList," +
-                    "@filterItemList",
+                    "@filterItemList", 
+                    releaseIdParam,
                     subjectIdParam,
                     indicatorListParam,
                     filterItemListParam)
