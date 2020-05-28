@@ -87,9 +87,12 @@ describe('Modal', () => {
       key: 'Esc',
     });
 
-    await waitFor(() => {
-      expect(onExit).toHaveBeenCalled();
-    });
+    await waitFor(
+      () => {
+        expect(onExit).toHaveBeenCalled();
+      },
+      { interval: 100 },
+    );
   });
 
   test('mouseDown on underlay of modal calls `onExit` handler', async () => {
