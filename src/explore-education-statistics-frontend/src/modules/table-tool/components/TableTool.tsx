@@ -57,17 +57,20 @@ const TableToolFinalStep = ({
   }, [publication]);
 
   const handlePermalinkClick = async () => {
-    if (!currentTableHeaders || !releaseId) {
+    if (!currentTableHeaders) {
       return;
     }
     setPermalinkLoading(true);
 
-    const { id } = await permalinkService.createPermalink(releaseId, {
-      query,
-      configuration: {
-        tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
+    const { id } = await permalinkService.createPermalink(
+      {
+        query,
+        configuration: {
+          tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
+        },
       },
-    });
+      releaseId,
+    );
 
     setPermalinkId(id);
     setPermalinkLoading(false);

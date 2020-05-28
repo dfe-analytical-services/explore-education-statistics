@@ -42,10 +42,13 @@ interface CreatePermalink {
 
 export default {
   createPermalink(
-    releaseId: string,
     query: CreatePermalink,
+    releaseId?: string,
   ): Promise<Permalink> {
-    return dataApi.post(`/release/${releaseId}/permalink`, query);
+    if (releaseId) {
+      return dataApi.post(`/release/${releaseId}/permalink`, query);
+    }
+    return dataApi.post(`/permalink`, query);
   },
   getPermalink(publicationSlug: string): Promise<Permalink> {
     return dataApi.get(`/permalink/${publicationSlug}`);
