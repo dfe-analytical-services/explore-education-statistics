@@ -6,7 +6,7 @@ import methodologyRoutes, {
   MethodologyRouteParams,
   navRoutes,
 } from '@admin/routes/edit-methodology/routes';
-import methodologyService from '@admin/services/methodology/methodologyService';
+import methodologyService from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import WarningMessage from '@common/components/WarningMessage';

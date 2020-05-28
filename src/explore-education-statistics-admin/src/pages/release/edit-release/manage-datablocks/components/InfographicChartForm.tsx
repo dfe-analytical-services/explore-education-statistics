@@ -1,7 +1,7 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import editReleaseDataService, {
+import releaseChartFileService, {
   ChartFile,
-} from '@admin/services/release/edit-release/data/editReleaseDataService';
+} from '@admin/services/releaseChartFileService';
 import Button from '@common/components/Button';
 import Form from '@common/components/form/Form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
@@ -54,7 +54,7 @@ const InfographicChartForm = ({
   const [deleteFile, toggleDeleteFile] = useToggle(false);
 
   const { value: files = [], retry: refreshFiles } = useAsyncRetry<ChartFile[]>(
-    () => editReleaseDataService.getChartFiles(releaseId),
+    () => releaseChartFileService.getChartFiles(releaseId),
     [releaseId],
   );
 
@@ -63,7 +63,7 @@ const InfographicChartForm = ({
       setUploading(true);
 
       try {
-        await editReleaseDataService.uploadChartFile(releaseId, {
+        await releaseChartFileService.uploadChartFile(releaseId, {
           name: values.name,
           file: values.file as File,
         });
@@ -119,7 +119,7 @@ const InfographicChartForm = ({
                   onExit={toggleDeleteFile.off}
                   onCancel={toggleDeleteFile.off}
                   onConfirm={async () => {
-                    await editReleaseDataService.deleteChartFile(
+                    await releaseChartFileService.deleteChartFile(
                       releaseId,
                       subjectName,
                       form.values.fileId,

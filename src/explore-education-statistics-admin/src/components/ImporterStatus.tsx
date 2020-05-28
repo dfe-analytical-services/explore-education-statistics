@@ -1,10 +1,9 @@
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
-import { DataFile } from '@admin/services/release/edit-release/data/editReleaseDataService';
-import importStatusService from '@admin/services/release/imports/service';
-import {
+import { DataFile } from '@admin/services/releaseDataFileService';
+import importStatusService, {
   ImportStatus,
   ImportStatusCode,
-} from '@admin/services/release/imports/types';
+} from '@admin/services/importService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryListItem from '@common/components/SummaryListItem';

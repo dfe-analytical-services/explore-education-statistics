@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
@@ -11,7 +11,7 @@ import React from 'react';
 const AdminPublicationReleaseHelpAndSupportSection = ({
   release,
 }: {
-  release: ManageContentPageViewModel['release'];
+  release: EditableRelease;
 }) => {
   const { isEditing } = useEditingContext();
   const { publication } = release;

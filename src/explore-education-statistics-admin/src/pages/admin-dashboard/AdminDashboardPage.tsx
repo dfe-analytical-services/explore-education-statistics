@@ -7,10 +7,11 @@ import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import { PrereleaseContactDetails } from '@admin/services/common/types';
-import dashboardService from '@admin/services/dashboard/service';
-import { AdminDashboardRelease } from '@admin/services/dashboard/types';
-import loginService from '@admin/services/sign-in/service';
+import loginService from '@admin/services/loginService';
+import preReleaseContactService, {
+  PrereleaseContactDetails,
+} from '@admin/services/preReleaseContactService';
+import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
@@ -28,12 +29,12 @@ const AdminDashboardPage = () => {
     retry: reloadDashboard,
   } = useAsyncRetry(async () => {
     const [draftReleases, scheduledReleases] = await Promise.all([
-      dashboardService.getDraftReleases(),
-      dashboardService.getScheduledReleases(),
+      releaseService.getDraftReleases(),
+      releaseService.getScheduledReleases(),
     ]);
 
     const contactResultsByRelease = scheduledReleases.map(release =>
-      dashboardService
+      preReleaseContactService
         .getPreReleaseContactsForRelease(release.id)
         .then(contacts => ({
           releaseId: release.id,
@@ -53,10 +54,7 @@ const AdminDashboardPage = () => {
     return [draftReleases, scheduledReleases];
   }, []);
 
-  const [draftReleases, scheduledReleases] = value as [
-    AdminDashboardRelease[],
-    AdminDashboardRelease[],
-  ];
+  const [draftReleases, scheduledReleases] = value as [Release[], Release[]];
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>

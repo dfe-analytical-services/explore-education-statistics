@@ -4,7 +4,7 @@ import BlockDroppable from '@admin/modules/find-statistics/components/BlockDropp
 import Comments, {
   CommentsChangeHandler,
 } from '@admin/modules/find-statistics/components/Comments';
-import { EditableBlock } from '@admin/services/publicationService';
+import { EditableBlock } from '@admin/services/types/content';
 import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';

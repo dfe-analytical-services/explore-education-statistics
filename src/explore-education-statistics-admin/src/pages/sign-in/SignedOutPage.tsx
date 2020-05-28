@@ -1,5 +1,5 @@
 import Page from '@admin/components/Page';
-import loginService from '@admin/services/sign-in/service';
+import loginService from '@admin/services/loginService';
 import React from 'react';
 
 const SignedOutPage = () => {

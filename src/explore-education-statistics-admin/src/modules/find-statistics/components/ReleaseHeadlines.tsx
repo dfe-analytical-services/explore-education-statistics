@@ -2,7 +2,7 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { EditableRelease } from '@admin/services/publicationService';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import TabsSection from '@common/components/TabsSection';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';

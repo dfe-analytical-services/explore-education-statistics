@@ -1,5 +1,5 @@
-import { MethodologyContent } from '@admin/services/methodology/types';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import { MethodologyContent } from '@admin/services/methodologyContentService';
+import { EditableContentBlock } from '@admin/services/types/content';
 import { ContentSection } from '@common/services/publicationService';
 
 export type ContentSectionKeys = keyof Pick<

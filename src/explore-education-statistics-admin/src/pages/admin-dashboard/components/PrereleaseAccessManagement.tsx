@@ -1,7 +1,8 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import { PrereleaseContactDetails } from '@admin/services/common/types';
-import dashboardService from '@admin/services/dashboard/service';
-import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import preReleaseContactService, {
+  PrereleaseContactDetails,
+} from '@admin/services/preReleaseContactService';
+import { Release } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Form from '@common/components/form/Form';
@@ -25,14 +26,14 @@ interface FormValues {
 }
 
 interface Props {
-  release: AdminDashboardRelease;
+  release: Release;
 }
 
 const PrereleaseAccessManagement = ({ release }: Props) => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    dashboardService
+    preReleaseContactService
       .getPreReleaseContactsForRelease(release.id)
       .then(preReleaseContactsForRelease =>
         setModel({
@@ -62,7 +63,7 @@ const PrereleaseAccessManagement = ({ release }: Props) => {
       inviting: true,
     });
 
-    await dashboardService
+    await preReleaseContactService
       .addPreReleaseContactToRelease(release.id, email)
       .then(updatedContacts => {
         resetForm();
@@ -135,7 +136,7 @@ const PrereleaseAccessManagement = ({ release }: Props) => {
                         removing: true,
                       });
 
-                      dashboardService
+                      preReleaseContactService
                         .removePreReleaseContactFromRelease(
                           release.id,
                           existingContact.email,

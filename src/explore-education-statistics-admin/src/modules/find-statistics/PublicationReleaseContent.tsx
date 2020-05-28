@@ -8,7 +8,7 @@ import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPa
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
+import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
@@ -124,7 +124,7 @@ const PublicationReleaseContent = () => {
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          editReleaseDataService.downloadFile(path)
+                          releaseDataFileService.downloadFile(path)
                         }
                         className="govuk-link"
                       >

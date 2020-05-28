@@ -2,13 +2,11 @@ import EditablePageModeToggle from '@admin/components/editable/EditablePageModeT
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
 import { ReleaseRouteParams } from '@admin/routes/edit-release/routes';
-import permissionService from '@admin/services/permissions/permissionService';
-import {
-  EditableBlock,
+import permissionService from '@admin/services/permissionService';
+import releaseContentService, {
   EditableRelease,
-  ExtendedComment,
-} from '@admin/services/publicationService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+} from '@admin/services/releaseContentService';
+import { EditableBlock, ExtendedComment } from '@admin/services/types/content';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';

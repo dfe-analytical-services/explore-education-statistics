@@ -1,8 +1,8 @@
 import EditableLink from '@admin/components/editable/EditableLink';
 import Link from '@admin/components/Link';
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import { relatedInformationService } from '@admin/services/release/edit-release/content/service';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import {
@@ -16,7 +16,7 @@ import { Formik } from 'formik';
 import React, { useState } from 'react';
 
 interface Props {
-  release: ManageContentPageViewModel['release'];
+  release: EditableRelease;
 }
 
 const RelatedInformationSection = ({ release }: Props) => {
@@ -27,15 +27,19 @@ const RelatedInformationSection = ({ release }: Props) => {
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
     return new Promise(resolve => {
-      relatedInformationService.create(release.id, link).then(newLinks => {
-        setLinks(newLinks);
-        resolve();
-      });
+      releaseContentRelatedInformationService
+        .create(release.id, link)
+        .then(newLinks => {
+          setLinks(newLinks);
+          resolve();
+        });
     });
   };
 
   const removeLink = (linkId: string) => {
-    relatedInformationService.delete(release.id, linkId).then(setLinks);
+    releaseContentRelatedInformationService
+      .delete(release.id, linkId)
+      .then(setLinks);
   };
 
   const renderLinkForm = () => {

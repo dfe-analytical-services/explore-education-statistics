@@ -1,9 +1,10 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
-import { MethodologyStatus } from '@admin/services/common/types';
-import methodologyService from '@admin/services/methodology/methodologyService';
-import permissionService from '@admin/services/permissions/permissionService';
+import methodologyService, {
+  MethodologyStatus,
+} from '@admin/services/methodologyService';
+import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';

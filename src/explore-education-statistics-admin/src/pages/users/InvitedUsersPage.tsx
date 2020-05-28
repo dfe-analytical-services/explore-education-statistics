@@ -1,7 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userService from '@admin/services/users/service';
-import { UserStatus } from '@admin/services/users/types';
+import userService, { UserStatus } from '@admin/services/userService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useCallback, useEffect, useState } from 'react';

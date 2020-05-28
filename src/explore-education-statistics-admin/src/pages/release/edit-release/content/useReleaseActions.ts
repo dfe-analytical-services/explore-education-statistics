@@ -1,9 +1,8 @@
 import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
-import {
+import releaseContentService, {
   ContentBlockAttachRequest,
-  ContentBlockPostModel,
-} from '@admin/services/release/edit-release/content/types';
+} from '@admin/services/releaseContentService';
+import { ContentBlockPostModel } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback } from 'react';
 import { useReleaseDispatch } from './ReleaseContext';

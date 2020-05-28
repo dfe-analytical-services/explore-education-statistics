@@ -1,6 +1,6 @@
 import Page from '@admin/components/Page';
 import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
-import methodologyService from '@admin/services/methodology/methodologyService';
+import methodologyService from '@admin/services/methodologyService';
 import { formatISO } from 'date-fns';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';

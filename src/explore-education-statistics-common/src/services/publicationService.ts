@@ -2,7 +2,7 @@ import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 import { DayMonthYear } from '@common/utils/date/dayMonthYear';
 import { contentApi } from './api';
 
-export type ReleaseStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
+export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 
 export interface Methodology {
   id: string;
@@ -108,7 +108,7 @@ export interface Release<
   latestRelease: boolean;
   publishScheduled?: string;
   nextReleaseDate: DayMonthYear;
-  status: ReleaseStatus;
+  status: ReleaseApprovalStatus;
   relatedInformation: BasicLink[];
   type: {
     id: string;

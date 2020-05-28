@@ -1,4 +1,4 @@
-import client from '@admin/services/util/service';
+import client from '@admin/services/utils/service';
 import produce from 'immer';
 
 export interface Config {

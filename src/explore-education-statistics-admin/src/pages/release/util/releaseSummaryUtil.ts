@@ -1,7 +1,9 @@
-import { AdminDashboardRelease } from '@admin/services/dashboard/types';
-import { ReleaseStatus } from '@common/services/publicationService';
+import { Release } from '@admin/services/releaseService';
+import { ReleaseApprovalStatus } from '@common/services/publicationService';
 
-export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
+export const getReleaseStatusLabel = (
+  approvalStatus: ReleaseApprovalStatus,
+) => {
   switch (approvalStatus) {
     case 'Draft':
       return 'Draft';
@@ -24,5 +26,5 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   return '(not Live)';
 };
 
-export const getReleaseSummaryLabel = (release: AdminDashboardRelease) =>
+export const getReleaseSummaryLabel = (release: Release) =>
   `${release.title} ${getLiveLatestLabel(release.live, release.latestRelease)}`;

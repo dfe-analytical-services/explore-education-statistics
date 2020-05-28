@@ -6,7 +6,7 @@ import TableTabSection from '@admin/pages/release/edit-release/manage-datablocks
 import dataBlocksService, {
   CreateReleaseDataBlock,
   ReleaseDataBlock,
-} from '@admin/services/release/edit-release/datablocks/service';
+} from '@admin/services/dataBlockService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
