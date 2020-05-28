@@ -12,8 +12,8 @@ interface TableQueryOptions {
 }
 
 export default function useTableQuery(
-  releaseId: string,
   query: TableDataQuery | undefined,
+  releaseId: string | undefined,
   options?: TableQueryOptions,
 ): AsyncRetryState<FullTable | undefined> {
   const optionsRef = useRef<TableQueryOptions | undefined>(options);
@@ -26,7 +26,7 @@ export default function useTableQuery(
     }
 
     try {
-      const response = await tableBuilderService.getTableData(releaseId, query);
+      const response = await tableBuilderService.getTableData(query, releaseId);
       const fullTable = mapFullTable(response);
 
       if (optionsRef.current?.onSuccess) {

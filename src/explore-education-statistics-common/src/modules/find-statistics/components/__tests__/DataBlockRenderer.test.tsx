@@ -66,7 +66,7 @@ describe('DataBlockRenderer', () => {
 
     const { container } = render(
       <DataBlockRenderer
-        releaseId=""
+        releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -77,10 +77,13 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith('', {
-      ...testDataBlock.dataBlockRequest,
-      includeGeoJson: false,
-    } as TableDataQuery);
+    expect(getDataBlockForSubject).toBeCalledWith(
+      {
+        ...testDataBlock.dataBlockRequest,
+        includeGeoJson: false,
+      } as TableDataQuery,
+      'test-release-id',
+    );
 
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),
@@ -96,7 +99,7 @@ describe('DataBlockRenderer', () => {
 
     const { container } = render(
       <DataBlockRenderer
-        releaseId=""
+        releaseId="test-release-id"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -112,10 +115,13 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith('', {
-      ...testDataBlock.dataBlockRequest,
-      includeGeoJson: false,
-    } as TableDataQuery);
+    expect(getDataBlockForSubject).toBeCalledWith(
+      {
+        ...testDataBlock.dataBlockRequest,
+        includeGeoJson: false,
+      } as TableDataQuery,
+      'test-release-id',
+    );
 
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),
@@ -126,14 +132,14 @@ describe('DataBlockRenderer', () => {
 
   test('renders vertical chart', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      (releaseId: string, _: DataBlockRequest) => {
+      (_: DataBlockRequest, releaseId?: string) => {
         return Promise.resolve(testChartTableData);
       },
     );
 
     const { container } = render(
       <DataBlockRenderer
-        releaseId=""
+        releaseId="test-release-id"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -149,10 +155,13 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith('', {
-      ...testDataBlock.dataBlockRequest,
-      includeGeoJson: false,
-    } as TableDataQuery);
+    expect(getDataBlockForSubject).toBeCalledWith(
+      {
+        ...testDataBlock.dataBlockRequest,
+        includeGeoJson: false,
+      } as TableDataQuery,
+      'test-release-id',
+    );
 
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),
@@ -163,7 +172,7 @@ describe('DataBlockRenderer', () => {
 
   test('renders table', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      (releaseId: string, _: DataBlockRequest) => {
+      (_: DataBlockRequest, releaseId?: string) => {
         return Promise.resolve(testChartTableData);
       },
     );
@@ -172,7 +181,7 @@ describe('DataBlockRenderer', () => {
 
     const { container } = render(
       <DataBlockRenderer
-        releaseId=""
+        releaseId="test-release-id"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -194,24 +203,27 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith('', {
-      ...testDataBlock.dataBlockRequest,
-      includeGeoJson: false,
-    } as TableDataQuery);
+    expect(getDataBlockForSubject).toBeCalledWith(
+      {
+        ...testDataBlock.dataBlockRequest,
+        includeGeoJson: false,
+      } as TableDataQuery,
+      'test-release-id',
+    );
 
     expect(container.querySelector('table')).toMatchSnapshot();
   });
 
   test('renders map', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      (releaseId: string, _: DataBlockRequest) => {
+      (_: DataBlockRequest, releaseId?: string) => {
         return Promise.resolve(testMapTableData);
       },
     );
 
     const { container } = render(
       <DataBlockRenderer
-        releaseId=""
+        releaseId="test-release-id"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -222,10 +234,13 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith('', {
-      ...testDataBlock.dataBlockRequest,
-      includeGeoJson: true,
-    } as TableDataQuery);
+    expect(getDataBlockForSubject).toBeCalledWith(
+      {
+        ...testDataBlock.dataBlockRequest,
+        includeGeoJson: true,
+      } as TableDataQuery,
+      'test-release-id',
+    );
 
     expect(container.querySelector('.leaflet-container')).toMatchSnapshot();
   });
@@ -237,7 +252,7 @@ describe('DataBlockRenderer', () => {
 
     const { container } = render(
       <DataBlockRenderer
-        releaseId=""
+        releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -248,10 +263,13 @@ describe('DataBlockRenderer', () => {
 
     await wait();
 
-    expect(getDataBlockForSubject).toBeCalledWith('', {
-      ...testDataBlock.dataBlockRequest,
-      includeGeoJson: false,
-    } as TableDataQuery);
+    expect(getDataBlockForSubject).toBeCalledWith(
+      {
+        ...testDataBlock.dataBlockRequest,
+        includeGeoJson: false,
+      } as TableDataQuery,
+      'test-release-id',
+    );
 
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),

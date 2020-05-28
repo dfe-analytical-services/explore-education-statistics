@@ -26,13 +26,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ISubjectService _subjectService;
         private readonly IUserService _userService;
-
+        private readonly IReleaseService _releaseService;
+        
         public TableBuilderService(IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             IResultSubjectMetaService resultSubjectMetaService,
             ISubjectService subjectService,
             IUserService userService,
-            IResultBuilder<Observation, ObservationViewModel> resultBuilder)
+            IResultBuilder<Observation, ObservationViewModel> resultBuilder,
+            IReleaseService releaseService)
         {
             _observationService = observationService;
             _resultBuilder = resultBuilder;
@@ -40,8 +42,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _persistenceHelper = persistenceHelper;
             _subjectService = subjectService;
             _userService = userService;
+            _releaseService = releaseService;
         }
 
+        public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
+        {
+            var publicationId = _subjectService.GetPublicationForSubjectAsync(queryContext.SubjectId).Result.Id;
+            var releaseId = _releaseService.GetLatestPublishedRelease(publicationId);
+            
+            return Query(releaseId.Value, queryContext);
+        }
+        
         public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(Guid releaseId, ObservationQueryContext queryContext)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)

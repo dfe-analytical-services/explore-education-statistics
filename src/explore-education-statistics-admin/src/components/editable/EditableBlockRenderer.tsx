@@ -6,7 +6,7 @@ import DataBlockRenderer from '@common/modules/find-statistics/components/DataBl
 import React, { useCallback, useMemo } from 'react';
 
 interface Props {
-  releaseId: string;
+  releaseId?: string;
   allowHeadings?: boolean;
   block: EditableBlock;
   editable?: boolean;

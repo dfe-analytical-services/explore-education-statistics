@@ -41,7 +41,7 @@ const PublicationReleaseHeadlinesSection = ({
 
               const block = keyStat as DataBlock;
 
-              return <KeyStatTile releaseUuid={id} key={block.id} {...block} />;
+              return <KeyStatTile releaseId={id} key={block.id} {...block} />;
             })}
           </div>
 

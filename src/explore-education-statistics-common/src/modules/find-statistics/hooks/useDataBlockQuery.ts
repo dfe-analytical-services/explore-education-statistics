@@ -9,8 +9,8 @@ interface DataBlockWithOptionalResponse extends DataBlock {
 }
 
 export default function useDataBlockQuery(
-  releaseId: string,
   dataBlock: DataBlockWithOptionalResponse | undefined,
+  releaseId?: string | undefined,
 ): AsyncRetryState<TableDataResponse | undefined> {
   return useAsyncRetry<TableDataResponse | undefined>(async () => {
     if (!dataBlock) {
@@ -20,7 +20,7 @@ export default function useDataBlockQuery(
     const { dataBlockRequest, dataBlockResponse } = dataBlock;
 
     if (!dataBlockResponse) {
-      return tableBuilderService.getTableData(releaseId, dataBlockRequest);
+      return tableBuilderService.getTableData(dataBlockRequest, releaseId);
     }
 
     return dataBlockResponse;

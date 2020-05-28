@@ -55,10 +55,13 @@ const EditableKeyStatTile = ({
   useEffect(() => {
     if (!dataBlockResponse) {
       tableBuilderService
-        .getTableData(releaseId, {
-          ...dataBlockRequest,
-          includeGeoJson: false,
-        })
+        .getTableData(
+          {
+            ...dataBlockRequest,
+            includeGeoJson: false,
+          },
+          releaseId,
+        )
         .then(newResponse => {
           if (newResponse) {
             setDataBlockResponse(newResponse);
@@ -91,6 +94,7 @@ const EditableKeyStatTile = ({
   if (!isEditing) {
     return (
       <KeyStatTile
+        releaseId={releaseId}
         dataBlockRequest={dataBlockRequest}
         id={id}
         name={name}
@@ -191,6 +195,7 @@ const EditableKeyStatTile = ({
         </div>
       ) : (
         <KeyStatTile
+          releaseId={releaseId}
           dataBlockRequest={dataBlockRequest}
           id={id}
           name={name}

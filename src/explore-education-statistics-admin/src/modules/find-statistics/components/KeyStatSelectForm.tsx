@@ -55,7 +55,7 @@ const KeyStatSelectForm = ({
           open
           onToggle={() => {}}
         >
-          <KeyStatTile releaseUuid={releaseId} {...selectedDataBlock} />
+          <KeyStatTile releaseId={releaseId} {...selectedDataBlock} />
         </Details>
       </section>
     ) : null;

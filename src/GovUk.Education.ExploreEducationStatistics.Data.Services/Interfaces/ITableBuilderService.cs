@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface ITableBuilderService
     {
+        Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext);
+
         Task<Either<ActionResult, TableBuilderResultViewModel>> Query(Guid releaseId, ObservationQueryContext queryContext);
     }
 }

@@ -37,7 +37,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         {release.keyStatisticsSection.content.map(stat => {
           return stat.type === 'DataBlock' ? (
             <EditableKeyStatTile
-              releaseUuid={release.id}
+              releaseId={release.id}
               key={stat.id}
               {...stat}
               isEditing={isEditing}
@@ -58,7 +58,6 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                   values,
                 })
               }
-              releaseId={release.id}
             />
           ) : null;
         })}

@@ -13,7 +13,7 @@ import { DataBlock } from '@common/services/types/blocks';
 import React, { MouseEvent, ReactNode } from 'react';
 
 export interface DataBlockRendererProps {
-  releaseId: string;
+  releaseId?: string;
   additionalTabContent?: ReactNode;
   dataBlock?: DataBlock;
   firstTabs?: ReactNode;
@@ -38,13 +38,13 @@ const DataBlockRenderer = ({
   onToggle,
 }: DataBlockRendererProps) => {
   const { value: fullTable, isLoading } = useTableQuery(
-    releaseId,
     dataBlock
       ? {
           ...dataBlock.dataBlockRequest,
           includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
         }
       : undefined,
+    releaseId || undefined,
   );
 
   return (
