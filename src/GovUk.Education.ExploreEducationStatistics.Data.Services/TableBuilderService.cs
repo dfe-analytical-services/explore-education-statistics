@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services

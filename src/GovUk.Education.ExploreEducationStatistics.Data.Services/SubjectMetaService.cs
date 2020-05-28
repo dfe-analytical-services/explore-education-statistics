@@ -63,56 +63,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
+                .OnSuccess(GetSubjectMetaViewModel);
+        }
+        
+        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(Guid subjectId)
+        {
+            return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(subject => new SubjectMetaViewModel
-                {
-                    Filters = GetFilters(subject.Id),
-                    Indicators = GetIndicators(subject.Id),
-                    Locations = GetObservationalUnits(subject.Id),
-                    TimePeriod = GetTimePeriods(subject.Id)
-                });
+                .OnSuccess(GetSubjectMetaViewModel);
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
             SubjectMetaQueryContext query)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
+                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(subject, query));
+        }
+        
+        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
+            SubjectMetaQueryContext query)
+        {
+            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(subject =>
-                {
-                    var observations = _observationService.FindObservations(query).AsQueryable();
+                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(subject, query));
+        }
+        
+        private SubjectMetaViewModel GetSubjectMetaViewModel(Subject subject)
+        {
+            return new SubjectMetaViewModel
+            {
+                Filters = GetFilters(subject.Id),
+                Indicators = GetIndicators(subject.Id),
+                Locations = GetObservationalUnits(subject.Id),
+                TimePeriod = GetTimePeriods(subject.Id)
+            };
+        }
 
-                    var stopwatch = Stopwatch.StartNew();
-                    stopwatch.Start();
+        private SubjectMetaViewModel GetSubjectMetaViewModelFromQuery(Subject subject, SubjectMetaQueryContext query)
+        {
+            var observations = _observationService.FindObservations(query).AsQueryable();
 
-                    var filters = GetFilters(observations);
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
 
-                    _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    stopwatch.Restart();
+            var filters = GetFilters(observations);
 
-                    var indicators = GetIndicators(subject.Id);
+            _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
 
-                    _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    stopwatch.Restart();
+            var indicators = GetIndicators(subject.Id);
 
-                    var locations = GetObservationalUnits(observations);
+            _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
 
-                    _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    stopwatch.Restart();
+            var locations = GetObservationalUnits(observations);
 
-                    var timePeriods = GetTimePeriods(observations);
+            _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
 
-                    _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    stopwatch.Stop();
+            var timePeriods = GetTimePeriods(observations);
 
-                    return new SubjectMetaViewModel
-                    {
-                        Filters = filters,
-                        Indicators = indicators,
-                        Locations = locations,
-                        TimePeriod = timePeriods
-                    };
-                });
+            _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Stop();
+
+            return new SubjectMetaViewModel
+            {
+                Filters = filters,
+                Indicators = indicators,
+                Locations = locations,
+                TimePeriod = timePeriods
+            };
         }
 
         private Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId)
