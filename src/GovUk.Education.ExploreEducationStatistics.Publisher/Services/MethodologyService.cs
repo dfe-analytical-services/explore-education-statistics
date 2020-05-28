@@ -6,9 +6,9 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.CronScheduleUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -24,18 +24,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
-        public async Task<MethodologyViewModel> GetViewModelAsync(Guid id)
+        public async Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context)
         {
             var methodology = await _context.Methodologies
                 .SingleOrDefaultAsync(m => m.Id == id);
 
             var methodologyViewModel =  _mapper.Map<MethodologyViewModel>(methodology);
-            
-            if (!methodologyViewModel.Published.HasValue)
-            {
-                // Methodology isn't live yet. Set the published date based on what we expect it to be
-                methodologyViewModel.Published = GetNextScheduledPublishingTime();
-            }
+
+            // If the methodology isn't live yet set the published date based on what we expect it to be
+            methodologyViewModel.Published ??= context.Published;
             
             return methodologyViewModel;
         }

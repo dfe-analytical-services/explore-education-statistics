@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task PublishStagedReleaseContentAsync(Guid releaseId)
         {
             await _fileStorageService.MoveStagedContentAsync();
-            await _releaseService.SetPublishedDatesAsync(releaseId);
+            await _releaseService.SetPublishedDatesAsync(releaseId, DateTime.UtcNow);
         }
 
         public async Task PublishReleaseFilesAsync(Guid releaseId)
