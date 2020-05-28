@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -44,10 +45,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var releaseStatusId = await GetReleaseStatusId(message);
             await UpdateStage(message.ReleaseId, releaseStatusId, Stage.Started);
+            
+            var context = new PublishContext(DateTime.UtcNow, false);
+            
             try
             {
-                await _contentService.UpdateContentAsync(new[] {message.ReleaseId}, false);
-                await _releaseService.SetPublishedDatesAsync(message.ReleaseId);
+                await _contentService.UpdateContentAsync(new[] {message.ReleaseId}, context);
+                await _releaseService.SetPublishedDatesAsync(message.ReleaseId, context.Published);
                 await _notificationsService.NotifySubscribersAsync(new[] {message.ReleaseId});
                 await UpdateStage(message.ReleaseId, releaseStatusId, Stage.Complete);
             }

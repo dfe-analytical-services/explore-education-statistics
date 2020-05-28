@@ -75,7 +75,7 @@ const FormFieldDateInput = <FormValues extends {}>({
       const year = key === 'year' ? inputValue : values.year;
 
       if (type === 'date') {
-        const date = parse(`${year}-${month}-${day}`, 'yyyy-M-d', new Date());
+        const date = parse(`${year}-${month}-${day}Z`, 'yyyy-M-dX', new Date());
 
         helpers.setValue(isValid(date) ? date : undefined);
       } else {

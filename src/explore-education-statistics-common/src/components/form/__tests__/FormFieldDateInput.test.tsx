@@ -107,7 +107,7 @@ describe('FormFieldDateInput', () => {
     );
   });
 
-  test('sets a valid date as a form value', () => {
+  test('sets a valid UTC date as a form value', () => {
     const onChange = jest.fn();
 
     render(
