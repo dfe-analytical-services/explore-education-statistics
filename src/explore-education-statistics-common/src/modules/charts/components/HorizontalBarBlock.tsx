@@ -1,9 +1,9 @@
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
+import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import {
   AxisConfiguration,
   ChartDefinition,
-  RenderLegend,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
@@ -46,8 +46,9 @@ const HorizontalBarBlock = ({
   stacked = false,
   axes,
   legend,
-  renderLegend,
-}: HorizontalBarProps & RenderLegend) => {
+}: HorizontalBarProps) => {
+  const [legendProps, renderLegend] = useLegend();
+
   if (
     axes === undefined ||
     axes.major === undefined ||
@@ -74,6 +75,8 @@ const HorizontalBarBlock = ({
   return (
     <ChartContainer
       height={height || 300}
+      legend={legendProps}
+      legendPosition={legend}
       yAxisWidth={yAxisWidth}
       yAxisLabel={axes.major.label}
       xAxisHeight={xAxisHeight}

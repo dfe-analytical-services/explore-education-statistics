@@ -36,7 +36,6 @@ export const testMapConfiguration: Chart = {
       visible: true,
       unit: '',
       showGrid: true,
-      labelPosition: 'axis',
       min: 0,
       size: 50,
       tickConfig: 'default',

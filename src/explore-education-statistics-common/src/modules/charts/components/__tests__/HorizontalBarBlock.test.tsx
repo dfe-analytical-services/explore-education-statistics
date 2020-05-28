@@ -10,7 +10,7 @@ import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarB
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
@@ -26,40 +26,44 @@ describe('HorizontalBarBlock', () => {
 
   const { axes } = props;
 
-  test('renders basic chart correctly', () => {
+  test('renders basic chart correctly', async () => {
     const { container } = render(<HorizontalBarBlock {...props} />);
 
-    // axes
-    expect(
-      container.querySelector('.recharts-cartesian-axis.xAxis'),
-    ).toBeInTheDocument();
-    expect(
-      container.querySelector('.recharts-cartesian-axis.yAxis'),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      // axes
+      expect(
+        container.querySelector('.recharts-cartesian-axis.xAxis'),
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('.recharts-cartesian-axis.yAxis'),
+      ).toBeInTheDocument();
 
-    // grid & grid lines
-    expect(
-      container.querySelector('.recharts-cartesian-grid'),
-    ).toBeInTheDocument();
-    expect(
-      container.querySelector('.recharts-cartesian-grid-horizontal'),
-    ).toBeInTheDocument();
-    expect(
-      container.querySelector('.recharts-cartesian-grid-vertical'),
-    ).toBeInTheDocument();
+      // grid & grid lines
+      expect(
+        container.querySelector('.recharts-cartesian-grid'),
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('.recharts-cartesian-grid-horizontal'),
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('.recharts-cartesian-grid-vertical'),
+      ).toBeInTheDocument();
 
-    // Legend
-    expect(
-      container.querySelector('.recharts-default-legend'),
-    ).toBeInTheDocument();
+      // Legend
+      expect(
+        container.querySelector('.recharts-default-legend'),
+      ).toBeInTheDocument();
 
-    const legendItems = container.querySelectorAll('.recharts-legend-item');
+      const legendItems = container.querySelectorAll('.recharts-legend-item');
 
-    expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
-    expect(legendItems[1]).toHaveTextContent('Authorised absence rate');
-    expect(legendItems[2]).toHaveTextContent('Overall absence rate');
+      expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
+      expect(legendItems[1]).toHaveTextContent('Authorised absence rate');
+      expect(legendItems[2]).toHaveTextContent('Overall absence rate');
 
-    expect(container.querySelectorAll('.recharts-rectangle')).toHaveLength(15);
+      expect(container.querySelectorAll('.recharts-rectangle')).toHaveLength(
+        15,
+      );
+    });
   });
 
   test('major axis can be hidden', () => {

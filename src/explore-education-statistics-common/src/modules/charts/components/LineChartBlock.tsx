@@ -1,11 +1,11 @@
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
+import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import {
   AxisConfiguration,
   ChartDefinition,
   ChartProps,
   ChartSymbol,
-  RenderLegend,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories, {
@@ -77,8 +77,9 @@ const LineChartBlock = ({
   axes,
   legend,
   width,
-  renderLegend,
-}: LineChartProps & RenderLegend) => {
+}: LineChartProps) => {
+  const [legendProps, renderLegend] = useLegend();
+
   if (
     axes === undefined ||
     axes.major === undefined ||
@@ -105,6 +106,8 @@ const LineChartBlock = ({
   return (
     <ChartContainer
       height={height || 300}
+      legend={legendProps}
+      legendPosition={legend}
       yAxisWidth={yAxisWidth}
       yAxisLabel={axes.minor.label}
       xAxisHeight={xAxisHeight}
