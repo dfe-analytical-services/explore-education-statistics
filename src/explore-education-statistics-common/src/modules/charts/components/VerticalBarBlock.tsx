@@ -224,6 +224,9 @@ export const verticalBarBlockDefinition: ChartDefinition = {
         tickConfig: 'default',
         tickSpacing: 1,
         unit: '',
+        label: {
+          width: 100,
+        },
       },
     },
   },

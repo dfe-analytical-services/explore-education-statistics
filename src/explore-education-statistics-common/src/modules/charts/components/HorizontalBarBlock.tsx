@@ -226,6 +226,9 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
         tickConfig: 'default',
         tickSpacing: 1,
         unit: '',
+        label: {
+          width: 100,
+        },
       },
     },
   },

@@ -1077,6 +1077,7 @@ describe('chartBuilderReducer', () => {
             label: {
               text: 'Test minor axis label',
               rotated: true,
+              width: 100,
             },
           },
         },
@@ -1185,6 +1186,7 @@ describe('chartBuilderReducer', () => {
             unit: '',
             label: {
               text: '',
+              width: 100,
             },
           },
         },
@@ -1259,6 +1261,7 @@ describe('chartBuilderReducer', () => {
         unit: '',
         label: {
           text: '',
+          width: 100,
         },
       });
     });
