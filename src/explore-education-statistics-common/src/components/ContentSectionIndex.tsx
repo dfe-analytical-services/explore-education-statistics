@@ -24,7 +24,7 @@ type ViewportPosition = 'before' | 'within' | 'after';
 const ContentSectionIndex = ({
   contentRef,
   id,
-  selector = 'h2, h3, h4',
+  selector = 'h2, h3, h4, h5',
   sticky,
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
