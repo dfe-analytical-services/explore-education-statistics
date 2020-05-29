@@ -7,29 +7,30 @@ interface Props {
 }
 
 function MethodologyList({ publications }: Props) {
+  const filteredPublications = publications.filter(
+    publication => !!publication.methodology,
+  );
+
+  if (!filteredPublications.length) {
+    return null;
+  }
+
   return (
-    <ul className="govuk-list govuk-list--bullet">
-      {publications.map(publication => {
-        return (
-          <>
-            {publication.methodology && (
-              <li className="govuk-!-margin-bottom-2" key={publication.id}>
-                <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                  {publication.title}
-                </h3>
-                <div>
-                  <Link
-                    to="/methodology/[methodology]"
-                    as={`/methodology/${publication.methodology.slug}`}
-                  >
-                    View methodology
-                  </Link>
-                </div>
-              </li>
-            )}
-          </>
-        );
-      })}
+    <ul>
+      {filteredPublications.map(publication => (
+        <li className="govuk-!-margin-bottom-2" key={publication.id}>
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+            {publication.title}
+          </h3>
+
+          <Link
+            to="/methodology/[methodology]"
+            as={`/methodology/${publication.methodology?.slug}`}
+          >
+            View methodology
+          </Link>
+        </li>
+      ))}
     </ul>
   );
 }
