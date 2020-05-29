@@ -2,13 +2,12 @@ import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
-import { IdTitlePair } from '@admin/services/common/types';
-import dashboardService from '@admin/services/dashboard/service';
-import {
+import { IdTitlePair } from '@admin/services/types/common';
+import dashboardService, {
   AdminDashboardPublication,
-  AdminDashboardRelease,
-} from '@admin/services/dashboard/types';
-import permissionService from '@admin/services/permissions/permissionService';
+} from '@admin/services/dashboardService';
+import permissionService from '@admin/services/permissionService';
+import { Release } from '@admin/services/releaseService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormSelect from '@common/components/form/FormSelect';
@@ -36,7 +35,7 @@ const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
 
 interface Props {
   onChangePublication: () => void;
-  nonLiveReleases: AdminDashboardRelease[];
+  nonLiveReleases: Release[];
 }
 
 const ManagePublicationsAndReleasesTab = ({

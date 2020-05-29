@@ -1,8 +1,7 @@
-import { useAuthContext } from '@admin/contexts/AuthContext';
+import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import { ExtendedComment } from '@admin/services/publicationService';
-import { releaseContentService as service } from '@admin/services/release/edit-release/content/service';
-import { User } from '@admin/services/sign-in/types';
+import releaseContentCommentService from '@admin/services/releaseContentCommentService';
+import { ExtendedComment } from '@admin/services/types/content';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import classNames from 'classnames';
@@ -50,7 +49,7 @@ const Comments = ({
     };
 
     if (releaseId && sectionId) {
-      service
+      releaseContentCommentService
         .addContentSectionComment(
           releaseId,
           sectionId,
@@ -74,7 +73,7 @@ const Comments = ({
     const commentId = comments[index].id;
 
     if (releaseId && sectionId) {
-      service
+      releaseContentCommentService
         .deleteContentSectionComment(releaseId, sectionId, blockId, commentId)
         .then(() => {
           const newComments = [...comments];
@@ -93,7 +92,7 @@ const Comments = ({
     resolvedComment.resolvedBy = context.user && context.user.name;
 
     if (releaseId && sectionId) {
-      service
+      releaseContentCommentService
         .updateContentSectionComment(
           releaseId,
           sectionId,
@@ -113,7 +112,7 @@ const Comments = ({
     const editedComment = { ...comments[index] };
     editedComment.commentText = newContent;
     if (releaseId && sectionId) {
-      service
+      releaseContentCommentService
         .updateContentSectionComment(
           releaseId,
           sectionId,

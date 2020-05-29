@@ -1,8 +1,9 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import { summaryRoute } from '@admin/routes/edit-methodology/routes';
-import methodologyService from '@admin/services/methodology/methodologyService';
-import { MethodologyStatusListItem } from '@admin/services/methodology/types';
+import methodologyService, {
+  MethodologyStatusListItem,
+} from '@admin/services/methodologyService';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -64,7 +65,7 @@ const MethodologiesPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    methodologyService.getMethodologies().then(methodologies => {
+    methodologyService.getBauMethodologies().then(methodologies => {
       const liveMethodologies: MethodologyStatusListItem[] = methodologies.filter(
         methodology => {
           return methodology.status === 'Live';

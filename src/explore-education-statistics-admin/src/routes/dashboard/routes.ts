@@ -1,3 +1,4 @@
+import { User } from '@admin/contexts/AuthContext';
 import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage';
 import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
@@ -28,7 +29,6 @@ import InvitedUsersPage from '@admin/pages/users/InvitedUsersPage';
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import ManageUserPage from '@admin/pages/users/ManageUserPage';
 import PreReleaseUsersPage from '@admin/pages/users/PreReleaseUsersPage';
-import { User } from '@admin/services/sign-in/types';
 import { Dictionary } from '@admin/types';
 import { generatePath, RouteProps } from 'react-router';
 

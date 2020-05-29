@@ -1,7 +1,6 @@
 import Link from '@admin/components/Link';
-import { useAuthContext } from '@admin/contexts/AuthContext';
-import loginService from '@admin/services/sign-in/service';
-import { Authentication } from '@admin/services/sign-in/types';
+import { Authentication, useAuthContext } from '@admin/contexts/AuthContext';
+import loginService from '@admin/services/loginService';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import React from 'react';

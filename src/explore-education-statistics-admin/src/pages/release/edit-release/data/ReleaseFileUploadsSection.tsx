@@ -1,8 +1,8 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import permissionService from '@admin/services/permissions/permissionService';
-import editReleaseDataService, {
+import permissionService from '@admin/services/permissionService';
+import releaseAncillaryFileService, {
   AncillaryFile,
-} from '@admin/services/release/edit-release/data/editReleaseDataService';
+} from '@admin/services/releaseAncillaryFileService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
@@ -64,7 +64,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   useEffect(() => {
     Promise.all([
-      editReleaseDataService.getAncillaryFiles(releaseId),
+      releaseAncillaryFileService.getAncillaryFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
     ]).then(([filesResult, canUpdateReleaseResult]) => {
       setFiles(filesResult);
@@ -81,7 +81,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
         fileInput.value = '';
       });
 
-    const latestFiles = await editReleaseDataService.getAncillaryFiles(
+    const latestFiles = await releaseAncillaryFileService.getAncillaryFiles(
       releaseId,
     );
     setFiles(latestFiles);
@@ -89,7 +89,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
     setIsUploading(true);
-    await editReleaseDataService
+    await releaseAncillaryFileService
       .uploadAncillaryFile(releaseId, {
         name: values.name,
         file: values.file as File,
@@ -122,7 +122,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   ) => {
     setDeleting(ancillaryFileToDelete, true);
     setDeleteFileName('');
-    await editReleaseDataService
+    await releaseAncillaryFileService
       .deleteAncillaryFile(releaseId, deleteFileName)
       .then(() => {
         setDeleting(ancillaryFileToDelete, false);
@@ -225,7 +225,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="File">
                             <ButtonText
                               onClick={() =>
-                                editReleaseDataService.downloadAncillaryFile(
+                                releaseAncillaryFileService.downloadAncillaryFile(
                                   releaseId,
                                   file.filename,
                                 )

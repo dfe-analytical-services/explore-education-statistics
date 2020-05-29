@@ -1,7 +1,9 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import { BasicMethodology } from '@admin/services/common/types';
-import { ExternalMethodology } from '@admin/services/dashboard/types';
-import service from '@admin/services/edit-publication/service';
+import { ExternalMethodology } from '@admin/services/dashboardService';
+import methodologyService, {
+  BasicMethodology,
+} from '@admin/services/methodologyService';
+import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import {
   FormFieldRadioGroup,
@@ -62,7 +64,7 @@ const AssignMethodologyForm = ({
 
   useEffect(() => {
     setFormOpen(false);
-    service.getMethodologies().then(setMethodologies);
+    methodologyService.getMethodologies().then(setMethodologies);
   }, [currentMethodology, currentExternalMethodology]);
 
   const handleSubmit = useFormSubmit<AssignMethodologyFormValues>(
@@ -77,7 +79,7 @@ const AssignMethodologyForm = ({
             ? values.selectedMethodologyId
             : undefined,
       };
-      await service.updatePublicationMethodology({
+      await publicationService.updatePublicationMethodology({
         publicationId,
         ...newMethodology,
       });

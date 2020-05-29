@@ -1,5 +1,5 @@
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import service from '@admin/services/edit-publication/service';
+import contactService from '@admin/services/contactService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -41,7 +41,7 @@ const MethodologySummaryForm = ({
   onSubmit,
 }: Props) => {
   const { value: contacts = [] } = useAsyncHandledRetry(
-    service.getPublicationAndReleaseContacts,
+    contactService.getContacts,
     [],
   );
 

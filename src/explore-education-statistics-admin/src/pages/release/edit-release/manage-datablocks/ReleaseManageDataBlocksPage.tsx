@@ -1,9 +1,9 @@
 import ReleaseManageDataBlocksPageTabs from '@admin/pages/release/edit-release/manage-datablocks/components/ReleaseManageDataBlocksPageTabs';
 import { manageDataBlocksRoute } from '@admin/routes/edit-release/routes';
 import dataBlocksService, {
+  DeleteDataBlockPlan,
   ReleaseDataBlock,
-} from '@admin/services/release/edit-release/datablocks/service';
-import { DeleteDataBlockPlan } from '@admin/services/release/edit-release/datablocks/types';
+} from '@admin/services/dataBlockService';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';

@@ -1,4 +1,4 @@
-import { MethodologyContent } from '@admin/services/methodology/types';
+import { MethodologyContent } from '@admin/services/methodologyContentService';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';

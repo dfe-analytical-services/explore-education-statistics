@@ -1,12 +1,11 @@
 import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
 import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
-import { AdminDashboardRelease } from '@admin/services/dashboard/types';
-import service from '@admin/services/release/create-release/service';
+import releaseService, { Release } from '@admin/services/releaseService';
 import React, { useState } from 'react';
 
 interface Props {
-  releases: AdminDashboardRelease[];
+  releases: Release[];
   onChangeRelease: () => void;
 }
 
@@ -32,7 +31,7 @@ const DraftReleasesTab = ({ releases, onChangeRelease }: Props) => {
       {cancelAmendmentReleaseId && (
         <CancelAmendmentModal
           onConfirm={async () => {
-            await service.deleteRelease(cancelAmendmentReleaseId);
+            await releaseService.deleteRelease(cancelAmendmentReleaseId);
             setCancelAmendmentReleaseId(undefined);
             onChangeRelease();
           }}

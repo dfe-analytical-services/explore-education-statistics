@@ -1,12 +1,11 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import userService from '@admin/services/users/service';
-import {
+import userService, {
   User,
   UserReleaseRoleSubmission,
   UserUpdate,
-} from '@admin/services/users/types';
+} from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldSelect, FormFieldset } from '@common/components/form';

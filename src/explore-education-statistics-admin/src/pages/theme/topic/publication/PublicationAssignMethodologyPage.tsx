@@ -1,6 +1,7 @@
 import Page from '@admin/components/Page';
-import service from '@admin/services/common/service.ts';
-import { BasicPublicationDetails } from '@admin/services/common/types';
+import publicationService, {
+  BasicPublicationDetails,
+} from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -16,8 +17,8 @@ const PublicationAssignMethodologyPage = ({
   const [publication, setPublication] = useState<BasicPublicationDetails>();
 
   const getPublication = () => {
-    service
-      .getBasicPublicationDetails(match.params.publicationId)
+    publicationService
+      .getPublication(match.params.publicationId)
       .then(setPublication);
   };
   useEffect(getPublication, [match.params.publicationId]);

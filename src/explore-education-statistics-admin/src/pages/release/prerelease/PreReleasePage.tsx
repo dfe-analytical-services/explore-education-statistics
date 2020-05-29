@@ -5,12 +5,13 @@ import PublicationReleaseContent from '@admin/modules/find-statistics/Publicatio
 import { ReleaseProvider } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import permissionService, {
   PreReleaseWindowStatus,
-} from '@admin/services/permissions/permissionService';
-import { releaseContentService } from '@admin/services/release/edit-release/content/service';
+} from '@admin/services/permissionService';
 import preReleaseService, {
   PreReleaseSummary,
-} from '@admin/services/pre-release/preReleaseService';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+} from '@admin/services/preReleaseService';
+import releaseContentService, {
+  ReleaseContent,
+} from '@admin/services/releaseContentService';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { format } from 'date-fns';
@@ -19,7 +20,7 @@ import { RouteComponentProps } from 'react-router';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
-  content?: ManageContentPageViewModel;
+  content?: ReleaseContent;
   preReleaseSummary?: PreReleaseSummary;
 }
 

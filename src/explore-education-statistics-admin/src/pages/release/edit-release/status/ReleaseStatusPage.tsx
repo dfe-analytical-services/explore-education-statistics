@@ -2,15 +2,15 @@ import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/permissionService';
-import service from '@admin/services/release/edit-release/status/service';
+import permissionService from '@admin/services/permissionService';
+import releaseService from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
-import { ReleaseStatus } from '@common/services/publicationService';
+import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
@@ -29,12 +29,12 @@ const errorCodeMappings = [
 ];
 
 interface FormValues {
-  releaseStatus: ReleaseStatus;
+  releaseStatus: ReleaseApprovalStatus;
   internalReleaseNote: string;
 }
 
 interface Model {
-  releaseStatus: ReleaseStatus;
+  releaseStatus: ReleaseApprovalStatus;
   statusOptions: RadioOption[];
   editable: boolean;
 }
@@ -55,11 +55,11 @@ const ReleaseStatusPage = () => {
 
   useEffect(() => {
     Promise.all([
-      service.getReleaseStatus(releaseId),
+      releaseService.getReleaseSummary(releaseId),
       permissionService.canMarkReleaseAsDraft(releaseId),
       permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
       permissionService.canApproveRelease(releaseId),
-    ]).then(([releaseStatus, canMarkAsDraft, canSubmit, canApprove]) => {
+    ]).then(([releaseSummary, canMarkAsDraft, canSubmit, canApprove]) => {
       const statusOptions: RadioOption[] = [
         {
           label: 'In draft',
@@ -79,7 +79,7 @@ const ReleaseStatusPage = () => {
       ];
 
       setModel({
-        releaseStatus,
+        releaseStatus: releaseSummary.status,
         statusOptions,
         editable: statusOptions.some(option => !option.disabled),
       });
@@ -87,7 +87,7 @@ const ReleaseStatusPage = () => {
   }, [releaseId, showForm]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
-    await service.updateReleaseStatus(releaseId, values);
+    await releaseService.updateReleaseStatus(releaseId, values);
 
     if (model) {
       setModel({

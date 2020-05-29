@@ -1,6 +1,6 @@
 import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
 import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
-import methodologyService from '@admin/services/methodology/methodologyService';
+import methodologyService from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { formatISO } from 'date-fns';

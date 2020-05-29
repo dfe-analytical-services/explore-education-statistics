@@ -1,6 +1,6 @@
 import EditableKeyStatTile from '@admin/components/editable/EditableKeyStatTile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';

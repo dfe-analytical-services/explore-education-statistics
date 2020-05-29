@@ -1,6 +1,7 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
-import permissionService from '@admin/services/permissions/permissionService';
-import { Authentication, User } from '@admin/services/sign-in/types';
+import permissionService, {
+  GlobalPermissions,
+} from '@admin/services/permissionService';
 import React, {
   createContext,
   ReactNode,
@@ -10,6 +11,17 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+
+export interface User {
+  id: string;
+  name: string;
+  permissions: GlobalPermissions;
+  validToken?: boolean;
+}
+
+export interface Authentication {
+  user?: User;
+}
 
 const AuthContext = createContext<Authentication>({
   user: undefined,
