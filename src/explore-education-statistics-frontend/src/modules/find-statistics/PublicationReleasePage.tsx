@@ -200,7 +200,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                           ({ id, slug, title }) => (
                             <li key={id} data-testid="other-release-item">
                               <Link
-                                to="/find-statistics/[publication]"
+                                to="/find-statistics/[publication]/[release]"
                                 as={`/find-statistics/${data.publication.slug}/${slug}`}
                               >
                                 {title}
