@@ -1,4 +1,4 @@
-import Accordion, { generateIdList } from '@common/components/Accordion';
+import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
@@ -13,8 +13,6 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import MethodologyContentSection from '@frontend/modules/methodologies/components/MethodologyContentSection';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-
-const accordionIds: string[] = generateIdList(2);
 
 interface Props {
   methodologySlug: string;
@@ -90,11 +88,11 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
       )}
 
       {data.content && (
-        <Accordion id={accordionIds[0]}>
+        <Accordion id="content">
           {data.content.map(({ heading, caption, order, content }) => {
             return (
               <AccordionSection
-                id={`${accordionIds[0]}-${order}`}
+                id={`content-section-${order}`}
                 heading={heading}
                 caption={caption}
                 key={order}
@@ -116,7 +114,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         <>
           <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
-          <Accordion id={accordionIds[1]}>
+          <Accordion id="annexes">
             {data.annexes.map(({ heading, caption, order, content }) => {
               return (
                 <AccordionSection

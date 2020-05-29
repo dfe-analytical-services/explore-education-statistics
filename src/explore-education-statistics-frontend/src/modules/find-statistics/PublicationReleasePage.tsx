@@ -1,4 +1,4 @@
-import Accordion, { generateIdList } from '@common/components/Accordion';
+import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
@@ -26,8 +26,6 @@ import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
-
-const accordionIds: string[] = generateIdList(2);
 
 interface Props {
   data: Release;
@@ -306,7 +304,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       <PublicationReleaseHeadlinesSection release={data} />
 
       {data.content.length > 0 && (
-        <Accordion id={accordionIds[0]}>
+        <Accordion id="content">
           {data.content.map(({ heading, caption, order, content }) => {
             return (
               <AccordionSection heading={heading} caption={caption} key={order}>
@@ -328,7 +326,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       )}
 
       <HelpAndSupport
-        accordionId={accordionIds[1]}
+        accordionId="help-and-support"
         publicationTitle={data.publication.title}
         methodologyUrl={methodologyUrl}
         methodologySummary={methodologySummary}

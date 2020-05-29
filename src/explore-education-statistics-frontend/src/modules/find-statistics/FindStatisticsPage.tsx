@@ -1,4 +1,4 @@
-import Accordion, { generateIdList } from '@common/components/Accordion';
+import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -10,8 +10,6 @@ import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import PublicationList from './components/PublicationList';
 import { Topic } from './components/TopicList';
-
-const accordionIds: string[] = generateIdList(1);
 
 interface Props {
   themes: {
@@ -61,7 +59,7 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
       </div>
 
       {themes.length > 0 ? (
-        <Accordion id={accordionIds[0]}>
+        <Accordion id="publications">
           {themes.map(
             ({
               id: themeId,
