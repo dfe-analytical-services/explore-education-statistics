@@ -1,3 +1,4 @@
+import { useMobileMedia } from '@common/hooks/useMedia';
 import useMounted from '@common/hooks/useMounted';
 import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
 import { Block } from '@common/services/types/blocks';
@@ -17,6 +18,8 @@ const MethodologyContentSection = ({
 }: MethodologySectionProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
+  const { isMedia: isMobileMedia } = useMobileMedia();
+
   const { isMounted } = useMounted();
 
   if (!isMounted) {
@@ -26,7 +29,12 @@ const MethodologyContentSection = ({
   return (
     <div className="govuk-grid-row">
       <div className="govuk-grid-column-one-quarter">
-        <ContentSectionIndex id={id} contentRef={contentRef} sticky={open} />
+        <ContentSectionIndex
+          id={id}
+          contentRef={contentRef}
+          sticky={open}
+          visible={!isMobileMedia}
+        />
       </div>
 
       <div className="govuk-grid-column-three-quarters" ref={contentRef}>

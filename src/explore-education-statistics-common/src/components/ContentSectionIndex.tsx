@@ -17,6 +17,7 @@ interface Props {
   id: string;
   selector?: string;
   sticky?: boolean;
+  visible?: boolean;
 }
 
 type ViewportPosition = 'before' | 'within' | 'after';
@@ -26,7 +27,9 @@ const ContentSectionIndex = ({
   id,
   selector = 'h2, h3, h4, h5',
   sticky,
+  visible = true,
 }: Props) => {
+  const outerRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   const [elements, setElements] = useState<HTMLElement[]>([]);
@@ -80,25 +83,37 @@ const ContentSectionIndex = ({
   }, 10);
 
   useEffect(() => {
-    if (sticky) {
+    if (sticky && visible) {
       handleScroll();
       window.addEventListener('scroll', handleScroll);
     }
 
     return () => {
-      if (sticky) {
-        window.removeEventListener('scroll', handleScroll);
-      }
+      window.removeEventListener('scroll', handleScroll);
     };
-  }, [sticky]);
+  }, [handleScroll, visible, sticky]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
-    if (ref.current && !initialBounds) {
+    const handleResize = () => {
       // Need to explicitly set heights/widths using the
-      // height/width calculated on the initial render.
-      setInitialBounds(ref.current?.getBoundingClientRect());
+      // height/width calculated by the outer-most div.
+      if (outerRef.current) {
+        setInitialBounds(outerRef.current.getBoundingClientRect());
+      }
+    };
+
+    if (!initialBounds) {
+      handleResize();
     }
+
+    if (visible) {
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   });
 
   const { height, width } = initialBounds ?? {};
@@ -131,38 +146,39 @@ const ContentSectionIndex = ({
     }
   };
 
-  if (!isMounted || !elements.length) {
+  if (!isMounted || !elements.length || !visible) {
     return null;
   }
 
   return (
-    <div
-      className="dfe-print-hidden"
-      style={{
-        position: 'relative',
-        height,
-        width,
-        ...getContainerStyle(),
-      }}
-    >
+    <div ref={outerRef} className="dfe-print-hidden">
       <div
-        ref={ref}
         style={{
+          position: 'relative',
           height,
           width,
-          ...getStyle(),
+          ...getContainerStyle(),
         }}
       >
-        <h3 className="govuk-heading-s">In this section</h3>
+        <div
+          ref={ref}
+          style={{
+            height,
+            width,
+            ...getStyle(),
+          }}
+        >
+          <h3 className="govuk-heading-s">In this section</h3>
 
-        <ul className="govuk-body-s">
-          {elements.map((element, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <li key={index}>
-              <a href={`#${element.id}`}>{element.textContent}</a>
-            </li>
-          ))}
-        </ul>
+          <ul className="govuk-body-s">
+            {elements.map((element, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <li key={index}>
+                <a href={`#${element.id}`}>{element.textContent}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
