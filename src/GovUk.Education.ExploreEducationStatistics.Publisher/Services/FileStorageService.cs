@@ -6,17 +6,23 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
+using Task = System.Threading.Tasks.Task;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -26,44 +32,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private readonly string _privateStorageConnectionString;
         private readonly string _publicStorageConnectionString;
+        private readonly ContentDbContext _contentDbContext;
 
         private const string PrivateFilesContainerName = "releases";
         private const string PublicFilesContainerName = "downloads";
         private const string PublicContentContainerName = "cache";
 
-        public FileStorageService(IConfiguration configuration, ILogger<FileStorageService> logger)
+        public FileStorageService(
+            IConfiguration configuration,
+            ContentDbContext contentDbContext,
+            ILogger<FileStorageService> logger)
         {
             _privateStorageConnectionString = configuration.GetValue<string>("CoreStorage");
             _publicStorageConnectionString = configuration.GetValue<string>("PublicStorage");
+            _contentDbContext = contentDbContext;
             _logger = logger;
         }
 
         public async Task CopyReleaseToPublicContainer(CopyReleaseCommand copyReleaseCommand)
         {
             var privateContainer =
-                await FileStorageUtils.GetCloudBlobContainerAsync(_privateStorageConnectionString,
+                await GetCloudBlobContainerAsync(_privateStorageConnectionString,
                     PrivateFilesContainerName);
             var publicContainer =
-                await FileStorageUtils.GetCloudBlobContainerAsync(_publicStorageConnectionString,
+                await GetCloudBlobContainerAsync(_publicStorageConnectionString,
                     PublicFilesContainerName);
 
-            var sourceDirectoryPath = AdminReleaseDirectoryPath(copyReleaseCommand.ReleaseId);
-            var destinationDirectoryPath =
-                PublicReleaseDirectoryPath(copyReleaseCommand.PublicationSlug, copyReleaseCommand.ReleaseSlug);
-
-            if (copyReleaseCommand.ReleaseSlug != copyReleaseCommand.PreviousReleaseSlug)
+            // Slug may have changed for the amendment so also remove the previous contents if it has
+            if (copyReleaseCommand.ReleaseSlug != copyReleaseCommand.PreviousVersionSlug)
             {
                 var previousDestinationDirectoryPath =
                     PublicReleaseDirectoryPath(copyReleaseCommand.PublicationSlug,
-                        copyReleaseCommand.PreviousReleaseSlug);
+                        copyReleaseCommand.PreviousVersionSlug);
                 await DeleteBlobsAsync(publicContainer, previousDestinationDirectoryPath);
             }
+            
+            var destinationDirectoryPath =
+                PublicReleaseDirectoryPath(copyReleaseCommand.PublicationSlug, copyReleaseCommand.ReleaseSlug);
 
             await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
 
-            await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
-                publicContainer, copyReleaseCommand,
-                (source, destination) => CopyFileUnlessBatchedOrMeta(source, copyReleaseCommand.ReleaseId));
+            var releaseFileReferences = GetAllFilesUploaded(copyReleaseCommand.ReleaseId, ReleaseFileTypes.Data, Ancillary, Chart)
+                .Select(rf => rf.ReleaseFileReference).ToList();
+            
+            var versions = releaseFileReferences.GroupBy(rfr => rfr.ReleaseId)
+                .Select(grp => grp.First())
+                .ToList();
+            
+            var allFilesTransferred = new List<CloudBlockBlob>();
+
+            foreach (var version in versions)
+            {
+                var files = await CopyDirectoryAsync(
+                    AdminReleaseDirectoryPath(version.ReleaseId), 
+                    destinationDirectoryPath, privateContainer,
+                    publicContainer, copyReleaseCommand,
+                    (source, destination) =>
+                        CopyFileUnlessBatchedOrMeta(
+                            source,
+                            version.ReleaseId,
+                            releaseFileReferences));
+                
+                allFilesTransferred.AddRange(files);
+            }
+
+            await ZipFiles(publicContainer, allFilesTransferred, destinationDirectoryPath, copyReleaseCommand);
         }
 
         public async Task DeleteAllContentAsyncExcludingStaging()
@@ -114,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 blobName, contentType, content);
         }
 
-        private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
+        private async Task<List<CloudBlockBlob>> CopyDirectoryAsync(string sourceDirectoryPath, string destinationDirectoryPath,
             CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer,
             CopyReleaseCommand copyReleaseCommand, ShouldTransferCallbackAsync shouldTransferCallbackAsync)
         {
@@ -138,6 +171,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory,
                 CopyMethod.ServiceSideAsyncCopy, options, context);
+
+            return allFilesTransferred;
+        }
+
+        private async Task ZipFiles(CloudBlobContainer destinationContainer, List<CloudBlockBlob> allFilesTransferred, string destinationDirectoryPath, CopyReleaseCommand copyReleaseCommand)
+        {
+            var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
 
             await ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, copyReleaseCommand);
         }
@@ -176,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private static async Task<bool> CopyFileUnlessBatchedOrMeta(object source, Guid releaseId)
+        private async Task<bool> CopyFileUnlessBatchedOrMeta(object source, Guid releaseId, List<ReleaseFileReference> releaseFileReferences)
         {
             var item = source as CloudBlockBlob;
             if (item == null)
@@ -185,9 +225,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             await item.FetchAttributesAsync();
-            return !(FileStorageUtils.IsBatchedDataFile(item, releaseId) || FileStorageUtils.IsMetaDataFile(item));
+
+            if (IsBatchedDataFile(item, releaseId) || IsMetaDataFile(item))
+            {
+                return false;
+            }
+
+            var name = Path.GetFileName(item.Name);
+            
+            if (!releaseFileReferences.Exists(rfr => rfr.ReleaseId == releaseId && rfr.Filename == name))
+            {
+                _logger.LogError($"No release file reference found for releaseId {releaseId} and name : {name}");
+                return false;
+            }
+
+            return true;
         }
 
+        private List<ReleaseFile> GetAllFilesUploaded(Guid releaseId, params ReleaseFileTypes[] types)
+        {
+            return _contentDbContext
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Where(f => f.ReleaseId == releaseId && types.Contains(f.ReleaseFileReference.ReleaseFileType))
+                .ToList();
+        }
+        
         private static async Task ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
             CopyReleaseCommand copyReleaseCommand)
         {

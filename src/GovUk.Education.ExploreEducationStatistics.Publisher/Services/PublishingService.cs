@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 PublicationSlug = release.Publication.Slug,
                 PublishScheduled = release.PublishScheduled.Value,
                 ReleaseSlug = release.Slug,
-                PreviousReleaseSlug = release.PreviousVersion.Slug
+                PreviousVersionSlug = release.PreviousVersion.Slug
             };
             await _fileStorageService.CopyReleaseToPublicContainer(copyReleaseCommand);
         }
