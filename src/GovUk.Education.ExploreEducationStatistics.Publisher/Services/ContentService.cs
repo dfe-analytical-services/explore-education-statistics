@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var pathPrefix = context.Staging ? PublicContentStagingPath() : null;
             var blobName = pathFunction.Invoke(pathPrefix);
             var json = JsonConvert.SerializeObject(value, null, settings);
-            await _fileStorageService.UploadFromStreamAsync(blobName, MediaTypeNames.Application.Json, json);
+            await _fileStorageService.UploadContentFromStreamAsync(blobName, MediaTypeNames.Application.Json, json);
         }
     }
 }
