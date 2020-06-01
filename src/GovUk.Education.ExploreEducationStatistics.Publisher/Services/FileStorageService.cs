@@ -1,22 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ZipFileUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -188,53 +187,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return !(FileStorageUtils.IsBatchedDataFile(item, releaseId) || FileStorageUtils.IsMetaDataFile(item));
         }
 
-        private static async Task ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
+        private static Task ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
             CopyReleaseCommand copyReleaseCommand)
         {
-            var cloudBlockBlob = CreateBlobForAllFilesZip(directory, copyReleaseCommand);
-            var memoryStream = new MemoryStream();
+            var filePath =
+                $"{Ancillary.GetEnumLabel()}/{copyReleaseCommand.PublicationSlug}_{copyReleaseCommand.ReleaseSlug}.zip";
 
-            var zipOutputStream = new ZipOutputStream(memoryStream);
-            zipOutputStream.SetLevel(1);
-
-            foreach (var file in files)
-            {
-                PutNextZipEntry(zipOutputStream, file);
-            }
-
-            var context = new SingleTransferContext();
-            context.SetAttributesCallbackAsync += (destination) =>
-                SetAttributesCallbackAsync(destination, copyReleaseCommand.PublishScheduled);
-
-            zipOutputStream.Finish();
-            await TransferManager.UploadAsync(memoryStream, cloudBlockBlob, new UploadOptions(), context);
-
-            zipOutputStream.Close();
-        }
-
-        private static void PutNextZipEntry(ZipOutputStream zipOutputStream, CloudBlob cloudBlob)
-        {
-            var zipEntry = new ZipEntry(GetZipEntryName(cloudBlob));
-            zipOutputStream.PutNextEntry(zipEntry);
-            cloudBlob.DownloadToStream(zipOutputStream);
-        }
-
-        private static string GetZipEntryName(CloudBlob cloudBlob)
-        {
-            return cloudBlob.Uri.Segments.Last();
-        }
-
-        private static string GetZipFilePath(CopyReleaseCommand copyReleaseCommand)
-        {
-            return $"{Ancillary.GetEnumLabel()}/{copyReleaseCommand.PublicationSlug}_{copyReleaseCommand.ReleaseSlug}.zip";
-        }
-
-        private static CloudBlockBlob CreateBlobForAllFilesZip(CloudBlobDirectory directory, CopyReleaseCommand copyReleaseCommand)
-        {
-            var blob = directory.GetBlockBlobReference(GetZipFilePath(copyReleaseCommand));
-            blob.Properties.ContentType = "application/x-zip-compressed";
-            blob.Metadata.Add("name", "All files");
-            return blob;
+            return ZipFilesToBlob(
+                files,
+                directory,
+                filePath,
+                "All files",
+                (destination) => SetAttributesCallbackAsync(destination, copyReleaseCommand.PublishScheduled),
+                //TODO EES-945 Exclude the chart directory from the zip
+                null
+            );
         }
 
         private async Task DeleteBlobsAsync(CloudBlobContainer container, string directoryPath,
