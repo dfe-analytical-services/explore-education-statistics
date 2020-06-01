@@ -9,8 +9,8 @@ export interface FormTextInputProps extends FormBaseInputProps {
   value?: string;
 }
 
-const FormTextInput = (props: FormTextInputProps) => {
-  return <FormBaseInput {...props} />;
+const FormTextInput = ({ value = '', ...props }: FormTextInputProps) => {
+  return <FormBaseInput {...props} value={value} />;
 };
 
 export default FormTextInput;

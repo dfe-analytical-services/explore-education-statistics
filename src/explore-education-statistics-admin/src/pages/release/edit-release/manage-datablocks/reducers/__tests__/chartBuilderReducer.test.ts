@@ -51,6 +51,9 @@ describe('chartBuilderReducer', () => {
         id: 'xaxis',
         title: 'X Axis',
         type: 'major',
+        capabilities: {
+          canRotateLabel: false,
+        },
         defaults: {
           groupBy: 'timePeriod',
           min: 0,
@@ -68,6 +71,9 @@ describe('chartBuilderReducer', () => {
         id: 'yaxis',
         title: 'Y Axis',
         type: 'minor',
+        capabilities: {
+          canRotateLabel: true,
+        },
       },
     },
   };
@@ -194,6 +200,9 @@ describe('chartBuilderReducer', () => {
         type: 'major',
         visible: true,
         unit: '',
+        label: {
+          text: '',
+        },
       });
 
       expect(nextState.axes.minor).toEqual<AxisConfiguration>({
@@ -201,6 +210,9 @@ describe('chartBuilderReducer', () => {
         referenceLines: [],
         type: 'minor',
         visible: true,
+        label: {
+          text: '',
+        },
       });
     });
 
@@ -349,6 +361,9 @@ describe('chartBuilderReducer', () => {
           type: 'major',
           groupBy: 'indicators',
           visible: false,
+          label: {
+            text: 'Some label',
+          },
         },
       } as ChartBuilderActions);
 
@@ -366,6 +381,9 @@ describe('chartBuilderReducer', () => {
         type: 'major',
         unit: '',
         visible: false,
+        label: {
+          text: 'Some label',
+        },
       });
     });
 
@@ -955,7 +973,7 @@ describe('chartBuilderReducer', () => {
       });
     });
 
-    test('has correct with with initial configuration', () => {
+    test('has correct state with initial configuration', () => {
       const initialConfiguration: Chart = {
         legend: 'top',
         axes: {
@@ -981,6 +999,10 @@ describe('chartBuilderReducer', () => {
             max: 10,
             tickConfig: 'default',
             unit: '%',
+            label: {
+              text: 'Test major axis label',
+              width: 300,
+            },
           },
           minor: {
             type: 'minor',
@@ -993,6 +1015,10 @@ describe('chartBuilderReducer', () => {
             min: 500,
             max: 1000,
             tickConfig: 'default',
+            label: {
+              text: 'Test minor axis label',
+              rotated: true,
+            },
           },
         },
         type: 'line',
@@ -1030,6 +1056,10 @@ describe('chartBuilderReducer', () => {
             tickConfig: 'default',
             tickSpacing: 1,
             unit: '%',
+            label: {
+              text: 'Test major axis label',
+              width: 300,
+            },
           },
           minor: {
             type: 'minor',
@@ -1044,6 +1074,11 @@ describe('chartBuilderReducer', () => {
             tickConfig: 'default',
             tickSpacing: 1,
             unit: '',
+            label: {
+              text: 'Test minor axis label',
+              rotated: true,
+              width: 100,
+            },
           },
         },
         definition: lineChartBlockDefinition,
@@ -1134,6 +1169,9 @@ describe('chartBuilderReducer', () => {
             tickConfig: 'default',
             tickSpacing: 1,
             unit: '',
+            label: {
+              text: '',
+            },
           },
           minor: {
             type: 'minor',
@@ -1146,6 +1184,10 @@ describe('chartBuilderReducer', () => {
             tickConfig: 'default',
             tickSpacing: 1,
             unit: '',
+            label: {
+              text: '',
+              width: 100,
+            },
           },
         },
         definition: lineChartBlockDefinition,
@@ -1217,6 +1259,10 @@ describe('chartBuilderReducer', () => {
         tickConfig: 'default',
         tickSpacing: 1,
         unit: '',
+        label: {
+          text: '',
+          width: 100,
+        },
       });
     });
 

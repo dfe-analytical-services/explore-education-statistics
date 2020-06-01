@@ -13,10 +13,11 @@ import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
 import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
+import deepMerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
+import omit from 'lodash/omit';
 import { useCallback, useMemo } from 'react';
 import { Reducer } from 'use-immer';
-import omit from 'lodash/omit';
 
 export interface ChartOptions extends ChartDefinitionOptions {
   fileId?: string;
@@ -77,25 +78,38 @@ const defaultOptions: Partial<ChartOptions> = {
   title: '',
 };
 
-const defaultAxisOptions: Partial<AxisConfiguration> = {
-  dataSets: [],
-  referenceLines: [],
-  visible: true,
-};
-
 const updateAxis = (
   axisDefinition: ChartDefinitionAxis,
-  current: AxisConfiguration,
+  current: Partial<AxisConfiguration> = {},
   next: Partial<AxisConfiguration> = {},
 ): AxisConfiguration => {
-  return {
-    ...defaultAxisOptions,
-    ...(axisDefinition.defaults ?? {}),
-    ...current,
-    ...next,
-    ...(axisDefinition.constants ?? {}),
+  const defaultAxisOptions: AxisConfiguration = {
+    dataSets: [],
+    referenceLines: [],
+    visible: true,
+    label: {
+      text: '',
+    },
     type: axisDefinition.type,
   };
+
+  return deepMerge.all<AxisConfiguration>(
+    [
+      defaultAxisOptions,
+      (axisDefinition.defaults ?? {}) as Partial<AxisConfiguration>,
+      current,
+      next,
+      (axisDefinition.constants ?? {}) as Partial<AxisConfiguration>,
+      {
+        // Ensure `type` will not be unset
+        // by one of the previous objects.
+        type: axisDefinition.type,
+      },
+    ],
+    {
+      arrayMerge: (target, source) => source,
+    },
+  );
 };
 
 const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
@@ -187,10 +201,7 @@ export const chartBuilderReducer: Reducer<
       draft.axes = mapValues(
         action.payload.axes,
         (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
-          return updateAxis(
-            axisDefinition,
-            draft.axes[type] as AxisConfiguration,
-          );
+          return updateAxis(axisDefinition, draft.axes[type]);
         },
       );
 
