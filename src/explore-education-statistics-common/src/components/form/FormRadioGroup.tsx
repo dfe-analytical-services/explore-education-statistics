@@ -83,7 +83,11 @@ class FormRadioGroup<Value extends string = string> extends PureComponent<
             <FormRadio
               disabled={disabled}
               {...option}
-              id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
+              id={
+                option.id
+                  ? option.id
+                  : `${id}-${option.value.replace(/\s/g, '-')}`
+              }
               checked={value === option.value}
               key={option.value}
               name={name}

@@ -1,7 +1,6 @@
 import ButtonText from '@common/components/ButtonText';
 import { OmitStrict, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
-import kebabCase from 'lodash/kebabCase';
 import orderBy from 'lodash/orderBy';
 import React, {
   createRef,
@@ -134,7 +133,11 @@ export class BaseFormCheckboxGroup extends PureComponent<
           <FormCheckbox
             disabled={disabled}
             {...option}
-            id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
+            id={
+              option.id
+                ? option.id
+                : `${id}-${option.value.replace(/\s/g, '-')}`
+            }
             name={name}
             key={option.value}
             checked={value.indexOf(option.value) > -1}
