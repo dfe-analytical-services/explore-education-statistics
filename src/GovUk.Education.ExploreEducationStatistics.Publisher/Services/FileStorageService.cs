@@ -193,14 +193,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var filePath =
                 $"{Ancillary.GetEnumLabel()}/{copyReleaseCommand.PublicationSlug}_{copyReleaseCommand.ReleaseSlug}.zip";
 
+            var excludePattern = $"^{copyReleaseCommand.ReleaseId}/{Chart.GetEnumLabel()}/.+$";
+
             return ZipFilesToBlob(
                 files,
                 directory,
                 filePath,
                 "All files",
                 (destination) => SetAttributesCallbackAsync(destination, copyReleaseCommand.PublishScheduled),
-                //TODO EES-945 Exclude the chart directory from the zip
-                null
+                excludePattern
             );
         }
 
