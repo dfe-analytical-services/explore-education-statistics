@@ -25,13 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task PublishReleaseFilesAsync(Guid releaseId)
         {
             var release = await _releaseService.GetAsync(releaseId);
+                
             var copyReleaseCommand = new CopyReleaseCommand
             {
                 ReleaseId = releaseId,
                 PublicationSlug = release.Publication.Slug,
                 PublishScheduled = release.PublishScheduled.Value,
                 ReleaseSlug = release.Slug,
-                PreviousVersionSlug = release.PreviousVersion.Slug
+                PreviousVersionSlug = release.PreviousVersion.Slug,
+                ReleaseFileReferences = _releaseService.GetReleaseFileReferences(releaseId)
             };
             await _fileStorageService.CopyReleaseToPublicContainer(copyReleaseCommand);
         }

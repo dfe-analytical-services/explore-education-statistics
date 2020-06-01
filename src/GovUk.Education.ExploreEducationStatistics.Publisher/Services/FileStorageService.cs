@@ -6,16 +6,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
@@ -32,7 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private readonly string _privateStorageConnectionString;
         private readonly string _publicStorageConnectionString;
-        private readonly ContentDbContext _contentDbContext;
 
         private const string PrivateFilesContainerName = "releases";
         private const string PublicFilesContainerName = "downloads";
@@ -40,12 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public FileStorageService(
             IConfiguration configuration,
-            ContentDbContext contentDbContext,
             ILogger<FileStorageService> logger)
         {
             _privateStorageConnectionString = configuration.GetValue<string>("CoreStorage");
             _publicStorageConnectionString = configuration.GetValue<string>("PublicStorage");
-            _contentDbContext = contentDbContext;
             _logger = logger;
         }
 
@@ -72,10 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
 
-            var releaseFileReferences = GetAllFilesUploaded(copyReleaseCommand.ReleaseId, ReleaseFileTypes.Data, Ancillary, Chart)
-                .Select(rf => rf.ReleaseFileReference).ToList();
-            
-            var versions = releaseFileReferences.GroupBy(rfr => rfr.ReleaseId)
+            var versions = copyReleaseCommand.ReleaseFileReferences.GroupBy(rfr => rfr.ReleaseId)
                 .Select(grp => grp.First())
                 .ToList();
             
@@ -91,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         CopyFileUnlessBatchedOrMeta(
                             source,
                             version.ReleaseId,
-                            releaseFileReferences));
+                            copyReleaseCommand.ReleaseFileReferences));
                 
                 allFilesTransferred.AddRange(files);
             }
@@ -242,15 +233,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return true;
         }
 
-        private List<ReleaseFile> GetAllFilesUploaded(Guid releaseId, params ReleaseFileTypes[] types)
-        {
-            return _contentDbContext
-                .ReleaseFiles
-                .Include(f => f.ReleaseFileReference)
-                .Where(f => f.ReleaseId == releaseId && types.Contains(f.ReleaseFileReference.ReleaseFileType))
-                .ToList();
-        }
-        
         private static async Task ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
             CopyReleaseCommand copyReleaseCommand)
         {

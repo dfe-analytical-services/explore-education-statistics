@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Models
 {
@@ -9,5 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Models
         public string ReleaseSlug { get; set; }
         public DateTime PublishScheduled { get; set; }
         public string PreviousVersionSlug { get; set; }
+        public List<ReleaseFileReference> ReleaseFileReferences { get; set; }
     }
 }

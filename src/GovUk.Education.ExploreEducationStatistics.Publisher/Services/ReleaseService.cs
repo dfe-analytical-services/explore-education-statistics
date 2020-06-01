@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -124,6 +125,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 statisticsRelease.Published ??= published;
                 await _statisticsDbContext.SaveChangesAsync();
             }
+        }
+        
+        public List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types)
+        {
+            return _contentDbContext
+                .ReleaseFileReferences
+                .Where(rfr => rfr.ReleaseId == releaseId && types.Contains(rfr.ReleaseFileType))
+                .ToList();
         }
 
         private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
