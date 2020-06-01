@@ -1,0 +1,10 @@
+@import '../styles/govuk-base';
+
+.group {
+  align-items: center;
+  display: inline-flex;
+
+  :not(:last-child) {
+    margin-right: govuk-spacing(2);
+  }
+}
