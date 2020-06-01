@@ -39,6 +39,7 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
     ) : (
       <FormFieldCheckboxGroup
         {...props}
+        legendHidden
         selectAll
         small
         name={name}
