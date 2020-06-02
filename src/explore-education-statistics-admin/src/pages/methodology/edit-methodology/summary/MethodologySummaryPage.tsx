@@ -1,6 +1,6 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
-import methodologyService from '@admin/services/methodology/methodologyService';
+import methodologyService from '@admin/services/methodologyService';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';

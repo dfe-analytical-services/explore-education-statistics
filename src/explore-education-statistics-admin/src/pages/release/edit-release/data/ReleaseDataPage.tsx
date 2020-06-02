@@ -1,13 +1,13 @@
 import ReleaseFootnotesSection from '@admin/pages/release/edit-release/data/ReleaseFootnotesSection';
+import generateFootnoteMetaMap, {
+  FootnoteMetaGetters,
+} from '@admin/pages/release/edit-release/data/utils/generateFootnoteMetaMap';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import permissionService from '@admin/services/permissions/permissionService';
-import footnotesService from '@admin/services/release/edit-release/footnotes/service';
-import {
+import permissionService from '@admin/services/permissionService';
+import footnotesService, {
   Footnote,
   FootnoteMeta,
-  FootnoteMetaGetters,
-} from '@admin/services/release/edit-release/footnotes/types';
-import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
+} from '@admin/services/footnoteService';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useCallback, useEffect, useState } from 'react';

@@ -1,14 +1,13 @@
-import FootnotesList from '@admin/components/footnotes/FootnotesList';
+import FootnotesList from '@admin/pages/release/edit-release/data/components/footnotes/FootnotesList';
 import FootnoteForm, {
   FootnoteFormConfig,
-} from '@admin/components/footnotes/form/FootnoteForm';
+} from '@admin/pages/release/edit-release/data/components/footnotes/form/FootnoteForm';
 import Link from '@admin/components/Link';
 import { FootnotesData } from '@admin/pages/release/edit-release/data/ReleaseDataPage';
-import footnotesService from '@admin/services/release/edit-release/footnotes/service';
-import {
+import footnotesService, {
   Footnote,
-  FootnoteProps,
-} from '@admin/services/release/edit-release/footnotes/types';
+  BaseFootnote,
+} from '@admin/services/footnoteService';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';
 
@@ -41,7 +40,7 @@ const ReleaseFootnotesSection = ({
       _setFootnoteForm({ state: 'edit', footnote });
     },
     cancel: () => _setFootnoteForm({ state: 'cancel' }),
-    save: (footnote: FootnoteProps, footnoteId?: string) => {
+    save: (footnote: BaseFootnote, footnoteId?: string) => {
       if (!footnotesData) return;
       if (footnoteId) {
         footnotesService

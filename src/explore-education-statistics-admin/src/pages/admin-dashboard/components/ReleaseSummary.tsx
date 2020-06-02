@@ -3,7 +3,7 @@ import {
   getReleaseStatusLabel,
   getReleaseSummaryLabel,
 } from '@admin/pages/release/util/releaseSummaryUtil';
-import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import { Release } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -17,7 +17,7 @@ import React, { ReactNode } from 'react';
 import LazyLoad from 'react-lazyload';
 
 interface Props {
-  release: AdminDashboardRelease;
+  release: Release;
   actions: ReactNode;
   secondaryActions?: ReactNode;
   children?: ReactNode;

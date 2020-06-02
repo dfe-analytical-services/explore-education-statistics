@@ -1,6 +1,6 @@
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { EditableRelease } from '@admin/services/publicationService';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback } from 'react';

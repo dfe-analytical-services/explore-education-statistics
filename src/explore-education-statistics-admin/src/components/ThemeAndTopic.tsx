@@ -1,7 +1,7 @@
 import ThemeAndTopicContext, {
   SetThemeAndTopicCallbackParameters,
 } from '@admin/components/ThemeAndTopicContext';
-import { IdTitlePair } from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/types/common';
 import React, { ReactNode, useState } from 'react';
 
 interface ThemeAndTopicProps {

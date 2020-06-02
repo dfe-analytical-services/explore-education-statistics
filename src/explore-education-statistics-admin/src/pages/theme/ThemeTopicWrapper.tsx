@@ -2,7 +2,7 @@ import Page from '@admin/components/Page';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
-import dashboardService from '@admin/services/dashboard/service';
+import dashboardService from '@admin/services/dashboardService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import React, { useContext, useEffect, useState } from 'react';

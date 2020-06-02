@@ -8,7 +8,7 @@ import permalinkService, { Permalink } from '@common/services/permalinkService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
-import { GetServerSideProps, NextPage, NextPageContext } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef } from 'react';
 import styles from './PermalinkPage.module.scss';
 

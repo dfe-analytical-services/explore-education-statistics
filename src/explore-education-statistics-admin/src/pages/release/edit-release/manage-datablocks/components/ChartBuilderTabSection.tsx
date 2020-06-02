@@ -2,8 +2,8 @@ import ChartBuilder, {
   TableQueryUpdateHandler,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder';
 import { SavedDataBlock } from '@admin/pages/release/edit-release/manage-datablocks/components/ReleaseManageDataBlocksPageTabs';
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
-import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablocks/service';
+import { ReleaseDataBlock } from '@admin/services/dataBlockService';
+import releaseChartFileService from '@admin/services/releaseChartFileService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderService, {
@@ -56,7 +56,7 @@ const ChartBuilderTabSection = ({
     async (chart: Chart) => {
       // Cleanup potential infographic chart file if required
       if (chart.type === 'infographic' && chart.fileId) {
-        await editReleaseDataService.deleteChartFile(
+        await releaseChartFileService.deleteChartFile(
           releaseId,
           meta.subjectName,
           chart.fileId,

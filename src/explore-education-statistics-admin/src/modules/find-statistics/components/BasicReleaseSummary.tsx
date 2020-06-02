@@ -1,6 +1,6 @@
 import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
-import commonService from '@admin/services/common/service';
-import { EditableContentBlock } from '@admin/services/publicationService';
+import metaService from '@admin/services/metaService';
+import { EditableContentBlock } from '@admin/services/types/content';
 import FormattedDate from '@common/components/FormattedDate';
 import Tag from '@common/components/Tag';
 import { Release } from '@common/services/publicationService';
@@ -32,7 +32,7 @@ const BasicReleaseSummary = ({ release }: Props) => {
   >();
 
   useEffect(() => {
-    commonService.getReleaseTypes().then(types => {
+    metaService.getReleaseTypes().then(types => {
       const icons: Dictionary<ReleaseTypeIcon> = {};
 
       // TODO would be nicer to control this via some metadata from the back end rather than

@@ -1,8 +1,7 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import userService from '@admin/services/users/service';
-import { Role, UserInvite } from '@admin/services/users/types';
+import userService, { Role, UserInvite } from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';

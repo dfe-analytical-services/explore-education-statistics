@@ -1,7 +1,7 @@
 import { getConfig } from '@admin/config';
 import '@admin/polyfill';
 import { initApplicationInsights } from '@admin/services/applicationInsightsService';
-import configureAxios from '@admin/services/util/configureAxios';
+import configureAxios from '@admin/services/utils/configureAxios';
 import { enableES5 } from 'immer';
 import React from 'react';
 import ReactDOM from 'react-dom';

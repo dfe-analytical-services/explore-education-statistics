@@ -1,6 +1,6 @@
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import { releaseNoteService } from '@admin/services/release/edit-release/content/service';
-import { ManageContentPageViewModel } from '@admin/services/release/edit-release/content/types';
+import { EditableRelease } from '@admin/services/releaseContentService';
+import releaseNoteService from '@admin/services/releaseNoteService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
@@ -15,7 +15,7 @@ import { Formik } from 'formik';
 import React, { useState } from 'react';
 
 interface Props {
-  release: ManageContentPageViewModel['release'];
+  release: EditableRelease;
   logEvent?: (...params: string[]) => void;
 }
 

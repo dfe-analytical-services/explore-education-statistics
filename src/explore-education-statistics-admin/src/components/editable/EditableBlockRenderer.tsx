@@ -1,6 +1,6 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
-import { EditableBlock } from '@admin/services/publicationService';
+import { EditableBlock } from '@admin/services/types/content';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 import React, { useCallback, useMemo } from 'react';

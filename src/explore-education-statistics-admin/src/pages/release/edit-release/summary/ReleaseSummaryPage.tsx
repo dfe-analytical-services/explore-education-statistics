@@ -1,14 +1,12 @@
 import Link from '@admin/components/Link';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
-import commonService from '@admin/services/common/service';
-import {
-  IdTitlePair,
+import { IdTitlePair } from '@admin/services/types/common';
+import metaService, {
   TimePeriodCoverageGroup,
-} from '@admin/services/common/types';
-import permissionService from '@admin/services/permissions/permissionService';
-import service from '@admin/services/release/edit-release/summary/service';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
+} from '@admin/services/metaService';
+import permissionService from '@admin/services/permissionService';
+import releaseService, { ReleaseSummary } from '@admin/services/releaseService';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -19,7 +17,7 @@ import {
 import React, { useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {
-  releaseSummaryDetails: ReleaseSummaryDetails;
+  releaseSummaryDetails: ReleaseSummary;
   timePeriodCoverageGroups: TimePeriodCoverageGroup[];
   releaseTypes: IdTitlePair[];
   canEditRelease: boolean;
@@ -32,9 +30,9 @@ const ReleaseSummaryPage = () => {
 
   useEffect(() => {
     Promise.all([
-      service.getReleaseSummaryDetails(releaseId),
-      commonService.getReleaseTypes(),
-      commonService.getTimePeriodCoverageGroups(),
+      releaseService.getReleaseSummary(releaseId),
+      metaService.getReleaseTypes(),
+      metaService.getTimePeriodCoverageGroups(),
       permissionService.canUpdateRelease(releaseId),
     ]).then(
       ([

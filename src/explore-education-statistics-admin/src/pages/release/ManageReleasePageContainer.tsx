@@ -4,10 +4,12 @@ import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
-import service from '@admin/services/common/service';
-import { BasicPublicationDetails } from '@admin/services/common/types';
-import releaseService from '@admin/services/release/edit-release/summary/service';
-import { ReleasePublicationStatus } from '@admin/services/release/types';
+import publicationService, {
+  BasicPublicationDetails,
+} from '@admin/services/publicationService';
+import releaseService, {
+  ReleasePublicationStatus,
+} from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
@@ -34,7 +36,7 @@ const ManageReleasePageContainer = ({
   } = useAsyncRetry(
     () =>
       Promise.all([
-        service.getBasicPublicationDetails(publicationId),
+        publicationService.getPublication(publicationId),
         releaseService.getReleasePublicationStatus(releaseId),
       ]),
     [publicationId, releaseId],

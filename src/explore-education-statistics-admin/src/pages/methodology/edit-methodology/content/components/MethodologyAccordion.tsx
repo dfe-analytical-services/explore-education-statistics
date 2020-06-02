@@ -1,6 +1,6 @@
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import { MethodologyContent } from '@admin/services/methodology/types';
+import { MethodologyContent } from '@admin/services/methodologyContentService';
 import { Dictionary } from '@common/types';
 import React, { useCallback } from 'react';
 import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';

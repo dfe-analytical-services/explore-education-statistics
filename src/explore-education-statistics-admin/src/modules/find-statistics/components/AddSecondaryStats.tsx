@@ -1,6 +1,6 @@
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import { EditableRelease } from '@admin/services/publicationService';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';

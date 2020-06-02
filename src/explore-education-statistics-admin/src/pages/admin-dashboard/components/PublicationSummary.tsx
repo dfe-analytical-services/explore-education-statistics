@@ -2,11 +2,8 @@ import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
-import {
-  AdminDashboardPublication,
-  AdminDashboardRelease,
-} from '@admin/services/dashboard/types';
-import service from '@admin/services/release/create-release/service';
+import { AdminDashboardPublication } from '@admin/services/dashboardService';
+import releaseService, { Release } from '@admin/services/releaseService';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -30,7 +27,7 @@ const PublicationSummary = ({
   const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
     string
   >();
-  const noAmendmentInProgressFilter = (release: AdminDashboardRelease) =>
+  const noAmendmentInProgressFilter = (release: Release) =>
     publication &&
     !publication.releases.some(
       r => r.amendment && r.previousVersionId === release.id,
@@ -115,14 +112,16 @@ const PublicationSummary = ({
         <ModalConfirm
           title="Confirm you want to amend this live release"
           onConfirm={async () =>
-            service.createReleaseAmendment(amendReleaseId).then(amendment =>
-              history.push(
-                summaryRoute.generateLink({
-                  publicationId: publication.id,
-                  releaseId: amendment.id,
-                }),
-              ),
-            )
+            releaseService
+              .createReleaseAmendment(amendReleaseId)
+              .then(amendment =>
+                history.push(
+                  summaryRoute.generateLink({
+                    publicationId: publication.id,
+                    releaseId: amendment.id,
+                  }),
+                ),
+              )
           }
           onExit={() => setAmendReleaseId(undefined)}
           onCancel={() => setAmendReleaseId(undefined)}
@@ -138,7 +137,7 @@ const PublicationSummary = ({
       {cancelAmendmentReleaseId && (
         <CancelAmendmentModal
           onConfirm={async () => {
-            await service.deleteRelease(cancelAmendmentReleaseId);
+            await releaseService.deleteRelease(cancelAmendmentReleaseId);
             setCancelAmendmentReleaseId(undefined);
             onChangePublication();
           }}

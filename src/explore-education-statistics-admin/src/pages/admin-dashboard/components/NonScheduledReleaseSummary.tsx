@@ -2,12 +2,12 @@ import ButtonLink from '@admin/components/ButtonLink';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import { Release } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import React from 'react';
 
 interface Props {
-  release: AdminDashboardRelease;
+  release: Release;
   onClickAmendRelease?: (releaseId: string) => void;
   onClickCancelAmendment: (releaseId: string) => void;
 }

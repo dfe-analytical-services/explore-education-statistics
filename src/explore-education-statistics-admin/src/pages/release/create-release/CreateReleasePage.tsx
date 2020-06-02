@@ -6,9 +6,11 @@ import ReleaseSummaryForm, {
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import appRouteList from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import { IdTitlePair } from '@admin/services/common/types';
-import service from '@admin/services/release/create-release/service';
-import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import { IdTitlePair } from '@admin/services/types/common';
+import publicationService from '@admin/services/publicationService';
+import releaseService, {
+  CreateReleaseRequest,
+} from '@admin/services/releaseService';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import {
   errorCodeAndFieldNameToFieldError,
@@ -57,8 +59,8 @@ const CreateReleasePage = ({
 
   useEffect(() => {
     Promise.all([
-      service.getTemplateRelease(publicationId),
-      service.getPublication(publicationId),
+      publicationService.getPublicationReleaseTemplate(publicationId),
+      publicationService.getPublication(publicationId),
     ]).then(([templateRelease, publication]) => {
       setModel({
         templateRelease,
@@ -81,7 +83,7 @@ const CreateReleasePage = ({
         values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
     };
 
-    const createdRelease = await service.createRelease(release);
+    const createdRelease = await releaseService.createRelease(release);
 
     history.push(
       summaryRoute.generateLink({
