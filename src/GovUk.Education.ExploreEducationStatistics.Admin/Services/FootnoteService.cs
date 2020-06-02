@@ -401,7 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return otherFootnoteReferences == 0;
         }
         
-        private async Task<bool> DeleteReleaseFootnoteLinkAsync(Guid releaseId, Guid footnoteId)
+        private async Task DeleteReleaseFootnoteLinkAsync(Guid releaseId, Guid footnoteId)
         {
             var releaseFootnote = await _context
                 .ReleaseFootnote
@@ -411,7 +411,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefaultAsync();
             
             _context.ReleaseFootnote.Remove(releaseFootnote);
-            return true;
         }
     }
 }

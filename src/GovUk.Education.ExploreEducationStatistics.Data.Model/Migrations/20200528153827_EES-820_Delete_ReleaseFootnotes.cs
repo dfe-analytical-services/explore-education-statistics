@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // Revert to the version in the previous migration 20200303144410_Routine_DropAndCreateRelease.sql
+            // Revert to the version in the previous migration 20200528124909_Routine_DropAndCreateRelease.sql
             migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousVersionMigrationId}_Routine_DropAndCreateRelease.sql");
         }
     }
