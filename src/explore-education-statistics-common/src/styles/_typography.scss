@@ -60,3 +60,8 @@ blockquote {
   @extend .govuk-inset-text;
   margin-left: 0;
 }
+
+p pre,
+.govuk-body pre {
+  white-space: normal;
+}

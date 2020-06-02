@@ -1,5 +1,6 @@
 import React, { createRef } from 'react';
 import MethodologySection from './MethodologySection';
+import styles from './MethodologyHeader.module.scss';
 
 export interface MethodologyHeaderProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ export default class MethodologyHeader extends React.Component<
       const headerBottom = parentBottom - headerHeight;
 
       if (parentTop < 0) {
-        this.staticRef.current.classList.add('fixed');
+        this.staticRef.current.classList.add(styles.fixedHeader);
         if (headerBottom > 0) {
           this.staticRef.current.style.top = `${-parentTop}px`;
         } else {
@@ -43,7 +44,7 @@ export default class MethodologyHeader extends React.Component<
             headerHeight}px`;
         }
       } else {
-        this.staticRef.current.classList.remove('fixed');
+        this.staticRef.current.classList.remove(styles.fixedHeader);
         this.staticRef.current.style.top = '';
       }
     }

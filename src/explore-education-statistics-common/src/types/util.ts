@@ -49,7 +49,8 @@ export type PartialBy<T, K extends keyof T> = OmitStrict<T, K> &
   Partial<Pick<T, K>>;
 
 /**
- * Construct a type with a set of optional properties K of type T.
+ * Make all properties (including nested objects) in T optional.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type PartialRecord<K extends keyof any, T> = { [P in K]?: T };
+export type NestedPartial<T> = {
+  [P in keyof T]?: T[P] extends object | undefined ? NestedPartial<T[P]> : T[P];
+};
