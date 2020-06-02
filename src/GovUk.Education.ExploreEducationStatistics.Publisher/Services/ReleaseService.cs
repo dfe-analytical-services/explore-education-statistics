@@ -7,10 +7,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -19,16 +21,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IFileStorageService fileStorageService,
+            IReleaseSubjectService releaseSubjectService,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _fileStorageService = fileStorageService;
+            _releaseSubjectService = releaseSubjectService;
             _mapper = mapper;
         }
 
@@ -143,6 +148,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
         {
             return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+        }
+        
+        public async Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds)
+        {
+            var previousVersions = _contentDbContext.Releases.Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
+                    .Select(r => r.PreviousVersionId);
+
+            foreach (var releaseSubject in _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)))
+            {
+                await _releaseSubjectService.RemoveReleaseSubjectLinkAsync(releaseSubject.ReleaseId,
+                    releaseSubject.SubjectId);
+            }
         }
     }
 }

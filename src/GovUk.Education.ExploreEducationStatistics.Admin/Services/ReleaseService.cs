@@ -48,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
+        private readonly IReleaseSubjectService _releaseSubjectService;
 
         // TODO PP-318 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -64,7 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IImportStatusService importStatusService,
 	        IFootnoteService footnoteService, 
             StatisticsDbContext statisticsDbContext,
-            IDataBlockService dataBlockService)
+            IDataBlockService dataBlockService,
+            IReleaseSubjectService releaseSubjectService)
         {
             _context = context;
             _publishingService = publishingService;
@@ -79,6 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
+            _releaseSubjectService = releaseSubjectService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
@@ -394,17 +397,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private async Task<List<ContentSection>> GetContentAsync(Guid id)
-        {
-            return await _context
-                .ReleaseContentSections
-                .Include(join => join.ContentSection)
-                .ThenInclude(section => section.Content)
-                .Where(join => join.ReleaseId == id)
-                .Select(join => join.ContentSection)
-                .ToListAsync();
-        }
-
         private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
         { 
             var templateRelease = _context.Releases.AsNoTracking()
@@ -457,7 +449,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async footnotes =>
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var orphanFootnotes = subject == null ? new List<Footnote>() : await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
+                    var orphanFootnotes = subject == null ? new List<Footnote>() : await _releaseSubjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
                     
                     return new DeleteDataFilePlan
                     {
@@ -486,7 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async deletePlan =>
                 {
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                    await _subjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
+                    await _releaseSubjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
 
                     return await _fileStorageService
                         .RemoveDataFileReleaseLinkAsync(releaseId, fileName)

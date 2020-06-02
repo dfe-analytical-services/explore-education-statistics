@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_FastTrack()
         {
-            var result = await _controller.GetAsync(_releaseId, _validId.ToString());
+            var result = await _controller.GetAsync(_releaseId.ToString(), _validId.ToString());
 
             Assert.IsType<FastTrackViewModel>(result.Value);
             Assert.Equal(_validId, result.Value.Id);
@@ -46,14 +46,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_FastTrack_NotFound()
         {
-            var result = await _controller.GetAsync(_releaseId, _notFoundId.ToString());
+            var result = await _controller.GetAsync(_releaseId.ToString(), _notFoundId.ToString());
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
         public async void Get_FastTrack_InvalidId()
         {
-            var result = await _controller.GetAsync(_releaseId, "InvalidGuid");
+            var result = await _controller.GetAsync(_releaseId.ToString(), "InvalidGuid");
             Assert.IsType<NotFoundResult>(result.Result);
         }
     }

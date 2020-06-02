@@ -4,6 +4,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -480,7 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             builder.UseInMemoryDatabase(databaseName: "LatestRelease");
             var options = builder.Options;
 
-            var (fileStorageService, statisticsDbContext) = Mocks();
+            var (fileStorageService, statisticsDbContext, releaseSubjectService) = Mocks();
 
             using (var context = new ContentDbContext(options))
             {
@@ -494,6 +495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = new ReleaseService(contentDbContext,
                     statisticsDbContext.Object,
                     fileStorageService.Object,
+                    releaseSubjectService.Object,
                     MapperForProfile<MappingProfiles>());
 
                 var result = service.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>());
@@ -510,7 +512,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             builder.UseInMemoryDatabase(databaseName: "LatestReleaseViewModel");
             var options = builder.Options;
 
-            var (fileStorageService, statisticsDbContext) = Mocks();
+            var (fileStorageService, statisticsDbContext, releaseSubjectService) = Mocks();
 
             using (var context = new ContentDbContext(options))
             {
@@ -527,6 +529,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = new ReleaseService(contentDbContext,
                     statisticsDbContext.Object,
                     fileStorageService.Object,
+                    releaseSubjectService.Object,
                     MapperForProfile<MappingProfiles>());
 
                 var result =
@@ -593,7 +596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             builder.UseInMemoryDatabase("ReleaseViewModel");
             var options = builder.Options;
 
-            var (fileStorageService, statisticsDbContext) = Mocks();
+            var (fileStorageService, statisticsDbContext, releaseSubjectService) = Mocks();
 
             using (var context = new ContentDbContext(options))
             {
@@ -610,6 +613,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = new ReleaseService(contentDbContext,
                     statisticsDbContext.Object,
                     fileStorageService.Object,
+                    releaseSubjectService.Object,
                     MapperForProfile<MappingProfiles>());
 
                 var result = service.GetReleaseViewModel(PublicationARelease1V1.Id, PublishContext());
@@ -675,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             builder.UseInMemoryDatabase("ReleaseViewModel_NotYetPublished");
             var options = builder.Options;
 
-            var (fileStorageService, statisticsDbContext) = Mocks();
+            var (fileStorageService, statisticsDbContext, releaseSubjectService) = Mocks();
 
             using (var context = new ContentDbContext(options))
             {
@@ -692,6 +696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = new ReleaseService(contentDbContext,
                     statisticsDbContext.Object,
                     fileStorageService.Object,
+                    releaseSubjectService.Object,
                     MapperForProfile<MappingProfiles>());
 
                 var context = PublishContext();
@@ -714,11 +719,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         private static (Mock<IFileStorageService>,
-            Mock<StatisticsDbContext>) Mocks()
+            Mock<StatisticsDbContext>,
+            Mock<IReleaseSubjectService>) Mocks()
         {
             return (
                 new Mock<IFileStorageService>(),
-                new Mock<StatisticsDbContext>());
+                new Mock<StatisticsDbContext>(),
+                new Mock<IReleaseSubjectService>());
         }
     }
 }

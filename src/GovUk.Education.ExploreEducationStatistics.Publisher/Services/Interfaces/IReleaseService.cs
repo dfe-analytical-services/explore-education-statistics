@@ -24,5 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task SetPublishedDatesAsync(Guid id, DateTime published);
 
         List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types);
+        
+        Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds);
     }
 }

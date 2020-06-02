@@ -30,7 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseNoTemplate()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService,
+                fileStorageService, importStatusService, footnoteService, statisticsDbContext,
+                dataBlockService, releaseSubjectService) = Mocks();
 
             var publication = new Publication
             {
@@ -49,7 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = new ReleaseService(context, AdminMapper(), 
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object, statisticsDbContext.Object,
+                    dataBlockService.Object, releaseSubjectService.Object);
                 
                 var publishScheduled = new DateTime(2050, 6, 30, 14, 0, 0);
 
@@ -79,7 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseWithTemplate()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
+                importStatusService, footnoteService, statisticsDbContext, dataBlockService, releaseSubjectService) = Mocks();
             
             var dataBlock1 = new DataBlock
             {
@@ -191,7 +196,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object, statisticsDbContext.Object,
+                    dataBlockService.Object, releaseSubjectService.Object);
                 
                 // Service method under test
                 var result = releaseService.CreateReleaseAsync(
@@ -232,7 +239,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void LatestReleaseCorrectlyReported()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
+                importStatusService, footnoteService, statisticsDbContext, dataBlockService, releaseSubjectService) = Mocks();
 
             var publication = new Publication
             {
@@ -277,7 +285,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object, statisticsDbContext.Object,
+                    dataBlockService.Object, releaseSubjectService.Object);
                 
                 // Method under test
                 var notLatest = (await releaseService.GetReleaseForIdAsync(notLatestRelease.Id)).Right;
@@ -289,7 +299,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object, statisticsDbContext.Object,
+                    dataBlockService.Object, releaseSubjectService.Object);
                 
                 // Method under test
                 var latest = (await releaseService.GetReleaseForIdAsync(latestRelease.Id)).Right;
@@ -301,7 +313,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void EditReleaseSummary()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
+                importStatusService, footnoteService, statisticsDbContext, dataBlockService, releaseSubjectService) = Mocks();
 
             var releaseId = new Guid("02c73027-3e06-4495-82a4-62b778c005a9");
             var addHocReleaseTypeId = new Guid("f3800c32-1e1c-4d42-8165-d1bcb3c8b47c");
@@ -349,7 +362,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object, statisticsDbContext.Object,
+                    dataBlockService.Object, releaseSubjectService.Object);
                 
                 // Method under test 
                 var edited = await releaseService
@@ -380,7 +395,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetReleaseSummaryAsync()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
+                importStatusService, footnoteService, statisticsDbContext, dataBlockService, releaseSubjectService) = Mocks();
             
             var releaseId = new Guid("5cf345d4-7f7b-425c-8267-de785cfc040b");
             var adhocReleaseType = new ReleaseType
@@ -425,7 +441,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object, statisticsDbContext.Object,
+                    dataBlockService.Object, releaseSubjectService.Object);
                 
                 // Method under test 
                 var summaryResult = await releaseService.GetReleaseSummaryAsync(releaseId);
@@ -443,7 +461,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetLatestReleaseAsync()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
+                importStatusService, footnoteService, statisticsDbContext, dataBlockService, releaseSubjectService) = Mocks();
 
             var publication = new Publication
             {
@@ -515,7 +534,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object, statisticsDbContext.Object,
+                    dataBlockService.Object, releaseSubjectService.Object);
 
                 // Method under test 
                 var latest = releaseService.GetLatestReleaseAsync(publication.Id).Result.Right;
@@ -528,7 +549,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void DeleteReleaseAsync()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+            var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
+                importStatusService, footnoteService, statisticsDbContext, dataBlockService, releaseSubjectService) = Mocks();
 
             var publication = new Publication
             {
@@ -589,7 +611,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = new ReleaseService(context, AdminMapper(),
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
-                    subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                    subjectService.Object, tableStorageService.Object, fileStorageService.Object,
+                    importStatusService.Object, footnoteService.Object, statisticsDbContext.Object,
+                    dataBlockService.Object, releaseSubjectService.Object);
 
                 // Method under test 
                 var result = releaseService.DeleteReleaseAsync(release.Id).Result.Right;
@@ -680,7 +704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void PublishReleaseAsync()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
-                importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+                importStatusService, footnoteService, statisticsDbContext, dataBlockService, releaseSubjectService) = Mocks();
 
             var release = new Release
             {
@@ -709,7 +733,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     importStatusService.Object,
                     footnoteService.Object,
                     statisticsDbContext.Object,
-                    dataBlockService.Object);
+                    dataBlockService.Object,
+                    releaseSubjectService.Object);
 
                 var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
 
@@ -723,7 +748,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void PublishReleaseContentAsync()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService, fileStorageService,
-                importStatusService, footnoteService, statisticsDbContext, dataBlockService) = Mocks();
+                importStatusService, footnoteService, statisticsDbContext, dataBlockService, releaseSubjectService) = Mocks();
 
             var release = new Release
             {
@@ -748,7 +773,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     importStatusService.Object,
                     footnoteService.Object,
                     statisticsDbContext.Object,
-                    dataBlockService.Object);
+                    dataBlockService.Object,
+                    releaseSubjectService.Object);
 
                 var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
 
@@ -769,7 +795,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IImportStatusService>,
             Mock<IFootnoteService>,
             Mock<StatisticsDbContext>,
-            Mock<IDataBlockService>) Mocks()
+            Mock<IDataBlockService>,
+            Mock<IReleaseSubjectService>) Mocks()
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
@@ -792,7 +819,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
                 new Mock<StatisticsDbContext>(),
-                new Mock<IDataBlockService>());
+                new Mock<IDataBlockService>(),
+                new Mock<IReleaseSubjectService>());
         }
     }
 }

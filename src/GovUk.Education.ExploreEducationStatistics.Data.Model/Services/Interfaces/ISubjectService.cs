@@ -11,12 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
         bool Exists(Guid releaseId, string name);
 
         Task<Publication> GetPublicationForSubjectAsync(Guid subjectId);
-
-        Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, Guid subjectId);
-
+        
         Task<Subject> GetAsync(Guid releaseId, string name);
-
-        Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(Guid subjectId);
 
         Task<List<Subject>> GetSubjectsForReleaseAsync(Guid releaseId);
     }
