@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Models
 {
-    public class CopyReleaseCommand
+    public class CopyReleaseFilesCommand
     {
         public Guid ReleaseId { get; set; }
         public string PublicationSlug { get; set; }
