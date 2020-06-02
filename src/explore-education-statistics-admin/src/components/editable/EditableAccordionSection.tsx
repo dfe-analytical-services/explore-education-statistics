@@ -72,7 +72,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
           id="heading"
           name="heading"
           label="Edit Heading"
-          defaultValue={newHeading}
+          value={newHeading}
           onChange={e => {
             setNewHeading(e.target.value);
           }}
