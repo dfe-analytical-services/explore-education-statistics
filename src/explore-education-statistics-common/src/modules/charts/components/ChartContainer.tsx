@@ -44,6 +44,7 @@ const ChartContainer = ({
         >
           {yAxisLabel?.text && (
             <AxisLabel
+              data-testid="y-axis-label"
               width={
                 yAxisLabel.rotated ? height - xAxisHeight : yAxisLabelWidth
               }
@@ -63,6 +64,7 @@ const ChartContainer = ({
 
         {xAxisLabel?.text && (
           <AxisLabel
+            data-testid="x-axis-label"
             className="dfe-flex dfe-justify-content--center"
             width={xAxisLabel.width}
             style={{

@@ -518,7 +518,11 @@ describe('LineChartBlock', () => {
       />,
     );
 
-    expect(screen.getByText('Test axis label 1')).toBeInTheDocument();
-    expect(screen.getByText('Test axis label 2')).toBeInTheDocument();
+    expect(screen.getByTestId('x-axis-label')).toHaveTextContent(
+      'Test axis label 1',
+    );
+    expect(screen.getByTestId('y-axis-label')).toHaveTextContent(
+      'Test axis label 2',
+    );
   });
 });
