@@ -26,7 +26,6 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
     return options[0].options.length > 1 ? (
       <FormFieldCheckboxSearchGroup
         {...props}
-        hideCount
         legendHidden
         selectAll
         options={options[0].options}
@@ -70,7 +69,7 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
       }
     >
       {options.length > 1 && (
-        <FormFieldCheckboxSearchSubGroups {...props} hideCount legendHidden />
+        <FormFieldCheckboxSearchSubGroups {...props} legendHidden />
       )}
 
       {options.length === 1 && renderSingleGroup()}

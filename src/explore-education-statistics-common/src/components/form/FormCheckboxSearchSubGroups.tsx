@@ -4,7 +4,6 @@ import FormFieldset, {
 } from '@common/components/form/FormFieldset';
 import useMounted from '@common/hooks/useMounted';
 import camelCase from 'lodash/camelCase';
-import sum from 'lodash/sum';
 import React, { useState } from 'react';
 import styles from './FormCheckboxSearchSubGroups.module.scss';
 import FormCheckboxSubGroups, {
@@ -14,12 +13,10 @@ import FormTextSearchInput from './FormTextSearchInput';
 
 export interface FormCheckboxSearchSubGroupsProps
   extends FormCheckboxSubGroupsProps {
-  hideCount?: boolean;
   searchLabel?: string;
 }
 
 const FormCheckboxSearchSubGroups = ({
-  hideCount = false,
   searchLabel = 'Search options',
   legend,
   legendHidden,
@@ -64,25 +61,10 @@ const FormCheckboxSearchSubGroups = ({
       }));
   }
 
-  const selectedCount = sum(
-    options.flatMap(optionGroup =>
-      optionGroup.options.reduce(
-        (acc, option) => (value.indexOf(option.value) > -1 ? acc + 1 : acc),
-        0,
-      ),
-    ),
-  );
-
   return (
     <>
       {isMounted ? (
         <FormFieldset {...fieldsetProps}>
-          {selectedCount > 0 && !hideCount && (
-            <div className="govuk-!-margin-bottom-2">
-              <span className="govuk-tag govuk-!-font-size-14">{`${selectedCount} selected`}</span>
-            </div>
-          )}
-
           <FormTextSearchInput
             id={`${id}-search`}
             name={`${name}-search`}

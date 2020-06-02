@@ -10,12 +10,10 @@ import FormCheckboxGroup, {
 import styles from './FormCheckboxSearchGroup.module.scss';
 
 export interface FormCheckboxSearchGroupProps extends FormCheckboxGroupProps {
-  hideCount?: boolean;
   searchLabel?: string;
 }
 
 const FormCheckboxSearchGroup = ({
-  hideCount = false,
   searchLabel = 'Search options',
   legend,
   legendSize,
@@ -49,21 +47,10 @@ const FormCheckboxSearchGroup = ({
     );
   }
 
-  const selectedCount = options.reduce(
-    (acc, option) => (value.indexOf(option.value) > -1 ? acc + 1 : acc),
-    0,
-  );
-
   return (
     <>
       {isMounted ? (
         <FormFieldset {...fieldsetProps}>
-          {selectedCount > 0 && !hideCount && (
-            <div className="govuk-!-margin-bottom-2">
-              <span className="govuk-tag govuk-!-font-size-14">{`${selectedCount} selected`}</span>
-            </div>
-          )}
-
           <FormTextSearchInput
             id={`${id}-search`}
             name={`${name}-search`}

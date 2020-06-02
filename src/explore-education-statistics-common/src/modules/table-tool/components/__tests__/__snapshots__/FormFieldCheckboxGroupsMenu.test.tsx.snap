@@ -217,7 +217,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with single c
   id="test"
 >
   <legend
-    class="govuk-fieldset__legend govuk-fieldset__legend--l"
+    class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
   >
     Choose options
   </legend>

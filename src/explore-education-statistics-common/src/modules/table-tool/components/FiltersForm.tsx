@@ -7,9 +7,10 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
 import {
-  FilterOption,
   PublicationSubjectMeta,
+  FilterOption,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
@@ -184,7 +185,12 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                     <FormFieldCheckboxSearchSubGroups
                       name="indicators"
                       id={`${formId}-indicators`}
-                      legend="Indicators"
+                      legend={
+                        <>
+                          Indicators
+                          <FormCheckboxSelectedCount name="indicators" />
+                        </>
+                      }
                       legendSize="m"
                       hint="Select at least one indicator"
                       selectAll
