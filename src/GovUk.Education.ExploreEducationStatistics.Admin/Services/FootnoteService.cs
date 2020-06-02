@@ -112,10 +112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         DeleteEntities(footnote.FilterItems);
                         DeleteEntities(footnote.Indicators);
 
-                        Remove(id);
+                        await RemoveAsync(id);
                     } 
                     
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return true;
                 }));
         }
