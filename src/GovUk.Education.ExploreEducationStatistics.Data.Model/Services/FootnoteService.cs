@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -42,6 +45,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     indicatorListParam,
                     filterItemListParam)
                 .AsNoTracking();
+        }
+        
+        public async Task<Either<ActionResult, bool>> DeleteFootnote(Guid releaseId, Guid id)
+        {
+            var footnote = _context.Footnote
+                .Include(f => f.Filters)
+                .Include(f => f.FilterGroups)
+                .Include(f => f.FilterItems)
+                .Include(f => f.Indicators)
+                .Include(f => f.Subjects).FirstOrDefault(f => f.Id == id);
+
+            if (footnote != null)
+            {
+                await DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
+
+                if (await IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
+                {
+                    DeleteEntities(footnote.Subjects);
+                    DeleteEntities(footnote.Filters);
+                    DeleteEntities(footnote.FilterGroups);
+                    DeleteEntities(footnote.FilterItems);
+                    DeleteEntities(footnote.Indicators);
+
+                    await RemoveAsync(id);
+                }
+            }
+            return true;
+        }
+
+        public async Task<Either<ActionResult, bool>> DeleteFootnotes(Guid releaseId, List<Footnote> footnotes)
+        {
+            foreach (var footnote in footnotes)
+            {
+                await DeleteFootnote(releaseId, footnote.Id);
+            }
+
+            return true;
+        }
+        
+        public async Task<bool> IsFootnoteExclusiveToReleaseAsync(Guid releaseId, Guid footnoteId)
+        {
+            var otherFootnoteReferences = await _context
+                .ReleaseFootnote
+                .CountAsync(rf => rf.FootnoteId == footnoteId && rf.ReleaseId != releaseId);
+
+            return otherFootnoteReferences == 0;
+        }
+
+        private async Task DeleteReleaseFootnoteLinkAsync(Guid releaseId, Guid footnoteId)
+        {
+            var releaseFootnote = await _context
+                .ReleaseFootnote
+                .Where(rf => 
+                    rf.ReleaseId == releaseId 
+                    && rf.FootnoteId == footnoteId)
+                .FirstOrDefaultAsync();
+            
+            _context.ReleaseFootnote.Remove(releaseFootnote);
+        }
+        
+        private void DeleteEntities<T>(IEnumerable<T> entitiesToDelete)
+        {
+            foreach (var t in entitiesToDelete)
+            {
+                _context.Entry(t).State = EntityState.Deleted;
+            }
         }
     }
 }

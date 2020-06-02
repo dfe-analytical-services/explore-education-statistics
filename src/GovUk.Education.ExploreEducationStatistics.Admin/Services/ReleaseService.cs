@@ -449,7 +449,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async footnotes =>
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var orphanFootnotes = subject == null ? new List<Footnote>() : await _releaseSubjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
+                    var orphanFootnotes = subject == null ? new List<Footnote>() : await _releaseSubjectService.GetFootnotesAsync(releaseId, subject.Id);
                     
                     return new DeleteDataFilePlan
                     {

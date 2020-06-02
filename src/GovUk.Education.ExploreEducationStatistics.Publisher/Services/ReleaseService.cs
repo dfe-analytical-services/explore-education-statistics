@@ -152,10 +152,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         
         public async Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds)
         {
-            var previousVersions = _contentDbContext.Releases.Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
-                    .Select(r => r.PreviousVersionId);
-
-            foreach (var releaseSubject in _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)))
+            var versions = await _contentDbContext.Releases.Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
+                .ToListAsync();
+            var previousVersions = versions.Select(v => v.PreviousVersionId);
+            
+            foreach (var releaseSubject in await _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)).ToListAsync())
             {
                 await _releaseSubjectService.RemoveReleaseSubjectLinkAsync(releaseSubject.ReleaseId,
                     releaseSubject.SubjectId);

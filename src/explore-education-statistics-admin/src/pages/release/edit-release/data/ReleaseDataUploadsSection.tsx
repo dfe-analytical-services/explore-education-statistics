@@ -304,7 +304,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               'This release has been approved, and can no longer be updated.'}
 
             {typeof canUpdateRelease !== 'undefined' &&
-              canUpdateRelease &&
+              !canUpdateRelease &&
               'This release is an amendment to a live release and so it is not possible to change any data files.'}
 
             {dataFiles.length > 0 && (

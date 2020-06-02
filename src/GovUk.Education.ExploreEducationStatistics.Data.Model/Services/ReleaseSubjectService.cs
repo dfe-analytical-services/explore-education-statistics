@@ -11,10 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
     public class ReleaseSubjectService : IReleaseSubjectService
     {
         private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly IFootnoteService _footnoteService;
 
-        public ReleaseSubjectService(StatisticsDbContext statisticsDbContext)
+        public ReleaseSubjectService(StatisticsDbContext statisticsDbContext, IFootnoteService footnoteService)
         {
             _statisticsDbContext = statisticsDbContext;
+            _footnoteService = footnoteService;
         }
 
         public async Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, Guid subjectId)
@@ -34,6 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             _statisticsDbContext.ReleaseSubject.Remove(releaseSubjectLinkToRemove);
             
+            var footnotesForSubject = await GetFootnotesAsync(releaseId, subjectId);
+
+            await _footnoteService.DeleteFootnotes(releaseId, footnotesForSubject);
+            
             if (numberOfReleaseSubjectLinks == 1)
             {
                 var subject = await _statisticsDbContext
@@ -42,10 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             
                 if (subject != null)
                 {
-                    var orphanFootnotes = await GetFootnotesOnlyForSubjectAsync(subjectId);
-
                     _statisticsDbContext.Subject.Remove(subject);
-                    _statisticsDbContext.Footnote.RemoveRange(orphanFootnotes);
                 }    
             }
         
@@ -53,10 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return true;
         }
         
-        public async Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(Guid subjectId)
+        public async Task<List<Footnote>> GetFootnotesAsync(Guid releaseId, Guid subjectId)
         {
             var footnotesLinkedToSubject = await _statisticsDbContext
                 .Footnote
+                .Include(f => f.Releases)
                 .Include(f => f.Filters)
                 .Include(f => f.FilterGroups)
                 .ThenInclude(fg => fg.FilterGroup)
@@ -70,11 +74,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .ThenInclude(i => i.IndicatorGroup)
                 .Include(f => f.Subjects)
                 .Where(footnote => 
-                    footnote.Subjects.Select(s => s.SubjectId).Contains(subjectId)
+                    footnote.Releases.Select(r => r.ReleaseId).Contains(releaseId) &&
+                    (footnote.Subjects.Select(s => s.SubjectId).Contains(subjectId)
                     || footnote.Filters.Select(filterFootnote => filterFootnote.Filter.SubjectId).Contains(subjectId)
                     || footnote.FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroup.Filter.SubjectId).Contains(subjectId)
                     || footnote.FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId).Contains(subjectId)
-                    || footnote.Indicators.Select(indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroup.SubjectId).Contains(subjectId)
+                    || footnote.Indicators.Select(indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroup.SubjectId).Contains(subjectId))
                 )
                 .ToListAsync();
              

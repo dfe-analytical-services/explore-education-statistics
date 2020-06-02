@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     {
         Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, Guid subjectId);
         
-        Task<List<Footnote>> GetFootnotesOnlyForSubjectAsync(Guid subjectId);
+        Task<List<Footnote>> GetFootnotesAsync(Guid releaseId, Guid subjectId);
     }
 }

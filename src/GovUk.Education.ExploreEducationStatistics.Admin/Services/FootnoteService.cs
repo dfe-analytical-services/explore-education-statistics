@@ -30,7 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
-
+        private readonly GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService
+            _commonFootnoteService;
+        
         public FootnoteService(StatisticsDbContext context,
             ILogger<FootnoteService> logger,
             IFilterService filterService,
@@ -39,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IIndicatorService indicatorService,
             ISubjectService subjectService, 
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper, 
-            IUserService userService, 
+            IUserService userService,
+            GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService commonFootnoteService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper) : base(context, logger)
         {
             _filterService = filterService;
@@ -49,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
+            _commonFootnoteService = commonFootnoteService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
         }
 
@@ -99,22 +103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id, HydrateFootnote)
+                .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id)
                 .OnSuccess(async footnote =>
                 {
-                    await DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
-                    
-                    if (await IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
-                    {
-                        DeleteEntities(footnote.Subjects);
-                        DeleteEntities(footnote.Filters);
-                        DeleteEntities(footnote.FilterGroups);
-                        DeleteEntities(footnote.FilterItems);
-                        DeleteEntities(footnote.Indicators);
-
-                        await RemoveAsync(id);
-                    } 
-                    
+                    await _commonFootnoteService.DeleteFootnote(releaseId, footnote.Id);
                     await _context.SaveChangesAsync();
                     return true;
                 }));
@@ -136,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id, HydrateFootnote)
                 .OnSuccess(async footnote =>
                 {
-                    if (await IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
+                    if (await _commonFootnoteService.IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
                     {
                         DbSet().Update(footnote);
 
@@ -350,14 +342,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private void DeleteEntities<T>(IEnumerable<T> entitiesToDelete)
-        {
-            foreach (var t in entitiesToDelete)
-            {
-                _context.Entry(t).State = EntityState.Deleted;
-            }
-        }
-
         private static bool SequencesAreEqualIgnoringOrder(IEnumerable<Guid> left, IEnumerable<Guid> right)
         {
             return left.OrderBy(id => id).SequenceEqual(right.OrderBy(id => id));
@@ -390,27 +374,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(indicator => indicator.IndicatorGroup)
                 .Include(footnote => footnote.Subjects)
                 .SingleOrDefault();
-        }
-        
-        private async Task<bool> IsFootnoteExclusiveToReleaseAsync(Guid releaseId, Guid footnoteId)
-        {
-            var otherFootnoteReferences = await _context
-                .ReleaseFootnote
-                .CountAsync(rf => rf.FootnoteId == footnoteId && rf.ReleaseId != releaseId);
-
-            return otherFootnoteReferences == 0;
-        }
-        
-        private async Task DeleteReleaseFootnoteLinkAsync(Guid releaseId, Guid footnoteId)
-        {
-            var releaseFootnote = await _context
-                .ReleaseFootnote
-                .Where(rf => 
-                    rf.ReleaseId == releaseId 
-                    && rf.FootnoteId == footnoteId)
-                .FirstOrDefaultAsync();
-            
-            _context.ReleaseFootnote.Remove(releaseFootnote);
         }
     }
 }

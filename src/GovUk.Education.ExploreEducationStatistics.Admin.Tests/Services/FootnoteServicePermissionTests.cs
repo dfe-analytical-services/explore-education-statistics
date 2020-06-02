@@ -103,7 +103,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 indicatorService, 
                 subjectService, 
                 releaseHelper, 
-                userService, 
+                userService,
+                footnoteService,
                 footnoteHelper
                 ) = Mocks();
             
@@ -118,7 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     indicatorService.Object, 
                     subjectService.Object, 
                     releaseHelper.Object, 
-                    userService.Object, 
+                    userService.Object,
+                    footnoteService.Object,
                     footnoteHelper.Object
                 );
 
@@ -135,6 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ISubjectService>,
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IUserService>,
+            Mock<IFootnoteService>,
             Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
         {
             var contentPersistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
@@ -148,7 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IIndicatorService>(), 
                 new Mock<ISubjectService>(), 
                 contentPersistenceHelper,
-                new Mock<IUserService>(), 
+                new Mock<IUserService>(),
+                new Mock<IFootnoteService>(), 
                 MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(footnote.Id, footnote));
         }
     }
