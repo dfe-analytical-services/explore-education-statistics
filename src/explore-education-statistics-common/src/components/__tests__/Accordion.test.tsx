@@ -1,10 +1,10 @@
-import { fireEvent, render, wait } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import Accordion from '../Accordion';
 import AccordionSection from '../AccordionSection';
 
 describe('Accordion', () => {
-  test('renders with hidden content by default', async () => {
+  test('renders with hidden content by default', () => {
     const { container } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading">
@@ -12,8 +12,6 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
-
-    await wait();
 
     expect(
       container.querySelector('.govuk-accordion__section--expanded'),
@@ -26,7 +24,7 @@ describe('Accordion', () => {
     expect(container).toMatchSnapshot();
   });
 
-  test('renders with visible content when `open` is true', async () => {
+  test('renders with visible content when `open` is true', () => {
     const { container } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading" open>
@@ -34,8 +32,6 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
-
-    await wait();
 
     expect(
       container.querySelector('govuk-accordion__section--expanded'),
@@ -48,7 +44,7 @@ describe('Accordion', () => {
     expect(container).toMatchSnapshot();
   });
 
-  test('clicking heading makes the hidden content visible', async () => {
+  test('clicking heading makes the hidden content visible', () => {
     const { getByText } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading">
@@ -56,8 +52,6 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
-
-    await wait();
 
     const heading = getByText('Test heading');
 
@@ -68,15 +62,13 @@ describe('Accordion', () => {
     expect(heading).toHaveAttribute('aria-expanded', 'true');
   });
 
-  test('generates section IDs in correct order', async () => {
+  test('generates section IDs in correct order', () => {
     const { getAllByText } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading">Test content</AccordionSection>
         <AccordionSection heading="Test heading">Test content</AccordionSection>
       </Accordion>,
     );
-
-    await wait();
 
     const headings = getAllByText('Test heading');
     const contents = getAllByText('Test content');
@@ -88,7 +80,7 @@ describe('Accordion', () => {
     expect(contents[1]).toHaveAttribute('id', 'test-sections-2-content');
   });
 
-  test('can use custom heading or content IDs for sections', async () => {
+  test('can use custom heading or content IDs for sections', () => {
     const { getAllByText } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading" id="custom-1">
@@ -97,8 +89,6 @@ describe('Accordion', () => {
         <AccordionSection heading="Test heading">Test content</AccordionSection>
       </Accordion>,
     );
-
-    await wait();
 
     const headings = getAllByText('Test heading');
     const contents = getAllByText('Test content');
@@ -125,8 +115,6 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    await wait();
-
     const heading = getByText('Test heading 1');
 
     jest.runOnlyPendingTimers();
@@ -149,19 +137,19 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    await wait();
-
     const content = container.querySelector(
       '#test-sections-1-content',
     ) as HTMLElement;
 
-    jest.runOnlyPendingTimers();
+    jest.advanceTimersByTime(300);
 
-    expect(getByText('Test heading 1')).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
-    expect(content.scrollIntoView).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(getByText('Test heading 1')).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
+      expect(content.scrollIntoView).toHaveBeenCalled();
+    });
   });
 
   test('scrolls to and opens section if location hash matches an element in the section content', async () => {
@@ -179,19 +167,22 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    await wait();
+    jest.advanceTimersByTime(300);
 
-    expect(getByText('Test heading 2')).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
+    await waitFor(() => {
+      expect(getByText('Test heading 2')).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
 
-    const content = container.querySelector('#test-heading') as HTMLElement;
-    jest.runOnlyPendingTimers();
-    expect(content.scrollIntoView).toHaveBeenCalled();
+      const content = container.querySelector('#test-heading') as HTMLElement;
+
+      expect(content.scrollIntoView).toHaveBeenCalled();
+    });
   });
 
-  test('accordion sections that were opened when the location hash matches an element in the section content can be closed', async () => {
+  test('accordion sections that were opened when the location hash matches an element in the section content can be closed', () => {
+    jest.useFakeTimers();
     window.location.hash = '#test-sections-1-content';
 
     const { getByText } = render(
@@ -205,16 +196,18 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    await wait();
+    jest.runOnlyPendingTimers();
 
     const heading = getByText('Test heading 1') as HTMLElement;
 
     expect(heading).toHaveAttribute('aria-expanded', 'true');
+
     fireEvent.click(heading);
+
     expect(heading).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('clicking on `Open all` reveals all sections', async () => {
+  test('clicking on `Open all` reveals all sections', () => {
     const { getByText, getAllByText } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1">
@@ -225,8 +218,6 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
-
-    await wait();
 
     const button = getByText('Open all');
     const sections = getAllByText(/Test heading/);
@@ -242,7 +233,7 @@ describe('Accordion', () => {
     expect(sections[1]).toHaveAttribute('aria-expanded', 'true');
   });
 
-  test('clicking on `Open all` causes `onToggleAll` handler to be called with new state', async () => {
+  test('clicking on `Open all` causes `onToggleAll` handler to be called with new state', () => {
     const toggleAll = jest.fn();
 
     const { getByText } = render(
@@ -253,8 +244,6 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    await wait();
-
     expect(toggleAll).not.toHaveBeenCalled();
 
     fireEvent.click(getByText('Open all'));
@@ -262,7 +251,7 @@ describe('Accordion', () => {
     expect(toggleAll).toHaveBeenCalledWith(true);
   });
 
-  test('clicking on `Close all` closes all sections', async () => {
+  test('clicking on `Close all` closes all sections', () => {
     const { getByText, getAllByText } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1" open>
@@ -273,8 +262,6 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
-
-    await wait();
 
     const button = getByText('Close all');
     const sections = getAllByText(/Test heading/);
@@ -290,7 +277,7 @@ describe('Accordion', () => {
     expect(sections[1]).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('clicking on `Close all` causes `onToggleAll` handler to be called with new state', async () => {
+  test('clicking on `Close all` causes `onToggleAll` handler to be called with new state', () => {
     const toggleAll = jest.fn();
 
     const { getByText } = render(
@@ -300,8 +287,6 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
-
-    await wait();
 
     expect(toggleAll).not.toHaveBeenCalled();
 

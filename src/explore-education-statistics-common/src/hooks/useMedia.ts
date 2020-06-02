@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
 
+export const breakpoints = {
+  mobile: '320px',
+  tablet: '641px',
+  desktop: '769px',
+};
+
 /**
  * Hook that detects if the window currently
  * matches a given media {@param query} string.
@@ -37,4 +43,8 @@ export default function useMedia(query: string) {
   };
 }
 
-export const useDesktopMedia = () => useMedia('(min-width: 40.0625em)');
+export const useMobileMedia = () =>
+  useMedia(`(max-width: ${breakpoints.tablet})`);
+
+export const useDesktopMedia = () =>
+  useMedia(`(min-width: ${breakpoints.desktop})`);

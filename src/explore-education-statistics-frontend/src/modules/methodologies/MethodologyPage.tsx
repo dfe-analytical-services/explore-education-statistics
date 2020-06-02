@@ -1,6 +1,5 @@
-import Accordion, { generateIdList } from '@common/components/Accordion';
+import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
 import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
@@ -11,11 +10,9 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
-import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
+import MethodologyContentSection from '@frontend/modules/methodologies/components/MethodologyContentSection';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-
-const accordionIds: string[] = generateIdList(2);
 
 interface Props {
   methodologySlug: string;
@@ -91,28 +88,22 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
       )}
 
       {data.content && (
-        <Accordion id={accordionIds[0]}>
+        <Accordion id="content">
           {data.content.map(({ heading, caption, order, content }) => {
             return (
               <AccordionSection
-                id={`${accordionIds[0]}-${order}`}
+                id={`content-section-${order}`}
                 heading={heading}
                 caption={caption}
                 key={order}
               >
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-one-quarter">
-                    <MethodologyHeader>
-                      <ContentSectionIndex
-                        fromId={`${accordionIds[0]}-${order}-content`}
-                      />
-                    </MethodologyHeader>
-                  </div>
-
-                  <div className="govuk-grid-column-three-quarters">
-                    <SectionBlocks content={content} />
-                  </div>
-                </div>
+                {({ open, contentId }) => (
+                  <MethodologyContentSection
+                    id={contentId}
+                    open={open}
+                    content={content}
+                  />
+                )}
               </AccordionSection>
             );
           })}
@@ -123,7 +114,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         <>
           <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
-          <Accordion id={accordionIds[1]}>
+          <Accordion id="annexes">
             {data.annexes.map(({ heading, caption, order, content }) => {
               return (
                 <AccordionSection

@@ -26,10 +26,6 @@ export interface AccordionProps {
   onToggle?: (accordionSection: { id: string; title: string }) => void;
 }
 
-export function generateIdList(count: number) {
-  return new Array(count).fill('content-section-').map((id, n) => id + (n + 1));
-}
-
 const Accordion = ({
   children,
   id,
@@ -63,48 +59,48 @@ const Accordion = ({
   );
 
   const { isMounted } = useMounted(() => {
-    const goToHash = () => {
-      if (!ref.current || !window.location.hash) {
-        return;
-      }
+    const goToHash = async () => {
+      setTimeout(() => {
+        if (!ref.current || !window.location.hash) {
+          return;
+        }
 
-      let locationHashEl: HTMLElement | null = null;
+        let locationHashEl: HTMLElement | null = null;
 
-      try {
-        locationHashEl = ref.current.querySelector(window.location.hash);
-      } catch (_) {
-        return;
-      }
+        try {
+          locationHashEl = ref.current.querySelector(window.location.hash);
+        } catch (_) {
+          return;
+        }
 
-      if (!locationHashEl) {
-        return;
-      }
+        if (!locationHashEl) {
+          return;
+        }
 
-      const sectionEl = locationHashEl.closest(
-        `.${accordionSectionClasses.section}`,
-      );
-
-      if (!sectionEl) {
-        return;
-      }
-
-      updateOpenSections(draft => {
-        const matchingSection = sections.find(
-          section => sectionEl.id === section.id,
+        const sectionEl = locationHashEl.closest(
+          `.${accordionSectionClasses.section}`,
         );
 
-        if (matchingSection) {
-          draft[matchingSection.id] = true;
+        if (!sectionEl) {
+          return;
         }
-      });
 
-      setTimeout(
-        () =>
+        updateOpenSections(draft => {
+          const matchingSection = sections.find(
+            section => sectionEl.id === section.id,
+          );
+
+          if (matchingSection) {
+            draft[matchingSection.id] = true;
+          }
+        });
+
+        setTimeout(() => {
           (locationHashEl as HTMLElement).scrollIntoView({
             block: 'start',
-          }),
-        100,
-      );
+          });
+        }, 100);
+      }, 200);
     };
 
     goToHash();
