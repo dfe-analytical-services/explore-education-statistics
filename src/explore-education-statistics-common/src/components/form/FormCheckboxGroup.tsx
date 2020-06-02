@@ -1,12 +1,16 @@
 import ButtonText from '@common/components/ButtonText';
+import useMounted from '@common/hooks/useMounted';
 import { OmitStrict, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import React, {
-  createRef,
+  FocusEventHandler,
+  memo,
   MouseEvent,
   MouseEventHandler,
-  PureComponent,
+  useCallback,
+  useMemo,
+  useRef,
 } from 'react';
 import FormCheckbox, {
   CheckboxChangeEventHandler,
@@ -31,8 +35,6 @@ interface BaseFormCheckboxGroupProps {
   disabled?: boolean;
   id: string;
   name: string;
-  onAllChange?: CheckboxGroupAllChangeEventHandler;
-  onChange?: CheckboxChangeEventHandler;
   options: CheckboxOption[];
   selectAll?: boolean;
   small?: boolean;
@@ -41,122 +43,111 @@ interface BaseFormCheckboxGroupProps {
     | ((option: CheckboxOption) => CheckboxOption[keyof CheckboxOption])[];
   orderDirection?: ('asc' | 'desc')[];
   value: string[];
+  onAllChange?: CheckboxGroupAllChangeEventHandler;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
+  onChange?: CheckboxChangeEventHandler;
 }
-
-export type FormCheckboxGroupProps = BaseFormCheckboxGroupProps &
-  FormFieldsetProps;
 
 /**
  * Basic checkbox group that should be used as a controlled component.
  */
-export class BaseFormCheckboxGroup extends PureComponent<
-  BaseFormCheckboxGroupProps
-> {
-  public static defaultProps = {
-    selectAll: false,
-    small: false,
-    order: ['label'],
-    orderDirection: ['asc'],
-    value: [],
-  };
+export const BaseFormCheckboxGroup = ({
+  disabled,
+  value = [],
+  id,
+  name,
+  options,
+  selectAll = false,
+  small,
+  order = ['label'],
+  orderDirection = ['asc'],
+  onBlur,
+  onChange,
+  onAllChange,
+}: BaseFormCheckboxGroupProps) => {
+  const ref = useRef<HTMLDivElement>(null);
 
-  private ref = createRef<HTMLDivElement>();
-
-  public componentDidMount(): void {
-    if (this.ref.current) {
+  useMounted(() => {
+    if (ref.current) {
       import('govuk-frontend/govuk/components/checkboxes/checkboxes').then(
         ({ default: GovUkCheckboxes }) => {
-          if (this.ref.current) {
-            new GovUkCheckboxes(this.ref.current).init();
+          if (ref.current) {
+            new GovUkCheckboxes(ref.current).init();
           }
         },
       );
     }
-  }
+  });
 
-  private handleAllChange: MouseEventHandler<HTMLButtonElement> = event => {
-    const { onAllChange } = this.props;
-
-    if (onAllChange) {
-      onAllChange(event, this.isAllChecked());
-    }
-  };
-
-  private handleChange: CheckboxChangeEventHandler = (event, option) => {
-    const { onChange } = this.props;
-
-    if (onChange) {
-      onChange(event, option);
-    }
-  };
-
-  private isAllChecked = () => {
-    const { options, value } = this.props;
-
+  const isAllChecked = useMemo(() => {
     return options.every(option => value.indexOf(option.value) > -1);
+  }, [options, value]);
+
+  const handleAllChange: MouseEventHandler<HTMLButtonElement> = useCallback(
+    event => {
+      if (onAllChange) {
+        onAllChange(event, isAllChecked);
+      }
+    },
+    [isAllChecked, onAllChange],
+  );
+
+  return (
+    <div
+      className={classNames('govuk-checkboxes', {
+        'govuk-checkboxes--small': small,
+      })}
+      ref={ref}
+    >
+      {options.length > 1 && selectAll && (
+        <ButtonText
+          id={`${id}-all`}
+          onClick={handleAllChange}
+          className={styles.selectAll}
+          underline={false}
+        >
+          {`${isAllChecked ? 'Unselect' : 'Select'} all ${
+            options.length
+          } options`}
+        </ButtonText>
+      )}
+
+      {orderBy(options, order, orderDirection).map(option => (
+        <FormCheckbox
+          disabled={disabled}
+          {...option}
+          id={
+            option.id ? option.id : `${id}-${option.value.replace(/\s/g, '-')}`
+          }
+          name={name}
+          key={option.value}
+          checked={value.indexOf(option.value) > -1}
+          onBlur={onBlur}
+          onChange={onChange}
+        />
+      ))}
+
+      {options.length === 0 && <p>No options available.</p>}
+    </div>
+  );
+};
+
+export type FormCheckboxGroupProps = BaseFormCheckboxGroupProps &
+  OmitStrict<FormFieldsetProps, 'onBlur' | 'onFocus'> & {
+    onFieldsetBlur?: FocusEventHandler<HTMLFieldSetElement>;
+    onFieldsetFocus?: FocusEventHandler<HTMLFieldSetElement>;
   };
 
-  public render() {
-    const {
-      disabled,
-      value,
-      name,
-      id,
-      options,
-      selectAll,
-      order,
-      orderDirection,
-      small,
-    } = this.props;
-
-    return (
-      <div
-        className={classNames('govuk-checkboxes', {
-          'govuk-checkboxes--small': small,
-        })}
-        ref={this.ref}
-      >
-        {options.length > 1 && selectAll && (
-          <ButtonText
-            id={`${id}-all`}
-            onClick={this.handleAllChange}
-            className={styles.selectAll}
-            underline={false}
-          >
-            {`${this.isAllChecked() ? 'Unselect' : 'Select'} all ${
-              options.length
-            } options`}
-          </ButtonText>
-        )}
-
-        {orderBy(options, order, orderDirection).map(option => (
-          <FormCheckbox
-            disabled={disabled}
-            {...option}
-            id={
-              option.id
-                ? option.id
-                : `${id}-${option.value.replace(/\s/g, '-')}`
-            }
-            name={name}
-            key={option.value}
-            checked={value.indexOf(option.value) > -1}
-            onChange={this.handleChange}
-          />
-        ))}
-
-        {options.length === 0 && <p>No options available.</p>}
-      </div>
-    );
-  }
-}
-
-const FormCheckboxGroup = (props: FormCheckboxGroupProps) => {
+const FormCheckboxGroup = ({
+  onFieldsetBlur,
+  onFieldsetFocus,
+  ...props
+}: FormCheckboxGroupProps) => {
   return (
-    <FormFieldset {...props}>
+    <FormFieldset {...props} onBlur={onFieldsetBlur} onFocus={onFieldsetFocus}>
       <BaseFormCheckboxGroup {...props} />
     </FormFieldset>
   );
 };
 
-export default FormCheckboxGroup;
+export default memo(FormCheckboxGroup);

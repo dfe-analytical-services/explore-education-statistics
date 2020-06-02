@@ -3,7 +3,6 @@ import FormFieldset, {
   FormFieldsetProps,
 } from '@common/components/form/FormFieldset';
 import useMounted from '@common/hooks/useMounted';
-import camelCase from 'lodash/camelCase';
 import React, { useState } from 'react';
 import styles from './FormCheckboxSearchSubGroups.module.scss';
 import FormCheckboxSubGroups, {
@@ -18,14 +17,32 @@ export interface FormCheckboxSearchSubGroupsProps
 
 const FormCheckboxSearchSubGroups = ({
   searchLabel = 'Search options',
-  legend,
-  legendHidden,
-  legendSize,
-  hint,
-  error,
   ...props
 }: FormCheckboxSearchSubGroupsProps) => {
-  const { id, name, options, onAllChange, value = [] } = props;
+  const { isMounted } = useMounted();
+
+  const [searchTerm, setSearchTerm] = useState('');
+
+  if (!isMounted) {
+    return <FormCheckboxSubGroups {...props} />;
+  }
+
+  const {
+    id,
+    legend,
+    hint,
+    legendHidden,
+    legendSize,
+    error,
+    name,
+    onAllChange,
+    onFieldsetFocus,
+    onFieldsetBlur,
+    options = [],
+    value = [],
+    ...groupProps
+  } = props;
+
   const fieldsetProps: FormFieldsetProps = {
     id,
     legend,
@@ -33,16 +50,15 @@ const FormCheckboxSearchSubGroups = ({
     legendSize,
     hint,
     error,
+    onFocus: onFieldsetFocus,
+    onBlur: onFieldsetBlur,
   };
-
-  const { isMounted } = useMounted();
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const lowercaseSearchTerm = searchTerm.toLowerCase();
 
   let filteredOptions = options;
 
   if (searchTerm) {
+    const lowercaseSearchTerm = searchTerm.toLowerCase();
+
     filteredOptions = options
       .filter(optionGroup =>
         optionGroup.options.some(
@@ -62,48 +78,40 @@ const FormCheckboxSearchSubGroups = ({
   }
 
   return (
-    <>
-      {isMounted ? (
-        <FormFieldset {...fieldsetProps}>
-          <FormTextSearchInput
-            id={`${id}-search`}
-            name={`${name}-search`}
-            onChange={event => setSearchTerm(event.target.value)}
-            onKeyPress={event => {
-              if (event.key === 'Enter') {
-                event.preventDefault();
+    <FormFieldset {...fieldsetProps}>
+      <FormTextSearchInput
+        id={`${id}-search`}
+        name={`${name}-search`}
+        label={searchLabel}
+        width={20}
+        onChange={event => setSearchTerm(event.target.value)}
+        onKeyPress={event => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+          }
+        }}
+      />
+
+      <div aria-live="assertive" className={styles.optionsContainer}>
+        {filteredOptions.map((optionGroup, index) => (
+          <FormCheckboxGroup
+            {...groupProps}
+            key={optionGroup.legend}
+            name={name}
+            id={optionGroup.id ? optionGroup.id : `${id}-${index + 1}`}
+            legend={optionGroup.legend}
+            legendSize="s"
+            options={optionGroup.options}
+            value={value}
+            onAllChange={(event, checked) => {
+              if (onAllChange) {
+                onAllChange(event, checked, optionGroup.options);
               }
             }}
-            label={searchLabel}
-            width={20}
           />
-
-          <div aria-live="assertive" className={styles.optionsContainer}>
-            {filteredOptions.map(optionGroup => (
-              <FormCheckboxGroup
-                {...props}
-                id={
-                  optionGroup.id
-                    ? optionGroup.id
-                    : `${id}-${camelCase(optionGroup.legend)}`
-                }
-                key={optionGroup.legend}
-                legend={optionGroup.legend}
-                legendSize="s"
-                options={optionGroup.options}
-                onAllChange={(event, checked) => {
-                  if (onAllChange) {
-                    onAllChange(event, checked, optionGroup.options);
-                  }
-                }}
-              />
-            ))}
-          </div>
-        </FormFieldset>
-      ) : (
-        <FormCheckboxSubGroups {...fieldsetProps} {...props} />
-      )}
-    </>
+        ))}
+      </div>
+    </FormFieldset>
   );
 };
 
