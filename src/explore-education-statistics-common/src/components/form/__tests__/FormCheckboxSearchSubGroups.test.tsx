@@ -45,7 +45,7 @@ describe('FormCheckboxSearchSubGroups', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('generates group IDs from group legends if none provided', () => {
+  test('generates group IDs if none provided', () => {
     const { container } = render(
       <FormCheckboxSearchSubGroups
         id="test-checkboxes"
@@ -66,8 +66,8 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    expect(container.querySelector('#test-checkboxes-groupA')).not.toBeNull();
-    expect(container.querySelector('#test-checkboxes-groupB')).toBeNull();
+    expect(container.querySelector('#test-checkboxes-1')).not.toBeNull();
+    expect(container.querySelector('#test-checkboxes-2')).toBeNull();
     expect(container.querySelector('#custom-group-id')).not.toBeNull();
   });
 

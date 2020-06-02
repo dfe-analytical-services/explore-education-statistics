@@ -23,7 +23,7 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
     >
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset"
-                  id="test-checkboxes-groupA"
+                  id="test-checkboxes-1"
         >
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
             Group A
@@ -31,26 +31,26 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
           <div class="govuk-checkboxes">
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
-                     id="test-checkboxes-groupA-1"
+                     id="test-checkboxes-1-1"
                      name="testCheckboxes"
                      type="checkbox"
                      value="1"
               >
               <label class="govuk-label govuk-checkboxes__label"
-                     for="test-checkboxes-groupA-1"
+                     for="test-checkboxes-1-1"
               >
                 Checkbox 1
               </label>
             </div>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
-                     id="test-checkboxes-groupA-2"
+                     id="test-checkboxes-1-2"
                      name="testCheckboxes"
                      type="checkbox"
                      value="2"
               >
               <label class="govuk-label govuk-checkboxes__label"
-                     for="test-checkboxes-groupA-2"
+                     for="test-checkboxes-1-2"
               >
                 Checkbox 2
               </label>
@@ -60,7 +60,7 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
       </div>
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset"
-                  id="test-checkboxes-groupB"
+                  id="test-checkboxes-2"
         >
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
             Group B
@@ -68,26 +68,26 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
           <div class="govuk-checkboxes">
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
-                     id="test-checkboxes-groupB-3"
+                     id="test-checkboxes-2-3"
                      name="testCheckboxes"
                      type="checkbox"
                      value="3"
               >
               <label class="govuk-label govuk-checkboxes__label"
-                     for="test-checkboxes-groupB-3"
+                     for="test-checkboxes-2-3"
               >
                 Checkbox 3
               </label>
             </div>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
-                     id="test-checkboxes-groupB-4"
+                     id="test-checkboxes-2-4"
                      name="testCheckboxes"
                      type="checkbox"
                      value="4"
               >
               <label class="govuk-label govuk-checkboxes__label"
-                     for="test-checkboxes-groupB-4"
+                     for="test-checkboxes-2-4"
               >
                 Checkbox 4
               </label>
