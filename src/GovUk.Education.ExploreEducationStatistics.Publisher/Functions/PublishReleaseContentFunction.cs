@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -69,7 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 try
                 {
-                    await _releaseService.RemoveDataForPreviousVersions(releaseIds);
+                    if (!PublisherUtils.IsDevelopment())
+                    {
+                        await _releaseService.RemoveDataForPreviousVersions(releaseIds);
+                    }
+
                     await _notificationsService.NotifySubscribersAsync(releaseIds);
                     await UpdateStage(published, Complete);
                 }
