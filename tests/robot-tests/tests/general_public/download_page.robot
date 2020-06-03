@@ -20,6 +20,7 @@ Validate Pupils and schools contains Pupil absence files
     [Documentation]  EES-562
     [Tags]  HappyPath
     user checks page contains accordion   Pupils and schools
+    user waits for page to finish loading
     user opens accordion section   Pupils and schools
 
     user checks accordion section contains text  Pupils and schools   Pupil absence

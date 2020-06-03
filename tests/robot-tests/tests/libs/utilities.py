@@ -7,6 +7,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
+def user_waits_for_page_to_finish_loading():
+  # This is required because despite the DOM being loaded, and even a button being enabled, React/NextJS
+  # hasn't finished processing the page, and so click are intermittently ignored. I'm wrapping
+  # this sleep in a keyword such that if we find a way to check whether the JS processing has finished in the
+  # future, we can change it here.
+  time.sleep(0.2)
+
 def user_sets_focus_to_element(selector):
   if selector.startswith('css:'):
     selector = selector[4:]
@@ -54,11 +61,7 @@ def user_checks_there_are_x_accordion_sections(num):
   sl.page_should_contain_element('xpath:.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")]', limit=num)
 
 def user_verifies_accordion_is_open(section_text):
-  try:
-    sl.driver \
-      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-  except NoSuchElementException:
-    raise AssertionError(f'Cannot find accordion with header {section_text}')
+  sl.wait_until_page_contains_element(f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
 
   try:
     sl.driver \
@@ -80,18 +83,17 @@ def user_verifies_accordion_is_closed(section_text):
     raise AssertionError(f'Accordion section "{section_text}" should have attribute aria-expanded="false"')
 
 def user_opens_accordion_section(exact_section_text):
-  try:
-    elem = sl.driver \
-      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]')
-  except NoSuchElementException:
-    raise AssertionError(f'Cannot find accordion with header {exact_section_text}')
+  sl.wait_until_page_contains_element(f'xpath://*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]')
 
   try:
-    sl.driver \
+    elem = sl.driver \
       .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="false"]')
   except NoSuchElementException:
     BuiltIn().log_to_console(f'WARNING: Accordion section "{exact_section_text}" already open!')
     return
+
+  sl.set_focus_to_element(elem)
+  sl.wait_until_element_is_enabled(elem)
 
   try:
     elem.click()

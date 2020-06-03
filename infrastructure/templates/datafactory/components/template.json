@@ -1128,6 +1128,16 @@
                                             "name": "IndicatorGroupId",
                                             "type": "Guid"
                                         }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "DecimalPlaces",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "DecimalPlaces",
+                                            "type": "Int32"
+                                        }
                                     }
                                 ]
                             }

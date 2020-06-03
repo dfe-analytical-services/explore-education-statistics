@@ -33,12 +33,12 @@ User creates a new release for publication "${publication}" for start year "${st
     user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverage
     user selects from list by label  css:#releaseSummaryForm-timePeriodCoverage  Academic Year
     user enters text into element  css:#releaseSummaryForm-timePeriodCoverageStartYear  ${startYear}
-    user enters text into element  css:[id="scheduledPublishDate.day"]  30
-    user enters text into element  css:[id="scheduledPublishDate.month"]  09
-    user enters text into element  css:[id="scheduledPublishDate.year"]   ${startYear}
-    user enters text into element  css:[id="nextReleaseDate.day"]  01
-    user enters text into element  css:[id="nextReleaseDate.month"]  09
-    user enters text into element  css:[id="nextReleaseDate.year"]  ${nextYear}
+    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-day  30
+    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-month  09
+    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-year   ${startYear}
+    user enters text into element  css:#releaseSummaryForm-nextReleaseDate-day  01
+    user enters text into element  css:#releaseSummaryForm-nextReleaseDate-month  09
+    user enters text into element  css:#releaseSummaryForm-nextReleaseDate-year  ${nextYear}
     user selects radio   National Statistics
     user clicks element   xpath://button[text()="Create new release"]
     user waits until page contains element  xpath://span[text()="Edit release"]

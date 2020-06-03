@@ -12,6 +12,7 @@ Navigate to Find Statistics page
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/find-statistics
     user waits until page contains heading  Find statistics and data
+    user waits for page to finish loading
 
 # TODO: User uses search
 
