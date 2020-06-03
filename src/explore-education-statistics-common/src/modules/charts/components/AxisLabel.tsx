@@ -8,7 +8,7 @@ interface Props {
   className?: string;
   rotated?: boolean;
   style?: CSSProperties;
-  width?: number;
+  textStyle?: CSSProperties;
 }
 
 const AxisLabel = ({
@@ -17,7 +17,7 @@ const AxisLabel = ({
   className,
   rotated,
   style,
-  width,
+  textStyle,
 }: Props) => {
   return (
     <div
@@ -31,12 +31,7 @@ const AxisLabel = ({
           [styles.labelRotated]: rotated,
         })}
       >
-        <div
-          className="dfe-align--centre"
-          style={{
-            width,
-          }}
-        >
+        <div className="dfe-align--centre" style={textStyle}>
           {children}
         </div>
       </div>

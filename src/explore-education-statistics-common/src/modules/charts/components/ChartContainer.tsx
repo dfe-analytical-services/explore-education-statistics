@@ -29,8 +29,6 @@ const ChartContainer = ({
 }: Props) => {
   const { isMounted } = useMounted();
 
-  const yAxisLabelWidth = yAxisLabel?.text ? yAxisLabel?.width ?? 100 : 0;
-
   if (!isMounted) {
     return null;
   }
@@ -52,34 +50,49 @@ const ChartContainer = ({
           {yAxisLabel?.text && (
             <AxisLabel
               data-testid="y-axis-label"
-              width={
-                yAxisLabel.rotated ? height - xAxisHeight : yAxisLabelWidth
-              }
               rotated={yAxisLabel.rotated}
               style={{
+                flexBasis: yAxisLabel.rotated
+                  ? yAxisLabel.width || 50
+                  : yAxisLabel.width || 100,
+                maxWidth: '40%',
                 marginBottom: xAxisHeight,
                 marginRight: 10,
+              }}
+              textStyle={{
+                maxWidth: '100%',
+                width: yAxisLabel.rotated
+                  ? height - xAxisHeight
+                  : yAxisLabel.width || 100,
               }}
             >
               {yAxisLabel.text}
             </AxisLabel>
           )}
 
-          {children}
-        </div>
-
-        {xAxisLabel?.text && (
-          <AxisLabel
-            data-testid="x-axis-label"
-            className="dfe-flex dfe-justify-content--center"
-            width={xAxisLabel.width}
+          <div
             style={{
-              marginLeft: yAxisWidth + yAxisLabelWidth,
+              width: '100%',
             }}
           >
-            {xAxisLabel.text}
-          </AxisLabel>
-        )}
+            {children}
+
+            {xAxisLabel?.text && (
+              <AxisLabel
+                data-testid="x-axis-label"
+                className="dfe-flex dfe-justify-content--center"
+                style={{
+                  marginLeft: yAxisWidth,
+                }}
+                textStyle={{
+                  maxWidth: xAxisLabel.width,
+                }}
+              >
+                {xAxisLabel.text}
+              </AxisLabel>
+            )}
+          </div>
+        </div>
       </div>
 
       {legendPosition === 'bottom' && legend && (
