@@ -5,6 +5,7 @@ import releaseContentCommentService, {
   UpdateExtendedComment,
 } from '@admin/services/releaseContentCommentService';
 import { ExtendedComment } from '@admin/services/types/content';
+import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import classNames from 'classnames';
@@ -187,110 +188,99 @@ const Comments = ({
             </>
           )}
           <div className={styles.commentsContainer}>
-            {comments &&
-              comments.map(
-                (
-                  {
-                    id,
-                    userId,
-                    name,
-                    time,
-                    commentText,
-                    state,
-                    resolvedOn,
-                    resolvedBy,
-                  },
-                  index,
-                ) => (
-                  <div key={id}>
-                    <h2 className="govuk-body-xs govuk-!-margin-0">
-                      <strong>
-                        {name} <FormattedDate>{time}</FormattedDate>
-                      </strong>
-                    </h2>
-                    {editableComment && editableComment === id ? (
-                      <form>
-                        <textarea
-                          name="editComment"
-                          id={`edit_comment_${id}`}
-                          value={editableCommentText}
-                          onChange={e => setEditableCommentText(e.target.value)}
-                        />
-                        <button
-                          type="button"
-                          className="govuk-button"
-                          disabled={editableCommentText.length === 0}
-                          onClick={() => {
-                            updateComment(index, editableCommentText);
-                          }}
-                        >
-                          Update
-                        </button>
-                      </form>
-                    ) : (
-                      <p className="govuk-body-xs govuk-!-margin-bottom-1">
-                        {commentText}
-                      </p>
-                    )}
-                    {state === 'open' && canResolve && (
+            {comments.map(
+              (
+                {
+                  id,
+                  userId,
+                  name,
+                  time,
+                  commentText,
+                  state,
+                  resolvedOn,
+                  resolvedBy,
+                },
+                index,
+              ) => (
+                <div key={id}>
+                  <h2 className="govuk-body-xs govuk-!-margin-0">
+                    <strong>
+                      {name} <FormattedDate>{time}</FormattedDate>
+                    </strong>
+                  </h2>
+                  {editableComment && editableComment === id ? (
+                    <form>
+                      <textarea
+                        name="editComment"
+                        id={`edit_comment_${id}`}
+                        value={editableCommentText}
+                        onChange={e => setEditableCommentText(e.target.value)}
+                      />
                       <button
                         type="button"
-                        className="govuk-body-xs govuk-!-margin-right-3"
-                        onClick={() => resolveComment(index)}
+                        className="govuk-button"
+                        disabled={editableCommentText.length === 0}
+                        onClick={() => {
+                          updateComment(index, editableCommentText);
+                        }}
                       >
-                        Resolve
+                        Update
                       </button>
-                    )}
-                    {state === 'resolved' && (
-                      <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
-                        <em>
-                          Resolved{' '}
-                          {resolvedOn && (
-                            <FormattedDate>resolvedOn</FormattedDate>
-                          )}{' '}
-                          by {resolvedBy}
-                        </em>
-                      </p>
-                    )}
-                    {canComment && (
-                      <>
-                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                        <a
-                          className="govuk-body-xs govuk-!-margin-right-3"
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => removeComment(index)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          Remove
-                        </a>
-                      </>
-                    )}
-                    {canComment && user?.id === userId && (
-                      <>
-                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                        <a
-                          className="govuk-body-xs govuk-!-margin-right-3"
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => {
-                            setEditableCommentText(commentText);
-                            return editableComment
-                              ? setEditableComment('')
-                              : setEditableComment(id);
-                          }}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          {editableComment && editableComment === id
-                            ? 'Cancel'
-                            : 'Edit'}
-                        </a>
-                      </>
-                    )}
-                    <hr />
-                  </div>
-                ),
-              )}
+                    </form>
+                  ) : (
+                    <p className="govuk-body-xs govuk-!-margin-bottom-1">
+                      {commentText}
+                    </p>
+                  )}
+                  {state === 'open' && canResolve && (
+                    <ButtonText
+                      className="govuk-body-xs govuk-!-margin-right-3"
+                      onClick={() => resolveComment(index)}
+                    >
+                      Resolve
+                    </ButtonText>
+                  )}
+                  {state === 'resolved' && (
+                    <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
+                      <em>
+                        Resolved{' '}
+                        {resolvedOn && (
+                          <FormattedDate>resolvedOn</FormattedDate>
+                        )}{' '}
+                        by {resolvedBy}
+                      </em>
+                    </p>
+                  )}
+                  {canComment && (
+                    <ButtonText
+                      className="govuk-body-xs govuk-!-margin-right-3"
+                      onClick={() => removeComment(index)}
+                    >
+                      Remove
+                    </ButtonText>
+                  )}
+                  {canComment && user?.id === userId && (
+                    <>
+                      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                      <ButtonText
+                        className="govuk-body-xs govuk-!-margin-right-3"
+                        onClick={() => {
+                          setEditableCommentText(commentText);
+                          return editableComment
+                            ? setEditableComment('')
+                            : setEditableComment(id);
+                        }}
+                      >
+                        {editableComment && editableComment === id
+                          ? 'Cancel'
+                          : 'Edit'}
+                      </ButtonText>
+                    </>
+                  )}
+                  <hr />
+                </div>
+              ),
+            )}
           </div>
         </Details>
       </div>
