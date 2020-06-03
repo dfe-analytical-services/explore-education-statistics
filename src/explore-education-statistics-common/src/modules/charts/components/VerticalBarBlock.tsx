@@ -78,9 +78,9 @@ const VerticalBarBlock = ({
       legend={legendProps}
       legendPosition={legend}
       yAxisWidth={yAxisWidth}
-      yAxisLabel={axes.major.label}
+      yAxisLabel={axes.minor.label}
       xAxisHeight={xAxisHeight}
-      xAxisLabel={axes.minor.label}
+      xAxisLabel={axes.major.label}
     >
       <ResponsiveContainer width={width || '100%'} height={height || 300}>
         <BarChart

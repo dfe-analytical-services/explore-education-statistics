@@ -26,8 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task PublishReleaseFilesAsync(Guid releaseId)
         {
             var release = await _releaseService.GetAsync(releaseId);
-                
-            var copyReleaseCommand = new CopyReleaseCommand
+            var copyReleaseCommand = new CopyReleaseFilesCommand
             {
                 ReleaseId = releaseId,
                 PublicationSlug = release.Publication.Slug,
@@ -37,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 ReleaseFileReferences = _releaseService.GetReleaseFileReferences(
                     releaseId, ReleaseFileTypes.Ancillary, ReleaseFileTypes.Chart, ReleaseFileTypes.Data)
             };
-            await _fileStorageService.CopyReleaseToPublicContainer(copyReleaseCommand);
+            await _fileStorageService.CopyReleaseFilesToPublicContainer(copyReleaseCommand);
         }
     }
 }

@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Models
 {
-    public class CopyReleaseCommand
+    public class CopyReleaseFilesCommand
     {
         public Guid ReleaseId { get; set; }
         public string PublicationSlug { get; set; }

@@ -107,7 +107,7 @@ const PublicationReleaseContent = () => {
                 onBlockContentSave={summaryBlockUpdate}
                 onBlockDelete={summaryBlockDelete}
               />
-              {release.summarySection.content?.length === 0 && (
+              {isEditing && release.summarySection.content?.length === 0 && (
                 <div className="govuk-!-margin-bottom-8 dfe-align--centre">
                   <Button variant="secondary" onClick={addSummaryBlock}>
                     Add a summary text block

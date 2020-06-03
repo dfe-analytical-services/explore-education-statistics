@@ -9,7 +9,13 @@ export type ToggleHandler = (open: boolean, id: string) => void;
 
 export interface AccordionSectionProps {
   caption?: string;
-  children?: ReactNode;
+  children?:
+    | ReactNode
+    | ((props: {
+        open: boolean;
+        headingId: string;
+        contentId: string;
+      }) => ReactNode);
   className?: string;
   goToTop?: boolean;
   header?: ReactNode;
@@ -104,7 +110,9 @@ const AccordionSection = ({
         aria-labelledby={headingId}
         id={contentId}
       >
-        {children}
+        {typeof children === 'function'
+          ? children({ open, contentId, headingId })
+          : children}
 
         {goToTop && <GoToTopLink />}
       </div>

@@ -24,7 +24,7 @@ function EditableBlockRenderer({
   onContentSave,
   onDelete,
 }: Props) {
-  const id = `editableBlockRenderer-${block.id}`;
+  const blockId = `block-${block.id}`;
 
   const handleContentSave = useMemo(
     () => (content: string) => {
@@ -44,7 +44,7 @@ function EditableBlockRenderer({
           <EditableBlockWrapper onDelete={editable ? handleDelete : undefined}>
             <DataBlockRenderer
               releaseId={releaseId}
-              id={id}
+              id={blockId}
               dataBlock={block}
               getInfographic={getInfographic}
             />
@@ -57,7 +57,7 @@ function EditableBlockRenderer({
         <EditableContentBlock
           allowHeadings={allowHeadings}
           editable={editable}
-          id={id}
+          id={blockId}
           label="Block content"
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}

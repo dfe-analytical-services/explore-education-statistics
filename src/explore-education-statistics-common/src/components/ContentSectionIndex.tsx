@@ -1,83 +1,186 @@
-import React, { Component } from 'react';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import useMounted from '@common/hooks/useMounted';
+import React, {
+  CSSProperties,
+  RefObject,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
-interface IndexResult {
-  element: Element;
-  location: string;
-}
+const TOP_MARGIN = 20;
+const BOTTOM_MARGIN = 40;
 
 interface Props {
-  fromId: string;
+  contentRef: RefObject<HTMLElement>;
+  id: string;
+  selector?: string;
+  sticky?: boolean;
+  visible?: boolean;
 }
 
-interface State {
-  indexResults: IndexResult[];
-  indexComplete: boolean;
-}
+type ViewportPosition = 'before' | 'within' | 'after';
 
-class ContentSectionIndex extends Component<Props> {
-  public state: State = {
-    indexResults: [],
-    indexComplete: false,
+const ContentSectionIndex = ({
+  contentRef,
+  id,
+  selector = 'h2, h3, h4, h5',
+  sticky,
+  visible = true,
+}: Props) => {
+  const outerRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [elements, setElements] = useState<HTMLElement[]>([]);
+  const [viewportPosition, setViewportPosition] = useState<ViewportPosition>();
+  const [initialBounds, setInitialBounds] = useState<DOMRect>();
+
+  const { isMounted } = useMounted(() => {
+    if (contentRef.current) {
+      const nextElements = Array.from(
+        contentRef.current.querySelectorAll(selector),
+      ) as HTMLElement[];
+
+      if (!id) {
+        throw new Error('Prop `id` must not be empty');
+      }
+
+      nextElements.forEach((element, index) => {
+        if (!element.id) {
+          // eslint-disable-next-line no-param-reassign
+          element.id = `${id}-${index + 1}`;
+        }
+      });
+
+      setElements(nextElements);
+    }
+  });
+
+  const [handleScroll] = useDebouncedCallback(() => {
+    if (!ref.current || !contentRef.current) {
+      return;
+    }
+
+    const { height: indexHeight } = ref.current.getBoundingClientRect();
+    const { top, bottom } = contentRef.current.getBoundingClientRect();
+
+    const isBefore = top > TOP_MARGIN;
+    const isAfter = bottom < indexHeight + TOP_MARGIN + BOTTOM_MARGIN;
+    const isWithin = !isBefore && !isAfter;
+
+    let nextViewportPosition: ViewportPosition = 'before';
+
+    if (isWithin) {
+      nextViewportPosition = 'within';
+    } else if (isAfter) {
+      nextViewportPosition = 'after';
+    }
+
+    if (nextViewportPosition !== viewportPosition) {
+      setViewportPosition(nextViewportPosition);
+    }
+  }, 10);
+
+  useEffect(() => {
+    if (sticky && visible) {
+      handleScroll();
+      window.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll, visible, sticky]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      // Need to explicitly set heights/widths using the
+      // height/width calculated by the outer-most div.
+      if (outerRef.current) {
+        setInitialBounds(outerRef.current.getBoundingClientRect());
+      }
+    };
+
+    if (!initialBounds) {
+      handleResize();
+    }
+
+    if (visible) {
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  });
+
+  const { height, width } = initialBounds ?? {};
+
+  const getContainerStyle = (): CSSProperties => {
+    switch (viewportPosition) {
+      case 'after':
+        return {
+          height: contentRef.current?.getBoundingClientRect()?.height,
+        };
+      default:
+        return {};
+    }
   };
 
-  public componentDidMount() {
-    const { fromId } = this.props;
-    this.index(fromId);
-  }
-
-  private static getLocationText(element: HTMLElement): string {
-    const location: string[] = [];
-    location.unshift(element.textContent || '');
-    return location.join(' > ');
-  }
-
-  private index = (fromId: string) => {
-    const elements = Array.from(
-      document.querySelectorAll(`#${fromId} h2, #${fromId} h3, #${fromId} h4`),
-    ) as HTMLElement[];
-    const indexResults =
-      elements != null
-        ? elements.map(element => {
-            const location = ContentSectionIndex.getLocationText(element);
-
-            return {
-              element,
-              location,
-            };
-          })
-        : [];
-
-    this.setState({ indexResults, indexComplete: true });
+  const getStyle = (): CSSProperties => {
+    switch (viewportPosition) {
+      case 'within':
+        return {
+          position: 'fixed',
+          top: TOP_MARGIN,
+        };
+      case 'after':
+        return {
+          position: 'absolute',
+          bottom: BOTTOM_MARGIN,
+        };
+      default:
+        return {};
+    }
   };
 
-  public render() {
-    const { indexResults, indexComplete } = this.state;
-
-    return (
-      <>
-        {indexComplete && indexResults.length > 0 && (
-          <>
-            <h3 className="govuk-heading-s dfe-print-hidden">
-              In this section
-            </h3>
-            <ul className="govuk-body-s dfe-print-hidden">
-              {indexResults.map(item => {
-                return (
-                  <>
-                    {item.location && (
-                      <li>
-                        <a href={`#${item.element.id}`}>{item.location}</a>
-                      </li>
-                    )}
-                  </>
-                );
-              })}
-            </ul>
-          </>
-        )}
-      </>
-    );
+  if (!isMounted || !elements.length || !visible) {
+    return null;
   }
-}
 
+  return (
+    <div ref={outerRef} className="dfe-print-hidden">
+      <div
+        style={{
+          position: 'relative',
+          height,
+          width,
+          ...getContainerStyle(),
+        }}
+      >
+        <div
+          ref={ref}
+          style={{
+            height,
+            width,
+            ...getStyle(),
+          }}
+        >
+          <h3 className="govuk-heading-s">In this section</h3>
+
+          <ul className="govuk-body-s">
+            {elements.map((element, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <li key={index}>
+                <a href={`#${element.id}`}>{element.textContent}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
 export default ContentSectionIndex;
