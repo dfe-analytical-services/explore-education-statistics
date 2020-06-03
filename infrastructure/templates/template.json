@@ -1247,7 +1247,7 @@
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
         "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
         "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
-        "FUNCTION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
+        "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
         "HOTJAR_ID": "[parameters('publicAppHotjarId')]",
         "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
         "NODE_ENV": "production",

@@ -9,7 +9,7 @@ declare namespace NodeJS {
     PUBLIC_URL: string;
     CONTENT_API_BASE_URL: string;
     DATA_API_BASE_URL: string;
-    FUNCTION_API_BASE_URL: string;
+    NOTIFICATION_API_BASE_URL: string;
   }
 }
 

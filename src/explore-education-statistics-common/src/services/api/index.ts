@@ -5,7 +5,7 @@ import Client from './Client';
 export const baseUrl = {
   content: process.env.CONTENT_API_BASE_URL,
   data: process.env.DATA_API_BASE_URL || '/api/data',
-  function: process.env.FUNCTION_API_BASE_URL,
+  notification: process.env.NOTIFICATION_API_BASE_URL,
 };
 
 export const contentApi = new Client(
@@ -22,9 +22,9 @@ export const dataApi = new Client(
   }),
 );
 
-export const functionApi = new Client(
+export const notificationApi = new Client(
   axios.create({
-    baseURL: baseUrl.function,
+    baseURL: baseUrl.notification,
     paramsSerializer: commaSeparated,
   }),
 );

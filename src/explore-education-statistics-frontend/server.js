@@ -46,7 +46,7 @@ async function startServer(port = process.env.PORT || 3000) {
     "'self'",
     process.env.CONTENT_API_BASE_URL.replace('/api', ''),
     process.env.DATA_API_BASE_URL.replace('/api', ''),
-    process.env.FUNCTION_API_BASE_URL.replace('/api', ''),
+    process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
     'http://*.hotjar.com:*',
     'https://*.hotjar.com:*',
     'https://vc.hotjar.io:*',
