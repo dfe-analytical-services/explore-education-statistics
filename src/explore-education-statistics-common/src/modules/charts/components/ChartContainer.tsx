@@ -1,3 +1,4 @@
+import useMounted from '@common/hooks/useMounted';
 import AxisLabel from '@common/modules/charts/components/AxisLabel';
 import { ChartProps, Label } from '@common/modules/charts/types/chart';
 import classNames from 'classnames';
@@ -26,7 +27,13 @@ const ChartContainer = ({
   xAxisLabel,
   xAxisHeight = 0,
 }: Props) => {
+  const { isMounted } = useMounted();
+
   const yAxisLabelWidth = yAxisLabel?.text ? yAxisLabel?.width ?? 100 : 0;
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <>
@@ -50,7 +57,6 @@ const ChartContainer = ({
               }
               rotated={yAxisLabel.rotated}
               style={{
-                flexBasis: yAxisLabelWidth,
                 marginBottom: xAxisHeight,
                 marginRight: 10,
               }}
