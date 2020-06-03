@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/attach")]
-        public async Task<ActionResult<IContentBlock>> AddContentBlock(
+        public async Task<ActionResult<IContentBlock>> AttachContentBlock(
             Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
         {
             return await _contentService

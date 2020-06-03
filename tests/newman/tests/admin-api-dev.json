@@ -5481,7 +5481,7 @@
 									"response": []
 								},
 								{
-									"name": "Add HTMLBlock to summarySection",
+									"name": "Add HtmlBlock to summarySection",
 									"event": [
 										{
 											"listen": "test",
@@ -5546,6 +5546,71 @@
 									"response": []
 								},
 								{
+									"name": "Add HtmlBlock to headlinesSection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0c8c14d7-fd51-43a2-bf71-02e226dbd0a5",
+												"exec": [
+													"const respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"New MarkDownBlock should be present\", function () { ",
+													"    // assert new block details",
+													"    pm.expect(respJson.id).to.not.be.null;",
+													"    pm.expect(respJson.order).to.equal(1);",
+													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
+													"    pm.expect(respJson.content).to.be.undefined;",
+													"    ",
+													"    // assert that deliberately excluded fields are not present",
+													"    pm.expect(respJson.contentSection).to.be.undefined;",
+													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
+													"});",
+													"",
+													"pm.test(\"Store variables for upcoming tests\", function () {",
+													"    pm.globals.set(\"headlines_section_htmlblock_id\", respJson.id);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\torder: 1,\n\ttype: 'HtmlBlock'\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_headlines_section_id}}/blocks/add",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{release_headlines_section_id}}",
+												"blocks",
+												"add"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Update summarySection HtmlBlock",
 									"event": [
 										{
@@ -5596,72 +5661,6 @@
 												"{{release_summary_section_id}}",
 												"block",
 												"{{summary_section_htmlblock_id}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Add MarkDown Block to headlinesSection",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "0c8c14d7-fd51-43a2-bf71-02e226dbd0a5",
-												"exec": [
-													"const respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"New MarkDownBlock should be present\", function () { ",
-													"    // assert new block details",
-													"    pm.expect(respJson.id).to.not.be.null;",
-													"    pm.expect(respJson.order).to.equal(1);",
-													"    // MarkDownBlock is deprecated",
-													"    pm.expect(respJson.type).to.equal(\"HtmlBlock\");",
-													"    pm.expect(respJson.content).to.be.undefined;",
-													"    ",
-													"    // assert that deliberately excluded fields are not present",
-													"    pm.expect(respJson.contentSection).to.be.undefined;",
-													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
-													"});",
-													"",
-													"pm.test(\"Store variables for upcoming tests\", function () {",
-													"    pm.globals.set(\"headlines_section_markdownblock_id\", respJson.id);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/json",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{ \n\torder: 1,\n\ttype: 'MarkDownBlock'\n}"
-										},
-										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_headlines_section_id}}/blocks/add",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"release",
-												"{{release_id}}",
-												"content",
-												"section",
-												"{{release_headlines_section_id}}",
-												"blocks",
-												"add"
 											]
 										}
 									},
@@ -5827,9 +5826,8 @@
 													"    pm.expect(headlinesSection.id).to.equal(pm.globals.get('release_headlines_section_id'));",
 													"    pm.expect(headlinesSection.order).to.equal(0);",
 													"    pm.expect(headlinesSection.content.length).to.equal(1);",
-													"    // MarkDownBlock is deprecated",
 													"    pm.expect(headlinesSection.content[0].type).to.equal(\"HtmlBlock\");",
-													"    pm.expect(headlinesSection.content[0].id).to.equal(pm.globals.get('headlines_section_markdownblock_id'));",
+													"    pm.expect(headlinesSection.content[0].id).to.equal(pm.globals.get('headlines_section_htmlblock_id'));",
 													"    pm.expect(headlinesSection.content[0].order).to.equal(1);",
 													"});",
 													"",
@@ -5882,7 +5880,101 @@
 									"response": []
 								},
 								{
-									"name": "Delete DataBlock from keyStatisticsSecondarySection",
+									"name": "Delete HtmlBlock from summarySection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "41b9748b-0548-42b7-9c41-c1b10b066ebd",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () {",
+													"    pm.expect(respJson.length).to.equal(0); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_summary_section_id}}/block/{{summary_section_htmlblock_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{release_summary_section_id}}",
+												"block",
+												"{{summary_section_htmlblock_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete HtmlBlock from headlinesSection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "49858aca-ab8c-420f-a123-c906b5701549",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () {",
+													"    pm.expect(respJson.length).to.equal(0); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_headlines_section_id}}/block/{{headlines_section_htmlblock_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{release_headlines_section_id}}",
+												"block",
+												"{{headlines_section_htmlblock_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete DataBlock from keyStatisticsSection",
 									"event": [
 										{
 											"listen": "test",
@@ -5897,11 +5989,53 @@
 													"",
 													"pm.test(\"Number of results should be correct\", function () {",
 													"    pm.expect(respJson.length).to.equal(0); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_section_id}}/block/{{key_statistics_section_datablock_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"content",
+												"section",
+												"{{release_key_statistics_section_id}}",
+												"block",
+												"{{key_statistics_section_datablock_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete DataBlock from keyStatisticsSecondarySection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fcbff465-64f7-4483-9d87-cf711f988a0c",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
 													"});",
 													"",
-													"pm.test(\"Results should be correct\", function () {",
-													"    const dataBlock = respJson.find(block => block.id === pm.globals.get('key_statistics_secondary_section_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock shouldn\\'t exist').to.be.undefined;",
+													"pm.test(\"Number of results should be correct\", function () {",
+													"    pm.expect(respJson.length).to.equal(0); ",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5951,35 +6085,27 @@
 													"    const summarySection = respJson.release.summarySection;",
 													"    pm.expect(summarySection.id).to.equal(pm.globals.get('release_summary_section_id'));",
 													"    pm.expect(summarySection.order).to.equal(0);",
-													"    pm.expect(summarySection.content.length).to.equal(1);",
-													"    pm.expect(summarySection.content[0].body).to.equal(\"<b>Html Block HTML!!!!</b>\");",
-													"    pm.expect(summarySection.content[0].type).to.equal(\"HtmlBlock\");",
-													"    pm.expect(summarySection.content[0].id).to.equal(pm.globals.get('summary_section_htmlblock_id'));",
-													"    pm.expect(summarySection.content[0].order).to.equal(1);",
+													"    pm.expect(summarySection.content).to.be.an('array').that.is.empty;",
 													"});",
 													"",
 													"pm.test(\"headlinesSection should be correct\", function () {",
 													"    const headlinesSection = respJson.release.headlinesSection;",
 													"    pm.expect(headlinesSection.id).to.equal(pm.globals.get('release_headlines_section_id'));",
 													"    pm.expect(headlinesSection.order).to.equal(0);",
-													"    pm.expect(headlinesSection.content.length).to.equal(1);",
-													"    pm.expect(headlinesSection.content[0].type).to.equal(\"HtmlBlock\");",
-													"    pm.expect(headlinesSection.content[0].id).to.equal(pm.globals.get('headlines_section_markdownblock_id'));",
-													"    pm.expect(headlinesSection.content[0].order).to.equal(1);",
+													"    pm.expect(headlinesSection.content).to.be.an('array').that.is.empty;",
 													"});",
 													"",
 													"pm.test(\"keyStatisticsSection should be correct\", function () {",
 													"    const keyStatsSection = respJson.release.keyStatisticsSection;",
 													"    pm.expect(keyStatsSection.id).to.equal(pm.globals.get('release_key_statistics_section_id'));",
 													"    pm.expect(keyStatsSection.order).to.equal(0);",
-													"    pm.expect(keyStatsSection.content.length).to.equal(1);",
-													"    pm.expect(keyStatsSection.content[0].type).to.equal(\"DataBlock\");",
-													"    pm.expect(keyStatsSection.content[0].id).to.equal(pm.globals.get('key_statistics_section_datablock_id'));",
-													"    pm.expect(keyStatsSection.content[0].order).to.equal(0);",
+													"    pm.expect(keyStatsSection.content).to.be.an('array').that.is.empty;",
 													"});",
 													"",
 													"pm.test(\"keyStatisticsSecondarySection should be correct\", function () {",
 													"    const keyStatsSecondarySection = respJson.release.keyStatisticsSecondarySection;",
+													"    pm.expect(keyStatsSecondarySection.id).to.equal(pm.globals.get('release_key_statistics_secondary_section_id'));",
+													"    pm.expect(keyStatsSecondarySection.order).to.equal(0);",
 													"    pm.expect(keyStatsSecondarySection.content).to.be.an('array').that.is.empty;",
 													"});"
 												],
