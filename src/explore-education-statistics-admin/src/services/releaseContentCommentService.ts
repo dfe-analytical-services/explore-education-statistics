@@ -1,6 +1,12 @@
 import { ExtendedComment } from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
 
+export type AddExtendedComment = Pick<ExtendedComment, 'commentText'>;
+export type UpdateExtendedComment = Pick<
+  ExtendedComment,
+  'id' | 'commentText' | 'state'
+>;
+
 const releaseContentCommentService = {
   getContentSectionComments(
     releaseId: string,
@@ -16,7 +22,7 @@ const releaseContentCommentService = {
     releaseId: string,
     sectionId: string,
     contentBlockId: string,
-    comment: ExtendedComment,
+    comment: AddExtendedComment,
   ): Promise<ExtendedComment> {
     return client.post(
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments/add`,
@@ -28,7 +34,7 @@ const releaseContentCommentService = {
     releaseId: string,
     sectionId: string,
     contentBlockId: string,
-    comment: ExtendedComment,
+    comment: UpdateExtendedComment,
   ): Promise<ExtendedComment> {
     return client.put(
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${comment.id}`,

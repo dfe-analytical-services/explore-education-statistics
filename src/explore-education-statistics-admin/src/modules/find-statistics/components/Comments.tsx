@@ -1,11 +1,14 @@
-import { useAuthContext, Authentication } from '@admin/contexts/AuthContext';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import releaseContentCommentService from '@admin/services/releaseContentCommentService';
+import releaseContentCommentService, {
+  AddExtendedComment,
+  UpdateExtendedComment,
+} from '@admin/services/releaseContentCommentService';
 import { ExtendedComment } from '@admin/services/types/content';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import classNames from 'classnames';
-import React, { createRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from './Comments.module.scss';
 
 export type CommentsChangeHandler = (
@@ -25,29 +28,23 @@ interface Props {
 const Comments = ({
   blockId,
   sectionId,
-  comments,
+  comments = [],
   onChange,
   canResolve = false,
   canComment = false,
 }: Props) => {
-  const [newComment, setNewComment] = React.useState<string>('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [newComment, setNewComment] = useState<string>('');
   const [editableComment, setEditableComment] = useState<string>('');
   const [editableCommentText, setEditableCommentText] = useState<string>('');
 
+  const { user } = useAuthContext();
   const { releaseId } = useManageReleaseContext();
-  const { user }: Authentication = useAuthContext();
-  if (!user) {
-    throw new Error('User not returned from useAuthContext');
-  }
 
-  const addComment = (comment: string) => {
-    const additionalComment: ExtendedComment = {
-      id: '0',
-      userId: user.id,
-      name: user.name,
-      time: new Date(),
-      commentText: comment,
-      state: 'open',
+  const addComment = (commentText: string) => {
+    const additionalComment: AddExtendedComment = {
+      commentText,
     };
 
     if (releaseId && sectionId) {
@@ -87,11 +84,9 @@ const Comments = ({
   };
 
   const resolveComment = (index: number) => {
-    const resolvedComment: ExtendedComment = {
+    const resolvedComment: UpdateExtendedComment = {
       ...comments[index],
       state: 'resolved',
-      resolvedOn: new Date(),
-      resolvedBy: user.name,
     };
 
     if (releaseId && sectionId) {
@@ -102,18 +97,21 @@ const Comments = ({
           blockId,
           resolvedComment,
         )
-        .then(() => {
+        .then(savedComment => {
           const newComments = [...comments];
-          newComments[index] = resolvedComment;
+          newComments[index] = savedComment;
 
           onChange(blockId, newComments);
         });
     }
   };
 
-  const updateComment = (index: number, newContent: string) => {
-    const editedComment = { ...comments[index] };
-    editedComment.commentText = newContent;
+  const updateComment = (index: number, commentText: string) => {
+    const editedComment: UpdateExtendedComment = {
+      ...comments[index],
+      commentText,
+    };
+
     if (releaseId && sectionId) {
       releaseContentCommentService
         .updateContentSectionComment(
@@ -122,19 +120,17 @@ const Comments = ({
           blockId,
           editedComment,
         )
-        .then(() => {
+        .then(savedComment => {
           const newComments = [...comments];
-
-          newComments[index] = editedComment;
+          newComments[index] = savedComment;
 
           onChange(blockId, newComments);
+
           setEditableComment('');
           setEditableCommentText('');
         });
     }
   };
-
-  const ref = createRef<HTMLDivElement>();
 
   return (
     <>
