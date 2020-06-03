@@ -9,11 +9,11 @@ this class to style manually created tables via the editor*/
   overflow: auto;
 }
 
-.table table {
+table {
   @extend .govuk-table;
 }
 
-.table table,
+table,
 .govuk-table {
   background: #fff;
 

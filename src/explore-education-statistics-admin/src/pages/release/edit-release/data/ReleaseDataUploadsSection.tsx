@@ -1,11 +1,11 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import permissionService from '@admin/services/permissions/permissionService';
-import editReleaseDataService, {
+import { ImportStatusCode } from '@admin/services/importService';
+import permissionService from '@admin/services/permissionService';
+import releaseDataFileService, {
   DataFile,
   DeleteDataFilePlan,
-} from '@admin/services/release/edit-release/data/editReleaseDataService';
-import { ImportStatusCode } from '@admin/services/release/imports/types';
+} from '@admin/services/releaseDataFileService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
@@ -109,7 +109,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   useEffect(() => {
     Promise.all([
-      editReleaseDataService.getReleaseDataFiles(releaseId),
+      releaseDataFileService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
       permissionService.canUpdateReleaseDataFiles(releaseId),
     ]).then(
@@ -135,7 +135,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         fileInput.value = '';
       });
 
-    const files = await editReleaseDataService.getReleaseDataFiles(releaseId);
+    const files = await releaseDataFileService.getReleaseDataFiles(releaseId);
     setDataFiles(files);
   };
 
@@ -174,7 +174,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
     setIsUploading(true);
-    await editReleaseDataService
+    await releaseDataFileService
       .uploadDataFiles(releaseId, {
         subjectTitle: values.subjectTitle,
         dataFile: values.dataFile as File,
@@ -195,7 +195,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   ) => {
     setDeleting(dataFileToDelete, true);
     setDeleteDataFile(undefined);
-    await editReleaseDataService
+    await releaseDataFileService
       .deleteDataFiles(releaseId, (deleteDataFile as DeleteDataFile).file)
       .then(() => {
         setDeleting(dataFileToDelete, false);
@@ -369,7 +369,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="Data file">
                             <ButtonText
                               onClick={() =>
-                                editReleaseDataService.downloadDataFile(
+                                releaseDataFileService.downloadDataFile(
                                   releaseId,
                                   dataFile.filename,
                                 )
@@ -381,7 +381,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="Metadata file">
                             <ButtonText
                               onClick={() =>
-                                editReleaseDataService.downloadDataMetadataFile(
+                                releaseDataFileService.downloadDataMetadataFile(
                                   releaseId,
                                   dataFile.metadataFilename,
                                 )
@@ -419,7 +419,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                                 actions={
                                   <ButtonText
                                     onClick={() =>
-                                      editReleaseDataService
+                                      releaseDataFileService
                                         .getDeleteDataFilePlan(
                                           releaseId,
                                           dataFile,

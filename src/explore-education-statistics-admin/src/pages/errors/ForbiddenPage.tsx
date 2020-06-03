@@ -1,6 +1,6 @@
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import loginService from '@admin/services/sign-in/service';
+import loginService from '@admin/services/loginService';
 import React from 'react';
 
 const ForbiddenPage = () => {

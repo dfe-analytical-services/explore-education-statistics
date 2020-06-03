@@ -1,5 +1,5 @@
-import methodologyService from '@admin/services/methodology/methodologyService';
-import { ContentBlockPostModel } from '@admin/services/release/edit-release/content/types';
+import methodologyContentService from '@admin/services/methodologyContentService';
+import { ContentBlockPostModel } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useMethodologyDispatch } from './MethodologyContext';
 import { ContentSectionKeys } from './MethodologyContextActionTypes';
@@ -18,7 +18,7 @@ export default function useMethodologyActions() {
     blockId: string;
     sectionKey: ContentSectionKeys;
   }) {
-    await methodologyService.deleteContentSectionBlock({
+    await methodologyContentService.deleteContentSectionBlock({
       methodologyId,
       sectionId,
       blockId,
@@ -49,13 +49,15 @@ export default function useMethodologyActions() {
     bodyContent: string;
     sectionKey: ContentSectionKeys;
   }) {
-    const updateBlock = await methodologyService.updateContentSectionBlock({
-      methodologyId,
-      sectionId,
-      blockId,
-      block: { body: bodyContent },
-      sectionKey,
-    });
+    const updateBlock = await methodologyContentService.updateContentSectionBlock(
+      {
+        methodologyId,
+        sectionId,
+        blockId,
+        block: { body: bodyContent },
+        sectionKey,
+      },
+    );
     dispatch({
       type: 'UPDATE_BLOCK_FROM_SECTION',
       payload: {
@@ -81,7 +83,7 @@ export default function useMethodologyActions() {
     block: ContentBlockPostModel;
     sectionKey: ContentSectionKeys;
   }) {
-    const newBlock = await methodologyService.addContentSectionBlock({
+    const newBlock = await methodologyContentService.addContentSectionBlock({
       methodologyId,
       sectionId,
       block,
@@ -107,7 +109,7 @@ export default function useMethodologyActions() {
     order: Dictionary<number>;
     sectionKey: ContentSectionKeys;
   }) {
-    const sectionContent = await methodologyService.updateContentSectionBlocksOrder(
+    const sectionContent = await methodologyContentService.updateContentSectionBlocksOrder(
       { methodologyId, sectionId, order, sectionKey },
     );
     dispatch({
@@ -128,7 +130,7 @@ export default function useMethodologyActions() {
     order: number;
     sectionKey: ContentSectionKeys;
   }) {
-    const newSection = await methodologyService.addContentSection({
+    const newSection = await methodologyContentService.addContentSection({
       methodologyId,
       order,
       sectionKey,
@@ -151,7 +153,7 @@ export default function useMethodologyActions() {
     order: Dictionary<number>;
     sectionKey: ContentSectionKeys;
   }) {
-    const content = await methodologyService.updateContentSectionsOrder({
+    const content = await methodologyContentService.updateContentSectionsOrder({
       methodologyId,
       order,
       sectionKey,
@@ -174,7 +176,7 @@ export default function useMethodologyActions() {
     sectionId: string;
     sectionKey: ContentSectionKeys;
   }) {
-    const content = await methodologyService.removeContentSection({
+    const content = await methodologyContentService.removeContentSection({
       methodologyId,
       sectionId,
       sectionKey,
@@ -199,12 +201,14 @@ export default function useMethodologyActions() {
     heading: string;
     sectionKey: ContentSectionKeys;
   }) {
-    const section = await methodologyService.updateContentSectionHeading({
-      methodologyId,
-      sectionId,
-      heading,
-      sectionKey,
-    });
+    const section = await methodologyContentService.updateContentSectionHeading(
+      {
+        methodologyId,
+        sectionId,
+        heading,
+        sectionKey,
+      },
+    );
 
     dispatch({
       type: 'UPDATE_CONTENT_SECTION',

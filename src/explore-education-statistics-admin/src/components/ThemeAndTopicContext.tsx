@@ -1,5 +1,5 @@
 import { ThemeAndTopicsIdsAndTitles } from '@admin/components/ThemeAndTopic';
-import { IdTitlePair } from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/types/common';
 import { createContext } from 'react';
 
 export interface SetThemeAndTopicCallbackParameters {

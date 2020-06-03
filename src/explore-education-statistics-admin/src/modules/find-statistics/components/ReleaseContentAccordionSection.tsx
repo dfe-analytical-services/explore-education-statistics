@@ -3,10 +3,8 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import {
-  EditableBlock,
-  EditableRelease,
-} from '@admin/services/publicationService';
+import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';

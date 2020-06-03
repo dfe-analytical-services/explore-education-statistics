@@ -48,7 +48,6 @@ export const testChartConfiguration: Chart = {
       title: 'School Year',
       size: 50,
       showGrid: true,
-      labelPosition: 'axis',
       tickConfig: 'default',
     },
     minor: {
@@ -61,7 +60,6 @@ export const testChartConfiguration: Chart = {
       title: 'Absence Rate',
       size: 50,
       showGrid: true,
-      labelPosition: 'axis',
       min: 0,
       tickConfig: 'default',
     },
@@ -102,7 +100,6 @@ export const testDeprecatedChartConfiguration: Chart = {
       title: 'School Year',
       size: 50,
       showGrid: true,
-      labelPosition: 'axis',
       tickConfig: 'default',
     },
     minor: {
@@ -115,7 +112,6 @@ export const testDeprecatedChartConfiguration: Chart = {
       title: 'Absence Rate',
       size: 50,
       showGrid: true,
-      labelPosition: 'axis',
       min: 0,
       tickConfig: 'default',
     },

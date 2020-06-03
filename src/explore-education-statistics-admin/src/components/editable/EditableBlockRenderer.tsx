@@ -1,6 +1,6 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
-import { EditableBlock } from '@admin/services/publicationService';
+import { EditableBlock } from '@admin/services/types/content';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
 import React, { useCallback, useMemo } from 'react';
@@ -22,7 +22,7 @@ function EditableBlockRenderer({
   onContentSave,
   onDelete,
 }: Props) {
-  const id = `editableBlockRenderer-${block.id}`;
+  const blockId = `block-${block.id}`;
 
   const handleContentSave = useMemo(
     () => (content: string) => {
@@ -41,7 +41,7 @@ function EditableBlockRenderer({
         <div className="dfe-content-overflow">
           <EditableBlockWrapper onDelete={editable ? handleDelete : undefined}>
             <DataBlockRenderer
-              id={id}
+              id={blockId}
               dataBlock={block}
               getInfographic={getInfographic}
             />
@@ -54,7 +54,7 @@ function EditableBlockRenderer({
         <EditableContentBlock
           allowHeadings={allowHeadings}
           editable={editable}
-          id={id}
+          id={blockId}
           label="Block content"
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}

@@ -1,6 +1,6 @@
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ChartAxisConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartAxisConfiguration';
-import styles from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilder.module.scss';
+import ChartBuilderPreview from '@admin/pages/release/edit-release/manage-datablocks/components/ChartBuilderPreview';
 import ChartConfiguration from '@admin/pages/release/edit-release/manage-datablocks/components/ChartConfiguration';
 import ChartDataSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDataSelector';
 import ChartDefinitionSelector from '@admin/pages/release/edit-release/manage-datablocks/components/ChartDefinitionSelector';
@@ -10,15 +10,12 @@ import {
   useChartBuilderReducer,
 } from '@admin/pages/release/edit-release/manage-datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
-import Details from '@common/components/Details';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
-import ChartRenderer, {
-  ChartRendererProps,
-} from '@common/modules/charts/components/ChartRenderer';
+import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import {
   horizontalBarBlockDefinition,
   HorizontalBarProps,
@@ -40,7 +37,6 @@ import {
   ChartProps,
 } from '@common/modules/charts/types/chart';
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
-import isChartRenderable from '@common/modules/charts/util/isChartRenderable';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import {
   TableDataQuery,
@@ -245,6 +241,16 @@ const ChartBuilder = ({
     [actions, onTableQueryUpdate],
   );
 
+  const [handleChartConfigurationChange] = useDebouncedCallback(
+    actions.updateChartOptions,
+    200,
+  );
+
+  const [handleAxisConfigurationChange] = useDebouncedCallback(
+    actions.updateChartAxis,
+    200,
+  );
+
   const handleBoundaryLevelChange = useCallback(
     async (boundaryLevel: string) => {
       setDataLoading(true);
@@ -301,23 +307,12 @@ const ChartBuilder = ({
       />
 
       {definition && (
-        <Details summary="Chart preview" open>
-          <div className="govuk-width-container">
-            {isChartRenderable(chartProps) ? (
-              <LoadingSpinner loading={isDataLoading} text="Loading chart data">
-                <ChartRenderer {...chartProps} />
-              </LoadingSpinner>
-            ) : (
-              <div className={styles.previewPlaceholder}>
-                {Object.keys(axes).length > 0 ? (
-                  <p>Add data to view a preview of the chart</p>
-                ) : (
-                  <p>Configure the {definition.name} to view a preview</p>
-                )}
-              </div>
-            )}
-          </div>
-        </Details>
+        <ChartBuilderPreview
+          axes={axes}
+          chart={chartProps}
+          definition={definition}
+          loading={isDataLoading}
+        />
       )}
 
       {definition && (
@@ -337,7 +332,7 @@ const ChartBuilder = ({
               meta={meta}
               releaseId={releaseId}
               onBoundaryLevelChange={handleBoundaryLevelChange}
-              onChange={actions.updateChartOptions}
+              onChange={handleChartConfigurationChange}
               onFormStateChange={actions.updateFormState}
               onSubmit={handleChartConfigurationSubmit}
             />
@@ -392,7 +387,7 @@ const ChartBuilder = ({
                     definition={definition}
                     data={data}
                     meta={meta}
-                    onChange={actions.updateChartAxis}
+                    onChange={handleAxisConfigurationChange}
                     onFormStateChange={actions.updateFormState}
                     onSubmit={handleAxisConfigurationSubmit}
                   />

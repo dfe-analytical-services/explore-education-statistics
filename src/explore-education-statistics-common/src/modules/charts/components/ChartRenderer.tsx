@@ -13,17 +13,7 @@ import { MapBlockInternalProps } from '@common/modules/charts/components/MapBloc
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import { chartDefinitions } from '@common/modules/charts/types/chart';
-import omit from 'lodash/omit';
-import React, { memo, useMemo, useState } from 'react';
-import { ContentRenderer, LegendProps } from 'recharts';
-import DefaultLegendContent from 'recharts/lib/component/DefaultLegendContent';
-
-function hasLegend(props: ChartRendererProps): boolean {
-  return chartDefinitions.some(
-    chart => chart.type === props.type && chart.capabilities.hasLegend,
-  );
-}
+import React, { memo, useMemo } from 'react';
 
 export type ChartRendererProps = {
   source?: string;
@@ -48,33 +38,14 @@ export type ChartRendererProps = {
 function ChartRenderer({ source, ...props }: ChartRendererProps) {
   const { data, meta, title } = props;
 
-  const [legendProps, setLegendProps] = useState<LegendProps>();
-
-  const renderLegend: ContentRenderer<LegendProps> = useMemo(
-    () => nextProps => {
-      const nextLegendProps = omit(nextProps, 'content');
-
-      // Need to do a deep comparison of the props to
-      // avoid falling into an infinite rendering loop.
-      if (JSON.stringify(legendProps) !== JSON.stringify(nextLegendProps)) {
-        setTimeout(() => {
-          setLegendProps(nextLegendProps);
-        });
-      }
-
-      return null;
-    },
-    [legendProps],
-  );
-
   const chart = useMemo(() => {
     switch (props.type) {
       case 'line':
-        return <LineChartBlock {...props} renderLegend={renderLegend} />;
+        return <LineChartBlock {...props} />;
       case 'verticalbar':
-        return <VerticalBarBlock {...props} renderLegend={renderLegend} />;
+        return <VerticalBarBlock {...props} />;
       case 'horizontalbar':
-        return <HorizontalBarBlock {...props} renderLegend={renderLegend} />;
+        return <HorizontalBarBlock {...props} />;
       case 'map':
         return <MapBlock {...props} />;
       case 'infographic':
@@ -82,26 +53,14 @@ function ChartRenderer({ source, ...props }: ChartRendererProps) {
       default:
         return <p>Unable to render invalid chart type</p>;
     }
-  }, [props, renderLegend]);
+  }, [props]);
 
   if (data && meta && data.length > 0) {
     return (
       <figure className="govuk-!-margin-0">
         {title && <figcaption className="govuk-heading-s">{title}</figcaption>}
 
-        {hasLegend(props) && props.legend === 'top' && legendProps && (
-          <div className="govuk-!-margin-bottom-6">
-            <DefaultLegendContent {...legendProps} />
-          </div>
-        )}
-
-        <div className="govuk-!-margin-bottom-6">{chart}</div>
-
-        {hasLegend(props) && props.legend === 'bottom' && legendProps && (
-          <div className="govuk-!-margin-bottom-6">
-            <DefaultLegendContent {...legendProps} />
-          </div>
-        )}
+        {chart}
 
         <FigureFootnotes footnotes={meta.footnotes} />
 

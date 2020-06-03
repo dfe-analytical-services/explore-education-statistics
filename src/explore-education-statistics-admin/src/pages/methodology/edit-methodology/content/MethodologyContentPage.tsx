@@ -2,8 +2,8 @@ import EditablePageModeToggle from '@admin/components/editable/EditablePageModeT
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
-import methodologyService from '@admin/services/methodology/methodologyService';
-import permissionService from '@admin/services/permissions/permissionService';
+import methodologyContentService from '@admin/services/methodologyContentService';
+import permissionService from '@admin/services/permissionService';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import PageSearchForm from '@common/components/PageSearchForm';
@@ -99,7 +99,7 @@ const MethodologyContentPage = ({
   const { value, isLoading } = useAsyncHandledRetry<
     MethodologyContextState
   >(async () => {
-    const methodology = await methodologyService.getMethodologyContent(
+    const methodology = await methodologyContentService.getMethodologyContent(
       methodologyId,
     );
     const canUpdateMethodology = await permissionService.canUpdateMethodology(

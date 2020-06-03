@@ -19,13 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task PublishStagedReleaseContentAsync(Guid releaseId)
         {
             await _fileStorageService.MoveStagedContentAsync();
-            await _releaseService.SetPublishedDatesAsync(releaseId);
+            await _releaseService.SetPublishedDatesAsync(releaseId, DateTime.UtcNow);
         }
 
         public async Task PublishReleaseFilesAsync(Guid releaseId)
         {
             var release = await _releaseService.GetAsync(releaseId);
-            var copyReleaseCommand = new CopyReleaseCommand
+            var copyReleaseCommand = new CopyReleaseFilesCommand
             {
                 ReleaseId = releaseId,
                 PublicationSlug = release.Publication.Slug,
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 ReleaseSlug = release.Slug,
                 PreviousReleaseSlug = release.PreviousVersion.Slug
             };
-            await _fileStorageService.CopyReleaseToPublicContainer(copyReleaseCommand);
+            await _fileStorageService.CopyReleaseFilesToPublicContainer(copyReleaseCommand);
         }
     }
 }

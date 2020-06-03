@@ -1,9 +1,9 @@
+import { EditableRelease } from '@admin/services/releaseContentService';
 import {
   EditableBlock,
   EditableContentBlock,
-  EditableRelease,
   ExtendedComment,
-} from '@admin/services/publicationService';
+} from '@admin/services/types/content';
 import { DataBlock } from '@common/services/types/blocks';
 import { produce } from 'immer';
 import {

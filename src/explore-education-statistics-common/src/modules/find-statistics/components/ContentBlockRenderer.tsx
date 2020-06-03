@@ -8,11 +8,13 @@ interface Props {
 }
 
 const ContentBlockRenderer = ({ block }: Props) => {
+  const { body = '' } = block;
+
   switch (block.type) {
     case 'MarkDownBlock':
-      return <ReactMarkdown className="govuk-body" source={block.body} />;
+      return <ReactMarkdown className="govuk-body" source={body} />;
     case 'HtmlBlock':
-      return <SanitizeHtml dirtyHtml={block.body} />;
+      return <SanitizeHtml dirtyHtml={body} />;
     default:
       return null;
   }

@@ -1,27 +1,68 @@
-import { Release } from '@common/services/publicationService';
-import { ContentBlock, DataBlock } from '@common/services/types/blocks';
+import { ContactDetails } from '@admin/services/contactService';
+import { ExternalMethodology } from '@admin/services/dashboardService';
+import { BasicMethodology } from '@admin/services/methodologyService';
+import { IdTitlePair } from '@admin/services/types/common';
+import client from '@admin/services/utils/service';
 
-export type CommentState = 'open' | 'resolved';
-
-export interface ExtendedComment {
+export interface BasicPublicationDetails {
   id: string;
-  userId: string;
-  name: string;
-  time: Date;
-  commentText: string;
-  state?: CommentState;
-  resolvedBy?: string;
-  resolvedOn?: Date;
+  title: string;
+  contact?: ContactDetails;
+  methodology?: BasicMethodology;
+  externalMethodology?: ExternalMethodology;
+  themeId: string;
 }
 
-export type EditableContentBlock = ContentBlock & {
-  comments: ExtendedComment[];
+export interface PublicationMethodologyDetails {
+  selectedMethodologyId?: string;
+  externalMethodology?: ExternalMethodology;
+}
+
+export interface CreatePublicationRequest
+  extends PublicationMethodologyDetails {
+  topicId: string;
+  publicationTitle: string;
+  selectedContactId: string;
+}
+
+const publicationService = {
+  createPublication({
+    topicId,
+    publicationTitle: title,
+    selectedContactId: contactId,
+    selectedMethodologyId: methodologyId,
+    externalMethodology,
+  }: CreatePublicationRequest) {
+    return client.post(`/topic/${topicId}/publications`, {
+      title,
+      contactId,
+      methodologyId,
+      externalMethodology,
+    });
+  },
+
+  getPublication(publicationId: string): Promise<BasicPublicationDetails> {
+    return client.get<BasicPublicationDetails>(
+      `/publications/${publicationId}`,
+    );
+  },
+
+  getPublicationReleaseTemplate: (
+    publicationId: string,
+  ): Promise<IdTitlePair | undefined> => {
+    return client.get(`/publications/${publicationId}/releases/template`);
+  },
+
+  updatePublicationMethodology({
+    publicationId,
+    selectedMethodologyId: methodologyId,
+    externalMethodology,
+  }: PublicationMethodologyDetails & { publicationId: string }) {
+    return client.put(`/publications/${publicationId}/methodology`, {
+      methodologyId,
+      externalMethodology,
+    });
+  },
 };
 
-export type EditableDataBlock = DataBlock & {
-  comments: ExtendedComment[];
-};
-
-export type EditableBlock = EditableContentBlock | EditableDataBlock;
-
-export type EditableRelease = Release<EditableContentBlock, EditableDataBlock>;
+export default publicationService;

@@ -3,13 +3,13 @@ import Page from '@admin/components/Page';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import appRouteList from '@admin/routes/dashboard/routes';
-import {
+import contactService, { ContactDetails } from '@admin/services/contactService';
+import { ExternalMethodology } from '@admin/services/dashboardService';
+import methodologyService, {
   BasicMethodology,
-  ContactDetails,
-  IdTitlePair,
-} from '@admin/services/common/types';
-import { ExternalMethodology } from '@admin/services/dashboard/types';
-import service from '@admin/services/edit-publication/service';
+} from '@admin/services/methodologyService';
+import publicationService from '@admin/services/publicationService';
+import { IdTitlePair } from '@admin/services/types/common';
 import { Dictionary } from '@admin/types';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -57,8 +57,8 @@ const CreatePublicationPage = ({
 
   useEffect(() => {
     Promise.all([
-      service.getMethodologies(),
-      service.getPublicationAndReleaseContacts(),
+      methodologyService.getMethodologies(),
+      contactService.getContacts(),
     ]).then(([methodologies, contacts]) => {
       setModel({
         methodologies,
@@ -79,7 +79,7 @@ const CreatePublicationPage = ({
     if (values.methodologyChoice === 'external') {
       methodology.externalMethodology = values.externalMethodology;
     }
-    await service.createPublication({
+    await publicationService.createPublication({
       topicId: topic.id,
       ...values,
       ...methodology,

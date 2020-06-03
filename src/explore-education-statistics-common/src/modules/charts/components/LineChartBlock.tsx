@@ -1,10 +1,11 @@
+import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
+import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import {
   AxisConfiguration,
   ChartDefinition,
   ChartProps,
   ChartSymbol,
-  RenderLegend,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories, {
@@ -76,8 +77,9 @@ const LineChartBlock = ({
   axes,
   legend,
   width,
-  renderLegend,
-}: LineChartProps & RenderLegend) => {
+}: LineChartProps) => {
+  const [legendProps, renderLegend] = useLegend();
+
   if (
     axes === undefined ||
     axes.major === undefined ||
@@ -98,90 +100,103 @@ const LineChartBlock = ({
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
 
+  const yAxisWidth = parseNumber(axes.minor.size);
+  const xAxisHeight = parseNumber(axes.major.size);
+
   return (
-    <ResponsiveContainer width={width || '100%'} height={height || 300}>
-      <LineChart
-        aria-label={alt}
-        role="img"
-        focusable={false}
-        data={chartData}
-        margin={{
-          left: 30,
-        }}
-      >
-        <Tooltip
-          content={<CustomTooltip dataSetCategories={dataSetCategories} />}
-          wrapperStyle={{ zIndex: 1000 }}
-        />
-
-        {legend && legend !== 'none' && (
-          <Legend content={renderLegend} align="left" layout="vertical" />
-        )}
-
-        <CartesianGrid
-          strokeDasharray="3 3"
-          horizontal={axes.minor.showGrid !== false}
-          vertical={axes.major.showGrid !== false}
-        />
-
-        <YAxis
-          {...minorDomainTicks}
-          type="number"
-          hide={!axes.minor.visible}
-          unit={axes.minor.unit}
-          width={parseNumber(axes.minor.size)}
-        />
-
-        <XAxis
-          {...majorDomainTicks}
-          type="category"
-          dataKey="name"
-          hide={!axes.major.visible}
-          unit={axes.major.unit}
-          height={parseNumber(axes.major.size)}
-          padding={{ left: 20, right: 20 }}
-          tickMargin={10}
-          tickFormatter={getCategoryLabel(dataSetCategories)}
-        />
-
-        {getCategoryDataSetConfigurations(
-          dataSetCategories,
-          axes.major,
-          meta,
-        ).map(({ config, dataKey, dataSet }) => (
-          <Line
-            key={dataKey}
-            dataKey={dataKey}
-            isAnimationActive={false}
-            name={config.label}
-            stroke={config.colour}
-            fill={config.colour}
-            unit={dataSet.indicator.unit}
-            type="linear"
-            legendType={getLegendType(config.symbol)}
-            dot={getDot(config.symbol)}
-            strokeWidth="2"
-            strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
+    <ChartContainer
+      height={height || 300}
+      legend={legendProps}
+      legendPosition={legend}
+      yAxisWidth={yAxisWidth}
+      yAxisLabel={axes.minor.label}
+      xAxisHeight={xAxisHeight}
+      xAxisLabel={axes.major.label}
+    >
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
+        <LineChart
+          aria-label={alt}
+          role="img"
+          focusable={false}
+          data={chartData}
+          margin={{
+            left: 30,
+          }}
+        >
+          <Tooltip
+            content={<CustomTooltip dataSetCategories={dataSetCategories} />}
+            wrapperStyle={{ zIndex: 1000 }}
           />
-        ))}
 
-        {axes.major.referenceLines?.map(referenceLine => (
-          <ReferenceLine
-            key={`${referenceLine.position}_${referenceLine.label}`}
-            x={referenceLine.position}
-            label={referenceLine.label}
-          />
-        ))}
+          {legend && legend !== 'none' && (
+            <Legend content={renderLegend} align="left" layout="vertical" />
+          )}
 
-        {axes.minor.referenceLines?.map(referenceLine => (
-          <ReferenceLine
-            key={`${referenceLine.position}_${referenceLine.label}`}
-            y={referenceLine.position}
-            label={referenceLine.label}
+          <CartesianGrid
+            strokeDasharray="3 3"
+            horizontal={axes.minor.showGrid !== false}
+            vertical={axes.major.showGrid !== false}
           />
-        ))}
-      </LineChart>
-    </ResponsiveContainer>
+
+          <YAxis
+            {...minorDomainTicks}
+            type="number"
+            hide={!axes.minor.visible}
+            unit={axes.minor.unit}
+            width={yAxisWidth}
+          />
+
+          <XAxis
+            {...majorDomainTicks}
+            type="category"
+            dataKey="name"
+            hide={!axes.major.visible}
+            unit={axes.major.unit}
+            height={xAxisHeight}
+            padding={{ left: 20, right: 20 }}
+            tickMargin={10}
+            tickFormatter={getCategoryLabel(dataSetCategories)}
+          />
+
+          {getCategoryDataSetConfigurations(
+            dataSetCategories,
+            axes.major,
+            meta,
+          ).map(({ config, dataKey, dataSet }) => (
+            <Line
+              key={dataKey}
+              dataKey={dataKey}
+              isAnimationActive={false}
+              name={config.label}
+              stroke={config.colour}
+              fill={config.colour}
+              unit={dataSet.indicator.unit}
+              type="linear"
+              legendType={getLegendType(config.symbol)}
+              dot={getDot(config.symbol)}
+              strokeWidth="2"
+              strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
+            />
+          ))}
+
+          {axes.major.referenceLines?.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              x={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
+
+          {axes.minor.referenceLines?.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              y={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </ChartContainer>
   );
 };
 
@@ -219,6 +234,9 @@ export const lineChartBlockDefinition: ChartDefinition = {
       id: 'xaxis',
       title: 'X Axis (major axis)',
       type: 'major',
+      capabilities: {
+        canRotateLabel: false,
+      },
       defaults: {
         groupBy: 'timePeriod',
         min: 0,
@@ -235,6 +253,9 @@ export const lineChartBlockDefinition: ChartDefinition = {
       id: 'yaxis',
       title: 'Y Axis (minor axis)',
       type: 'minor',
+      capabilities: {
+        canRotateLabel: true,
+      },
       defaults: {
         min: 0,
         showGrid: true,
@@ -242,6 +263,9 @@ export const lineChartBlockDefinition: ChartDefinition = {
         tickConfig: 'default',
         tickSpacing: 1,
         unit: '',
+        label: {
+          width: 100,
+        },
       },
     },
   },

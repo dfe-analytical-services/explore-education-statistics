@@ -34,18 +34,20 @@ const CustomTooltip = ({
               return (
                 // eslint-disable-next-line react/no-array-index-key
                 <li key={index}>
-                  <span
-                    className={styles.itemColour}
-                    style={{ backgroundColor: item.fill }}
-                  />
+                  <div className="govuk-!-margin-right-2">
+                    <span
+                      className={styles.itemColour}
+                      style={{ backgroundColor: item.fill }}
+                    />
+                  </div>
 
-                  <span>
+                  <div>
                     {`${item.name} : `}
 
                     <strong>
                       {formatPretty(item.value.toString(), item.unit)}
                     </strong>
-                  </span>
+                  </div>
                 </li>
               );
             },

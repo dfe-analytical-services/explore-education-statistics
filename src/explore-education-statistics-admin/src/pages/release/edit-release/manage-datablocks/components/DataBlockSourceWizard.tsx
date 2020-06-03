@@ -1,7 +1,7 @@
 import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/edit-release/manage-datablocks/components/DataBlockDetailsForm';
-import { ReleaseDataBlock } from '@admin/services/release/edit-release/datablocks/service';
+import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {

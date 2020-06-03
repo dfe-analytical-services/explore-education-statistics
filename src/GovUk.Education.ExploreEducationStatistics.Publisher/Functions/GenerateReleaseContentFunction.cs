@@ -2,11 +2,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusContentStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.CronScheduleUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -38,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateStage(message, Started);
             try
             {
-                await _contentService.UpdateContentAsync(message.Releases.Select(tuple => tuple.ReleaseId));
+                var context = new PublishContext(GetNextScheduledPublishingTime(), true);
+                await _contentService.UpdateContentAsync(message.Releases.Select(tuple => tuple.ReleaseId), context);
                 await UpdateStage(message, Complete);
             }
             catch (Exception e)

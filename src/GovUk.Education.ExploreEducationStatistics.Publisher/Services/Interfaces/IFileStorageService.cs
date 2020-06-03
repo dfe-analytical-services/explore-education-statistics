@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IFileStorageService
     {
-        Task CopyReleaseToPublicContainer(CopyReleaseCommand copyReleaseCommand);
+        Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand);
 
         Task DeleteAllContentAsyncExcludingStaging();
 
@@ -15,6 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task MoveStagedContentAsync();
 
-        Task UploadFromStreamAsync(string blobName, string contentType, string content);
+        Task UploadContentFromStreamAsync(string blobName, string contentType, string content);
     }
 }

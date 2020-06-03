@@ -27,8 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public string Unit;
         public bool ShowGrid = true;
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public LabelPosition LabelPosition;
+        public Label? Label;
 
         public int? Min;
         public int? Max;
@@ -65,24 +64,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public ChartConfiguration Config;
     }
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum LabelPosition
+    public class Label
     {
-        axis,
-        graph,
-        top,
-        left,
-        right,
-        bottom,
-        inside,
-        outside,
-        insideLeft,
-        insideRight,
-        insideTop,
-        insideBottom,
-        insideTopLeft,
-        insideBottomLeft,
-        insideTopRight
+        public string Text;
+        public int? Width;
+        public bool? Rotated;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]

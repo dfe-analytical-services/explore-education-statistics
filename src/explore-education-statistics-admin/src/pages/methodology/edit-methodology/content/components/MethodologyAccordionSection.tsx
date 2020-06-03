@@ -4,7 +4,7 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import {
   EditableBlock,
   EditableContentBlock,
-} from '@admin/services/publicationService';
+} from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';

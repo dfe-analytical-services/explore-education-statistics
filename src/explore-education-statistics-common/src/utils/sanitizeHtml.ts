@@ -27,6 +27,10 @@ const config: sanitize.IOptions = {
     a: ['href'],
     th: ['colspan', 'rowspan'],
     td: ['colspan', 'rowspan'],
+    h2: ['id'],
+    h3: ['id'],
+    h4: ['id'],
+    h5: ['id'],
   },
 };
 

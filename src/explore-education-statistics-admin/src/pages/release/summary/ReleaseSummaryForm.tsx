@@ -1,8 +1,7 @@
-import service from '@admin/services/common/service';
-import {
-  IdTitlePair,
+import { IdTitlePair } from '@admin/services/types/common';
+import metaService, {
   TimePeriodCoverageGroup,
-} from '@admin/services/common/types';
+} from '@admin/services/metaService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
@@ -67,8 +66,8 @@ const ReleaseSummaryForm = <
 
   useEffect(() => {
     Promise.all([
-      service.getReleaseTypes(),
-      service.getTimePeriodCoverageGroups(),
+      metaService.getReleaseTypes(),
+      metaService.getTimePeriodCoverageGroups(),
     ]).then(([releaseTypesResult, timePeriodGroupsResult]) => {
       setModel({
         releaseTypes: releaseTypesResult,

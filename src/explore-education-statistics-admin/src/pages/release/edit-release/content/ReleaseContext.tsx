@@ -1,8 +1,5 @@
-import {
-  EditableBlock,
-  EditableRelease,
-  ExtendedComment,
-} from '@admin/services/publicationService';
+import { EditableRelease } from '@admin/services/releaseContentService';
+import { EditableBlock, ExtendedComment } from '@admin/services/types/content';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ContentSection } from '@common/services/publicationService';
 import { BaseBlock, DataBlock } from '@common/services/types/blocks';

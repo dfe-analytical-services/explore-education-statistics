@@ -7,9 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.CronScheduleUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
-        public CachedReleaseViewModel GetReleaseViewModel(Guid id)
+        public CachedReleaseViewModel GetReleaseViewModel(Guid id, PublishContext context)
         {
             var release = _contentDbContext.Releases
                 .Include(r => r.Type)
@@ -62,11 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             releaseViewModel.DownloadFiles =
                 _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
 
-            if (!releaseViewModel.Published.HasValue)
-            {
-                // Release isn't live yet. Set the published date based on what we expect it to be
-                releaseViewModel.Published = GetNextScheduledPublishingTime();
-            }
+            // If the release isn't live yet set the published date based on what we expect it to be
+            releaseViewModel.Published ??= context.Published;
 
             return releaseViewModel;
         }
@@ -77,23 +74,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => !release.SoftDeleted && IsReleasePublished(release, includedReleaseIds) && IsLatestVersionOfRelease(release.Publication, release.Id))
+                .Where(release => !release.SoftDeleted && IsReleasePublished(release, includedReleaseIds) &&
+                                  IsLatestVersionOfRelease(release.Publication, release.Id))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
         }
 
         public CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId,
-            IEnumerable<Guid> includedReleaseIds)
+            IEnumerable<Guid> includedReleaseIds, PublishContext context)
         {
             var latestRelease = GetLatestRelease(publicationId, includedReleaseIds);
-            return GetReleaseViewModel(latestRelease.Id);
+            return GetReleaseViewModel(latestRelease.Id, context);
         }
 
-        public async Task SetPublishedDatesAsync(Guid id)
+        public async Task SetPublishedDatesAsync(Guid id, DateTime published)
         {
-            var publishedDate = DateTime.UtcNow;
-
             var contentRelease = await _contentDbContext.Releases
                 .Include(release => release.Publication)
                 .ThenInclude(publication => publication.Methodology)
@@ -110,13 +106,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             _contentDbContext.Releases.Update(contentRelease);
-            contentRelease.Published = publishedDate;
+            contentRelease.Published ??= published;
 
             // TODO EES-913 Remove this when methodologies are published independently 
             if (methodology != null)
             {
                 _contentDbContext.Methodologies.Update(methodology);
-                methodology.Published = publishedDate;
+                methodology.Published ??= published;
             }
 
             await _contentDbContext.SaveChangesAsync();
@@ -125,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (statisticsRelease != null)
             {
                 _statisticsDbContext.Release.Update(statisticsRelease);
-                statisticsRelease.Published = publishedDate;
+                statisticsRelease.Published ??= published;
                 await _statisticsDbContext.SaveChangesAsync();
             }
         }

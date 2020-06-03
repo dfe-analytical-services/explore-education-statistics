@@ -10,5 +10,6 @@
 
 @import './recharts';
 
-// DfE patterns
-@import './patterns/dfe-modifiers';
+@import './utils/flex';
+@import './utils/modifiers';
+@import './utils/position';

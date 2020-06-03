@@ -8,7 +8,7 @@ import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPa
 import ReleaseContentAccordion from '@admin/modules/find-statistics/components/ReleaseContentAccordion';
 import { useReleaseState } from '@admin/pages/release/edit-release/content/ReleaseContext';
 import useReleaseActions from '@admin/pages/release/edit-release/content/useReleaseActions';
-import editReleaseDataService from '@admin/services/release/edit-release/data/editReleaseDataService';
+import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
@@ -116,7 +116,7 @@ const PublicationReleaseContent = () => {
                 onBlockDelete={removeBlock}
                 onBlockCommentsChange={updateBlockComments}
               />
-              {release.summarySection.content?.length === 0 && (
+              {isEditing && release.summarySection.content?.length === 0 && (
                 <div className="govuk-!-margin-bottom-8 dfe-align--centre">
                   <Button variant="secondary" onClick={addBlock}>
                     Add a summary text block
@@ -134,7 +134,7 @@ const PublicationReleaseContent = () => {
                     <li key={path}>
                       <ButtonText
                         onClick={() =>
-                          editReleaseDataService.downloadFile(path)
+                          releaseDataFileService.downloadFile(path)
                         }
                         className="govuk-link"
                       >

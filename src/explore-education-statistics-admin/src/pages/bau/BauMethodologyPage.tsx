@@ -1,6 +1,7 @@
 import Page from '@admin/components/Page';
-import methodologyService from '@admin/services/methodology/methodologyService';
-import { MethodologyStatusListItem } from '@admin/services/methodology/types';
+import methodologyService, {
+  MethodologyStatusListItem,
+} from '@admin/services/methodologyService';
 import Tag from '@common/components/Tag';
 import React, { useEffect, useState } from 'react';
 
@@ -12,7 +13,7 @@ const BauMethodologyPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    methodologyService.getMethodologies().then(methodologies => {
+    methodologyService.getBauMethodologies().then(methodologies => {
       setModel({
         methodologies,
       });

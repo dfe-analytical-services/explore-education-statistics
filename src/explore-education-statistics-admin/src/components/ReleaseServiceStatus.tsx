@@ -1,6 +1,8 @@
 import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
-import dashboardService from '@admin/services/dashboard/service';
+import releaseService, {
+  ReleaseStageStatuses,
+} from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { forceCheck } from 'react-lazyload';
@@ -11,56 +13,19 @@ interface Props {
   exclude?: 'status' | 'details';
 }
 
-type PublishingStage =
-  | 'Validating'
-  | 'Cancelled'
-  | 'Complete'
-  | 'Failed'
-  | 'Scheduled'
-  | 'NotStarted'
-  | 'Started';
-
-type OverallStage =
-  | 'Validating'
-  | 'Complete'
-  | 'Failed'
-  | 'Invalid'
-  | 'Scheduled'
-  | 'Started'
-  | 'Superseded';
-
-type TaskStage =
-  | 'Validating'
-  | 'Cancelled'
-  | 'Complete'
-  | 'Failed'
-  | 'Queued'
-  | 'NotStarted'
-  | 'Started';
-
-export interface ReleaseStatus {
-  releaseId?: string;
-  dataStage?: TaskStage;
-  contentStage?: TaskStage;
-  filesStage?: TaskStage;
-  publishingStage?: PublishingStage;
-  overallStage: OverallStage;
-  lastUpdated?: string;
-}
-
 const ReleaseServiceStatus = ({
   releaseId,
   refreshPeriod = 10000,
   exclude,
 }: Props) => {
-  const [currentStatus, setCurrentStatus] = useState<ReleaseStatus>();
+  const [currentStatus, setCurrentStatus] = useState<ReleaseStageStatuses>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
     'blue',
   );
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchReleaseServiceStatus = useCallback(() => {
-    return dashboardService
+    return releaseService
       .getReleaseStatus(releaseId)
       .then(status => {
         if (!status) {

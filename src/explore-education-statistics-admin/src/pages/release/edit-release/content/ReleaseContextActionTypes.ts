@@ -2,7 +2,7 @@ import {
   EditableBlock,
   EditableContentBlock,
   ExtendedComment,
-} from '@admin/services/publicationService';
+} from '@admin/services/types/content';
 import { ContentSection, Release } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 
