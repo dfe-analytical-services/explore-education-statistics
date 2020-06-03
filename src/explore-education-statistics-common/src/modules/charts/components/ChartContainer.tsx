@@ -1,8 +1,9 @@
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useMounted from '@common/hooks/useMounted';
 import AxisLabel from '@common/modules/charts/components/AxisLabel';
 import { ChartProps, Label } from '@common/modules/charts/types/chart';
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { LegendProps } from 'recharts';
 import DefaultLegendContent from 'recharts/lib/component/DefaultLegendContent';
 
@@ -27,7 +28,19 @@ const ChartContainer = ({
   xAxisLabel,
   xAxisHeight = 0,
 }: Props) => {
-  const { isMounted } = useMounted();
+  const [renderCount, setRenderCount] = useState(0);
+
+  const [handleResize] = useDebouncedCallback(() => {
+    setRenderCount(renderCount + 1);
+  }, 500);
+
+  const { isMounted } = useMounted(() => {
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  });
 
   if (!isMounted) {
     return null;
@@ -41,7 +54,7 @@ const ChartContainer = ({
         </div>
       )}
 
-      <div className="govuk-!-margin-bottom-6">
+      <div className="govuk-!-margin-bottom-6" key={renderCount}>
         <div
           className={classNames('dfe-flex', {
             'dfe-align-items--center': !yAxisLabel?.rotated,
