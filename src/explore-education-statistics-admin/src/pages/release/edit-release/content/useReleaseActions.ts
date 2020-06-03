@@ -2,10 +2,12 @@ import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTi
 import releaseContentService, {
   ContentBlockAttachRequest,
 } from '@admin/services/releaseContentService';
-import { ContentBlockPostModel } from '@admin/services/types/content';
+import {
+  ContentBlockPostModel,
+  ExtendedComment,
+} from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback } from 'react';
-import { ExtendedComment } from 'src/services/publicationService';
 import { useReleaseDispatch } from './ReleaseContext';
 import { ContentSectionKeys } from './ReleaseContextActionTypes';
 
