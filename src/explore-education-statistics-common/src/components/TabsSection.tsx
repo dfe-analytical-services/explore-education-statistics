@@ -11,7 +11,6 @@ import styles from './TabsSection.module.scss';
 
 export const classes = {
   panel: 'govuk-tabs__panel',
-  panelHidden: 'govuk-visually-hidden',
 };
 
 export interface TabsSectionProps {
@@ -43,14 +42,14 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
     // Hide additional props from the component's public API to
     // avoid any confusion over this component's usage as
     // it should only be used in combination with Tabs.
-    const tabProps = restProps as HTMLAttributes<HTMLElement>;
+    const { hidden, ...tabProps } = restProps as HTMLAttributes<HTMLElement>;
 
     return (
       <section
         aria-labelledby={onMedia(tabProps['aria-labelledby'])}
+        hidden={hidden}
         className={classNames(classes.panel, styles.panel, {
-          [classes.panelHidden]: tabProps.hidden,
-          [styles.forceFullWidth]: tabProps.hidden,
+          [styles.panelHidden]: hidden,
         })}
         id={id}
         ref={ref}
