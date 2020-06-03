@@ -12,6 +12,7 @@ Go to Table Tool page
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until page contains heading  Create your own tables online
+    user waits for page to finish loading
 
 Select Exclusions publication
     [Tags]  HappyPath

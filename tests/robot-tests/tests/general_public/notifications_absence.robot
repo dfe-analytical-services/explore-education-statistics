@@ -15,6 +15,7 @@ Navigate to Absence publication
 
     user clicks link  Find statistics and data
     user waits until page contains  Browse to find the statistics and data you’re looking for
+    user waits for page to finish loading
 
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
@@ -38,9 +39,9 @@ Go to Notify me page for Absence publication
 Sign up for email alerts
     [Tags]  HappyPath   NotAgainstPreProd
     [Documentation]   EES-716
-    user clicks element  css:#email-id
-    user presses keys    mark@hiveit.co.uk
-    user clicks element  css:#submit-button
+    user clicks element  css:#subscriptionForm-email
+    press keys  css:#subscriptionForm-email  mark@hiveit.co.uk
+    user clicks button   Subscribe
 
     user waits until page contains heading   Subscribed
     user checks page contains  Thank you. Check your email to confirm your subscription.

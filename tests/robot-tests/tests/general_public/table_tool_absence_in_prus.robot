@@ -12,6 +12,7 @@ Go to Table Tool page
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until page contains heading  Create your own tables online
+    user waits for page to finish loading
 
 Select "Pupil absence" publication
     [Tags]  HappyPath
@@ -85,8 +86,11 @@ Unselect England as a location
     [Tags]  HappyPath
     user opens details dropdown     National
     user clicks checkbox            England
-    # EES-231
-    #user checks page does not contain element  xpath://h2[text()="There is a problem"]
+    user checks page contains element  xpath://*[@class="govuk-error-message" and text()="Select at least one location"]
+
+    # EES-951
+    user clicks element  //*[contains(@class,"govuk-details__summary-text") and text()="National"]
+
     user closes details dropdown    National
 
 Select locations LAs Barnet, Barnsley, Bedford
