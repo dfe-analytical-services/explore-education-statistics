@@ -1,160 +1,191 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Tabs renders multiple tabs correctly with titles 1`] = `
-<div class="govuk-tabs tabs"
-     id="test-tabs"
->
-  <ul class="govuk-tabs__list"
+<div>
+  <div
+    class="govuk-tabs tabs"
+    id="test-tabs"
+  >
+    <ul
+      class="govuk-tabs__list"
       role="tablist"
-  >
-    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"
-        role="presentation"
     >
-      <a class="govuk-tabs__tab"
-         href="#test-tabs-1"
-         id="test-tabs-1-tab"
-         aria-controls="test-tabs-1"
-         aria-selected="true"
-         role="tab"
+      <li
+        class="govuk-tabs__list-item govuk-tabs__list-item--selected"
+        role="presentation"
       >
+        <a
+          aria-controls="test-tabs-1"
+          aria-selected="true"
+          class="govuk-tabs__tab"
+          href="#test-tabs-1"
+          id="test-tabs-1-tab"
+          role="tab"
+        >
+          Tab 1
+        </a>
+      </li>
+      <li
+        class="govuk-tabs__list-item"
+        role="presentation"
+      >
+        <a
+          aria-controls="test-tabs-2"
+          aria-selected="false"
+          class="govuk-tabs__tab"
+          href="#test-tabs-2"
+          id="test-tabs-2-tab"
+          role="tab"
+          tabindex="-1"
+        >
+          Tab 2
+        </a>
+      </li>
+    </ul>
+    <section
+      aria-labelledby="test-tabs-1-tab"
+      class="govuk-tabs__panel panel"
+      id="test-tabs-1"
+      role="tabpanel"
+      tabindex="-1"
+    >
+      <h3>
         Tab 1
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item"
-        role="presentation"
+      </h3>
+      <p>
+        Test section 1 content
+      </p>
+    </section>
+    <section
+      aria-labelledby="test-tabs-2-tab"
+      class="govuk-tabs__panel panel panelHidden"
+      hidden=""
+      id="test-tabs-2"
+      role="tabpanel"
+      tabindex="-1"
     >
-      <a class="govuk-tabs__tab"
-         href="#test-tabs-2"
-         id="test-tabs-2-tab"
-         tabindex="-1"
-         aria-controls="test-tabs-2"
-         aria-selected="false"
-         role="tab"
-      >
+      <h3>
         Tab 2
-      </a>
-    </li>
-  </ul>
-  <section class="govuk-tabs__panel panel"
-           id="test-tabs-1"
-           aria-labelledby="test-tabs-1-tab"
-           role="tabpanel"
-           tabindex="-1"
-  >
-    <h3>
-      Tab 1
-    </h3>
-    <p>
-      Test section 1 content
-    </p>
-  </section>
-  <section class="govuk-tabs__panel panel govuk-visually-hidden forceFullWidth"
-           id="test-tabs-2"
-           aria-labelledby="test-tabs-2-tab"
-           role="tabpanel"
-           tabindex="-1"
-  >
-    <h3>
-      Tab 2
-    </h3>
-    <p>
-      Test section 2 content
-    </p>
-  </section>
+      </h3>
+      <p>
+        Test section 2 content
+      </p>
+    </section>
+  </div>
 </div>
 `;
 
 exports[`Tabs renders multiple tabs correctly without titles 1`] = `
-<div class="govuk-tabs tabs"
-     id="test-tabs"
->
-  <ul class="govuk-tabs__list"
+<div>
+  <div
+    class="govuk-tabs tabs"
+    id="test-tabs"
+  >
+    <ul
+      class="govuk-tabs__list"
       role="tablist"
-  >
-    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"
-        role="presentation"
     >
-      <a class="govuk-tabs__tab"
-         href="#test-tabs-1"
-         id="test-tabs-1-tab"
-         aria-controls="test-tabs-1"
-         aria-selected="true"
-         role="tab"
-      >
-        Tab 1
-      </a>
-    </li>
-    <li class="govuk-tabs__list-item"
+      <li
+        class="govuk-tabs__list-item govuk-tabs__list-item--selected"
         role="presentation"
-    >
-      <a class="govuk-tabs__tab"
-         href="#test-tabs-2"
-         id="test-tabs-2-tab"
-         tabindex="-1"
-         aria-controls="test-tabs-2"
-         aria-selected="false"
-         role="tab"
       >
-        Tab 2
-      </a>
-    </li>
-  </ul>
-  <section class="govuk-tabs__panel panel"
-           id="test-tabs-1"
-           aria-labelledby="test-tabs-1-tab"
-           role="tabpanel"
-           tabindex="-1"
-  >
-    <p>
-      Test section 1 content
-    </p>
-  </section>
-  <section class="govuk-tabs__panel panel govuk-visually-hidden forceFullWidth"
-           id="test-tabs-2"
-           aria-labelledby="test-tabs-2-tab"
-           role="tabpanel"
-           tabindex="-1"
-  >
-    <p>
-      Test section 2 content
-    </p>
-  </section>
+        <a
+          aria-controls="test-tabs-1"
+          aria-selected="true"
+          class="govuk-tabs__tab"
+          href="#test-tabs-1"
+          id="test-tabs-1-tab"
+          role="tab"
+        >
+          Tab 1
+        </a>
+      </li>
+      <li
+        class="govuk-tabs__list-item"
+        role="presentation"
+      >
+        <a
+          aria-controls="test-tabs-2"
+          aria-selected="false"
+          class="govuk-tabs__tab"
+          href="#test-tabs-2"
+          id="test-tabs-2-tab"
+          role="tab"
+          tabindex="-1"
+        >
+          Tab 2
+        </a>
+      </li>
+    </ul>
+    <section
+      aria-labelledby="test-tabs-1-tab"
+      class="govuk-tabs__panel panel"
+      id="test-tabs-1"
+      role="tabpanel"
+      tabindex="-1"
+    >
+      
+      <p>
+        Test section 1 content
+      </p>
+    </section>
+    <section
+      aria-labelledby="test-tabs-2-tab"
+      class="govuk-tabs__panel panel panelHidden"
+      hidden=""
+      id="test-tabs-2"
+      role="tabpanel"
+      tabindex="-1"
+    >
+      
+      <p>
+        Test section 2 content
+      </p>
+    </section>
+  </div>
 </div>
 `;
 
 exports[`Tabs renders single tab correctly 1`] = `
-<div class="govuk-tabs tabs"
-     id="test-tabs"
->
-  <ul class="govuk-tabs__list"
+<div>
+  <div
+    class="govuk-tabs tabs"
+    id="test-tabs"
+  >
+    <ul
+      class="govuk-tabs__list"
       role="tablist"
-  >
-    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"
-        role="presentation"
     >
-      <a class="govuk-tabs__tab"
-         href="#test-tabs-1"
-         id="test-tabs-1-tab"
-         aria-controls="test-tabs-1"
-         aria-selected="true"
-         role="tab"
+      <li
+        class="govuk-tabs__list-item govuk-tabs__list-item--selected"
+        role="presentation"
       >
+        <a
+          aria-controls="test-tabs-1"
+          aria-selected="true"
+          class="govuk-tabs__tab"
+          href="#test-tabs-1"
+          id="test-tabs-1-tab"
+          role="tab"
+        >
+          Tab 1
+        </a>
+      </li>
+    </ul>
+    <section
+      aria-labelledby="test-tabs-1-tab"
+      class="govuk-tabs__panel panel"
+      id="test-tabs-1"
+      role="tabpanel"
+      tabindex="-1"
+    >
+      <h3>
         Tab 1
-      </a>
-    </li>
-  </ul>
-  <section class="govuk-tabs__panel panel"
-           id="test-tabs-1"
-           aria-labelledby="test-tabs-1-tab"
-           role="tabpanel"
-           tabindex="-1"
-  >
-    <h3>
-      Tab 1
-    </h3>
-    <p>
-      Test section 1 content
-    </p>
-  </section>
+      </h3>
+      <p>
+        Test section 1 content
+      </p>
+    </section>
+  </div>
 </div>
 `;

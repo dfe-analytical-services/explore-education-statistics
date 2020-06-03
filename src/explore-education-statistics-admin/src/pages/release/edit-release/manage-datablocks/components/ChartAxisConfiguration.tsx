@@ -250,14 +250,14 @@ const ChartAxisConfiguration = ({
         label: Yup.object<Label>({
           text: Yup.string(),
           rotated: Yup.boolean(),
-          width: Yup.number(),
+          width: Yup.number().positive('Label width must be positive'),
         }),
       });
     } else {
       schema = schema.shape({
         label: Yup.object<Label>({
           text: Yup.string(),
-          width: Yup.number(),
+          width: Yup.number().positive('Label width must be positive'),
         }),
       });
     }
@@ -398,6 +398,7 @@ const ChartAxisConfiguration = ({
                     label="Width (px)"
                     name="label.width"
                     width={5}
+                    min={0}
                   />
 
                   {(validationSchema.fields.label as ObjectSchema<Label>).fields

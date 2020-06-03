@@ -1,7 +1,9 @@
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import useMounted from '@common/hooks/useMounted';
 import AxisLabel from '@common/modules/charts/components/AxisLabel';
 import { ChartProps, Label } from '@common/modules/charts/types/chart';
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { LegendProps } from 'recharts';
 import DefaultLegendContent from 'recharts/lib/component/DefaultLegendContent';
 
@@ -26,7 +28,23 @@ const ChartContainer = ({
   xAxisLabel,
   xAxisHeight = 0,
 }: Props) => {
-  const yAxisLabelWidth = yAxisLabel?.text ? yAxisLabel?.width ?? 100 : 0;
+  const [renderCount, setRenderCount] = useState(0);
+
+  const [handleResize] = useDebouncedCallback(() => {
+    setRenderCount(renderCount + 1);
+  }, 500);
+
+  const { isMounted } = useMounted(() => {
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  });
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <>
@@ -36,7 +54,7 @@ const ChartContainer = ({
         </div>
       )}
 
-      <div className="govuk-!-margin-bottom-6">
+      <div className="govuk-!-margin-bottom-6" key={renderCount}>
         <div
           className={classNames('dfe-flex', {
             'dfe-align-items--center': !yAxisLabel?.rotated,
@@ -45,35 +63,49 @@ const ChartContainer = ({
           {yAxisLabel?.text && (
             <AxisLabel
               data-testid="y-axis-label"
-              width={
-                yAxisLabel.rotated ? height - xAxisHeight : yAxisLabelWidth
-              }
               rotated={yAxisLabel.rotated}
               style={{
-                flexBasis: yAxisLabelWidth,
+                flexBasis: yAxisLabel.rotated
+                  ? yAxisLabel.width || 50
+                  : yAxisLabel.width || 100,
+                maxWidth: '40%',
                 marginBottom: xAxisHeight,
                 marginRight: 10,
+              }}
+              textStyle={{
+                maxWidth: '100%',
+                width: yAxisLabel.rotated
+                  ? height - xAxisHeight
+                  : yAxisLabel.width || 100,
               }}
             >
               {yAxisLabel.text}
             </AxisLabel>
           )}
 
-          {children}
-        </div>
-
-        {xAxisLabel?.text && (
-          <AxisLabel
-            data-testid="x-axis-label"
-            className="dfe-flex dfe-justify-content--center"
-            width={xAxisLabel.width}
+          <div
             style={{
-              marginLeft: yAxisWidth + yAxisLabelWidth,
+              width: '100%',
             }}
           >
-            {xAxisLabel.text}
-          </AxisLabel>
-        )}
+            {children}
+
+            {xAxisLabel?.text && (
+              <AxisLabel
+                data-testid="x-axis-label"
+                className="dfe-flex dfe-justify-content--center"
+                style={{
+                  marginLeft: yAxisWidth,
+                }}
+                textStyle={{
+                  maxWidth: xAxisLabel.width,
+                }}
+              >
+                {xAxisLabel.text}
+              </AxisLabel>
+            )}
+          </div>
+        </div>
       </div>
 
       {legendPosition === 'bottom' && legend && (
