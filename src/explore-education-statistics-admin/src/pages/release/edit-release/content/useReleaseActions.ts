@@ -7,7 +7,7 @@ import {
   ExtendedComment,
 } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useReleaseDispatch } from './ReleaseContext';
 import { ContentSectionKeys } from './ReleaseContextActionTypes';
 
@@ -309,18 +309,34 @@ export default function useReleaseActions() {
     [dispatch],
   );
 
-  return {
-    updateAvailableDataBlocks,
-    deleteContentSectionBlock,
-    updateContentSectionDataBlock,
-    updateContentSectionBlock,
-    addContentSectionBlock,
-    attachContentSectionBlock,
-    updateSectionBlockOrder,
-    addContentSection,
-    updateContentSectionsOrder,
-    removeContentSection,
-    updateContentSectionHeading,
-    updateBlockComments,
-  };
+  return useMemo(
+    () => ({
+      updateAvailableDataBlocks,
+      deleteContentSectionBlock,
+      updateContentSectionDataBlock,
+      updateContentSectionBlock,
+      addContentSectionBlock,
+      attachContentSectionBlock,
+      updateSectionBlockOrder,
+      addContentSection,
+      updateContentSectionsOrder,
+      removeContentSection,
+      updateContentSectionHeading,
+      updateBlockComments,
+    }),
+    [
+      addContentSection,
+      addContentSectionBlock,
+      attachContentSectionBlock,
+      deleteContentSectionBlock,
+      removeContentSection,
+      updateAvailableDataBlocks,
+      updateBlockComments,
+      updateContentSectionBlock,
+      updateContentSectionDataBlock,
+      updateContentSectionHeading,
+      updateContentSectionsOrder,
+      updateSectionBlockOrder,
+    ],
+  );
 }
