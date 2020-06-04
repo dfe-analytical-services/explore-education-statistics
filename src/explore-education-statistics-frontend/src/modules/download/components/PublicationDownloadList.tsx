@@ -1,4 +1,3 @@
-import { baseUrl } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import React from 'react';
 
@@ -47,7 +46,7 @@ function PublicationList({ publications }: Props) {
               {downloadFiles.map(({ extension, name, path, size }) => (
                 <li key={path} className="govuk-!-margin-bottom-6">
                   <Link
-                    to={`${baseUrl.data}/download/${path}`}
+                    to={`${process.env.DATA_API_BASE_URL}/download/${path}`}
                     className="govuk-link"
                     data-testid={`download-stats-${path}`}
                   >

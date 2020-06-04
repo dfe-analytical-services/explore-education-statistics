@@ -2,10 +2,11 @@
 import '@frontend/polyfill';
 
 import useMounted from '@common/hooks/useMounted';
-import { setApiBaseUrls } from '@common/services/api';
+import { contentApi, dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
 import loadEnv from '@frontend/loadEnv';
+import notificationApi from '@frontend/services/clients/notificationApi';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
@@ -24,11 +25,10 @@ const App = ({ Component, pageProps, cookies }: Props) => {
 
   loadEnv();
 
-  setApiBaseUrls({
-    content: process.env.CONTENT_API_BASE_URL,
-    data: process.env.DATA_API_BASE_URL,
-    notification: process.env.NOTIFICATION_API_BASE_URL,
-  });
+  contentApi.axios.defaults.baseURL = process.env.CONTENT_API_BASE_URL;
+  dataApi.axios.defaults.baseURL = process.env.DATA_API_BASE_URL;
+  notificationApi.axios.defaults.baseURL =
+    process.env.NOTIFICATION_API_BASE_URL;
 
   useMounted(() => {
     if (process.env.GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
