@@ -170,11 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Update, ReleaseNoteViewModel>();
 
-            CreateMap<Comment, CommentViewModel>()
-                .ForMember(dest => dest.CreatedBy,
-#pragma warning disable 612
-                    m => m.MapFrom(c => c.LegacyCreatedBy));
-#pragma warning restore 612
+            CreateMap<Comment, CommentViewModel>();
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));

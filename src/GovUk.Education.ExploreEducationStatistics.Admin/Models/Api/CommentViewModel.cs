@@ -1,4 +1,5 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -7,9 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public Guid Id { get; set; }
         public string Content { get; set; }
         public DateTime Created { get; set; }
-        // TODO EES-18 retrieve User name when mapping or LegacyCreatedBy if CreatedById is null
-        public string CreatedBy { get; set; }
-        public Guid CreatedById { get; set; }
+        public User CreatedBy { get; set; }
         public DateTime? Updated { get; set; }
+
+        [Obsolete("Use CreatedBy.Id instead")]
+        public Guid CreatedById => CreatedBy.Id;
+
+        [Obsolete("Use CreatedBy.FirstName and CreatedBy.LastName instead")]
+        public string CreatedByName => $"{CreatedBy.FirstName} {CreatedBy.LastName}";
     }
 }

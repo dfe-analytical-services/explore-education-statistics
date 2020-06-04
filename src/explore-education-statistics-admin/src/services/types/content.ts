@@ -1,7 +1,5 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 
-export type CommentState = 'open' | 'resolved';
-
 export interface ExtendedComment {
   id: string;
   content: string;

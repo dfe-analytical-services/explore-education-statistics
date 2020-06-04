@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -13,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -25,13 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper; 
         private readonly IUserService _userService; 
 
-        public ContentService(ContentDbContext context, IPersistenceHelper<ContentDbContext> persistenceHelper, 
+        public ContentService(ContentDbContext context,
+            UserManager<ApplicationUser> userManager,
+            IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IMapper mapper, IUserService userService)
         {
             _context = context;
+            _userManager = userManager;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _userService = userService;
@@ -367,7 +373,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return NotFound<List<CommentViewModel>>();
                     }
 
-                    return _mapper.Map<List<CommentViewModel>>(contentBlock.Comments);
+                    var comments = _mapper.Map<List<CommentViewModel>>(contentBlock.Comments);
+                    comments.ForEach(model => model.CreatedBy = new User
+                    {
+                        Id = Guid.Empty,
+                        FirstName = "TODO EES-18",
+                        LastName = "TODO EES-18"
+                    });
+                    return comments;
                 }
             );
         }
@@ -403,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     await _context.SaveChangesAsync();
 
                     var added = await _context.Comment.FindAsync(comment.Id);
-                    return _mapper.Map<CommentViewModel>(added);
+                    return await BuildCommentViewModel(added);
                 }
             );
         }
@@ -438,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     await _context.SaveChangesAsync();
 
                     var updated = await _context.Comment.FindAsync(comment.Id);
-                    return _mapper.Map<CommentViewModel>(updated);
+                    return await BuildCommentViewModel(updated);
                 }
             );
         }
@@ -468,7 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     _context.Comment.Remove(comment);
                     await _context.SaveChangesAsync();
 
-                    return _mapper.Map<CommentViewModel>(comment);
+                    return await BuildCommentViewModel(comment);
                 }
             );
         }
@@ -623,6 +636,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .ThenInclude(section => section.Content)
                     .ThenInclude(content => content.Comments)
                 ;
+        }
+
+        private async Task<CommentViewModel> BuildCommentViewModel(Comment comment)
+        {
+            var result = _mapper.Map<CommentViewModel>(comment);
+            if (!string.IsNullOrEmpty(comment.LegacyCreatedBy))
+            {
+                result.CreatedBy = new User
+                {
+                    FirstName = comment.LegacyCreatedBy
+                };
+            }
+            else
+            {
+                var user = await _userManager.FindByIdAsync(comment.CreatedById.ToString());
+                result.CreatedBy = new User
+                {
+                    Id = comment.CreatedById,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email
+                };
+            }
+            return result;
         }
         
         private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(
