@@ -75,6 +75,7 @@ const nextConfig = {
     APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
     GA_TRACKING_ID: process.env.GA_TRACKING_ID,
     HOTJAR_ID: process.env.HOTJAR_ID,
+    PUBLIC_URL: process.env.PUBLIC_URL,
   },
   webpack(config, options) {
     const { dev, isServer } = options;
