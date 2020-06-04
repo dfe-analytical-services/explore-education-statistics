@@ -1,5 +1,7 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
+import { Dictionary } from '@common/types';
+import { useCookies } from '@frontend/hooks/useCookies';
 import loadEnv from '@frontend/loadEnv';
 
 import useMounted from '@common/hooks/useMounted';
@@ -12,13 +14,19 @@ import {
 import { initHotJar } from '@frontend/services/hotjarService';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import { useRouter } from 'next/router';
+import { parseCookies } from 'nookies';
 import React from 'react';
 import '../styles/_all.scss';
 
 loadEnv();
 
-const App = ({ Component, pageProps }: AppProps) => {
+interface Props extends AppProps {
+  cookies: Dictionary<string>;
+}
+
+const App = ({ Component, pageProps, cookies }: Props) => {
   const router = useRouter();
+  const { getCookie } = useCookies(cookies);
 
   loadEnv();
 
@@ -29,7 +37,10 @@ const App = ({ Component, pageProps }: AppProps) => {
   });
 
   useMounted(() => {
-    initGoogleAnalytics(process.env.GA_TRACKING_ID);
+    if (getCookie('disableGA') !== 'true') {
+      initGoogleAnalytics(process.env.GA_TRACKING_ID);
+    }
+
     initHotJar(process.env.HOTJAR_ID);
     initApplicationInsights(process.env.APPINSIGHTS_INSTRUMENTATIONKEY);
 
@@ -48,7 +59,10 @@ App.getInitialProps = async (appContext: AppContext) => {
 
   loadEnv();
 
-  return { ...appProps };
+  return {
+    ...appProps,
+    cookies: parseCookies(appContext.ctx),
+  };
 };
 
 export default App;

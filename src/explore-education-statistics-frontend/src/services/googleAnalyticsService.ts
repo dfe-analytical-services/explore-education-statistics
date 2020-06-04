@@ -1,12 +1,15 @@
 import ReactGA from 'react-ga';
 
 let initialised = false;
+let gaTrackingId = '';
 
 export const googleAnalyticsCookies = ['_ga', '_gid', '_gat'];
 
 export function initGoogleAnalytics(trackingId: string) {
-  if (!initialised) {
+  if (!initialised && trackingId) {
     ReactGA.initialize(trackingId);
+
+    gaTrackingId = trackingId;
     initialised = true;
 
     // eslint-disable-next-line no-console
@@ -16,11 +19,11 @@ export function initGoogleAnalytics(trackingId: string) {
 
 export function enableGoogleAnalytics() {
   // @ts-ignore
-  window[`ga-disable-${process.env.GA_TRACKING_ID}`] = false;
+  window[`ga-disable-${gaTrackingId}`] = false;
 }
 export function disableGoogleAnalytics() {
   // @ts-ignore
-  window[`ga-disable-${process.env.GA_TRACKING_ID}`] = true;
+  window[`ga-disable-${gaTrackingId}`] = true;
 }
 
 export const logPageView = () => {
