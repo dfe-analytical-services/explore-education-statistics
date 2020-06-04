@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         
                 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
-        public async Task<ActionResult<CommentViewModel>> AddComment(
+        public async Task<ActionResult<CommentViewModel>> UpdateComment(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, AddOrUpdateCommentRequest request)
         {
             return await _contentService
