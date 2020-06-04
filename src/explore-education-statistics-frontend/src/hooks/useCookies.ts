@@ -1,8 +1,8 @@
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
 import {
-  disableGA,
-  enableGA,
+  disableGoogleAnalytics,
+  enableGoogleAnalytics,
   googleAnalyticsCookies,
 } from '@frontend/services/googleAnalyticsService';
 import { addMonths, addYears } from 'date-fns';
@@ -97,12 +97,12 @@ export function useCookies(initialCookies?: Dictionary<string>) {
       );
 
       if (isDisabled) {
-        disableGA();
+        disableGoogleAnalytics();
         googleAnalyticsCookies.forEach(cookieName =>
           destroyCookie(null, cookieName),
         );
       } else {
-        enableGA();
+        enableGoogleAnalytics();
       }
     },
   };

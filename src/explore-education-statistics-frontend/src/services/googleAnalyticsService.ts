@@ -4,19 +4,21 @@ let initialised = false;
 
 export const googleAnalyticsCookies = ['_ga', '_gid', '_gat'];
 
-if (process.env.GA_TRACKING_ID && !initialised) {
-  ReactGA.initialize(process.env.GA_TRACKING_ID);
-  initialised = true;
+export function initGoogleAnalytics(trackingId: string) {
+  if (!initialised) {
+    ReactGA.initialize(trackingId);
+    initialised = true;
 
-  // eslint-disable-next-line no-console
-  console.log('GA initialised');
+    // eslint-disable-next-line no-console
+    console.log('GA initialised');
+  }
 }
 
-export function enableGA() {
+export function enableGoogleAnalytics() {
   // @ts-ignore
   window[`ga-disable-${process.env.GA_TRACKING_ID}`] = false;
 }
-export function disableGA() {
+export function disableGoogleAnalytics() {
   // @ts-ignore
   window[`ga-disable-${process.env.GA_TRACKING_ID}`] = true;
 }

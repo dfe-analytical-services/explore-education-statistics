@@ -2,7 +2,13 @@ import axios from 'axios';
 import { commaSeparated } from '../util/paramSerializers';
 import Client from './Client';
 
-export const baseUrl = {
+interface BaseUrls {
+  content: string;
+  data: string;
+  notification: string;
+}
+
+export const baseUrl: BaseUrls = {
   content: process.env.CONTENT_API_BASE_URL,
   data: process.env.DATA_API_BASE_URL || '/api/data',
   notification: process.env.NOTIFICATION_API_BASE_URL,
@@ -28,3 +34,22 @@ export const notificationApi = new Client(
     paramsSerializer: commaSeparated,
   }),
 );
+
+const urlToApi: { [key in keyof BaseUrls]: Client } = {
+  content: contentApi,
+  data: dataApi,
+  notification: notificationApi,
+};
+
+/**
+ * Explicitly set base URLs for clients if unable to
+ * rely on environment variables to correctly set them.
+ */
+export function setApiBaseUrls(baseUrls: BaseUrls) {
+  Object.assign(baseUrl, baseUrls);
+
+  Object.entries(urlToApi).forEach(([key, client]) => {
+    // eslint-disable-next-line no-param-reassign
+    client.axios.defaults.baseURL = baseUrls[key as keyof BaseUrls];
+  });
+}

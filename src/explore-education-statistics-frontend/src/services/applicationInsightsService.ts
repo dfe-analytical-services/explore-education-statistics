@@ -1,11 +1,13 @@
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 // eslint-disable-next-line import/prefer-default-export
-export const initApplicationInsights = () => {
-  if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
+export function initApplicationInsights(
+  key: string,
+): ApplicationInsights | undefined {
+  if (key) {
     const appInsights = new ApplicationInsights({
       config: {
-        instrumentationKey: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
+        instrumentationKey: key,
         enableAutoRouteTracking: true,
         autoTrackPageVisitTime: true,
       },
@@ -14,5 +16,9 @@ export const initApplicationInsights = () => {
 
     // eslint-disable-next-line no-console
     console.log('Application Insights initialised');
+
+    return appInsights;
   }
-};
+
+  return undefined;
+}
