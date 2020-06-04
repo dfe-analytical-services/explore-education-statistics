@@ -60,7 +60,7 @@ Search for "pupil"
     user clicks element   css:#pageSearchForm-option-0
 
     user verifies accordion is open  1. Overview of absence statistics
-    user waits until element is visible  css:#content-section-1-1
+    user waits until element is visible  css:#section1-1
     user waits until page contains    All maintained schools are required to provide 2 possible sessions per day,
 
 Search for "specific enquiry"
