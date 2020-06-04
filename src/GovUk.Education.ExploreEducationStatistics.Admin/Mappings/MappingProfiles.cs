@@ -33,20 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title))
                 .ForMember(dest => dest.PublicationId,
-                    m => m.MapFrom(r => r.Publication.Id))
-                // TODO return real Comments as soon as commenting on Releases has been implemented
-                .ForMember(dest => dest.DraftComments,
-                    m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
-                    {
-                        new ReleaseViewModel.Comment() { Message = "Message 1\nSome multiline content\nSpanning several lines", AuthorName = "TODO User", CreatedDate = DateTime.Now.AddMonths(-2)},
-                        new ReleaseViewModel.Comment() { Message = "Message 2", AuthorName = "TODO User 2", CreatedDate = DateTime.Now.AddMonths(-3)},
-                        new ReleaseViewModel.Comment() { Message = "Message 3", AuthorName = "TODO User 3", CreatedDate = DateTime.Now.AddMonths(-4)},
-                    }))
-                .ForMember(dest => dest.HigherReviewComments,
-                    m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
-                    {
-                        new ReleaseViewModel.Comment() { Message = "Message 4", AuthorName = "TODO Responsible Statistician 4", CreatedDate = DateTime.Now.AddDays(-2)},
-                    }));
+                    m => m.MapFrom(r => r.Publication.Id));
 
             CreateMap<Release, MyReleaseViewModel>()
                 .ForMember(
@@ -58,19 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Title))
                 .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
-                // TODO return real Comments as soon as commenting on Releases has been implemented
-                .ForMember(dest => dest.DraftComments,
-                    m => m.MapFrom(_ => new List<MyReleaseViewModel.Comment>()
-                    {
-                        new MyReleaseViewModel.Comment() { Message = "Message 1\nSome multiline content\nSpanning several lines", AuthorName = "TODO User", CreatedDate = DateTime.Now.AddMonths(-2)},
-                        new MyReleaseViewModel.Comment() { Message = "Message 2", AuthorName = "TODO User 2", CreatedDate = DateTime.Now.AddMonths(-3)},
-                        new MyReleaseViewModel.Comment() { Message = "Message 3", AuthorName = "TODO User 3", CreatedDate = DateTime.Now.AddMonths(-4)},
-                    }))
-                .ForMember(dest => dest.HigherReviewComments,
-                    m => m.MapFrom(_ => new List<MyReleaseViewModel.Comment>()
-                    {
-                        new MyReleaseViewModel.Comment() { Message = "Message 4", AuthorName = "TODO Responsible Statistician 4", CreatedDate = DateTime.Now.AddDays(-2)},
-                    }))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
 
             CreateMap<Release, ReleaseSummaryViewModel>();

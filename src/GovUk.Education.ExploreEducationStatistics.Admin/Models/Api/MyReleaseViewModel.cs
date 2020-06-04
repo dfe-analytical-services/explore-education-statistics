@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -43,10 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public PartialDate NextReleaseDate { get; set; }
 
         public string InternalReleaseNote { get; set; }
-        
-        public List<Comment> DraftComments { get; set; }
-
-        public List<Comment> HigherReviewComments { get; set; }
 
         public PermissionsSet Permissions { get; set; }
         
@@ -57,15 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
             public bool CanDeleteRelease { get; set; }
             
             public bool CanMakeAmendmentOfRelease { get; set; }
-        }
-
-        public class Comment
-        {
-            public string AuthorName { get; set; }
-            
-            public DateTime CreatedDate { get; set; }
-
-            public string Message { get; set; }
         }
     }
 }
