@@ -1,17 +1,11 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
-import { Dictionary } from '@common/types';
-import { useCookies } from '@frontend/hooks/useCookies';
-import loadEnv from '@frontend/loadEnv';
 
 import useMounted from '@common/hooks/useMounted';
 import { setApiBaseUrls } from '@common/services/api';
-import { initApplicationInsights } from '@common/services/applicationInsightsService';
-import {
-  initGoogleAnalytics,
-  logPageView,
-} from '@frontend/services/googleAnalyticsService';
-import { initHotJar } from '@frontend/services/hotjarService';
+import { Dictionary } from '@common/types';
+import { useCookies } from '@frontend/hooks/useCookies';
+import loadEnv from '@frontend/loadEnv';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
@@ -37,16 +31,31 @@ const App = ({ Component, pageProps, cookies }: Props) => {
   });
 
   useMounted(() => {
-    if (getCookie('disableGA') !== 'true') {
-      initGoogleAnalytics(process.env.GA_TRACKING_ID);
+    if (process.env.GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
+      import('@frontend/services/googleAnalyticsService').then(
+        ({ initGoogleAnalytics, logPageView }) => {
+          initGoogleAnalytics(process.env.GA_TRACKING_ID);
+
+          logPageView();
+
+          router.events.on('routeChangeComplete', logPageView);
+        },
+      );
     }
 
-    initHotJar(process.env.HOTJAR_ID);
-    initApplicationInsights(process.env.APPINSIGHTS_INSTRUMENTATIONKEY);
+    if (process.env.HOTJAR_ID) {
+      import('@frontend/services/hotjarService').then(({ initHotJar }) => {
+        initHotJar(process.env.HOTJAR_ID);
+      });
+    }
 
-    logPageView();
-
-    router.events.on('routeChangeComplete', logPageView);
+    if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
+      import('@common/services/applicationInsightsService').then(
+        ({ initApplicationInsights }) => {
+          initApplicationInsights(process.env.APPINSIGHTS_INSTRUMENTATIONKEY);
+        },
+      );
+    }
 
     document.body.classList.add('js-enabled');
   });
