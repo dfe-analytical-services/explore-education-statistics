@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -373,8 +372,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             );
         }
 
-        public Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(Guid releaseId, Guid contentSectionId,
-            Guid contentBlockId, AddCommentRequest comment)
+        public Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(Guid releaseId,
+            Guid contentSectionId,
+            Guid contentBlockId,
+            AddOrUpdateCommentRequest request)
         {
             return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
@@ -389,28 +390,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
                     }
 
-                    var newComment = _context.Comment.Add(new Comment
+                    var comment = new Comment
                     {
                         Id = new Guid(),
-                        IContentBlockId = contentBlockId,
-                        UserId = comment.UserId,
-                        Name = comment.Name,
-                        State = comment.State,
-                        Time = comment.Time,
-                        CommentText = comment.CommentText,
-                        ResolvedBy = comment.ResolvedBy,
-                        ResolvedOn = comment.ResolvedOn,
-                    });
-
+                        ContentBlockId = contentBlockId,
+                        Content = request.Content,
+                        Created = DateTime.UtcNow,
+                        CreatedById = _userService.GetUserId()
+                    };
+                    
+                    await _context.Comment.AddAsync(comment);
                     await _context.SaveChangesAsync();
-                    return _mapper.Map<CommentViewModel>(newComment.Entity);
+
+                    var added = await _context.Comment.FindAsync(comment.Id);
+                    return _mapper.Map<CommentViewModel>(added);
                 }
             );
         }
 
         public Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid releaseId,
             Guid contentSectionId, Guid contentBlockId, Guid commentId,
-            UpdateCommentRequest commentRequest)
+            AddOrUpdateCommentRequest request)
         {
             return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
@@ -432,18 +432,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationActionResult(CommentNotFound);
                     }
 
-                    comment.UserId = commentRequest.UserId;
-                    comment.Name = commentRequest.Name;
-                    comment.State = commentRequest.State;
-                    comment.Time = commentRequest.Time;
-                    comment.CommentText = commentRequest.CommentText;
-                    comment.ResolvedBy = commentRequest.ResolvedBy;
-                    comment.ResolvedOn = commentRequest.ResolvedOn;
-
                     _context.Comment.Update(comment);
+                    comment.Content = request.Content;
+                    comment.Updated = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
 
-                    return _mapper.Map<CommentViewModel>(comment);
+                    var updated = await _context.Comment.FindAsync(comment.Id);
+                    return _mapper.Map<CommentViewModel>(updated);
                 }
             );
         }
@@ -474,7 +469,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     await _context.SaveChangesAsync();
 
                     return _mapper.Map<CommentViewModel>(comment);
-
                 }
             );
         }

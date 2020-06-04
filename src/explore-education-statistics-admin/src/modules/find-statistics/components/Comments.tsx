@@ -43,9 +43,9 @@ const Comments = ({
   const { user } = useAuthContext();
   const { releaseId } = useManageReleaseContext();
 
-  const addComment = (commentText: string) => {
+  const addComment = (content: string) => {
     const additionalComment: AddExtendedComment = {
-      commentText,
+      content,
     };
 
     if (releaseId && sectionId) {
@@ -87,7 +87,6 @@ const Comments = ({
   const resolveComment = (index: number) => {
     const resolvedComment: UpdateExtendedComment = {
       ...comments[index],
-      state: 'resolved',
     };
 
     if (releaseId && sectionId) {
@@ -107,10 +106,10 @@ const Comments = ({
     }
   };
 
-  const updateComment = (index: number, commentText: string) => {
+  const updateComment = (index: number, content: string) => {
     const editedComment: UpdateExtendedComment = {
       ...comments[index],
-      commentText,
+      content,
     };
 
     if (releaseId && sectionId) {
@@ -190,22 +189,13 @@ const Comments = ({
           <div className={styles.commentsContainer}>
             {comments.map(
               (
-                {
-                  id,
-                  userId,
-                  name,
-                  time,
-                  commentText,
-                  state,
-                  resolvedOn,
-                  resolvedBy,
-                },
+                { id, content, created, createdById, createdByName, updated },
                 index,
               ) => (
                 <div key={id}>
                   <h2 className="govuk-body-xs govuk-!-margin-0">
                     <strong>
-                      {name} <FormattedDate>{time}</FormattedDate>
+                      {createdByName} <FormattedDate>{created}</FormattedDate>
                     </strong>
                   </h2>
                   {editableComment && editableComment === id ? (
@@ -229,26 +219,7 @@ const Comments = ({
                     </form>
                   ) : (
                     <p className="govuk-body-xs govuk-!-margin-bottom-1">
-                      {commentText}
-                    </p>
-                  )}
-                  {state === 'open' && canResolve && (
-                    <ButtonText
-                      className="govuk-body-xs govuk-!-margin-right-3"
-                      onClick={() => resolveComment(index)}
-                    >
-                      Resolve
-                    </ButtonText>
-                  )}
-                  {state === 'resolved' && (
-                    <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
-                      <em>
-                        Resolved{' '}
-                        {resolvedOn && (
-                          <FormattedDate>resolvedOn</FormattedDate>
-                        )}{' '}
-                        by {resolvedBy}
-                      </em>
+                      {content}
                     </p>
                   )}
                   {canComment && (
@@ -259,13 +230,13 @@ const Comments = ({
                       Remove
                     </ButtonText>
                   )}
-                  {canComment && user?.id === userId && (
+                  {canComment && user?.id === createdById && (
                     <>
                       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
                       <ButtonText
                         className="govuk-body-xs govuk-!-margin-right-3"
                         onClick={() => {
-                          setEditableCommentText(commentText);
+                          setEditableCommentText(content);
                           return editableComment
                             ? setEditableComment('')
                             : setEditableComment(id);

@@ -237,6 +237,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Comment>()
+                .Property(comment => comment.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<Comment>()
+                .Property(comment => comment.Updated)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
             modelBuilder.Entity<Methodology>()
                 .Property(b => b.Content)
                 .HasConversion(
@@ -2571,15 +2583,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     new Comment
                     {
                         Id = new Guid("514940e6-3b84-4e1b-aa5d-d1e5fa671e1b"),
-                        IContentBlockId = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
-                        CommentText = "Test Text",
-                        Name = "A Test User",
-                        State = CommentState.open,
-                        Time = new DateTime(2019, 12, 1, 15, 0, 0),
-                        ResolvedBy = null,
-                        ResolvedOn = null
+                        ContentBlockId = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
+                        Content = "Test Text",
+                        Created = new DateTime(2019, 12, 1, 15, 0, 0),
+                        CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
                     }
-                    
                 );
             
             modelBuilder.Entity<MarkDownBlock>().HasData(

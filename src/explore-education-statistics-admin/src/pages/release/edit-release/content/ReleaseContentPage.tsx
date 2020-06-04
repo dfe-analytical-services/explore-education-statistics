@@ -91,7 +91,7 @@ const getUnresolvedComments = (release: EditableRelease) =>
         ],
         [],
       ),
-  ].filter(comment => comment !== undefined && comment.state === 'open');
+  ].filter(comment => comment !== undefined);
 
 const ReleaseContentPage = ({
   match,

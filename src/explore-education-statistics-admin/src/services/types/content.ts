@@ -4,13 +4,11 @@ export type CommentState = 'open' | 'resolved';
 
 export interface ExtendedComment {
   id: string;
-  userId: string;
-  name: string;
-  time: Date;
-  commentText: string;
-  state?: CommentState;
-  resolvedBy?: string;
-  resolvedOn?: Date;
+  content: string;
+  created: Date;
+  createdById: string;
+  createdByName: string;
+  updated?: Date;
 }
 
 export type EditableContentBlock = ContentBlock & {

@@ -148,20 +148,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments/add")]
         public async Task<ActionResult<CommentViewModel>> AddComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddCommentRequest comment)
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddOrUpdateCommentRequest request)
         {
             return await _contentService
-                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, comment)
+                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, request)
                 .HandleFailuresOr(Ok);
         }
         
                 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
         public async Task<ActionResult<CommentViewModel>> AddComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, UpdateCommentRequest comment)
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, AddOrUpdateCommentRequest request)
         {
             return await _contentService
-                .UpdateCommentAsync(releaseId, contentSectionId, contentBlockId, commentId, comment)
+                .UpdateCommentAsync(releaseId, contentSectionId, contentBlockId, commentId, request)
                 .HandleFailuresOr(Ok);
         }
         

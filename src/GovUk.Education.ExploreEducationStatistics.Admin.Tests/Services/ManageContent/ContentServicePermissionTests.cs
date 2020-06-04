@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -52,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         _release.Id,
                         ContentSectionId,
                         ContentBlockId,
-                        new AddCommentRequest()), 
+                        new AddOrUpdateCommentRequest()), 
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -77,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         ContentSectionId,
                         ContentBlockId,
                         Guid.NewGuid(),
-                        new UpdateCommentRequest()), 
+                        new AddOrUpdateCommentRequest()), 
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 

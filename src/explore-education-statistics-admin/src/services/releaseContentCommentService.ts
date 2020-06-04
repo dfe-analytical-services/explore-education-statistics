@@ -1,11 +1,8 @@
 import { ExtendedComment } from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
 
-export type AddExtendedComment = Pick<ExtendedComment, 'commentText'>;
-export type UpdateExtendedComment = Pick<
-  ExtendedComment,
-  'id' | 'commentText' | 'state'
->;
+export type AddExtendedComment = Pick<ExtendedComment, 'content'>;
+export type UpdateExtendedComment = Pick<ExtendedComment, 'id' | 'content'>;
 
 const releaseContentCommentService = {
   getContentSectionComments(

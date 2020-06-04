@@ -113,8 +113,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Topic, ApiTopicViewModel>();
 
-            CreateMap<CommentState, string>().ConvertUsing(s => s.GetEnumValue());
-
             CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
                 .ForMember(dest => dest.Content,
                     m => m.MapFrom(r =>
@@ -199,10 +197,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Update, ReleaseNoteViewModel>();
 
             CreateMap<Comment, CommentViewModel>()
-                .ForMember(
-                    dest => dest.State,
-                    m => m.MapFrom(c => c.State.GetEnumValue())
-                );
+                .ForMember(dest => dest.CreatedBy,
+#pragma warning disable 612
+                    m => m.MapFrom(c => c.LegacyCreatedBy));
+#pragma warning restore 612
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
