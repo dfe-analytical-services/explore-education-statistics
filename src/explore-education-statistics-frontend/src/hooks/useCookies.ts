@@ -33,7 +33,6 @@ export const allowedCookies: AllowedCookies = {
     duration: '1 month',
     options: {
       expires: addMonths(new Date(), 1),
-      secure: true,
     },
   },
   disableGA: {
@@ -41,7 +40,6 @@ export const allowedCookies: AllowedCookies = {
     duration: '10 years',
     options: {
       expires: addYears(new Date(), 10),
-      secure: true,
     },
   },
 };
@@ -62,7 +60,10 @@ export function useCookies(initialCookies?: Dictionary<string>) {
     value: string,
     options: Cookie['options'],
   ) => {
-    setBaseCookie(null, name, value, options);
+    setBaseCookie(null, name, value, {
+      secure: process.env.NODE_ENV !== 'development',
+      ...options,
+    });
 
     setCookies({
       ...cookies,
