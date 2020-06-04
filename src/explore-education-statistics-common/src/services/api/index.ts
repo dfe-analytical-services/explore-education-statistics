@@ -5,13 +5,11 @@ import Client from './Client';
 interface BaseUrls {
   content: string;
   data: string;
-  notification: string;
 }
 
 export const baseUrl: BaseUrls = {
   content: process.env.CONTENT_API_BASE_URL,
   data: process.env.DATA_API_BASE_URL || '/api/data',
-  notification: process.env.NOTIFICATION_API_BASE_URL,
 };
 
 export const contentApi = new Client(
@@ -28,17 +26,9 @@ export const dataApi = new Client(
   }),
 );
 
-export const notificationApi = new Client(
-  axios.create({
-    baseURL: baseUrl.notification,
-    paramsSerializer: commaSeparated,
-  }),
-);
-
 const urlToApi: { [key in keyof BaseUrls]: Client } = {
   content: contentApi,
   data: dataApi,
-  notification: notificationApi,
 };
 
 /**

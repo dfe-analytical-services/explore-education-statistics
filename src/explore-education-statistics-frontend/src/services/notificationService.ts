@@ -1,4 +1,4 @@
-import { notificationApi } from '@common/services/api';
+import notificationApi from '@frontend/services/clients/notificationApi';
 
 export interface SubscriptionData {
   email: string;

@@ -1,14 +1,9 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
 import adminApi from '@admin/services/utils/service';
-import { contentApi, dataApi, notificationApi } from '@common/services/api';
+import { contentApi, dataApi } from '@common/services/api';
 import Client from '@common/services/api/Client';
 
-export const clients: Client[] = [
-  adminApi,
-  contentApi,
-  dataApi,
-  notificationApi,
-];
+export const clients: Client[] = [adminApi, contentApi, dataApi];
 
 const configureAxios = () => {
   clients.forEach(client => {
