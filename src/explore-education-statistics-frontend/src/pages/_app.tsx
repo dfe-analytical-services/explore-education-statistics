@@ -4,7 +4,7 @@ import loadEnv from '@frontend/loadEnv';
 
 import useMounted from '@common/hooks/useMounted';
 import { setApiBaseUrls } from '@common/services/api';
-import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
+import { initApplicationInsights } from '@common/services/applicationInsightsService';
 import {
   initGoogleAnalytics,
   logPageView,
