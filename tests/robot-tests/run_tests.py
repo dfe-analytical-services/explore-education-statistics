@@ -13,7 +13,7 @@ from pabot.pabot import main as pabot_run_cli
 import cProfile
 import pstats
 import scripts.keyword_profile as kp
-import chromedriver_install as cdi
+import pyderman
 from dotenv import load_dotenv
 import time
 import requests
@@ -91,12 +91,14 @@ timeout = 30
 implicit_wait = 5
 
 # Install chromedriver and add it to PATH
-cdi.install(file_directory='./webdriver/',
-            verbose=False,
-            chmod=True,
-            overwrite=False,
-            version=args.chromedriver_version)
-os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
+pyderman.install(file_directory='./webdriver/',
+               filename='chromedriver',
+               verbose=False,
+               chmod=True,
+               overwrite=False,
+               version=args.chromedriver_version)
+
+os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
