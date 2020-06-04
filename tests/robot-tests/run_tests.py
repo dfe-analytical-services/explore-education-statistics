@@ -19,9 +19,14 @@ from dotenv import load_dotenv
 import time
 import requests
 import json
+import sys
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
+
+sys.path.append(str(Path("../../useful-scripts/auth-tokens")))
+
+from get_auth_tokens import get_identity_info
 
 # Parse arguments
 parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
@@ -95,11 +100,11 @@ implicit_wait = 5
 
 # Install chromedriver and add it to PATH
 pyderman.install(file_directory='./webdriver/',
-               filename='chromedriver',
-               verbose=False,
-               chmod=True,
-               overwrite=False,
-               version=args.chromedriver_version)
+                 filename='chromedriver',
+                 verbose=False,
+                 chmod=True,
+                 overwrite=False,
+                 version=args.chromedriver_version)
 
 os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
@@ -126,15 +131,6 @@ else:
     assert os.getenv('ADMIN_PASSWORD') is not None
 
 if args.tests and "general_public" not in args.tests:  # Auth not required with general_public tests
-    print('Getting get_identity_info function from get_auth_tokens.py script...', end='')
-
-    globals()['__name__'] = '__test_runner__'
-
-    exec(Path("../../useful-scripts/auth-tokens/get_auth_tokens.py").read_text(), globals(),
-         locals())
-    assert callable(get_identity_info)
-    print('done!')
-
     if "general_public" not in args.tests:  # Don't need BAU user if running general_public tests
         if os.path.exists('IDENTITY_LOCAL_STORAGE_BAU.txt') and os.path.exists(
                 'IDENTITY_COOKIE_BAU.txt'):
