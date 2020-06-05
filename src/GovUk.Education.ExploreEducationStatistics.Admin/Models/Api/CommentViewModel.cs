@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public DateTime? Updated { get; set; }
 
         [Obsolete("Use CreatedBy.Id instead")]
-        public Guid? CreatedById => CreatedBy?.Id;
+        public Guid? CreatedById => CreatedBy.Id;
 
         [Obsolete("Use CreatedBy.FirstName and CreatedBy.LastName instead")]
         public string CreatedByName => $"{CreatedBy.FirstName} {CreatedBy.LastName}";
