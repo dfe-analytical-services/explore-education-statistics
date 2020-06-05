@@ -204,7 +204,7 @@ def user_clicks_checkbox(checkbox_label):
 
 def capture_large_screenshot():
     currentWindow = sl.get_window_size()
-    page_height = sl._current_browser().execute_script(
+    page_height = sl.driver.execute_script(
         "return document.documentElement.scrollHeight;")
 
     page_width = currentWindow[0]
