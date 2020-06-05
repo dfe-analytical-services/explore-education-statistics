@@ -130,79 +130,106 @@ else:
     assert os.getenv('ADMIN_EMAIL') is not None
     assert os.getenv('ADMIN_PASSWORD') is not None
 
-if args.tests and "general_public" not in args.tests:  # Auth not required with general_public tests
-    if "general_public" not in args.tests:  # Don't need BAU user if running general_public tests
-        if os.path.exists('IDENTITY_LOCAL_STORAGE_BAU.txt') and os.path.exists(
-                'IDENTITY_COOKIE_BAU.txt'):
-            print('Getting BAU user authentication information from local files...', end='')
-            with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'r') as ls_file:
-                os.environ['IDENTITY_LOCAL_STORAGE_BAU'] = ls_file.read()
-            with open('IDENTITY_COOKIE_BAU.txt', 'r') as cookie_file:
-                os.environ['IDENTITY_COOKIE_BAU'] = cookie_file.read()
-            print('done!')
+# Auth not required with general_public tests
+if args.tests and "general_public" not in args.tests:
+    def authenticate_user(user, email, password, clear_existing=True):
+        assert user and email and password
+
+        local_storage_name = f'IDENTITY_LOCAL_STORAGE_{user}'
+        cookie_name = f'IDENTITY_COOKIE_{user}'
+
+        local_storage_file = Path(f'{local_storage_name}.json')
+        cookie_file = Path(f'{cookie_name}.json')
+
+        if clear_existing:
+            local_storage_file.unlink(True)
+            cookie_file.unlink(True)
+
+        if local_storage_file.exists() and cookie_file.exists():
+            print(f'Getting {user} authentication information from local files... ')
+
+            os.environ[local_storage_name] = local_storage_file.read_text()
+            os.environ[cookie_name] = cookie_file.read_text()
         else:
-            print('Logging in to obtain BAU user authentication information...', end='', flush=True)
-            os.environ["IDENTITY_LOCAL_STORAGE_BAU"], os.environ[
-                'IDENTITY_COOKIE_BAU'] = get_identity_info(os.getenv('ADMIN_URL'),
-                                                           os.getenv('ADMIN_EMAIL'),
-                                                           os.getenv('ADMIN_PASSWORD'),
-                                                           chromedriver_version=args.chromedriver_version)
+            print(f'Logging in to obtain {user} authentication information... ')
 
-            # Save auth info to files for efficiency
-            with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'w') as ls_file:
-                ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])
-            with open('IDENTITY_COOKIE_BAU.txt', 'w') as cookie_file:
-                cookie_file.write(os.environ['IDENTITY_COOKIE_BAU'])
-            print(' done!')
-        assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
-        assert os.getenv('IDENTITY_COOKIE_BAU') is not None
+            os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
+                url=os.getenv('ADMIN_URL'),
+                email=email,
+                password=password,
+                chromedriver_version=args.chromedriver_version
+            )
 
-    if f"admin{os.sep}bau" not in args.tests:  # Don't need analyst user if running admin/bau tests
-        if os.path.exists('IDENTITY_LOCAL_STORAGE_ANALYST.txt') and os.path.exists(
-                'IDENTITY_COOKIE_ANALYST.txt'):
-            print('Getting ANALYST user authentication information from local files...', end='')
-            with open('IDENTITY_LOCAL_STORAGE_ANALYST.txt', 'r') as ls_file:
-                os.environ['IDENTITY_LOCAL_STORAGE_ANALYST'] = ls_file.read()
-            with open('IDENTITY_COOKIE_ANALYST.txt', 'r') as cookie_file:
-                os.environ['IDENTITY_COOKIE_ANALYST'] = cookie_file.read()
-            print('done!')
-        else:
-            print('Logging in to obtain ANALYST user authentication information...', end='',
-                  flush=True)
-            os.environ["IDENTITY_LOCAL_STORAGE_ANALYST"], os.environ[
-                'IDENTITY_COOKIE_ANALYST'] = get_identity_info(os.getenv('ADMIN_URL'),
-                                                               os.getenv('ANALYST_EMAIL'),
-                                                               os.getenv('ANALYST_PASSWORD'),
-                                                               chromedriver_version=args.chromedriver_version)
+            # Cache auth info to files for efficiency
+            local_storage_file.write_text(os.environ[local_storage_name])
+            cookie_file.write_text(os.environ[cookie_name])
 
-            # Save auth info to files for efficiency
-            with open('IDENTITY_LOCAL_STORAGE_ANALYST.txt', 'w') as ls_file:
-                ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_ANALYST'])
-            with open('IDENTITY_COOKIE_ANALYST.txt', 'w') as cookie_file:
-                cookie_file.write(os.environ['IDENTITY_COOKIE_ANALYST'])
-            print(' done!')
-        assert os.getenv('IDENTITY_LOCAL_STORAGE_ANALYST') is not None
-        assert os.getenv('IDENTITY_COOKIE_ANALYST') is not None
+            print('Done!')
 
-    # NOTE(mark): Tests that alter data only occur on local and dev environments
-    if args.env in ['local', 'dev']:
-        requests.packages.urllib3.disable_warnings()  # To prevent InsecureRequestWarning
+        assert os.getenv(local_storage_name) is not None
+        assert os.getenv(cookie_name) is not None
+
+
+    def setup_authentication(clear_existing=False):
+        # Don't need BAU user if running general_public tests
+        if "general_public" not in args.tests:
+            authenticate_user(
+                user='BAU',
+                email=os.getenv('ADMIN_EMAIL'),
+                password=os.getenv('ADMIN_PASSWORD'),
+                clear_existing=clear_existing
+            )
+
+        # Don't need analyst user if running admin/bau tests
+        if f"admin{os.sep}bau" not in args.tests:
+            authenticate_user(
+                user='ANALYST',
+                email=os.getenv('ANALYST_EMAIL'),
+                password=os.getenv('ANALYST_PASSWORD'),
+                clear_existing=clear_existing
+            )
+
+    def create_test_topic():
+        # To prevent InsecureRequestWarning
+        requests.packages.urllib3.disable_warnings()
+
         # Create topic to be used by UI tests
         run_identifier = str(time.time()).split('.')[0]
+        os.environ['RUN_IDENTIFIER'] = run_identifier
+
+        print(f'Attempting to create test topic {run_identifier}...')
+
         create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/449d720f-9a87-4895-91fe-70972d1bdc04/topics'
         jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {jwt_token}',
         }
-        body = {'title': f'UI test topic {run_identifier}'}
-        r = requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
 
-        # print('r.status_code', r.status_code)
-        # print('r.text', r.text)
-        assert r.status_code != 401, 'Failed to authenticate to create topic! Delete robot-tests/IDENTITY_*.txt files?'
-        assert r.status_code == 200, 'Failed to create topic! Have you created the Test theme?'
-        os.environ['RUN_IDENTIFIER'] = run_identifier
+        body = {'title': f'UI test topic {run_identifier}'}
+
+        return requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
+
+
+    setup_authentication()
+
+    # NOTE(mark): Tests that alter data only occur on local and dev environments
+    if args.env in ['local', 'dev']:
+        response = create_test_topic()
+
+        if response.status_code in {401, 403}:
+            print('Attempting re-authentication...')
+
+            # Delete identify files and re-attempt to fetch them
+            setup_authentication(clear_existing=True)
+            response = create_test_topic()
+
+            assert response.status_code not in {401, 403}, \
+                'Failed to authenticate. Check that identity files exist or are not expired.'
+
+        assert response.status_code == 200, \
+            'Failed to create topic! Have you created the Test theme?'
+
         assert os.getenv('RUN_IDENTIFIER') is not None
 
 if args.env == 'local':

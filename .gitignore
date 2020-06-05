@@ -33,7 +33,7 @@ junit.xml
 /tests/robot-tests/backup-data
 /tests/robot-tests/webdriver
 /tests/robot-tests/.env.*
-/tests/robot-tests/IDENTITY_*.txt
+/tests/robot-tests/IDENTITY_*
 /tests/robot-tests/.pabotsuitenames
 /tests/robot-tests/geckodriver.log
 **/*/chromedriver
