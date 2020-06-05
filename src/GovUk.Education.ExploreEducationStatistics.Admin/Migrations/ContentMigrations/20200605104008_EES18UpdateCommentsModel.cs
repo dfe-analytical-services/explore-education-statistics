@@ -60,6 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 "Comment",
                 "CreatedById");
 
+            migrationBuilder.AlterColumn<Guid>("CreatedById",
+                "Comment",
+                nullable: true);
+
+            migrationBuilder.Sql(
+                $"UPDATE dbo.Comment SET CreatedById = NULL WHERE CreatedById = '{Guid.Empty.ToString()}'");
+
             migrationBuilder.AddColumn<DateTime>(
                 name: "Updated",
                 table: "Comment",
@@ -71,10 +78,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 keyValue: new Guid("514940e6-3b84-4e1b-aa5d-d1e5fa671e1b"),
                 columns: new[] {"CreatedById", "LegacyCreatedBy"},
                 values: new object[] {new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"), null});
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comment_CreatedById",
+                table: "Comment",
+                column: "CreatedById");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Comment_Users_CreatedById",
+                table: "Comment",
+                column: "CreatedById",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Comment_Users_CreatedById",
+                table: "Comment");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Comment_CreatedById",
+                table: "Comment");
+
             migrationBuilder.DropForeignKey(
                 name: "FK_Comment_ContentBlock_ContentBlockId",
                 table: "Comment");
@@ -130,6 +158,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.RenameColumn("Created",
                 "Comment",
                 "Time");
+
+            migrationBuilder.AlterColumn<Guid>("CreatedById",
+                "Comment",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
             migrationBuilder.RenameColumn("CreatedById",
                 "Comment",

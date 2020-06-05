@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -14,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.Extensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -27,17 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper; 
         private readonly IUserService _userService; 
 
         public ContentService(ContentDbContext context,
-            UserManager<ApplicationUser> userManager,
             IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IMapper mapper, IUserService userService)
         {
             _context = context;
-            _userManager = userManager;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _userService = userService;
@@ -415,7 +410,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     await _context.Comment.AddAsync(comment);
                     await _context.SaveChangesAsync();
 
-                    var added = await _context.Comment.FindAsync(comment.Id);
+                    var added = await _context.Comment
+                        .Include(c => c.CreatedBy)
+                        .FirstAsync(c => c.Id == comment.Id);
                     return await BuildCommentViewModel(added);
                 }
             );
@@ -425,67 +422,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid contentSectionId, Guid contentBlockId, Guid commentId,
             AddOrUpdateCommentRequest request)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
-                {
-                    var (_, section) = tuple;
+            return _persistenceHelper.CheckEntityExists<Comment>(commentId)
+                .OnSuccess(_userService.CheckCanUpdateComment)
+                .OnSuccess(_ => CheckContentSectionExists(releaseId, contentSectionId)
+                    .OnSuccess(CheckCanUpdateRelease)
+                    .OnSuccess(async tuple =>
+                        {
+                            var (_, section) = tuple;
 
-                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
+                            var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
 
-                    if (contentBlock == null)
-                    {
-                        return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
-                    }
+                            if (contentBlock == null)
+                            {
+                                return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
+                            }
 
-                    var comment = contentBlock.Comments.Find( c => c.Id == commentId);
+                            var comment = contentBlock.Comments.Find(c => c.Id == commentId);
 
-                    if (comment == null)
-                    {
-                        return ValidationActionResult(CommentNotFound);
-                    }
+                            if (comment == null)
+                            {
+                                return ValidationActionResult(CommentNotFound);
+                            }
 
-                    _context.Comment.Update(comment);
-                    comment.Content = request.Content;
-                    comment.Updated = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
-
-                    var updated = await _context.Comment.FindAsync(comment.Id);
-                    return await BuildCommentViewModel(updated);
-                }
-            );
+                            _context.Comment.Update(comment);
+                            comment.Content = request.Content;
+                            comment.Updated = DateTime.UtcNow;
+                            await _context.SaveChangesAsync();
+                            
+                            var updated = await _context.Comment
+                                .Include(c => c.CreatedBy)
+                                .FirstAsync(c => c.Id == comment.Id);
+                            return await BuildCommentViewModel(updated);
+                        }
+                    ));
         }
 
-        public Task<Either<ActionResult, CommentViewModel>> DeleteCommentAsync(Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId)
+        public Task<Either<ActionResult, CommentViewModel>> DeleteCommentAsync(Guid releaseId,
+            Guid contentSectionId,
+            Guid contentBlockId,
+            Guid commentId)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
-                {
-                    var (_, section) = tuple;
+            return _persistenceHelper.CheckEntityExists<Comment>(commentId)
+                .OnSuccess(_userService.CheckCanUpdateComment)
+                .OnSuccess(_ => CheckContentSectionExists(releaseId, contentSectionId)
+                    .OnSuccess(CheckCanUpdateRelease)
+                    .OnSuccess(async tuple =>
+                        {
+                            var (_, section) = tuple;
 
-                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
+                            var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
 
-                    if (contentBlock == null)
-                    {
-                        return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
-                    }
+                            if (contentBlock == null)
+                            {
+                                return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
+                            }
 
-                    var comment = contentBlock.Comments.Find( c => c.Id == commentId);
+                            var comment = contentBlock.Comments.Find(c => c.Id == commentId);
 
-                    if (comment == null)
-                    {
-                        return ValidationActionResult(CommentNotFound);
-                    }
+                            if (comment == null)
+                            {
+                                return ValidationActionResult(CommentNotFound);
+                            }
 
-                    _context.Comment.Remove(comment);
-                    await _context.SaveChangesAsync();
+                            _context.Comment.Remove(comment);
+                            await _context.SaveChangesAsync();
 
-                    return await BuildCommentViewModel(comment);
-                }
-            );
+                            return await BuildCommentViewModel(comment);
+                        }
+                    ));
         }
-        
+
         private async Task<Either<ActionResult, IContentBlock>> AddContentBlockToContentSectionAndSaveAsync(int? order, ContentSection section,
             IContentBlock newContentBlock)
         {
@@ -641,22 +647,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private async Task<CommentViewModel> BuildCommentViewModel(Comment comment)
         {
             var result = _mapper.Map<CommentViewModel>(comment);
+            // TODO EES-18 Can this be moved to MapperProfile?
             if (!string.IsNullOrEmpty(comment.LegacyCreatedBy))
             {
                 result.CreatedBy = new User
                 {
                     FirstName = comment.LegacyCreatedBy
-                };
-            }
-            else
-            {
-                var user = await _userManager.FindByIdAsync(comment.CreatedById.ToString());
-                result.CreatedBy = new User
-                {
-                    Id = comment.CreatedById,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email
                 };
             }
             return result;
