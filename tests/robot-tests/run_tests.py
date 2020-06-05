@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 import time
 import requests
 import json
+import shutil
 import sys
 
 current_dir = Path(__file__).absolute().parent
@@ -256,6 +257,10 @@ else:
 
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
+
+# Remove any existing test results
+if Path('test-results').exists():
+    shutil.rmtree("test-results")
 
 # Run tests
 if args.interp == "robot":
