@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return await _contentService
                 .GetCommentsAsync(releaseId, contentSectionId, contentBlockId)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
         
         
@@ -152,26 +152,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return await _contentService
                 .AddCommentAsync(releaseId, contentSectionId, contentBlockId, request)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
         
                 
-        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
-        public async Task<ActionResult<CommentViewModel>> UpdateComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, AddOrUpdateCommentRequest request)
+        [HttpPut("comment/{commentId}")]
+        public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, AddOrUpdateCommentRequest request)
         {
             return await _contentService
-                .UpdateCommentAsync(releaseId, contentSectionId, contentBlockId, commentId, request)
-                .HandleFailuresOr(Ok);
+                .UpdateCommentAsync(commentId, request)
+                .HandleFailuresOrOk();
         }
         
-        [HttpDelete("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
-        public async Task<ActionResult<CommentViewModel>> DeleteComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId)
+        [HttpDelete("comment/{commentId}")]
+        public async Task<ActionResult> DeleteComment(Guid commentId)
         {
             return await _contentService
-                .DeleteCommentAsync(releaseId, contentSectionId, contentBlockId, commentId)
-                .HandleFailuresOr(Ok);
+                .DeleteCommentAsync(commentId)
+                .HandleFailuresOr(_ => new NoContentResult());
         }
     }
 }

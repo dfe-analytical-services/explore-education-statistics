@@ -72,38 +72,14 @@ const Comments = ({
   const removeComment = (index: number) => {
     const commentId = comments[index].id;
 
-    if (releaseId && sectionId) {
-      releaseContentCommentService
-        .deleteContentSectionComment(releaseId, sectionId, blockId, commentId)
-        .then(() => {
-          const newComments = [...comments];
-          newComments.splice(index, 1);
+    releaseContentCommentService
+      .deleteContentSectionComment(commentId)
+      .then(() => {
+        const newComments = [...comments];
+        newComments.splice(index, 1);
 
-          onChange(blockId, newComments);
-        });
-    }
-  };
-
-  const resolveComment = (index: number) => {
-    const resolvedComment: UpdateExtendedComment = {
-      ...comments[index],
-    };
-
-    if (releaseId && sectionId) {
-      releaseContentCommentService
-        .updateContentSectionComment(
-          releaseId,
-          sectionId,
-          blockId,
-          resolvedComment,
-        )
-        .then(savedComment => {
-          const newComments = [...comments];
-          newComments[index] = savedComment;
-
-          onChange(blockId, newComments);
-        });
-    }
+        onChange(blockId, newComments);
+      });
   };
 
   const updateComment = (index: number, content: string) => {
@@ -112,24 +88,17 @@ const Comments = ({
       content,
     };
 
-    if (releaseId && sectionId) {
-      releaseContentCommentService
-        .updateContentSectionComment(
-          releaseId,
-          sectionId,
-          blockId,
-          editedComment,
-        )
-        .then(savedComment => {
-          const newComments = [...comments];
-          newComments[index] = savedComment;
+    releaseContentCommentService
+      .updateContentSectionComment(editedComment)
+      .then(savedComment => {
+        const newComments = [...comments];
+        newComments[index] = savedComment;
 
-          onChange(blockId, newComments);
+        onChange(blockId, newComments);
 
-          setEditableComment('');
-          setEditableCommentText('');
-        });
-    }
+        setEditableComment('');
+        setEditableCommentText('');
+      });
   };
 
   return (

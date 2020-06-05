@@ -57,11 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddOrUpdateCommentRequest request);
 
-        Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId,
+        Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid commentId, 
             AddOrUpdateCommentRequest request);
 
-        Task<Either<ActionResult, CommentViewModel>> DeleteCommentAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId);
+        Task<Either<ActionResult, bool>> DeleteCommentAsync(Guid commentId);
     }
 }

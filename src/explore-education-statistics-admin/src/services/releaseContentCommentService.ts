@@ -28,26 +28,13 @@ const releaseContentCommentService = {
   },
 
   updateContentSectionComment(
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
     comment: UpdateExtendedComment,
   ): Promise<ExtendedComment> {
-    return client.put(
-      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${comment.id}`,
-      comment,
-    );
+    return client.put(`/comment/${comment.id}`, comment);
   },
 
-  deleteContentSectionComment(
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-    commentId: string,
-  ): Promise<void> {
-    return client.delete(
-      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${commentId}`,
-    );
+  deleteContentSectionComment(commentId: string): Promise<void> {
+    return client.delete(`/comment/${commentId}`);
   },
 };
 

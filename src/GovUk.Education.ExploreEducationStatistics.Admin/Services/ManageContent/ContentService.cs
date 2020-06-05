@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, IContentBlock>> AddContentBlockAsync(Guid releaseId, Guid contentSectionId,
-            AddContentBlockRequest request) 
+            AddContentBlockRequest request)
         {
             return 
                 CheckContentSectionExists(releaseId, contentSectionId)
@@ -368,14 +368,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return NotFound<List<CommentViewModel>>();
                     }
 
-                    var comments = _mapper.Map<List<CommentViewModel>>(contentBlock.Comments);
-                    comments.ForEach(model => model.CreatedBy = new User
-                    {
-                        Id = Guid.Empty,
-                        FirstName = "TODO EES-18",
-                        LastName = "TODO EES-18"
-                    });
-                    return comments;
+                    // TODO EES-18 MapperProfile isn't mapping LegacyCreatedBy
+                    return _mapper.Map<List<CommentViewModel>>(contentBlock.Comments);
                 }
             );
         }
@@ -418,78 +412,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             );
         }
 
-        public Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid releaseId,
-            Guid contentSectionId, Guid contentBlockId, Guid commentId,
+        public Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid commentId,
             AddOrUpdateCommentRequest request)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId)
                 .OnSuccess(_userService.CheckCanUpdateComment)
-                .OnSuccess(_ => CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
-                        {
-                            var (_, section) = tuple;
+                .OnSuccess(async comment =>
+                    {
+                        _context.Comment.Update(comment);
+                        comment.Content = request.Content;
+                        comment.Updated = DateTime.UtcNow;
+                        await _context.SaveChangesAsync();
 
-                            var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
-
-                            if (contentBlock == null)
-                            {
-                                return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
-                            }
-
-                            var comment = contentBlock.Comments.Find(c => c.Id == commentId);
-
-                            if (comment == null)
-                            {
-                                return ValidationActionResult(CommentNotFound);
-                            }
-
-                            _context.Comment.Update(comment);
-                            comment.Content = request.Content;
-                            comment.Updated = DateTime.UtcNow;
-                            await _context.SaveChangesAsync();
-                            
-                            var updated = await _context.Comment
-                                .Include(c => c.CreatedBy)
-                                .FirstAsync(c => c.Id == comment.Id);
-                            return await BuildCommentViewModel(updated);
-                        }
-                    ));
+                        var updated = await _context.Comment
+                            .Include(c => c.CreatedBy)
+                            .FirstAsync(c => c.Id == comment.Id);
+                        return await BuildCommentViewModel(updated);
+                    }
+                );
         }
 
-        public Task<Either<ActionResult, CommentViewModel>> DeleteCommentAsync(Guid releaseId,
-            Guid contentSectionId,
-            Guid contentBlockId,
-            Guid commentId)
+        public Task<Either<ActionResult, bool>> DeleteCommentAsync(Guid commentId)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId)
                 .OnSuccess(_userService.CheckCanUpdateComment)
-                .OnSuccess(_ => CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
-                        {
-                            var (_, section) = tuple;
-
-                            var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
-
-                            if (contentBlock == null)
-                            {
-                                return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
-                            }
-
-                            var comment = contentBlock.Comments.Find(c => c.Id == commentId);
-
-                            if (comment == null)
-                            {
-                                return ValidationActionResult(CommentNotFound);
-                            }
-
-                            _context.Comment.Remove(comment);
-                            await _context.SaveChangesAsync();
-
-                            return await BuildCommentViewModel(comment);
-                        }
-                    ));
+                .OnSuccess(async comment =>
+                    {
+                        _context.Comment.Remove(comment);
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
+                );
         }
 
         private async Task<Either<ActionResult, IContentBlock>> AddContentBlockToContentSectionAndSaveAsync(int? order, ContentSection section,
@@ -641,6 +594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
                     .ThenInclude(content => content.Comments)
+                    .ThenInclude(comment => comment.CreatedBy)
                 ;
         }
 
