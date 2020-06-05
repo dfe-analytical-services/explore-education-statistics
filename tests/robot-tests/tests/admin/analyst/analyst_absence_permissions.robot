@@ -12,32 +12,31 @@ Validate Analyst1 can see correct themes and topics
     user selects theme "Pupils and schools" and topic "Pupil absence" from the admin dashboard
     user waits until page contains accordion section  Pupil absence in schools in England     60
 
-    user checks list contains label   css:#selectTheme   Pupils and schools
-    user checks list contains x elements   css:#selectTopic   2
-    user checks list contains label   css:#selectTopic   Exclusions
-    user checks list contains label   css:#selectTopic   Pupil absence
+    user checks list contains label   id:selectTheme   Pupils and schools
+    user checks list contains x elements   id:selectTopic   2
+    user checks list contains label   id:selectTopic   Exclusions
+    user checks list contains label   id:selectTopic   Pupil absence
 
 Validate Analyst1 can see correct draft releases
     [Tags]  HappyPath
-    user checks element should contain   css:#draft-releases-tab   View draft releases (2)
-    user clicks element   css:#draft-releases-tab
-    user waits until draft releases tab contains publication  Pupil absence in schools in England
-    user checks draft releases tab publication has release   Pupil absence in schools in England    Academic Year 2016/17 (Live - Latest release)
-    user checks draft releases tab contains publication  Permanent and fixed-period exclusions in England
-    user checks draft releases tab publication has release   Permanent and fixed-period exclusions in England    Academic Year 2016/17 (Live - Latest release)
+    user checks element should contain   id:draft-releases-tab   View draft releases (0)
+    user clicks element   id:draft-releases-tab
+    user waits until page contains  There are currently no draft releases
+    user checks element does not contain  id:draft-releases  Pupil absence in schools in England
+    user checks element does not contain  id:draft-releases  Permanent and fixed-period exclusions in England
 
 Validate Analyst1 can see correct scheduled releases
     [Tags]  HappyPath
-    user checks element should contain   css:#scheduled-releases-tab   View scheduled releases (0)
-    user clicks element   css:#scheduled-releases-tab
-    user waits until element contains  css:#scheduled-releases   There are currently no scheduled releases
+    user checks element should contain   id:scheduled-releases-tab   View scheduled releases (0)
+    user clicks element   id:scheduled-releases-tab
+    user waits until element contains  id:scheduled-releases   There are currently no scheduled releases
 
 Validate Analyst1 cannot create a publication for Pupils absence topic
     [Tags]  HappyPath
-    user clicks element   css:#my-publications-tab
-    user waits until page contains element   css:#selectTheme
+    user clicks element   id:my-publications-tab
+    user waits until page contains element   id:selectTheme
     user waits until page contains element   xpath://h3[text()="Pupil absence"]
-    user checks page does not contain element   xpath://a[text()="Create new publication"]
+    user checks page does not contain element   link:Create new publication
 
 Validate Analyst1 cannot create a release for Pupil absence topic
     [Tags]  HappyPath
@@ -59,35 +58,20 @@ Validate Analyst1 can see Absence release summary
     user checks summary list item "Next release expected" should be ""
     user checks summary list item "Release type" should be "Official Statistics"
 
-Validate Analyst1 can see "Upload data files" button
+Validate Analyst1 cannot see 'Upload data files' button
     [Tags]  HappyPath
-    user clicks element   xpath://a[text()="Manage data"]
-    user waits until page contains element  xpath://legend[text()="Add new data to release"]   60
-    user waits until page contains element   css:#upload-data-files-button
+    user clicks element  link:Manage data
+    user waits until page contains  This release has been approved
+    user checks page does not contain element  css:#upload-data-files-button
 
-Validate Analyst1 can see "Add another footnote" button
+Validate Analyst1 cannot see data blocks
     [Tags]  HappyPath
-    user clicks element  css:#footnotes-tab
-    user waits until page contains element   xpath://h2[text()="Footnotes"]
-    user waits until page contains element   css:#add-footnote-button
-
-Validate Analyst1 can see "Upload file" button for ancillary files
-    [Tags]  HappyPath
-    user clicks element   css:#file-upload-tab
-    user waits until page contains element   xpath://legend[text()="Upload file"]
-    user checks page contains element   css:#upload-file-button
-
-Validate Analyst1 can see subjects for Absence 2016/17 release
-    [Tags]  HappyPath
-    user clicks element   xpath://a[text()="Manage data blocks"]
-    user waits until page contains element   xpath://h2[text()="Create new data block"]
-    user waits until page contains element   css:#publicationSubjectForm-subjectId
-    user waits until page contains element   xpath://label[text()="Absence by characteristic"]
-    user checks element count is x   xpath://*[@id="publicationSubjectForm-subjectId"]//*[@class="govuk-radios__item"]    7
+    user clicks element  link:Manage data blocks
+    user waits until page contains  This release is currently not editable
 
 Validate Analyst1 can see Manage content page
     [Tags]  HappyPath
-    user clicks element   xpath://a[text()="Manage content"]
+    user clicks element  link:Manage content
     user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]    120
 
 Validate Manage content page is in Edit mode
@@ -96,7 +80,7 @@ Validate Manage content page is in Edit mode
     user checks page contains element  css:#pageMode-edit[checked]
     user checks page does not contain element   css:#pageMode-preview[checked]
 
-Validate Analyst1 can see Manage content page key stats
+Validate Analyst1 can see 'Manage content' page key stats
     [Tags]  HappyPath
     [Documentation]   EES-1508
     user waits until page contains key stat tile   Overall absence rate        4.7%    60
@@ -104,7 +88,7 @@ Validate Analyst1 can see Manage content page key stats
     user waits until page contains key stat tile   Unauthorised absence rate   1.3%
     user checks element count is x    css:[data-testid="key-stat-tile"]   3
 
-Validate Analyst1 can see Manage content page accordion sections
+Validate Analyst1 can see 'Manage content' page accordion sections
     [Tags]  HappyPath
     user waits until page contains accordion section  About these statistics
     user checks accordion is in position  About these statistics            1
@@ -120,12 +104,9 @@ Validate Analyst1 can see Manage content page accordion sections
     user checks accordion is in position  Contact us                        11
     user checks there are x accordion sections  11
 
-Validate Analyst1 cannot Approve a Pupil absence in schools in England release
+Validate Analyst1 cannot Approve the 'Pupil absence in schools in England' release
     [Tags]  HappyPath
-    user clicks element   xpath://a[text()="Release status"]
+    user clicks element  link:Release status
     user waits until page contains element  xpath://h2[text()="Release Status"]
-    user clicks element   xpath://button[text()="Update release status"]
-    user waits until page contains element   css:#releaseStatusForm
-    user checks page contains element   xpath://*[@id="releaseStatusForm-releaseStatus-draft" and not(@disabled)]
-    user checks page contains element   xpath://*[@id="releaseStatusForm-releaseStatus-higher-level-review" and not(@disabled)]
-    user checks page contains element   xpath://*[@id="releaseStatusForm-releaseStatus-approved" and @disabled]
+    user checks page contains   The current release status is: Approved
+    user checks page does not contain  xpath://button[text()="Update release status"]
