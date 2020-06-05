@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import React, { MouseEventHandler, ReactNode } from 'react';
-import { ButtonProps } from './Button';
 import styles from './ButtonText.module.scss';
 
 interface Props {
@@ -19,7 +18,7 @@ const ButtonText = ({
   type = 'button',
   underline = true,
   ...props
-}: Props & ButtonProps) => {
+}: Props) => {
   return (
     // eslint-disable-next-line react/button-has-type
     <button

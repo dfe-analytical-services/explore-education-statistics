@@ -3,10 +3,14 @@ import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 export interface ExtendedComment {
   id: string;
   content: string;
-  created: Date;
-  createdById: string;
-  createdByName: string;
-  updated?: Date;
+  createdBy: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  created: string;
+  updated?: string;
 }
 
 export type EditableContentBlock = ContentBlock & {

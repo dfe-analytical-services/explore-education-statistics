@@ -98,7 +98,6 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
                   sectionId={sectionId}
                   blockId={block.id}
                   comments={block.comments}
-                  canResolve={false}
                   canComment
                   onChange={handleCommentsChange}
                 />

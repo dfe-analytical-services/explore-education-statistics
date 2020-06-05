@@ -20,6 +20,7 @@ interface Props {
   children: ReactNode;
   id: string;
   submitId?: string;
+  showErrorSummary?: boolean;
   showSubmitError?: boolean;
 }
 
@@ -44,6 +45,7 @@ const Form = ({
   children,
   id,
   submitId = `${id}-submit`,
+  showErrorSummary = true,
   showSubmitError = false,
 }: Props) => {
   const formik = useFormikContext();
@@ -107,12 +109,14 @@ const Form = ({
 
   return (
     <form id={id} onSubmit={handleSubmit}>
-      <ErrorSummary
-        errors={allErrors}
-        id={`${id}-summary`}
-        focusOnError={hasSummaryFocus}
-        onFocus={toggleSummaryFocus.off}
-      />
+      {showErrorSummary && (
+        <ErrorSummary
+          errors={allErrors}
+          id={`${id}-summary`}
+          focusOnError={hasSummaryFocus}
+          onFocus={toggleSummaryFocus.off}
+        />
+      )}
 
       {children}
     </form>
