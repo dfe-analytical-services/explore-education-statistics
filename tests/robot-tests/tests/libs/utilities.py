@@ -5,6 +5,7 @@ from logging import warn
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+import os
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
@@ -33,6 +34,8 @@ def user_sets_focus_to_element(selector):
 
 def set_cookie_from_json(cookie_json):
     cookie_dict = json.loads(cookie_json)
+    del cookie_dict['domain']
+
     sl.driver.add_cookie(cookie_dict)
 
 
