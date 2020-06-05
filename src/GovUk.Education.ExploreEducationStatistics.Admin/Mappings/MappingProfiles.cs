@@ -81,30 +81,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => !r.SoftDeleted && IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());
 
-            CreateMap<DataBlock, DataBlockViewModel>();
+            CreateContentBlockMap();
             CreateMap<CreateDataBlockViewModel, DataBlock>();
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
 
             CreateMap<Topic, ApiTopicViewModel>();
 
+            CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
+                m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
+
             CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
                 .ForMember(dest => dest.Content,
-                    m => m.MapFrom(r =>
-                        r.GenericContent
-                            .Select(ContentSectionViewModel.ToViewModel)
-                            .OrderBy(s => s.Order)))
-                .ForMember(dest => dest.SummarySection,
-                    m => m.MapFrom(r =>
-                        ContentSectionViewModel.ToViewModel(r.SummarySection)))
-                .ForMember(dest => dest.HeadlinesSection,
-                    m => m.MapFrom(r =>
-                        ContentSectionViewModel.ToViewModel(r.HeadlinesSection)))
-                .ForMember(dest => dest.KeyStatisticsSection,
-                    m => m.MapFrom(r =>
-                        ContentSectionViewModel.ToViewModel(r.KeyStatisticsSection)))
-                .ForMember(dest => dest.KeyStatisticsSecondarySection,
-                    m => m.MapFrom(r =>
-                        ContentSectionViewModel.ToViewModel(r.KeyStatisticsSecondarySection)))
+                    m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)))
                 .ForMember(
                     dest => dest.Updates,
                     m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
@@ -170,9 +158,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Update, ReleaseNoteViewModel>();
 
-            CreateMap<Comment, CommentViewModel>();
+            CreateMap<Comment, CommentViewModel>()
+                .ForMember(dest => dest.CreatedBy,
+                    m => m.MapFrom(comment =>
+                        comment.CreatedById == null
+                            ? new User
+                            {
+                                FirstName = comment.LegacyCreatedBy
+                            }
+                            : comment.CreatedBy));
 
-            CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
+            CreateMap<ContentSection, ContentSectionViewModel>()
+                .ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
             CreateMap<Methodology, ManageMethodologyContentViewModel>()
@@ -182,6 +179,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
 
             CreateMap<Release, ReleasePublicationStatusViewModel>();
+        }
+
+        private void CreateContentBlockMap()
+        {
+            CreateMap<IContentBlock, IContentBlockViewModel>()
+                .IncludeAllDerived()
+                .ForMember(dest => dest.Comments,
+                    m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));
+
+            CreateMap<DataBlock, DataBlockViewModel>();
+
+            CreateMap<HtmlBlock, HtmlBlockViewModel>();
+
+            CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
         }
 
         private static bool IsLatestVersionOfRelease(List<Release> releases, Guid releaseId)

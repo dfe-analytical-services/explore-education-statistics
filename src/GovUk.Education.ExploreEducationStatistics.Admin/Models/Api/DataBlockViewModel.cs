@@ -7,9 +7,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
-    public class DataBlockViewModel
+    public class DataBlockViewModel : IContentBlockViewModel
     {
         public Guid Id { get; set; }
+
+        public List<CommentViewModel> Comments { get; set; }
 
         public string Heading { get; set; }
 
@@ -21,8 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public List<IContentBlockChart> Charts { get; set; }
 
+        public int Order { get; set; }
+
         public DataBlockSummary Summary { get; set; }
 
         public List<TableBuilderConfiguration> Tables { get; set; }
+
+        public ContentBlockType Type => ContentBlockType.DataBlock;
     }
 }

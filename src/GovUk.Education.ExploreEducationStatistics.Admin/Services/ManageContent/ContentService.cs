@@ -43,12 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(release => 
-                    release
-                        .GenericContent
-                        .Select(ContentSectionViewModel.ToViewModel)
-                        .OrderBy(c => c.Order)
-                        .ToList());
+                .OnSuccess(OrderedContentSections);
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(
@@ -101,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
-                    return ContentSectionViewModel.ToViewModel(newContentSection);
+                    return _mapper.Map<ContentSectionViewModel>(newContentSection);
                 });
         }
 
@@ -119,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                         _context.ContentSections.Update(sectionToUpdate);
                         await _context.SaveChangesAsync();
-                        return ContentSectionViewModel.ToViewModel(sectionToUpdate);
+                        return _mapper.Map<ContentSectionViewModel>(sectionToUpdate);
                     });
         }
         
@@ -158,9 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(Guid releaseId, Guid contentSectionId)
         {
-            return 
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(tuple => ContentSectionViewModel.ToViewModel(tuple.Item2));
+            return CheckContentSectionExists(releaseId, contentSectionId)
+                    .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
         }
 
         public Task<Either<ActionResult, List<IContentBlock>>> ReorderContentBlocksAsync(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
@@ -368,7 +362,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return NotFound<List<CommentViewModel>>();
                     }
 
-                    // TODO EES-18 MapperProfile isn't mapping LegacyCreatedBy
                     return _mapper.Map<List<CommentViewModel>>(contentBlock.Comments);
                 }
             );
@@ -407,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     var added = await _context.Comment
                         .Include(c => c.CreatedBy)
                         .FirstAsync(c => c.Id == comment.Id);
-                    return await BuildCommentViewModel(added);
+                    return _mapper.Map<CommentViewModel>(added);
                 }
             );
         }
@@ -427,7 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         var updated = await _context.Comment
                             .Include(c => c.CreatedBy)
                             .FirstAsync(c => c.Id == comment.Id);
-                        return await BuildCommentViewModel(updated);
+                        return _mapper.Map<CommentViewModel>(updated);
                     }
                 );
         }
@@ -578,11 +571,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ToList();
         }
 
-        private static List<ContentSectionViewModel> OrderedContentSections(Release release)
+        private List<ContentSectionViewModel> OrderedContentSections(Release release)
         {
-            return release
-                .GenericContent
-                .Select(ContentSectionViewModel.ToViewModel)
+            return _mapper.Map<List<ContentSectionViewModel>>(release.GenericContent)
                 .OrderBy(c => c.Order)
                 .ToList();
         }
@@ -598,20 +589,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 ;
         }
 
-        private async Task<CommentViewModel> BuildCommentViewModel(Comment comment)
-        {
-            var result = _mapper.Map<CommentViewModel>(comment);
-            // TODO EES-18 Can this be moved to MapperProfile?
-            if (!string.IsNullOrEmpty(comment.LegacyCreatedBy))
-            {
-                result.CreatedBy = new User
-                {
-                    FirstName = comment.LegacyCreatedBy
-                };
-            }
-            return result;
-        }
-        
         private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(
             Guid releaseId, Guid contentSectionId)
         {
