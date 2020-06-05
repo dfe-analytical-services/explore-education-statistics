@@ -445,11 +445,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => _footnoteService.GetFootnotesAsync(releaseId))
-                .OnSuccess(async footnotes =>
+                .OnSuccess(async _ => 
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var orphanFootnotes = subject == null ? new List<Footnote>() : await _releaseSubjectService.GetFootnotesAsync(releaseId, subject.Id);
+                    var orphanFootnotes = subject == null ? new List<Footnote>() : _footnoteService.GetFootnotesThatWillBeOrphaned(releaseId, subject.Id);
                     
                     return new DeleteDataFilePlan
                     {

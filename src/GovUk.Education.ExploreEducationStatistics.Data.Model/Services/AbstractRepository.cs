@@ -119,7 +119,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var entity = await FindAsync(id) ?? throw new ArgumentException("Entity not found", nameof(id));
             return DbSet().Remove(entity).Entity;
         }
-
+        
+        protected async Task<TEntity> UpdateAsync(TKey id)
+        {
+            var entity = await FindAsync(id) ?? throw new ArgumentException("Entity not found", nameof(id));
+            return DbSet().Update(entity).Entity;
+        }
+        
         protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<Guid> values)
         {
             return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListGuidType");

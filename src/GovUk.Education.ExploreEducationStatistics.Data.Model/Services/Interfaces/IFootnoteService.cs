@@ -13,11 +13,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IQueryable<Observation> observations,
             IEnumerable<Guid> indicators
         );
+        
+        IEnumerable<Footnote> GetFootnotes(Guid releaseId);
+
+        List<Footnote> GetFootnotesThatWillBeOrphaned(Guid releaseId, Guid subjectId);
 
         Task DeleteFootnote(Guid releaseId, Guid id);
 
-        Task DeleteFootnotes(Guid releaseId, List<Footnote> footnotes);
-
+        Task DeleteFootnotesForSubject(Guid releaseId, Guid subjectId);
+        
         Task<bool> IsFootnoteExclusiveToReleaseAsync(Guid releaseId, Guid footnoteId);
+
+        Task DeleteReleaseFootnoteLinkAsync(Guid releaseId, Guid footnoteId);
+
     }
 }

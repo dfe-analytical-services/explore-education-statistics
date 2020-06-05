@@ -143,6 +143,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         _context.SaveChanges();
                         return GetFootnote(id);
                     }
+                    
+                    // If this amendment of the footnote affects other release then break the link with the old 
+                    // and create a new one
+                    await _commonFootnoteService.DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
 
                     return await CreateFootnote(
                         releaseId,
@@ -155,29 +159,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }));
         }
 
-        public  Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId)
+        public Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId)
         {
             return _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ => _context.Footnote
-                .Include(footnote => footnote.Filters)
-                .ThenInclude(filterFootnote => filterFootnote.Filter)
-                .Include(footnote => footnote.FilterGroups)
-                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-                .ThenInclude(filterGroup => filterGroup.Filter)
-                .Include(footnote => footnote.FilterItems)
-                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
-                .ThenInclude(filterItem => filterItem.FilterGroup)
-                .ThenInclude(filterGroup => filterGroup.Filter)
-                .Include(footnote => footnote.Indicators)
-                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
-                .ThenInclude(indicator => indicator.IndicatorGroup)
-                .Include(footnote => footnote.Releases)
-                .Include(footnote => footnote.Subjects)
-                .Where(footnote =>
-                    (footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseId == releaseId)
-                    )).AsEnumerable());
+                .OnSuccess(_ => (_commonFootnoteService.GetFootnotes(releaseId)));
+        }
+
+        public List<Footnote> GetFootnotesThatWillBeOrphaned(Guid releaseId, Guid subjectId)
+        {
+            return _commonFootnoteService.GetFootnotesThatWillBeOrphaned(releaseId, subjectId);
         }
 
         private void CreateSubjectLinks(Footnote footnote, IEnumerable<Guid> subjectIds)
