@@ -1,40 +1,25 @@
 import { ContactDetails } from '@admin/services/contactService';
-import { IdLabelPair, IdTitlePair } from '@admin/services/types/common';
+import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import { DayMonthYear } from '@common/utils/date/dayMonthYear';
-
-interface Comment {
-  message: string;
-  authorName: string;
-  createdDate: string;
-}
-
-interface UserDetails {
-  id: string;
-  name: string;
-}
 
 export interface Release {
   id: string;
   status: ReleaseApprovalStatus;
   latestRelease: boolean;
   live: boolean;
+  amendment: boolean;
   releaseName: string;
   publicationId: string;
   publicationTitle: string;
-  timePeriodCoverage: IdLabelPair;
+  timePeriodCoverage: ValueLabelPair;
   title: string;
   contact: ContactDetails;
-  lastEditedUser: UserDetails;
-  lastEditedDateTime: string;
-  publishScheduled: Date;
+  publishScheduled: string;
   published?: string;
   nextReleaseDate: DayMonthYear;
   internalReleaseNote?: string;
-  draftComments: Comment[];
-  higherReviewComments: Comment[];
-  amendment: boolean;
   previousVersionId: string;
   permissions: {
     canUpdateRelease: boolean;
