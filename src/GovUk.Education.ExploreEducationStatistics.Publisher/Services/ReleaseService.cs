@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.EntityFrameworkCore;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 
@@ -81,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => !release.SoftDeleted && IsReleasePublished(release, includedReleaseIds) &&
-                                  IsLatestVersionOfRelease(release.Publication, release.Id))
+                                  PublisherUtils.IsLatestVersionOfRelease(release.Publication.Releases, release.Id))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
@@ -145,11 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return release.Live || includedReleaseIds.Contains(release.Id);
         }
 
-        private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
-        {
-            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
-        }
-        
         public async Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds)
         {
             var versions = await _contentDbContext.Releases.Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)

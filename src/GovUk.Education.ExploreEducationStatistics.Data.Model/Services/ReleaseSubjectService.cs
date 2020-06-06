@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             _statisticsDbContext.ReleaseSubject.Remove(releaseSubjectLinkToRemove);
             
-            await _footnoteService.DeleteFootnotesForSubject(releaseId, subjectId);
+            await _footnoteService.DeleteFootnotes(releaseId, subjectId);
             
             if (numberOfReleaseSubjectLinks == 1)
             {

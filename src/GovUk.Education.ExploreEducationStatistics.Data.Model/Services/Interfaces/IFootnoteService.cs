@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IFootnoteService
     {
-        IEnumerable<Footnote> GetFootnotes(
+        IEnumerable<Footnote> GetFilteredFootnotes(
             Guid releaseId,
             Guid subjectId,
             IQueryable<Observation> observations,
@@ -16,11 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
         
         IEnumerable<Footnote> GetFootnotes(Guid releaseId);
 
-        List<Footnote> GetFootnotesThatWillBeOrphaned(Guid releaseId, Guid subjectId);
+        IEnumerable<Footnote> GetFootnotes(Guid releaseId, List<Guid> subjects);
 
         Task DeleteFootnote(Guid releaseId, Guid id);
 
-        Task DeleteFootnotesForSubject(Guid releaseId, Guid subjectId);
+        Task DeleteFootnotes(Guid releaseId, Guid subjectId);
         
         Task<bool> IsFootnoteExclusiveToReleaseAsync(Guid releaseId, Guid footnoteId);
 

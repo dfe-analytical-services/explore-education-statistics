@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => release.PublicationId == publicationId && !release.SoftDeleted)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds) &&
-                                  IsLatestVersionOfRelease(release.Publication, release.Id))
+                                  PublisherUtils.IsLatestVersionOfRelease(release.Publication.Releases, release.Id))
                 .OrderByDescending(release => release.Year)
                 .ThenByDescending(release => release.TimePeriodCoverage);
             return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
@@ -145,11 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
         {
             return release.Live || includedReleaseIds.Contains(release.Id);
-        }
-        
-        private bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
-        {
-            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
     }
 }

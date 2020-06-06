@@ -167,9 +167,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => (_commonFootnoteService.GetFootnotes(releaseId)));
         }
 
-        public List<Footnote> GetFootnotesThatWillBeOrphaned(Guid releaseId, Guid subjectId)
+        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)
         {
-            return _commonFootnoteService.GetFootnotesThatWillBeOrphaned(releaseId, subjectId);
+            return _commonFootnoteService.GetFootnotes(releaseId, new List<Guid>(){subjectId});
         }
 
         private void CreateSubjectLinks(Footnote footnote, IEnumerable<Guid> subjectIds)

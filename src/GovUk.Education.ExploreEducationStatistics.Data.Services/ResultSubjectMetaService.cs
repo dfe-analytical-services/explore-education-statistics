@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnotes = GetFootnotes(releaseId, observations, query);
+                    var footnotes = GetFilteredFootnotes(releaseId, observations, query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -157,10 +157,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 _indicatorService.GetIndicators(query.SubjectId, query.Indicators));
         }
 
-        private IEnumerable<FootnoteViewModel> GetFootnotes(Guid releaseId, IQueryable<Observation> observations,
+        private IEnumerable<FootnoteViewModel> GetFilteredFootnotes(Guid releaseId, IQueryable<Observation> observations,
             SubjectMetaQueryContext queryContext)
         {
-            return _footnoteService.GetFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
+            return _footnoteService.GetFilteredFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
                     Id = footnote.Id,

@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId);
 
-        List<Footnote> GetFootnotesThatWillBeOrphaned(Guid releaseId, Guid subjectId);
+        IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId);
 
         Task<Either<ActionResult, Footnote>> UpdateFootnote(
             Guid releaseId,

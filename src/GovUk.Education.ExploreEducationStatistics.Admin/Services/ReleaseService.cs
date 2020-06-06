@@ -448,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => 
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var orphanFootnotes = subject == null ? new List<Footnote>() : _footnoteService.GetFootnotesThatWillBeOrphaned(releaseId, subject.Id);
+                    var footnotes = subject == null ? new List<Footnote>() : _footnoteService.GetFootnotes(releaseId, subject.Id);
                     
                     return new DeleteDataFilePlan
                     {
@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         
                         DeleteDataBlockPlan = _dataBlockService.GetDeleteDataBlockPlan(releaseId, subject),
                         
-                        FootnoteIds = orphanFootnotes
+                        FootnoteIds = footnotes
                            .Select(footnote => footnote.Id)
                            .ToList(),
                     };
