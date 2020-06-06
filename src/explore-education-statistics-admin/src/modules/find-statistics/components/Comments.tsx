@@ -39,7 +39,7 @@ const Comments = ({
   sectionId,
   comments = [],
   onChange,
-  canComment = false,
+  canComment = true,
 }: Props) => {
   const [editingComment, setEditingComment] = useState<Comment>();
 
@@ -141,6 +141,7 @@ const Comments = ({
                   </strong>
                 </p>
                 <p>
+                  {comment.updated ? 'Updated: ' : ''}
                   <FormattedDate format="d MMMM yyyy HH:mm">
                     {comment.updated || comment.created}
                   </FormattedDate>
@@ -200,7 +201,7 @@ const Comments = ({
                             removeComment(index);
                           }}
                         >
-                          Remove
+                          Delete
                         </ButtonText>
                       </ButtonGroup>
                     )}
