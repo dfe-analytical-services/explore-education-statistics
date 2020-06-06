@@ -2,10 +2,7 @@ import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTi
 import releaseContentService, {
   ContentBlockAttachRequest,
 } from '@admin/services/releaseContentService';
-import {
-  ContentBlockPostModel,
-  ExtendedComment,
-} from '@admin/services/types/content';
+import { ContentBlockPostModel, Comment } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback, useMemo } from 'react';
 import { useReleaseDispatch } from './ReleaseContext';
@@ -296,7 +293,7 @@ export default function useReleaseActions() {
       sectionId: string;
       blockId: string;
       sectionKey: ContentSectionKeys;
-      comments: ExtendedComment[];
+      comments: Comment[];
     }) => {
       dispatch({
         type: 'UPDATE_BLOCK_COMMENTS',

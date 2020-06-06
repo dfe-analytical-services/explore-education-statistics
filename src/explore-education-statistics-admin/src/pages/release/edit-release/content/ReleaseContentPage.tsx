@@ -6,7 +6,7 @@ import permissionService from '@admin/services/permissionService';
 import releaseContentService, {
   EditableRelease,
 } from '@admin/services/releaseContentService';
-import { EditableBlock, ExtendedComment } from '@admin/services/types/content';
+import { EditableBlock, Comment } from '@admin/services/types/content';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -62,9 +62,9 @@ const ReleaseContentPageLoaded = () => {
 
 const contentSectionComments = (
   contentSection: ContentSection<EditableBlock>,
-): ExtendedComment[] => {
+): Comment[] => {
   if (contentSection.content?.length) {
-    return contentSection.content.reduce<ExtendedComment[]>(
+    return contentSection.content.reduce<Comment[]>(
       (allCommentsForSection, content) => {
         content.comments.forEach(comment =>
           allCommentsForSection.push(comment),
@@ -84,7 +84,7 @@ const getUnresolvedComments = (release: EditableRelease) =>
     ...contentSectionComments(release.keyStatisticsSection),
     ...release.content
       .filter(_ => _.content !== undefined)
-      .reduce<ExtendedComment[]>(
+      .reduce<Comment[]>(
         (allComments, contentSection) => [
           ...allComments,
           ...contentSectionComments(contentSection),

@@ -1,6 +1,6 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 
-export interface ExtendedComment {
+export interface Comment {
   id: string;
   content: string;
   createdBy: {
@@ -14,11 +14,11 @@ export interface ExtendedComment {
 }
 
 export type EditableContentBlock = ContentBlock & {
-  comments: ExtendedComment[];
+  comments: Comment[];
 };
 
 export type EditableDataBlock = DataBlock & {
-  comments: ExtendedComment[];
+  comments: Comment[];
 };
 
 export type EditableBlock = EditableContentBlock | EditableDataBlock;

@@ -1,5 +1,5 @@
 import { EditableRelease } from '@admin/services/releaseContentService';
-import { EditableBlock, ExtendedComment } from '@admin/services/types/content';
+import { EditableBlock, Comment } from '@admin/services/types/content';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ContentSection } from '@common/services/publicationService';
 import { BaseBlock, DataBlock } from '@common/services/types/blocks';
@@ -14,7 +14,7 @@ export type ReleaseContextState = {
   release: EditableRelease;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
-  unresolvedComments: ExtendedComment[];
+  unresolvedComments: Comment[];
 };
 const ReleaseStateContext = createContext<ReleaseContextState | undefined>(
   undefined,

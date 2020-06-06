@@ -1,15 +1,15 @@
-import { ExtendedComment } from '@admin/services/types/content';
+import { Comment } from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
 
-export type AddExtendedComment = Pick<ExtendedComment, 'content'>;
-export type UpdateExtendedComment = Pick<ExtendedComment, 'id' | 'content'>;
+export type AddComment = Pick<Comment, 'content'>;
+export type UpdateComment = Pick<Comment, 'id' | 'content'>;
 
 const releaseContentCommentService = {
   getContentSectionComments(
     releaseId: string,
     sectionId: string,
     contentBlockId: string,
-  ): Promise<ExtendedComment[]> {
+  ): Promise<Comment[]> {
     return client.get(
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments`,
     );
@@ -19,17 +19,15 @@ const releaseContentCommentService = {
     releaseId: string,
     sectionId: string,
     contentBlockId: string,
-    comment: AddExtendedComment,
-  ): Promise<ExtendedComment> {
+    comment: AddComment,
+  ): Promise<Comment> {
     return client.post(
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments/add`,
       comment,
     );
   },
 
-  updateContentSectionComment(
-    comment: UpdateExtendedComment,
-  ): Promise<ExtendedComment> {
+  updateContentSectionComment(comment: UpdateComment): Promise<Comment> {
     return client.put(`/comment/${comment.id}`, comment);
   },
 

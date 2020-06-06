@@ -1,7 +1,7 @@
 import {
   EditableBlock,
   EditableContentBlock,
-  ExtendedComment,
+  Comment,
 } from '@admin/services/types/content';
 import { ContentSection, Release } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
@@ -85,7 +85,7 @@ export type UpdateBlockComments = {
   type: 'UPDATE_BLOCK_COMMENTS';
   payload: {
     meta: BlockMeta;
-    comments: ExtendedComment[];
+    comments: Comment[];
   };
 };
 

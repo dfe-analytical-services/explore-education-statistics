@@ -2,7 +2,7 @@ import { EditableRelease } from '@admin/services/releaseContentService';
 import {
   EditableBlock,
   EditableContentBlock,
-  ExtendedComment,
+  Comment,
 } from '@admin/services/types/content';
 import { DataBlock } from '@common/services/types/blocks';
 import { produce } from 'immer';
@@ -748,7 +748,7 @@ describe('ReleaseContext', () => {
   test("UPDATE_BLOCK_COMMENTS updates a block's comments", () => {
     const sectionKey = 'content';
 
-    const newComment: ExtendedComment = {
+    const newComment: Comment = {
       id: 'comment-3',
       content: 'a third comment',
       createdBy: {
@@ -785,7 +785,7 @@ describe('ReleaseContext', () => {
       },
     );
 
-    expect(release?.content[0].content[0].comments).toEqual<ExtendedComment[]>([
+    expect(release?.content[0].content[0].comments).toEqual<Comment[]>([
       {
         id: 'comment-1',
         content: 'A comment',

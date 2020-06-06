@@ -1,10 +1,10 @@
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
 import releaseContentCommentService, {
-  AddExtendedComment,
-  UpdateExtendedComment,
+  AddComment,
+  UpdateComment,
 } from '@admin/services/releaseContentCommentService';
-import { ExtendedComment } from '@admin/services/types/content';
+import { Comment } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -23,13 +23,13 @@ interface FormValues {
 
 export type CommentsChangeHandler = (
   blockId: string,
-  comments: ExtendedComment[],
+  comments: Comment[],
 ) => void;
 
 interface Props {
   blockId: string;
   sectionId: string;
-  comments: ExtendedComment[];
+  comments: Comment[];
   canComment?: boolean;
   onChange: CommentsChangeHandler;
 }
@@ -41,13 +41,13 @@ const Comments = ({
   onChange,
   canComment = false,
 }: Props) => {
-  const [editingComment, setEditingComment] = useState<ExtendedComment>();
+  const [editingComment, setEditingComment] = useState<Comment>();
 
   const { user } = useAuthContext();
   const { releaseId } = useManageReleaseContext();
 
   const addComment = (content: string) => {
-    const additionalComment: AddExtendedComment = {
+    const additionalComment: AddComment = {
       content,
     };
 
@@ -79,7 +79,7 @@ const Comments = ({
   };
 
   const updateComment = (index: number, content: string) => {
-    const editedComment: UpdateExtendedComment = {
+    const editedComment: UpdateComment = {
       ...comments[index],
       content,
     };
