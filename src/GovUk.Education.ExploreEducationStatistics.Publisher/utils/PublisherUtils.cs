@@ -14,9 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.utils
             return environment?.Equals(EnvironmentName.Development) ?? false;
         }
         
-        public static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
+        public static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId, IEnumerable<Guid> includedReleaseIds)
         {
-            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Live && r.Id != releaseId);
+            return !releases.Any(r => r.PreviousVersionId == releaseId && IsReleasePublished(r, includedReleaseIds) && r.Id != releaseId);
+        }
+        
+        public static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
+        {
+            return release.Live || includedReleaseIds.Contains(release.Id);
         }
     }
 }

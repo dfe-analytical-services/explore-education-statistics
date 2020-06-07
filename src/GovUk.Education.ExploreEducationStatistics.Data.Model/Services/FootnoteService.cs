@@ -51,9 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             foreach (var footnote in footnotesLinkedToSubject)
             {
-                var linkedToNoOtherSubject = IsFootnoteLinkedToNoOtherSubject(footnote.Id, subjectId);
+                var canRemoveFootnote = IsFootnoteLinkedToAnotherSubject(footnote.Id, subjectId);
 
-                await DeleteFootnote(releaseId, footnote, linkedToNoOtherSubject);
+                await DeleteFootnote(releaseId, footnote, canRemoveFootnote);
             }
         }
 
@@ -156,51 +156,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private bool IsFootnoteLinkedToNoOtherSubject(Guid id, Guid subjectId)
+        private bool IsFootnoteLinkedToAnotherSubject(Guid id, Guid subjectId)
         {
             var footnote = _context.Footnote
                 .Include(f => f.Filters)
                 .Include(f => f.FilterGroups)
                 .Include(f => f.FilterItems)
                 .Include(f => f.Indicators)
-                .Include(f => f.Subjects).FirstOrDefault(f => f.Id == id);
-            
-            // if this Footnote is directly linked to any other Subjects than this one, then it's not just for
-            // this Subject
-            if (footnote.Subjects.Any(subject => subject.SubjectId != subjectId))
-            {
-                return false;
-            }
+                .Include(f => f.Subjects).Single(f => f.Id == id);
 
-            // if this Footnote is directly linked to a Filter for any other Subject, then it's not just for
-            // this Subject
-            if (footnote.Filters.Any(filter => filter.Filter.SubjectId != subjectId))
-            {
-                return false;
-            }
-
-            // if this Footnote is directly linked to an Indicator for any other Subject, then it's not just for
-            // this Subject
-            if (footnote.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId))
-            {
-                return false;
-            }
-
-            // if this Footnote is directly linked to a Filter Group for any other Subject, then it's not just for
-            // this Subject
-            if (footnote.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId))
-            {
-                return false;
-            }
-
-            // if this Footnote is directly linked to a Filter Item for any other Subject, then it's not just for
-            // this Subject
-            if (footnote.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId))
-            {
-                return false;
-            }
-
-            return true;
+            return (footnote.Subjects.Any(subject => subject.SubjectId != subjectId) ||
+                    footnote.Filters.Any(filter => filter.Filter.SubjectId != subjectId) ||
+                    footnote.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId) ||
+                    footnote.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId) ||
+                    footnote.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId));
         }
     }
 }

@@ -81,8 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => !release.SoftDeleted && IsReleasePublished(release, includedReleaseIds) &&
-                                  PublisherUtils.IsLatestVersionOfRelease(release.Publication.Releases, release.Id))
+                .Where(release => !release.SoftDeleted && PublisherUtils.IsLatestVersionOfRelease(release.Publication.Releases, release.Id, includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
@@ -139,11 +138,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ReleaseFileReferences
                 .Where(rfr => rfr.ReleaseId == releaseId && types.Contains(rfr.ReleaseFileType))
                 .ToList();
-        }
-
-        private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
-        {
-            return release.Live || includedReleaseIds.Contains(release.Id);
         }
 
         public async Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds)
