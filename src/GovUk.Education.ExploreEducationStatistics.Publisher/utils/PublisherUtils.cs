@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.utils
 {
-    public class PublisherUtils
+    public static class PublisherUtils
     {
         public static bool IsDevelopment()
         {
