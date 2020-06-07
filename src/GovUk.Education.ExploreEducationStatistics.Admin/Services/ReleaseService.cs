@@ -246,9 +246,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
                 .Where(f => f.ReleaseId == originalRelease.Id)
-                .Select(f => f.CreateReleaseAmendment(newRelease));
+                .Select(f => f.CreateReleaseAmendment(newRelease)).ToList();
 
-            await _context.AddRangeAsync(releaseFileCopies);
+            _context.ReleaseFiles.AddRange(releaseFileCopies);
             await _context.SaveChangesAsync();
             return newRelease;
         }

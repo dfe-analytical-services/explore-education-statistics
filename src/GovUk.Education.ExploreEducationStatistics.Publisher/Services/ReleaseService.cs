@@ -135,8 +135,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types)
         {
             return _contentDbContext
-                .ReleaseFileReferences
-                .Where(rfr => rfr.ReleaseId == releaseId && types.Contains(rfr.ReleaseFileType))
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(rfr => rfr.ReleaseId == releaseId)
+                .Select(rf => rf.ReleaseFileReference)
+                .Where(rfr => types.Contains(rfr.ReleaseFileType))
                 .ToList();
         }
 
