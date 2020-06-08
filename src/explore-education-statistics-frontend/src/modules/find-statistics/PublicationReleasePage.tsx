@@ -4,7 +4,6 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
   ReleaseType,
@@ -143,7 +142,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                 {data.downloadFiles.map(({ extension, name, path, size }) => (
                   <li key={path}>
                     <Link
-                      to={`${baseUrl.data}/download/${path}`}
+                      to={`${process.env.DATA_API_BASE_URL}/download/${path}`}
                       analytics={{
                         category: 'Downloads',
                         action: `Release page ${name} file downloaded`,

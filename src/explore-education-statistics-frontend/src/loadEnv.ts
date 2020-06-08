@@ -1,9 +1,9 @@
 import getConfig from 'next/config';
 
-const { publicRuntimeConfig } = getConfig();
+export default function loadEnv() {
+  const { publicRuntimeConfig } = getConfig();
 
-process.env = {
-  ...process.env,
-  ...publicRuntimeConfig,
-  APP_ROOT_ID: '__next',
-};
+  Object.assign(process.env, publicRuntimeConfig, {
+    APP_ROOT_ID: '__next',
+  });
+}

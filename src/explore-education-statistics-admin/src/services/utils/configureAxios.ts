@@ -1,11 +1,12 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
 import adminApi from '@admin/services/utils/service';
-import { contentApi, dataApi, functionApi } from '@common/services/api';
-import Client from '@common/services/api/Client';
-
-export const clients: Client[] = [adminApi, contentApi, dataApi, functionApi];
+import { dataApi } from '@common/services/api';
 
 const configureAxios = () => {
+  dataApi.axios.defaults.baseURL = '/api/data';
+
+  const clients = [dataApi, adminApi];
+
   clients.forEach(client => {
     client.axios.interceptors.request.use(
       async config => {

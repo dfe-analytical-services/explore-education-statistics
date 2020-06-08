@@ -52,31 +52,6 @@ const DataBlockRenderer = ({
       <Tabs id={id} onToggle={onToggle}>
         {firstTabs}
 
-        {dataBlock?.tables?.length && fullTable && (
-          <TabsSection id={`${id}-tables`} title="Table">
-            {dataBlock?.tables.map((table, index) => {
-              return (
-                <TimePeriodDataTable
-                  key={index}
-                  fullTable={fullTable}
-                  captionTitle={dataBlock?.heading}
-                  source={dataBlock?.source}
-                  tableHeadersConfig={
-                    table.tableHeaders
-                      ? mapTableHeadersConfig(
-                          table.tableHeaders,
-                          fullTable.subjectMeta,
-                        )
-                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
-                  }
-                />
-              );
-            })}
-
-            {additionalTabContent}
-          </TabsSection>
-        )}
-
         {dataBlock?.charts?.length && fullTable && (
           <TabsSection id={`${id}-charts`} title="Chart">
             <a
@@ -126,6 +101,31 @@ const DataBlockRenderer = ({
                   data={fullTable?.results}
                   meta={fullTable?.subjectMeta}
                   source={dataBlock?.source}
+                />
+              );
+            })}
+
+            {additionalTabContent}
+          </TabsSection>
+        )}
+
+        {dataBlock?.tables?.length && fullTable && (
+          <TabsSection id={`${id}-tables`} title="Table">
+            {dataBlock?.tables.map((table, index) => {
+              return (
+                <TimePeriodDataTable
+                  key={index}
+                  fullTable={fullTable}
+                  captionTitle={dataBlock?.heading}
+                  source={dataBlock?.source}
+                  tableHeadersConfig={
+                    table.tableHeaders
+                      ? mapTableHeadersConfig(
+                          table.tableHeaders,
+                          fullTable.subjectMeta,
+                        )
+                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                  }
                 />
               );
             })}

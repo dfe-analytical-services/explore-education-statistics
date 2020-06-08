@@ -481,8 +481,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                 new Publication
                                 {
                                     Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
-                                    Title = "Secondary and primary schools applications and offers",
-                                    Slug = "secondary-and-primary-schools-applications-and-offers",
+                                    Title = "Secondary and primary school applications and offers",
+                                    Slug = "secondary-and-primary-school-applications-and-offers",
                                     Releases = new[]
                                     {
                                         applicationsAndOffersRelease

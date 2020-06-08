@@ -616,11 +616,6 @@
               "name": "StatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
-            },
-            {
-              "name": "PublicStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
-              "type": "Custom"
             }
           ]
         }
@@ -1247,7 +1242,7 @@
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
         "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
         "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
-        "FUNCTION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
+        "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
         "HOTJAR_ID": "[parameters('publicAppHotjarId')]",
         "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
         "NODE_ENV": "production",

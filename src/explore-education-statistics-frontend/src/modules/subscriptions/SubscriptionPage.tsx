@@ -8,7 +8,7 @@ import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import functionsService from '@frontend/services/functionsService';
+import notificationService from '@frontend/services/notificationService';
 import classNames from 'classnames';
 import { Formik } from 'formik';
 import { GetServerSideProps, NextPage } from 'next';
@@ -42,7 +42,7 @@ const SubscriptionPage: NextPage<Props> = ({
     if (email !== '') {
       const { id, title } = data;
 
-      await functionsService.subscribeToPublication({
+      await notificationService.subscribeToPublication({
         email,
         id,
         slug,

@@ -831,7 +831,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TeamName = "School preference statistics team",
                     TeamEmail = "school.preference@education.gov.uk",
                     ContactName = "Helen Bray",
-                    ContactTelNo = "020 7783 8553"
+                    ContactTelNo = "0370 000 2288"
 
                 },
                 new Contact
@@ -1620,10 +1620,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                     MethodologyId = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
-                    Title = "Secondary and primary schools applications and offers",
+                    Title = "Secondary and primary school applications and offers",
                     Summary = "",
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
-                    Slug = "secondary-and-primary-schools-applications-and-offers",
+                    Slug = "secondary-and-primary-school-applications-and-offers",
                     LegacyPublicationUrl =
                         new Uri("https://www.gov.uk/government/collections/statistics-school-applications"),
                     ContactId = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191")

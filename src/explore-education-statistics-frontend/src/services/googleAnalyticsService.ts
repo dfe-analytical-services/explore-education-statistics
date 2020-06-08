@@ -1,24 +1,29 @@
 import ReactGA from 'react-ga';
 
 let initialised = false;
+let gaTrackingId = '';
 
 export const googleAnalyticsCookies = ['_ga', '_gid', '_gat'];
 
-if (process.env.GA_TRACKING_ID && !initialised) {
-  ReactGA.initialize(process.env.GA_TRACKING_ID);
-  initialised = true;
+export function initGoogleAnalytics(trackingId: string) {
+  if (!initialised && trackingId) {
+    ReactGA.initialize(trackingId);
 
-  // eslint-disable-next-line no-console
-  console.log('GA initialised');
+    gaTrackingId = trackingId;
+    initialised = true;
+
+    // eslint-disable-next-line no-console
+    console.log('GA initialised');
+  }
 }
 
-export function enableGA() {
+export function enableGoogleAnalytics() {
   // @ts-ignore
-  window[`ga-disable-${process.env.GA_TRACKING_ID}`] = false;
+  window[`ga-disable-${gaTrackingId}`] = false;
 }
-export function disableGA() {
+export function disableGoogleAnalytics() {
   // @ts-ignore
-  window[`ga-disable-${process.env.GA_TRACKING_ID}`] = true;
+  window[`ga-disable-${gaTrackingId}`] = true;
 }
 
 export const logPageView = () => {

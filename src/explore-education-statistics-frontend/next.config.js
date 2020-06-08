@@ -71,10 +71,11 @@ const nextConfig = {
   publicRuntimeConfig: {
     CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
     DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
-    FUNCTION_API_BASE_URL: process.env.FUNCTION_API_BASE_URL,
+    NOTIFICATION_API_BASE_URL: process.env.NOTIFICATION_API_BASE_URL,
     APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
     GA_TRACKING_ID: process.env.GA_TRACKING_ID,
     HOTJAR_ID: process.env.HOTJAR_ID,
+    PUBLIC_URL: process.env.PUBLIC_URL,
   },
   webpack(config, options) {
     const { dev, isServer } = options;

@@ -1,4 +1,4 @@
-import { functionApi } from '@common/services/api';
+import notificationApi from '@frontend/services/clients/notificationApi';
 
 export interface SubscriptionData {
   email: string;
@@ -13,6 +13,6 @@ export default {
     slug: string;
     title: string;
   }): Promise<SubscriptionData> {
-    return functionApi.post('/publication/subscribe', query);
+    return notificationApi.post('/publication/subscribe', query);
   },
 };
