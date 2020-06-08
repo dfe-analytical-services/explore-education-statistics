@@ -56,9 +56,7 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
         return;
       }
 
-      const blockIndex = content.findIndex(block => block.id === blockId);
-
-      if (blockIndex > -1) {
+      if (content.find(block => block.id === blockId)) {
         onBlockCommentsChange(blockId, comments);
       }
     },

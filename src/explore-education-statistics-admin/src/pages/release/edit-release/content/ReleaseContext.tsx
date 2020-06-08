@@ -196,9 +196,6 @@ export const releaseReducer: Reducer<
       }
       return draft;
     }
-    default: {
-      return draft;
-    }
     case 'UPDATE_BLOCK_COMMENTS': {
       const { comments, meta } = action.payload;
       const { sectionId, sectionKey, blockId } = meta;
@@ -237,6 +234,9 @@ export const releaseReducer: Reducer<
       } else {
         matchingBlock.comments = comments;
       }
+      return draft;
+    }
+    default: {
       return draft;
     }
   }
