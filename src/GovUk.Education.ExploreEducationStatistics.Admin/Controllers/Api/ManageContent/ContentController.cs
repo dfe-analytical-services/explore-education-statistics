@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return await _contentService
                 .DeleteCommentAsync(commentId)
-                .HandleFailuresOr(_ => new NoContentResult());
+                .HandleFailuresOrNoContent();
         }
     }
 }
