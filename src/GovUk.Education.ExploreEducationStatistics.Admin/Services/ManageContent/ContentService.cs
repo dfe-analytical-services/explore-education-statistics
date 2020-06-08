@@ -346,6 +346,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     });
         }
 
+        private Task<Either<ActionResult, CommentViewModel>> GetCommentAsync(Guid commentId)
+        {
+            return _persistenceHelper.CheckEntityExists<Comment>(commentId, queryable => 
+                    queryable.Include(comment => comment.CreatedBy))
+                .OnSuccess(comment => _mapper.Map<CommentViewModel>(comment));
+        }
+
         public Task<Either<ActionResult, List<CommentViewModel>>> GetCommentsAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId
         )
@@ -396,11 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     
                     await _context.Comment.AddAsync(comment);
                     await _context.SaveChangesAsync();
-
-                    var added = await _context.Comment
-                        .Include(c => c.CreatedBy)
-                        .FirstAsync(c => c.Id == comment.Id);
-                    return _mapper.Map<CommentViewModel>(added);
+                    return await GetCommentAsync(comment.Id);
                 }
             );
         }
@@ -416,11 +419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         comment.Content = request.Content;
                         comment.Updated = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
-
-                        var updated = await _context.Comment
-                            .Include(c => c.CreatedBy)
-                            .FirstAsync(c => c.Id == comment.Id);
-                        return _mapper.Map<CommentViewModel>(updated);
+                        return await GetCommentAsync(commentId);
                     }
                 );
         }
