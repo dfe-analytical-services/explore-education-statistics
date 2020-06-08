@@ -15,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly string _storageConnectionString;
 
-        public FileStorageService(IConfiguration config)
+        public FileStorageService(string connectionString)
         {
-            _storageConnectionString = config.GetValue<string>("PublicStorage");
+            _storageConnectionString = connectionString;
         }
 
         public async Task<string> DownloadTextAsync(string containerName, string blobName)
