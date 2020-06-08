@@ -65,7 +65,7 @@ const ReleaseContentAccordionSection = ({
   );
 
   const updateBlock = useCallback(
-    async (blockId, bodyContent) => {
+    async (blockId: string, bodyContent: string) => {
       await actions.updateContentSectionBlock({
         releaseId: release.id,
         sectionId,
