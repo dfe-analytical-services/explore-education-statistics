@@ -10,11 +10,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public DateTime Created { get; set; }
         public User CreatedBy { get; set; }
         public DateTime? Updated { get; set; }
-
-        [Obsolete("Use CreatedBy.Id instead")]
-        public Guid? CreatedById => CreatedBy.Id;
-
-        [Obsolete("Use CreatedBy.FirstName and CreatedBy.LastName instead")]
-        public string CreatedByName => $"{CreatedBy.FirstName} {CreatedBy.LastName}";
     }
 }

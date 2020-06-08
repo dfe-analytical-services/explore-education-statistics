@@ -164,7 +164,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         comment.CreatedById == null
                             ? new User
                             {
-                                FirstName = comment.LegacyCreatedBy
+#pragma warning disable 612
+                                FirstName = comment.LegacyCreatedBy,
+#pragma warning restore 612
+                                LastName = ""
                             }
                             : comment.CreatedBy));
 
