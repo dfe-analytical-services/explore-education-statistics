@@ -238,6 +238,7 @@ if args.env == 'local':
     robotArgs += ['--exclude', 'NotAgainstLocal']
 if args.env == 'dev':
     robotArgs += ['--include', 'Dev']
+    robotArgs += ['--exclude', 'NotAgainstDev']
 if args.env == 'test':
     robotArgs += ['--include', 'Test',
                   '--exclude', 'AltersData']

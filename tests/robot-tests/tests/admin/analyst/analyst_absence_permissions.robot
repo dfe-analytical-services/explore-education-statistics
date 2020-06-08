@@ -18,7 +18,7 @@ Validate Analyst1 can see correct themes and topics
     user checks list contains label   id:selectTopic   Pupil absence
 
 Validate Analyst1 can see correct draft releases
-    [Tags]  HappyPath
+    [Tags]  HappyPath   NotAgainstDev
     user checks element should contain   id:draft-releases-tab   View draft releases (0)
     user clicks element   id:draft-releases-tab
     user waits until page contains  There are currently no draft releases
@@ -59,13 +59,13 @@ Validate Analyst1 can see Absence release summary
     user checks summary list item "Release type" should be "Official Statistics"
 
 Validate Analyst1 cannot see 'Upload data files' button
-    [Tags]  HappyPath
+    [Tags]  HappyPath   NotAgainstDev
     user clicks element  link:Manage data
     user waits until page contains  This release has been approved
     user checks page does not contain element  css:#upload-data-files-button
 
 Validate Analyst1 cannot see data blocks
-    [Tags]  HappyPath
+    [Tags]  HappyPath   NotAgainstDev
     user clicks element  link:Manage data blocks
     user waits until page contains  This release is currently not editable
 
@@ -105,7 +105,7 @@ Validate Analyst1 can see 'Manage content' page accordion sections
     user checks there are x accordion sections  11
 
 Validate Analyst1 cannot Approve the 'Pupil absence in schools in England' release
-    [Tags]  HappyPath
+    [Tags]  HappyPath   NotAgainstDev
     user clicks element  link:Release status
     user waits until page contains element  xpath://h2[text()="Release Status"]
     user checks page contains   The current release status is: Approved
