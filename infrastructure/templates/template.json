@@ -616,11 +616,6 @@
               "name": "StatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
-            },
-            {
-              "name": "PublicStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]",
-              "type": "Custom"
             }
           ]
         }
