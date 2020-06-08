@@ -78,13 +78,14 @@ const ReleaseContentAccordionSection = ({
   );
 
   const removeBlock = useCallback(
-    (blockId: string) =>
-      actions.deleteContentSectionBlock({
+    async (blockId: string) => {
+      await actions.deleteContentSectionBlock({
         releaseId: release.id,
         sectionId,
         blockId,
         sectionKey: 'content',
-      }),
+      });
+    },
     [actions, release.id, sectionId],
   );
 
@@ -103,23 +104,22 @@ const ReleaseContentAccordionSection = ({
   }, [blocks, actions, release.id, sectionId]);
 
   const handleHeadingChange = useCallback(
-    (title: string) =>
-      actions.updateContentSectionHeading({
+    async (title: string) => {
+      await actions.updateContentSectionHeading({
         sectionId,
         title,
         releaseId: release.id,
-      }),
+      });
+    },
     [actions, sectionId, release.id],
   );
 
-  const handleRemoveSection = useCallback(
-    () =>
-      actions.removeContentSection({
-        sectionId,
-        releaseId: release.id,
-      }),
-    [actions, sectionId, release.id],
-  );
+  const handleRemoveSection = useCallback(async () => {
+    await actions.removeContentSection({
+      sectionId,
+      releaseId: release.id,
+    });
+  }, [actions, sectionId, release.id]);
 
   const updateBlockComments: CommentsChangeHandler = useCallback(
     async (blockId, comments) => {

@@ -21,8 +21,8 @@ const ReleaseHeadlines = ({ release }: Props) => {
 
   const getChartFile = useGetChartFile(release.id);
 
-  const addBlock = useCallback(() => {
-    actions.addContentSectionBlock({
+  const addBlock = useCallback(async () => {
+    await actions.addContentSectionBlock({
       releaseId: release.id,
       sectionId: release.headlinesSection.id,
       sectionKey: 'headlinesSection',
@@ -35,8 +35,8 @@ const ReleaseHeadlines = ({ release }: Props) => {
   }, [actions, release.id, release.headlinesSection.id]);
 
   const updateBlock = useCallback(
-    (blockId, bodyContent) => {
-      actions.updateContentSectionBlock({
+    async (blockId, bodyContent) => {
+      await actions.updateContentSectionBlock({
         releaseId: release.id,
         sectionId: release.headlinesSection.id,
         blockId,
@@ -48,8 +48,8 @@ const ReleaseHeadlines = ({ release }: Props) => {
   );
 
   const removeBlock = useCallback(
-    (blockId: string) => {
-      actions.deleteContentSectionBlock({
+    async (blockId: string) => {
+      await actions.deleteContentSectionBlock({
         releaseId: release.id,
         sectionId: release.headlinesSection.id,
         blockId,
