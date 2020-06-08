@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return _persistenceHelper
                 .CheckEntityExists<DataBlock>(id)
                 .OnSuccess(_ => _dataBlockService.DeleteAsync(releaseId, id))
-                .HandleFailuresOr(_ => new NoContentResult());
+                .HandleFailuresOrNoContent();
         }
         
         [HttpGet("release/{releaseId}/datablocks/{id}/delete-plan")]

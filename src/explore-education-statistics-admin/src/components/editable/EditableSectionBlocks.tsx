@@ -22,6 +22,7 @@ export interface EditableSectionBlockProps extends SectionBlocksProps {
   onBlocksChange?: (nextBlocks: EditableBlock[]) => void;
   onBlockContentSave: (blockId: string, content: string) => void;
   onBlockDelete: (blockId: string) => void;
+  onBlockCommentsChange?: CommentsChangeHandler;
 }
 
 const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
@@ -35,6 +36,7 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
     onBlockContentSave,
     onBlockDelete,
     onBlocksChange,
+    onBlockCommentsChange,
   } = props;
 
   const { isEditing } = useEditingContext();
@@ -50,20 +52,15 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
 
   const handleCommentsChange: CommentsChangeHandler = useCallback(
     (blockId, comments) => {
-      if (!onBlocksChange) {
+      if (!onBlockCommentsChange) {
         return;
       }
 
-      const blockIndex = content.findIndex(block => block.id === blockId);
-
-      if (blockIndex > -1) {
-        const nextBlocks = [...content];
-        nextBlocks[blockIndex].comments = comments;
-
-        onBlocksChange(nextBlocks);
+      if (content.find(block => block.id === blockId)) {
+        onBlockCommentsChange(blockId, comments);
       }
     },
-    [content, onBlocksChange],
+    [content, onBlockCommentsChange],
   );
 
   if (!isEditing) {
@@ -99,7 +96,6 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
                   sectionId={sectionId}
                   blockId={block.id}
                   comments={block.comments}
-                  canResolve={false}
                   canComment
                   onChange={handleCommentsChange}
                 />

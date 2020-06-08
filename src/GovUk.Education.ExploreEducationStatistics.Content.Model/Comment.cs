@@ -5,12 +5,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class Comment
     {
         public Guid Id { get; set; }
-        public Guid? IContentBlockId { get; set; }
-        public string Name { get; set; }
-        public DateTime Time { get; set; }
-        public string CommentText { get; set; }
-        public string? ResolvedBy { get; set; }
-        public DateTime? ResolvedOn { get; set; }
-        public CommentState State { get; set; }
+        public IContentBlock ContentBlock { get; set; }
+        public Guid ContentBlockId { get; set; }
+        public string Content { get; set; }
+        public DateTime Created { get; set; }
+        public User CreatedBy { get; set; }
+        public Guid? CreatedById { get; set; }
+        [Obsolete] public string LegacyCreatedBy { get; set; }
+        public DateTime? Updated { get; set; }
     }
 }

@@ -31,5 +31,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             
             return result.IsRight ? new ActionResult<T>(result.Right) : result.Left;
         }
+
+        public static async Task<ActionResult> HandleFailuresOrNoContent<T>(
+            this Task<Either<ActionResult, T>> validationErrorsRaisingAction)
+        {
+            var result = await validationErrorsRaisingAction;
+
+            return result.IsRight ? new NoContentResult() : result.Left;
+        }
     }
 }

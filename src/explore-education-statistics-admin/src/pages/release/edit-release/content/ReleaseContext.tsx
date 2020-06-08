@@ -1,5 +1,5 @@
 import { EditableRelease } from '@admin/services/releaseContentService';
-import { EditableBlock, ExtendedComment } from '@admin/services/types/content';
+import { EditableBlock, Comment } from '@admin/services/types/content';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ContentSection } from '@common/services/publicationService';
 import { BaseBlock, DataBlock } from '@common/services/types/blocks';
@@ -14,7 +14,7 @@ export type ReleaseContextState = {
   release: EditableRelease;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
-  unresolvedComments: ExtendedComment[];
+  unresolvedComments: Comment[];
 };
 const ReleaseStateContext = createContext<ReleaseContextState | undefined>(
   undefined,
@@ -193,6 +193,46 @@ export const releaseReducer: Reducer<
         if (sectionIndex !== -1) {
           draft.release.content[sectionIndex] = section;
         }
+      }
+      return draft;
+    }
+    case 'UPDATE_BLOCK_COMMENTS': {
+      const { comments, meta } = action.payload;
+      const { sectionId, sectionKey, blockId } = meta;
+
+      const matchingSection = draft.release[sectionKey] as
+        | ContentSection<EditableBlock>
+        | ContentSection<EditableBlock>[];
+
+      if (!matchingSection) {
+        throw new Error(
+          `${action.type}: Section "${sectionKey}" could not be found.`,
+        );
+      }
+
+      let matchingBlock;
+      if (Array.isArray(matchingSection)) {
+        const matchingContentSection = matchingSection.find(
+          section => section.id === sectionId,
+        );
+
+        if (matchingContentSection) {
+          matchingBlock = matchingContentSection.content.find(
+            block => block.id === blockId,
+          );
+        }
+      } else {
+        matchingBlock = matchingSection.content.find(
+          block => block.id === blockId,
+        );
+      }
+
+      if (!matchingBlock) {
+        throw new Error(
+          `${action.type}: Block "${blockId}" could not be found with sectionKey "${sectionKey}" and sectionId "${sectionId}".`,
+        );
+      } else {
+        matchingBlock.comments = comments;
       }
       return draft;
     }

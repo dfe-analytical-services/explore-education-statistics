@@ -19,14 +19,12 @@ const ReleaseContentAccordion = ({
 }: ReleaseContentAccordionProps) => {
   const { addContentSection, updateContentSectionsOrder } = useReleaseActions();
 
-  const addAccordionSection = useCallback(
-    () =>
-      addContentSection({
-        releaseId: release.id,
-        order: release.content.length,
-      }),
-    [release.id, release.content.length, addContentSection],
-  );
+  const addAccordionSection = useCallback(async () => {
+    await addContentSection({
+      releaseId: release.id,
+      order: release.content.length,
+    });
+  }, [release.id, release.content.length, addContentSection]);
 
   const reorderAccordionSections = useCallback(
     async (ids: string[]) => {

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -44,6 +43,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             }
         };
 
+        private readonly Comment _comment = new Comment
+        {
+            Id = Guid.NewGuid()
+        };
+
         [Fact]
         public void AddCommentAsync()
         {
@@ -52,7 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         _release.Id,
                         ContentSectionId,
                         ContentBlockId,
-                        new AddCommentRequest()), 
+                        new AddOrUpdateCommentRequest()),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -60,12 +65,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public void DeleteCommentAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.DeleteCommentAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        ContentBlockId,
-                        Guid.NewGuid()), 
-                SecurityPolicies.CanUpdateSpecificRelease);
+                    service.DeleteCommentAsync(_comment.Id),
+                _comment,
+                SecurityPolicies.CanUpdateSpecificComment);
         }
 
         [Fact]
@@ -73,12 +75,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             AssertSecurityPoliciesChecked(service => 
                     service.UpdateCommentAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        ContentBlockId,
-                        Guid.NewGuid(),
-                        new UpdateCommentRequest()), 
-                SecurityPolicies.CanUpdateSpecificRelease);
+                        _comment.Id,
+                        new AddOrUpdateCommentRequest()),
+                _comment,
+                SecurityPolicies.CanUpdateSpecificComment);
         }
 
         [Fact]
@@ -88,7 +88,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.AddContentBlockAsync(
                         _release.Id,
                         ContentSectionId,
-                        new AddContentBlockRequest()), 
+                        new AddContentBlockRequest()),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -98,7 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             AssertSecurityPoliciesChecked(service => 
                     service.AddContentSectionAsync(
                         _release.Id,
-                        new AddContentSectionRequest()), 
+                        new AddContentSectionRequest()),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -109,7 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.AttachContentBlockAsync(
                         _release.Id,
                         ContentSectionId,
-                        new AttachContentBlockRequest()), 
+                        new AttachContentBlockRequest()),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -120,7 +123,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.RemoveContentBlockAsync(
                         _release.Id,
                         ContentSectionId,
-                        ContentBlockId), 
+                        ContentBlockId),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -130,7 +134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             AssertSecurityPoliciesChecked(service => 
                     service.RemoveContentSectionAsync(
                         _release.Id,
-                        ContentSectionId), 
+                        ContentSectionId),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -141,7 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.ReorderContentBlocksAsync(
                         _release.Id,
                         ContentSectionId,
-                        new Dictionary<Guid, int>()), 
+                        new Dictionary<Guid, int>()),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -151,7 +157,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             AssertSecurityPoliciesChecked(service => 
                     service.ReorderContentSectionsAsync(
                         _release.Id,
-                        new Dictionary<Guid, int>()), 
+                        new Dictionary<Guid, int>()),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -162,7 +169,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.UpdateContentSectionHeadingAsync(
                         _release.Id,
                         ContentSectionId,
-                        ""), 
+                        ""),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -174,7 +182,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         _release.Id,
                         ContentSectionId,
                         ContentBlockId,
-                        new UpdateTextBasedContentBlockRequest()), 
+                        new UpdateTextBasedContentBlockRequest()),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -186,18 +195,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         _release.Id,
                         ContentSectionId,
                         ContentBlockId,
-                        new UpdateDataBlockRequest()), 
+                        new UpdateDataBlockRequest()),
+                _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
         
-        private void AssertSecurityPoliciesChecked<T>(
-            Func<ContentService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
+        private void AssertSecurityPoliciesChecked<T, TProtectedResource>(
+            Func<ContentService, Task<Either<ActionResult, T>>> protectedAction,
+            TProtectedResource resource,
+            params SecurityPolicies[] policies)
         {
-            var (contentDbContext, releaseHelper, mapper, userService) = Mocks();
+            var (contentDbContext, persistenceHelper, mapper, userService) = Mocks();
 
-            var service = new ContentService(contentDbContext.Object, releaseHelper.Object, mapper.Object, userService.Object);
+            var service = new ContentService(contentDbContext.Object, persistenceHelper.Object, mapper.Object, userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
+            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, resource, userService, service, policies);
         }
         
         private (
@@ -206,9 +218,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             Mock<IMapper>,
             Mock<IUserService>) Mocks()
         {
+            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
+            MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
+            MockUtils.SetupCall(persistenceHelper, _comment.Id, _comment);
+            
             return (
                 new Mock<ContentDbContext>(), 
-                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release), 
+                persistenceHelper,
                 new Mock<IMapper>(), 
                 new Mock<IUserService>());
         }

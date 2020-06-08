@@ -18,16 +18,13 @@ import React, { useCallback, useMemo } from 'react';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
+import { CommentsChangeHandler } from './components/Comments';
 
 const PublicationReleaseContent = () => {
   const { value: config } = useConfig();
   const { isEditing } = useEditingContext();
   const { release } = useReleaseState();
-  const {
-    addContentSectionBlock,
-    updateContentSectionBlock,
-    deleteContentSectionBlock,
-  } = useReleaseActions();
+  const actions = useReleaseActions();
 
   const releaseCount = useMemo(() => {
     if (release) {
@@ -39,9 +36,9 @@ const PublicationReleaseContent = () => {
     return 0;
   }, [release]);
 
-  const addSummaryBlock = useCallback(async () => {
+  const addBlock = useCallback(async () => {
     if (release)
-      await addContentSectionBlock({
+      await actions.addContentSectionBlock({
         releaseId: release.id,
         sectionId: release.summarySection.id,
         sectionKey: 'summarySection',
@@ -51,12 +48,12 @@ const PublicationReleaseContent = () => {
           body: '',
         },
       });
-  }, [release, addContentSectionBlock]);
+  }, [release, actions]);
 
-  const summaryBlockUpdate = useCallback(
+  const updateBlock = useCallback(
     async (blockId, bodyContent) => {
       if (release)
-        await updateContentSectionBlock({
+        await actions.updateContentSectionBlock({
           releaseId: release.id,
           sectionId: release.summarySection.id,
           blockId,
@@ -64,20 +61,32 @@ const PublicationReleaseContent = () => {
           bodyContent,
         });
     },
-    [release, updateContentSectionBlock],
+    [release, actions],
   );
 
-  const summaryBlockDelete = useCallback(
+  const removeBlock = useCallback(
     async (blockId: string) => {
       if (release)
-        await deleteContentSectionBlock({
+        await actions.deleteContentSectionBlock({
           releaseId: release.id,
           sectionId: release.summarySection.id,
           blockId,
           sectionKey: 'summarySection',
         });
     },
-    [release, deleteContentSectionBlock],
+    [release, actions],
+  );
+
+  const updateBlockComments: CommentsChangeHandler = useCallback(
+    async (blockId, comments) => {
+      await actions.updateBlockComments({
+        sectionId: release.summarySection.id,
+        blockId,
+        sectionKey: 'summarySection',
+        comments,
+      });
+    },
+    [actions, release.summarySection.id],
   );
 
   if (!release) {
@@ -103,12 +112,13 @@ const PublicationReleaseContent = () => {
                 allowComments
                 sectionId={release.summarySection.id}
                 content={release.summarySection.content}
-                onBlockContentSave={summaryBlockUpdate}
-                onBlockDelete={summaryBlockDelete}
+                onBlockContentSave={updateBlock}
+                onBlockDelete={removeBlock}
+                onBlockCommentsChange={updateBlockComments}
               />
               {isEditing && release.summarySection.content?.length === 0 && (
                 <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-                  <Button variant="secondary" onClick={addSummaryBlock}>
+                  <Button variant="secondary" onClick={addBlock}>
                     Add a summary text block
                   </Button>
                 </div>

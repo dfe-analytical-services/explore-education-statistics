@@ -198,6 +198,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             return userService.DoCheck(release, SecurityPolicies.CanPublishSpecificRelease);
         }
+        
+        public static Task<Either<ActionResult, Comment>> CheckCanUpdateComment(
+            this IUserService userService, Comment comment)
+        {
+            return userService.DoCheck(comment, SecurityPolicies.CanUpdateSpecificComment);
+        }
 
         private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy) 
         {

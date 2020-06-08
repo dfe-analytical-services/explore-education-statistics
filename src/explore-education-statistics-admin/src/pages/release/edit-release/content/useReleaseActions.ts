@@ -2,9 +2,9 @@ import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTi
 import releaseContentService, {
   ContentBlockAttachRequest,
 } from '@admin/services/releaseContentService';
-import { ContentBlockPostModel } from '@admin/services/types/content';
+import { ContentBlockPostModel, Comment } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useReleaseDispatch } from './ReleaseContext';
 import { ContentSectionKeys } from './ReleaseContextActionTypes';
 
@@ -283,17 +283,57 @@ export default function useReleaseActions() {
     [dispatch],
   );
 
-  return {
-    updateAvailableDataBlocks,
-    deleteContentSectionBlock,
-    updateContentSectionDataBlock,
-    updateContentSectionBlock,
-    addContentSectionBlock,
-    attachContentSectionBlock,
-    updateSectionBlockOrder,
-    addContentSection,
-    updateContentSectionsOrder,
-    removeContentSection,
-    updateContentSectionHeading,
-  };
+  const updateBlockComments = useCallback(
+    async ({
+      sectionId,
+      blockId,
+      sectionKey,
+      comments,
+    }: {
+      sectionId: string;
+      blockId: string;
+      sectionKey: ContentSectionKeys;
+      comments: Comment[];
+    }) => {
+      dispatch({
+        type: 'UPDATE_BLOCK_COMMENTS',
+        payload: {
+          meta: { sectionId, blockId, sectionKey },
+          comments,
+        },
+      });
+    },
+    [dispatch],
+  );
+
+  return useMemo(
+    () => ({
+      updateAvailableDataBlocks,
+      deleteContentSectionBlock,
+      updateContentSectionDataBlock,
+      updateContentSectionBlock,
+      addContentSectionBlock,
+      attachContentSectionBlock,
+      updateSectionBlockOrder,
+      addContentSection,
+      updateContentSectionsOrder,
+      removeContentSection,
+      updateContentSectionHeading,
+      updateBlockComments,
+    }),
+    [
+      addContentSection,
+      addContentSectionBlock,
+      attachContentSectionBlock,
+      deleteContentSectionBlock,
+      removeContentSection,
+      updateAvailableDataBlocks,
+      updateBlockComments,
+      updateContentSectionBlock,
+      updateContentSectionDataBlock,
+      updateContentSectionHeading,
+      updateContentSectionsOrder,
+      updateSectionBlockOrder,
+    ],
+  );
 }

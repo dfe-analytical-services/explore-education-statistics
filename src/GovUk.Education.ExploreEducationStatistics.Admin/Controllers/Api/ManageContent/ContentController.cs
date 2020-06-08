@@ -142,36 +142,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return await _contentService
                 .GetCommentsAsync(releaseId, contentSectionId, contentBlockId)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
         
         
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments/add")]
         public async Task<ActionResult<CommentViewModel>> AddComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddCommentRequest comment)
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddOrUpdateCommentRequest request)
         {
             return await _contentService
-                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, comment)
-                .HandleFailuresOr(Ok);
+                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, request)
+                .HandleFailuresOrOk();
         }
         
                 
-        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
-        public async Task<ActionResult<CommentViewModel>> AddComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId, UpdateCommentRequest comment)
+        [HttpPut("comment/{commentId}")]
+        public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, AddOrUpdateCommentRequest request)
         {
             return await _contentService
-                .UpdateCommentAsync(releaseId, contentSectionId, contentBlockId, commentId, comment)
-                .HandleFailuresOr(Ok);
+                .UpdateCommentAsync(commentId, request)
+                .HandleFailuresOrOk();
         }
         
-        [HttpDelete("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comment/{commentId}")]
-        public async Task<ActionResult<CommentViewModel>> DeleteComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, Guid commentId)
+        [HttpDelete("comment/{commentId}")]
+        public async Task<ActionResult> DeleteComment(Guid commentId)
         {
             return await _contentService
-                .DeleteCommentAsync(releaseId, contentSectionId, contentBlockId, commentId)
-                .HandleFailuresOr(Ok);
+                .DeleteCommentAsync(commentId)
+                .HandleFailuresOrNoContent();
         }
     }
 }

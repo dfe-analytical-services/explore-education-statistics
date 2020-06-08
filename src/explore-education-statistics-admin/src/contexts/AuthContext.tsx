@@ -23,7 +23,7 @@ export interface Authentication {
   user?: User;
 }
 
-const AuthContext = createContext<Authentication>({
+export const AuthContext = createContext<Authentication>({
   user: undefined,
 });
 
