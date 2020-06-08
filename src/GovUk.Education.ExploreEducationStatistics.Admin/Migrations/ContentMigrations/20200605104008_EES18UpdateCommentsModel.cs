@@ -159,6 +159,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 "Comment",
                 "Time");
 
+            migrationBuilder.Sql(
+                $"UPDATE dbo.Comment SET CreatedById = '{Guid.Empty.ToString()}' WHERE CreatedById IS NULL");
+
             migrationBuilder.AlterColumn<Guid>("CreatedById",
                 "Comment",
                 nullable: false,
