@@ -106,15 +106,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     Promise.all([
       releaseDataFileService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-    ]).then(
-      ([
-        releaseDataFiles,
-        canUpdateReleaseResponse,
-      ]) => {
-        setDataFiles(releaseDataFiles);
-        setCanUpdateRelease(canUpdateReleaseResponse);
-      },
-    );
+    ]).then(([releaseDataFiles, canUpdateReleaseResponse]) => {
+      setDataFiles(releaseDataFiles);
+      setCanUpdateRelease(canUpdateReleaseResponse);
+    });
   }, [publicationId, releaseId]);
 
   const resetPage = async ({ resetForm }: FormikHelpers<FormValues>) => {
@@ -401,31 +396,30 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="Date uploaded">
                             {format(dataFile.created, 'd/M/yyyy HH:mm')}
                           </SummaryListItem>
-                          {canUpdateRelease &&
-                            dataFile.canDelete && (
-                              <SummaryListItem
-                                term="Actions"
-                                actions={
-                                  <ButtonText
-                                    onClick={() =>
-                                      releaseDataFileService
-                                        .getDeleteDataFilePlan(
-                                          releaseId,
-                                          dataFile,
-                                        )
-                                        .then(plan => {
-                                          setDeleteDataFile({
-                                            plan,
-                                            file: dataFile,
-                                          });
-                                        })
-                                    }
-                                  >
-                                    Delete files
-                                  </ButtonText>
-                                }
-                              />
-                            )}
+                          {canUpdateRelease && dataFile.canDelete && (
+                            <SummaryListItem
+                              term="Actions"
+                              actions={
+                                <ButtonText
+                                  onClick={() =>
+                                    releaseDataFileService
+                                      .getDeleteDataFilePlan(
+                                        releaseId,
+                                        dataFile,
+                                      )
+                                      .then(plan => {
+                                        setDeleteDataFile({
+                                          plan,
+                                          file: dataFile,
+                                        });
+                                      })
+                                  }
+                                >
+                                  Delete files
+                                </ButtonText>
+                              }
+                            />
+                          )}
                         </SummaryList>
                       </AccordionSection>
                     );

@@ -82,14 +82,27 @@ const footnoteService = {
   ): Promise<{ meta: FootnoteMeta; footnotes: Footnote[] }> {
     return client.get(`/data/footnote/release/${releaseId}`);
   },
-  async createFootnote(releaseId: string, footnote: BaseFootnote): Promise<Footnote> {
-    return client.post(`/data/footnote/release/${releaseId}`, footnoteToFlatFootnote(footnote));
+  async createFootnote(
+    releaseId: string,
+    footnote: BaseFootnote,
+  ): Promise<Footnote> {
+    return client.post(
+      `/data/footnote/release/${releaseId}`,
+      footnoteToFlatFootnote(footnote),
+    );
   },
   async getFootnote(id: string) {
     return client.get(`/data/footnote/${id}`);
   },
-  async updateFootnote(releaseId: string, id: string, footnote: BaseFootnote): Promise<Footnote> {
-    return client.put(`/data/footnote/release/${releaseId}/${id}`, footnoteToFlatFootnote(footnote));
+  async updateFootnote(
+    releaseId: string,
+    id: string,
+    footnote: BaseFootnote,
+  ): Promise<Footnote> {
+    return client.put(
+      `/data/footnote/release/${releaseId}/${id}`,
+      footnoteToFlatFootnote(footnote),
+    );
   },
   async deleteFootnote(releaseId: string, id: string): Promise<void> {
     return client.delete(`/data/footnote/release/${releaseId}/${id}`);
