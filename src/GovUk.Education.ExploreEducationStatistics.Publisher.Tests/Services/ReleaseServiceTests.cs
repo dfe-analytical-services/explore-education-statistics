@@ -172,21 +172,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationARelease3,
             new Release
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("b647f4cd-4aba-47d9-ab8d-82ece32dca86"),
                 PublicationId = PublicationA.Id,
                 ReleaseName = "2017",
                 TimePeriodCoverage = AcademicYearQ4,
                 Published = new DateTime(2019, 1, 01),
-                Status = Approved
+                Status = Approved,
+                Version = 0,
+                PreviousVersionId = new Guid("b647f4cd-4aba-47d9-ab8d-82ece32dca86") 
             },
             new Release
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("21109205-6362-4746-bc37-0e6db2838173"),
                 PublicationId = PublicationA.Id,
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ4,
                 Published = null,
-                Status = Draft
+                Status = Draft,
+                Version = 0,
+                PreviousVersionId = new Guid("21109205-6362-4746-bc37-0e6db2838173") 
             }
         };
 

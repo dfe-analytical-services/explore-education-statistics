@@ -11,9 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.EntityFrameworkCore;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -81,7 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => !release.SoftDeleted && PublisherUtils.IsLatestVersionOfRelease(release.Publication.Releases, release.Id, includedReleaseIds))
+                .Where(release => !release.SoftDeleted && IsReleasePublished(release, includedReleaseIds)
+                                                       && IsLatestVersionOfRelease(release.Publication.Releases, release.Id, includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
