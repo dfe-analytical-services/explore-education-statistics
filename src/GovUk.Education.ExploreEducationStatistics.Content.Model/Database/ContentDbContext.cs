@@ -831,7 +831,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TeamName = "School preference statistics team",
                     TeamEmail = "school.preference@education.gov.uk",
                     ContactName = "Helen Bray",
-                    ContactTelNo = "020 7783 8553"
+                    ContactTelNo = "0370 000 2288"
 
                 },
                 new Contact
