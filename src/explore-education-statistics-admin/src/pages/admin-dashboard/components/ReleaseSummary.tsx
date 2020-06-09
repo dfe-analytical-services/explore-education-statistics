@@ -9,6 +9,8 @@ import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import Tag from '@common/components/Tag';
+import TagGroup from '@common/components/TagGroup';
 import {
   formatDayMonthYear,
   isValidDayMonthYear,
@@ -32,22 +34,36 @@ const ReleaseSummary = ({
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={getReleaseSummaryLabel(release)}
-      tag={[
-        getReleaseStatusLabel(release.status),
-        release.amendment && 'Amendment',
-        release.status === 'Approved' && (
-          <LazyLoad
-            scroll={false}
-            placeholder={
-              <LoadingSpinner className="govuk-!-margin-0" inline size="sm" />
-            }
-            once
-          >
-            <ReleaseServiceStatus exclude="details" releaseId={release.id} />
-          </LazyLoad>
-        ),
-      ]}
+      summary={
+        <>
+          {getReleaseSummaryLabel(release)}
+
+          <TagGroup className="govuk-!-margin-left-2">
+            <Tag>{getReleaseStatusLabel(release.status)}</Tag>
+
+            {release.amendment && <Tag>Amendment</Tag>}
+
+            {release.status === 'Approved' && (
+              <LazyLoad
+                once
+                scroll={false}
+                placeholder={
+                  <LoadingSpinner
+                    className="govuk-!-margin-0"
+                    inline
+                    size="sm"
+                  />
+                }
+              >
+                <ReleaseServiceStatus
+                  exclude="details"
+                  releaseId={release.id}
+                />
+              </LazyLoad>
+            )}
+          </TagGroup>
+        </>
+      }
     >
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">

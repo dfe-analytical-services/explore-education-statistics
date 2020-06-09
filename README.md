@@ -315,6 +315,16 @@ cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.D
 dotnet ef migrations add Ees183Test --project ..\GovUk.Education.ExploreEducationStatistics.Data.Model
 ```
 
+## Automated tests
+
+Aside from unit tests for each project, we maintain suites of Robot Framework and Postman/Newman 
+tests that can be found in `tests`.
+
+See the relevant READMEs:
+
+- [Postman/Newman tests](./tests/newman/README.md)
+- [Robot Framework tests](./tests/robot-tests/README.md)
+
 ## Contributing
 
 ## License

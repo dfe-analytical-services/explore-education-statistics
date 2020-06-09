@@ -174,7 +174,6 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                   disabled={form.isSubmitting}
                                   options={topic.publications.map(
                                     publication => ({
-                                      id: publication.id,
                                       label: publication.title,
                                       value: publication.id,
                                     }),

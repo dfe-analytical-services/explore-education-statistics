@@ -1,12 +1,11 @@
-/* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { RadioChangeEventHandler } from '../FormRadio';
 import FormRadioGroup from '../FormRadioGroup';
 
 describe('FormRadioGroup', () => {
   test('renders list of radios in correct order', () => {
-    const { container, getAllByLabelText } = render(
+    const { container } = render(
       <FormRadioGroup
         value=""
         id="test-radios"
@@ -20,7 +19,7 @@ describe('FormRadioGroup', () => {
       />,
     );
 
-    const radios = getAllByLabelText(/Test radio/);
+    const radios = screen.getAllByLabelText(/Test radio/);
 
     expect(radios).toHaveLength(3);
     expect(radios[0]).toHaveAttribute('value', '1');
@@ -31,7 +30,7 @@ describe('FormRadioGroup', () => {
   });
 
   test('renders list of radios in reverse order', () => {
-    const { getAllByLabelText } = render(
+    render(
       <FormRadioGroup
         value=""
         id="test-radios"
@@ -46,7 +45,7 @@ describe('FormRadioGroup', () => {
       />,
     );
 
-    const radios = getAllByLabelText(/Test radio/);
+    const radios = screen.getAllByLabelText(/Test radio/);
 
     expect(radios).toHaveLength(3);
     expect(radios[0]).toHaveAttribute('value', '3');
@@ -55,7 +54,7 @@ describe('FormRadioGroup', () => {
   });
 
   test('renders list of radios in custom order', () => {
-    const { getAllByLabelText } = render(
+    render(
       <FormRadioGroup
         value=""
         id="test-radios"
@@ -71,7 +70,7 @@ describe('FormRadioGroup', () => {
       />,
     );
 
-    const radios = getAllByLabelText(/Test radio/);
+    const radios = screen.getAllByLabelText(/Test radio/);
 
     expect(radios).toHaveLength(3);
     expect(radios[0]).toHaveAttribute('value', '3');
@@ -106,9 +105,9 @@ describe('FormRadioGroup', () => {
       }
     }
 
-    const { getByLabelText } = render(<RadioWrapper />);
+    render(<RadioWrapper />);
 
-    const radio = getByLabelText('Test radio') as HTMLInputElement;
+    const radio = screen.getByLabelText('Test radio') as HTMLInputElement;
 
     expect(radio.checked).toBe(false);
 
@@ -147,10 +146,10 @@ describe('FormRadioGroup', () => {
       }
     }
 
-    const { getByLabelText } = render(<RadioWrapper />);
+    render(<RadioWrapper />);
 
-    const radio1 = getByLabelText('Test radio 1') as HTMLInputElement;
-    const radio2 = getByLabelText('Test radio 2') as HTMLInputElement;
+    const radio1 = screen.getByLabelText('Test radio 1') as HTMLInputElement;
+    const radio2 = screen.getByLabelText('Test radio 2') as HTMLInputElement;
 
     fireEvent.click(radio1);
 
@@ -164,7 +163,7 @@ describe('FormRadioGroup', () => {
   });
 
   test('renders correctly with legend', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormRadioGroup
         value=""
         legend="Choose a radio"
@@ -174,7 +173,7 @@ describe('FormRadioGroup', () => {
       />,
     );
 
-    expect(getByText('Choose a radio')).toBeDefined();
+    expect(screen.getByText('Choose a radio')).toBeInTheDocument();
     expect(container.innerHTML).toMatchSnapshot();
   });
 
@@ -194,7 +193,7 @@ describe('FormRadioGroup', () => {
   });
 
   test('renders option with conditional contents', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormRadioGroup
         value="2"
         id="test-radios"
@@ -225,16 +224,21 @@ describe('FormRadioGroup', () => {
 
     const hiddenClass = 'govuk-radios__conditional--hidden';
 
-    expect(getByText('Conditional 1').parentElement).toHaveClass(hiddenClass);
-    expect(getByText('Conditional 2').parentElement).not.toHaveClass(
+    expect(screen.getByText('Conditional 1').parentElement).toHaveClass(
       hiddenClass,
     );
-    expect(getByText('Conditional 3').parentElement).toHaveClass(hiddenClass);
+    expect(screen.getByText('Conditional 2').parentElement).not.toHaveClass(
+      hiddenClass,
+    );
+    expect(screen.getByText('Conditional 3').parentElement).toHaveClass(
+      hiddenClass,
+    );
+
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('generates option IDs from id and value if none specified', () => {
-    const { container, getByLabelText } = render(
+    render(
       <FormRadioGroup
         id="test-radios"
         name="test-radios"
@@ -243,23 +247,26 @@ describe('FormRadioGroup', () => {
           { label: 'Test radio 1', value: 'opt1' },
           { label: 'Test radio 2', value: 'opt-2' },
           { label: 'Test radio 3', value: 'opt.3' },
+          { label: 'Test radio 4', value: 'opt 4 is \n here' },
         ]}
       />,
     );
 
-    expect(getByLabelText('Test radio 1')).toHaveAttribute(
+    expect(screen.getByLabelText('Test radio 1')).toHaveAttribute(
       'id',
-      'test-radios-opt-1',
+      'test-radios-opt1',
     );
-    expect(getByLabelText('Test radio 2')).toHaveAttribute(
+    expect(screen.getByLabelText('Test radio 2')).toHaveAttribute(
       'id',
       'test-radios-opt-2',
     );
-    expect(getByLabelText('Test radio 3')).toHaveAttribute(
+    expect(screen.getByLabelText('Test radio 3')).toHaveAttribute(
       'id',
-      'test-radios-opt-3',
+      'test-radios-opt.3',
     );
-
-    expect(container.innerHTML).toMatchSnapshot();
+    expect(screen.getByLabelText('Test radio 4')).toHaveAttribute(
+      'id',
+      'test-radios-opt-4-is---here',
+    );
   });
 });

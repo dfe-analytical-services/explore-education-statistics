@@ -8,16 +8,26 @@ Run 'python run_tests.py -h' to see argument options
 
 import os
 import argparse
+from pathlib import Path
 from robot import run_cli as robot_run_cli
 from pabot.pabot import main as pabot_run_cli
 import cProfile
 import pstats
 import scripts.keyword_profile as kp
-import chromedriver_install as cdi
+import pyderman
 from dotenv import load_dotenv
 import time
 import requests
 import json
+import shutil
+import sys
+
+current_dir = Path(__file__).absolute().parent
+os.chdir(current_dir)
+
+sys.path.append(str(Path("../../useful-scripts/auth-tokens")))
+
+from get_auth_tokens import get_identity_info
 
 # Parse arguments
 parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
@@ -61,7 +71,6 @@ parser.add_argument("--ci",
                     help="specify that the test are running as part of the CI pipeline")
 parser.add_argument("--chromedriver",
                     dest="chromedriver_version",
-                    default="80.0.3987.106",
                     metavar="{version}",
                     help="specify which version of chromedriver to use")
 """
@@ -91,108 +100,137 @@ timeout = 30
 implicit_wait = 5
 
 # Install chromedriver and add it to PATH
-cdi.install(file_directory='./webdriver/',
-            verbose=False,
-            chmod=True,
-            overwrite=False,
-            version=args.chromedriver_version)
-os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
+pyderman.install(file_directory='./webdriver/',
+                 filename='chromedriver',
+                 verbose=False,
+                 chmod=True,
+                 overwrite=False,
+                 version=args.chromedriver_version)
+
+os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
-             #"--exitonfailure",
+             # "--exitonfailure",
              "--exclude", "Failing",
              "--exclude", "UnderConstruction"]
 if args.tags:
     robotArgs += ["--include", args.tags]
 
 if args.ci:
-    robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
+    robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v",
+                  "implicit_wait:" + str(implicit_wait)]
     # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
-    robotArgs += ['--removekeywords', 'name:common.user goes to url']  # To hide basic auth credentials
+    robotArgs += ['--removekeywords',
+                  'name:common.user goes to url']  # To hide basic auth credentials
 else:
-    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
+    load_dotenv('.env.' + args.env)
     assert os.getenv('PUBLIC_URL') is not None
     assert os.getenv('ADMIN_URL') is not None
     assert os.getenv('ADMIN_EMAIL') is not None
     assert os.getenv('ADMIN_PASSWORD') is not None
 
-if args.tests and "general_public" not in args.tests:  # Auth not required with general_public tests
-    print('Getting get_identity_info function from get_auth_tokens.py script...', end='')
-    # NOTE(mark): Because you cannot import from a parent dir, we do this...
-    if os.path.exists(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py'):
-        f = open(f'..{os.sep}..{os.sep}useful-scripts{os.sep}auth-tokens{os.sep}get_auth_tokens.py', 'r')
-    elif os.path.exists(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py'):  # For pipeline
-        f = open(f'..{os.sep}auth-token-script{os.sep}get_auth_tokens.py', 'r')
-    assert f is not None, 'Failed to open file get_auth_tokens.py!'
-    get_auth_tokens_script = f.read()
-    globals()['__name__'] = '__test_runner__'
-    exec(get_auth_tokens_script, globals(), locals())
-    assert callable(get_identity_info)
-    print('done!')
+# Auth not required with general_public tests
+if args.tests and "general_public" not in args.tests:
+    def authenticate_user(user, email, password, clear_existing=True):
+        assert user and email and password
 
-    if "general_public" not in args.tests:  # Don't need BAU user if running general_public tests
-        if os.path.exists('IDENTITY_LOCAL_STORAGE_BAU.txt') and os.path.exists('IDENTITY_COOKIE_BAU.txt'):
-            print('Getting BAU user authentication information from local files...', end='')
-            with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'r') as ls_file:
-                os.environ['IDENTITY_LOCAL_STORAGE_BAU'] = ls_file.read()
-            with open('IDENTITY_COOKIE_BAU.txt', 'r') as cookie_file:
-                os.environ['IDENTITY_COOKIE_BAU'] = cookie_file.read()
-            print('done!')
+        local_storage_name = f'IDENTITY_LOCAL_STORAGE_{user}'
+        cookie_name = f'IDENTITY_COOKIE_{user}'
+
+        local_storage_file = Path(f'{local_storage_name}.json')
+        cookie_file = Path(f'{cookie_name}.json')
+
+        if clear_existing:
+            local_storage_file.unlink(True)
+            cookie_file.unlink(True)
+
+        if local_storage_file.exists() and cookie_file.exists():
+            print(f'Getting {user} authentication information from local files... ')
+
+            os.environ[local_storage_name] = local_storage_file.read_text()
+            os.environ[cookie_name] = cookie_file.read_text()
         else:
-            print('Logging in to obtain BAU user authentication information...', end='', flush=True)
-            os.environ["IDENTITY_LOCAL_STORAGE_BAU"], os.environ['IDENTITY_COOKIE_BAU'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ADMIN_EMAIL'), os.getenv('ADMIN_PASSWORD'), chromedriver_version=args.chromedriver_version)
+            print(f'Logging in to obtain {user} authentication information... ')
 
-            # Save auth info to files for efficiency
-            with open('IDENTITY_LOCAL_STORAGE_BAU.txt', 'w') as ls_file:
-                ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])
-            with open('IDENTITY_COOKIE_BAU.txt', 'w') as cookie_file:
-                cookie_file.write(os.environ['IDENTITY_COOKIE_BAU'])
-            print(' done!')
-        assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
-        assert os.getenv('IDENTITY_COOKIE_BAU') is not None
+            os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
+                url=os.getenv('ADMIN_URL'),
+                email=email,
+                password=password,
+                chromedriver_version=args.chromedriver_version
+            )
 
-    if f"admin{os.sep}bau" not in args.tests:  # Don't need analyst user if running admin/bau tests
-        if os.path.exists('IDENTITY_LOCAL_STORAGE_ANALYST.txt') and os.path.exists('IDENTITY_COOKIE_ANALYST.txt'):
-            print('Getting ANALYST user authentication information from local files...', end='')
-            with open('IDENTITY_LOCAL_STORAGE_ANALYST.txt', 'r') as ls_file:
-                os.environ['IDENTITY_LOCAL_STORAGE_ANALYST'] = ls_file.read()
-            with open('IDENTITY_COOKIE_ANALYST.txt', 'r') as cookie_file:
-                os.environ['IDENTITY_COOKIE_ANALYST'] = cookie_file.read()
-            print('done!')
-        else:
-            print('Logging in to obtain ANALYST user authentication information...', end='', flush=True)
-            os.environ["IDENTITY_LOCAL_STORAGE_ANALYST"], os.environ['IDENTITY_COOKIE_ANALYST'] = get_identity_info(os.getenv('ADMIN_URL'), os.getenv('ANALYST_EMAIL'), os.getenv('ANALYST_PASSWORD'), chromedriver_version=args.chromedriver_version)
+            # Cache auth info to files for efficiency
+            local_storage_file.write_text(os.environ[local_storage_name])
+            cookie_file.write_text(os.environ[cookie_name])
 
-            # Save auth info to files for efficiency
-            with open('IDENTITY_LOCAL_STORAGE_ANALYST.txt', 'w') as ls_file:
-                ls_file.write(os.environ['IDENTITY_LOCAL_STORAGE_ANALYST'])
-            with open('IDENTITY_COOKIE_ANALYST.txt', 'w') as cookie_file:
-                cookie_file.write(os.environ['IDENTITY_COOKIE_ANALYST'])
-            print(' done!')
-        assert os.getenv('IDENTITY_LOCAL_STORAGE_ANALYST') is not None
-        assert os.getenv('IDENTITY_COOKIE_ANALYST') is not None
+            print('Done!')
 
-    # NOTE(mark): Tests that alter data only occur on local and dev environments
-    if args.env in ['local', 'dev']:
-        requests.packages.urllib3.disable_warnings()  # To prevent InsecureRequestWarning
+        assert os.getenv(local_storage_name) is not None
+        assert os.getenv(cookie_name) is not None
+
+
+    def setup_authentication(clear_existing=False):
+        # Don't need BAU user if running general_public tests
+        if "general_public" not in args.tests:
+            authenticate_user(
+                user='BAU',
+                email=os.getenv('ADMIN_EMAIL'),
+                password=os.getenv('ADMIN_PASSWORD'),
+                clear_existing=clear_existing
+            )
+
+        # Don't need analyst user if running admin/bau tests
+        if f"admin{os.sep}bau" not in args.tests:
+            authenticate_user(
+                user='ANALYST',
+                email=os.getenv('ANALYST_EMAIL'),
+                password=os.getenv('ANALYST_PASSWORD'),
+                clear_existing=clear_existing
+            )
+
+    def create_test_topic():
+        # To prevent InsecureRequestWarning
+        requests.packages.urllib3.disable_warnings()
+
         # Create topic to be used by UI tests
         run_identifier = str(time.time()).split('.')[0]
+        os.environ['RUN_IDENTIFIER'] = run_identifier
+
+        print(f'Attempting to create test topic {run_identifier}...')
+
         create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/449d720f-9a87-4895-91fe-70972d1bdc04/topics'
         jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {jwt_token}',
         }
-        body = {'title': f'UI test topic {run_identifier}'}
-        r = requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
 
-        #print('r.status_code', r.status_code)
-        #print('r.text', r.text)
-        assert r.status_code != 401, 'Failed to authenticate to create topic! Delete robot-tests/IDENTITY_*.txt files?'
-        assert r.status_code == 200, 'Failed to create topic! Have you created the Test theme?'
-        os.environ['RUN_IDENTIFIER'] = run_identifier
+        body = {'title': f'UI test topic {run_identifier}'}
+
+        return requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
+
+
+    setup_authentication()
+
+    # NOTE(mark): Tests that alter data only occur on local and dev environments
+    if args.env in ['local', 'dev']:
+        response = create_test_topic()
+
+        if response.status_code in {401, 403}:
+            print('Attempting re-authentication...')
+
+            # Delete identify files and re-attempt to fetch them
+            setup_authentication(clear_existing=True)
+            response = create_test_topic()
+
+            assert response.status_code not in {401, 403}, \
+                'Failed to authenticate. Check that identity files exist or are not expired.'
+
+        assert response.status_code == 200, \
+            'Failed to create topic! Have you created the Test theme?'
+
         assert os.getenv('RUN_IDENTIFIER') is not None
 
 if args.env == 'local':
@@ -200,6 +238,7 @@ if args.env == 'local':
     robotArgs += ['--exclude', 'NotAgainstLocal']
 if args.env == 'dev':
     robotArgs += ['--include', 'Dev']
+    robotArgs += ['--exclude', 'NotAgainstDev']
 if args.env == 'test':
     robotArgs += ['--include', 'Test',
                   '--exclude', 'AltersData']
@@ -219,6 +258,10 @@ else:
 
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
+
+# Remove any existing test results
+if Path('test-results').exists():
+    shutil.rmtree("test-results")
 
 # Run tests
 if args.interp == "robot":

@@ -24,39 +24,39 @@ exports[`FormCheckboxSearchGroup renders list of checkboxes in correct order 1`]
       <div class="govuk-checkboxes govuk-checkboxes--small">
         <div class="govuk-checkboxes__item">
           <input class="govuk-checkboxes__input"
-                 id="test-checkboxes-1"
+                 id="test-checkboxes-checkboxes-1"
                  name="testCheckboxes"
                  type="checkbox"
                  value="1"
           >
           <label class="govuk-label govuk-checkboxes__label"
-                 for="test-checkboxes-1"
+                 for="test-checkboxes-checkboxes-1"
           >
             Test checkbox 1
           </label>
         </div>
         <div class="govuk-checkboxes__item">
           <input class="govuk-checkboxes__input"
-                 id="test-checkboxes-2"
+                 id="test-checkboxes-checkboxes-2"
                  name="testCheckboxes"
                  type="checkbox"
                  value="2"
           >
           <label class="govuk-label govuk-checkboxes__label"
-                 for="test-checkboxes-2"
+                 for="test-checkboxes-checkboxes-2"
           >
             Test checkbox 2
           </label>
         </div>
         <div class="govuk-checkboxes__item">
           <input class="govuk-checkboxes__input"
-                 id="test-checkboxes-3"
+                 id="test-checkboxes-checkboxes-3"
                  name="testCheckboxes"
                  type="checkbox"
                  value="3"
           >
           <label class="govuk-label govuk-checkboxes__label"
-                 for="test-checkboxes-3"
+                 for="test-checkboxes-checkboxes-3"
           >
             Test checkbox 3
           </label>

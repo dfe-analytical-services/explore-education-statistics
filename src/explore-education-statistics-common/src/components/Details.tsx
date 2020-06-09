@@ -1,4 +1,3 @@
-import Tag from '@common/components/Tag';
 import useMounted from '@common/hooks/useMounted';
 import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/utils/dom/findAllParents';
@@ -23,7 +22,6 @@ export type DetailsToggleHandler = (
 
 export interface DetailsProps {
   className?: string;
-  tag?: ReactNode[];
   children: ReactNode;
   id?: string;
   /**
@@ -51,7 +49,6 @@ const Details = ({
   open = false,
   onToggle,
   summary,
-  tag,
 }: DetailsProps) => {
   const [id] = useState(propId);
   const ref = useRef<HTMLElement>(null);
@@ -134,27 +131,6 @@ const Details = ({
           data-testid={formatTestId(`Expand Details Section ${summary}`)}
         >
           {summary}
-          {tag &&
-            tag.map((item, index) => {
-              if (typeof item === 'string') {
-                return (
-                  <Tag
-                    key={`tag-${String(index)}`}
-                    className="govuk-!-margin-left-2"
-                  >
-                    {item}
-                  </Tag>
-                );
-              }
-              return (
-                <span
-                  key={`tag-${String(index)}`}
-                  className="govuk-!-margin-left-2"
-                >
-                  {item}
-                </span>
-              );
-            })}
         </span>
       </summary>
       <div

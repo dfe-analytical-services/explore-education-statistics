@@ -32,7 +32,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
     >
       <fieldset
         class="govuk-fieldset"
-        id="test-groupA"
+        id="test-1"
       >
         <legend
           class="govuk-fieldset__legend govuk-fieldset__legend--s"
@@ -47,14 +47,14 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           >
             <input
               class="govuk-checkboxes__input"
-              id="test-groupA-1"
+              id="test-1-1"
               name="test"
               type="checkbox"
               value="1"
             />
             <label
               class="govuk-label govuk-checkboxes__label"
-              for="test-groupA-1"
+              for="test-1-1"
             >
               Option 1
             </label>
@@ -64,14 +64,14 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           >
             <input
               class="govuk-checkboxes__input"
-              id="test-groupA-2"
+              id="test-1-2"
               name="test"
               type="checkbox"
               value="2"
             />
             <label
               class="govuk-label govuk-checkboxes__label"
-              for="test-groupA-2"
+              for="test-1-2"
             >
               Option 2
             </label>
@@ -84,7 +84,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
     >
       <fieldset
         class="govuk-fieldset"
-        id="test-groupB"
+        id="test-2"
       >
         <legend
           class="govuk-fieldset__legend govuk-fieldset__legend--s"
@@ -99,14 +99,14 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           >
             <input
               class="govuk-checkboxes__input"
-              id="test-groupB-3"
+              id="test-2-3"
               name="test"
               type="checkbox"
               value="3"
             />
             <label
               class="govuk-label govuk-checkboxes__label"
-              for="test-groupB-3"
+              for="test-2-3"
             >
               Option 3
             </label>
@@ -116,14 +116,14 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           >
             <input
               class="govuk-checkboxes__input"
-              id="test-groupB-4"
+              id="test-2-4"
               name="test"
               type="checkbox"
               value="4"
             />
             <label
               class="govuk-label govuk-checkboxes__label"
-              for="test-groupB-4"
+              for="test-2-4"
             >
               Option 4
             </label>
@@ -167,7 +167,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
     >
       <button
         class="button noUnderline selectAll"
-        id="test-all"
+        id="test-checkboxes-all"
         type="button"
       >
         Select all 2 options
@@ -177,14 +177,14 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
       >
         <input
           class="govuk-checkboxes__input"
-          id="test-1"
+          id="test-checkboxes-1"
           name="test"
           type="checkbox"
           value="1"
         />
         <label
           class="govuk-label govuk-checkboxes__label"
-          for="test-1"
+          for="test-checkboxes-1"
         >
           Option 1
         </label>
@@ -194,14 +194,14 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
       >
         <input
           class="govuk-checkboxes__input"
-          id="test-2"
+          id="test-checkboxes-2"
           name="test"
           type="checkbox"
           value="2"
         />
         <label
           class="govuk-label govuk-checkboxes__label"
-          for="test-2"
+          for="test-checkboxes-2"
         >
           Option 2
         </label>
@@ -217,7 +217,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with single c
   id="test"
 >
   <legend
-    class="govuk-fieldset__legend govuk-fieldset__legend--l"
+    class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
   >
     Choose options
   </legend>
