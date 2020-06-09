@@ -27,7 +27,7 @@ Validate Pupils and schools contains Pupil absence files
 
 Validate Pupil absence data downloads are available
     [Documentation]  EES-562
-    [Tags]  HappyPath
+    [Tags]  HappyPath   NotAgainstLocal
     environment variable should be set   DATA_API_URL
 
     user opens details dropdown  Pupil absence

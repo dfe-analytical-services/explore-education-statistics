@@ -87,6 +87,7 @@ user opens chrome headless
   Call Method    ${c_opts}   add_argument    headless
   Call Method    ${c_opts}   add_argument    disable-gpu
   Call Method    ${c_opts}   add_argument    window-size\=1920,1080
+  Call Method    ${c_opts}   add_argument    ignore-certificate-errors
   Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
 
 user opens chrome with xvfb
@@ -94,7 +95,7 @@ user opens chrome with xvfb
   ${options}=    evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 
   # --no-sandbox allows chrome to run in a docker container: https://github.com/jessfraz/dockerfiles/issues/149
-  run keyword if    ${docker} == 1     Call Method   ${options}   add_argument  --no-sandbox
+  run keyword if    ${docker} == 1     Call Method   ${options}   add_argument  --no-sandbox --ignore-certificate-errors
 
   create webdriver    Chrome   chrome_options=${options}
   set window size    1920    1080
@@ -105,6 +106,7 @@ user opens chrome without xvfb
   Call Method    ${c_opts}   add_argument    disable-gpu
   Call Method    ${c_opts}   add_argument    disable-extensions
   Call Method    ${c_opts}   add_argument    window-size\=1920,1080
+  Call Method    ${c_opts}   add_argument    ignore-certificate-errors
   Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
   maximize browser window
 
@@ -112,7 +114,7 @@ user opens firefox headless
   ${f_opts} =     Evaluate     sys.modules['selenium.webdriver'].firefox.options.Options()    sys, selenium.webdriver
   Call Method    ${f_opts}   add_argument    -headless
   Create Webdriver    Firefox    firefox_options=${f_opts}
-  
+
 user opens firefox with xvfb
   start virtual display   1920    1080
   open browser   about:blank   firefox

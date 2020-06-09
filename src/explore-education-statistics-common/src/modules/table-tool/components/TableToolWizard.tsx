@@ -251,6 +251,12 @@ const TableToolWizard = ({
 
     const tableData = await tableBuilderService.getTableData(query);
 
+    if (!tableData.results.length || !tableData.subjectMeta) {
+      throw new Error(
+        'No data available for the options selected. Please try again with different options.',
+      );
+    }
+
     const table = mapFullTable(tableData);
     const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
 

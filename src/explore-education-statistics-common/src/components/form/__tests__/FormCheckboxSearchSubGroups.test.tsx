@@ -45,7 +45,7 @@ describe('FormCheckboxSearchSubGroups', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('generates group IDs from group legends if none provided', () => {
+  test('generates group IDs if none provided', () => {
     const { container } = render(
       <FormCheckboxSearchSubGroups
         id="test-checkboxes"
@@ -66,8 +66,8 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    expect(container.querySelector('#test-checkboxes-groupA')).not.toBeNull();
-    expect(container.querySelector('#test-checkboxes-groupB')).toBeNull();
+    expect(container.querySelector('#test-checkboxes-1')).not.toBeNull();
+    expect(container.querySelector('#test-checkboxes-2')).toBeNull();
     expect(container.querySelector('#custom-group-id')).not.toBeNull();
   });
 
@@ -204,66 +204,5 @@ describe('FormCheckboxSearchSubGroups', () => {
     expect(checkboxes).toHaveLength(2);
     expect(checkboxes[0]).toHaveAttribute('value', '1');
     expect(checkboxes[1]).toHaveAttribute('value', '2');
-  });
-
-  test('selecting options increments the selection count', async () => {
-    const { queryByText } = render(
-      <FormCheckboxSearchSubGroups
-        name="testCheckboxes"
-        id="test-checkboxes"
-        legend="Choose options"
-        searchLabel="Search options"
-        value={['1']}
-        options={[
-          {
-            legend: 'Group A',
-            options: [
-              { label: 'Checkbox 1', value: '1' },
-              { label: 'Checkbox 2', value: '2' },
-            ],
-          },
-          {
-            legend: 'Group B',
-            options: [
-              { label: 'Checkbox 3', value: '3' },
-              { label: 'Checkbox 4', value: '4' },
-            ],
-          },
-        ]}
-      />,
-    );
-
-    expect(queryByText('1 selected')).not.toBeNull();
-  });
-
-  test('setting `hideCount` prop to true hides the selection count', () => {
-    const { queryByText } = render(
-      <FormCheckboxSearchSubGroups
-        name="testCheckboxes"
-        id="test-checkboxes"
-        legend="Choose options"
-        searchLabel="Search options"
-        hideCount
-        value={['1']}
-        options={[
-          {
-            legend: 'Group A',
-            options: [
-              { label: 'Checkbox 1', value: '1' },
-              { label: 'Checkbox 2', value: '2' },
-            ],
-          },
-          {
-            legend: 'Group B',
-            options: [
-              { label: 'Checkbox 3', value: '3' },
-              { label: 'Checkbox 4', value: '4' },
-            ],
-          },
-        ]}
-      />,
-    );
-
-    expect(queryByText('1 selected')).toBeNull();
   });
 });

@@ -1,6 +1,6 @@
 import useMounted from '@common/hooks/useMounted';
 import classNames from 'classnames';
-import React, { ChangeEvent, memo, ReactNode } from 'react';
+import React, { ChangeEvent, FocusEventHandler, memo, ReactNode } from 'react';
 
 export type OtherRadioChangeProps = Pick<FormRadioProps, 'label'>;
 
@@ -17,6 +17,7 @@ export interface FormRadioProps {
   id: string;
   label: string;
   name: string;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: RadioChangeEventHandler;
   value: string;
   disabled?: boolean;
@@ -30,6 +31,7 @@ const FormRadio = ({
   id,
   label,
   name,
+  onBlur,
   onChange,
   value,
   disabled = false,
@@ -51,6 +53,7 @@ const FormRadio = ({
           defaultChecked={defaultChecked}
           id={id}
           name={name}
+          onBlur={onBlur}
           onChange={event => {
             if (onChange) {
               onChange(event, { label });

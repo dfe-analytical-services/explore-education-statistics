@@ -1,67 +1,73 @@
-import { fireEvent, render, wait } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import Details from '../Details';
 
 describe('Details', () => {
-  test('renders correctly', async () => {
+  test('renders correctly', () => {
     const { container } = render(
       <Details summary="Test summary" id="test-details">
         Test content
       </Details>,
     );
 
-    await wait();
-
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('re-rendering does not change auto-generated `id`', () => {
-    const { container, rerender } = render(
+    const { rerender } = render(
       <Details summary="Test summary">Test content</Details>,
     );
 
-    const originalId = container.querySelector('.govuk-details__text')?.id;
+    const originalId = screen
+      .getByRole('button')
+      .getAttribute('aria-controls') as string;
 
-    expect(originalId).toBeDefined();
+    expect(originalId.startsWith('details-content-')).toBe(true);
 
     rerender(<Details summary="Test summary 2">Test content 2</Details>);
 
-    const currentId = container.querySelector('.govuk-details__text')?.id;
+    const currentId = screen
+      .getByRole('button', {
+        name: 'Test summary 2',
+      })
+      .getAttribute('aria-controls');
 
     expect(currentId).toBe(originalId);
   });
 
-  test('renders correctly with `open` prop set to true', async () => {
-    const { getByText, container } = render(
+  test('renders correctly with `open` prop set to true', () => {
+    const { container } = render(
       <Details summary="Test summary" id="test-details" open>
         Test content
       </Details>,
     );
 
-    await wait();
+    expect(screen.getByRole('group')).toHaveAttribute('open');
 
-    expect(container.querySelector('[open]')).not.toBeNull();
-
-    expect(container.querySelector('summary')).toHaveAttribute(
-      'aria-expanded',
-      'true',
+    expect(
+      screen.getByRole('button', {
+        name: 'Test summary',
+      }),
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Test content')).toHaveAttribute(
+      'aria-hidden',
+      'false',
     );
-    expect(getByText('Test content')).toHaveAttribute('aria-hidden', 'false');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('clicking the summary reveals the content', async () => {
-    const { container, getByText } = render(
+  test('clicking the summary reveals the content', () => {
+    render(
       <Details summary="Test summary" id="test-details">
         Test content
       </Details>,
     );
 
-    await wait();
-
-    const content = getByText('Test content');
-    const summary = container.querySelector('summary') as HTMLElement;
+    const content = screen.getByText('Test content');
+    const summary = screen.getByRole('button', {
+      name: 'Test summary',
+    });
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(content).toHaveAttribute('aria-hidden', 'true');
@@ -72,17 +78,17 @@ describe('Details', () => {
     expect(content).toHaveAttribute('aria-hidden', 'false');
   });
 
-  test('clicking the summary collapses the content when `open` is true', async () => {
-    const { container, getByText } = render(
+  test('clicking the summary collapses the content when `open` is true', () => {
+    render(
       <Details summary="Test summary" id="test-details" open>
         Test content
       </Details>,
     );
 
-    await wait();
-
-    const content = getByText('Test content');
-    const summary = container.querySelector('summary') as HTMLElement;
+    const content = screen.getByText('Test content');
+    const summary = screen.getByRole('button', {
+      name: 'Test summary',
+    });
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(content).toHaveAttribute('aria-hidden', 'false');
@@ -94,16 +100,16 @@ describe('Details', () => {
   });
 
   test('changing `open` prop from false to true reveals the content', async () => {
-    const { getByText, container, rerender } = render(
+    const { rerender } = render(
       <Details summary="Test summary" id="test-details">
         Test content
       </Details>,
     );
 
-    await wait();
-
-    const content = getByText('Test content');
-    const summary = container.querySelector('summary');
+    const content = screen.getByText('Test content');
+    const summary = screen.getByRole('button', {
+      name: 'Test summary',
+    });
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(content).toHaveAttribute('aria-hidden', 'true');
@@ -118,17 +124,17 @@ describe('Details', () => {
     expect(content).toHaveAttribute('aria-hidden', 'false');
   });
 
-  test('changing `open` prop from true to false hides the content', async () => {
-    const { getByText, container, rerender } = render(
+  test('changing `open` prop from true to false hides the content', () => {
+    const { rerender } = render(
       <Details summary="Test summary" id="test-details" open>
         Test content
       </Details>,
     );
 
-    await wait();
-
-    const content = getByText('Test content');
-    const summary = container.querySelector('summary');
+    const content = screen.getByText('Test content');
+    const summary = screen.getByRole('button', {
+      name: 'Test summary',
+    });
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(content).toHaveAttribute('aria-hidden', 'false');
@@ -143,18 +149,18 @@ describe('Details', () => {
     expect(content).toHaveAttribute('aria-hidden', 'true');
   });
 
-  test('onToggle handler returns true when expanded', async () => {
+  test('onToggle handler returns true when expanded', () => {
     const handleToggle = jest.fn();
 
-    const { container } = render(
+    render(
       <Details summary="Test summary" id="test-details" onToggle={handleToggle}>
         Test content
       </Details>,
     );
 
-    await wait();
-
-    const summary = container.querySelector('summary') as HTMLElement;
+    const summary = screen.getByRole('button', {
+      name: 'Test summary',
+    });
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
 
@@ -167,18 +173,18 @@ describe('Details', () => {
     );
   });
 
-  test('onToggle handler returns false when collapsed', async () => {
+  test('onToggle handler returns false when collapsed', () => {
     const handleToggle = jest.fn();
 
-    const { container } = render(
+    render(
       <Details summary="Test summary" id="test-details" onToggle={handleToggle}>
         Test content
       </Details>,
     );
 
-    await wait();
-
-    const summary = container.querySelector('summary') as HTMLElement;
+    const summary = screen.getByRole('button', {
+      name: 'Test summary',
+    });
 
     fireEvent.click(summary);
     fireEvent.click(summary);
