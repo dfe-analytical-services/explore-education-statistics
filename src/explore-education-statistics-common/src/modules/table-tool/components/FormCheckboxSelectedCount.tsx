@@ -17,15 +17,12 @@ const FormCheckboxSelectedCount = ({ name }: Props) => {
     count = value.length;
   }
 
-  return (
-    <>
-      {count > 0 ? (
-        <Tag className="govuk-!-margin-left-2 govuk-!-font-size-14">
-          {count} selected
-        </Tag>
-      ) : null}
-    </>
-  );
+  return count > 0 ? (
+    <Tag className="govuk-!-margin-left-2 govuk-!-font-size-14">
+      <span className="govuk-visually-hidden"> - </span>
+      {count} selected
+    </Tag>
+  ) : null;
 };
 
 export default FormCheckboxSelectedCount;

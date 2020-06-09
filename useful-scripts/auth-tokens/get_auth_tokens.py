@@ -3,7 +3,8 @@ import time
 import argparse
 import json
 from selenium import webdriver
-import chromedriver_install as cdi
+import pyderman
+
 
 def wait_until_page_contains_xpath(context, selector):
     timeout = 10
@@ -18,18 +19,23 @@ def wait_until_page_contains_xpath(context, selector):
             return
     raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
 
-def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADMIN", chromedriver_version='80.0.3987.106'):
-    cdi.install(file_directory="./webdriver/",
-                verbose=False,
-                chmod=True,
-                overwrite=False,
-                version=chromedriver_version)
+
+def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADMIN",
+                      chromedriver_version='80.0.3987.106'):
+    pyderman.install(file_directory="./webdriver/",
+                     filename='chromedriver',
+                     verbose=False,
+                     chmod=True,
+                     overwrite=False,
+                     version=chromedriver_version)
+
     os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--ignore-certificate-errors')
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(url)
 
@@ -82,11 +88,14 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
         pass
 
     try:
-        wait_until_page_contains_xpath(driver, '//span[text()="Welcome"]')   # Should be Admin dashboard for user
+        wait_until_page_contains_xpath(driver,
+                                       '//span[text()="Welcome"]')  # Should be Admin dashboard for user
     except:
-        raise AssertionError(f'Couldn\'t find \'//span[text()="Welcome"]\' on page. Incorrect user details used? Found page source: \n{driver.page_source}')
+        raise AssertionError(
+            f'Couldn\'t find \'//span[text()="Welcome"]\' on page. Incorrect user details used? Found page source: \n{driver.page_source}')
 
-    local_storage_json = driver.execute_script(f"return window.localStorage.getItem('GovUk.Education.ExploreEducationStatistics.Adminuser:{url}:GovUk.Education.ExploreEducationStatistics.Admin')")
+    local_storage_json = driver.execute_script(
+        f"return window.localStorage.getItem('GovUk.Education.ExploreEducationStatistics.Adminuser:{url}:GovUk.Education.ExploreEducationStatistics.Admin')")
     assert local_storage_json is not None, f"Couldn't find 'GovUk.Education.ExploreEducationStatistics.Adminuser:{url}:GovUk.Education.ExploreEducationStatistics.Admin' in Local Storage!"
 
     identity_cookie_dict = driver.get_cookie('.AspNetCore.Identity.Application')
@@ -95,6 +104,7 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
 
     driver.close()
     return (local_storage_json, identity_cookie)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="python get_auth_tokens.py",

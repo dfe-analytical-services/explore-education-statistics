@@ -1,10 +1,10 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import FormCheckboxGroup from '../FormCheckboxGroup';
 
 describe('FormCheckboxGroup', () => {
   test('renders list of checkboxes in correct order', () => {
-    const { container, getAllByLabelText } = render(
+    const { container } = render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -18,7 +18,7 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const checkboxes = getAllByLabelText(/Test checkbox/);
+    const checkboxes = screen.getAllByLabelText(/Test checkbox/);
 
     expect(checkboxes).toHaveLength(3);
     expect(checkboxes[0]).toHaveAttribute('value', '1');
@@ -29,7 +29,7 @@ describe('FormCheckboxGroup', () => {
   });
 
   test('renders list of checkboxes in reverse order', () => {
-    const { getAllByLabelText } = render(
+    render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -44,7 +44,7 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const checkboxes = getAllByLabelText(/Test checkbox/);
+    const checkboxes = screen.getAllByLabelText(/Test checkbox/);
 
     expect(checkboxes).toHaveLength(3);
     expect(checkboxes[0]).toHaveAttribute('value', '3');
@@ -53,7 +53,7 @@ describe('FormCheckboxGroup', () => {
   });
 
   test('renders list of checkboxes in custom order', () => {
-    const { getAllByLabelText } = render(
+    render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -69,7 +69,7 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const radios = getAllByLabelText(/Test checkbox/);
+    const radios = screen.getAllByLabelText(/Test checkbox/);
 
     expect(radios).toHaveLength(3);
     expect(radios[0]).toHaveAttribute('value', '3');
@@ -78,7 +78,7 @@ describe('FormCheckboxGroup', () => {
   });
 
   test('renders checkboxes with some pre-checked', () => {
-    const { container, getAllByLabelText } = render(
+    const { container } = render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -92,7 +92,9 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const checkboxes = getAllByLabelText(/Test checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.getAllByLabelText(
+      /Test checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(3);
     expect(checkboxes[0].checked).toBe(false);
@@ -103,7 +105,7 @@ describe('FormCheckboxGroup', () => {
   });
 
   test('renders correctly with legend', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormCheckboxGroup
         legend="Choose some checkboxes"
         id="test-checkboxes"
@@ -113,7 +115,7 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    expect(getByText('Choose some checkboxes')).toBeDefined();
+    expect(screen.getByText('Choose some checkboxes')).toBeDefined();
     expect(container.innerHTML).toMatchSnapshot();
   });
 
@@ -134,7 +136,7 @@ describe('FormCheckboxGroup', () => {
   });
 
   test('renders `Select all 3 options` button when `selectAll` is true', () => {
-    const { container, queryByText } = render(
+    render(
       <FormCheckboxGroup
         value={[]}
         id="test-checkboxes"
@@ -149,14 +151,12 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    expect(queryByText('Select all 3 options')).not.toBeNull();
-    expect(queryByText('Unselect all 3 options')).toBeNull();
-
-    expect(container.innerHTML).toMatchSnapshot();
+    expect(screen.getByText('Select all 3 options')).toBeInTheDocument();
+    expect(screen.queryByText('Unselect all 3 options')).toBeNull();
   });
 
   test('renders `Unselect all 3 options` button when all options are pre-checked', () => {
-    const { queryByText } = render(
+    render(
       <FormCheckboxGroup
         value={['1', '2', '3']}
         id="test-checkboxes"
@@ -171,12 +171,12 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    expect(queryByText('Unselect all 3 options')).not.toBeNull();
-    expect(queryByText('Select all 3 options')).toBeNull();
+    expect(screen.queryByText('Unselect all 3 options')).not.toBeNull();
+    expect(screen.queryByText('Select all 3 options')).toBeNull();
   });
 
   test('does not render `Unselect all 3 options` button when checked values do not match options', () => {
-    const { queryByText } = render(
+    render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -191,12 +191,12 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    expect(queryByText('Unselect all 3 options')).toBeNull();
-    expect(queryByText('Select all 3 options')).not.toBeNull();
+    expect(screen.queryByText('Unselect all 3 options')).toBeNull();
+    expect(screen.queryByText('Select all 3 options')).not.toBeNull();
   });
 
   test('does not render `Select all 3 options` button when there is only one option', () => {
-    const { queryByLabelText } = render(
+    render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -207,13 +207,13 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    expect(queryByLabelText('Select all 3 options')).toBeNull();
-    expect(queryByLabelText('Unselect all 3 options')).toBeNull();
-    expect(queryByLabelText('Test checkbox 1')).not.toBeNull();
+    expect(screen.queryByLabelText('Select all 3 options')).toBeNull();
+    expect(screen.queryByLabelText('Unselect all 3 options')).toBeNull();
+    expect(screen.queryByLabelText('Test checkbox 1')).not.toBeNull();
   });
 
   test('renders option with conditional contents', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -244,16 +244,20 @@ describe('FormCheckboxGroup', () => {
 
     const hiddenClass = 'govuk-checkboxes__conditional--hidden';
 
-    expect(getByText('Conditional 1').parentElement).toHaveClass(hiddenClass);
-    expect(getByText('Conditional 2').parentElement).not.toHaveClass(
+    expect(screen.getByText('Conditional 1').parentElement).toHaveClass(
       hiddenClass,
     );
-    expect(getByText('Conditional 3').parentElement).toHaveClass(hiddenClass);
+    expect(screen.getByText('Conditional 2').parentElement).not.toHaveClass(
+      hiddenClass,
+    );
+    expect(screen.getByText('Conditional 3').parentElement).toHaveClass(
+      hiddenClass,
+    );
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('generates option IDs from id and value if none specified', () => {
-    const { container, getByLabelText } = render(
+    render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -263,23 +267,27 @@ describe('FormCheckboxGroup', () => {
           { label: 'Test checkbox 1', value: 'opt1' },
           { label: 'Test checkbox 2', value: 'opt-2' },
           { label: 'Test checkbox 3', value: 'opt.3' },
+          { label: 'Test checkbox 4', value: 'opt 4 is \n here' },
         ]}
       />,
     );
 
-    expect(getByLabelText('Test checkbox 1')).toHaveAttribute(
+    expect(screen.getByLabelText('Test checkbox 1')).toHaveAttribute(
       'id',
-      'test-checkboxes-opt-1',
+      'test-checkboxes-opt1',
     );
-    expect(getByLabelText('Test checkbox 2')).toHaveAttribute(
+    expect(screen.getByLabelText('Test checkbox 2')).toHaveAttribute(
       'id',
       'test-checkboxes-opt-2',
     );
-    expect(getByLabelText('Test checkbox 3')).toHaveAttribute(
+    expect(screen.getByLabelText('Test checkbox 3')).toHaveAttribute(
       'id',
-      'test-checkboxes-opt-3',
+      'test-checkboxes-opt.3',
     );
 
-    expect(container.innerHTML).toMatchSnapshot();
+    expect(screen.getByLabelText('Test checkbox 4')).toHaveAttribute(
+      'id',
+      'test-checkboxes-opt-4-is---here',
+    );
   });
 });

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { ChangeEvent, memo, ReactNode } from 'react';
+import React, { ChangeEvent, FocusEventHandler, memo, ReactNode } from 'react';
 
 export type OtherCheckboxChangeProps = Pick<FormCheckboxProps, 'label'>;
 
@@ -18,6 +18,7 @@ export interface FormCheckboxProps {
   label: string;
   boldLabel?: boolean;
   name: string;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: CheckboxChangeEventHandler;
   value: string;
   disabled?: boolean;
@@ -33,6 +34,7 @@ const FormCheckbox = ({
   label,
   boldLabel = false,
   name,
+  onBlur,
   onChange,
   value,
   disabled = false,
@@ -47,6 +49,7 @@ const FormCheckbox = ({
           defaultChecked={defaultChecked}
           id={id}
           name={name}
+          onBlur={onBlur}
           onChange={event => {
             if (onChange) {
               onChange(event, { label });

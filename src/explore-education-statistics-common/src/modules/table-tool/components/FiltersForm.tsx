@@ -7,106 +7,38 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import {
-  FilterOption,
-  PublicationSubjectMeta,
-} from '@common/services/tableBuilderService';
+import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
+import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
-import React, { useRef } from 'react';
+import React, { useMemo } from 'react';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
+import ResetFormOnPreviousStep from './ResetFormOnPreviousStep';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
-import ResetFormOnPreviousStep from './ResetFormOnPreviousStep';
 
 export interface FormValues {
   indicators: string[];
-  filters: {
-    [key: string]: string[];
-  };
-}
-
-interface InitialValuesType {
-  indicators: string[];
-  filters: string[];
+  filters: Dictionary<string[]>;
 }
 
 export type FilterFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
+  initialValues?: {
+    indicators: string[];
+    filters: string[];
+  };
   subjectMeta: PublicationSubjectMeta;
   onSubmit: FilterFormSubmitHandler;
-  initialValues?: InitialValuesType;
 }
 
-export const buildInitialFormValue = (
-  meta: PublicationSubjectMeta,
-  initial?: InitialValuesType,
-) => {
-  return {
-    filters: mapValues(meta.filters, filter => {
-      if (initial && initial.filters) {
-        const allFilterOptions = ([] as FilterOption[]).concat(
-          ...Object.values(filter.options).map(({ options }) => options),
-        );
-
-        const allFilterValues = allFilterOptions.map(({ value }) => value);
-
-        return allFilterValues.filter(value => initial.filters.includes(value));
-      }
-
-      if (typeof filter.options.Default !== 'undefined') {
-        // Automatically select filter option when there is only one
-        return filter.options.Default.options.length === 1
-          ? [filter.options.Default.options[0].value]
-          : [];
-      }
-      return [];
-    }),
-    indicators: (initial && initial.indicators) || [],
-  };
-};
-
-type GroupedDictionary = Dictionary<{
-  options: { label: string; value: string }[];
-}>;
-
-const reduceGroupedDictionary = (dictionary: GroupedDictionary) =>
-  Object.values(dictionary).reduce(
-    (result, group) => ({
-      ...result,
-      ...group.options.reduce(
-        (optionResults, option) => ({
-          ...optionResults,
-          [option.value]: option.label,
-        }),
-        {},
-      ),
-    }),
-    {},
-  );
-
-const reduceGroupedGroupDictionary = (
-  dictionary: Dictionary<{ options: GroupedDictionary }>,
-) =>
-  Object.keys(dictionary).reduce(
-    (result, indicatorGroup) => ({
-      ...result,
-      ...reduceGroupedDictionary(dictionary[indicatorGroup].options),
-    }),
-    {},
-  );
-
-const reduceFiltersKeyLegend = (dictionary: Dictionary<{ legend: string }>) =>
-  Object.entries(dictionary).reduce(
-    (filters, [key, { legend }]) => ({ ...filters, [key]: legend }),
-    {},
-  );
+const formId = 'filtersForm';
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -119,31 +51,35 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     isActive,
   } = props;
 
-  const ref = useRef<HTMLDivElement>(null);
+  const initialFormValues = useMemo(() => {
+    return {
+      filters: mapValues(subjectMeta.filters, filter => {
+        if (initialValues?.filters) {
+          const filterValues = Object.values(filter.options)
+            .flatMap(group => group.options)
+            .map(option => option.value);
 
-  const formId = 'filtersForm';
+          return filterValues.filter(filterValue =>
+            initialValues.filters.includes(filterValue),
+          );
+        }
 
-  const parsedMeta: {
-    indicators: Dictionary<string>;
-    filters: Dictionary<string>;
-  } = React.useMemo(
-    () => ({
-      indicators: reduceGroupedDictionary(subjectMeta.indicators),
-      filters: {
-        ...reduceFiltersKeyLegend(subjectMeta.filters),
-        ...reduceGroupedGroupDictionary(subjectMeta.filters),
-      },
-    }),
-    [subjectMeta],
-  );
+        if (filter.options.Default) {
+          // Automatically select filter option when there is only one
+          return filter.options.Default.options.length === 1
+            ? [filter.options.Default.options[0].value]
+            : [];
+        }
+
+        return [];
+      }),
+      indicators: initialValues?.indicators ?? [],
+    };
+  }, [initialValues, subjectMeta]);
 
   const stepHeading = (
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
-
-  const initialFormValues = React.useMemo(() => {
-    return buildInitialFormValue(subjectMeta, initialValues);
-  }, [initialValues, subjectMeta]);
 
   return (
     <Formik<FormValues>
@@ -153,14 +89,14 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       validationSchema={Yup.object<FormValues>({
         indicators: Yup.array()
           .of(Yup.string())
-          .required('Select at least one indicator'),
+          .required('Select at least one option from indicators'),
         filters: Yup.object(
           mapValues(subjectMeta.filters, filter =>
             Yup.array()
               .of(Yup.string())
               .min(
                 1,
-                `Select at least one option under ${filter.legend.toLowerCase()}`,
+                `Select at least one option from ${filter.legend.toLowerCase()}`,
               ),
           ),
         ),
@@ -173,8 +109,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       {form => {
         const { getError } = createErrorHelper(form);
 
-        return isActive ? (
-          <div ref={ref}>
+        if (isActive) {
+          return (
             <Form {...form} id={formId} showSubmitError>
               {stepHeading}
 
@@ -184,18 +120,21 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                     <FormFieldCheckboxSearchSubGroups
                       name="indicators"
                       id={`${formId}-indicators`}
-                      legend="Indicators"
+                      legend={
+                        <>
+                          Indicators
+                          <FormCheckboxSelectedCount name="indicators" />
+                        </>
+                      }
                       legendSize="m"
-                      hint="Select at least one indicator"
+                      hint="Select at least one indicator below"
                       selectAll
                       disabled={form.isSubmitting}
-                      options={Object.entries(subjectMeta.indicators).map(
-                        ([_, group]) => {
-                          return {
-                            legend: group.label,
-                            options: group.options,
-                          };
-                        },
+                      options={Object.values(subjectMeta.indicators).map(
+                        group => ({
+                          legend: group.label,
+                          options: group.options,
+                        }),
                       )}
                     />
 
@@ -215,7 +154,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                               <FormFieldCheckboxGroupsMenu<FormValues>
                                 key={filterKey}
                                 name={filterName}
-                                id={`${formId}-${camelCase(filterName)}`}
+                                id={`${formId}-${camelCase(filterKey)}`}
                                 legend={filterGroup.legend}
                                 hint={filterGroup.hint}
                                 disabled={form.isSubmitting}
@@ -242,6 +181,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 {...props}
                 form={form}
                 formId={formId}
+                submitText="Create table"
+                submittingText="Creating table"
                 onSubmitClick={() => {
                   // Automatically select totalValue for filters that haven't had a selection made
                   Object.keys(form.values.filters).forEach(filterName => {
@@ -255,12 +196,12 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                     }
                   });
                 }}
-                submitText="Create table"
-                submittingText="Creating table"
               />
             </Form>
-          </div>
-        ) : (
+          );
+        }
+
+        return (
           <>
             {stepHeading}
 
@@ -272,27 +213,38 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
             <SummaryList noBorder>
               <SummaryListItem term="Indicators">
                 <CollapsibleList>
-                  {form.values.indicators.map(indicator => (
-                    <li key={indicator}>{parsedMeta.indicators[indicator]}</li>
-                  ))}
+                  {Object.values(subjectMeta.indicators)
+                    .flatMap(group => group.options)
+                    .filter(indicator =>
+                      form.values.indicators.includes(indicator.value),
+                    )
+                    .map(indicator => (
+                      <li key={indicator.value}>{indicator.label}</li>
+                    ))}
                 </CollapsibleList>
               </SummaryListItem>
-              {Object.entries(form.values.filters).map(
-                ([filterGroupId, filterItemIds]) => (
+
+              {Object.entries(subjectMeta.filters)
+                .filter(([groupKey]) => !!form.values.filters[groupKey])
+                .map(([filterGroupKey, filterGroup]) => (
                   <SummaryListItem
-                    term={parsedMeta.filters[filterGroupId]}
-                    key={filterGroupId}
+                    key={filterGroupKey}
+                    term={filterGroup.legend}
                   >
                     <CollapsibleList>
-                      {filterItemIds.map(filterItemId => (
-                        <li key={filterItemId}>
-                          {parsedMeta.filters[filterItemId]}
-                        </li>
-                      ))}
+                      {Object.values(filterGroup.options)
+                        .flatMap(group => group.options)
+                        .filter(option =>
+                          form.values.filters[filterGroupKey].includes(
+                            option.value,
+                          ),
+                        )
+                        .map(option => (
+                          <li key={option.value}>{option.label}</li>
+                        ))}
                     </CollapsibleList>
                   </SummaryListItem>
-                ),
-              )}
+                ))}
             </SummaryList>
           </>
         );
