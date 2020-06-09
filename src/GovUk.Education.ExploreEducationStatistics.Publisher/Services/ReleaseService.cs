@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (contentRelease.Amendment)
             {
-                var previousVersion = await _contentDbContext.Releases
+                var previousVersion = await _contentDbContext.Releases.AsNoTracking()
                     .SingleOrDefaultAsync(r => r.Id == contentRelease.PreviousVersionId);
 
                 if (previousVersion?.Published == null)
