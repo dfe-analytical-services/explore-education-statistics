@@ -96,14 +96,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new Comment
                     {
                         Id = Guid.NewGuid(),
-                        Name = "Comment 1",
-                        CommentText = "Comment 1 Text"
+                        Content = "Comment 1 Text"
                     },
                     new Comment
                     {
                         Id = Guid.NewGuid(),
-                        Name = "Comment 2",
-                        CommentText = "Comment 2 Text"
+                        Content = "Comment 2 Text"
                     }
                 }
             };
@@ -153,14 +151,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                                     new Comment
                                                     {
                                                         Id = Guid.NewGuid(),
-                                                        Name = "Html Comment 1",
-                                                        CommentText = "Comment 1 Text"
+                                                        Content = "Comment 1 Text"
                                                     },
                                                     new Comment
                                                     {
                                                         Id = Guid.NewGuid(),
-                                                        Name = "Html Comment 2",
-                                                        CommentText = "Comment 2 Text"
+                                                        Content = "Comment 2 Text"
                                                     }
                                                 }
                                             },

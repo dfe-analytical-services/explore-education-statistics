@@ -9,6 +9,7 @@ import DataBlockRenderer from '@common/modules/find-statistics/components/DataBl
 import React, { useCallback } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
 import KeyStatistics from './KeyStatistics';
+import { CommentsChangeHandler } from './Comments';
 
 interface Props {
   release: EditableRelease;
@@ -16,16 +17,12 @@ interface Props {
 
 const ReleaseHeadlines = ({ release }: Props) => {
   const { isEditing } = useEditingContext();
-  const {
-    addContentSectionBlock,
-    deleteContentSectionBlock,
-    updateContentSectionBlock,
-  } = useReleaseActions();
+  const actions = useReleaseActions();
 
   const getChartFile = useGetChartFile(release.id);
 
-  const addHeadlinesBlock = useCallback(() => {
-    addContentSectionBlock({
+  const addBlock = useCallback(async () => {
+    await actions.addContentSectionBlock({
       releaseId: release.id,
       sectionId: release.headlinesSection.id,
       sectionKey: 'headlinesSection',
@@ -35,11 +32,11 @@ const ReleaseHeadlines = ({ release }: Props) => {
         body: '',
       },
     });
-  }, [release.id, release.headlinesSection.id, addContentSectionBlock]);
+  }, [actions, release.id, release.headlinesSection.id]);
 
-  const headlinesBlockUpdate = useCallback(
-    (blockId, bodyContent) => {
-      updateContentSectionBlock({
+  const updateBlock = useCallback(
+    async (blockId, bodyContent) => {
+      await actions.updateContentSectionBlock({
         releaseId: release.id,
         sectionId: release.headlinesSection.id,
         blockId,
@@ -47,19 +44,31 @@ const ReleaseHeadlines = ({ release }: Props) => {
         bodyContent,
       });
     },
-    [release.id, release.headlinesSection.id, updateContentSectionBlock],
+    [actions, release.id, release.headlinesSection.id],
   );
 
-  const headlinesBlockDelete = useCallback(
-    (blockId: string) => {
-      deleteContentSectionBlock({
+  const removeBlock = useCallback(
+    async (blockId: string) => {
+      await actions.deleteContentSectionBlock({
         releaseId: release.id,
         sectionId: release.headlinesSection.id,
         blockId,
         sectionKey: 'headlinesSection',
       });
     },
-    [release.id, release.headlinesSection.id, deleteContentSectionBlock],
+    [actions, release.id, release.headlinesSection.id],
+  );
+
+  const updateBlockComments: CommentsChangeHandler = useCallback(
+    async (blockId, comments) => {
+      await actions.updateBlockComments({
+        sectionId: release.headlinesSection.id,
+        blockId,
+        sectionKey: 'headlinesSection',
+        comments,
+      });
+    },
+    [actions, release.headlinesSection.id],
   );
 
   return (
@@ -90,13 +99,14 @@ const ReleaseHeadlines = ({ release }: Props) => {
                 allowComments
                 sectionId={release.headlinesSection.id}
                 content={release.headlinesSection.content}
-                onBlockContentSave={headlinesBlockUpdate}
-                onBlockDelete={headlinesBlockDelete}
+                onBlockContentSave={updateBlock}
+                onBlockDelete={removeBlock}
+                onBlockCommentsChange={updateBlockComments}
               />
 
               {isEditing && release.headlinesSection.content?.length === 0 && (
                 <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-                  <Button variant="secondary" onClick={addHeadlinesBlock}>
+                  <Button variant="secondary" onClick={addBlock}>
                     Add a headlines text block
                   </Button>
                 </div>

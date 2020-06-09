@@ -11,7 +11,7 @@ interface Props {
 const FormattedDate = ({
   children,
   className,
-  format = 'dd MMMM yyyy',
+  format = 'd MMMM yyyy',
   parseFormat,
 }: Props) => {
   let parsedDate: Date;

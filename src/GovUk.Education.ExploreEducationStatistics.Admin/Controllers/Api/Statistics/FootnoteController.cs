@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         {
             return await _footnoteService
                 .DeleteFootnote(releaseId, id)
-                .HandleFailuresOr(result => new NoContentResult());
+                .HandleFailuresOrNoContent();
         }
 
         [HttpGet("release/{releaseId}")]

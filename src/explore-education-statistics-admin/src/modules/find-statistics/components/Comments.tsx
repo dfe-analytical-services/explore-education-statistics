@@ -1,23 +1,35 @@
-import { useAuthContext, User } from '@admin/contexts/AuthContext';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useManageReleaseContext } from '@admin/pages/release/ManageReleaseContext';
-import releaseContentCommentService from '@admin/services/releaseContentCommentService';
-import { ExtendedComment } from '@admin/services/types/content';
+import releaseContentCommentService, {
+  AddComment,
+  UpdateComment,
+} from '@admin/services/releaseContentCommentService';
+import { Comment } from '@admin/services/types/content';
+import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
+import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
+import { Form } from '@common/components/form';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
-import classNames from 'classnames';
-import React, { createRef, useState } from 'react';
+import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
+import React, { useState } from 'react';
 import styles from './Comments.module.scss';
+
+interface FormValues {
+  content: string;
+}
 
 export type CommentsChangeHandler = (
   blockId: string,
-  comments: ExtendedComment[],
+  comments: Comment[],
 ) => void;
 
 interface Props {
   blockId: string;
   sectionId: string;
-  comments: ExtendedComment[];
-  canResolve?: boolean;
+  comments: Comment[];
   canComment?: boolean;
   onChange: CommentsChangeHandler;
 }
@@ -25,27 +37,18 @@ interface Props {
 const Comments = ({
   blockId,
   sectionId,
-  comments,
+  comments = [],
   onChange,
-  canResolve = false,
-  canComment = false,
+  canComment = true,
 }: Props) => {
-  const [newComment, setNewComment] = React.useState<string>('');
-  const [editableComment, setEditableComment] = useState<string>('');
-  const [editableCommentText, setEditableCommentText] = useState<string>('');
+  const [editingComment, setEditingComment] = useState<Comment>();
 
+  const { user } = useAuthContext();
   const { releaseId } = useManageReleaseContext();
-  const context = useAuthContext();
 
-  const addComment = (comment: string) => {
-    const user = context.user as User;
-
-    const additionalComment: ExtendedComment = {
-      id: '0',
-      name: user.name,
-      time: new Date(),
-      commentText: comment,
-      state: 'open',
+  const addComment = (content: string) => {
+    const additionalComment: AddComment = {
+      content,
     };
 
     if (releaseId && sectionId) {
@@ -56,15 +59,8 @@ const Comments = ({
           blockId,
           additionalComment,
         )
-        .then(populatedComment => {
-          let newComments = [populatedComment];
-
-          if (comments) {
-            newComments = [...newComments, ...comments];
-          }
-
-          onChange(blockId, newComments);
-          setNewComment('');
+        .then(newComment => {
+          onChange(blockId, [newComment, ...comments]);
         });
     }
   };
@@ -72,229 +68,153 @@ const Comments = ({
   const removeComment = (index: number) => {
     const commentId = comments[index].id;
 
-    if (releaseId && sectionId) {
-      releaseContentCommentService
-        .deleteContentSectionComment(releaseId, sectionId, blockId, commentId)
-        .then(() => {
-          const newComments = [...comments];
-          newComments.splice(index, 1);
+    releaseContentCommentService
+      .deleteContentSectionComment(commentId)
+      .then(() => {
+        const newComments = [...comments];
+        newComments.splice(index, 1);
 
-          onChange(blockId, newComments);
-        });
-    }
+        onChange(blockId, newComments);
+      });
   };
 
-  const resolveComment = (index: number) => {
-    const resolvedComment = { ...comments[index] };
+  const updateComment = (index: number, content: string) => {
+    const editedComment: UpdateComment = {
+      ...comments[index],
+      content,
+    };
 
-    resolvedComment.state = 'resolved';
-    resolvedComment.resolvedOn = new Date();
-    resolvedComment.resolvedBy = context.user && context.user.name;
+    releaseContentCommentService
+      .updateContentSectionComment(editedComment)
+      .then(savedComment => {
+        const newComments = [...comments];
+        newComments[index] = savedComment;
 
-    if (releaseId && sectionId) {
-      releaseContentCommentService
-        .updateContentSectionComment(
-          releaseId,
-          sectionId,
-          blockId,
-          resolvedComment,
-        )
-        .then(() => {
-          const newComments = [...comments];
-          newComments[index] = resolvedComment;
+        onChange(blockId, newComments);
 
-          onChange(blockId, newComments);
-        });
-    }
+        setEditingComment(undefined);
+      });
   };
-
-  const updateComment = (index: number, newContent: string) => {
-    const editedComment = { ...comments[index] };
-    editedComment.commentText = newContent;
-    if (releaseId && sectionId) {
-      releaseContentCommentService
-        .updateContentSectionComment(
-          releaseId,
-          sectionId,
-          blockId,
-          editedComment,
-        )
-        .then(() => {
-          const newComments = [...comments];
-
-          newComments[index] = editedComment;
-
-          onChange(blockId, newComments);
-          setEditableComment('');
-          setEditableCommentText('');
-        });
-    }
-  };
-
-  const ref = createRef<HTMLDivElement>();
 
   return (
-    <>
-      <div
-        role="presentation"
-        ref={ref}
-        className={classNames('dfe-comment-block', [styles.addComment])}
+    <div className={styles.container}>
+      <Details
+        className="govuk-!-margin-bottom-1 govuk-body-s"
+        summary={`${canComment ? `Add / ` : ''}View comments (${
+          comments.length
+        })`}
       >
-        <Details
-          summary={`${canComment ? `Add / ` : ''}View comments (${
-            comments.length
-          })`}
-          className="govuk-!-margin-bottom-1 govuk-body-s"
-          onToggle={isOpen => {
-            if (ref.current) {
-              const section = document.getElementById(
-                `content-section-${blockId}`,
-              );
-              if (isOpen) {
-                ref.current.classList.add(styles.top);
-                if (section) {
-                  section.classList.add(styles.commentWhileCommenting);
-                }
-              } else {
-                ref.current.classList.remove(styles.top);
-                if (section) {
-                  section.classList.remove(styles.commentWhileCommenting);
-                }
-              }
-            }
-          }}
-        >
-          {canComment && (
-            <>
-              <form>
-                <textarea
-                  name="comment"
-                  id={`new_comment_${blockId}`}
-                  value={newComment}
-                  onChange={e => setNewComment(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="govuk-button"
-                  disabled={newComment.length === 0}
-                  onClick={() => {
-                    addComment(newComment);
-                  }}
-                >
-                  Submit
-                </button>
-              </form>
-              <hr />
-            </>
-          )}
-          <div className={styles.commentsContainer}>
-            {comments &&
-              comments.map(
-                (
-                  {
-                    id,
-                    name,
-                    time,
-                    commentText,
-                    state,
-                    resolvedOn,
-                    resolvedBy,
-                  },
-                  index,
-                ) => (
-                  <div key={id}>
-                    <h2 className="govuk-body-xs govuk-!-margin-0">
-                      <strong>
-                        {name} <FormattedDate>{time}</FormattedDate>
-                      </strong>
-                    </h2>
-                    {editableComment && editableComment === id ? (
-                      <form>
-                        <textarea
-                          name="editComment"
-                          id={`edit_comment_${id}`}
-                          value={editableCommentText}
-                          onChange={e => setEditableCommentText(e.target.value)}
-                        />
-                        <button
-                          type="button"
-                          className="govuk-button"
-                          disabled={editableCommentText.length === 0}
+        {canComment && (
+          <Formik<FormValues>
+            initialValues={{
+              content: '',
+            }}
+            validationSchema={Yup.object({
+              content: Yup.string().required('Enter a comment'),
+            })}
+            onSubmit={values => {
+              addComment(values.content);
+            }}
+          >
+            <Form id={`${blockId}-addCommentForm`} showErrorSummary={false}>
+              <FormFieldTextArea<FormValues>
+                label="Comment"
+                name="content"
+                id={`${blockId}-addCommentForm-content`}
+                rows={3}
+              />
+
+              <Button type="submit">Add comment</Button>
+            </Form>
+          </Formik>
+        )}
+
+        <ul className={styles.commentsContainer}>
+          {comments.map((comment, index) => {
+            const { createdBy } = comment;
+
+            return (
+              <li key={comment.id} className="govuk-body-s">
+                <p className="govuk-!-margin-0">
+                  <strong>
+                    {`${createdBy.firstName} ${createdBy.lastName}`}
+                  </strong>
+                </p>
+                <p>
+                  {comment.updated ? 'Updated: ' : ''}
+                  <FormattedDate format="d MMMM yyyy HH:mm">
+                    {comment.updated || comment.created}
+                  </FormattedDate>
+                </p>
+
+                {editingComment?.id === comment.id ? (
+                  <Formik<FormValues>
+                    initialValues={{
+                      content: editingComment.content,
+                    }}
+                    validationSchema={Yup.object({
+                      content: Yup.string().required('Enter a comment'),
+                    })}
+                    onSubmit={values => {
+                      updateComment(index, values.content);
+                    }}
+                  >
+                    <Form
+                      id={`${blockId}-editCommentForm`}
+                      showErrorSummary={false}
+                    >
+                      <FormFieldTextArea<FormValues>
+                        label="Comment"
+                        name="content"
+                        id={`${blockId}-editCommentForm-editComment`}
+                        rows={3}
+                      />
+
+                      <ButtonGroup>
+                        <Button type="submit">Update</Button>
+                        <ButtonText
                           onClick={() => {
-                            updateComment(index, editableCommentText);
+                            setEditingComment(undefined);
                           }}
                         >
-                          Update
-                        </button>
-                      </form>
-                    ) : (
-                      <p className="govuk-body-xs govuk-!-margin-bottom-1">
-                        {commentText}
-                      </p>
-                    )}
-                    {state === 'open' && canResolve && (
-                      <button
-                        type="button"
-                        className="govuk-body-xs govuk-!-margin-right-3"
-                        onClick={() => resolveComment(index)}
-                      >
-                        Resolve
-                      </button>
-                    )}
-                    {state === 'resolved' && (
-                      <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
-                        <em>
-                          Resolved{' '}
-                          {resolvedOn && (
-                            <FormattedDate>resolvedOn</FormattedDate>
-                          )}{' '}
-                          by {resolvedBy}
-                        </em>
-                      </p>
-                    )}
-                    {canComment && (
-                      <>
-                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                        <a
-                          className="govuk-body-xs govuk-!-margin-right-3"
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => removeComment(index)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          Remove
-                        </a>
-                      </>
-                    )}
-                    {canComment && (
-                      <>
-                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                        <a
-                          className="govuk-body-xs govuk-!-margin-right-3"
-                          role="button"
-                          tabIndex={0}
+                          Cancel
+                        </ButtonText>
+                      </ButtonGroup>
+                    </Form>
+                  </Formik>
+                ) : (
+                  <>
+                    <p>{comment.content}</p>
+
+                    {canComment && user?.id === createdBy.id && (
+                      <ButtonGroup>
+                        <ButtonText
                           onClick={() => {
-                            setEditableCommentText(commentText);
-                            return editableComment
-                              ? setEditableComment('')
-                              : setEditableComment(id);
+                            setEditingComment(comment);
                           }}
-                          style={{ cursor: 'pointer' }}
                         >
-                          {editableComment && editableComment === id
-                            ? 'Cancel'
-                            : 'Edit'}
-                        </a>
-                        <hr />
-                      </>
+                          Edit
+                        </ButtonText>
+
+                        <ButtonText
+                          onClick={() => {
+                            removeComment(index);
+                          }}
+                        >
+                          Delete
+                        </ButtonText>
+                      </ButtonGroup>
                     )}
-                  </div>
-                ),
-              )}
-          </div>
-        </Details>
-      </div>
-    </>
+                  </>
+                )}
+
+                <hr />
+              </li>
+            );
+          })}
+        </ul>
+      </Details>
+    </div>
   );
 };
 

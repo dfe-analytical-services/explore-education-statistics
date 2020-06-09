@@ -66,11 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(methodology =>
                 {
                     var content = ContentListSelector[contentType](methodology);
-                    
-                    return content
-                        .Select(ContentSectionViewModel.ToViewModel)
-                        .OrderBy(c => c.Order)
-                        .ToList();
+                    return OrderedContentSections(content);
                 });
         }
 
@@ -130,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     
                     _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
-                    return ContentSectionViewModel.ToViewModel(newContentSection);
+                    return _mapper.Map<ContentSectionViewModel>(newContentSection);
                 });
         }
 
@@ -150,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         _context.Methodologies.Update(methodology);
                         await _context.SaveChangesAsync();
-                        return ContentSectionViewModel.ToViewModel(sectionToUpdate);
+                        return _mapper.Map<ContentSectionViewModel>(sectionToUpdate);
                     });
         }
         
@@ -186,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return 
                 CheckContentSectionExists(methodologyId, contentSectionId)
                     .OnSuccess(CheckCanViewMethodology)
-                    .OnSuccess(tuple => ContentSectionViewModel.ToViewModel(tuple.Item2));
+                    .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
         }
 
         public Task<Either<ActionResult, List<IContentBlock>>> ReorderContentBlocksAsync(Guid methodologyId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
@@ -366,10 +362,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .ToList();
         }
 
-        private static List<ContentSectionViewModel> OrderedContentSections(List<ContentSection> sectionsList)
+        private List<ContentSectionViewModel> OrderedContentSections(List<ContentSection> sectionsList)
         {
-            return sectionsList
-                .Select(ContentSectionViewModel.ToViewModel)
+            return _mapper.Map<List<ContentSectionViewModel>>(sectionsList)
                 .OrderBy(c => c.Order)
                 .ToList();
         }

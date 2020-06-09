@@ -1,23 +1,24 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 
-export type CommentState = 'open' | 'resolved';
-
-export interface ExtendedComment {
+export interface Comment {
   id: string;
-  name: string;
-  time: Date;
-  commentText: string;
-  state?: CommentState;
-  resolvedBy?: string;
-  resolvedOn?: Date;
+  content: string;
+  createdBy: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  created: string;
+  updated?: string;
 }
 
 export type EditableContentBlock = ContentBlock & {
-  comments: ExtendedComment[];
+  comments: Comment[];
 };
 
 export type EditableDataBlock = DataBlock & {
-  comments: ExtendedComment[];
+  comments: Comment[];
 };
 
 export type EditableBlock = EditableContentBlock | EditableDataBlock;

@@ -106,6 +106,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPreReleaseSummary.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPreReleaseSummaryRequirement()));
 
+                // does this user have permission to update a specific Comment?
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificComment.ToString(), policy =>
+                    policy.Requirements.Add(new UpdateSpecificCommentRequirement()));
+
                 /**
                  * Pre Release management
                  */
@@ -188,6 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();
 
             /**
              * Pre Release management

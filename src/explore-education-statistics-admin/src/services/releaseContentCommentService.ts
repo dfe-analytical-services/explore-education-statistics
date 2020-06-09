@@ -1,12 +1,15 @@
-import { ExtendedComment } from '@admin/services/types/content';
+import { Comment } from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
+
+export type AddComment = Pick<Comment, 'content'>;
+export type UpdateComment = Pick<Comment, 'id' | 'content'>;
 
 const releaseContentCommentService = {
   getContentSectionComments(
     releaseId: string,
     sectionId: string,
     contentBlockId: string,
-  ): Promise<ExtendedComment[]> {
+  ): Promise<Comment[]> {
     return client.get(
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments`,
     );
@@ -16,35 +19,20 @@ const releaseContentCommentService = {
     releaseId: string,
     sectionId: string,
     contentBlockId: string,
-    comment: ExtendedComment,
-  ): Promise<ExtendedComment> {
+    comment: AddComment,
+  ): Promise<Comment> {
     return client.post(
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments/add`,
       comment,
     );
   },
 
-  updateContentSectionComment(
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-    comment: ExtendedComment,
-  ): Promise<ExtendedComment> {
-    return client.put(
-      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${comment.id}`,
-      comment,
-    );
+  updateContentSectionComment(comment: UpdateComment): Promise<Comment> {
+    return client.put(`/comment/${comment.id}`, comment);
   },
 
-  deleteContentSectionComment(
-    releaseId: string,
-    sectionId: string,
-    contentBlockId: string,
-    commentId: string,
-  ): Promise<void> {
-    return client.delete(
-      `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comment/${commentId}`,
-    );
+  deleteContentSectionComment(commentId: string): Promise<void> {
+    return client.delete(`/comment/${commentId}`);
   },
 };
 

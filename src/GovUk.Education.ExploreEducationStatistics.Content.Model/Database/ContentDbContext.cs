@@ -237,6 +237,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Comment>()
+                .Property(comment => comment.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<Comment>()
+                .Property(comment => comment.Updated)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
             modelBuilder.Entity<Methodology>()
                 .Property(b => b.Content)
                 .HasConversion(
@@ -395,6 +407,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<UserReleaseInvite>()
                 .HasQueryFilter(r => !r.SoftDeleted);
+
+            var analystMvcUser1Id = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04");
+            var analystMvcUser2Id = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62");
+            var analystMvcUser3Id = new Guid("b390b405-ef90-4b9d-8770-22948e53189a");
+            var bauMvcUser1Id = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd");
+            var bauMvcUser2Id = new Guid("b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63");
+            var prereleaseMvcUser1Id = new Guid("d5c85378-df85-482c-a1ce-09654dae567d");
+            var prereleaseMvcUser2Id = new Guid("ee9a02c1-b3f9-402c-9e9b-4fb78d737050");
 
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType
@@ -1960,7 +1980,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     Created = new DateTime(2017, 8, 1, 23, 59, 54, DateTimeKind.Utc),
-                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    CreatedById = bauMvcUser1Id,
                     PreviousVersionId = absenceReleaseId
                 },
 
@@ -1998,7 +2018,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     },
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     Created = new DateTime(2017, 8, 1, 11, 13, 22, DateTimeKind.Utc),
-                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    CreatedById = bauMvcUser1Id,
                     PreviousVersionId = exclusionsReleaseId
                 },
 
@@ -2021,7 +2041,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TimePeriodCoverage = TimeIdentifier.CalendarYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     Created = new DateTime(2019, 8, 1, 9, 30, 33, DateTimeKind.Utc),
-                    CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
+                    CreatedById = bauMvcUser1Id,
                     PreviousVersionId = applicationOffersReleaseId
                 }
             );
@@ -2571,15 +2591,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     new Comment
                     {
                         Id = new Guid("514940e6-3b84-4e1b-aa5d-d1e5fa671e1b"),
-                        IContentBlockId = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
-                        CommentText = "Test Text",
-                        Name = "A Test User",
-                        State = CommentState.open,
-                        Time = new DateTime(2019, 12, 1, 15, 0, 0),
-                        ResolvedBy = null,
-                        ResolvedOn = null
+                        ContentBlockId = new Guid("a0b85d7d-a9bd-48b5-82c6-a119adc74ca2"),
+                        Content = "Test Text",
+                        Created = new DateTime(2019, 12, 1, 15, 0, 0),
+                        CreatedById = bauMvcUser1Id,
                     }
-                    
                 );
             
             modelBuilder.Entity<MarkDownBlock>().HasData(
@@ -6194,14 +6210,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     }
                 }
             );
-            
-            var analystMvcUser1Id = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04");
-            var analystMvcUser2Id = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62");
-            var analystMvcUser3Id = new Guid("b390b405-ef90-4b9d-8770-22948e53189a");
-            var bauMvcUser1Id = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd");
-            var bauMvcUser2Id = new Guid("b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63");
-            var prereleaseMvcUser1Id = new Guid("d5c85378-df85-482c-a1ce-09654dae567d");
-            var prereleaseMvcUser2Id = new Guid("ee9a02c1-b3f9-402c-9e9b-4fb78d737050");
 
             modelBuilder.Entity<User>()
                 .HasData(

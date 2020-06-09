@@ -1,16 +1,14 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
     public class CommentViewModel
     {
         public Guid Id { get; set; }
-        public Guid? IContentBlockId { get; set; }
-        public string Name { get; set; }
-        public DateTime Time { get; set; }
-        public string CommentText { get; set; }
-        public string? ResolvedBy { get; set; }
-        public DateTime? ResolvedOn { get; set; }
-        public string State { get; set; }
+        public string Content { get; set; }
+        public DateTime Created { get; set; }
+        public User CreatedBy { get; set; }
+        public DateTime? Updated { get; set; }
     }
 }

@@ -2,6 +2,7 @@ import { EditableRelease } from '@admin/services/releaseContentService';
 import {
   EditableBlock,
   EditableContentBlock,
+  Comment,
 } from '@admin/services/types/content';
 import { DataBlock } from '@common/services/types/blocks';
 import { produce } from 'immer';
@@ -71,18 +72,26 @@ const basicRelease: EditableRelease = {
           order: 0,
           comments: [
             {
-              id: '814e3272-1a3e-4849-d53b-08d7c40dd247',
-              name: 'Bau1',
-              time: new Date('2020-03-09T09:39:53.736'),
-              commentText: 'A comment',
-              state: 'open',
+              id: 'comment-1',
+              content: 'A comment',
+              createdBy: {
+                id: 'user-1',
+                firstName: 'Bau1',
+                lastName: '',
+                email: 'bau1@test.com',
+              },
+              created: '2020-03-09T09:39:53.736',
             },
             {
-              id: 'a4a6bd84-992b-44a0-d53c-08d7c40dd247',
-              name: 'Bau1',
-              time: new Date('2020-03-09T09:40:16.534'),
-              commentText: 'another comment',
-              state: 'open',
+              id: 'comment-2',
+              content: 'another comment',
+              createdBy: {
+                id: 'user-1',
+                firstName: 'Bau1',
+                lastName: '',
+                email: 'bau1@test.com',
+              },
+              created: '2020-03-09T09:40:16.534',
             },
           ],
         },
@@ -605,18 +614,26 @@ describe('ReleaseContext', () => {
         body: '',
         comments: [
           {
-            id: '814e3272-1a3e-4849-d53b-08d7c40dd247',
-            name: 'Bau1',
-            time: new Date('2020-03-09T09:39:53.736'),
-            commentText: 'A comment',
-            state: 'open',
+            id: 'comment-1',
+            content: 'A comment',
+            createdBy: {
+              id: 'user-1',
+              firstName: 'Bau1',
+              lastName: '',
+              email: 'bau1@test.com',
+            },
+            created: '2020-03-09T09:39:53.736',
           },
           {
-            id: 'a4a6bd84-992b-44a0-d53c-08d7c40dd247',
-            name: 'Bau1',
-            time: new Date('2020-03-09T09:40:16.534'),
-            commentText: 'another comment',
-            state: 'open',
+            id: 'comment-2',
+            content: 'another comment',
+            createdBy: {
+              id: 'user-1',
+              firstName: 'Bau1',
+              lastName: '',
+              email: 'bau1@test.com',
+            },
+            created: '2020-03-09T09:40:16.534',
           },
         ],
       },
@@ -641,12 +658,8 @@ describe('ReleaseContext', () => {
       },
     );
 
-    expect(
-      (release?.content[0].content as EditableContentBlock[])[0].order,
-    ).toEqual(newContent[0].order);
-    expect(
-      (release?.content[0].content as EditableContentBlock[])[1].order,
-    ).toEqual(newContent[1].order);
+    expect(release?.content[0].content[0]).toEqual(newContent[0]);
+    expect(release?.content[0].content[1]).toEqual(newContent[1]);
   });
 
   test('ADD_CONTENT_SECTION adds a new section to release content', () => {
@@ -730,5 +743,82 @@ describe('ReleaseContext', () => {
     expect(release?.content[0].id).toEqual(basicSection.id);
     expect(release?.content[0].caption).toEqual('updated caption');
     expect(release?.content[0].heading).toEqual('updated heading');
+  });
+
+  test("UPDATE_BLOCK_COMMENTS updates a block's comments", () => {
+    const sectionKey = 'content';
+
+    const newComment: Comment = {
+      id: 'comment-3',
+      content: 'a third comment',
+      createdBy: {
+        id: 'user-1',
+        firstName: 'Bau1',
+        lastName: '',
+        email: 'bau1@test.com',
+      },
+      created: '2020-03-10T12:00:00.000',
+    };
+
+    const updatedComments = [
+      ...basicRelease.content[0].content[0].comments,
+      newComment,
+    ];
+
+    const { release } = releaseReducer(
+      {
+        release: basicRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+        unresolvedComments: [],
+      },
+      {
+        type: 'UPDATE_BLOCK_COMMENTS',
+        payload: {
+          meta: {
+            sectionId: basicRelease.content[0].id,
+            blockId: basicRelease.content[0].content[0].id,
+            sectionKey,
+          },
+          comments: [...updatedComments],
+        },
+      },
+    );
+
+    expect(release?.content[0].content[0].comments).toEqual<Comment[]>([
+      {
+        id: 'comment-1',
+        content: 'A comment',
+        createdBy: {
+          id: 'user-1',
+          firstName: 'Bau1',
+          lastName: '',
+          email: 'bau1@test.com',
+        },
+        created: '2020-03-09T09:39:53.736',
+      },
+      {
+        id: 'comment-2',
+        content: 'another comment',
+        createdBy: {
+          id: 'user-1',
+          firstName: 'Bau1',
+          lastName: '',
+          email: 'bau1@test.com',
+        },
+        created: '2020-03-09T09:40:16.534',
+      },
+      {
+        id: 'comment-3',
+        content: 'a third comment',
+        createdBy: {
+          id: 'user-1',
+          firstName: 'Bau1',
+          lastName: '',
+          email: 'bau1@test.com',
+        },
+        created: '2020-03-10T12:00:00.000',
+      },
+    ]);
   });
 });

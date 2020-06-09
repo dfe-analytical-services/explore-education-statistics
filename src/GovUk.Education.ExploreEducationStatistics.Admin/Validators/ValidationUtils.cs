@@ -79,7 +79,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         IncorrectContentBlockTypeForAttach,
         ContentBlockAlreadyDetached,
         ContentBlockNotAttachedToThisContentSection,
-        CommentNotFound,
         UserAlreadyExists,
         UserDoesNotExist,
         UserAlreadyHasReleaseRole,

@@ -8,6 +8,11 @@
 
   button {
     margin-bottom: govuk-spacing(4);
+    margin-right: govuk-spacing(2);
+  }
+
+  button:last-child {
+    margin-right: 0;
   }
 
   // stylelint-disable-next-line order/order
