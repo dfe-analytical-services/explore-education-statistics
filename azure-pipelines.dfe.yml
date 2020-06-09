@@ -291,6 +291,13 @@ jobs:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
+      - task: CopyFiles@2
+        displayName: 'Copy Pipfiles to robot-tests'
+        inputs:
+          Contents: |
+            Pipfile
+            Pipfile.lock
+          TargetFolder: 'tests/robot-tests'
       - task: PublishPipelineArtifact@0
         displayName: 'Publish Robot tests'
         inputs:
