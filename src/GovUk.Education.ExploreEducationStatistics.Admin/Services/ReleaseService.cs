@@ -386,6 +386,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }));
         }
 
+        public IEnumerable<Guid> GetReferencedReleaseFileVersions(Guid releaseId, params ReleaseFileTypes[] types)
+        {
+            var releaseFileReferences = _context
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(rfr => rfr.ReleaseId == releaseId)
+                .Select(rf => rf.ReleaseFileReference)
+                .Where(rfr => types.Contains(rfr.ReleaseFileType))
+                .ToList();
+            
+            return releaseFileReferences.GroupBy(rfr => rfr.ReleaseId)
+                .Select(grp => grp.First().ReleaseId)
+                .ToList();
+        }
+
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {

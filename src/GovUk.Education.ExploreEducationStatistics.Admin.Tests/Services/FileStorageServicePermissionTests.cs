@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -92,7 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             AssertSecurityPoliciesChecked(service => 
                     service.ListPublicFilesPreview(
-                        _release.Id
+                        _release.Id,
+                        new List<Guid>(){_release.Id}
                     ), 
                 CanViewSpecificRelease);
         }

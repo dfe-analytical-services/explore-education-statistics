@@ -44,5 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, IEnumerable<FileInfo>>>  RemoveDataFileReleaseLinkAsync(Guid releaseId, string fileName, string subjectTitle);
 
         Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName);
+
+        IEnumerable<Guid> GetReferencedReleaseFileVersions(Guid releaseId, params ReleaseFileTypes[] types);
     }
 }

@@ -49,13 +49,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileUploadsValidatorService = fileUploadsValidatorService;
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId)
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId, IEnumerable<Guid> referencedVersions)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => 
-                    FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName, releaseId));
+                    FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName, referencedVersions));
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadDataFilesAsync(Guid releaseId,
