@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 
             foreach (var block in blocks)
             {
-                var infoGraphicChart = block.Charts.FirstOrDefault(c => c.Type == ChartType.infographic.ToString());
+                var infoGraphicChart = block.Charts.FirstOrDefault(c => c.Type == ChartType.Infographic);
                 if (infoGraphicChart != null && ((InfographicChart)infoGraphicChart).FileId == fileName)
                 {
                     block.Charts.Remove(infoGraphicChart);
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ContentSectionHeading = GetContentSectionHeading(block),
                 InfographicFilenames = block
                     .Charts
-                    .Where(chart => chart.Type == ChartType.infographic.ToString())
+                    .Where(chart => chart.Type == ChartType.Infographic)
                     .Cast<InfographicChart>()
                     .Select(chart => chart.FileId)
                     .ToList(),

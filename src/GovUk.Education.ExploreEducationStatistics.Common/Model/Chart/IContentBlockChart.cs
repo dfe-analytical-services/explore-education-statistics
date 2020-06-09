@@ -1,67 +1,36 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.ChartType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum ChartType
-    {
-        line,
-        horizontalbar,
-        verticalbar,
-        map,
-        infographic
-    }
-
     [JsonConverter(typeof(ContentBlockChartConverter))]
     public interface IContentBlockChart
     {
-        string Type { get; }
+        ChartType Type { get; }
         string Title { get; set; }
         string Alt { get; set; }
         int Height { get; set; }
         int? Width { get; set; }
     }
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum Legend
+    public class LineChart : AbstractChart
     {
-        none,
-        bottom,
-        top
-    }
-
-    public class LineChart : IContentBlockChart
-    {
-        public string Type => ChartType.line.ToString();
-        public string Title { get; set; }
-        public string Alt { get; set; }
-        public int? Width { get; set; }
-        public int Height { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Legend Legend;
-
+        public override ChartType Type => Line;
+        
+        public ChartLegend Legend;
         public int LegendHeight { get; set; }
 
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
     }
 
-    public class HorizontalBarChart : IContentBlockChart
+    public class HorizontalBarChart : AbstractChart
     {
-        public string Type =>  ChartType.horizontalbar.ToString();
-        public string Title { get; set; }
-        public string Alt { get; set; }
-        public int? Width { get; set; }
-        public int Height { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Legend Legend;
-
+        public override ChartType Type => HorizontalBar;
+        
+        public ChartLegend Legend;
         public int LegendHeight { get; set; }
 
         public Dictionary<string, ChartConfiguration> Labels;
@@ -69,43 +38,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public bool Stacked;
     }
 
-    public class VerticalBarChart : IContentBlockChart
+    public class VerticalBarChart : AbstractChart
     {
-        public string Type =>  ChartType.verticalbar.ToString();
+        public override ChartType Type => VerticalBar;
+        
+        public ChartLegend Legend;
+        public int LegendHeight { get; set; }
+        
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
         public bool Stacked;
-        public string Title { get; set; }
-        public string Alt { get; set; }
-        public int? Width { get; set; }
-        public int Height { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Legend Legend;
-
-        public int LegendHeight { get; set; }
     }
 
-    public class MapChart : IContentBlockChart
+    public class MapChart : AbstractChart
     {
-        public string Type =>  ChartType.map.ToString();
-        public string Title { get; set; }
-        public string Alt { get; set; }
-        public int? Width { get; set; }
-        public int Height { get; set; }
+        public override ChartType Type => Map;
+        
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
     }
 
-    public class InfographicChart : IContentBlockChart
+    public class InfographicChart : AbstractChart
     {
-        public string Type =>  ChartType.infographic.ToString();
-        public string Title { get; set; }
-        public string Alt { get; set; }
-        public int? Width { get; set; }
-        public int Height { get; set; }
-
-        public string ReleaseId;
-        public string FileId;
+        public override ChartType Type => Infographic;
+        public string FileId { get; set; }
     }
 }
