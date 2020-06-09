@@ -112,6 +112,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 throw new ArgumentException("Content Release does not exist", nameof(id));
             }
 
+            if (contentRelease.Amendment)
+            {
+                var previousVersion = await _contentDbContext.Releases
+                    .SingleOrDefaultAsync(r => r.Id == contentRelease.PreviousVersionId);
+
+                if (previousVersion?.Published == null)
+                {
+                    throw new ArgumentException("Previous version of release does not exist or is not live", nameof(contentRelease.PreviousVersionId));
+                }
+
+                published = previousVersion.Published.Value;
+            }
+
             _contentDbContext.Releases.Update(contentRelease);
             contentRelease.Published ??= published;
 
