@@ -22,7 +22,7 @@ def wait_until_page_contains_xpath(context, selector):
 
 def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADMIN",
                       chromedriver_version='80.0.3987.106'):
-    pyderman.install(file_directory="./webdriver/",
+    pyderman.install(file_directory="../webdriver/",
                      filename='chromedriver',
                      verbose=False,
                      chmod=True,

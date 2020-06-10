@@ -292,24 +292,14 @@ jobs:
       vmImage: 'ubuntu-16.04'
     steps:
       - task: CopyFiles@2
-        displayName: 'Copy Pipfiles to robot-tests'
+        displayName: 'Copy Pipfiles to tests'
         inputs:
           Contents: |
             Pipfile
             Pipfile.lock
-          TargetFolder: 'tests/robot-tests'
+          TargetFolder: 'tests'
       - task: PublishPipelineArtifact@0
-        displayName: 'Publish Robot tests'
+        displayName: 'Publish test files'
         inputs:
-          artifactName: 'robot-tests'
-          targetPath: 'tests/robot-tests'
-      - task: PublishPipelineArtifact@0
-        displayName: 'Publish Newman tests'
-        inputs:
-          artifactName: 'newman-tests'
-          targetPath: 'tests/newman'
-      - task: PublishPipelineArtifact@0
-        displayName: 'Publish Auth Token script'
-        inputs:
-          artifactName: 'auth-token-script'
-          targetPath: 'useful-scripts/auth-tokens'
+          artifactName: 'tests'
+          targetPath: 'tests'
