@@ -468,16 +468,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return new DeleteDataFilePlan
                     {
                         ReleaseId = releaseId,
-                        
                         SubjectId = subject?.Id ?? Guid.Empty,
-                        
                         TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName),
-                        
                         DeleteDataBlockPlan = _dataBlockService.GetDeleteDataBlockPlan(releaseId, subject),
-                        
-                        FootnoteIds = footnotes
-                           .Select(footnote => footnote.Id)
-                           .ToList(),
+                        FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
                     };
                 });
         }
@@ -601,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.Type);
         }
         
-        public static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)
+        private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)
         {
             // Require publication / release / contact / type graph to be able to work out:
             // If the release is the latest
