@@ -82,7 +82,7 @@ At the time of writing, the pipeline runs the tests against the Dev environment,
 
 ## Authentication
 
-To run the admin tests, the run_tests.py script uses `../../useful-scripts/auth-tokens/get_auth_tokens.py`. The `get_identity_info` function logs in as a user and then returns the relevant local storage and cookies for the authenticated user. This is done so that if an authenticated user is required, a test run only needs to log in once rather than once for each test suite.
+To run the admin tests, the `run_tests.py` script uses `scripts/get_auth_tokens.py`. The `get_identity_info` function logs in as a user and then returns the relevant local storage and cookies for the authenticated user. This is done so that if an authenticated user is required, a test run only needs to log in once rather than once for each test suite.
 
 After the user has been logged in by the run_tests.py script, the local storage and cookie data for the authenticated user is saved in the `IDENTITY_LOCAL_STORAGE.txt` and `IDENTITY_COOKIE.txt` files. This is done so that if you're running the tests locally, you don't need to authenticate every time you rerun the tests, as the run_tests.py script will use the data they contain if they exist.
 

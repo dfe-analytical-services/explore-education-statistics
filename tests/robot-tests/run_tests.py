@@ -6,28 +6,26 @@
 Run 'python run_tests.py -h' to see argument options
 """
 
-import os
 import argparse
-from pathlib import Path
-from robot import run_cli as robot_run_cli
-from pabot.pabot import main as pabot_run_cli
 import cProfile
-import pstats
-import scripts.keyword_profile as kp
-import pyderman
-from dotenv import load_dotenv
-import time
-import requests
 import json
+import os
+import pstats
 import shutil
-import sys
+import time
+from pathlib import Path
+
+import pyderman
+import requests
+from dotenv import load_dotenv
+from pabot.pabot import main as pabot_run_cli
+from robot import run_cli as robot_run_cli
+
+import scripts.keyword_profile as kp
+from scripts.get_auth_tokens import get_identity_info
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
-
-sys.path.append(str(Path("../../useful-scripts/auth-tokens")))
-
-from get_auth_tokens import get_identity_info
 
 # Parse arguments
 parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
@@ -189,6 +187,7 @@ if args.tests and "general_public" not in args.tests:
                 password=os.getenv('ANALYST_PASSWORD'),
                 clear_existing=clear_existing
             )
+
 
     def create_test_topic():
         # To prevent InsecureRequestWarning
