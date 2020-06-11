@@ -8,8 +8,8 @@ trigger:
       - master
   paths:
     exclude:
-      - infrastructure/
-pr: none
+    - infrastructure/
+pr: [ 'master' ]
 
 jobs:
   - job: 'Backend'
