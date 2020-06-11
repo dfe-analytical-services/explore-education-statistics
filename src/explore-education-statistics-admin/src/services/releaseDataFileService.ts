@@ -100,13 +100,6 @@ const releaseDataFileService = {
       })
       .then(response => downloadFile(response, fileName));
   },
-  downloadDataMetadataFile(releaseId: string, fileName: string): Promise<void> {
-    return client
-      .get<Blob>(`/release/${releaseId}/data/${fileName}`, {
-        responseType: 'blob',
-      })
-      .then(response => downloadFile(response, fileName));
-  },
   downloadFile(path: string): Promise<void> {
     return client
       .get<Blob>(`/release/${path}`, {
