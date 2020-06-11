@@ -19,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             _storageConnectionString = connectionString;
         }
+        
 
         public async Task<string> DownloadTextAsync(string containerName, string blobName)
         {
