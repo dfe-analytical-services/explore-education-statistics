@@ -67,9 +67,7 @@ const ReleaseManageDataBlocksPageTabs = ({
 
     const query = {
       ...selectedDataBlock.dataBlockRequest,
-      includeGeoJson: selectedDataBlock.charts.some(
-        chart => chart.type === 'map',
-      ),
+      includeGeoJson: selectedDataBlock?.chart?.type === 'map',
     };
 
     const tableData = await tableBuilderService.getTableData(query);
@@ -117,7 +115,7 @@ const ReleaseManageDataBlocksPageTabs = ({
         ...dataBlock,
         dataBlockRequest: {
           ...dataBlock.dataBlockRequest,
-          includeGeoJson: dataBlock.charts[0]?.type === 'map',
+          includeGeoJson: dataBlock.chart?.type === 'map',
         },
       };
 
@@ -142,8 +140,8 @@ const ReleaseManageDataBlocksPageTabs = ({
 
   const handleDataBlockSourceSave: DataBlockSourceWizardSaveHandler = useCallback(
     async ({ query, table, tableHeaders, details }) => {
-      const charts = produce(selectedDataBlock?.charts ?? [], draft => {
-        const majorAxis = draft[0]?.axes?.major;
+      const chart = produce(selectedDataBlock?.chart, draft => {
+        const majorAxis = draft?.axes?.major;
 
         if (majorAxis?.dataSets) {
           majorAxis.dataSets = filterOrphanedDataSets(
@@ -163,7 +161,7 @@ const ReleaseManageDataBlocksPageTabs = ({
         ...(selectedDataBlock ?? {}),
         ...details,
         dataBlockRequest: query,
-        charts,
+        chart,
         tables: [
           {
             tableHeaders: mapUnmappedTableHeaders(tableHeaders),

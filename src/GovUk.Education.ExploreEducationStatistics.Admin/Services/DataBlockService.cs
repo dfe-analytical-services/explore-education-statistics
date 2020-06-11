@@ -93,10 +93,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 
             foreach (var block in blocks)
             {
-                var infoGraphicChart = block.Charts.FirstOrDefault(c => c.Type == ChartType.Infographic);
-                if (infoGraphicChart != null && ((InfographicChart)infoGraphicChart).FileId == fileName)
+                if (block.Chart is InfographicChart infoGraphicChart && infoGraphicChart.FileId == fileName)
                 {
-                    block.Charts.Remove(infoGraphicChart);
+                    block.Chart = null;
                     _context.DataBlocks.Update(block);
                     await _context.SaveChangesAsync();
                     return true;
@@ -167,17 +166,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private DependentDataBlock CreateDependentDataBlock(DataBlock block)
         {
-            return new DependentDataBlock()
+            var filenames = block.Chart is InfographicChart chart ?  new List<string>
+            {
+                chart.FileId
+            } : new List<string>();
+            
+            return new DependentDataBlock
             {
                 Id = block.Id,
                 Name = block.Name,
                 ContentSectionHeading = GetContentSectionHeading(block),
-                InfographicFilenames = block
-                    .Charts
-                    .Where(chart => chart.Type == ChartType.Infographic)
-                    .Cast<InfographicChart>()
-                    .Select(chart => chart.FileId)
-                    .ToList(),
+                InfographicFilenames = filenames
             };
         }
         

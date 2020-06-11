@@ -39,7 +39,7 @@ const DataBlockRenderer = ({
     dataBlock
       ? {
           ...dataBlock.dataBlockRequest,
-          includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
+          includeGeoJson: dataBlock?.chart?.type === 'map',
         }
       : undefined,
   );
@@ -49,7 +49,7 @@ const DataBlockRenderer = ({
       <Tabs id={id} onToggle={onToggle}>
         {firstTabs}
 
-        {dataBlock?.charts?.length && fullTable && (
+        {dataBlock && dataBlock.chart && fullTable && (
           <TabsSection id={`${id}-charts`} title="Chart">
             <a
               className="govuk-visually-hidden"
@@ -61,47 +61,47 @@ const DataBlockRenderer = ({
               data tables tab.
             </a>
 
-            {dataBlock?.charts.map((chart, index) => {
-              const key = index;
+            {dataBlock.chart &&
+              (() => {
+                const axes = { ...dataBlock.chart?.axes } as Required<
+                  AxesConfiguration
+                >;
 
-              const axes = { ...chart.axes } as Required<AxesConfiguration>;
+                if (
+                  axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
+                  dataBlock?.chart?.labels
+                ) {
+                  axes.major.dataSets = getLabelDataSetConfigurations(
+                    dataBlock?.chart?.labels,
+                    axes.major.dataSets,
+                  );
+                }
 
-              if (
-                axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
-                chart.labels
-              ) {
-                axes.major.dataSets = getLabelDataSetConfigurations(
-                  chart.labels,
-                  axes.major.dataSets,
-                );
-              }
+                if (dataBlock.chart?.type === 'infographic') {
+                  return (
+                    <ChartRenderer
+                      {...dataBlock.chart}
+                      key={dataBlock.id}
+                      axes={axes}
+                      data={fullTable?.results}
+                      meta={fullTable?.subjectMeta}
+                      source={dataBlock?.source}
+                      getInfographic={getInfographic}
+                    />
+                  );
+                }
 
-              if (chart.type === 'infographic') {
                 return (
                   <ChartRenderer
-                    {...chart}
-                    key={key}
+                    {...dataBlock.chart}
+                    key={dataBlock.id}
                     axes={axes}
                     data={fullTable?.results}
                     meta={fullTable?.subjectMeta}
                     source={dataBlock?.source}
-                    getInfographic={getInfographic}
                   />
                 );
-              }
-
-              return (
-                <ChartRenderer
-                  {...chart}
-                  key={key}
-                  axes={axes}
-                  data={fullTable?.results}
-                  meta={fullTable?.subjectMeta}
-                  source={dataBlock?.source}
-                />
-              );
-            })}
-
+              })()}
             {additionalTabContent}
           </TabsSection>
         )}

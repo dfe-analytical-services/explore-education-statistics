@@ -20,7 +20,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public ObservationQueryContext DataBlockRequest { get; set; }
 
-        public List<IContentBlockChart> Charts { get; set; }
+        [Obsolete("Maintain compatibility with existing cached DataBlocks")]
+        public List<IContentBlockChart> Charts
+        {
+            set
+            {
+                if (value != null && value.Count > 0)
+                {
+                    Chart = value[0];
+                }
+            }
+        }
+
+        public IContentBlockChart Chart { get; set; }
 
         public DataBlockSummaryViewModel Summary { get; set; }
 
