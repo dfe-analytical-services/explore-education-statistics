@@ -60,7 +60,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .StreamFile(releaseId, ReleaseFileTypes.Data, filename)
                 .HandleFailures();
         }
-
+        
+        [HttpGet("release/{releaseId}/meta/{filename}")]
+        public async Task<ActionResult> GetMetaFile(Guid releaseId, string filename)
+        {
+            return await _fileStorageService
+                .StreamFile(releaseId, ReleaseFileTypes.Metadata, filename)
+                .HandleFailures();
+        }
+        
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
         public async Task<ActionResult> GetAncillaryFile(Guid releaseId, string filename)
         {
