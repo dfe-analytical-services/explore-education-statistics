@@ -6,6 +6,7 @@ import releaseDataFileService, {
   DataFile,
   DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
+import releaseMetaFileService from '@admin/services/releaseMetaFileService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
@@ -381,7 +382,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="Metadata file">
                             <ButtonText
                               onClick={() =>
-                                releaseDataFileService.downloadDataMetadataFile(
+                                releaseMetaFileService.downloadDataMetadataFile(
                                   releaseId,
                                   dataFile.metadataFilename,
                                 )
