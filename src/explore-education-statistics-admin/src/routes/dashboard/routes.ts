@@ -4,6 +4,7 @@ import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
+import ContactsPage from '@admin/pages/contacts/ContactsPage';
 import AdminDocumentationConfigureCharts from '@admin/pages/documentation/DocumentationConfigureCharts';
 import AdminDocumentationCreateNewPublication from '@admin/pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationCreateNewRelease from '@admin/pages/documentation/DocumentationCreateNewRelease';
@@ -80,6 +81,12 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
     component: BauMethodologyPage,
     protectedAction: user =>
       user.permissions.canAccessMethodologyAdministrationPages,
+    exact: true,
+  },
+  administrationContacts: {
+    path: '/administration/contacts',
+    component: ContactsPage,
+    protectedAction: user => user.permissions.canAccessUserAdministrationPages,
     exact: true,
   },
   administrationUsers: {
