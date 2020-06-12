@@ -120,6 +120,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(async existing =>
                 {
+                    if (existing.Chart is InfographicChart infographicChart)
+                    {
+                        if (!(updateDataBlock.Chart is InfographicChart))
+                        {
+                            var release = GetReleaseForDataBlock(existing.Id);
+                            // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
+                            await _fileStorageService.DeleteNonDataFileAsync(release.Id, ReleaseFileTypes.Chart,
+                                infographicChart.FileId);
+                        }
+                    }
                     _context.DataBlocks.Update(existing);
                     _mapper.Map(updateDataBlock, existing);
                     await _context.SaveChangesAsync();
@@ -215,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             return true;
         }
-        
+
         private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
             var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
@@ -268,14 +278,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .First(block => block.Id == id);
         }
 
-        private async Task<Either<ActionResult, DataBlock>> CheckCanUpdateReleaseForDataBlock(DataBlock dataBlock)
+        private Release GetReleaseForDataBlock(Guid dataBlockId)
         {
-            var release = _context
+            return _context
                 .ReleaseContentBlocks
                 .Include(join => join.Release)
-                .First(join => join.ContentBlockId == dataBlock.Id)
+                .First(join => join.ContentBlockId == dataBlockId)
                 .Release;
+        }
 
+        private async Task<Either<ActionResult, DataBlock>> CheckCanUpdateReleaseForDataBlock(DataBlock dataBlock)
+        {
+            var release = GetReleaseForDataBlock(dataBlock.Id);
             return await _userService
                 .CheckCanUpdateRelease(release)
                 .OnSuccess(_ => dataBlock);
