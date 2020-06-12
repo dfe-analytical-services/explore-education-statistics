@@ -355,12 +355,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/C:/Users/ben/dev/explore-education-statistics/tests/newman/files/admin-api-test.csv"
+									"src": "files/admin-api-test.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/C:/Users/ben/dev/explore-education-statistics/tests/newman/files/admin-api-test.meta.csv"
+									"src": "files/admin-api-test.meta.csv"
 								}
 							]
 						},
