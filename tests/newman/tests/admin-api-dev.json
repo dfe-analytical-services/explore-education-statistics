@@ -5505,13 +5505,13 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    contentBlockId: '{{sub1_datablock1_id}}',\n    order: 0\n}",
+											"raw": "{\n    \"contentBlockId\": \"{{sub1_datablock1_id}}\",\n    \"order\": 0\n}",
 											"options": {
 												"raw": {}
 											}
 										},
 										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_section_id}}/blocks/attatch",
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_section_id}}/blocks/attach",
 											"host": [
 												"{{admin_api_url}}"
 											],
@@ -5522,7 +5522,7 @@
 												"section",
 												"{{release_key_statistics_section_id}}",
 												"blocks",
-												"attatch"
+												"attach"
 											]
 										}
 									},
@@ -5573,10 +5573,10 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    contentBlockId: '{{sub1_datablock2_id}}',\n    order: 0\n}"
+											"raw": "{\n    \"contentBlockId\": \"{{sub1_datablock2_id}}\",\n    \"order\": 0\n}"
 										},
 										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_secondary_section_id}}/blocks/attatch",
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_secondary_section_id}}/blocks/attach",
 											"host": [
 												"{{admin_api_url}}"
 											],
@@ -5587,7 +5587,7 @@
 												"section",
 												"{{release_key_statistics_secondary_section_id}}",
 												"blocks",
-												"attatch"
+												"attach"
 											]
 										}
 									},
