@@ -55,7 +55,6 @@ describe('DataBlockRenderer', () => {
       ],
       locations: {},
     },
-    charts: [],
     tables: [],
   };
 
@@ -69,7 +68,7 @@ describe('DataBlockRenderer', () => {
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
-          charts: [testChartConfiguration],
+          chart: testChartConfiguration,
         }}
       />,
     );
@@ -98,12 +97,10 @@ describe('DataBlockRenderer', () => {
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          charts: [
-            {
-              ...testChartConfiguration,
-              type: 'horizontalbar',
-            } as Chart,
-          ],
+          chart: {
+            ...testChartConfiguration,
+            type: 'horizontalbar',
+          } as Chart,
         }}
       />,
     );
@@ -134,12 +131,10 @@ describe('DataBlockRenderer', () => {
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          charts: [
-            {
-              ...testChartConfiguration,
-              type: 'verticalbar',
-            } as Chart,
-          ],
+          chart: {
+            ...testChartConfiguration,
+            type: 'verticalbar',
+          } as Chart,
         }}
       />,
     );
@@ -210,7 +205,7 @@ describe('DataBlockRenderer', () => {
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          charts: [testMapConfiguration],
+          chart: testMapConfiguration,
         }}
       />,
     );
@@ -235,7 +230,7 @@ describe('DataBlockRenderer', () => {
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
-          charts: [testDeprecatedChartConfiguration],
+          chart: testDeprecatedChartConfiguration,
         }}
       />,
     );
