@@ -4733,71 +4733,6 @@
 									"response": []
 								},
 								{
-									"name": "Add DataBlock (without specifying order)",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "014ee677-e449-4e8b-89c2-2df115da3e69",
-												"exec": [
-													"const respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"New DataBlock should be present\", function () { ",
-													"    // assert new block details",
-													"    pm.expect(respJson.id).to.not.be.null;",
-													"    pm.expect(respJson.order).to.equal(3);",
-													"    pm.expect(respJson.type).to.equal(\"DataBlock\");",
-													"    pm.expect(respJson.content).to.be.undefined;",
-													"    ",
-													"    // assert that deliberately excluded fields are not present",
-													"    pm.expect(respJson.contentSection).to.be.undefined;",
-													"    pm.expect(respJson.contentSectionId).to.be.undefined;",
-													"});",
-													"",
-													"pm.test(\"Store variables for upcoming tests\", function () {",
-													"    pm.globals.set(\"added_datablock_id\", pm.response.json().id);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/json",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{ \n\ttype: 'DataBlock'\n}"
-										},
-										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{content_section_id}}/blocks/add",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"release",
-												"{{release_id}}",
-												"content",
-												"section",
-												"{{content_section_id}}",
-												"blocks",
-												"add"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Verify Content Blocks added",
 									"event": [
 										{
@@ -4819,7 +4754,7 @@
 													"",
 													"pm.test(\"content should be correct\", function () {",
 													"    const content = respJson.content; ",
-													"    pm.expect(content.length).to.equal(3);",
+													"    pm.expect(content.length).to.equal(2);",
 													"    ",
 													"    const markDownBlock = content.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
 													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.not.be.undefined;",
@@ -4835,13 +4770,6 @@
 													"    pm.expect(htmlBlock.order).to.equal(2);",
 													"    pm.expect(htmlBlock.heading).to.be.undefined;",
 													"    pm.expect(htmlBlock.body).to.be.undefined;",
-													"    ",
-													"    const dataBlock = content.find(block => block.id === pm.globals.get('added_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
-													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(3);",
-													"    pm.expect(dataBlock.heading).to.be.undefined;",
-													"    pm.expect(dataBlock.body).to.be.undefined;",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5020,11 +4948,6 @@
 													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
 													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
 													"    pm.expect(htmlBlock.order).to.equal(2);",
-													"    ",
-													"    const dataBlock = content.find(block => block.id === pm.globals.get('added_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
-													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(3);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5072,7 +4995,7 @@
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () {",
-													"    pm.expect(respJson.length).to.equal(3); ",
+													"    pm.expect(respJson.length).to.equal(2); ",
 													"});",
 													"",
 													"pm.test(\"Results should be correct\", function () {",
@@ -5087,11 +5010,6 @@
 													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
 													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
 													"    pm.expect(htmlBlock.order).to.equal(1);",
-													"    ",
-													"    const dataBlock = respJson.find(block => block.id === pm.globals.get('added_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
-													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(3);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5109,7 +5027,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{    \n\t'{{added_htmlblock_id}}': 1,\n\t'{{added_markdownblock_id}}': 2,\n\t'{{added_datablock_id}}': 3,\n}"
+											"raw": "{    \n\t'{{added_htmlblock_id}}': 1,\n\t'{{added_markdownblock_id}}': 2\n}"
 										},
 										"url": {
 											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{content_section_id}}/blocks/order",
@@ -5151,7 +5069,7 @@
 													"",
 													"pm.test(\"content should be correct\", function () {",
 													"    const content = respJson.content;",
-													"    pm.expect(content.length).to.equal(3);",
+													"    pm.expect(content.length).to.equal(2);",
 													"    ",
 													"    const markDownBlock = content.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
 													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.not.be.undefined;",
@@ -5164,11 +5082,6 @@
 													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
 													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
 													"    pm.expect(htmlBlock.order).to.equal(1);",
-													"    ",
-													"    const dataBlock = content.find(block => block.id === pm.globals.get('added_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
-													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(3);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5201,7 +5114,7 @@
 									"response": []
 								},
 								{
-									"name": "Delete MarkDownBlock",
+									"name": "Detatch MarkDownBlock",
 									"event": [
 										{
 											"listen": "test",
@@ -5215,7 +5128,7 @@
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () {",
-													"    pm.expect(respJson.length).to.equal(2); ",
+													"    pm.expect(respJson.length).to.equal(1); ",
 													"});",
 													"",
 													"pm.test(\"Results should be correct\", function () {",
@@ -5229,11 +5142,6 @@
 													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
 													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
 													"    pm.expect(htmlBlock.order).to.equal(1);",
-													"    ",
-													"    const dataBlock = respJson.find(block => block.id === pm.globals.get('added_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock should exist').to.not.be.undefined;",
-													"    pm.expect(dataBlock.type).to.equal('DataBlock');",
-													"    pm.expect(dataBlock.order).to.equal(2);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5266,70 +5174,7 @@
 									"response": []
 								},
 								{
-									"name": "Delete DataBlock",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "686c5886-ce9d-4505-933c-55693d444b40",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () {",
-													"    pm.expect(respJson.length).to.equal(1); ",
-													"});",
-													"",
-													"pm.test(\"Results should be correct\", function () {",
-													"    const insetTextBlock = respJson.find(block => block.id === pm.globals.get('added_insettextblock_id'));",
-													"    pm.expect(insetTextBlock, 'InsetTextBlock should exist').to.be.undefined;",
-													"    ",
-													"    const markDownBlock = respJson.find(block => block.id === pm.globals.get('added_markdownblock_id'));",
-													"    pm.expect(markDownBlock, 'MarkDownBlock should exist').to.be.undefined;",
-													"    ",
-													"    const dataBlock = respJson.find(block => block.id === pm.globals.get('added_datablock_id'));",
-													"    pm.expect(dataBlock, 'DataBlock should exist').to.be.undefined;",
-													"    ",
-													"    const htmlBlock = respJson.find(block => block.id === pm.globals.get('added_htmlblock_id'));",
-													"    pm.expect(htmlBlock, 'HtmlBlock should exist').to.not.be.undefined;",
-													"    pm.expect(htmlBlock.type).to.equal('HtmlBlock');",
-													"    pm.expect(htmlBlock.order).to.equal(1);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{content_section_id}}/block/{{added_datablock_id}}",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"release",
-												"{{release_id}}",
-												"content",
-												"section",
-												"{{content_section_id}}",
-												"block",
-												"{{added_datablock_id}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Delete HtmlBlock",
+									"name": "Detatch HtmlBlock",
 									"event": [
 										{
 											"listen": "test",
@@ -5616,7 +5461,7 @@
 									"response": []
 								},
 								{
-									"name": "Add DataBlock to keyStatisticsSection",
+									"name": "Attach DataBlock to keyStatisticsSection",
 									"event": [
 										{
 											"listen": "test",
@@ -5654,16 +5499,19 @@
 										"header": [
 											{
 												"key": "Content-Type",
-												"value": "application/json",
-												"type": "text"
+												"type": "text",
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\torder: 0,\n\ttype: 'DataBlock'\n}"
+											"raw": "{\n    \"contentBlockId\": \"{{sub1_datablock1_id}}\",\n    \"order\": 0\n}",
+											"options": {
+												"raw": {}
+											}
 										},
 										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_section_id}}/blocks/add",
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_section_id}}/blocks/attach",
 											"host": [
 												"{{admin_api_url}}"
 											],
@@ -5674,14 +5522,14 @@
 												"section",
 												"{{release_key_statistics_section_id}}",
 												"blocks",
-												"add"
+												"attach"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Add DataBlock to keyStatisticsSecondarySection",
+									"name": "Attach DataBlock to keyStatisticsSecondarySection",
 									"event": [
 										{
 											"listen": "test",
@@ -5719,16 +5567,16 @@
 										"header": [
 											{
 												"key": "Content-Type",
-												"value": "application/json",
-												"type": "text"
+												"type": "text",
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\torder: 0,\n\ttype: 'DataBlock'\n}"
+											"raw": "{\n    \"contentBlockId\": \"{{sub1_datablock2_id}}\",\n    \"order\": 0\n}"
 										},
 										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_secondary_section_id}}/blocks/add",
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_secondary_section_id}}/blocks/attach",
 											"host": [
 												"{{admin_api_url}}"
 											],
@@ -5739,7 +5587,7 @@
 												"section",
 												"{{release_key_statistics_secondary_section_id}}",
 												"blocks",
-												"add"
+												"attach"
 											]
 										}
 									},
@@ -5786,7 +5634,7 @@
 													"    pm.expect(keyStatsSection.order).to.equal(0);",
 													"    pm.expect(keyStatsSection.content.length).to.equal(1);",
 													"    pm.expect(keyStatsSection.content[0].type).to.equal(\"DataBlock\");",
-													"    pm.expect(keyStatsSection.content[0].id).to.equal(pm.globals.get('key_statistics_section_datablock_id'));",
+													"    pm.expect(keyStatsSection.content[0].id).to.equal(pm.globals.get('sub1_datablock1_id'));",
 													"    pm.expect(keyStatsSection.content[0].order).to.equal(0);",
 													"});",
 													"",
@@ -5796,7 +5644,7 @@
 													"    pm.expect(keyStatsSecondarySection.order).to.equal(0);",
 													"    pm.expect(keyStatsSecondarySection.content.length).to.equal(1);",
 													"    pm.expect(keyStatsSecondarySection.content[0].type).to.equal(\"DataBlock\");",
-													"    pm.expect(keyStatsSecondarySection.content[0].id).to.equal(pm.globals.get('key_statistics_secondary_section_datablock_id'));",
+													"    pm.expect(keyStatsSecondarySection.content[0].id).to.equal(pm.globals.get('sub1_datablock2_id'));",
 													"    pm.expect(keyStatsSecondarySection.content[0].order).to.equal(0);",
 													"});"
 												],
@@ -5923,7 +5771,7 @@
 									"response": []
 								},
 								{
-									"name": "Delete DataBlock from keyStatisticsSection",
+									"name": "Detatch DataBlock from keyStatisticsSection",
 									"event": [
 										{
 											"listen": "test",
@@ -5952,7 +5800,7 @@
 											"raw": ""
 										},
 										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_section_id}}/block/{{key_statistics_section_datablock_id}}",
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_section_id}}/block/{{sub1_datablock1_id}}",
 											"host": [
 												"{{admin_api_url}}"
 											],
@@ -5963,14 +5811,14 @@
 												"section",
 												"{{release_key_statistics_section_id}}",
 												"block",
-												"{{key_statistics_section_datablock_id}}"
+												"{{sub1_datablock1_id}}"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Delete DataBlock from keyStatisticsSecondarySection",
+									"name": "Detatch DataBlock from keyStatisticsSecondarySection",
 									"event": [
 										{
 											"listen": "test",
@@ -5999,7 +5847,7 @@
 											"raw": ""
 										},
 										"url": {
-											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_secondary_section_id}}/block/{{key_statistics_secondary_section_datablock_id}}",
+											"raw": "{{admin_api_url}}/release/{{release_id}}/content/section/{{release_key_statistics_secondary_section_id}}/block/{{sub1_datablock2_id}}",
 											"host": [
 												"{{admin_api_url}}"
 											],
@@ -6010,7 +5858,7 @@
 												"section",
 												"{{release_key_statistics_secondary_section_id}}",
 												"block",
-												"{{key_statistics_secondary_section_datablock_id}}"
+												"{{sub1_datablock2_id}}"
 											]
 										}
 									},
@@ -7344,6 +7192,82 @@
 												"{{release_id}}",
 												"content",
 												"available-datablocks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete data block 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "2d66a881-38e8-427a-966e-6ab4fd95760e",
+												"exec": [
+													"pm.test(\"Status code is 204\", function() {",
+													"    pm.response.to.have.status(204);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/datablocks/{{sub1_datablock1_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"datablocks",
+												"{{sub1_datablock1_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete data block 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "72f8d955-2645-45bf-96c0-0aadfd8de085",
+												"exec": [
+													"pm.test(\"Status code is 204\", function() {",
+													"    pm.response.to.have.status(204);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/release/{{release_id}}/datablocks/{{sub1_datablock2_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"release",
+												"{{release_id}}",
+												"datablocks",
+												"{{sub1_datablock2_id}}"
 											]
 										}
 									},
