@@ -83,9 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 CopyColumns(csvTable, table);
                 CopyRows(table, batch.ToList(), headerList);
 
-                // If no lines then don't create a batch or message
-                if (table.Rows.Count == 0)
+                // If no lines then don't create a batch or message unless it's the last one & there are zero
+                // lines in total in which case create a zero lines batch
+                if ((table.Rows.Count == 0 && batchCount != batches.Count()) || (table.Rows.Count == 0 && messages.Count != 0))
                 {
+                    batchCount++;
                     continue;
                 }
 
