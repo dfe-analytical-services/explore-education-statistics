@@ -30,6 +30,14 @@ const BauDashboardPage = () => {
             </p>
           </div>
         )}
+        <div className="govuk-grid-column-one-third">
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+            <Link to="/administration/contacts">Manage contacts</Link>
+          </h3>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
+            View a list of all publication contacts.
+          </p>
+        </div>
       </div>
 
       <hr className="govuk-!-margin-top-9" />
