@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             foreach (var footnote in footnotesLinkedToSubject)
             {
-                var canRemoveFootnote = IsFootnoteLinkedToAnotherSubject(footnote.Id, subjectId);
+                var canRemoveFootnote = !IsFootnoteLinkedToAnotherSubject(footnote.Id, subjectId);
 
                 await DeleteFootnote(releaseId, footnote, canRemoveFootnote);
             }
