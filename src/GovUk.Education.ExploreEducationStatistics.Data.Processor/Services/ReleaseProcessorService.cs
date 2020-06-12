@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Thread.Sleep(new Random().Next(1, 5) * 1000);
             
             var release = CreateOrUpdateRelease(message, context);
-            RemoveSubject(message.SubjectId, subjectData.Name, release, context);
+            RemoveSubject(subjectData.Name, release, context);
             
             var subject = CreateSubject(message.SubjectId, subjectData.Name, release, context);
             CreateReleaseFileLink(message, contentDbContext, release, subject);
@@ -51,9 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var releaseFileLink = contentDbContext
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
-                .FirstOrDefault(
-                    f => f.ReleaseId == release.Id
-                         && f.ReleaseFileReference.Filename == message.DataFileName);
+                .FirstOrDefault(f => f.ReleaseId == release.Id && f.ReleaseFileReference.Filename == message.DataFileName);
 
             if (releaseFileLink != null)
             {
@@ -63,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private void RemoveSubject(Guid subjectId, string name, Release release, StatisticsDbContext context)
+        private void RemoveSubject(string name, Release release, StatisticsDbContext context)
         {
             var releaseSubject = context.ReleaseSubject
                 .FirstOrDefault(r => r.Subject.Name == name && r.ReleaseId == release.Id);
@@ -74,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 context.ReleaseSubject.Remove(releaseSubject);
             }
             
-            var subject = context.Subject.FirstOrDefault(s => s.Id == subjectId);
+            var subject = context.Subject.FirstOrDefault(s => s.Name == name);
 
             if (subject != null)
             {
