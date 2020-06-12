@@ -85,23 +85,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await RemoveChartFileReleaseLinks(deletePlan);
             return true;
         }
-        
-        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName, string fileName)
+
+        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName,
+            string fileName)
         {
-            var subject = await _subjectService.GetAsync(releaseId, subjectName);
-            var blocks = GetDataBlocks(releaseId, subject.Id);
-                
-            foreach (var block in blocks)
-            {
-                if (block.Chart is InfographicChart infoGraphicChart && infoGraphicChart.FileId == fileName)
-                {
-                    block.Chart = null;
-                    _context.DataBlocks.Update(block);
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
-            }
-            return true;
+            return await RemoveInfographicChartFromDataBlock(releaseId, subjectName, fileName)
+                .OnSuccessDo(() =>
+                    _fileStorageService.DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
         }
         
         public async Task<DataBlockViewModel> GetAsync(Guid id)
@@ -200,6 +190,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
         
+        private async Task<Either<ActionResult, bool>> RemoveInfographicChartFromDataBlock(Guid releaseId,
+            string subjectName, string fileName)
+        {
+            // TODO EES-960 - Using Subject here doesn't find datablocks in the same Release but for a different Subject
+            // that include the same infographic file.
+            // They are left untouched but the file is eventually removed causing an error.
+            var subject = await _subjectService.GetAsync(releaseId, subjectName);
+            var blocks = GetDataBlocks(releaseId, subject.Id);
+
+            foreach (var block in blocks)
+            {
+                // TODO EES-960 - This isn't guaranteed to delete the requested infographic causing an error
+                // It could be the same filename but in a different datablock that uses the same subject
+                if (block.Chart is InfographicChart infoGraphicChart && infoGraphicChart.FileId == fileName)
+                {
+                    block.Chart = null;
+                    _context.DataBlocks.Update(block);
+                    await _context.SaveChangesAsync();
+                    // TODO EES-960 - Returning here leaves infographic files of the same filename on other datablocks
+                    // The file is eventually deleted from Storage causing an error.
+                    return true;
+                }
+            }
+            return true;
+        }
+        
         private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
             var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
@@ -234,8 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(join => join.ReleaseId == releaseId)
                 .ToList()
                 .Select(join => join.ContentBlock)
-                .Where(block => block.GetType() == typeof(DataBlock))
-                .Cast<DataBlock>()
+                .OfType<DataBlock>()
                 .Where(block => block.DataBlockRequest.SubjectId == subjectId)
                 .ToList();
         }
@@ -249,8 +264,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(join => join.ReleaseId == releaseId)
                 .ToList()
                 .Select(join => join.ContentBlock)
-                .Where(block => block.GetType() == typeof(DataBlock))
-                .Cast<DataBlock>().First(block => block.Id == id);
+                .OfType<DataBlock>()
+                .First(block => block.Id == id);
         }
 
         private async Task<Either<ActionResult, DataBlock>> CheckCanUpdateReleaseForDataBlock(DataBlock dataBlock)

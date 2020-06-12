@@ -264,12 +264,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/chart/{subjectName}/{fileName}")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
+        public async Task<ActionResult> DeleteChartFile(
             Guid releaseId, string subjectName, string fileName)
         {
             return await _dataBlockService.RemoveChartFile(releaseId, subjectName, fileName)
-                .OnSuccess(_ => _fileStorageService.DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
-                .HandleFailuresOrOk();
+                .HandleFailuresOrNoContent();
         }
 
         [HttpGet("releases/{releaseId}/status")]
