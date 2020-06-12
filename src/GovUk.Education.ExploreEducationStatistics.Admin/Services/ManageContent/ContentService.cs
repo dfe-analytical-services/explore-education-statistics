@@ -181,6 +181,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, IContentBlock>> AddContentBlockAsync(Guid releaseId, Guid contentSectionId,
             AddContentBlockRequest request)
         {
+            if (request.Type == ContentBlockType.DataBlock)
+            {
+                throw new ArgumentOutOfRangeException(nameof(request), "Cannot create type DataBlock");
+            }
+            
             return 
                 CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)

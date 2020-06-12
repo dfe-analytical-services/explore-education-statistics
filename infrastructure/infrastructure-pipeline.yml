@@ -15,11 +15,11 @@ pool:
 
 steps:
 - task: AzSKARMTemplateChecker@4
-  enabled: false
+  enabled: true
   inputs:
     ARMTemplateFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/templates/'
     ARMTemplateParameterFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/'
-
+    SkipControlsFromFile: '$(System.DefaultWorkingDirectory)/infrastructure/template-checker/skip-controls.csv'
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'arm-template'
