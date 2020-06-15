@@ -358,11 +358,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
 
             modelBuilder.Entity<DataBlock>()
-                .Property(block => block.Chart)
-                .HasColumnName("DataBlock_Chart")
+                .Property(block => block.Charts)
+                .HasColumnName("DataBlock_Charts")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<IContentBlockChart>(v));
+                    v => JsonConvert.DeserializeObject<List<IContentBlockChart>>(v));
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Summary)
@@ -2932,7 +2932,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -3000,6 +3001,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
                 // absence key statistics tile 2
                 new DataBlock
@@ -3083,7 +3085,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -3127,6 +3130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
                 // absence key statistics tile 3
                 new DataBlock
@@ -3210,7 +3214,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -3278,6 +3283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
                 // absence key statistics aggregate table
                 new DataBlock
@@ -3381,7 +3387,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -3465,6 +3472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
                 // absence generic data blocks used in content
                 new DataBlock
@@ -3536,7 +3544,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -3620,6 +3629,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
                 new DataBlock
                 {
@@ -3656,7 +3666,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new MapChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -3738,6 +3749,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     }
                             }
                         }
+                    }
                 },
 
                 // exclusions key statistics tile 1
@@ -3822,7 +3834,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     },
 
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -3875,6 +3888,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
 
                 // exclusions key statistics tile 2
@@ -3958,7 +3972,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -4001,6 +4016,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
 
                 // exclusions key statistics tile 3
@@ -4085,7 +4101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     },
 
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -4128,6 +4145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
 
                 // exclusions key statistics aggregate table
@@ -4240,7 +4258,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     },
 
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -4302,6 +4321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
                 // exclusions generic data blocks used in content
                 new DataBlock
@@ -4373,7 +4393,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -4416,6 +4437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
                 new DataBlock
                 {
@@ -4487,7 +4509,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -4533,6 +4556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
 
                 // exclusions detached Data Block (not yet belonging to any Content Section)
@@ -4621,7 +4645,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     },
 
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -4664,6 +4689,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
 
                 // another exclusions detached Data Block (not yet belonging to any Content Section)
@@ -4752,7 +4778,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     },
 
-                    Chart =
+                    Charts = new List<IContentBlockChart>
+                    {
                         new LineChart
                         {
                             Axes = new Dictionary<string, ChartAxisConfigurationItem>
@@ -4795,7 +4822,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Legend = ChartLegend.top
                         }
+                    }
                 },
+
                 // Secondary and primary schools applications offers key statistics tile 1
                 new DataBlock
                 {

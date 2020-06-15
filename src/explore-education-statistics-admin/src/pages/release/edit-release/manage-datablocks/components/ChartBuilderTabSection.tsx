@@ -46,7 +46,7 @@ const ChartBuilderTabSection = ({
       await onDataBlockSave({
         ...dataBlock,
         dataBlockRequest: query,
-        chart,
+        charts: [chart],
       });
     },
     [dataBlock, onDataBlockSave, query],
@@ -65,6 +65,7 @@ const ChartBuilderTabSection = ({
 
       await onDataBlockSave({
         ...dataBlock,
+        charts: [],
       });
     },
     [dataBlock, onDataBlockSave, releaseId, meta.subjectName],
@@ -97,7 +98,7 @@ const ChartBuilderTabSection = ({
       releaseId={releaseId}
       data={table.results}
       meta={meta}
-      initialConfiguration={dataBlock.chart}
+      initialConfiguration={dataBlock.charts[0]}
       onChartSave={handleChartSave}
       onChartDelete={handleChartDelete}
       onTableQueryUpdate={handleTableQueryUpdate}

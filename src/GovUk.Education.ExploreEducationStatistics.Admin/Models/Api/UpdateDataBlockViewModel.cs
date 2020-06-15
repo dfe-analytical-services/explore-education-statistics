@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public ObservationQueryContext DataBlockRequest { get; set; }
 
-        public IContentBlockChart Chart { get; set; }
+        public List<IContentBlockChart> Charts { get; set; }
 
         public DataBlockSummary Summary { get; set; }
 

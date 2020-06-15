@@ -120,14 +120,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(async existing =>
                 {
-                    if (existing.Chart is InfographicChart infographicChart)
+                    // TODO EES-753 Alter this when multiple charts are supported
+                    var existingChart = existing.Charts.OfType<InfographicChart>().FirstOrDefault();
+                    if (existingChart != null)
                     {
-                        if (!(updateDataBlock.Chart is InfographicChart))
+                        if (updateDataBlock.Charts.OfType<InfographicChart>().FirstOrDefault() != null)
                         {
                             var release = GetReleaseForDataBlock(existing.Id);
                             // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
                             await _fileStorageService.DeleteNonDataFileAsync(release.Id, ReleaseFileTypes.Chart,
-                                infographicChart.FileId);
+                                existingChart.FileId);
                         }
                     }
                     _context.DataBlocks.Update(existing);
@@ -166,17 +168,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private DependentDataBlock CreateDependentDataBlock(DataBlock block)
         {
-            var filenames = block.Chart is InfographicChart chart ?  new List<string>
-            {
-                chart.FileId
-            } : new List<string>();
-            
             return new DependentDataBlock
             {
                 Id = block.Id,
                 Name = block.Name,
                 ContentSectionHeading = GetContentSectionHeading(block),
-                InfographicFilenames = filenames
+                InfographicFilenames = block
+                    .Charts
+                    .OfType<InfographicChart>()
+                    .Select(chart => chart.FileId)
+                    .ToList(),
             };
         }
         
@@ -211,11 +212,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             foreach (var block in blocks)
             {
+                // TODO EES-753 Alter this when multiple charts are supported
+                var infoGraphicChart = block.Charts
+                    .OfType<InfographicChart>()
+                    .FirstOrDefault();
+
                 // TODO EES-960 - This isn't guaranteed to delete the requested infographic causing an error
                 // It could be the same filename but in a different datablock that uses the same subject
-                if (block.Chart is InfographicChart infoGraphicChart && infoGraphicChart.FileId == fileName)
+                if (infoGraphicChart != null && infoGraphicChart.FileId == fileName)
                 {
-                    block.Chart = null;
+                    block.Charts.Remove(infoGraphicChart);
                     _context.DataBlocks.Update(block);
                     await _context.SaveChangesAsync();
                     // TODO EES-960 - Returning here leaves infographic files of the same filename on other datablocks
