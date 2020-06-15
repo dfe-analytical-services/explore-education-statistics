@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddSingleton<IFileStorageService, FileStorageService>();
+            services.AddTransient<IFileStorageService, FileStorageService>(s => new FileStorageService(Configuration.GetValue<string>("PublicStorage")));;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
