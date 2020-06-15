@@ -113,7 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
         }
 
-        public async Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(Guid id, UpdateDataBlockViewModel updateDataBlock)
+        public async Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(Guid id,
+            UpdateDataBlockViewModel updateDataBlock)
         {
             return await _persistenceHelper
                 .CheckEntityExists<DataBlock>(id)
@@ -121,17 +122,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async existing =>
                 {
                     // TODO EES-753 Alter this when multiple charts are supported
-                    var existingChart = existing.Charts.OfType<InfographicChart>().FirstOrDefault();
-                    if (existingChart != null)
+                    var infographicChart = existing.Charts.OfType<InfographicChart>().FirstOrDefault();
+                    var updatedInfographicChart = updateDataBlock.Charts.OfType<InfographicChart>().FirstOrDefault();
+                    
+                    if (infographicChart != null && updatedInfographicChart == null)
                     {
-                        if (updateDataBlock.Charts.OfType<InfographicChart>().FirstOrDefault() != null)
-                        {
-                            var release = GetReleaseForDataBlock(existing.Id);
-                            // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
-                            await _fileStorageService.DeleteNonDataFileAsync(release.Id, ReleaseFileTypes.Chart,
-                                existingChart.FileId);
-                        }
+                        // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
+                        var release = GetReleaseForDataBlock(existing.Id);
+                        await _fileStorageService.DeleteNonDataFileAsync(release.Id, ReleaseFileTypes.Chart,
+                            infographicChart.FileId);
                     }
+
                     _context.DataBlocks.Update(existing);
                     _mapper.Map(updateDataBlock, existing);
                     await _context.SaveChangesAsync();
