@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(
-                "UPDATE dbo.ContentBlock SET DataBlock_Charts = JSON_MODIFY(DataBlock_Charts, '$.ReleaseId', '') WHERE 1=1");
+                "UPDATE dbo.ContentBlock SET DataBlock_Charts = JSON_MODIFY(DataBlock_Charts, '$[0].ReleaseId', '') WHERE 1=1");
         }
     }
 }
