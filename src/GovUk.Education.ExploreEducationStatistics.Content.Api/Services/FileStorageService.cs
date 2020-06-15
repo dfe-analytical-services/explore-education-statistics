@@ -10,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
         private const string PublicContentContainerName = "cache";
         private readonly string _storageConnectionString;
 
-        public FileStorageService(IConfiguration config)
+        public FileStorageService(string connectionString)
         {
-            _storageConnectionString = config.GetValue<string>("PublicStorage");
+            _storageConnectionString = connectionString;
         }
 
         public async Task<string> DownloadTextAsync(string blobName)

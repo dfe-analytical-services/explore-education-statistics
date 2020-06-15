@@ -85,24 +85,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await RemoveChartFileReleaseLinks(deletePlan);
             return true;
         }
-        
-        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName, string fileName)
+
+        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName,
+            string fileName)
         {
-            var subject = await _subjectService.GetAsync(releaseId, subjectName);
-            var blocks = GetDataBlocks(releaseId, subject.Id);
-                
-            foreach (var block in blocks)
-            {
-                var infoGraphicChart = block.Charts.FirstOrDefault(c => c.Type == ChartType.infographic.ToString());
-                if (infoGraphicChart != null && ((InfographicChart)infoGraphicChart).FileId == fileName)
-                {
-                    block.Charts.Remove(infoGraphicChart);
-                    _context.DataBlocks.Update(block);
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
-            }
-            return true;
+            return await RemoveInfographicChartFromDataBlock(releaseId, subjectName, fileName)
+                .OnSuccessDo(() =>
+                    _fileStorageService.DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
         }
         
         public async Task<DataBlockViewModel> GetAsync(Guid id)
@@ -124,13 +113,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
         }
 
-        public async Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(Guid id, UpdateDataBlockViewModel updateDataBlock)
+        public async Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(Guid id,
+            UpdateDataBlockViewModel updateDataBlock)
         {
             return await _persistenceHelper
                 .CheckEntityExists<DataBlock>(id)
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(async existing =>
                 {
+                    // TODO EES-753 Alter this when multiple charts are supported
+                    var infographicChart = existing.Charts.OfType<InfographicChart>().FirstOrDefault();
+                    var updatedInfographicChart = updateDataBlock.Charts.OfType<InfographicChart>().FirstOrDefault();
+                    
+                    if (infographicChart != null && updatedInfographicChart == null)
+                    {
+                        // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
+                        var release = GetReleaseForDataBlock(existing.Id);
+                        await _fileStorageService.DeleteNonDataFileAsync(release.Id, ReleaseFileTypes.Chart,
+                            infographicChart.FileId);
+                    }
+
                     _context.DataBlocks.Update(existing);
                     _mapper.Map(updateDataBlock, existing);
                     await _context.SaveChangesAsync();
@@ -167,15 +169,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private DependentDataBlock CreateDependentDataBlock(DataBlock block)
         {
-            return new DependentDataBlock()
+            return new DependentDataBlock
             {
                 Id = block.Id,
                 Name = block.Name,
                 ContentSectionHeading = GetContentSectionHeading(block),
                 InfographicFilenames = block
                     .Charts
-                    .Where(chart => chart.Type == ChartType.infographic.ToString())
-                    .Cast<InfographicChart>()
+                    .OfType<InfographicChart>()
                     .Select(chart => chart.FileId)
                     .ToList(),
             };
@@ -201,6 +202,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
         
+        private async Task<Either<ActionResult, bool>> RemoveInfographicChartFromDataBlock(Guid releaseId,
+            string subjectName, string fileName)
+        {
+            // TODO EES-960 - Using Subject here doesn't find datablocks in the same Release but for a different Subject
+            // that include the same infographic file.
+            // They are left untouched but the file is eventually removed causing an error.
+            var subject = await _subjectService.GetAsync(releaseId, subjectName);
+            var blocks = GetDataBlocks(releaseId, subject.Id);
+
+            foreach (var block in blocks)
+            {
+                // TODO EES-753 Alter this when multiple charts are supported
+                var infoGraphicChart = block.Charts
+                    .OfType<InfographicChart>()
+                    .FirstOrDefault();
+
+                // TODO EES-960 - This isn't guaranteed to delete the requested infographic causing an error
+                // It could be the same filename but in a different datablock that uses the same subject
+                if (infoGraphicChart != null && infoGraphicChart.FileId == fileName)
+                {
+                    block.Charts.Remove(infoGraphicChart);
+                    _context.DataBlocks.Update(block);
+                    await _context.SaveChangesAsync();
+                    // TODO EES-960 - Returning here leaves infographic files of the same filename on other datablocks
+                    // The file is eventually deleted from Storage causing an error.
+                    return true;
+                }
+            }
+            return true;
+        }
+
         private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
             var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
@@ -235,8 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(join => join.ReleaseId == releaseId)
                 .ToList()
                 .Select(join => join.ContentBlock)
-                .Where(block => block.GetType() == typeof(DataBlock))
-                .Cast<DataBlock>()
+                .OfType<DataBlock>()
                 .Where(block => block.DataBlockRequest.SubjectId == subjectId)
                 .ToList();
         }
@@ -250,18 +281,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(join => join.ReleaseId == releaseId)
                 .ToList()
                 .Select(join => join.ContentBlock)
-                .Where(block => block.GetType() == typeof(DataBlock))
-                .Cast<DataBlock>().First(block => block.Id == id);
+                .OfType<DataBlock>()
+                .First(block => block.Id == id);
+        }
+
+        private Release GetReleaseForDataBlock(Guid dataBlockId)
+        {
+            return _context
+                .ReleaseContentBlocks
+                .Include(join => join.Release)
+                .First(join => join.ContentBlockId == dataBlockId)
+                .Release;
         }
 
         private async Task<Either<ActionResult, DataBlock>> CheckCanUpdateReleaseForDataBlock(DataBlock dataBlock)
         {
-            var release = _context
-                .ReleaseContentBlocks
-                .Include(join => join.Release)
-                .First(join => join.ContentBlockId == dataBlock.Id)
-                .Release;
-
+            var release = GetReleaseForDataBlock(dataBlock.Id);
             return await _userService
                 .CheckCanUpdateRelease(release)
                 .OnSuccess(_ => dataBlock);

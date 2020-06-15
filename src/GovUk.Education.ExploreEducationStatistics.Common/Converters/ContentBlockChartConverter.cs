@@ -1,63 +1,37 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
 {
-    public class ContentBlockChartConverter : JsonConverter
+    public class ContentBlockChartConverter : JsonConverter<IContentBlockChart>
     {
         public override bool CanWrite => false;
-        public override bool CanRead => true;
 
-        public override bool CanConvert(Type objectType)
+        public override IContentBlockChart ReadJson(JsonReader reader, Type objectType,
+            IContentBlockChart existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            return (objectType == typeof(IContentBlockChart));
+            var jsonObject = JObject.Load(reader);
+            var type = jsonObject["Type"] ?? jsonObject["type"];
+            var chartType = EnumUtil.GetFromString<ChartType>(type.Value<string>());
+
+            IContentBlockChart contentBlock = chartType switch
+            {
+                ChartType.Line => new LineChart(),
+                ChartType.HorizontalBar => new HorizontalBarChart(),
+                ChartType.VerticalBar => new VerticalBarChart(),
+                ChartType.Map => new MapChart(),
+                ChartType.Infographic => new InfographicChart(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            serializer.Populate(jsonObject.CreateReader(), contentBlock);
+            return contentBlock;
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-            JsonSerializer serializer)
-        {
-            try
-            {
-                var jsonObject = JObject.Load(reader);
-                var contentBlock = default(IContentBlockChart);
-
-                var type = jsonObject["Type"] ?? jsonObject["type"];
-
-                switch (type.Value<string>())
-                {
-                    case "line":
-                        contentBlock = new LineChart();
-                        break;
-                    case "horizontalbar":
-                        contentBlock = new HorizontalBarChart();
-                        break;
-                    case "verticalbar":
-                        contentBlock = new VerticalBarChart();
-                        break;
-                    case "map":
-                        contentBlock = new MapChart();
-                        break;
-                    case "infographic":
-                        contentBlock = new InfographicChart();
-                        break;
-                }
-
-                if (contentBlock != null)
-                {
-                    serializer.Populate(jsonObject.CreateReader(), contentBlock);
-                }
-
-                return contentBlock;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, IContentBlockChart value, JsonSerializer serializer)
         {
             throw new InvalidOperationException("Use default serialization.");
         }

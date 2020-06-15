@@ -12,7 +12,6 @@ export interface ChartFile {
 }
 
 interface UploadChartFileRequest {
-  name: string;
   file: File;
 }
 
@@ -35,10 +34,7 @@ const releaseChartFileService = {
   async uploadChartFile(releaseId: string, request: UploadChartFileRequest) {
     const data = new FormData();
     data.append('file', request.file);
-    return client.post<null>(
-      `/release/${releaseId}/chart?name=${request.name}`,
-      data,
-    );
+    return client.post<null>(`/release/${releaseId}/chart`, data);
   },
 
   async deleteChartFile(

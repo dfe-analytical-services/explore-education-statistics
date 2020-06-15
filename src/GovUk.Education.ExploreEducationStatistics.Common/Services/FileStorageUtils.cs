@@ -91,6 +91,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blobContainer;
         }
 
+        public static FileInfo GetFileInfo(CloudBlob blob)
+        {
+            blob.FetchAttributes();
+            return new FileInfo
+            {
+                Extension = GetExtension(blob),
+                Name = GetName(blob),
+                Path = blob.Name,
+                Size = GetSize(blob)
+            };
+        }
+
         public static IEnumerable<FileInfo> ListPublicFilesPreview(string storageConnectionString, string containerName,
             IEnumerable<Guid> referencedVersions)
         {

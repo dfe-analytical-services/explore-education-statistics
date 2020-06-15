@@ -11,8 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
     public interface IFileStorageService
     {
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
+        Task<Common.Model.Either<ActionResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metaFile, string name, bool overwrite, string userName);
+
+        Task<Either<ActionResult, IEnumerable<Common.Model.FileInfo>>> ListChartFilesAsync(Guid releaseId);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId, params ReleaseFileTypes[] types);
         
@@ -20,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile file,
             string name, ReleaseFileTypes type, bool overwrite);
+
+        Task<Either<ActionResult, Common.Model.FileInfo>> UploadChartFileAsync(Guid releaseId, IFormFile file);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteNonDataFileAsync(Guid releaseId, ReleaseFileTypes type,
             string fileName);
