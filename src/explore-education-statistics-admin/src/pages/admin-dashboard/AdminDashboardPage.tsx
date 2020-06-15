@@ -130,7 +130,9 @@ const AdminDashboardPage = () => {
                     </ButtonLink>
                   }
                 >
-                  <PrereleaseAccessManagement release={release} />
+                  {release.permissions.canUpdateRelease && (
+                    <PrereleaseAccessManagement release={release} />
+                  )}
                 </ReleaseSummary>
               )}
             />
