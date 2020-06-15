@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IThemeMetaService, ThemeMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-            services.AddTransient<IFileStorageService, FileStorageService>();
+            services.AddTransient<IFileStorageService, FileStorageService>(s => new FileStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFilterService, FilterService>();
