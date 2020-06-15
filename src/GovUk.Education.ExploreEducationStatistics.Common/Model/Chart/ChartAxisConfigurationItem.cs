@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public string Unit;
         public bool ShowGrid = true;
 
-        public Label? Label;
+        public Label Label;
 
         public int? Min;
         public int? Max;
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public Guid Indicator;
         public List<Guid> Filters = new List<Guid>();
         public ChartDataLocation Location;
-        public string? TimePeriod;
+        public string TimePeriod;
         public ChartConfiguration Config;
     }
 

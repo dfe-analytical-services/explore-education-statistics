@@ -2999,7 +2999,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.cross
                                     },
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -3128,7 +3128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.diamond
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -3281,7 +3281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.circle
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -3470,7 +3470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.diamond
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -3627,7 +3627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.diamond
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -3886,7 +3886,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.circle
                                     },
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -4014,7 +4014,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.circle
                                     },
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -4143,7 +4143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.circle
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -4319,7 +4319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.cross
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -4435,7 +4435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.circle
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -4554,7 +4554,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.circle
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -4687,7 +4687,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.circle
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },
@@ -4820,7 +4820,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         symbol = ChartSymbol.circle
                                     }
                             },
-                            Legend = Legend.top
+                            Legend = ChartLegend.top
                         }
                     }
                 },

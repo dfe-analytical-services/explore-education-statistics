@@ -26,7 +26,6 @@ const errorCodeMappings = [
 ];
 
 interface FormValues {
-  name: string;
   file: File | null;
   fileId: string;
 }
@@ -64,7 +63,6 @@ const InfographicChartForm = ({
 
       try {
         await releaseChartFileService.uploadChartFile(releaseId, {
-          name: values.name,
           file: values.file as File,
         });
         await refreshFiles();
@@ -82,12 +80,10 @@ const InfographicChartForm = ({
     <Formik<FormValues>
       enableReinitialize
       initialValues={{
-        name: '',
         file: null,
         fileId: fileId || '',
       }}
       validationSchema={Yup.object<FormValues>({
-        name: Yup.string().required('Enter a name'),
         file: Yup.mixed().required('Choose a file'),
         fileId: Yup.string(),
       })}
@@ -99,9 +95,6 @@ const InfographicChartForm = ({
             {fileId && selectedFile && (
               <>
                 <SummaryList>
-                  <SummaryListItem term="Name">
-                    {selectedFile.title}
-                  </SummaryListItem>
                   <SummaryListItem term="Filename">{fileId}</SummaryListItem>
                 </SummaryList>
 
@@ -139,23 +132,13 @@ const InfographicChartForm = ({
 
             {!fileId && (
               <>
-                <FormFieldTextInput
-                  id={`${formId}-name`}
-                  name="name"
-                  label="Select a name to give the file"
-                  width={20}
-                />
-
                 <FormFieldFileInput<FormValues>
                   id={`${formId}-file`}
                   name="file"
                   label="Select a file to upload"
                 />
 
-                <Button
-                  type="submit"
-                  disabled={!form.values.file || !form.values.name || uploading}
-                >
+                <Button type="submit" disabled={!form.values.file || uploading}>
                   Upload
                 </Button>
               </>

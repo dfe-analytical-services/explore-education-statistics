@@ -130,10 +130,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> GetChartFilesAsync(Guid releaseId)
+        public async Task<ActionResult<IEnumerable<Common.Model.FileInfo>>> GetChartFilesAsync(Guid releaseId)
         {
             return await _fileStorageService
-                .ListFilesAsync(releaseId, ReleaseFileTypes.Chart)
+                .ListChartFilesAsync(releaseId)
                 .HandleFailuresOrOk();
         }
 
@@ -157,11 +157,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> AddChartFilesAsync(Guid releaseId,
-            [Required] [FromQuery(Name = "name")] string name, IFormFile file)
+        public async Task<ActionResult<Common.Model.FileInfo>> AddChartFilesAsync(Guid releaseId, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, true)
+                .UploadChartFileAsync(releaseId, file)
                 .HandleFailuresOrOk();
         }
 
@@ -273,12 +272,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/chart/{subjectName}/{fileName}")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
+        public async Task<ActionResult> DeleteChartFile(
             Guid releaseId, string subjectName, string fileName)
         {
             return await _dataBlockService.RemoveChartFile(releaseId, subjectName, fileName)
-                .OnSuccess(_ => _fileStorageService.DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName))
-                .HandleFailuresOrOk();
+                .HandleFailuresOrNoContent();
         }
 
         [HttpGet("releases/{releaseId}/status")]
