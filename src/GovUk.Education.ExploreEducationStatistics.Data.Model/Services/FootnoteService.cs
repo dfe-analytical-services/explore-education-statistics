@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -136,7 +137,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         FilterGroups = f.FilterGroups.Where(filterGroupFootnote => subjects.Contains(filterGroupFootnote.FilterGroup.Filter.SubjectId)).ToList(),
                         FilterItems = f.FilterItems.Where(filterItemFootnote => subjects.Contains(filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId)).ToList(),
                         Subjects = f.Subjects.Where(subjectFootnote => subjects.Contains(subjectFootnote.SubjectId)).ToList()
-                    }).ToList();
+                    }).ToList()
+                    .Where(f => (f.Filters != null && f.Filters.Any()) ||
+                                  (f.Indicators != null && f.Indicators.Any()) ||
+                                  (f.FilterGroups != null && f.FilterGroups.Any()) ||
+                                  (f.FilterItems != null && f.FilterItems.Any()) ||
+                                  (f.Subjects != null && f.Subjects.Any())
+                    ).ToList();
         }
 
         public async Task DeleteReleaseFootnoteLinkAsync(Guid releaseId, Guid footnoteId)
@@ -163,6 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Include(f => f.FilterGroups)
                 .Include(f => f.FilterItems)
                 .Include(f => f.Indicators)
+                .ThenInclude(i => i.Indicator.IndicatorGroup)
                 .Include(f => f.Subjects).Single(f => f.Id == id);
 
             return (footnote.Subjects.Any(subject => subject.SubjectId != subjectId) ||
