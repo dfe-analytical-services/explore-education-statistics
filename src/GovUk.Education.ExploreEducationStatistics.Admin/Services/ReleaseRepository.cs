@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userReleaseIds = await _context
                 .UserReleaseRoles
-                .Where(r => r.UserId == userId)
+                .Where(r => r.UserId == userId && r.Role != ReleaseRole.PrereleaseViewer)
                 .Select(r => r.ReleaseId)
                 .ToListAsync();
             
