@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Thread.Sleep(new Random().Next(1, 5) * 1000);
             
             var release = CreateOrUpdateRelease(message, context);
-            RemoveSubject(subjectData.Name, release, context);
+            RemoveSubjectIfExisting(subjectData.Name, release, context);
             
             var subject = CreateSubject(message.SubjectId, subjectData.Name, release, context);
             CreateReleaseFileLink(message, contentDbContext, release, subject);
@@ -61,25 +61,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private void RemoveSubject(string name, Release release, StatisticsDbContext context)
+        private void RemoveSubjectIfExisting(string name, Release release, StatisticsDbContext context)
         {
             var releaseSubject = context.ReleaseSubject
+                .Include(rs => rs.Subject)
                 .FirstOrDefault(r => r.Subject.Name == name && r.ReleaseId == release.Id);
             
             // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
             if (releaseSubject != null)
             {
+                var subject = releaseSubject.Subject;
                 context.ReleaseSubject.Remove(releaseSubject);
-            }
-            
-            var subject = context.Subject.FirstOrDefault(s => s.Name == name);
-
-            if (subject != null)
-            {
                 context.Subject.Remove(subject);
+                context.SaveChanges();
             }
-            
-            context.SaveChanges();
         }
 
         private Subject CreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext context)
