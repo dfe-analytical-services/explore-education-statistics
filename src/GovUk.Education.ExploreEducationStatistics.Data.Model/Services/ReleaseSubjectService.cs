@@ -45,6 +45,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             
                 if (subject != null)
                 {
+                    var observationFilterItems = _statisticsDbContext.ObservationFilterItem
+                            .Include(ofi => ofi.Observation)
+                            .ThenInclude(o => o.Subject)
+                            .Where(ofi => ofi.Observation.Subject.Id == subjectId);
+                    
+                    _statisticsDbContext.ObservationFilterItem.RemoveRange(observationFilterItems);
+
                     _statisticsDbContext.Subject.Remove(subject);
                 }    
             }
