@@ -19,17 +19,7 @@ def user_waits_for_page_to_finish_loading():
 
 
 def user_sets_focus_to_element(selector):
-    if selector.startswith('css:'):
-        selector = selector[4:]
-        sl.wait_until_page_contains_element(f'css:{selector}')
-        elem = sl.driver.find_element_by_css_selector(selector)
-    elif selector.startswith('xpath:'):
-        selector = selector[6:]
-        sl.wait_until_page_contains_element(f'xpath:{selector}')
-        elem = sl.driver.find_element_by_xpath(selector)
-    else:
-        raise AssertionError('Selector must be either css or xpath!')
-    elem.send_keys(Keys.NULL)
+    sl.set_focus_to_element(selector)
 
 
 def set_cookie_from_json(cookie_json):
@@ -41,7 +31,7 @@ def set_cookie_from_json(cookie_json):
 
 def get_datetime(strf):
     now = datetime.now()
-    return now.strftime(strf)
+    return now.strftime(strf).lstrip('0')
 
 
 def user_should_be_at_top_of_page():

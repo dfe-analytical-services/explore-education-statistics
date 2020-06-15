@@ -55,7 +55,7 @@ Add release note to release
     # TODO: Check release note is there
     user waits until page contains element   xpath://span[text()="See all 1 updates"]
     user clicks element   xpath://span[text()="See all 1 updates"]
-    ${date}=  get datetime   %-d %B %Y
+    ${date}=  get datetime   %d %B %Y
     user checks page contains element   xpath://*[@data-testid="last-updated-element"]/time[text()="${date}"]
     user checks page contains element   xpath://*[@data-testid="last-updated-element"]/p[text()="Test release note one"]
 
