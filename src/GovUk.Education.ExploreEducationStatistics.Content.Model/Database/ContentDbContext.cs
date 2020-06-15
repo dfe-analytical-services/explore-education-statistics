@@ -1746,10 +1746,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Publication
                 {
                     Id = new Guid("1d0e4263-3d70-433e-bd95-f29754db5888"),
-                    Title = "Multi-academy trust performance measures",
+                    Title = "Multi-academy trust performance measures at key stage 4",
                     Summary = "",
                     TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
-                    Slug = "multi-academy-trust-performance-measures",
+                    Slug = "multi-academy-trust-performance-measures-at-ks4",
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures"),
@@ -1806,10 +1806,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Publication
                 {
                     Id = new Guid("eab51107-4ef0-4926-8f8b-c8bd7f5a21d5"),
-                    Title = "Multi-academy trust performance measures",
+                    Title = "Multi-academy trust performance measures at key stage 2",
                     Summary = "",
                     TopicId = new Guid("eac38700-b968-4029-b8ac-0eb8e1356480"),
-                    Slug = "multi-academy-trust-performance-measures",
+                    Slug = "multi-academy-trust-performance-measures-at-ks2",
                     LegacyPublicationUrl =
                         new Uri(
                             "https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2"),
