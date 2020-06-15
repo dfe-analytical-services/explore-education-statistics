@@ -8,16 +8,12 @@ import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatu
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import loginService from '@admin/services/loginService';
-import preReleaseContactService, {
-  PrereleaseContactDetails,
-} from '@admin/services/preReleaseContactService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { Dictionary } from '@common/types';
 import React from 'react';
 import ManagePublicationsAndReleasesTab from './components/ManagePublicationsAndReleasesTab';
 
@@ -32,24 +28,6 @@ const AdminDashboardPage = () => {
       releaseService.getDraftReleases(),
       releaseService.getScheduledReleases(),
     ]);
-
-    const contactResultsByRelease = scheduledReleases.map(release =>
-      preReleaseContactService
-        .getPreReleaseContactsForRelease(release.id)
-        .then(contacts => ({
-          releaseId: release.id,
-          contacts,
-        })),
-    );
-
-    const contactResults = await Promise.all(contactResultsByRelease);
-
-    const preReleaseContactsByScheduledRelease: Dictionary<PrereleaseContactDetails[]> = {};
-
-    contactResults.forEach(result => {
-      const { releaseId, contacts } = result;
-      preReleaseContactsByScheduledRelease[releaseId] = contacts;
-    });
 
     return [draftReleases, scheduledReleases];
   }, []);
