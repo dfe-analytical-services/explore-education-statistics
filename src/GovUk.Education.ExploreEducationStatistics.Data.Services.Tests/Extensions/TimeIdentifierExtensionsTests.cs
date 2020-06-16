@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         [Fact]
         public void TimeIdentifiersAreWeeks()
         {
-            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsMonth(), TimeIdentifierUtil.GetWeeks());
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsWeek(), TimeIdentifierUtil.GetWeeks());
         }
 
         [Fact]

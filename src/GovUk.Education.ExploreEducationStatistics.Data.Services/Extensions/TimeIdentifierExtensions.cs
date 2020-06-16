@@ -75,6 +75,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
                 return GetMonths();
             }
 
+            if (timeIdentifier.IsWeek())
+            {
+                return GetWeeks();
+            }
+
             if (timeIdentifier.IsAcademicQuarter())
             {
                 return GetAcademicQuarters();
