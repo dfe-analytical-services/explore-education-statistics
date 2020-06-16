@@ -73,6 +73,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public NotificationList GetNotifications(string templateType = "", string status = "", string reference = "",
+            string olderThanId = "", bool includeSpreadsheetUploads = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public NotificationList GetNotifications(string templateType = "", string status = "", string reference = "",
             string olderThanId = "")
         {
             throw new NotImplementedException();

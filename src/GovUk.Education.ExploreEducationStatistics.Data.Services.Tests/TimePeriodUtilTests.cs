@@ -79,6 +79,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 December
             };
 
+            var weekIdentifiers = new[]
+            {
+                Week1,
+                Week2,
+                Week3,
+                Week4,
+                Week5,
+                Week6,
+                Week7,
+                Week8,
+                Week9,
+                Week10,
+                Week11,
+                Week12,
+                Week13,
+                Week14,
+                Week15,
+                Week16,
+                Week17,
+                Week18,
+                Week19,
+                Week20,
+                Week21,
+                Week22,
+                Week23,
+                Week24,
+                Week25,
+                Week26,
+                Week27,
+                Week28,
+                Week29,
+                Week30,
+                Week31,
+                Week32,
+                Week33,
+                Week34,
+                Week35,
+                Week36,
+                Week37,
+                Week38,
+                Week39,
+                Week40,
+                Week41,
+                Week42,
+                Week43,
+                Week44,
+                Week45,
+                Week46,
+                Week47,
+                Week48,
+                Week49,
+                Week50,
+                Week51,
+                Week52
+            };
+
             var termIdentifiers = new[]
             {
                 AutumnTerm,
@@ -97,6 +153,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Assert.Throws<ArgumentException>(() =>
                     TimePeriodUtil.Range(new TimePeriodQuery(2018, January, 2019, identifier)));
+            }
+
+            foreach (var identifier in _allTimeIdentifiers.Except(weekIdentifiers))
+            {
+                Assert.Throws<ArgumentException>(() =>
+                    TimePeriodUtil.Range(new TimePeriodQuery(2018, Week1, 2019, identifier)));
             }
 
             foreach (var identifier in _allTimeIdentifiers.Except(termIdentifiers))
@@ -254,6 +316,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     (2020, March)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, April, 2020, March)).ToList());
+        }
+
+        [Fact]
+        public void RangeIsGeneratedForWeekQuery()
+        {
+            CollectionAssert.AreEquivalent(
+                new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2020, Week17)
+                },
+                TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week17)).ToList());
+
+            CollectionAssert.AreEquivalent(
+                new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2020, Week1),
+                    (2020, Week2),
+                    (2020, Week3),
+                    (2020, Week4),
+                    (2020, Week5),
+                    (2020, Week6),
+                    (2020, Week7),
+                    (2020, Week8),
+                    (2020, Week9),
+                    (2020, Week10),
+                    (2020, Week11),
+                    (2020, Week12),
+                    (2020, Week13),
+                    (2020, Week14),
+                    (2020, Week15),
+                    (2020, Week16),
+                    (2020, Week17),
+                    (2020, Week18),
+                    (2020, Week19),
+                    (2020, Week20),
+                    (2020, Week21),
+                    (2020, Week22),
+                    (2020, Week23),
+                    (2020, Week24),
+                    (2020, Week25),
+                    (2020, Week26),
+                    (2020, Week27),
+                    (2020, Week28),
+                    (2020, Week29),
+                    (2020, Week30),
+                    (2020, Week31),
+                    (2020, Week32),
+                    (2020, Week33),
+                    (2020, Week34),
+                    (2020, Week35),
+                    (2020, Week36),
+                    (2020, Week37),
+                    (2020, Week38),
+                    (2020, Week39),
+                    (2020, Week40),
+                    (2020, Week41),
+                    (2020, Week42),
+                    (2020, Week43),
+                    (2020, Week44),
+                    (2020, Week45),
+                    (2020, Week46),
+                    (2020, Week47),
+                    (2020, Week48),
+                    (2020, Week49),
+                    (2020, Week50),
+                    (2020, Week51),
+                    (2020, Week52)
+                },
+                TimePeriodUtil.Range(new TimePeriodQuery(2020, Week1, 2020, Week52)).ToList());
+
+            CollectionAssert.AreEquivalent(
+                new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2020, Week17),
+                    (2020, Week18),
+                    (2020, Week19),
+                    (2020, Week20)
+                },
+                TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week20)).ToList());
+
+            CollectionAssert.AreEquivalent(
+                new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, Week51),
+                    (2019, Week52),
+                    (2020, Week1),
+                    (2020, Week2)
+                },
+                TimePeriodUtil.Range(new TimePeriodQuery(2019, Week51, 2020, Week2)).ToList());
         }
 
         [Fact]

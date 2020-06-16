@@ -119,6 +119,162 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         November,
 
         [TimeIdentifierMeta("December", "M12", Month)]
-        December
+        December,
+
+        [TimeIdentifierMeta("Week 1", "W1", Week)]
+        Week1,
+
+        [TimeIdentifierMeta("Week 2", "W2", Week)]
+        Week2,
+
+        [TimeIdentifierMeta("Week 3", "W3", Week)]
+        Week3,
+
+        [TimeIdentifierMeta("Week 4", "W4", Week)]
+        Week4,
+
+        [TimeIdentifierMeta("Week 5", "W5", Week)]
+        Week5,
+
+        [TimeIdentifierMeta("Week 6", "W6", Week)]
+        Week6,
+
+        [TimeIdentifierMeta("Week 7", "W7", Week)]
+        Week7,
+
+        [TimeIdentifierMeta("Week 8", "W8", Week)]
+        Week8,
+
+        [TimeIdentifierMeta("Week 9", "W9", Week)]
+        Week9,
+
+        [TimeIdentifierMeta("Week 10", "W10", Week)]
+        Week10,
+
+        [TimeIdentifierMeta("Week 11", "W11", Week)]
+        Week11,
+
+        [TimeIdentifierMeta("Week 12", "W12", Week)]
+        Week12,
+
+        [TimeIdentifierMeta("Week 13", "W13", Week)]
+        Week13,
+
+        [TimeIdentifierMeta("Week 14", "W14", Week)]
+        Week14,
+
+        [TimeIdentifierMeta("Week 15", "W15", Week)]
+        Week15,
+
+        [TimeIdentifierMeta("Week 16", "W16", Week)]
+        Week16,
+
+        [TimeIdentifierMeta("Week 17", "W17", Week)]
+        Week17,
+
+        [TimeIdentifierMeta("Week 18", "W18", Week)]
+        Week18,
+
+        [TimeIdentifierMeta("Week 19", "W19", Week)]
+        Week19,
+
+        [TimeIdentifierMeta("Week 20", "W20", Week)]
+        Week20,
+
+        [TimeIdentifierMeta("Week 21", "W21", Week)]
+        Week21,
+
+        [TimeIdentifierMeta("Week 22", "W22", Week)]
+        Week22,
+
+        [TimeIdentifierMeta("Week 23", "W23", Week)]
+        Week23,
+
+        [TimeIdentifierMeta("Week 24", "W24", Week)]
+        Week24,
+
+        [TimeIdentifierMeta("Week 25", "W25", Week)]
+        Week25,
+
+        [TimeIdentifierMeta("Week 26", "W26", Week)]
+        Week26,
+
+        [TimeIdentifierMeta("Week 27", "W27", Week)]
+        Week27,
+
+        [TimeIdentifierMeta("Week 28", "W28", Week)]
+        Week28,
+
+        [TimeIdentifierMeta("Week 29", "W29", Week)]
+        Week29,
+
+        [TimeIdentifierMeta("Week 30", "W30", Week)]
+        Week30,
+
+        [TimeIdentifierMeta("Week 31", "W31", Week)]
+        Week31,
+
+        [TimeIdentifierMeta("Week 32", "W32", Week)]
+        Week32,
+
+        [TimeIdentifierMeta("Week 33", "W33", Week)]
+        Week33,
+
+        [TimeIdentifierMeta("Week 34", "W34", Week)]
+        Week34,
+
+        [TimeIdentifierMeta("Week 35", "W35", Week)]
+        Week35,
+
+        [TimeIdentifierMeta("Week 36", "W36", Week)]
+        Week36,
+
+        [TimeIdentifierMeta("Week 37", "W37", Week)]
+        Week37,
+
+        [TimeIdentifierMeta("Week 38", "W38", Week)]
+        Week38,
+
+        [TimeIdentifierMeta("Week 39", "W39", Week)]
+        Week39,
+
+        [TimeIdentifierMeta("Week 40", "W40", Week)]
+        Week40,
+
+        [TimeIdentifierMeta("Week 41", "W41", Week)]
+        Week41,
+
+        [TimeIdentifierMeta("Week 42", "W42", Week)]
+        Week42,
+
+        [TimeIdentifierMeta("Week 43", "W43", Week)]
+        Week43,
+
+        [TimeIdentifierMeta("Week 44", "W44", Week)]
+        Week44,
+
+        [TimeIdentifierMeta("Week 45", "W45", Week)]
+        Week45,
+
+        [TimeIdentifierMeta("Week 46", "W46", Week)]
+        Week46,
+
+        [TimeIdentifierMeta("Week 47", "W47", Week)]
+        Week47,
+
+        [TimeIdentifierMeta("Week 48", "W48", Week)]
+        Week48,
+
+        [TimeIdentifierMeta("Week 49", "W49", Week)]
+        Week49,
+
+        [TimeIdentifierMeta("Week 50", "W50", Week)]
+        Week50,
+
+        [TimeIdentifierMeta("Week 51", "W51", Week)]
+        Week51,
+
+        [TimeIdentifierMeta("Week 52", "W52", Week)]
+        Week52
     }
 }
