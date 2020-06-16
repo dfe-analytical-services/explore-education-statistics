@@ -19,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
                    IsFinancialQuarter(timeIdentifier) && IsFinancialQuarter(compare) ||
                    IsTaxQuarter(timeIdentifier) && IsTaxQuarter(compare) ||
                    IsMonth(timeIdentifier) && IsMonth(compare) ||
+                   IsWeek(timeIdentifier) && IsWeek(compare) ||
                    IsTerm(timeIdentifier) && IsTerm(compare);
         }
 
@@ -50,6 +51,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
         public static bool IsMonth(this TimeIdentifier timeIdentifier)
         {
             return GetMonths().Contains(timeIdentifier);
+        }
+
+        public static bool IsWeek(this TimeIdentifier timeIdentifier)
+        {
+            return GetWeeks().Contains(timeIdentifier);
         }
 
         public static bool IsTerm(this TimeIdentifier timeIdentifier)

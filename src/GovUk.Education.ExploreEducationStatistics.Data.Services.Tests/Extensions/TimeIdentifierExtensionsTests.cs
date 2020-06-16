@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
             Assert.True(January.IsAlike(January));
             Assert.True(SpringTerm.IsAlike(SpringTerm));
             Assert.True(ReportingYear.IsAlike(ReportingYear));
+            Assert.True(Week1.IsAlike(Week1));
         }
 
         [Fact]
@@ -57,6 +58,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         public void MonthsAreAlike()
         {
             AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetMonths());
+        }
+
+        [Fact]
+        public void WeeksAreAlike()
+        {
+            AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetWeeks());
         }
 
         [Fact]
@@ -103,6 +110,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         public void TimeIdentifiersAreMonths()
         {
             AssertTimeIdentifiersMeetCondition(identifier => identifier.IsMonth(), TimeIdentifierUtil.GetMonths());
+        }
+
+        [Fact]
+        public void TimeIdentifiersAreWeeks()
+        {
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsMonth(), TimeIdentifierUtil.GetWeeks());
         }
 
         [Fact]
@@ -155,6 +168,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         public void GetAssociatedRangeForMonthReturnsAssociatedRange()
         {
             Assert.Equal(TimeIdentifierUtil.GetMonths(), January.GetAssociatedRange());
+        }
+
+        [Fact]
+        public void GetAssociatedRangeForWeeksReturnsAssociatedRange()
+        {
+            Assert.Equal(TimeIdentifierUtil.GetWeeks(), Week1.GetAssociatedRange());
         }
 
         [Fact]

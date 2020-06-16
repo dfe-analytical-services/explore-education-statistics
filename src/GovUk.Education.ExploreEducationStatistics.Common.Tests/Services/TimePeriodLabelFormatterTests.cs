@@ -92,6 +92,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
+        public void FormatTimePeriodUsingWeekIdentifiers()
+        {
+            Assert.Equal($"{Year} Week 1", Format(Year, Week1));
+            Assert.Equal($"{Year} Week 2", Format(Year, Week2));
+            Assert.Equal($"{Year} Week 3", Format(Year, Week3));
+            Assert.Equal($"{Year} Week 4", Format(Year, Week4));
+            Assert.Equal($"{Year} Week 5", Format(Year, Week5));
+            Assert.Equal($"{Year} Week 6", Format(Year, Week6));
+            Assert.Equal($"{Year} Week 7", Format(Year, Week7));
+            Assert.Equal($"{Year} Week 8", Format(Year, Week8));
+            Assert.Equal($"{Year} Week 9", Format(Year, Week9));
+            Assert.Equal($"{Year} Week 10", Format(Year, Week10));
+            Assert.Equal($"{Year} Week 11", Format(Year, Week11));
+            Assert.Equal($"{Year} Week 12", Format(Year, Week12));
+            Assert.Equal($"{Year} Week 13", Format(Year, Week13));
+            Assert.Equal($"{Year} Week 14", Format(Year, Week14));
+            Assert.Equal($"{Year} Week 15", Format(Year, Week15));
+            Assert.Equal($"{Year} Week 16", Format(Year, Week16));
+            Assert.Equal($"{Year} Week 17", Format(Year, Week17));
+            Assert.Equal($"{Year} Week 18", Format(Year, Week18));
+            Assert.Equal($"{Year} Week 19", Format(Year, Week19));
+            Assert.Equal($"{Year} Week 20", Format(Year, Week20));
+            Assert.Equal($"{Year} Week 21", Format(Year, Week21));
+            Assert.Equal($"{Year} Week 22", Format(Year, Week22));
+            Assert.Equal($"{Year} Week 23", Format(Year, Week23));
+            Assert.Equal($"{Year} Week 24", Format(Year, Week24));
+            Assert.Equal($"{Year} Week 25", Format(Year, Week25));
+            Assert.Equal($"{Year} Week 26", Format(Year, Week26));
+            Assert.Equal($"{Year} Week 27", Format(Year, Week27));
+            Assert.Equal($"{Year} Week 28", Format(Year, Week28));
+            Assert.Equal($"{Year} Week 29", Format(Year, Week29));
+            Assert.Equal($"{Year} Week 30", Format(Year, Week30));
+            Assert.Equal($"{Year} Week 31", Format(Year, Week31));
+            Assert.Equal($"{Year} Week 32", Format(Year, Week32));
+            Assert.Equal($"{Year} Week 33", Format(Year, Week33));
+            Assert.Equal($"{Year} Week 34", Format(Year, Week34));
+            Assert.Equal($"{Year} Week 35", Format(Year, Week35));
+            Assert.Equal($"{Year} Week 36", Format(Year, Week36));
+            Assert.Equal($"{Year} Week 37", Format(Year, Week37));
+            Assert.Equal($"{Year} Week 38", Format(Year, Week38));
+            Assert.Equal($"{Year} Week 39", Format(Year, Week39));
+            Assert.Equal($"{Year} Week 40", Format(Year, Week40));
+            Assert.Equal($"{Year} Week 41", Format(Year, Week41));
+            Assert.Equal($"{Year} Week 42", Format(Year, Week42));
+            Assert.Equal($"{Year} Week 43", Format(Year, Week43));
+            Assert.Equal($"{Year} Week 44", Format(Year, Week44));
+            Assert.Equal($"{Year} Week 45", Format(Year, Week45));
+            Assert.Equal($"{Year} Week 46", Format(Year, Week46));
+            Assert.Equal($"{Year} Week 47", Format(Year, Week47));
+            Assert.Equal($"{Year} Week 48", Format(Year, Week48));
+            Assert.Equal($"{Year} Week 49", Format(Year, Week49));
+            Assert.Equal($"{Year} Week 50", Format(Year, Week50));
+            Assert.Equal($"{Year} Week 51", Format(Year, Week51));
+            Assert.Equal($"{Year} Week 52", Format(Year, Week52));
+        }
+
+        [Fact]
         public void FormatTimePeriodWithFullLabelFormat()
         {
             Assert.Equal($"{Year} Calendar Year", Format(Year, CalendarYear, FullLabel));
@@ -184,6 +241,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             _testOutputHelper.WriteLine($"Format({Year}, SpringTerm)        {Format(Year, SpringTerm)}");
             _testOutputHelper.WriteLine($"Format({Year}, SummerTerm)        {Format(Year, SummerTerm)}");
             _testOutputHelper.WriteLine($"Format({Year}, AutumnSpringTerm)  {Format(Year, AutumnSpringTerm)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week1)             {Format(Year, Week1)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week2)             {Format(Year, Week2)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week3)             {Format(Year, Week3)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week4)             {Format(Year, Week4)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week5)             {Format(Year, Week5)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week6)             {Format(Year, Week6)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week7)             {Format(Year, Week7)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week8)             {Format(Year, Week8)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week9)             {Format(Year, Week9)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week10)            {Format(Year, Week10)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week11)            {Format(Year, Week11)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week12)            {Format(Year, Week12)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week13)            {Format(Year, Week13)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week14)            {Format(Year, Week14)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week15)            {Format(Year, Week15)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week16)            {Format(Year, Week16)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week17)            {Format(Year, Week17)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week18)            {Format(Year, Week18)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week19)            {Format(Year, Week19)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week20)            {Format(Year, Week20)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week21)            {Format(Year, Week21)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week22)            {Format(Year, Week22)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week23)            {Format(Year, Week23)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week24)            {Format(Year, Week24)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week25)            {Format(Year, Week25)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week26)            {Format(Year, Week26)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week27)            {Format(Year, Week27)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week28)            {Format(Year, Week28)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week29)            {Format(Year, Week29)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week30)            {Format(Year, Week30)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week31)            {Format(Year, Week31)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week32)            {Format(Year, Week32)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week33)            {Format(Year, Week33)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week34)            {Format(Year, Week34)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week35)            {Format(Year, Week35)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week36)            {Format(Year, Week36)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week37)            {Format(Year, Week37)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week38)            {Format(Year, Week38)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week39)            {Format(Year, Week39)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week40)            {Format(Year, Week40)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week41)            {Format(Year, Week41)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week42)            {Format(Year, Week42)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week43)            {Format(Year, Week43)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week44)            {Format(Year, Week44)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week45)            {Format(Year, Week45)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week46)            {Format(Year, Week46)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week47)            {Format(Year, Week47)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week48)            {Format(Year, Week48)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week49)            {Format(Year, Week49)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week50)            {Format(Year, Week50)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week51)            {Format(Year, Week51)}");
+            _testOutputHelper.WriteLine($"Format({Year}, Week52)            {Format(Year, Week52)}");
         }
     }
 }

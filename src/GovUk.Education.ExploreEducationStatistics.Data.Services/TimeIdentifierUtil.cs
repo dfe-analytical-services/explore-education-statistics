@@ -23,6 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
+        public static TimeIdentifier[] GetWeeks()
+        {
+            return Category.Week.GetTimeIdentifiers();
+        }
+
         public static TimeIdentifier[] GetTerms()
         {
             return Category.Term.GetTimeIdentifiers();
