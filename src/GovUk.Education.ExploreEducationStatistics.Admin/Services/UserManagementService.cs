@@ -324,9 +324,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var template = _configuration.GetValue<string>("NotifyReleaseRoleTemplateId");
             var email = _usersAndRolesDbContext.Users.FirstOrDefault(x => x.Id == userId.ToString())?.Email;
 
+            var link = (role.Name == ReleaseRole.PrereleaseViewer.GetEnumLabel() ? "prerelease " : "summary");
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://{uri}/publication/{publication.Id}/release/{release.Id}/summary"},
+                {"url", $"https://{uri}/publication/{publication.Id}/release/{release.Id}/{link}"},
                 {"role", role.Name},
                 {"publication", publication.Title},
                 {"release", release.Title}
