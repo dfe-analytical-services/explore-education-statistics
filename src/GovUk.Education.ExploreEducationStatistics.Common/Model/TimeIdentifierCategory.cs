@@ -15,14 +15,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         [EnumLabelValue("Tax Year")]
         TaxYear,
-        
+
         [EnumLabelValue("Reporting Year")]
         ReportingYear,
 
         [EnumLabelValue("Term")]
         Term,
-        
+
         [EnumLabelValue("Month")]
-        Month
+        Month,
+
+        [EnumLabelValue("Week")]
+        Week
     }
 }
