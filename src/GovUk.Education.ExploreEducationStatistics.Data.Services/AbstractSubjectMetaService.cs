@@ -15,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IBoundaryLevelService _boundaryLevelService;
         private readonly IFilterItemService _filterItemService;
         private readonly IGeoJsonService _geoJsonService;
+        protected static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         protected AbstractSubjectMetaService(IBoundaryLevelService boundaryLevelService,
             IFilterItemService filterItemService,
@@ -43,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Name = itemsGroupedByFilter.Key.Name,
                         Options = itemsGroupedByFilter
                             .GroupBy(item => item.FilterGroup, item => item, FilterGroup.IdComparer)
+                            .OrderBy(items => items.Key.Label, LabelComparer)
                             .ToDictionary(
                                 itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
                                 itemsGroupedByFilterGroup => BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key,
@@ -102,7 +104,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new FilterItemsMetaViewModel
             {
                 Label = filterGroup.Label,
-                Options = filterItems.Select(item => new LabelValue
+                Options = filterItems
+                    .OrderBy(item => item.Label, LabelComparer)
+                    .Select(item => new LabelValue
                 {
                     Label = item.Label,
                     Value = item.Id.ToString()
