@@ -104,11 +104,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public static IEnumerable<FileInfo> ListPublicFilesPreview(string storageConnectionString, string containerName,
-            IEnumerable<Guid> referencedVersions)
+            IEnumerable<Guid> referencedReleaseVersions)
         {
             var files = new List<FileInfo>();
 
-            foreach (var version in referencedVersions)
+            foreach (var version in referencedReleaseVersions)
             {
                 files.AddRange(ListFiles(storageConnectionString, containerName,
                     AdminReleaseDirectoryPath(version, ReleaseFileTypes.Data), false));

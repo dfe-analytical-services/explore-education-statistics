@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Release LatestRelease()
         {
-            return Releases?.Where(r => r.Live && !r.SoftDeleted && IsLatestVersionOfRelease(r.Publication, r.Id))
+            return Releases?.Where(r => r.Live && IsLatestVersionOfRelease(r.Publication, r.Id))
                 .OrderBy(r => r.Year)
                 .ThenBy(r => r.TimePeriodCoverage)
                 .LastOrDefault();

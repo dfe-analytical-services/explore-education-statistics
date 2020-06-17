@@ -50,14 +50,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId,
-            IEnumerable<Guid> referencedVersions)
+            IEnumerable<Guid> referencedReleaseVersions)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release =>
                     FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName,
-                        referencedVersions));
+                        referencedReleaseVersions));
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadDataFilesAsync(Guid releaseId,
