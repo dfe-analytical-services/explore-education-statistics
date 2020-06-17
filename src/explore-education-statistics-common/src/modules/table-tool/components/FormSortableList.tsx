@@ -40,7 +40,7 @@ const FormSortableList = (props: FormSortableListProps) => {
           {(droppableProvided, droppableSnapshot) => (
             <div
               {...droppableProvided.droppableProps}
-              className={classNames({
+              className={classNames(styles.list, {
                 [styles.listDraggingOver]: droppableSnapshot.isDraggingOver,
               })}
               ref={droppableProvided.innerRef}
