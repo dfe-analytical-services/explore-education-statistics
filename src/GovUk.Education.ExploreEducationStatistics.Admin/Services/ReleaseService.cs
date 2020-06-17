@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(f => f.ReleaseId == originalRelease.Id)
                 .Select(f => f.CreateReleaseAmendment(newRelease)).ToList();
 
-            _context.ReleaseFiles.AddRange(releaseFileCopies);
+            await _context.ReleaseFiles.AddRangeAsync(releaseFileCopies);
             await _context.SaveChangesAsync();
             return newRelease;
         }
@@ -388,17 +388,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public IEnumerable<Guid> GetReferencedReleaseFileVersions(Guid releaseId, params ReleaseFileTypes[] types)
         {
-            var releaseFileReferences = _context
+            return _context
                 .ReleaseFiles
                 .Include(rf => rf.ReleaseFileReference)
-                .Where(rfr => rfr.ReleaseId == releaseId)
+                .Where(rf => rf.ReleaseId == releaseId)
                 .Select(rf => rf.ReleaseFileReference)
                 .Where(rfr => types.Contains(rfr.ReleaseFileType))
-                .ToList();
-            
-            return releaseFileReferences.GroupBy(rfr => rfr.ReleaseId)
-                .Select(grp => grp.First().ReleaseId)
-                .ToList();
+                .Select(rfr => rfr.ReleaseId).Distinct();
         }
 
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,

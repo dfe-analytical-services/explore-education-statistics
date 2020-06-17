@@ -66,22 +66,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
 
-            var versions = copyReleaseFilesCommand.ReleaseFileReferences.GroupBy(rfr => rfr.ReleaseId)
-                .Select(grp => grp.First())
-                .ToList();
+            var referencedReleaseVersions = copyReleaseFilesCommand.ReleaseFileReferences
+                .Select(rfr => rfr.ReleaseId).Distinct();
             
             var allFilesTransferred = new List<CloudBlockBlob>();
 
-            foreach (var version in versions)
+            foreach (var version in referencedReleaseVersions)
             {
                 var files = await CopyDirectoryAsync(
-                    AdminReleaseDirectoryPath(version.ReleaseId), 
+                    AdminReleaseDirectoryPath(version), 
                     destinationDirectoryPath, privateContainer,
                     publicContainer, copyReleaseFilesCommand,
                     (source, destination) =>
                         CopyFileUnlessBatchedOrMeta(
                             source,
-                            version.ReleaseId,
+                            version,
                             copyReleaseFilesCommand.ReleaseFileReferences));
                 
                 allFilesTransferred.AddRange(files);
