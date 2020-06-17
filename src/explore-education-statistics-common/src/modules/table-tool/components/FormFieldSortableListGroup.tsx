@@ -55,7 +55,7 @@ const FormFieldSortableListGroup = <FormValues extends {}>({
                     <div
                       {...draggableProvided.draggableProps}
                       {...draggableProvided.dragHandleProps}
-                      className={classNames(styles.list, styles.listOneThird, {
+                      className={classNames(styles.list, {
                         [styles.isDragging]: draggableSnapshot.isDragging,
                       })}
                       ref={draggableProvided.innerRef}

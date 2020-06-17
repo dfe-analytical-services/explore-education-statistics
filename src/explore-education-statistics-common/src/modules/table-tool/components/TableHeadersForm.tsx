@@ -12,7 +12,6 @@ import last from 'lodash/last';
 import React, { useCallback } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import FormFieldSortableListGroup from './FormFieldSortableListGroup';
-import styles from './TableHeadersForm.module.scss';
 
 interface FormValues {
   rowGroups: Filter[][];
@@ -136,7 +135,7 @@ const TableHeadersForm = ({
                 }}
               >
                 <FormGroup>
-                  <div className={styles.axisContainer}>
+                  <div className="govuk-!-margin-bottom-2">
                     <FormFieldSortableListGroup<
                       PickByType<TableHeadersConfig, Filter[][]>
                     >
@@ -147,7 +146,7 @@ const TableHeadersForm = ({
                     />
                   </div>
 
-                  <div className={styles.axisContainer}>
+                  <div className="govuk-!-margin-bottom-2">
                     <FormFieldSortableListGroup<
                       PickByType<TableHeadersConfig, Filter[][]>
                     >
