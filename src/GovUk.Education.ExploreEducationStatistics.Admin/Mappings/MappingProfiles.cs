@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
-                        .FindAll(r => !r.SoftDeleted && IsLatestVersionOfRelease(p.Releases, r.Id))))
+                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(
                     dest => dest.ThemeId,
                     m => m.MapFrom(p => p.Topic.ThemeId));
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(p => p.Topic.ThemeId))
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
-                        .FindAll(r => !r.SoftDeleted && IsLatestVersionOfRelease(p.Releases, r.Id))))
+                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());
 
             CreateContentBlockMap();
@@ -114,8 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             }
                         },
                         OtherReleases = r.Publication.Releases
-                            .FindAll(otherRelease => !otherRelease.SoftDeleted &&
-                                                     r.Id != otherRelease.Id &&
+                            .FindAll(otherRelease => r.Id != otherRelease.Id &&
                                                      IsLatestVersionOfRelease(r.Publication.Releases, otherRelease.Id))
                             .OrderByDescending(otherRelease => otherRelease.Year)
                             .ThenByDescending(otherRelease => otherRelease.TimePeriodCoverage)
