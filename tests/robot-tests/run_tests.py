@@ -180,7 +180,7 @@ if args.tests and "general_public" not in args.tests:
             )
 
         # Don't need analyst user if running admin/bau tests
-        if f"admin{os.sep}bau" not in args.tests:
+        if f"{os.sep}bau" not in args.tests:
             authenticate_user(
                 user='ANALYST',
                 email=os.getenv('ANALYST_EMAIL'),

@@ -5,15 +5,25 @@ interface Props {
   children: ReactNode;
   className?: string;
   strong?: boolean;
+  id?: string | undefined;
 }
 
-const Tag = ({ children, className, strong = false }: Props) => {
+const Tag = ({
+  children,
+  className,
+  strong = false,
+  id = undefined,
+}: Props) => {
   const classes = classNames('govuk-tag', className);
 
   return strong ? (
-    <strong className={classes}>{children}</strong>
+    <strong className={classes} id={id}>
+      {children}
+    </strong>
   ) : (
-    <span className={classes}>{children}</span>
+    <span className={classes} id={id}>
+      {children}
+    </span>
   );
 };
 

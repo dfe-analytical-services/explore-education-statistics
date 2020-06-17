@@ -113,7 +113,10 @@ const ReleaseStatusPage = () => {
         <>
           <div className="govuk-!-margin-bottom-6">
             The current release status is:{' '}
-            <StatusBlock text={statusMap[model.releaseStatus]} />
+            <StatusBlock
+              text={statusMap[model.releaseStatus]}
+              id={`CurrentReleaseStatus-${statusMap[model.releaseStatus]}`}
+            />
             {model.releaseStatus === 'Approved' && (
               <div className="govuk-!-margin-top-1">
                 Release process status:{' '}

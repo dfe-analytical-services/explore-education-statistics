@@ -2,6 +2,25 @@ from selenium.webdriver.common.keys import Keys
 from robot.libraries.BuiltIn import BuiltIn
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 import time
+import os
+import json
+import requests
+
+def get_release_guid_from_release_status_page_url(url):
+    assert url.endswith('/status')
+    url_components = url.split('/')
+    return url_components[-2]
+
+def user_triggers_release_on_demand(release_id):
+    release_on_demand_endpoint = f'{os.getenv("ADMIN_URL")}/api/bau/release/{release_id}/publish'
+    jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {jwt_token}',
+    }
+
+    resp = requests.put(release_on_demand_endpoint, headers=headers, verify=False)
+    assert resp.status_code == 200, f'Release on demand request failed! Returned response code {resp.status_code}'
 
 def raise_assertion_error(err_msg):
     sl.capture_page_screenshot()
@@ -142,3 +161,14 @@ def user_deletes_editable_accordion_section_content_block(section_elem, block_nu
         sl.driver.find_element_by_xpath(f'//button[text()="Confirm"]').click()
     except:
         raise_assertion_error('Failed to find/click Confirm button')
+
+def user_waits_for_release_process_status_to_be(status, timeout):
+    max_time = time.time() + int(timeout)
+    while time.time() < max_time:
+        try:
+            sl.driver.find_element_by_css_selector(f'#release-process-status-{status}')
+            return
+        except:
+            sl.reload_page()
+            time.sleep(10)
+    raise_assertion_error(f'Release process status wasn\'t {status} after {timeout} seconds!')
