@@ -94,13 +94,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             
                 if (subject != null)
                 {
-                    var observationFilterItems = _context.ObservationFilterItem
-                        .Include(ofi => ofi.Observation)
-                        .ThenInclude(o => o.Subject)
-                        .Where(ofi => ofi.Observation.Subject.Id == subjectId);
-                
-                    _context.ObservationFilterItem.RemoveRange(observationFilterItems);
-                    
                     var orphanFootnotes = await GetFootnotesOnlyForSubjectAsync(subjectId);
 
                     _context.Subject.Remove(subject);
