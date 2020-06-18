@@ -67,11 +67,10 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   England
-    user checks results table column heading contains  css:table  2   1   2012/13
-    user checks results table column heading contains  css:table  2   2   2013/14
-    user checks results table column heading contains  css:table  2   3   2014/15
-    user checks results table column heading contains  css:table  2   4   2015/16
+    user checks results table column heading contains  css:table  1   1   2012/13
+    user checks results table column heading contains  css:table  1   2   2013/14
+    user checks results table column heading contains  css:table  1   3   2014/15
+    user checks results table column heading contains  css:table  1   4   2015/16
 
 Validate Gender male Authorised absence rate row
     [Tags]  HappyPath
@@ -127,24 +126,14 @@ Validate Gender female Unauthorised absence rate row
     user checks row cell contains text  ${row}    3     1.1%
     user checks row cell contains text  ${row}    4     1.1%
 
-Reorder Gender to be column
+Reorder Gender to be column group
     [Tags]  HappyPath
     user opens details dropdown     Re-order table headers
     user sets focus to element  xpath://legend[text()="Row group 1"]/../../..
     user presses keys    SPACE
     user presses keys    ARROW_DOWN
+    user presses keys    ARROW_LEFT
     user presses keys    SPACE
-
-Reorder England to be row
-    [Tags]  HappyPath
-    user waits until page contains element   xpath://legend[text()="Column group 2"]
-    user checks page does not contain element   xpath://legend[text()="Row group 1"]
-    user sets focus to element   xpath://legend[text()="Column group 2"]/../../..
-    user presses keys    SPACE
-    user presses keys    ARROW_UP
-    user presses keys    SPACE
-    user waits until page contains element   xpath://legend[text()="Row group 1"]
-    user checks page does not contain element   xpath://legend[text()="Column group 2"]
 
 Reorder Gender male to be second
     [Tags]  HappyPath
@@ -197,8 +186,7 @@ Validate results table column headings after reordering
 
 Validate results table row headings after reordering
     [Tags]  HappyPath
-    user checks results table row heading contains  1    1      England
-    user checks results table row heading contains  1    2      Overall absence rate
+    user checks results table row heading contains  1    1      Overall absence rate
     user checks results table row heading contains  2    1      Unauthorised absence rate
     user checks results table row heading contains  3    1      Authorised absence rate
 
@@ -258,6 +246,10 @@ User validates permalink table
     user checks results table column heading contains  css:table  2   6   2014/15
     user checks results table column heading contains  css:table  2   7   2015/16
     user checks results table column heading contains  css:table  2   8   2012/13
+
+    user checks results table row heading contains  1    1      Overall absence rate
+    user checks results table row heading contains  2    1      Unauthorised absence rate
+    user checks results table row heading contains  3    1      Authorised absence rate
 
     # Overall absence rate
     user checks results table cell contains  1    1     4.5%
