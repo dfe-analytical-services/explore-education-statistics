@@ -159,6 +159,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 hint={filterGroup.hint}
                                 disabled={form.isSubmitting}
                                 selectAll
+                                order={[]}
                                 options={Object.entries(
                                   filterGroup.options,
                                 ).map(([_, group]) => {
