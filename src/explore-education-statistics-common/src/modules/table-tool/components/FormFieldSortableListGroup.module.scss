@@ -7,7 +7,7 @@
 }
 
 .isDraggingOver {
-  background-color: govuk-colour('light-grey');
+  background-color: govuk-colour('mid-grey');
   border-color: $govuk-focus-colour;
 }
 
@@ -22,24 +22,17 @@
   }
 }
 
-.listOneThird {
-  flex-basis: 100%;
-  margin-bottom: govuk-spacing(2);
-
-  @include govuk-media-query($from: tablet) {
-    flex-basis: 33%;
-    margin-bottom: 0;
-
-    &:not(:last-of-type) {
-      margin-right: govuk-spacing(2);
-    }
-  }
-}
-
 .list {
   background: govuk-colour('light-grey');
   display: block;
+  flex-basis: 100%;
+  margin-bottom: govuk-spacing(2);
+  margin-right: govuk-spacing(2);
   padding: govuk-spacing(2);
+
+  @include govuk-media-query($from: desktop) {
+    flex-basis: 33%;
+  }
 
   &:focus {
     border: $govuk-focus-width solid #000;
