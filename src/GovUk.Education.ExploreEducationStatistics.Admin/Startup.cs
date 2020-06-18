@@ -85,21 +85,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging()
+                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging()
+                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
-                    .EnableSensitiveDataLogging()
+                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
             );
 
             // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
