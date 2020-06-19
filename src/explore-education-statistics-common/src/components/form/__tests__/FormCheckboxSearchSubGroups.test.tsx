@@ -238,7 +238,7 @@ describe('FormCheckboxSearchSubGroups', () => {
   test('providing a search term renders only relevant checkboxes', () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, getAllByLabelText } = render(
+    render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
         id="test-checkboxes"
@@ -264,9 +264,7 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
-
-    fireEvent.change(searchInput, {
+    fireEvent.change(screen.getByLabelText('Search options'), {
       target: {
         value: '2',
       },
@@ -274,7 +272,9 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     jest.runAllTimers();
 
-    const checkboxes = getAllByLabelText(/Checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.getAllByLabelText(
+      /Checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(1);
     expect(checkboxes[0]).toHaveAttribute('value', '2');
@@ -283,7 +283,7 @@ describe('FormCheckboxSearchSubGroups', () => {
   test('does not throw error if search term that is invalid regex is used', () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, queryAllByLabelText } = render(
+    render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
         id="test-checkboxes"
@@ -309,9 +309,7 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
-
-    fireEvent.change(searchInput, {
+    fireEvent.change(screen.getByLabelText('Search options'), {
       target: {
         value: '[',
       },
@@ -319,7 +317,9 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     jest.runAllTimers();
 
-    const checkboxes = queryAllByLabelText(/Checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.queryAllByLabelText(
+      /Checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(0);
   });
@@ -327,7 +327,7 @@ describe('FormCheckboxSearchSubGroups', () => {
   test('providing a search term does not remove checkboxes that have already been checked', () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, getAllByLabelText } = render(
+    render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
         id="test-checkboxes"
@@ -353,7 +353,7 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
+    const searchInput = screen.getByLabelText('Search options');
 
     fireEvent.change(searchInput, {
       target: {
@@ -363,10 +363,55 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     jest.runAllTimers();
 
-    const checkboxes = getAllByLabelText(/Checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.getAllByLabelText(
+      /Checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(2);
     expect(checkboxes[0]).toHaveAttribute('value', '1');
     expect(checkboxes[1]).toHaveAttribute('value', '2');
+  });
+
+  test('renders search input if more than one option in a single group', () => {
+    render(
+      <FormCheckboxSearchSubGroups
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        searchLabel="Search options"
+        value={[]}
+        options={[
+          {
+            legend: 'Group A',
+            options: [
+              { label: 'Checkbox 1', value: '1' },
+              { label: 'Checkbox 2', value: '2' },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByLabelText('Search options')).toBeInTheDocument();
+  });
+
+  test('does not render search input if only a single option', () => {
+    render(
+      <FormCheckboxSearchSubGroups
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        searchLabel="Search options"
+        value={[]}
+        options={[
+          {
+            legend: 'Group A',
+            options: [{ label: 'Checkbox 1', value: '1' }],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByLabelText('Search options')).not.toBeInTheDocument();
   });
 });
