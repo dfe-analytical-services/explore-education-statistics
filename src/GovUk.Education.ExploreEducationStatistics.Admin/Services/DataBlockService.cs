@@ -235,13 +235,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
-            var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
-                block.InfographicFilenames.Select(chartFilename =>
-                    _fileStorageService.DeleteNonDataFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
-                )
-            );
-            
-            await Task.WhenAll(deletes);
+            var chartFilenames = deletePlan.DependentDataBlocks.SelectMany(block => block.InfographicFilenames);
+
+            await _fileStorageService.DeleteNonDataFilesAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart,
+                chartFilenames);
         }
 
         private async Task DeleteDependentDataBlocks(DeleteDataBlockPlan deletePlan)

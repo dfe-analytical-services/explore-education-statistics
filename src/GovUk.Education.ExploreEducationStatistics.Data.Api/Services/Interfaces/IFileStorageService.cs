@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 
         bool FileExistsAndIsReleased(string containerName, string blobName);
 
-        public CloudBlob GetBlob(string containerName, string blobName);
+        CloudBlob GetBlob(string containerName, string blobName);
         
         IEnumerable<CloudBlockBlob> ListBlobs(string containerName);
 
