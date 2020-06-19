@@ -141,7 +141,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       <FormFieldset
                         id={`${formId}-filters`}
                         legend="Categories"
-                        legendSize="s"
+                        legendSize="m"
                         hint="Select at least one option from all categories"
                         error={getError('filters')}
                       >
