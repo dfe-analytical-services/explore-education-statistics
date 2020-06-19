@@ -140,18 +140,20 @@ const FormCheckboxSearchSubGroups = ({
             </ButtonText>
           )}
 
-          <FormTextSearchInput
-            id={`${id}-search`}
-            name={`${name}-search`}
-            label={searchLabel}
-            width={20}
-            onChange={event => setSearchTerm(event.target.value)}
-            onKeyPress={event => {
-              if (event.key === 'Enter') {
-                event.preventDefault();
-              }
-            }}
-          />
+          {totalOptions > 1 && (
+            <FormTextSearchInput
+              id={`${id}-search`}
+              name={`${name}-search`}
+              label={searchLabel}
+              width={20}
+              onChange={event => setSearchTerm(event.target.value)}
+              onKeyPress={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                }
+              }}
+            />
+          )}
         </>
       )}
 
