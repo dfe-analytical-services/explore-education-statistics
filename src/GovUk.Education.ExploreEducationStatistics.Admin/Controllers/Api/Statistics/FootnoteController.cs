@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
@@ -25,19 +25,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly IReleaseMetaService _releaseMetaService;
-        private readonly IMapper _mapper;
+        private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         public FootnoteController(IFilterService filterService,
             IFootnoteService footnoteService,
             IIndicatorGroupService indicatorGroupService,
-            IReleaseMetaService releaseMetaService,
-            IMapper mapper)
+            IReleaseMetaService releaseMetaService)
         {
             _filterService = filterService;
             _footnoteService = footnoteService;
             _indicatorGroupService = indicatorGroupService;
             _releaseMetaService = releaseMetaService;
-            _mapper = mapper;
         }
 
         [HttpPost]
@@ -111,16 +109,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
         private Dictionary<Guid, FootnotesIndicatorsMetaViewModel> GetIndicators(Guid subjectId)
         {
-            return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
-                group => group.Id,
-                group => new FootnotesIndicatorsMetaViewModel
-                {
-                    Label = group.Label,
-                    Options = group.Indicators.ToDictionary(
-                        indicator => indicator.Id,
-                        indicator => _mapper.Map<IndicatorMetaViewModel>(indicator))
-                }
-            );
+            return _indicatorGroupService.GetIndicatorGroups(subjectId)
+                .OrderBy(group => group.Label, LabelComparer)
+                .ToDictionary(
+                    group => group.Id,
+                    group => new FootnotesIndicatorsMetaViewModel
+                    {
+                        Label = group.Label,
+                        Options = group.Indicators
+                            .OrderBy(indicator => indicator.Label, LabelComparer)
+                            .ToDictionary(
+                                indicator => indicator.Id,
+                                indicator => new IndicatorMetaViewModel
+                                {
+                                    Label = indicator.Label,
+                                    Name = indicator.Name,
+                                    Unit = indicator.Unit.GetEnumValue(),
+                                    Value = indicator.Id.ToString(),
+                                    DecimalPlaces = indicator.DecimalPlaces
+                                })
+                    }
+                );
         }
 
         private Dictionary<Guid, FootnotesFilterMetaViewModel> GetFilters(Guid subjectId)
@@ -132,7 +141,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     {
                         Hint = filter.Hint,
                         Legend = filter.Label,
-                        Options = filter.FilterGroups.ToDictionary(
+                        Options = filter.FilterGroups
+                            .OrderBy(items => items.Label, LabelComparer)
+                            .ToDictionary(
                             filterGroup => filterGroup.Id,
                             filterGroup => BuildFilterItemsMetaViewModel(filterGroup, filterGroup.FilterItems))
                     });
@@ -144,13 +155,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return new FootnotesFilterItemsMetaViewModel
             {
                 Label = filterGroup.Label,
-                Options = filterItems.ToDictionary(
-                    item => item.Id,
-                    item => new LabelValue
-                    {
-                        Label = item.Label,
-                        Value = item.Id.ToString()
-                    })
+                Options = filterItems
+                    .OrderBy(item => item.Label, LabelComparer)
+                    .ToDictionary(
+                        item => item.Id,
+                        item => new LabelValue
+                        {
+                            Label = item.Label,
+                            Value = item.Id.ToString()
+                        })
             };
         }
 

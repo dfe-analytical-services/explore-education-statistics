@@ -98,6 +98,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return observationalUnits.Any(pair => HasBoundaryLevelForGeographicLevel(pair.Key));
         }
 
+        protected static IEnumerable<IndicatorMetaViewModel> BuildIndicatorViewModels(IEnumerable<Indicator> indicators)
+        {
+            return indicators.OrderBy(indicator => indicator.Label, LabelComparer)
+                .Select(indicator => new IndicatorMetaViewModel
+                {
+                    Label = indicator.Label,
+                    Name = indicator.Name,
+                    Unit = indicator.Unit.GetEnumValue(),
+                    Value = indicator.Id.ToString(),
+                    DecimalPlaces = indicator.DecimalPlaces
+                });
+        }
+
         protected static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
             IEnumerable<FilterItem> filterItems)
         {
