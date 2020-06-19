@@ -18,7 +18,7 @@ const FormFieldCheckboxGroup = <FormValues extends {}>(
 
   return (
     <FormField<string[]> {...props} formGroup={false}>
-      {({ field, helpers }) => (
+      {({ field, helpers, meta }) => (
         <FormCheckboxGroup
           {...props}
           {...field}
@@ -27,17 +27,24 @@ const FormFieldCheckboxGroup = <FormValues extends {}>(
               props.onAllChange(event, checked);
             }
 
+            if (event.isDefaultPrevented()) {
+              return;
+            }
+
             handleAllChange({
-              event,
-              value: field.value,
               checked,
               options,
               helpers,
+              meta,
             });
           }}
           onChange={(event, option) => {
             if (props.onChange) {
               props.onChange(event, option);
+            }
+
+            if (event.isDefaultPrevented()) {
+              return;
             }
 
             field.onChange(event);

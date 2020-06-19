@@ -37,6 +37,7 @@ interface BaseFormCheckboxGroupProps {
   name: string;
   options: CheckboxOption[];
   selectAll?: boolean;
+  selectAllText?: (isAllChecked: boolean, options: CheckboxOption[]) => string;
   small?: boolean;
   order?:
     | (keyof CheckboxOption)[]
@@ -48,6 +49,11 @@ interface BaseFormCheckboxGroupProps {
   onChange?: CheckboxChangeEventHandler;
 }
 
+const getDefaultSelectAllText = (
+  isAllChecked: boolean,
+  opts: CheckboxOption[],
+) => `${isAllChecked ? 'Unselect' : 'Select'} all ${opts.length} options`;
+
 /**
  * Basic checkbox group that should be used as a controlled component.
  */
@@ -58,6 +64,7 @@ export const BaseFormCheckboxGroup = ({
   name,
   options,
   selectAll = false,
+  selectAllText = getDefaultSelectAllText,
   small,
   order = ['label'],
   orderDirection = ['asc'],
@@ -106,9 +113,7 @@ export const BaseFormCheckboxGroup = ({
           className={styles.selectAll}
           underline={false}
         >
-          {`${isAllChecked ? 'Unselect' : 'Select'} all ${
-            options.length
-          } options`}
+          {selectAllText(isAllChecked, options)}
         </ButtonText>
       )}
 

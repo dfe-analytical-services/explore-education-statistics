@@ -88,12 +88,12 @@ describe('FormFieldCheckboxGroup', () => {
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
+            selectAll
             options={[
               { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
               { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
             ]}
-            selectAll
           />
         )}
       </Formik>,
