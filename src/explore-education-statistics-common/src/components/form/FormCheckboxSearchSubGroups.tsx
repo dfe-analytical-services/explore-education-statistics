@@ -1,5 +1,6 @@
 import ButtonText from '@common/components/ButtonText';
 import FormCheckboxGroup, {
+  BaseFormCheckboxGroup,
   CheckboxGroupAllChangeEvent,
   CheckboxOption,
   FormCheckboxGroupProps,
@@ -126,7 +127,7 @@ const FormCheckboxSearchSubGroups = ({
     <FormFieldset {...fieldsetProps}>
       {isMounted && (
         <>
-          {totalOptions > 1 && (
+          {totalOptions > 1 && options.length > 1 && (
             <ButtonText
               id={`${id}-all`}
               className="govuk-!-margin-bottom-4"
@@ -158,29 +159,47 @@ const FormCheckboxSearchSubGroups = ({
         aria-live={onMounted('assertive')}
         className={styles.optionsContainer}
       >
-        {filteredOptions.map((optionGroup, index) => (
-          <FormCheckboxGroup
+        {options.length > 1 ? (
+          <>
+            {filteredOptions.map((optionGroup, index) => (
+              <FormCheckboxGroup
+                {...groupProps}
+                key={optionGroup.legend}
+                name={name}
+                id={optionGroup.id ? optionGroup.id : `${id}-${index + 1}`}
+                legend={optionGroup.legend}
+                legendSize="s"
+                options={optionGroup.options}
+                value={value}
+                selectAll
+                selectAllText={(allChecked, opts) =>
+                  `${allChecked ? 'Unselect' : 'Select'} all ${
+                    opts.length
+                  } subgroup options`
+                }
+                onAllChange={(event, checked) => {
+                  if (onSubGroupAllChange) {
+                    onSubGroupAllChange(event, checked, optionGroup.options);
+                  }
+                }}
+              />
+            ))}
+          </>
+        ) : (
+          <BaseFormCheckboxGroup
             {...groupProps}
-            key={optionGroup.legend}
             name={name}
-            id={optionGroup.id ? optionGroup.id : `${id}-${index + 1}`}
-            legend={optionGroup.legend}
-            legendSize="s"
-            options={optionGroup.options}
+            id={options[0].id ? options[0].id : `${id}-1`}
+            options={options[0].options}
             value={value}
             selectAll
-            selectAllText={(allChecked, opts) =>
-              `${allChecked ? 'Unselect' : 'Select'} all ${
-                opts.length
-              } subgroup options`
-            }
             onAllChange={(event, checked) => {
               if (onSubGroupAllChange) {
-                onSubGroupAllChange(event, checked, optionGroup.options);
+                onSubGroupAllChange(event, checked, options[0].options);
               }
             }}
           />
-        ))}
+        )}
       </div>
     </FormFieldset>
   );
