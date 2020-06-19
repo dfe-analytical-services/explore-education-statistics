@@ -17,7 +17,6 @@ import React, {
   useState,
 } from 'react';
 import styles from './FormCheckboxSearchSubGroups.module.scss';
-import FormCheckboxSubGroups from './FormCheckboxSubGroups';
 import FormTextSearchInput from './FormTextSearchInput';
 
 export interface FormCheckboxSearchSubGroupsProps
@@ -74,7 +73,7 @@ const FormCheckboxSearchSubGroups = ({
     onBlur: onFieldsetBlur,
   };
 
-  const { isMounted } = useMounted();
+  const { isMounted, onMounted } = useMounted();
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -99,10 +98,6 @@ const FormCheckboxSearchSubGroups = ({
     },
     [isAllChecked, onAllChange],
   );
-
-  if (!isMounted) {
-    return <FormCheckboxSubGroups {...props} />;
-  }
 
   let filteredOptions = options;
 
@@ -129,33 +124,40 @@ const FormCheckboxSearchSubGroups = ({
 
   return (
     <FormFieldset {...fieldsetProps}>
-      {totalOptions > 1 && (
-        <ButtonText
-          id={`${id}-all`}
-          className="govuk-!-margin-bottom-4"
-          underline={false}
-          onClick={handleAllGroupsChange}
-        >
-          {`${
-            isAllChecked ? 'Unselect' : 'Select'
-          } all ${totalOptions} options`}
-        </ButtonText>
+      {isMounted && (
+        <>
+          {totalOptions > 1 && (
+            <ButtonText
+              id={`${id}-all`}
+              className="govuk-!-margin-bottom-4"
+              underline={false}
+              onClick={handleAllGroupsChange}
+            >
+              {`${
+                isAllChecked ? 'Unselect' : 'Select'
+              } all ${totalOptions} options`}
+            </ButtonText>
+          )}
+
+          <FormTextSearchInput
+            id={`${id}-search`}
+            name={`${name}-search`}
+            label={searchLabel}
+            width={20}
+            onChange={event => setSearchTerm(event.target.value)}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+              }
+            }}
+          />
+        </>
       )}
 
-      <FormTextSearchInput
-        id={`${id}-search`}
-        name={`${name}-search`}
-        label={searchLabel}
-        width={20}
-        onChange={event => setSearchTerm(event.target.value)}
-        onKeyPress={event => {
-          if (event.key === 'Enter') {
-            event.preventDefault();
-          }
-        }}
-      />
-
-      <div aria-live="assertive" className={styles.optionsContainer}>
+      <div
+        aria-live={onMounted('assertive')}
+        className={styles.optionsContainer}
+      >
         {filteredOptions.map((optionGroup, index) => (
           <FormCheckboxGroup
             {...groupProps}
