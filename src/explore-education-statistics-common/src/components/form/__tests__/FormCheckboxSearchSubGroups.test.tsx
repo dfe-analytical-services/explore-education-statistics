@@ -29,20 +29,55 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    const groups = screen.getAllByText(/Group/);
+    const group1 = within(screen.getByRole('group', { name: 'Group A' }));
+    const group2 = within(screen.getByRole('group', { name: 'Group B' }));
 
-    expect(groups[0]).toHaveTextContent('Group A');
-    expect(groups[1]).toHaveTextContent('Group B');
+    const group1Checkboxes = group1.getAllByRole('checkbox');
+    const group2Checkboxes = group2.getAllByRole('checkbox');
 
-    const checkboxes = screen.getAllByLabelText(
-      /Checkbox/,
-    ) as HTMLInputElement[];
+    expect(group1Checkboxes).toHaveLength(2);
+    expect(group1Checkboxes[0]).toHaveAttribute('value', '1');
+    expect(group1Checkboxes[1]).toHaveAttribute('value', '2');
 
-    expect(checkboxes).toHaveLength(4);
+    expect(group2Checkboxes).toHaveLength(2);
+    expect(group2Checkboxes[0]).toHaveAttribute('value', '3');
+    expect(group2Checkboxes[1]).toHaveAttribute('value', '4');
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders single group of checkboxes correctly', () => {
+    const { container } = render(
+      <FormCheckboxSearchSubGroups
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        value={[]}
+        options={[
+          {
+            legend: 'Group A',
+            options: [
+              { label: 'Checkbox 1', value: '1' },
+              { label: 'Checkbox 2', value: '2' },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('group', { name: 'Group A' }),
+    ).not.toBeInTheDocument();
+
+    const fieldset = within(
+      screen.getByRole('group', { name: 'Choose options' }),
+    );
+
+    const checkboxes = fieldset.getAllByRole('checkbox');
+
+    expect(checkboxes).toHaveLength(2);
     expect(checkboxes[0]).toHaveAttribute('value', '1');
     expect(checkboxes[1]).toHaveAttribute('value', '2');
-    expect(checkboxes[2]).toHaveAttribute('value', '3');
-    expect(checkboxes[3]).toHaveAttribute('value', '4');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -164,10 +199,46 @@ describe('FormCheckboxSearchSubGroups', () => {
     ).toBeInTheDocument();
   });
 
+  test('does not render `Select all subgroup options` button if there is only one subgroup', () => {
+    render(
+      <FormCheckboxSearchSubGroups
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        value={[]}
+        options={[
+          {
+            legend: 'Group A',
+            options: [
+              { label: 'Checkbox 1', value: '1' },
+              { label: 'Checkbox 2', value: '2' },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    const fieldset = within(
+      screen.getByRole('group', { name: 'Test checkboxes' }),
+    );
+
+    expect(
+      fieldset.queryByRole('button', {
+        name: 'Select all 2 subgroup options',
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      fieldset.getByRole('button', {
+        name: 'Select all 2 options',
+      }),
+    ).toBeInTheDocument();
+  });
+
   test('providing a search term renders only relevant checkboxes', () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, getAllByLabelText } = render(
+    render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
         id="test-checkboxes"
@@ -193,9 +264,7 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
-
-    fireEvent.change(searchInput, {
+    fireEvent.change(screen.getByLabelText('Search options'), {
       target: {
         value: '2',
       },
@@ -203,7 +272,9 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     jest.runAllTimers();
 
-    const checkboxes = getAllByLabelText(/Checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.getAllByLabelText(
+      /Checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(1);
     expect(checkboxes[0]).toHaveAttribute('value', '2');
@@ -212,7 +283,7 @@ describe('FormCheckboxSearchSubGroups', () => {
   test('does not throw error if search term that is invalid regex is used', () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, queryAllByLabelText } = render(
+    render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
         id="test-checkboxes"
@@ -238,9 +309,7 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
-
-    fireEvent.change(searchInput, {
+    fireEvent.change(screen.getByLabelText('Search options'), {
       target: {
         value: '[',
       },
@@ -248,7 +317,9 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     jest.runAllTimers();
 
-    const checkboxes = queryAllByLabelText(/Checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.queryAllByLabelText(
+      /Checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(0);
   });
@@ -256,7 +327,7 @@ describe('FormCheckboxSearchSubGroups', () => {
   test('providing a search term does not remove checkboxes that have already been checked', () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, getAllByLabelText } = render(
+    render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
         id="test-checkboxes"
@@ -282,7 +353,7 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
+    const searchInput = screen.getByLabelText('Search options');
 
     fireEvent.change(searchInput, {
       target: {
@@ -292,10 +363,55 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     jest.runAllTimers();
 
-    const checkboxes = getAllByLabelText(/Checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.getAllByLabelText(
+      /Checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(2);
     expect(checkboxes[0]).toHaveAttribute('value', '1');
     expect(checkboxes[1]).toHaveAttribute('value', '2');
+  });
+
+  test('renders search input if more than one option in a single group', () => {
+    render(
+      <FormCheckboxSearchSubGroups
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        searchLabel="Search options"
+        value={[]}
+        options={[
+          {
+            legend: 'Group A',
+            options: [
+              { label: 'Checkbox 1', value: '1' },
+              { label: 'Checkbox 2', value: '2' },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByLabelText('Search options')).toBeInTheDocument();
+  });
+
+  test('does not render search input if only a single option', () => {
+    render(
+      <FormCheckboxSearchSubGroups
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        searchLabel="Search options"
+        value={[]}
+        options={[
+          {
+            legend: 'Group A',
+            options: [{ label: 'Checkbox 1', value: '1' }],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByLabelText('Search options')).not.toBeInTheDocument();
   });
 });
