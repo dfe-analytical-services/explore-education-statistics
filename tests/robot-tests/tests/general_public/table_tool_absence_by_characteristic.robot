@@ -67,11 +67,10 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   England
-    user checks results table column heading contains  css:table  2   1   2012/13
-    user checks results table column heading contains  css:table  2   2   2013/14
-    user checks results table column heading contains  css:table  2   3   2014/15
-    user checks results table column heading contains  css:table  2   4   2015/16
+    user checks results table column heading contains  css:table  1   1   2012/13
+    user checks results table column heading contains  css:table  1   2   2013/14
+    user checks results table column heading contains  css:table  1   3   2014/15
+    user checks results table column heading contains  css:table  1   4   2015/16
 
 Validate Gender male Authorised absence rate row
     [Tags]  HappyPath
@@ -136,19 +135,6 @@ Reorder Gender to be column group
     user presses keys    ARROW_LEFT
     user presses keys    ${SPACE}
 
-#Reorder England to be row
-#    [Tags]  HappyPath
-#    user waits until page contains element   xpath://legend[text()="Column group 2"]
-#    user checks page does not contain element   xpath://legend[text()="Row group 1"]
-#    user sets focus to element   xpath://legend[text()="Column group 2"]/../../..
-#    user presses keys    ${SPACE}
-#    user presses keys    ARROW_UP
-#    user presses keys    ${SPACE}
-#    user waits until page contains element   xpath://legend[text()="Row group 1"]
-#    user checks page does not contain element   xpath://legend[text()="Column group 2"]
-#    user presses keys    ARROW_LEFT
-#    user presses keys    SPACE
-
 Reorder Gender male to be second
     [Tags]  HappyPath
     user sets focus to element   xpath://strong[text()="Gender male"]/../..  # The /../.. to get to a focusable element
@@ -169,7 +155,9 @@ Reorder Overall absence rate to be first
     [Tags]  HappyPath
     user sets focus to element  xpath://strong[text()="Overall absence rate"]/../..  # The /../.. to get to a focusable element
     user presses keys    ${SPACE}
+    user presses keys    ${SPACE}
     user presses keys    ARROW_UP
+    user presses keys    ARROW_UP   # Twice to ensure
     user presses keys    ${SPACE}
 
 Reorder 2012/13 to be last
