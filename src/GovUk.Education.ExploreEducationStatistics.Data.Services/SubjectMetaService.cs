@@ -144,7 +144,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     {
                         Hint = filter.Hint,
                         Legend = filter.Label,
-                        Options = filter.FilterGroups.ToDictionary(
+                        Options = filter.FilterGroups
+                            .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
+                            .ToDictionary(
                             filterGroup => filterGroup.Label.PascalCase(),
                             filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems)),
                         TotalValue = GetTotalValue(filter)

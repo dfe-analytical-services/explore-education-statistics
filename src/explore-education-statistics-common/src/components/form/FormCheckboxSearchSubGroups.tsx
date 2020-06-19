@@ -1,32 +1,52 @@
-import FormCheckboxGroup from '@common/components/form/FormCheckboxGroup';
+import ButtonText from '@common/components/ButtonText';
+import FormCheckboxGroup, {
+  CheckboxGroupAllChangeEvent,
+  CheckboxOption,
+  FormCheckboxGroupProps,
+} from '@common/components/form/FormCheckboxGroup';
 import FormFieldset, {
   FormFieldsetProps,
 } from '@common/components/form/FormFieldset';
 import useMounted from '@common/hooks/useMounted';
-import React, { useState } from 'react';
+import { OmitStrict } from '@common/types';
+import React, {
+  MouseEvent,
+  MouseEventHandler,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import styles from './FormCheckboxSearchSubGroups.module.scss';
-import FormCheckboxSubGroups, {
-  FormCheckboxSubGroupsProps,
-} from './FormCheckboxSubGroups';
 import FormTextSearchInput from './FormTextSearchInput';
 
 export interface FormCheckboxSearchSubGroupsProps
-  extends FormCheckboxSubGroupsProps {
+  extends OmitStrict<
+    FormCheckboxGroupProps,
+    'onAllChange' | 'selectAll' | 'selectAllText' | 'options'
+  > {
+  options: {
+    id?: string;
+    legend: string;
+    options: CheckboxOption[];
+  }[];
+  onAllChange?: (
+    event: MouseEvent<HTMLButtonElement>,
+    checked: boolean,
+  ) => void;
+  onSubGroupAllChange?: (
+    event: CheckboxGroupAllChangeEvent,
+    checked: boolean,
+    options: CheckboxOption[],
+  ) => void;
   searchLabel?: string;
 }
 
 const FormCheckboxSearchSubGroups = ({
   searchLabel = 'Search options',
+  onAllChange,
+  onSubGroupAllChange,
   ...props
 }: FormCheckboxSearchSubGroupsProps) => {
-  const { isMounted } = useMounted();
-
-  const [searchTerm, setSearchTerm] = useState('');
-
-  if (!isMounted) {
-    return <FormCheckboxSubGroups {...props} />;
-  }
-
   const {
     id,
     legend,
@@ -35,7 +55,6 @@ const FormCheckboxSearchSubGroups = ({
     legendSize,
     error,
     name,
-    onAllChange,
     onFieldsetFocus,
     onFieldsetBlur,
     options = [],
@@ -53,6 +72,32 @@ const FormCheckboxSearchSubGroups = ({
     onFocus: onFieldsetFocus,
     onBlur: onFieldsetBlur,
   };
+
+  const { isMounted, onMounted } = useMounted();
+
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const totalOptions = useMemo(
+    () => options.reduce((acc, group) => acc + group.options.length, 0),
+    [options],
+  );
+
+  const isAllChecked = useMemo(
+    () =>
+      options.every(group =>
+        group.options.every(option => value.includes(option.value)),
+      ),
+    [options, value],
+  );
+
+  const handleAllGroupsChange: MouseEventHandler<HTMLButtonElement> = useCallback(
+    event => {
+      if (onAllChange) {
+        onAllChange(event, isAllChecked);
+      }
+    },
+    [isAllChecked, onAllChange],
+  );
 
   let filteredOptions = options;
 
@@ -79,20 +124,40 @@ const FormCheckboxSearchSubGroups = ({
 
   return (
     <FormFieldset {...fieldsetProps}>
-      <FormTextSearchInput
-        id={`${id}-search`}
-        name={`${name}-search`}
-        label={searchLabel}
-        width={20}
-        onChange={event => setSearchTerm(event.target.value)}
-        onKeyPress={event => {
-          if (event.key === 'Enter') {
-            event.preventDefault();
-          }
-        }}
-      />
+      {isMounted && (
+        <>
+          {totalOptions > 1 && (
+            <ButtonText
+              id={`${id}-all`}
+              className="govuk-!-margin-bottom-4"
+              underline={false}
+              onClick={handleAllGroupsChange}
+            >
+              {`${
+                isAllChecked ? 'Unselect' : 'Select'
+              } all ${totalOptions} options`}
+            </ButtonText>
+          )}
 
-      <div aria-live="assertive" className={styles.optionsContainer}>
+          <FormTextSearchInput
+            id={`${id}-search`}
+            name={`${name}-search`}
+            label={searchLabel}
+            width={20}
+            onChange={event => setSearchTerm(event.target.value)}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+              }
+            }}
+          />
+        </>
+      )}
+
+      <div
+        aria-live={onMounted('assertive')}
+        className={styles.optionsContainer}
+      >
         {filteredOptions.map((optionGroup, index) => (
           <FormCheckboxGroup
             {...groupProps}
@@ -103,9 +168,15 @@ const FormCheckboxSearchSubGroups = ({
             legendSize="s"
             options={optionGroup.options}
             value={value}
+            selectAll
+            selectAllText={(allChecked, opts) =>
+              `${allChecked ? 'Unselect' : 'Select'} all ${
+                opts.length
+              } subgroup options`
+            }
             onAllChange={(event, checked) => {
-              if (onAllChange) {
-                onAllChange(event, checked, optionGroup.options);
+              if (onSubGroupAllChange) {
+                onSubGroupAllChange(event, checked, optionGroup.options);
               }
             }}
           />

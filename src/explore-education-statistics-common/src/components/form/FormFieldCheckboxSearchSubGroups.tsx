@@ -23,28 +23,47 @@ const FormFieldCheckboxSearchSubGroups = <FormValues extends {}>(
     <>
       {options.length > 1 && (
         <FormField<string[]> {...props}>
-          {({ field, helpers }) => {
+          {({ field, helpers, meta }) => {
             return (
               <FormCheckboxSearchSubGroups
                 {...props}
                 {...field}
                 small
-                onAllChange={(event, checked, groupOptions) => {
-                  if (props.onAllChange) {
-                    props.onAllChange(event, checked, groupOptions);
+                onAllChange={(event, checked) => {
+                  if (event.isDefaultPrevented()) {
+                    return;
                   }
 
                   handleAllChange({
                     checked,
-                    event,
+                    meta,
+                    helpers,
+                    options: options.flatMap(group => group.options),
+                  });
+                }}
+                onSubGroupAllChange={(event, checked, groupOptions) => {
+                  if (props.onSubGroupAllChange) {
+                    props.onSubGroupAllChange(event, checked, groupOptions);
+                  }
+
+                  if (event.isDefaultPrevented()) {
+                    return;
+                  }
+
+                  handleAllChange({
+                    checked,
+                    meta,
                     helpers,
                     options: groupOptions,
-                    value: field.value,
                   });
                 }}
                 onChange={(event, option) => {
                   if (props.onChange) {
                     props.onChange(event, option);
+                  }
+
+                  if (event.isDefaultPrevented()) {
+                    return;
                   }
 
                   field.onChange(event);
@@ -59,8 +78,8 @@ const FormFieldCheckboxSearchSubGroups = <FormValues extends {}>(
         <FormFieldCheckboxSearchGroup
           {...props}
           onAllChange={(event, checked) => {
-            if (props.onAllChange) {
-              props.onAllChange(event, checked, options[0].options);
+            if (props.onSubGroupAllChange) {
+              props.onSubGroupAllChange(event, checked, options[0].options);
             }
           }}
           options={options[0].options}

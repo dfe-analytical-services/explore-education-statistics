@@ -92,50 +92,44 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
 
     const tableCartesian: TableCell[][] = rowHeadersCartesian.map(
       rowFilterCombination => {
-        const rowCol1 = last(rowFilterCombination);
-
         return columnHeadersCartesian.map(
           (columnFilterCombination, columnIndex) => {
-            const rowCol2 = last(columnFilterCombination);
-
-            // User could choose to flip rows and columns
-            const indicator = (rowCol1 instanceof Indicator
-              ? rowCol1
-              : rowCol2) as Indicator;
-
-            const timePeriod = (rowCol2 instanceof TimePeriodFilter
-              ? rowCol2
-              : rowCol1) as TimePeriodFilter;
-
             const filterCombination = [
               ...rowFilterCombination,
               ...columnFilterCombination,
             ];
 
-            const categoryFilters = filterCombination.filter(
-              filter => filter instanceof CategoryFilter,
-            );
-
-            const locationFilters = filterCombination.filter(
-              filter => filter instanceof LocationFilter,
-            ) as LocationFilter[];
-
             const matchingResult = results.find(result => {
-              return (
-                categoryFilters.every(filter =>
-                  result.filters.includes(filter.value),
-                ) &&
-                result.timePeriod === timePeriod.value &&
-                locationFilters.every(filter => {
+              return filterCombination.every(filter => {
+                if (filter instanceof CategoryFilter) {
+                  return result.filters.includes(filter.value);
+                }
+
+                if (filter instanceof LocationFilter) {
                   const geographicLevel = camelCase(result.geographicLevel);
+
                   return (
                     result.location[geographicLevel] &&
                     result.location[geographicLevel].code === filter.value &&
                     filter.level === geographicLevel
                   );
-                })
-              );
+                }
+
+                if (filter instanceof TimePeriodFilter) {
+                  return result.timePeriod === filter.value;
+                }
+
+                return filter instanceof Indicator;
+              });
             });
+
+            const indicator = filterCombination.find(
+              filter => filter instanceof Indicator,
+            ) as Indicator | undefined;
+
+            if (!indicator) {
+              throw new Error('No indicator for filter combination');
+            }
 
             const text = getCellText(matchingResult, indicator);
 

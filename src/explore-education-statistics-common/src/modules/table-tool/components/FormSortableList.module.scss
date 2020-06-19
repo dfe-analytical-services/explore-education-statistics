@@ -1,5 +1,10 @@
 @import '../../../styles/govuk-base';
 
+.list {
+  max-height: 40vh;
+  overflow: auto;
+}
+
 .listDraggingOver {
   background: govuk-colour('light-grey');
   outline: $govuk-focus-width solid $govuk-focus-colour;

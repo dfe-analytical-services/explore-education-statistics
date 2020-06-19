@@ -8,6 +8,12 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Choose options
     </legend>
+    <button id="test-checkboxes-all"
+            class="button noUnderline govuk-!-margin-bottom-4"
+            type="button"
+    >
+      Select all 4 options
+    </button>
     <label class="govuk-label"
            for="test-checkboxes-search"
     >
@@ -18,8 +24,8 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
            id="test-checkboxes-search"
            type="text"
     >
-    <div aria-live="assertive"
-         class="optionsContainer"
+    <div class="optionsContainer"
+         aria-live="assertive"
     >
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset"
@@ -29,6 +35,12 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             Group A
           </legend>
           <div class="govuk-checkboxes">
+            <button id="test-checkboxes-1-all"
+                    class="button noUnderline selectAll"
+                    type="button"
+            >
+              Select all 2 subgroup options
+            </button>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-1-1"
@@ -66,6 +78,12 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             Group B
           </legend>
           <div class="govuk-checkboxes">
+            <button id="test-checkboxes-2-all"
+                    class="button noUnderline selectAll"
+                    type="button"
+            >
+              Select all 2 subgroup options
+            </button>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-2-3"

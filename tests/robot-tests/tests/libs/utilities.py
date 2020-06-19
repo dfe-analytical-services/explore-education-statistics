@@ -306,6 +306,13 @@ def user_gets_row_with_heading(heading):
     return elem
 
 
+def user_gets_row_number_with_heading(heading):
+    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
+    rows = sl.driver.find_elements_by_xpath('//table/tbody/tr')
+
+    return rows.index(elem) + 1
+
+
 def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
     table_elem = sl.get_webelement(table_selector)
     elems = table_elem.find_elements_by_xpath(
@@ -344,11 +351,29 @@ def user_checks_results_table_row_heading_contains(row, column, expected):
             f'"{expected}" not found in th tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
 
+def user_checks_results_table_heading_in_offset_row_contains(row, offset, column, expected):
+    offset_row = int(row) + int(offset)
+    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{offset_row}]/th[{column}]')
+
+    if expected not in elem.text:
+        raise AssertionError(
+            f'"{expected}" not found in th tag in results table tbody row {offset_row}, column {column}. Found text "{elem.text}".')
+
+
 def user_checks_results_table_cell_contains(row, column, expected):
     elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/td[{column}]')
     if expected not in elem.text:
         raise AssertionError(
             f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
+
+
+def user_checks_results_table_cell_in_offset_row_contains(row, offset, column, expected):
+    offset_row = int(row) + int(offset)
+    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{offset_row}]/td[{column}]')
+
+    if expected not in elem.text:
+        raise AssertionError(
+            f'"{expected}" not found in td tag in results table tbody row {offset_row}, column {column}. Found text "{elem.text}".')
 
 
 def user_checks_list_contains_x_elements(list_locator, num):

@@ -6,13 +6,17 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import { PickByType } from '@common/types';
 import reorder from '@common/utils/reorder';
 import Yup from '@common/validation/yup';
-import classNames from 'classnames';
 import { Form, Formik } from 'formik';
-import React, { useMemo } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import FormFieldSortableList from './FormFieldSortableList';
+import compact from 'lodash/compact';
+import last from 'lodash/last';
+import React, { useCallback } from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
 import FormFieldSortableListGroup from './FormFieldSortableListGroup';
-import styles from './TableHeadersForm.module.scss';
+
+interface FormValues {
+  rowGroups: Filter[][];
+  columnGroups: Filter[][];
+}
 
 interface Props {
   id?: string;
@@ -30,9 +34,21 @@ const TableHeadersForm = ({
     rows: [],
   },
 }: Props) => {
-  const formInitialValues = useMemo(() => ({ ...initialValues }), [
-    initialValues,
-  ]);
+  const handleSubmit = useCallback(
+    (values: FormValues) => {
+      onSubmit({
+        columnGroups:
+          values.columnGroups.length > 1
+            ? values.columnGroups.slice(0, -1)
+            : [],
+        rowGroups:
+          values.rowGroups.length > 1 ? values.rowGroups.slice(0, -1) : [],
+        columns: last(values.columnGroups) as Filter[],
+        rows: last(values.rowGroups) as Filter[],
+      });
+    },
+    [onSubmit],
+  );
 
   return (
     <Details summary="Re-order table headers">
@@ -46,208 +62,102 @@ const TableHeadersForm = ({
         use the arrow keys to move a selected item. If you are using a screen
         reader disable scan mode.
       </div>
-      <Formik<TableHeadersConfig>
+
+      <Formik<FormValues>
         enableReinitialize
-        initialValues={formInitialValues}
-        validationSchema={Yup.object<TableHeadersConfig>({
+        initialValues={{
+          columnGroups: compact([
+            ...(initialValues?.columnGroups ?? []),
+            initialValues?.columns,
+          ]),
+          rowGroups: compact([
+            ...(initialValues?.rowGroups ?? []),
+            initialValues?.rows,
+          ]),
+        }}
+        validationSchema={Yup.object<FormValues>({
           rowGroups: Yup.array()
             .of(
               Yup.array()
                 .of<Filter>(Yup.object())
                 .ensure(),
             )
-            .min(
-              formInitialValues.columnGroups.length +
-                formInitialValues.rowGroups.length >
-                1
-                ? 1
-                : 0,
-              'Must have at least one row group',
-            ),
+            .min(1, 'Must have at least one row group'),
           columnGroups: Yup.array()
             .of(
               Yup.array()
                 .of<Filter>(Yup.object())
                 .ensure(),
             )
-            .min(
-              formInitialValues.columnGroups.length +
-                formInitialValues.rowGroups.length >
-                1
-                ? 1
-                : 0,
-              'Must have at least one column group',
-            ),
-          columns: Yup.array()
-            .of<Filter>(Yup.object())
-            .ensure(),
-          rows: Yup.array()
-            .of<Filter>(Yup.object())
-            .ensure(),
+            .min(1, 'Must have at least one column group'),
         })}
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
       >
         {form => {
           return (
             <Form>
-              <FormGroup>
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-three-quarters-from-desktop">
-                    <DragDropContext
-                      onDragEnd={result => {
-                        if (!result.destination) {
-                          return;
-                        }
+              <DragDropContext
+                onDragEnd={result => {
+                  const { source, destination } = result;
 
-                        const { source, destination } = result;
+                  if (!destination) {
+                    return;
+                  }
 
-                        const destinationId = destination.droppableId as
-                          | 'columnGroups'
-                          | 'rowGroups';
+                  const destinationId = destination.droppableId as keyof FormValues;
+                  const sourceId = source.droppableId as keyof FormValues;
 
-                        const sourceId = source.droppableId as
-                          | 'columnGroups'
-                          | 'rowGroups';
+                  if (destinationId === sourceId) {
+                    form.setFieldTouched(destinationId);
+                    form.setFieldValue(
+                      destinationId,
+                      reorder(
+                        form.values[destinationId] as unknown[],
+                        source.index,
+                        destination.index,
+                      ),
+                    );
 
-                        const destinationGroup = form.values[destinationId];
+                    return;
+                  }
 
-                        if (destinationId === sourceId) {
-                          form.setFieldTouched(destinationId);
-                          form.setFieldValue(
-                            destinationId,
-                            reorder(
-                              destinationGroup,
-                              source.index,
-                              destination.index,
-                            ),
-                          );
-                        } else {
-                          const sourceClone = Array.from(form.values[sourceId]);
-                          const destinationClone = Array.from(destinationGroup);
+                  const nextSourceValue = [...form.values[sourceId]];
+                  const nextDestinationValue = [...form.values[destinationId]];
 
-                          const [sourceItem] = sourceClone.splice(
-                            source.index,
-                            1,
-                          );
-                          destinationClone.splice(
-                            destination.index,
-                            0,
-                            sourceItem,
-                          );
+                  const [sourceItem] = nextSourceValue.splice(source.index, 1);
+                  nextDestinationValue.splice(destination.index, 0, sourceItem);
 
-                          form.setFieldTouched(sourceId);
-                          form.setFieldValue(sourceId, sourceClone);
+                  form.setFieldValue(sourceId, nextSourceValue);
+                  form.setFieldValue(destinationId, nextDestinationValue);
 
-                          form.setFieldTouched(destinationId);
-                          form.setFieldValue(destinationId, destinationClone);
-                        }
-                      }}
+                  form.setFieldTouched(sourceId);
+                  form.setFieldTouched(destinationId);
+                }}
+              >
+                <FormGroup>
+                  <div className="govuk-!-margin-bottom-2">
+                    <FormFieldSortableListGroup<
+                      PickByType<TableHeadersConfig, Filter[][]>
                     >
-                      <div className={styles.axisContainer}>
-                        <FormFieldSortableListGroup<
-                          PickByType<TableHeadersConfig, Filter[][]>
-                        >
-                          id={`${id}-rowGroups`}
-                          name="rowGroups"
-                          legend="Row groups"
-                          groupLegend="Row group"
-                        />
-                      </div>
-
-                      <div className={styles.axisContainer}>
-                        <FormFieldSortableListGroup<
-                          PickByType<TableHeadersConfig, Filter[][]>
-                        >
-                          id={`${id}-columnGroups`}
-                          name="columnGroups"
-                          legend="Column groups"
-                          groupLegend="Column group"
-                        />
-                      </div>
-                    </DragDropContext>
+                      id={`${id}-rowGroups`}
+                      name="rowGroups"
+                      legend="Row groups"
+                      groupLegend="Row group"
+                    />
                   </div>
-                  <div className="govuk-grid-column-one-quarter-from-desktop">
-                    <DragDropContext
-                      onDragEnd={result => {
-                        if (!result.destination) {
-                          return;
-                        }
 
-                        const { source, destination } = result;
-
-                        if (source.index === destination.index) {
-                          return;
-                        }
-
-                        const columns = [...form.values.columns];
-                        const rows = [...form.values.rows];
-
-                        form.setFieldTouched('rows');
-                        form.setFieldValue('rows', columns);
-
-                        form.setFieldTouched('columns');
-                        form.setFieldValue('columns', rows);
-                      }}
+                  <div className="govuk-!-margin-bottom-2">
+                    <FormFieldSortableListGroup<
+                      PickByType<TableHeadersConfig, Filter[][]>
                     >
-                      <Droppable droppableId="rowColumns">
-                        {(droppableProvided, droppableSnapshot) => (
-                          <div
-                            {...droppableProvided.droppableProps}
-                            ref={droppableProvided.innerRef}
-                            className={classNames(styles.rowColContainer, {
-                              [styles.isDraggingOver]:
-                                droppableSnapshot.isDraggingOver,
-                            })}
-                          >
-                            <Draggable draggableId="rows" index={0}>
-                              {(draggableProvided, draggableSnapshot) => (
-                                <div
-                                  {...draggableProvided.draggableProps}
-                                  {...draggableProvided.dragHandleProps}
-                                  ref={draggableProvided.innerRef}
-                                  className={classNames(styles.list, {
-                                    [styles.isDragging]:
-                                      draggableSnapshot.isDragging,
-                                  })}
-                                >
-                                  <FormFieldSortableList<TableHeadersConfig>
-                                    name="rows"
-                                    id={`${id}-rows`}
-                                    legend="Rows"
-                                    legendSize="s"
-                                  />
-                                </div>
-                              )}
-                            </Draggable>
-                            <Draggable draggableId="columns" index={1}>
-                              {(draggableProvided, draggableSnapshot) => (
-                                <div
-                                  {...draggableProvided.draggableProps}
-                                  {...draggableProvided.dragHandleProps}
-                                  ref={draggableProvided.innerRef}
-                                  className={classNames(styles.list, {
-                                    [styles.isDragging]:
-                                      draggableSnapshot.isDragging,
-                                  })}
-                                >
-                                  <FormFieldSortableList<TableHeadersConfig>
-                                    name="columns"
-                                    id={`${id}-columns`}
-                                    legend="Columns"
-                                    legendSize="s"
-                                  />
-                                </div>
-                              )}
-                            </Draggable>
-
-                            {droppableProvided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
+                      id={`${id}-columnGroups`}
+                      name="columnGroups"
+                      legend="Column groups"
+                      groupLegend="Column group"
+                    />
                   </div>
-                </div>
-              </FormGroup>
+                </FormGroup>
+              </DragDropContext>
 
               <Button type="submit">Re-order table</Button>
             </Form>

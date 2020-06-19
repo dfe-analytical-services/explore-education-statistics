@@ -18,7 +18,8 @@ import {
   DataBlock,
   DataBlockRequest,
 } from '@common/services/types/blocks';
-import { render, wait } from '@testing-library/react';
+import { waitFor, screen } from '@testing-library/dom';
+import { render } from '@testing-library/react';
 import React from 'react';
 import DataBlockRenderer from '../DataBlockRenderer';
 
@@ -75,21 +76,21 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
-    await wait();
+    await waitFor(() => {
+      expect(getDataBlockForSubject).toBeCalledWith(
+        {
+          ...testDataBlock.dataBlockRequest,
+          includeGeoJson: false,
+        } as TableDataQuery,
+        'test-release-id',
+      );
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      {
-        ...testDataBlock.dataBlockRequest,
-        includeGeoJson: false,
-      } as TableDataQuery,
-      'test-release-id',
-    );
+      expect(
+        container.querySelectorAll('section.govuk-tabs__panel'),
+      ).toHaveLength(1);
 
-    expect(
-      container.querySelectorAll('section.govuk-tabs__panel'),
-    ).toHaveLength(1);
-
-    expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
+      expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
+    });
   });
 
   test('renders horizontal chart', async () => {
@@ -113,21 +114,21 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
-    await wait();
+    await waitFor(() => {
+      expect(getDataBlockForSubject).toBeCalledWith(
+        {
+          ...testDataBlock.dataBlockRequest,
+          includeGeoJson: false,
+        } as TableDataQuery,
+        'test-release-id',
+      );
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      {
-        ...testDataBlock.dataBlockRequest,
-        includeGeoJson: false,
-      } as TableDataQuery,
-      'test-release-id',
-    );
+      expect(
+        container.querySelectorAll('section.govuk-tabs__panel'),
+      ).toHaveLength(1);
 
-    expect(
-      container.querySelectorAll('section.govuk-tabs__panel'),
-    ).toHaveLength(1);
-
-    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+      expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+    });
   });
 
   test('renders vertical chart', async () => {
@@ -153,21 +154,21 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
-    await wait();
+    await waitFor(() => {
+      expect(getDataBlockForSubject).toBeCalledWith(
+        {
+          ...testDataBlock.dataBlockRequest,
+          includeGeoJson: false,
+        } as TableDataQuery,
+        'test-release-id',
+      );
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      {
-        ...testDataBlock.dataBlockRequest,
-        includeGeoJson: false,
-      } as TableDataQuery,
-      'test-release-id',
-    );
+      expect(
+        container.querySelectorAll('section.govuk-tabs__panel'),
+      ).toHaveLength(1);
 
-    expect(
-      container.querySelectorAll('section.govuk-tabs__panel'),
-    ).toHaveLength(1);
-
-    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+      expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+    });
   });
 
   test('renders table', async () => {
@@ -179,7 +180,7 @@ describe('DataBlockRenderer', () => {
 
     const fullTable = mapFullTable(testChartTableData);
 
-    const { container } = render(
+    render(
       <DataBlockRenderer
         releaseId="test-release-id"
         id="test-block"
@@ -201,17 +202,19 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
-    await wait();
+    await waitFor(() => {
+      expect(getDataBlockForSubject).toBeCalledWith(
+        {
+          ...testDataBlock.dataBlockRequest,
+          includeGeoJson: false,
+        } as TableDataQuery,
+        'test-release-id',
+      );
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      {
-        ...testDataBlock.dataBlockRequest,
-        includeGeoJson: false,
-      } as TableDataQuery,
-      'test-release-id',
-    );
-
-    expect(container.querySelector('table')).toMatchSnapshot();
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(4);
+      expect(screen.getAllByRole('cell')).toHaveLength(16);
+    });
   });
 
   test('renders map', async () => {
@@ -232,17 +235,17 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
-    await wait();
+    await waitFor(() => {
+      expect(getDataBlockForSubject).toBeCalledWith(
+        {
+          ...testDataBlock.dataBlockRequest,
+          includeGeoJson: true,
+        } as TableDataQuery,
+        'test-release-id',
+      );
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      {
-        ...testDataBlock.dataBlockRequest,
-        includeGeoJson: true,
-      } as TableDataQuery,
-      'test-release-id',
-    );
-
-    expect(container.querySelector('.leaflet-container')).toMatchSnapshot();
+      expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
+    });
   });
 
   test('can render line chart with deprecated `labels` for data sets', async () => {
@@ -261,29 +264,31 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
-    await wait();
+    await waitFor(() => {
+      expect(getDataBlockForSubject).toBeCalledWith(
+        {
+          ...testDataBlock.dataBlockRequest,
+          includeGeoJson: false,
+        } as TableDataQuery,
+        'test-release-id',
+      );
 
-    expect(getDataBlockForSubject).toBeCalledWith(
-      {
-        ...testDataBlock.dataBlockRequest,
-        includeGeoJson: false,
-      } as TableDataQuery,
-      'test-release-id',
-    );
+      expect(
+        container.querySelectorAll('section.govuk-tabs__panel'),
+      ).toHaveLength(1);
 
-    expect(
-      container.querySelectorAll('section.govuk-tabs__panel'),
-    ).toHaveLength(1);
+      expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
 
-    expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
-
-    const legendItems = container.querySelectorAll('.recharts-legend-item');
-    expect(legendItems[0]).toHaveTextContent(
-      'Unauthorised absence rate (England)',
-    );
-    expect(legendItems[1]).toHaveTextContent(
-      'Authorised absence rate (England)',
-    );
-    expect(legendItems[2]).toHaveTextContent('Overall absence rate (England)');
+      const legendItems = container.querySelectorAll('.recharts-legend-item');
+      expect(legendItems[0]).toHaveTextContent(
+        'Unauthorised absence rate (England)',
+      );
+      expect(legendItems[1]).toHaveTextContent(
+        'Authorised absence rate (England)',
+      );
+      expect(legendItems[2]).toHaveTextContent(
+        'Overall absence rate (England)',
+      );
+    });
   });
 });

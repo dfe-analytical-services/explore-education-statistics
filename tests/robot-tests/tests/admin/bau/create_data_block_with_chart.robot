@@ -98,125 +98,75 @@ Create table
     user waits until results table appears     180
     user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from 'Datablock test %{RUN_IDENTIFIER}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
-Validate table's column headings
+Validate table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1  1   2005
-    user checks results table column heading contains  css:table  1  2   2007
-    user checks results table column heading contains  css:table  1  3   2008
-    user checks results table column heading contains  css:table  1  4   2009
-    user checks results table column heading contains  css:table  1  5   2010
-    user checks results table column heading contains  css:table  1  6   2011
-    user checks results table column heading contains  css:table  1  7   2012
-    user checks results table column heading contains  css:table  1  8   2016
+    user checks results table column heading contains  css:table  1  1  Admission Numbers
 
-    scroll element into view   xpath://table/thead/tr[1]/th[12]
-
-    user checks results table column heading contains  css:table  1  9   2017
-    user checks results table column heading contains  css:table  1  10  2018
-    user checks results table column heading contains  css:table  1  11  2019
-    user checks results table column heading contains  css:table  1  12  2020
-
-Validate table row Bolton 001 (E02000984)
+Validate table rows for Bolton 001 (E02000984)
     [Tags]  HappyPath
-    ${row}=  user gets row with heading   Bolton 001 (E02000984)
-    user checks row contains heading  ${row}   Bolton 001 (E02000984)
-    user checks row cell contains text  ${row}   1    n/a
-    user checks row cell contains text  ${row}   2    n/a
-    user checks row cell contains text  ${row}   3    n/a
-    user checks row cell contains text  ${row}   4    n/a
-    user checks row cell contains text  ${row}   5    n/a
-    user checks row cell contains text  ${row}   6    n/a
-    user checks row cell contains text  ${row}   7    n/a
-    user checks row cell contains text  ${row}   8    n/a
-    user checks row cell contains text  ${row}   9    n/a
-    user checks row cell contains text  ${row}   10   n/a
-    user checks row cell contains text  ${row}   11   8,533
-    user checks row cell contains text  ${row}   12   n/a
+    ${row}=  user gets row number with heading  Bolton 001 (E02000984)
+    user checks results table heading in offset row contains  ${row}  0  2  2019
 
-Validate table row Bolton 001 (E05000364)
-    [Tags]  HappyPath
-    ${row}=  user gets row with heading   Bolton 001 (E05000364)
-    user checks row contains heading  ${row}   Bolton 001 (E05000364)
-    user checks row cell contains text  ${row}   1    n/a
-    user checks row cell contains text  ${row}   2    n/a
-    user checks row cell contains text  ${row}   3    n/a
-    user checks row cell contains text  ${row}   4    5,815
-    user checks row cell contains text  ${row}   5    5,595
-    user checks row cell contains text  ${row}   6    n/a
-    user checks row cell contains text  ${row}   7    n/a
-    user checks row cell contains text  ${row}   8    n/a
-    user checks row cell contains text  ${row}   9    6,373
-    user checks row cell contains text  ${row}   10   n/a
-    user checks row cell contains text  ${row}   11   n/a
-    user checks row cell contains text  ${row}   12   n/a
+    user checks results table cell in offset row contains  ${row}  0  1  8,533
 
-Validate table row Bolton 004 (E02000987)
+Validate table rows for Bolton 001 (E05000364)
     [Tags]  HappyPath
-    ${row}=  user gets row with heading   Bolton 004 (E02000987)
-    user checks row contains heading  ${row}   Bolton 004 (E02000987)
-    user checks row cell contains text  ${row}   1    n/a
-    user checks row cell contains text  ${row}   2    n/a
-    user checks row cell contains text  ${row}   3    n/a
-    user checks row cell contains text  ${row}   4    n/a
-    user checks row cell contains text  ${row}   5    n/a
-    user checks row cell contains text  ${row}   6    n/a
-    user checks row cell contains text  ${row}   7    n/a
-    user checks row cell contains text  ${row}   8    n/a
-    user checks row cell contains text  ${row}   9    n/a
-    user checks row cell contains text  ${row}   10   n/a
-    user checks row cell contains text  ${row}   11   n/a
-    user checks row cell contains text  ${row}   12   6,031
+    ${row}=  user gets row number with heading   Bolton 001 (E05000364)
+    user checks results table heading in offset row contains  ${row}  0  2  2009
+    user checks results table heading in offset row contains  ${row}  1  1  2010
+    user checks results table heading in offset row contains  ${row}  2  1  2017
 
-Validate table row Bolton 004 (E05010450)
-    [Tags]  HappyPath
-    ${row}=  user gets row with heading   Bolton 004 (E05010450)
-    user checks row contains heading  ${row}   Bolton 004 (E05010450)
-    user checks row cell contains text  ${row}   1    8,557
-    user checks row cell contains text  ${row}   2    n/a
-    user checks row cell contains text  ${row}   3    n/a
-    user checks row cell contains text  ${row}   4    n/a
-    user checks row cell contains text  ${row}   5    n/a
-    user checks row cell contains text  ${row}   6    n/a
-    user checks row cell contains text  ${row}   7    n/a
-    user checks row cell contains text  ${row}   8    n/a
-    user checks row cell contains text  ${row}   9    3,481
-    user checks row cell contains text  ${row}   10   8,630
-    user checks row cell contains text  ${row}   11   n/a
-    user checks row cell contains text  ${row}   12   n/a
+    user checks results table cell in offset row contains  ${row}  0  1  5,815
+    user checks results table cell in offset row contains  ${row}  1  1  5,595
+    user checks results table cell in offset row contains  ${row}  2  1  6,373
 
-Validate table row Nailsea Youngwood
+Validate table rows for Bolton 004 (E02000987)
     [Tags]  HappyPath
-    ${row}=  user gets row with heading   Nailsea Youngwood
-    user checks row contains heading  ${row}   Nailsea Youngwood
-    user checks row cell contains text   ${row}    1    3,612
-    user checks row cell contains text   ${row}    2    n/a
-    user checks row cell contains text   ${row}    3    n/a
-    user checks row cell contains text   ${row}    4    n/a
-    user checks row cell contains text   ${row}    5    9,304
-    user checks row cell contains text   ${row}    6    9,603
-    user checks row cell contains text   ${row}    7    8,150
-    user checks row cell contains text   ${row}    8    4,198
-    user checks row cell contains text   ${row}    9    n/a
-    user checks row cell contains text   ${row}    10   n/a
-    user checks row cell contains text   ${row}    11   n/a
-    user checks row cell contains text   ${row}    12   n/a
+    ${row}=  user gets row number with heading   Bolton 004 (E02000987)
+    user checks results table heading in offset row contains  ${row}  0  2  2020
 
-Validate table row Syon
+    user checks results table cell in offset row contains  ${row}  0  1  6,031
+
+Validate table rows for Bolton 004 (E05010450)
     [Tags]  HappyPath
-    ${row}=  user gets row with heading   Syon
-    user checks row contains heading  ${row}   Syon
-    user checks row cell contains text   ${row}   1    n/a
-    user checks row cell contains text   ${row}   2    9,914
-    user checks row cell contains text   ${row}   3    5,505
-    user checks row cell contains text   ${row}   4    n/a
-    user checks row cell contains text   ${row}   5    6,060
-    user checks row cell contains text   ${row}   6    n/a
-    user checks row cell contains text   ${row}   7    1,109
-    user checks row cell contains text   ${row}   8    n/a
-    user checks row cell contains text   ${row}   9    1,959
-    user checks row cell contains text   ${row}   10   n/a
-    user checks row cell contains text   ${row}   11   n/a
-    user checks row cell contains text   ${row}   12   n/a
+    ${row}=  user gets row number with heading   Bolton 004 (E05010450)
+    user checks results table heading in offset row contains  ${row}  0  2  2005
+    user checks results table heading in offset row contains  ${row}  1  1  2017
+    user checks results table heading in offset row contains  ${row}  2  1  2018
+
+    user checks results table cell in offset row contains  ${row}  0  1  8,557
+    user checks results table cell in offset row contains  ${row}  1  1  3,481
+    user checks results table cell in offset row contains  ${row}  2  1  8,630
+
+Validate table rows for Nailsea Youngwood
+    [Tags]  HappyPath
+    ${row}=  user gets row number with heading   Nailsea Youngwood
+    user checks results table heading in offset row contains  ${row}  0  2  2005
+    user checks results table heading in offset row contains  ${row}  1  1  2010
+    user checks results table heading in offset row contains  ${row}  2  1  2011
+    user checks results table heading in offset row contains  ${row}  3  1  2012
+    user checks results table heading in offset row contains  ${row}  4  1  2016
+
+    user checks results table cell in offset row contains  ${row}  0  1  3,612
+    user checks results table cell in offset row contains  ${row}  1  1  9,304
+    user checks results table cell in offset row contains  ${row}  2  1  9,603
+    user checks results table cell in offset row contains  ${row}  3  1  8,150
+    user checks results table cell in offset row contains  ${row}  4  1  4,198
+
+Validate table rows for Syon
+    [Tags]  HappyPath
+    ${row}=  user gets row number with heading   Syon
+    user checks results table heading in offset row contains  ${row}  0  2  2007
+    user checks results table heading in offset row contains  ${row}  1  1  2008
+    user checks results table heading in offset row contains  ${row}  2  1  2010
+    user checks results table heading in offset row contains  ${row}  3  1  2012
+    user checks results table heading in offset row contains  ${row}  4  1  2017
+
+    user checks results table cell in offset row contains  ${row}  0  1  9,914
+    user checks results table cell in offset row contains  ${row}  1  1  5,505
+    user checks results table cell in offset row contains  ${row}  2  1  6,060
+    user checks results table cell in offset row contains  ${row}  3  1  1,109
+    user checks results table cell in offset row contains  ${row}  4  1  1,959
 
 Save data block
     [Tags]  HappyPath

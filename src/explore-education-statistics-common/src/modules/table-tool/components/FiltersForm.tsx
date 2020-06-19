@@ -128,7 +128,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       }
                       legendSize="m"
                       hint="Select at least one indicator below"
-                      selectAll
                       disabled={form.isSubmitting}
                       options={Object.values(subjectMeta.indicators).map(
                         group => ({
@@ -142,7 +141,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       <FormFieldset
                         id={`${formId}-filters`}
                         legend="Categories"
-                        legendSize="s"
+                        legendSize="m"
                         hint="Select at least one option from all categories"
                         error={getError('filters')}
                       >
@@ -158,7 +157,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 legend={filterGroup.legend}
                                 hint={filterGroup.hint}
                                 disabled={form.isSubmitting}
-                                selectAll
+                                order={[]}
                                 options={Object.entries(
                                   filterGroup.options,
                                 ).map(([_, group]) => {
