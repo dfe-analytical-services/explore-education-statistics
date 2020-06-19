@@ -20,7 +20,7 @@ const FormFieldCheckboxSearchGroup = <FormValues extends {}>(
 
   return (
     <FormField<string[]> {...props}>
-      {({ field, helpers }) => {
+      {({ field, helpers, meta }) => {
         return (
           <FormCheckboxSearchGroup
             {...props}
@@ -30,17 +30,24 @@ const FormFieldCheckboxSearchGroup = <FormValues extends {}>(
                 props.onAllChange(event, checked);
               }
 
+              if (event.isDefaultPrevented()) {
+                return;
+              }
+
               handleAllChange({
                 checked,
                 helpers,
-                event,
+                meta,
                 options,
-                value: field.value,
               });
             }}
             onChange={(event, option) => {
               if (props.onChange) {
                 props.onChange(event, option);
+              }
+
+              if (event.isDefaultPrevented()) {
+                return;
               }
 
               field.onChange(event);

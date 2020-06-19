@@ -31,7 +31,7 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
         options={options[0].options}
         onAllChange={(event, checked) => {
           if (onAllChange) {
-            onAllChange(event, checked, options[0].options);
+            onAllChange(event, checked);
           }
         }}
       />
@@ -45,7 +45,7 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
         options={options[0].options}
         onAllChange={(event, checked) => {
           if (onAllChange) {
-            onAllChange(event, checked, options[0].options);
+            onAllChange(event, checked);
           }
         }}
       />

@@ -11,6 +11,13 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
     Choose options
   </legend>
   
+  <button
+    class="button noUnderline govuk-!-margin-bottom-4"
+    id="test-all"
+    type="button"
+  >
+    Select all 4 options
+  </button>
   <label
     class="govuk-label"
     for="test-search"
@@ -42,6 +49,13 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
         <div
           class="govuk-checkboxes govuk-checkboxes--small"
         >
+          <button
+            class="button noUnderline selectAll"
+            id="test-1-all"
+            type="button"
+          >
+            Select all 2 subgroup options
+          </button>
           <div
             class="govuk-checkboxes__item"
           >
@@ -94,6 +108,13 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
         <div
           class="govuk-checkboxes govuk-checkboxes--small"
         >
+          <button
+            class="button noUnderline selectAll"
+            id="test-2-all"
+            type="button"
+          >
+            Select all 2 subgroup options
+          </button>
           <div
             class="govuk-checkboxes__item"
           >
