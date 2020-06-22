@@ -6,11 +6,13 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { DependencyList, useEffect, useMemo } from 'react';
 
+export type AsyncHandledStateSetter<T> = OmitStrict<AsyncState<T>, 'error'>;
+
 export type AsyncHandledRetryState<T> = OmitStrict<
   AsyncRetryState<T>,
   'error' | 'setState'
 > & {
-  setState: (state: OmitStrict<AsyncState<T>, 'error'>) => void;
+  setState: (state: AsyncHandledStateSetter<T>) => void;
 };
 
 /**
@@ -23,7 +25,7 @@ export type AsyncHandledRetryState<T> = OmitStrict<
 export default function useAsyncHandledRetry<T>(
   task: () => Promise<T>,
   deps: DependencyList = [],
-  initialState?: AsyncState<T>,
+  initialState?: AsyncHandledStateSetter<T>,
 ): AsyncHandledRetryState<T> {
   const { handleApiErrors } = useErrorControl();
 

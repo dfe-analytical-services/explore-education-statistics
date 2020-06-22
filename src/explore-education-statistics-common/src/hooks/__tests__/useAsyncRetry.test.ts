@@ -85,4 +85,56 @@ describe('useAsyncRetry', () => {
     expect(result.current.value).toBeUndefined();
     expect(result.current.error).toEqual(new Error('some error'));
   });
+
+  test('resets to initial state when dependencies change', async () => {
+    const { result, rerender, waitForNextUpdate } = renderHook(
+      ({ deps }) => useAsyncRetry(() => Promise.resolve('some value'), deps),
+      {
+        initialProps: {
+          deps: ['first-dep'],
+        },
+      },
+    );
+
+    await waitForNextUpdate();
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toBe('some value');
+    expect(result.current.error).toBeUndefined();
+
+    rerender({ deps: ['second-dep'] });
+
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.value).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+
+    await waitForNextUpdate();
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toBe('some value');
+    expect(result.current.error).toBeUndefined();
+  });
+
+  test('does not reset to initial state if dependencies do not change', async () => {
+    const { result, rerender, waitForNextUpdate } = renderHook(
+      ({ deps }) => useAsyncRetry(() => Promise.resolve('some value'), deps),
+      {
+        initialProps: {
+          deps: ['first-dep'],
+        },
+      },
+    );
+
+    await waitForNextUpdate();
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toBe('some value');
+    expect(result.current.error).toBeUndefined();
+
+    rerender({ deps: ['first-dep'] });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toBe('some value');
+    expect(result.current.error).toBeUndefined();
+  });
 });
