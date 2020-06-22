@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddAncillaryFilesAsync(Guid releaseId,
-            [Required] [FromQuery(Name = "name")] string name, IFormFile file)
+            [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
             return await _fileStorageService
                 .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddDataFilesAsync(Guid releaseId,
-            [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
+            [FromQuery(Name = "name"), Required] string name, IFormFile file, IFormFile metaFile)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -246,16 +246,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/data/{fileName}/{subjectTitle}/delete-plan")]
-        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string fileName, string subjectTitle)
+        [HttpGet("release/{releaseId}/data/{fileName}/delete-plan")]
+        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId,
+            string fileName,
+            [FromQuery(Name = "name"), Required] string subjectTitle)
         {
             return await _releaseService
                 .GetDeleteDataFilePlan(releaseId, fileName, subjectTitle)
                 .HandleFailuresOrOk();
         }
-        
-        [HttpDelete("release/{releaseId}/data/{fileName}/{subjectTitle}")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId, string fileName, string subjectTitle)
+
+        [HttpDelete("release/{releaseId}/data/{fileName}")]
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId,
+            string fileName,
+            [FromQuery(Name = "name"), Required] string subjectTitle)
         {
             return await _releaseService
                 .RemoveDataFileReleaseLinkAsync(releaseId, fileName, subjectTitle)

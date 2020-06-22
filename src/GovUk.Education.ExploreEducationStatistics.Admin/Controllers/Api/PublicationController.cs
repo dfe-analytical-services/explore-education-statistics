@@ -25,8 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
         public async Task<ActionResult<List<MyPublicationViewModel>>> GetMyPublicationsAsync(
-            [Required] [FromQuery(Name = "topicId")]
-            Guid topicId)
+            [FromQuery(Name = "topicId"), Required] Guid topicId)
         {
             return await _publicationService
                 .GetMyPublicationsAndReleasesByTopicAsync(topicId)
