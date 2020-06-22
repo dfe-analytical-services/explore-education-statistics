@@ -48,10 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static void CreateReleaseFileLink(ImportMessage message, ContentDbContext contentDbContext, Release release,
             Subject subject)
         {
-            var releaseFileLink = contentDbContext
+            var releaseFileLinks = contentDbContext
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
-                .FirstOrDefault(f => f.ReleaseId == release.Id && f.ReleaseFileReference.Filename == message.DataFileName);
+                .Where(f => f.ReleaseId == release.Id);
+
+            // Make sure the filename predicate is case sensitive by executing in memory rather than in the db
+            var releaseFileLink = releaseFileLinks.ToList()
+                .FirstOrDefault(file => file.ReleaseFileReference.Filename == message.DataFileName);
 
             if (releaseFileLink != null)
             {
