@@ -180,31 +180,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(Guid subjectId)
         {
-            return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
-                group => group.Label.PascalCase(),
-                group => new IndicatorsMetaViewModel
-                {
-                    Label = group.Label,
-                    Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
-                }
-            );
+            return _indicatorGroupService.GetIndicatorGroups(subjectId)
+                .OrderBy(group => group.Label, LabelComparer)
+                .ToDictionary(
+                    group => group.Label.PascalCase(),
+                    group => new IndicatorsMetaViewModel
+                    {
+                        Label = group.Label,
+                        Options = BuildIndicatorViewModels(group.Indicators)
+                    }
+                );
         }
 
         private static Dictionary<string, ObservationalUnitsMetaViewModel> BuildObservationalUnitsViewModels(
             Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
         {
-            var viewModels = observationalUnits.ToDictionary(
-                pair => pair.Key.ToString().CamelCase(),
-                pair => new ObservationalUnitsMetaViewModel
-                {
-                    Hint = "",
-                    Legend = pair.Key.GetEnumLabel(),
-                    Options = pair.Value.Select(MapObservationalUnitToLabelValue)
-                });
+            var viewModels = observationalUnits
+                .OrderBy(pair => pair.Key.GetEnumLabel())
+                .ToDictionary(
+                    pair => pair.Key.ToString().CamelCase(),
+                    pair => new ObservationalUnitsMetaViewModel
+                    {
+                        Hint = "",
+                        Legend = pair.Key.GetEnumLabel(),
+                        Options = pair.Value.Select(MapObservationalUnitToLabelValue)
+                    });
 
             foreach (var (_, viewModel) in viewModels)
             {
-                viewModel.Options = TransformDuplicateObservationalUnitsWithUniqueLabels(viewModel.Options);
+                viewModel.Options = TransformDuplicateObservationalUnitsWithUniqueLabels(viewModel.Options)
+                    .OrderBy(value => value.Label);
             }
 
             return viewModels;

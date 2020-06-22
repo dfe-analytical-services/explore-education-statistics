@@ -116,6 +116,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                           name={`locations.${levelKey}`}
                           key={levelKey}
                           options={level.options}
+                          order={[]}
                           id={`${formId}-levels-${levelKey}`}
                           legend={level.legend}
                           legendHidden

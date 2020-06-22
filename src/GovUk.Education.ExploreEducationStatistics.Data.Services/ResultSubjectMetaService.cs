@@ -139,7 +139,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     geoJsonRequested,
                     boundaryLevelId));
 
-            return TransformDuplicateObservationalUnitsWithUniqueLabels(viewModels);
+            return TransformDuplicateObservationalUnitsWithUniqueLabels(viewModels)
+                .OrderBy(model => model.Level.ToString())
+                .ThenBy(model => model.Label);
         }
 
         private IEnumerable<BoundaryLevelIdLabel> GetBoundaryLevelOptions(long? boundaryLevelId,
@@ -153,8 +155,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private IEnumerable<IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
         {
-            return _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(
-                _indicatorService.GetIndicators(query.SubjectId, query.Indicators));
+            var indicators = _indicatorService.GetIndicators(query.SubjectId, query.Indicators);
+            return BuildIndicatorViewModels(indicators);
         }
 
         private IEnumerable<FootnoteViewModel> GetFilteredFootnotes(Guid releaseId, IQueryable<Observation> observations,

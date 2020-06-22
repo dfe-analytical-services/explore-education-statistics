@@ -129,6 +129,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       legendSize="m"
                       hint="Select at least one indicator below"
                       disabled={form.isSubmitting}
+                      order={[]}
                       options={Object.values(subjectMeta.indicators).map(
                         group => ({
                           legend: group.label,

@@ -117,3 +117,63 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
   </fieldset>
 </div>
 `;
+
+exports[`FormCheckboxSearchSubGroups renders single group of checkboxes correctly 1`] = `
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      Choose options
+    </legend>
+    <label class="govuk-label"
+           for="test-checkboxes-search"
+    >
+      Search options
+    </label>
+    <input name="testCheckboxes-search"
+           class="govuk-input searchInput govuk-input--width-20"
+           id="test-checkboxes-search"
+           type="text"
+    >
+    <div class="optionsContainer"
+         aria-live="assertive"
+    >
+      <div class="govuk-checkboxes">
+        <button id="test-checkboxes-1-all"
+                class="button noUnderline selectAll"
+                type="button"
+        >
+          Select all 2 options
+        </button>
+        <div class="govuk-checkboxes__item">
+          <input class="govuk-checkboxes__input"
+                 id="test-checkboxes-1-1"
+                 name="testCheckboxes"
+                 type="checkbox"
+                 value="1"
+          >
+          <label class="govuk-label govuk-checkboxes__label"
+                 for="test-checkboxes-1-1"
+          >
+            Checkbox 1
+          </label>
+        </div>
+        <div class="govuk-checkboxes__item">
+          <input class="govuk-checkboxes__input"
+                 id="test-checkboxes-1-2"
+                 name="testCheckboxes"
+                 type="checkbox"
+                 value="2"
+          >
+          <label class="govuk-label govuk-checkboxes__label"
+                 for="test-checkboxes-1-2"
+          >
+            Checkbox 2
+          </label>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</div>
+`;

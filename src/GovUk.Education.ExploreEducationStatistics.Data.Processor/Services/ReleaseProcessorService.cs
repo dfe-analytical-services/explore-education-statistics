@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             RemoveSubjectIfExisting(subjectData.Name, release, context);
             
             var subject = CreateSubject(message.SubjectId, subjectData.Name, release, context);
-            
+
             if (!UpdateReleaseFileReferenceLink(message, contentDbContext, release, subject))
             {
                 throw new Exception(
@@ -54,16 +54,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static bool UpdateReleaseFileReferenceLink(ImportMessage message, ContentDbContext contentDbContext, Release release,
             Subject subject)
         {
-            var releaseDataFileLink = contentDbContext
+            var releaseFileLinks = contentDbContext
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
-                .FirstOrDefault(f => f.ReleaseId == release.Id && f.ReleaseFileReference.Filename == message.DataFileName);
+                .Where(f => f.ReleaseId == release.Id);
+
+            // Make sure the filename predicate is case sensitive by executing in memory rather than in the db
+            var releaseFileLink = releaseFileLinks.ToList()
+                .FirstOrDefault(file => file.ReleaseFileReference.Filename == message.DataFileName);
 
             if (releaseDataFileLink != null)
             {
                 releaseDataFileLink.ReleaseFileReference.SubjectId = subject.Id;
                 contentDbContext.Update(releaseDataFileLink);
-                
+
                 var associatedMetaReference = contentDbContext.ReleaseFileReferences
                     .FirstOrDefault(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
                                   && rfr.ReleaseFileType == ReleaseFileTypes.Metadata);
@@ -72,10 +76,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     return false;
                 }
-                
+
                 associatedMetaReference.SubjectId = subject.Id;
                 contentDbContext.Update(associatedMetaReference);
-                
+
                 contentDbContext.SaveChanges();
                 return true;
             }

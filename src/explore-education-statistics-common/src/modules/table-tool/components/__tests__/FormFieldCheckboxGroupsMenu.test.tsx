@@ -1,11 +1,11 @@
-import { fireEvent, render, wait } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Formik } from 'formik';
 import React from 'react';
 import FormFieldCheckboxGroupsMenu from '../FormFieldCheckboxGroupsMenu';
 
 describe('FormFieldCheckboxGroupsMenu', () => {
   test('renders multiple checkbox groups in correct order with search input', () => {
-    const { container, getAllByLabelText, queryByLabelText } = render(
+    const { container } = render(
       <Formik
         initialValues={{
           test: '',
@@ -36,9 +36,9 @@ describe('FormFieldCheckboxGroupsMenu', () => {
       </Formik>,
     );
 
-    expect(queryByLabelText('Search options')).not.toBeNull();
+    expect(screen.queryByLabelText('Search options')).not.toBeNull();
 
-    const checkboxes = getAllByLabelText(/Option/);
+    const checkboxes = screen.getAllByLabelText(/Option/);
 
     expect(checkboxes[0]).toHaveAttribute('value', '1');
     expect(checkboxes[1]).toHaveAttribute('value', '2');
@@ -49,7 +49,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
   });
 
   test('renders single checkbox group with search input', () => {
-    const { container, getAllByLabelText, queryByLabelText } = render(
+    const { container } = render(
       <Formik
         initialValues={{
           test: '',
@@ -73,9 +73,9 @@ describe('FormFieldCheckboxGroupsMenu', () => {
       </Formik>,
     );
 
-    expect(queryByLabelText('Search options')).not.toBeNull();
+    expect(screen.queryByLabelText('Search options')).not.toBeNull();
 
-    const checkboxes = getAllByLabelText(/Option/);
+    const checkboxes = screen.getAllByLabelText(/Option/);
 
     expect(checkboxes[0]).toHaveAttribute('value', '1');
     expect(checkboxes[1]).toHaveAttribute('value', '2');
@@ -111,7 +111,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
   });
 
   test('menu contents is expanded if there is a field error', async () => {
-    const { container } = render(
+    render(
       <Formik
         initialValues={{
           test: '',
@@ -141,15 +141,13 @@ describe('FormFieldCheckboxGroupsMenu', () => {
       </Formik>,
     );
 
-    await wait();
-
-    const summary = container.querySelector('summary') as HTMLElement;
-
-    expect(summary).toHaveAttribute('aria-expanded', 'true');
+    expect(
+      screen.getByRole('button', { name: 'Choose options' }),
+    ).toHaveAttribute('aria-expanded', 'true');
   });
 
   test('clicking menu does not collapse it if there is a field error', async () => {
-    const { container } = render(
+    render(
       <Formik
         initialValues={{
           test: '',
@@ -179,9 +177,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
       </Formik>,
     );
 
-    await wait();
-
-    const summary = container.querySelector('summary') as HTMLElement;
+    const summary = screen.getByRole('button', { name: 'Choose options' });
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
 

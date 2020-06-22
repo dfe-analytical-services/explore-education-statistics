@@ -188,7 +188,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
     >
       <button
         class="button noUnderline selectAll"
-        id="test-checkboxes-all"
+        id="test-1-all"
         type="button"
       >
         Select all 2 options
@@ -198,14 +198,14 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
       >
         <input
           class="govuk-checkboxes__input"
-          id="test-checkboxes-1"
+          id="test-1-1"
           name="test"
           type="checkbox"
           value="1"
         />
         <label
           class="govuk-label govuk-checkboxes__label"
-          for="test-checkboxes-1"
+          for="test-1-1"
         >
           Option 1
         </label>
@@ -215,14 +215,14 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
       >
         <input
           class="govuk-checkboxes__input"
-          id="test-checkboxes-2"
+          id="test-1-2"
           name="test"
           type="checkbox"
           value="2"
         />
         <label
           class="govuk-label govuk-checkboxes__label"
-          for="test-checkboxes-2"
+          for="test-1-2"
         >
           Option 2
         </label>
@@ -244,24 +244,29 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with single c
   </legend>
   
   <div
-    class="govuk-checkboxes govuk-checkboxes--small"
+    aria-live="assertive"
+    class="optionsContainer"
   >
     <div
-      class="govuk-checkboxes__item"
+      class="govuk-checkboxes govuk-checkboxes--small"
     >
-      <input
-        class="govuk-checkboxes__input"
-        id="test-1"
-        name="test"
-        type="checkbox"
-        value="1"
-      />
-      <label
-        class="govuk-label govuk-checkboxes__label"
-        for="test-1"
+      <div
+        class="govuk-checkboxes__item"
       >
-        Option 1
-      </label>
+        <input
+          class="govuk-checkboxes__input"
+          id="test-1-1"
+          name="test"
+          type="checkbox"
+          value="1"
+        />
+        <label
+          class="govuk-label govuk-checkboxes__label"
+          for="test-1-1"
+        >
+          Option 1
+        </label>
+      </div>
     </div>
   </div>
 </fieldset>
