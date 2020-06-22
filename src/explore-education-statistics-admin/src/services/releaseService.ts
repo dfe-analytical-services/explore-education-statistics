@@ -22,6 +22,7 @@ export interface Release {
   internalReleaseNote?: string;
   previousVersionId: string;
   permissions: {
+    canAddPrereleaseUsers: boolean;
     canUpdateRelease: boolean;
     canDeleteRelease: boolean;
     canMakeAmendmentOfRelease: boolean;

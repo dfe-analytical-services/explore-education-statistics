@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         {
             return new MyReleaseViewModel.PermissionsSet
             {
+                CanAddPrereleaseUsers = CheckResult(_userService.CheckCanAssignPrereleaseContactsToRelease(release)),
                 CanUpdateRelease = CheckResult(_userService.CheckCanUpdateRelease(release)),
                 CanDeleteRelease = CheckResult(_userService.CheckCanDeleteRelease(release)),
                 CanMakeAmendmentOfRelease = CheckResult(_userService.CheckCanMakeAmendmentOfRelease(release))
