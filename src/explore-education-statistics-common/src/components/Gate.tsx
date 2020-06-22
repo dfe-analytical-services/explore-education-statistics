@@ -24,10 +24,7 @@ const Gate = ({
   fallback = null,
   loading = null,
 }: GateProps) => {
-  const [
-    { isLoading, value: isSuccess, error },
-    checkCondition,
-  ] = useAsyncCallback(
+  const [{ isLoading, value, error }, checkCondition] = useAsyncCallback(
     async () => (typeof condition === 'boolean' ? condition : condition()),
     [condition],
     {
@@ -37,16 +34,16 @@ const Gate = ({
   );
 
   useEffect(() => {
-    if (isLoading && !isSuccess && !error) {
+    if (isLoading && !value && !error) {
       checkCondition();
     }
-  }, [isLoading, isSuccess, error, checkCondition]);
+  }, [isLoading, value, error, checkCondition]);
 
   if (isLoading) {
     return loading;
   }
 
-  if (isSuccess) {
+  if (value) {
     return children;
   }
 

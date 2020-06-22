@@ -3,12 +3,15 @@ import { AsyncState } from '@common/hooks/useAsyncCallback';
 import useAsyncRetry, { AsyncRetryState } from '@common/hooks/useAsyncRetry';
 import { OmitStrict } from '@common/types';
 import omit from 'lodash/omit';
-import { DependencyList, useEffect } from 'react';
+import pick from 'lodash/pick';
+import { DependencyList, useEffect, useMemo } from 'react';
 
 export type AsyncHandledRetryState<T> = OmitStrict<
   AsyncRetryState<T>,
-  'error' | 'setError'
->;
+  'error' | 'setState'
+> & {
+  setState: (state: OmitStrict<AsyncState<T>, 'error'>) => void;
+};
 
 /**
  * Wrapper around {@see useAsyncRetry} that automatically handles
@@ -32,5 +35,12 @@ export default function useAsyncHandledRetry<T>(
     }
   }, [asyncRetry.error, handleApiErrors]);
 
-  return omit(asyncRetry, ['error', 'setError']);
+  return useMemo(() => {
+    return {
+      ...omit(asyncRetry, ['error', 'setState']),
+      setState: state => {
+        asyncRetry.setState(pick(state, ['value', 'isLoading']));
+      },
+    };
+  }, [asyncRetry]);
 }
