@@ -16,7 +16,9 @@ export interface AsyncRetryState<T> extends AsyncCallbackState<T> {
 export default function useAsyncRetry<T>(
   task: () => Promise<T>,
   deps: DependencyList = [],
-  initialState?: AsyncState<T>,
+  initialState: AsyncState<T> = {
+    isLoading: true,
+  },
 ): AsyncRetryState<T> {
   const [state, run] = useAsyncCallback<T, []>(task, deps, initialState);
   const { isLoading } = state;
