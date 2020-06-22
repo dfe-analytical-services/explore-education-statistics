@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -40,25 +41,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             RemoveSubjectIfExisting(subjectData.Name, release, context);
             
             var subject = CreateSubject(message.SubjectId, subjectData.Name, release, context);
-            CreateReleaseFileLink(message, contentDbContext, release, subject);
+            
+            if (!UpdateReleaseFileReferenceLink(message, contentDbContext, release, subject))
+            {
+                throw new Exception(
+                    "Unable to create release file links when importing : Check file references are correct");
+            }
             
             return subject;
         }
 
-        private static void CreateReleaseFileLink(ImportMessage message, ContentDbContext contentDbContext, Release release,
+        private static bool UpdateReleaseFileReferenceLink(ImportMessage message, ContentDbContext contentDbContext, Release release,
             Subject subject)
         {
-            var releaseFileLink = contentDbContext
+            var releaseDataFileLink = contentDbContext
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
                 .FirstOrDefault(f => f.ReleaseId == release.Id && f.ReleaseFileReference.Filename == message.DataFileName);
 
-            if (releaseFileLink != null)
+            if (releaseDataFileLink != null)
             {
-                releaseFileLink.ReleaseFileReference.SubjectId = subject.Id;
-                contentDbContext.Update(releaseFileLink);
+                releaseDataFileLink.ReleaseFileReference.SubjectId = subject.Id;
+                contentDbContext.Update(releaseDataFileLink);
+                
+                var associatedMetaReference = contentDbContext.ReleaseFileReferences
+                    .FirstOrDefault(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
+                                  && rfr.ReleaseFileType == ReleaseFileTypes.Metadata);
+
+                if (associatedMetaReference == null)
+                {
+                    return false;
+                }
+                
+                associatedMetaReference.SubjectId = subject.Id;
+                contentDbContext.Update(associatedMetaReference);
+                
                 contentDbContext.SaveChanges();
+                return true;
             }
+
+            return false;
         }
 
         private void RemoveSubjectIfExisting(string name, Release release, StatisticsDbContext context)

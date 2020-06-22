@@ -146,11 +146,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
                     }
 
-                    var datafile = GetReleaseFileReference(releaseId, ReleaseFileTypes.Data);
-                    var metafile = GetReleaseFileReference(releaseId, ReleaseFileTypes.Metadata);
+                    var metaFilename = await GetAssociatedMetaFilename(releaseId, dataFileName);
 
-                    return await DeleteFileLink(releaseId, datafile.Filename, datafile.ReleaseFileType)
-                        .OnSuccess(() => DeleteFileLink(releaseId, metafile.Filename, metafile.ReleaseFileType))
+                    return await DeleteFileLink(releaseId, dataFileName, ReleaseFileTypes.Data)
+                        .OnSuccess(() => DeleteFileLink(releaseId, metaFilename, ReleaseFileTypes.Metadata))
                         .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });
         }
@@ -365,13 +364,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<ReleaseFile> GetReleaseFileLinkAsync(Guid releaseId, string filename, ReleaseFileTypes type)
         {
-            return await _context
+            var releaseFileLinks = _context
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
                 .Where(f => f.ReleaseId == releaseId &&
-                            f.ReleaseFileReference.ReleaseFileType == type &&
-                            f.ReleaseFileReference.Filename == filename)
-                .FirstOrDefaultAsync();
+                            f.ReleaseFileReference.ReleaseFileType == type);
+            
+            // Make sure the filename predicate is case sensitive by executing in memory rather than in the db
+            return releaseFileLinks.ToList()
+                .FirstOrDefault(file => file.ReleaseFileReference.Filename == filename);
         }
 
         private async Task<Either<ActionResult, bool>> DeleteFileReference(Guid releaseId, string filename,
@@ -484,12 +485,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return AdminReleasePath(fileReference.ReleaseId, fileReference.ReleaseFileType, fileReference.Filename);
         }
 
-        private ReleaseFileReference GetReleaseFileReference(Guid releaseId, ReleaseFileTypes releaseFileType)
+        private async Task<string> GetAssociatedMetaFilename(Guid releaseId, string dataFileName)
         {
-            return _context.ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
-                .First(rf => rf.ReleaseId == releaseId && rf.ReleaseFileReference.ReleaseFileType == releaseFileType)
-                .ReleaseFileReference;
+            var releaseDataFileLink = await GetReleaseFileLinkAsync(releaseId, dataFileName, ReleaseFileTypes.Data);
+
+            return _context.ReleaseFileReferences
+                .First(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
+                              && rfr.ReleaseFileType == ReleaseFileTypes.Metadata
+                              && rfr.SubjectId == releaseDataFileLink.ReleaseFileReference.SubjectId).Filename;
         }
     }
 }
