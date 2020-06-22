@@ -85,12 +85,12 @@ const releaseDataFileService = {
     dataFile: DataFile,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${dataFile.filename}/${dataFile.title}/delete-plan`,
+      `/release/${releaseId}/data/${dataFile.filename}/delete-plan?name=${dataFile.title}`,
     );
   },
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<null> {
     return client.delete<null>(
-      `/release/${releaseId}/data/${dataFile.filename}/${dataFile.title}`,
+      `/release/${releaseId}/data/${dataFile.filename}?name=${dataFile.title}`,
     );
   },
   downloadDataFile(releaseId: string, fileName: string): Promise<void> {
