@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Where(f => f.ReleaseId == release.Id);
 
             // Make sure the filename predicate is case sensitive by executing in memory rather than in the db
-            var releaseFileLink = releaseFileLinks.ToList()
+            var releaseDataFileLink = releaseFileLinks.ToList()
                 .FirstOrDefault(file => file.ReleaseFileReference.Filename == message.DataFileName);
 
             if (releaseDataFileLink != null)
