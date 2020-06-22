@@ -45,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             
                 if (subject != null)
                 {
+                    // TODO - This has been reverted in master : Too slow - delete of subject will be moved to stored proc
                     var observationFilterItems = _statisticsDbContext.ObservationFilterItem
                             .Include(ofi => ofi.Observation)
                             .ThenInclude(o => o.Subject)
