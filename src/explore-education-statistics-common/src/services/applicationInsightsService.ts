@@ -1,6 +1,9 @@
-import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+import {
+  ApplicationInsights,
+  SeverityLevel,
+} from '@microsoft/applicationinsights-web';
 
-export { ApplicationInsights };
+export { ApplicationInsights, SeverityLevel };
 
 const appInsights = new ApplicationInsights({
   config: {
