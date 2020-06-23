@@ -130,42 +130,44 @@ Reorder Gender to be column group
     [Tags]  HappyPath
     user opens details dropdown     Re-order table headers
     user sets focus to element  xpath://legend[text()="Row group 1"]/../../..
-    user presses keys    SPACE
+    user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_LEFT
-    user presses keys    SPACE
+    user presses keys    ${SPACE}
 
 Reorder Gender male to be second
     [Tags]  HappyPath
     user sets focus to element   xpath://strong[text()="Gender male"]/../..  # The /../.. to get to a focusable element
-    user presses keys    SPACE
+    user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
-    user presses keys    SPACE
+    user presses keys    ${SPACE}
 
 Reorder Authorised absence rate to be last
     [Tags]  HappyPath
     user sets focus to element  xpath://strong[text()="Authorised absence rate"]/../..  # The /../.. to get to a focusable element
-    user presses keys    SPACE
+    user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
-    user presses keys    ARROW_DOWN  # Three time to ensure
-    user presses keys    SPACE
+    user presses keys    ARROW_DOWN  # Three times to ensure
+    user presses keys    ${SPACE}
 
 Reorder Overall absence rate to be first
     [Tags]  HappyPath
     user sets focus to element  xpath://strong[text()="Overall absence rate"]/../..  # The /../.. to get to a focusable element
-    user presses keys    SPACE
+    user presses keys    ${SPACE}
+    user presses keys    ${SPACE}
     user presses keys    ARROW_UP
-    user presses keys    SPACE
+    user presses keys    ARROW_UP   # Twice to ensure
+    user presses keys    ${SPACE}
 
 Reorder 2012/13 to be last
     [Tags]  HappyPath
     user sets focus to element  xpath://strong[text()="2012/13"]/../..  # The /../.. to get to a focusable element
-    user presses keys    SPACE
+    user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
-    user presses keys    SPACE
+    user presses keys    ${SPACE}
 
 Click Re-order table button
     [Tags]  HappyPath

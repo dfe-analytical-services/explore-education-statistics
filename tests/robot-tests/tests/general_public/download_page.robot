@@ -27,7 +27,7 @@ Validate Pupils and schools contains Pupil absence files
 
 Validate Pupil absence data downloads are available
     [Documentation]  EES-562
-    [Tags]  HappyPath   NotAgainstLocal
+    [Tags]  HappyPath
     environment variable should be set   DATA_API_URL
 
     user opens details dropdown  Pupil absence
@@ -47,10 +47,28 @@ Validate Pupil absence data downloads are available
     user checks page contains link with text and url  Absence rate percent bands, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_rate_percent_bands.csv
     user checks details dropdown contains download link  Pupil absence  All files, 2016/17
     user checks page contains link with text and url  All files, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/ancillary/pupil-absence-in-schools-in-england_2016-17.zip
+
+Download Absence in prus CSV
+    [Tags]  HappyPath
+    download file  xpath://span[text()="Pupil absence"]/../..//a[text()="Absence in prus, 2016/17"]   absence_in_prus.csv
+    downloaded file should have first line  absence_in_prus.csv   time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,num_schools,enrolments,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,enrolments_pa_10_exact,enrolments_pa_10_exact_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons
+
+Download All files ZIP
+    [Tags]  HappyPath
+    download file  xpath://span[text()="Pupil absence"]/../..//a[text()="All files, 2016/17"]   pupil-absence-in-schools-in-england_2016-17.zip
+    zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_by_characteristic.csv
+    zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_by_geographic_level.csv
+    zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_by_term.csv
+    zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_for_four_year_olds.csv
+    zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_in_prus.csv
+    zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_number_missing_at_least_one_session_by_reason.csv
+    zip should contain file   pupil-absence-in-schools-in-england_2016-17.zip  absence_rate_percent_bands.csv
+    zip should contains x files  pupil-absence-in-schools-in-england_2016-17.zip   7
+
     user closes details dropdown  Pupil absence
 
 Validate Pupil and schools contains Exclusions files
-    [Tags]  HappyPath   NotAgainstLocal
+    [Tags]  HappyPath
     user checks accordion section contains text  Pupils and schools   Exclusions
 
 Validate Exclusions data downloads are available
