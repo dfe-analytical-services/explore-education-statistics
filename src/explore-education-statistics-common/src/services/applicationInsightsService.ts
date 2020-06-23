@@ -5,6 +5,8 @@ import {
 
 export { ApplicationInsights, SeverityLevel };
 
+let isInitialised = false;
+
 const appInsights = new ApplicationInsights({
   config: {
     autoTrackPageVisitTime: true,
@@ -16,10 +18,14 @@ export function initApplicationInsights(
 ): ApplicationInsights {
   if (instrumentationKey) {
     appInsights.config.instrumentationKey = instrumentationKey;
-    appInsights.loadAppInsights();
 
-    // eslint-disable-next-line no-console
-    console.log('Application Insights initialised');
+    if (!isInitialised) {
+      appInsights.loadAppInsights();
+      isInitialised = true;
+
+      // eslint-disable-next-line no-console
+      console.log('Application Insights initialised');
+    }
   }
 
   return appInsights;
