@@ -1,24 +1,31 @@
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
-// eslint-disable-next-line import/prefer-default-export
+export { ApplicationInsights };
+
+const appInsights = new ApplicationInsights({
+  config: {
+    autoTrackPageVisitTime: true,
+  },
+});
+
 export function initApplicationInsights(
-  key: string,
-): ApplicationInsights | undefined {
-  if (key) {
-    const appInsights = new ApplicationInsights({
-      config: {
-        instrumentationKey: key,
-        enableAutoRouteTracking: true,
-        autoTrackPageVisitTime: true,
-      },
-    });
+  instrumentationKey: string,
+): ApplicationInsights {
+  if (instrumentationKey) {
+    appInsights.config.instrumentationKey = instrumentationKey;
     appInsights.loadAppInsights();
 
     // eslint-disable-next-line no-console
     console.log('Application Insights initialised');
-
-    return appInsights;
   }
 
-  return undefined;
+  return appInsights;
+}
+
+/**
+ * Escape hatch to get the Application Insights client
+ * directly. Prefer to use context if possible.
+ */
+export function getApplicationInsights(): ApplicationInsights {
+  return appInsights;
 }
