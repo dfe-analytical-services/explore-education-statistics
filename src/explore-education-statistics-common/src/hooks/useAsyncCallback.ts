@@ -7,10 +7,21 @@ export interface AsyncState<T> {
   error?: Error;
 }
 
+export type AsyncStateSetter<T> =
+  | {
+      isLoading: boolean;
+    }
+  | {
+      isLoading: false;
+      value: T;
+    }
+  | {
+      isLoading: false;
+      error: Error;
+    };
+
 export interface AsyncCallbackState<T> extends AsyncState<T> {
-  setLoading: (loading: boolean) => void;
-  setValue: (value: T) => void;
-  setError: (error: Error) => void;
+  setState: (state: AsyncStateSetter<T>) => void;
 }
 
 export type AsyncCallback<Args extends unknown[]> = (...args: Args) => void;
@@ -23,7 +34,7 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
   callback: (...args: Args) => Promise<Value>,
   deps: DependencyList = [],
   initialState: AsyncState<Value> = {
-    isLoading: true,
+    isLoading: false,
   },
 ): [AsyncCallbackState<Value>, AsyncCallback<Args>] {
   const previousCall = useRef(0);
@@ -51,7 +62,9 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
       return result;
     } catch (error) {
       if (currentCall === previousCall.current) {
-        logger.error(error);
+        if (process.env.NODE_ENV !== 'test') {
+          logger.error(error);
+        }
 
         setState({
           isLoading: false,
@@ -67,21 +80,7 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
   const stateReturn: AsyncCallbackState<Value> = useMemo(() => {
     return {
       ...state,
-      setLoading: isLoading =>
-        setState({
-          ...state,
-          isLoading,
-        }),
-      setValue: value =>
-        setState({
-          ...state,
-          value,
-        }),
-      setError: error =>
-        setState({
-          ...state,
-          error,
-        }),
+      setState,
     };
   }, [state]);
 

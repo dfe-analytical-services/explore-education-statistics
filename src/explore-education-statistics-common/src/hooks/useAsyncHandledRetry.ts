@@ -3,12 +3,17 @@ import { AsyncState } from '@common/hooks/useAsyncCallback';
 import useAsyncRetry, { AsyncRetryState } from '@common/hooks/useAsyncRetry';
 import { OmitStrict } from '@common/types';
 import omit from 'lodash/omit';
-import { DependencyList, useEffect } from 'react';
+import pick from 'lodash/pick';
+import { DependencyList, useEffect, useMemo } from 'react';
+
+export type AsyncHandledStateSetter<T> = OmitStrict<AsyncState<T>, 'error'>;
 
 export type AsyncHandledRetryState<T> = OmitStrict<
   AsyncRetryState<T>,
-  'error' | 'setError'
->;
+  'error' | 'setState'
+> & {
+  setState: (state: AsyncHandledStateSetter<T>) => void;
+};
 
 /**
  * Wrapper around {@see useAsyncRetry} that automatically handles
@@ -20,7 +25,7 @@ export type AsyncHandledRetryState<T> = OmitStrict<
 export default function useAsyncHandledRetry<T>(
   task: () => Promise<T>,
   deps: DependencyList = [],
-  initialState?: AsyncState<T>,
+  initialState?: AsyncHandledStateSetter<T>,
 ): AsyncHandledRetryState<T> {
   const { handleApiErrors } = useErrorControl();
 
@@ -32,5 +37,12 @@ export default function useAsyncHandledRetry<T>(
     }
   }, [asyncRetry.error, handleApiErrors]);
 
-  return omit(asyncRetry, ['error', 'setError']);
+  return useMemo(() => {
+    return {
+      ...omit(asyncRetry, ['error', 'setState']),
+      setState: state => {
+        asyncRetry.setState(pick(state, ['value', 'isLoading']));
+      },
+    };
+  }, [asyncRetry]);
 }
