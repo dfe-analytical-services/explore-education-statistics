@@ -144,6 +144,8 @@ async function startServer(port = process.env.PORT || 3000) {
 }
 
 startServer().catch(err => {
+  appInsights.defaultClient.trackException({ exception: err });
+
   console.error(err);
   process.exit(1);
 });
