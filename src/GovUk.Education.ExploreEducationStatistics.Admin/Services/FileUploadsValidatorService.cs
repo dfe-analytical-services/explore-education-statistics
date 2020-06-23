@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile dataFile, IFormFile metaFile, string name, bool overwrite)
         {
-            if (string.Equals(dataFile.FileName, metaFile.FileName, OrdinalIgnoreCase))
+            if (string.Equals(dataFile.FileName.ToLower(), metaFile.FileName.ToLower(), OrdinalIgnoreCase))
             {
                 return ValidationActionResult(DataAndMetadataFilesCannotHaveTheSameName);
             }
@@ -84,8 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFilenameCannotContainSpacesOrSpecialCharacters);
             }
 
-            var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
-            var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
+            var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName.ToLower());
+            var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName.ToLower());
 
             if (!IsCsvFile(dataFilePath, dataFile))
             {
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, bool>> ValidateFileForUpload(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile file, ReleaseFileTypes type, bool overwrite)
         {
-            var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName));
+            var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName.ToLower()));
             
             if (!overwrite && blob.Exists())
             {

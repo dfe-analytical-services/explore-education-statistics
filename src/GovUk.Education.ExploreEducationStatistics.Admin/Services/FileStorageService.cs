@@ -70,31 +70,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var blobContainer = await GetCloudBlobContainer();
                     var dataInfo = new Dictionary<string, string>
-                        {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {UserName, userName}};
+                        {{NameKey, name}, {MetaFileKey, metadataFile.FileName.ToLower()}, {UserName, userName}};
                     var metaDataInfo = new Dictionary<string, string>
-                        {{DataFileKey, dataFile.FileName}, {UserName, userName}};
-                    return await
-                        _fileUploadsValidatorService.ValidateDataFilesForUpload(blobContainer, releaseId, dataFile,
-                                metadataFile, name, overwrite)
-                            .OnSuccess(() => _importService.CreateImportTableRow(releaseId, dataFile.FileName))
-                            .OnSuccess(() => _fileUploadsValidatorService.ValidateFileForUpload(blobContainer,
-                                releaseId,
-                                dataFile, ReleaseFileTypes.Data, overwrite))
-                            .OnSuccess(() =>
-                                UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
-                            .OnSuccess(() => CreateBasicFileLink(dataFile.FileName, releaseId, ReleaseFileTypes.Data))
-                            .OnSuccess(() => _fileUploadsValidatorService.ValidateFileForUpload(blobContainer,
-                                releaseId,
-                                metadataFile, ReleaseFileTypes.Data, overwrite))
-                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile,
-                                ReleaseFileTypes.Metadata,
-                                metaDataInfo))
-                            .OnSuccess(() =>
-                                CreateBasicFileLink(metadataFile.FileName, releaseId, ReleaseFileTypes.Metadata))
+                        {{DataFileKey, dataFile.FileName.ToLower()}, {UserName, userName}};
+                    return await _fileUploadsValidatorService.ValidateDataFilesForUpload(blobContainer, releaseId, dataFile,metadataFile, name, overwrite)
+                            .OnSuccess(() => _importService.CreateImportTableRow(releaseId, dataFile.FileName.ToLower()))
+                            .OnSuccess(() => _fileUploadsValidatorService.ValidateFileForUpload(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, overwrite))
+                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
+                            .OnSuccess(() => CreateBasicFileLink(dataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Data))
+                            .OnSuccess(() => _fileUploadsValidatorService.ValidateFileForUpload(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, overwrite))
+                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo))
+                            .OnSuccess(() => CreateBasicFileLink(metadataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Metadata))
                             // add message to queue to process these files
-                            .OnSuccessDo(() => _importService.Import(dataFile.FileName, releaseId, dataFile))
-                            .OnSuccess(
-                                () => ListFilesAsync(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata));
+                            .OnSuccessDo(() => _importService.Import(dataFile.FileName.ToLower(), releaseId, dataFile))
+                            .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata));
                 });
         }
 
@@ -164,12 +153,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var blobContainer = await GetCloudBlobContainer();
-                    var info = new Dictionary<string, string> {{NameKey, name}};
+                    var info = new Dictionary<string, string> {{NameKey, name.ToLower()}};
                     return await
                         _fileUploadsValidatorService
                             .ValidateFileForUpload(blobContainer, releaseId, file, type, overwrite)
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, file, type, info))
-                            .OnSuccess(() => CreateBasicFileLink(file.FileName, releaseId, type))
+                            .OnSuccess(() => CreateBasicFileLink(file.FileName.ToLower(), releaseId, type))
                             .OnSuccess(() => ListFilesAsync(releaseId, type));
                 });
         }
@@ -183,15 +172,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var blobContainer = await GetCloudBlobContainer();
-                    var info = new Dictionary<string, string> {{NameKey, file.FileName}};
+                    var info = new Dictionary<string, string> {{NameKey, file.FileName.ToLower()}};
                     return await
                         _fileUploadsValidatorService.ValidateFileForUpload(blobContainer, releaseId, file, ReleaseFileTypes.Chart, true)
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, file, ReleaseFileTypes.Chart, info))
-                            .OnSuccess(() => CreateBasicFileLink(file.FileName, releaseId, ReleaseFileTypes.Chart))
+                            .OnSuccess(() => CreateBasicFileLink(file.FileName.ToLower(), releaseId, ReleaseFileTypes.Chart))
                             .OnSuccess(_ =>
                             {
                                 var blob = blobContainer.GetBlobReference(AdminReleasePath(releaseId,
-                                    ReleaseFileTypes.Chart, file.FileName));
+                                    ReleaseFileTypes.Chart, file.FileName.ToLower()));
                                 return GetFileInfo(blob);
                             });
                 });
@@ -388,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static async Task<Either<ActionResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues)
         {
-            var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName));
+            var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName.ToLower()));
             blob.Properties.ContentType = file.ContentType;
             var path = await UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);

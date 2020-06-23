@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             var subject = CreateSubject(message.SubjectId, subjectData.Name, release, context);
 
-            if (!UpdateReleaseFileReferenceLink(message, contentDbContext, release, subject))
+            if (!UpdateReleaseFileReferenceLinks(message, contentDbContext, release, subject))
             {
                 throw new Exception(
                     "Unable to create release file links when importing : Check file references are correct");
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return subject;
         }
 
-        private static bool UpdateReleaseFileReferenceLink(ImportMessage message, ContentDbContext contentDbContext, Release release,
+        private static bool UpdateReleaseFileReferenceLinks(ImportMessage message, ContentDbContext contentDbContext, Release release,
             Subject subject)
         {
             var releaseFileLinks = contentDbContext
