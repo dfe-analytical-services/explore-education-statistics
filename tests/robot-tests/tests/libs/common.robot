@@ -296,7 +296,7 @@ user clears element text
 user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
-  sleep   0.1
+  sleep  0.1
 
 user enters text into element
   [Arguments]   ${selector}   ${text}

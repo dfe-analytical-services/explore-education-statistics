@@ -61,8 +61,8 @@ describe('DataBlockRenderer', () => {
   };
 
   test('renders line chart', async () => {
-    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      () => Promise.resolve(testChartTableData),
+    tableBuilderService.getTableData.mockImplementation(() =>
+      Promise.resolve(testChartTableData),
     );
 
     const { container } = render(
@@ -77,7 +77,7 @@ describe('DataBlockRenderer', () => {
     );
 
     await waitFor(() => {
-      expect(getDataBlockForSubject).toBeCalledWith(
+      expect(tableBuilderService.getTableData).toBeCalledWith(
         {
           ...testDataBlock.dataBlockRequest,
           includeGeoJson: false,
@@ -94,8 +94,8 @@ describe('DataBlockRenderer', () => {
   });
 
   test('renders horizontal chart', async () => {
-    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      () => Promise.resolve(testChartTableData),
+    tableBuilderService.getTableData.mockImplementation(() =>
+      Promise.resolve(testChartTableData),
     );
 
     const { container } = render(
@@ -115,7 +115,7 @@ describe('DataBlockRenderer', () => {
     );
 
     await waitFor(() => {
-      expect(getDataBlockForSubject).toBeCalledWith(
+      expect(tableBuilderService.getTableData).toBeCalledWith(
         {
           ...testDataBlock.dataBlockRequest,
           includeGeoJson: false,
@@ -132,7 +132,7 @@ describe('DataBlockRenderer', () => {
   });
 
   test('renders vertical chart', async () => {
-    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
+    tableBuilderService.getTableData.mockImplementation(
       (_: DataBlockRequest, releaseId?: string) => {
         return Promise.resolve(testChartTableData);
       },
@@ -155,7 +155,7 @@ describe('DataBlockRenderer', () => {
     );
 
     await waitFor(() => {
-      expect(getDataBlockForSubject).toBeCalledWith(
+      expect(tableBuilderService.getTableData).toBeCalledWith(
         {
           ...testDataBlock.dataBlockRequest,
           includeGeoJson: false,
@@ -172,7 +172,7 @@ describe('DataBlockRenderer', () => {
   });
 
   test('renders table', async () => {
-    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
+    tableBuilderService.getTableData.mockImplementation(
       (_: DataBlockRequest, releaseId?: string) => {
         return Promise.resolve(testChartTableData);
       },
@@ -203,7 +203,7 @@ describe('DataBlockRenderer', () => {
     );
 
     await waitFor(() => {
-      expect(getDataBlockForSubject).toBeCalledWith(
+      expect(tableBuilderService.getTableData).toBeCalledWith(
         {
           ...testDataBlock.dataBlockRequest,
           includeGeoJson: false,
@@ -249,8 +249,8 @@ describe('DataBlockRenderer', () => {
   });
 
   test('can render line chart with deprecated `labels` for data sets', async () => {
-    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      () => Promise.resolve(testChartTableData),
+    tableBuilderService.getTableData.mockImplementation(() =>
+      Promise.resolve(testChartTableData),
     );
 
     const { container } = render(
@@ -265,7 +265,7 @@ describe('DataBlockRenderer', () => {
     );
 
     await waitFor(() => {
-      expect(getDataBlockForSubject).toBeCalledWith(
+      expect(tableBuilderService.getTableData).toBeCalledWith(
         {
           ...testDataBlock.dataBlockRequest,
           includeGeoJson: false,
@@ -289,6 +289,120 @@ describe('DataBlockRenderer', () => {
       expect(legendItems[2]).toHaveTextContent(
         'Overall absence rate (England)',
       );
+    });
+  });
+
+  test('re-rendering with new data block does not throw error', async () => {
+    tableBuilderService.getTableData.mockImplementation(() =>
+      Promise.resolve(testChartTableData),
+    );
+
+    const fullTable = mapFullTable(testChartTableData);
+
+    const { rerender } = render(
+      <DataBlockRenderer
+        id="test-block"
+        dataBlock={{
+          ...testDataBlock,
+          tables: [
+            {
+              tableHeaders: mapUnmappedTableHeaders(
+                getDefaultTableHeaderConfig(fullTable.subjectMeta),
+              ),
+              indicators: [
+                'authorised-absence-rate',
+                'unauthorised-absence-rate',
+                'overall-absence-rate',
+              ],
+            },
+          ],
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(4);
+      expect(screen.getAllByRole('cell')).toHaveLength(16);
+    });
+
+    tableBuilderService.getTableData.mockImplementation(() =>
+      Promise.resolve({
+        subjectMeta: {
+          ...testChartTableData.subjectMeta,
+          indicators: [
+            {
+              label: 'Number of authorised absence sessions',
+              unit: '',
+              value: 'authorised-absence-sessions',
+              name: 'absence_sess',
+            },
+          ],
+          timePeriodRange: [{ code: 'AY', label: '2018/19', year: 2018 }],
+        },
+        results: [
+          {
+            filters: ['characteristic-total', 'school-type-total'],
+            geographicLevel: 'Country',
+            location: { country: { code: 'E92000001', name: 'England' } },
+            measures: {
+              'authorised-absence-sessions': '500000',
+            },
+            timePeriod: '2018_AY',
+          },
+        ],
+      }),
+    );
+
+    expect(() => {
+      rerender(
+        <DataBlockRenderer
+          id="test-block"
+          dataBlock={{
+            ...testDataBlock,
+            dataBlockRequest: {
+              subjectId: '1',
+              geographicLevel: 'country',
+              timePeriod: {
+                startYear: 2018,
+                startCode: 'AY',
+                endYear: 2018,
+                endCode: 'AY',
+              },
+              filters: ['characteristic-total', 'school-type-total'],
+              indicators: ['authorised-absence-sessions'],
+              locations: {},
+            },
+            tables: [
+              {
+                tableHeaders: {
+                  columnGroups: [],
+                  rowGroups: [],
+                  columns: [
+                    {
+                      type: 'TimePeriod',
+                      value: '2018_AY',
+                    },
+                  ],
+                  rows: [
+                    {
+                      type: 'Indicator',
+                      value: 'authorised-absence-sessions',
+                    },
+                  ],
+                },
+                indicators: ['authorised-absence-sessions'],
+              },
+            ],
+          }}
+        />,
+      );
+    }).not.toThrowError();
+
+    await waitFor(() => {
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(2);
+      expect(screen.getAllByRole('cell')).toHaveLength(2);
     });
   });
 });

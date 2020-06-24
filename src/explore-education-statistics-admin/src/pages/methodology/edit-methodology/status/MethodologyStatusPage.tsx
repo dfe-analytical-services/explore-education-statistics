@@ -41,7 +41,7 @@ const MethodologyStatusPage = ({
 
   const {
     value: model,
-    setValue: setModel,
+    setState: setModel,
     isLoading,
   } = useAsyncRetry(async () => {
     const [summary, canApprove] = await Promise.all([
@@ -71,9 +71,12 @@ const MethodologyStatusPage = ({
     );
 
     setModel({
-      ...model,
-      summary: {
-        ...nextSummary,
+      isLoading: false,
+      value: {
+        ...model,
+        summary: {
+          ...nextSummary,
+        },
       },
     });
 

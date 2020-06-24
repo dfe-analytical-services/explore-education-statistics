@@ -1,3 +1,4 @@
+import { useApplicationInsights } from '@common/contexts/ApplicationInsightsContext';
 import Link from '@frontend/components/Link';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import { AxiosError } from 'axios';
@@ -6,11 +7,24 @@ import React from 'react';
 import Page from '../components/Page';
 
 interface Props {
-  errorMessage?: string;
+  error?: NextPageContext['err'];
   statusCode: number;
 }
 
-const ErrorPage = ({ statusCode }: Props) => {
+const ErrorPage = ({ statusCode, error }: Props) => {
+  const appInsights = useApplicationInsights();
+
+  if (error) {
+    // `error` is not actually an Error instance,
+    // (it's an object) so we have to convert
+    // it into one first before tracking it.
+    const exception = new Error(error.message);
+    exception.name = error.name;
+    exception.stack = error.stack;
+
+    appInsights.trackException({ exception });
+  }
+
   switch (statusCode) {
     case 404:
       return <NotFoundPage />;
@@ -30,11 +44,11 @@ const ErrorPage = ({ statusCode }: Props) => {
   }
 };
 
-ErrorPage.getInitialProps = ({ res, err }: NextPageContext): Props => {
+ErrorPage.getInitialProps = ({ res, err: error }: NextPageContext): Props => {
   let statusCode = res?.statusCode;
 
-  if (err) {
-    const axiosError = err as AxiosError;
+  if (error) {
+    const axiosError = error as AxiosError;
 
     if (axiosError.isAxiosError) {
       statusCode = axiosError.response?.status;
@@ -42,7 +56,7 @@ ErrorPage.getInitialProps = ({ res, err }: NextPageContext): Props => {
   }
 
   return {
-    errorMessage: err?.message ?? '',
+    error,
     statusCode: statusCode ?? 500,
   };
 };

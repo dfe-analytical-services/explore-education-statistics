@@ -32,7 +32,7 @@ const ReleaseManageDataBlocksPage = ({
     value: dataBlocks = emptyDataBlocks,
     isLoading,
     retry: fetchDataBlocks,
-    setValue: setDataBlocks,
+    setState: setDataBlocks,
   } = useAsyncRetry(() => dataBlocksService.getDataBlocks(releaseId), [
     releaseId,
   ]);
@@ -72,7 +72,10 @@ const ReleaseManageDataBlocksPage = ({
         );
       }
 
-      setDataBlocks(nextDataBlocks);
+      setDataBlocks({
+        isLoading: false,
+        value: nextDataBlocks,
+      });
     },
     [dataBlocks, setDataBlocks, history, publicationId, releaseId],
   );

@@ -109,6 +109,11 @@ const ReleaseServiceStatus = ({
               ? currentStatus.overallStage
               : 'Waiting to be scheduled...'
           }
+          id={
+            currentStatus
+              ? `release-process-status-${currentStatus.overallStage}`
+              : 'release-process-status-WaitingToBeScheduled'
+          }
         />
       )}
 

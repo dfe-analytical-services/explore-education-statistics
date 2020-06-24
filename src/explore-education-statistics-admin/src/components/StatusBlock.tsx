@@ -7,9 +7,15 @@ export interface StatusBlockProps {
   className?: string;
   color?: 'blue' | 'orange' | 'red' | 'green';
   text: string;
+  id?: string | undefined;
 }
 
-const StatusBlock = ({ color, text, className }: StatusBlockProps) => {
+const StatusBlock = ({
+  color,
+  text,
+  className,
+  id = undefined,
+}: StatusBlockProps) => {
   const colorClass = () => {
     switch (color) {
       case 'orange':
@@ -24,7 +30,7 @@ const StatusBlock = ({ color, text, className }: StatusBlockProps) => {
   };
 
   return (
-    <Tag className={classNames(colorClass(), className)} strong>
+    <Tag className={classNames(colorClass(), className)} strong id={id}>
       {text}
     </Tag>
   );

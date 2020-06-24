@@ -8,7 +8,9 @@ const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
 const envFilePath = fs.existsSync('.env.local') ? '.env.local' : '.env';
-const envConfig = DotEnv.config(fs.readFileSync(envFilePath));
+const envConfig = DotEnv.config({
+  path: envFilePath,
+});
 
 const createPlugin = plugin => {
   return (nextConfig = {}) =>

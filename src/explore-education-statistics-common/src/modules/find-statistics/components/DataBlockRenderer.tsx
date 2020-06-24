@@ -1,6 +1,8 @@
+import ErrorBoundary from '@common/components/ErrorBoundary';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import WarningMessage from '@common/components/WarningMessage';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { AxesConfiguration } from '@common/modules/charts/types/chart';
@@ -48,38 +50,54 @@ const DataBlockRenderer = ({
   );
 
   return (
-    <LoadingSpinner loading={isLoading}>
-      <Tabs id={id} onToggle={onToggle}>
-        {firstTabs}
+    <ErrorBoundary
+      fallback={<WarningMessage>Could not load content</WarningMessage>}
+    >
+      <LoadingSpinner loading={isLoading}>
+        <Tabs id={id} onToggle={onToggle}>
+          {firstTabs}
 
-        {dataBlock?.charts?.length && fullTable && (
-          <TabsSection id={`${id}-charts`} title="Chart">
-            <a
-              className="govuk-visually-hidden"
-              href={`#${id}-tables`}
-              aria-live="assertive"
-            >
-              If you are using a keyboard or a screen reader you may wish to
-              view the accessible table instead. Press enter to switch to the
-              data tables tab.
-            </a>
+          {dataBlock?.charts?.length && fullTable && (
+            <TabsSection id={`${id}-charts`} title="Chart">
+              <a
+                className="govuk-visually-hidden"
+                href={`#${id}-tables`}
+                aria-live="assertive"
+              >
+                If you are using a keyboard or a screen reader you may wish to
+                view the accessible table instead. Press enter to switch to the
+                data tables tab.
+              </a>
 
-            {dataBlock?.charts.map((chart, index) => {
-              const key = index;
+              {dataBlock?.charts.map((chart, index) => {
+                const key = index;
 
-              const axes = { ...chart.axes } as Required<AxesConfiguration>;
+                const axes = { ...chart.axes } as Required<AxesConfiguration>;
 
-              if (
-                axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
-                chart.labels
-              ) {
-                axes.major.dataSets = getLabelDataSetConfigurations(
-                  chart.labels,
-                  axes.major.dataSets,
-                );
-              }
+                if (
+                  axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
+                  chart.labels
+                ) {
+                  axes.major.dataSets = getLabelDataSetConfigurations(
+                    chart.labels,
+                    axes.major.dataSets,
+                  );
+                }
 
-              if (chart.type === 'infographic') {
+                if (chart.type === 'infographic') {
+                  return (
+                    <ChartRenderer
+                      {...chart}
+                      key={key}
+                      axes={axes}
+                      data={fullTable?.results}
+                      meta={fullTable?.subjectMeta}
+                      source={dataBlock?.source}
+                      getInfographic={getInfographic}
+                    />
+                  );
+                }
+
                 return (
                   <ChartRenderer
                     {...chart}
@@ -88,55 +106,43 @@ const DataBlockRenderer = ({
                     data={fullTable?.results}
                     meta={fullTable?.subjectMeta}
                     source={dataBlock?.source}
-                    getInfographic={getInfographic}
                   />
                 );
-              }
+              })}
 
-              return (
-                <ChartRenderer
-                  {...chart}
-                  key={key}
-                  axes={axes}
-                  data={fullTable?.results}
-                  meta={fullTable?.subjectMeta}
-                  source={dataBlock?.source}
-                />
-              );
-            })}
+              {additionalTabContent}
+            </TabsSection>
+          )}
 
-            {additionalTabContent}
-          </TabsSection>
-        )}
+          {dataBlock?.tables?.length && fullTable && (
+            <TabsSection id={`${id}-tables`} title="Table">
+              {dataBlock?.tables.map((table, index) => {
+                return (
+                  <TimePeriodDataTable
+                    key={index}
+                    fullTable={fullTable}
+                    captionTitle={dataBlock?.heading}
+                    source={dataBlock?.source}
+                    tableHeadersConfig={
+                      table.tableHeaders
+                        ? mapTableHeadersConfig(
+                            table.tableHeaders,
+                            fullTable.subjectMeta,
+                          )
+                        : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                    }
+                  />
+                );
+              })}
 
-        {dataBlock?.tables?.length && fullTable && (
-          <TabsSection id={`${id}-tables`} title="Table">
-            {dataBlock?.tables.map((table, index) => {
-              return (
-                <TimePeriodDataTable
-                  key={index}
-                  fullTable={fullTable}
-                  captionTitle={dataBlock?.heading}
-                  source={dataBlock?.source}
-                  tableHeadersConfig={
-                    table.tableHeaders
-                      ? mapTableHeadersConfig(
-                          table.tableHeaders,
-                          fullTable.subjectMeta,
-                        )
-                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
-                  }
-                />
-              );
-            })}
+              {additionalTabContent}
+            </TabsSection>
+          )}
 
-            {additionalTabContent}
-          </TabsSection>
-        )}
-
-        {lastTabs}
-      </Tabs>
-    </LoadingSpinner>
+          {lastTabs}
+        </Tabs>
+      </LoadingSpinner>
+    </ErrorBoundary>
   );
 };
 
