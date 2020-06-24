@@ -39,6 +39,7 @@ export interface ReleaseSummary {
   type: IdTitlePair;
   publishScheduled: string;
   nextReleaseDate?: DayMonthYear;
+  internalReleaseNote: string;
   status: ReleaseApprovalStatus;
   yearTitle: string;
 }
@@ -81,6 +82,8 @@ export interface ReleaseStageStatuses {
 }
 
 export interface ReleasePublicationStatus {
+  publishScheduled: string;
+  nextReleaseDate?: DayMonthYear;
   status: ReleaseApprovalStatus;
   amendment: boolean;
   live: boolean;
@@ -92,8 +95,6 @@ interface BaseReleaseSummaryRequest {
   };
   releaseName: number;
   typeId: string;
-  publishScheduled: string;
-  nextReleaseDate?: DayMonthYear;
 }
 
 export interface CreateReleaseRequest extends BaseReleaseSummaryRequest {
@@ -106,7 +107,9 @@ export interface UpdateReleaseSummaryRequest extends BaseReleaseSummaryRequest {
 }
 
 export interface UpdateReleaseStatusRequest {
-  releaseStatus: ReleaseApprovalStatus;
+  publishScheduled: string;
+  nextReleaseDate?: DayMonthYear;
+  status: ReleaseApprovalStatus;
   internalReleaseNote: string;
 }
 
@@ -157,7 +160,8 @@ const releaseService = {
   updateReleaseStatus: (
     releaseId: string,
     updateRequest: UpdateReleaseStatusRequest,
-  ) => client.put(`/releases/${releaseId}/status`, updateRequest),
+  ): Promise<ReleaseSummary> =>
+    client.put(`/releases/${releaseId}/status`, updateRequest),
 
   createReleaseAmendment(releaseId: string): Promise<ReleaseSummary> {
     return client.post(`/release/${releaseId}/amendment`);

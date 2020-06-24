@@ -34,6 +34,7 @@ export type FormRadioGroupProps<Value extends string = string> = {
   };
 
 const FormRadioGroup = <Value extends string = string>({
+  hint,
   inline = false,
   legendSize = 'm',
   small = false,
@@ -55,6 +56,7 @@ const FormRadioGroup = <Value extends string = string>({
   return (
     <FormFieldset
       {...props}
+      hint={hint}
       legendSize={legendSize}
       onBlur={onFieldsetBlur}
       onFocus={onFieldsetFocus}

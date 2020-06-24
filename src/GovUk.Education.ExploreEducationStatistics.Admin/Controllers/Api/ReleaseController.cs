@@ -296,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             UpdateReleaseStatusRequest updateRequest, Guid releaseId)
         {
             return await _releaseService
-                .UpdateReleaseStatusAsync(releaseId, updateRequest.ReleaseStatus, updateRequest.InternalReleaseNote)
+                .UpdateReleaseStatusAsync(releaseId, updateRequest)
                 .HandleFailuresOrOk();
         }
     }

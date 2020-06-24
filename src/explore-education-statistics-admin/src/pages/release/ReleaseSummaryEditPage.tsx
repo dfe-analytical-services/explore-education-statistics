@@ -12,7 +12,6 @@ import {
   errorCodeAndFieldNameToFieldError,
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
-import { formatISO } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -49,10 +48,6 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
         value: values.timePeriodCoverageCode,
       },
       releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
-      publishScheduled: formatISO(values.scheduledPublishDate, {
-        representation: 'date',
-      }),
-      nextReleaseDate: values.nextReleaseDate,
       typeId: values.releaseTypeId,
       releaseId,
     };
@@ -82,10 +77,6 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
                 releaseSummaryDetails.timePeriodCoverage.value,
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),
               releaseTypeId: releaseSummaryDetails.type.id,
-              scheduledPublishDate: new Date(
-                releaseSummaryDetails.publishScheduled,
-              ),
-              nextReleaseDate: releaseSummaryDetails?.nextReleaseDate,
             })}
             onSubmit={handleSubmit}
             onCancel={handleCancel}

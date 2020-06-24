@@ -19,7 +19,6 @@ import {
 import RelatedInformation from '@common/components/RelatedInformation';
 import { Publication } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
-import { formatISO } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
@@ -41,9 +40,9 @@ interface MatchProps {
   publicationId: string;
 }
 
-export type CreateReleaseFormValues = {
+export interface FormValues extends ReleaseSummaryFormValues {
   templateReleaseId: string;
-} & ReleaseSummaryFormValues;
+}
 
 interface Model {
   templateRelease: IdTitlePair | undefined;
@@ -70,16 +69,12 @@ const ReleaseCreatePage = ({
     });
   }, [publicationId]);
 
-  const handleSubmit = useFormSubmit<CreateReleaseFormValues>(async values => {
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
     const release: CreateReleaseRequest = {
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
       releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
-      publishScheduled: formatISO(values.scheduledPublishDate, {
-        representation: 'date',
-      }),
-      nextReleaseDate: values.nextReleaseDate,
       typeId: values.releaseTypeId,
       publicationId,
       templateReleaseId:
@@ -134,7 +129,7 @@ const ReleaseCreatePage = ({
           </RelatedInformation>
         </div>
       </div>
-      <ReleaseSummaryForm<CreateReleaseFormValues>
+      <ReleaseSummaryForm<FormValues>
         submitText="Create new release"
         initialValues={timePeriodCoverageGroups =>
           ({
@@ -143,7 +138,7 @@ const ReleaseCreatePage = ({
             timePeriodCoverageStartYear: '',
             releaseTypeId: '',
             templateReleaseId: '',
-          } as CreateReleaseFormValues)
+          } as FormValues)
         }
         validationSchema={baseRules =>
           baseRules.shape({
@@ -159,7 +154,7 @@ const ReleaseCreatePage = ({
           model &&
           model.templateRelease && (
             <div className="govuk-!-margin-top-9">
-              <FormFieldRadioGroup<CreateReleaseFormValues>
+              <FormFieldRadioGroup<FormValues>
                 id="releaseSummaryForm-templateReleaseId"
                 legend="Select template"
                 name="templateReleaseId"

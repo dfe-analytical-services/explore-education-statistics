@@ -423,30 +423,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
-            Guid releaseId, ReleaseStatus newStatus, string internalReleaseNote)
+            Guid releaseId, UpdateReleaseStatusRequest request)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, newStatus))
-                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, newStatus))
+                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
+                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, request.Status))
                 .OnSuccess(async release =>
                 {
-                    if (newStatus == ReleaseStatus.Approved && !release.PublishScheduled.HasValue)
+                    if (request.Status == ReleaseStatus.Approved &&
+                        request.PublishMethod == PublishMethod.Scheduled &&
+                        !request.PublishScheduledDate.HasValue)
                     {
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
                     }
 
-                    var oldStatus = release.Status;
+                    var isApproved = release.Status == ReleaseStatus.Approved || request.Status == ReleaseStatus.Approved;
 
-                    release.Status = newStatus;
-                    release.InternalReleaseNote = internalReleaseNote;
+                    release.Status = request.Status;
+                    release.InternalReleaseNote = request.InternalReleaseNote;
+                    release.NextReleaseDate = request.NextReleaseDate;
+
+                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate && isApproved
+                        ? DateTime.UtcNow
+                        : request.PublishScheduledDate;
+
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
 
                     // Only need to inform Publisher if changing release status to or from Approved
-                    if(oldStatus == ReleaseStatus.Approved || newStatus == ReleaseStatus.Approved)
+                    if (isApproved)
                     {
-                        await _publishingService.QueueValidateReleaseAsync(releaseId);
+                        await _publishingService.QueueValidateReleaseAsync(releaseId, request.PublishMethod == PublishMethod.Immediate);
                     }
 
                     return await GetReleaseSummaryAsync(releaseId);
