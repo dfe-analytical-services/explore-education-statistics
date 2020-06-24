@@ -10,5 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public IEnumerable<Observation> Observations { get; set; }
         public ICollection<SubjectFootnote> Footnotes { get; set; }
+        public bool SoftDeleted { get; set; }
     }
 }

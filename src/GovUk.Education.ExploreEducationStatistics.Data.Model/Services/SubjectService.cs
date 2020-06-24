@@ -33,12 +33,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .ReleaseSubject
                 .Any(r => r.ReleaseId == latestRelease.Value && r.SubjectId == subjectId);
         }
-        
-        public bool Exists(Guid releaseId, string name)
-        {
-            return GetAsync(releaseId, name).Result != null;
-        }
 
+        public async Task<Subject> GetAsync(Guid subjectId)
+        {
+            return await _context
+                .Subject
+                .Where(s => s.Id == subjectId).FirstOrDefaultAsync();
+        }
+        
         public async Task<Subject> GetAsync(Guid releaseId, string name)
         {
             return await _context

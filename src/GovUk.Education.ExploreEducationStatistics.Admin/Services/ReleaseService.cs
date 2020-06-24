@@ -492,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
         {
-            if (!_subjectService.Exists(deletePlan.SubjectId))
+            if (await _subjectService.GetAsync(deletePlan.SubjectId) == null)
             {
                 return await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
             }

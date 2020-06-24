@@ -45,15 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             
                 if (subject != null)
                 {
-                    // TODO - This has been reverted in master : Too slow - delete of subject will be moved to stored proc
-                    var observationFilterItems = _statisticsDbContext.ObservationFilterItem
-                            .Include(ofi => ofi.Observation)
-                            .ThenInclude(o => o.Subject)
-                            .Where(ofi => ofi.Observation.Subject.Id == subjectId);
-                    
-                    _statisticsDbContext.ObservationFilterItem.RemoveRange(observationFilterItems);
-
-                    _statisticsDbContext.Subject.Remove(subject);
+                    subject.SoftDeleted = true;
+                    _statisticsDbContext.Subject.Update(subject);
                 }    
             }
         

@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotOverwriteMetadataFile);
             }
 
-            if (_subjectService.Exists(releaseId, name))
+            if (await _subjectService.GetAsync(releaseId, name) != null)
             {
                 return ValidationActionResult(SubjectTitleMustBeUnique);
             }

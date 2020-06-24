@@ -73,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
+            ConfigureSubject(modelBuilder);
         }
 
         private static void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
@@ -409,6 +410,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.PlanningArea,
                     builder => builder.HasIndex(planningArea => planningArea.Code));
+        }
+        
+        private static void ConfigureSubject(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Subject>()
+                .HasQueryFilter(r => !r.SoftDeleted);
         }
         
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
