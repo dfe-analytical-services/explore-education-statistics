@@ -6,7 +6,7 @@ import DraftReleasesTab from '@admin/pages/admin-dashboard/components/DraftRelea
 import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
-import { summaryRoute } from '@admin/routes/edit-release/routes';
+import { summaryRoute } from '@admin/routes/releaseRoutes';
 import loginService from '@admin/services/loginService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';

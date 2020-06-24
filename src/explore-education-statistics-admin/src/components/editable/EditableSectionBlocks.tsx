@@ -1,9 +1,9 @@
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import BlockDraggable from '@admin/modules/find-statistics/components/BlockDraggable';
-import BlockDroppable from '@admin/modules/find-statistics/components/BlockDroppable';
+import BlockDraggable from '@admin/components/editable/BlockDraggable';
+import BlockDroppable from '@admin/components/editable/BlockDroppable';
 import Comments, {
   CommentsChangeHandler,
-} from '@admin/modules/find-statistics/components/Comments';
+} from '@admin/components/editable/Comments';
 import { EditableBlock } from '@admin/services/types/content';
 import SectionBlocks, {
   SectionBlocksProps,

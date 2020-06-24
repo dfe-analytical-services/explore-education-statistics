@@ -1,7 +1,7 @@
 import Tag from '@common/components/Tag';
 import React from 'react';
 import classNames from 'classnames';
-import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
+import styles from '@admin/pages/release/data/components/ReleaseDataUploadsSection.module.scss';
 
 export interface StatusBlockProps {
   className?: string;

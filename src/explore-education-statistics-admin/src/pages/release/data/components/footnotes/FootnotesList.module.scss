@@ -1,0 +1,23 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+.itemContainer {
+  border-top: 1px solid #b1b4b6;
+  padding: 1rem 0 0.5rem;
+}
+
+.row {
+  display: flex;
+  &__footnoteContent {
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+  &__footnoteActions {
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+  }
+}
+
+.footnoteSelectionTable {
+  margin-bottom: 0.5rem;
+  table-layout: fixed;
+}
