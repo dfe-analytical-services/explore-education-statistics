@@ -52,7 +52,7 @@
     "govuk-frontend": "^3.6.0",
     "history": "latest",
     "identity-obj-proxy": "^3.0.0",
-    "immer": "^6.0.3",
+    "immer": "^7.0.5",
     "intersection-observer": "^0.7.0",
     "jest": "^25.2.7",
     "jest-junit": "^10.0.0",
