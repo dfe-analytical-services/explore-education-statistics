@@ -1,6 +1,10 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
 
+import {
+  ApplicationInsightsContextProvider,
+  useApplicationInsights,
+} from '@common/contexts/ApplicationInsightsContext';
 import useMounted from '@common/hooks/useMounted';
 import { contentApi, dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
@@ -10,10 +14,27 @@ import notificationApi from '@frontend/services/clients/notificationApi';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../styles/_all.scss';
 
 loadEnv();
+
+const ApplicationInsightsTracking = () => {
+  const appInsights = useApplicationInsights();
+  const router = useRouter();
+
+  useEffect(() => {
+    appInsights.trackPageView({
+      uri: router.pathname,
+    });
+
+    router.events.on('routeChangeComplete', uri => {
+      appInsights.trackPageView({ uri });
+    });
+  }, [appInsights, router.events, router.pathname]);
+
+  return null;
+};
 
 interface Props extends AppProps {
   cookies: Dictionary<string>;
@@ -49,18 +70,18 @@ const App = ({ Component, pageProps, cookies }: Props) => {
       });
     }
 
-    if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
-      import('@common/services/applicationInsightsService').then(
-        ({ initApplicationInsights }) => {
-          initApplicationInsights(process.env.APPINSIGHTS_INSTRUMENTATIONKEY);
-        },
-      );
-    }
-
     document.body.classList.add('js-enabled');
   });
 
-  return <Component {...pageProps} />;
+  return (
+    <ApplicationInsightsContextProvider
+      instrumentationKey={process.env.APPINSIGHTS_INSTRUMENTATIONKEY}
+    >
+      <ApplicationInsightsTracking />
+
+      <Component {...pageProps} />
+    </ApplicationInsightsContextProvider>
+  );
 };
 
 App.getInitialProps = async (appContext: AppContext) => {

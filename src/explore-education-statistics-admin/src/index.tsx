@@ -1,6 +1,4 @@
-import { getConfig } from '@admin/config';
 import '@admin/polyfill';
-import { initApplicationInsights } from '@common/services/applicationInsightsService';
 import configureAxios from '@admin/services/utils/configureAxios';
 import { enableES5 } from 'immer';
 import React from 'react';
@@ -11,10 +9,6 @@ process.env.APP_ROOT_ID = 'root';
 
 enableES5();
 configureAxios();
-
-getConfig().then(config => {
-  initApplicationInsights(config.AppInsightsKey);
-});
 
 import('./App').then(({ default: App }) => {
   ReactDOM.render(<App />, document.getElementById('root'));
