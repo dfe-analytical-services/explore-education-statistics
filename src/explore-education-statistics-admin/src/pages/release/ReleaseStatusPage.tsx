@@ -12,7 +12,10 @@ import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
@@ -21,6 +24,7 @@ import {
   isPartialDateEmpty,
   isValidPartialDate,
   parsePartialDateToUtcDate,
+  formatPartialDate,
 } from '@common/utils/date/partialDate';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, formatISO, isValid } from 'date-fns';
@@ -133,17 +137,33 @@ const ReleaseStatusPage = () => {
       {!showForm ? (
         <>
           <div className="govuk-!-margin-bottom-6">
-            The current release status is:{' '}
-            <StatusBlock
-              text={statusMap[summary.status]}
-              id={`CurrentReleaseStatus-${statusMap[summary.status]}`}
-            />
-            {summary.status === 'Approved' && (
-              <div className="govuk-!-margin-top-1">
-                Release process status:{' '}
-                <ReleaseServiceStatus releaseId={releaseId} />
-              </div>
-            )}
+            <SummaryList>
+              <SummaryListItem term="Current status">
+                <StatusBlock
+                  text={statusMap[summary.status]}
+                  id={`CurrentReleaseStatus-${statusMap[summary.status]}`}
+                />
+              </SummaryListItem>
+              {summary.status === 'Approved' && (
+                <SummaryListItem term="Release process status">
+                  <ReleaseServiceStatus releaseId={releaseId} />
+                </SummaryListItem>
+              )}
+              <SummaryListItem term="Scheduled release">
+                {summary.publishScheduled ? (
+                  <FormattedDate>{summary.publishScheduled}</FormattedDate>
+                ) : (
+                  'Not scheduled'
+                )}
+              </SummaryListItem>
+              <SummaryListItem term="Next release expected">
+                {isValidPartialDate(summary.nextReleaseDate) ? (
+                  <time>{formatPartialDate(summary.nextReleaseDate)}</time>
+                ) : (
+                  'Not set'
+                )}
+              </SummaryListItem>
+            </SummaryList>
           </div>
 
           {isEditable && (

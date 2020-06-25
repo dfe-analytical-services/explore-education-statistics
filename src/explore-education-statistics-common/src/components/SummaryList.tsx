@@ -3,16 +3,15 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  className?: string;
   noBorder?: boolean;
-  additionalClassName?: string;
 }
 
-const SummaryList = ({ children, noBorder, additionalClassName }: Props) => {
+const SummaryList = ({ children, noBorder, className }: Props) => {
   return (
     <dl
-      className={classNames('govuk-summary-list', {
+      className={classNames('govuk-summary-list', className, {
         'govuk-summary-list--no-border': noBorder,
-        [additionalClassName || '']: additionalClassName,
       })}
     >
       {children}
