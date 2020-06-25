@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IFileStorageService
     {
         Task<Common.Model.Either<ActionResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
-            IFormFile dataFile, IFormFile metaFile, string name, bool overwrite, string userName);
+            IFormFile dataFile, IFormFile metaFile, string name, string userName);
 
         Task<Either<ActionResult, IEnumerable<Common.Model.FileInfo>>> ListChartFilesAsync(Guid releaseId);
 

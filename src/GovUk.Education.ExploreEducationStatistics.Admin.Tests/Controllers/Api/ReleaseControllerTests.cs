@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var metaFile = MockFile("metafile.csv");
             
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", false, "test user"))
+                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", "test user"))
                 .ReturnsAsync(new List<FileInfo>());
 
             // Call the method under test
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var metaFile = MockFile("metafile.csv");
             
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", false, 
+                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name",
                     "test user"))
                 .ReturnsAsync(new BadRequestObjectResult(CannotOverwriteFile));
 

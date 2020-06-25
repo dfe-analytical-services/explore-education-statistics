@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> UploadDataFilesAsync(Guid releaseId,
-            IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
+            IFormFile dataFile, IFormFile metadataFile, string name, string userName)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -73,12 +73,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {{NameKey, name}, {MetaFileKey, metadataFile.FileName.ToLower()}, {UserName, userName}};
                     var metaDataInfo = new Dictionary<string, string>
                         {{DataFileKey, dataFile.FileName.ToLower()}, {UserName, userName}};
-                    return await _fileUploadsValidatorService.ValidateDataFilesForUpload(blobContainer, releaseId, dataFile,metadataFile, name, overwrite)
+                    return await _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseId, dataFile,metadataFile, name)
                             .OnSuccess(() => _importService.CreateImportTableRow(releaseId, dataFile.FileName.ToLower()))
-                            .OnSuccess(() => _fileUploadsValidatorService.ValidateFileForUpload(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, overwrite))
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
                             .OnSuccess(() => CreateBasicFileLink(dataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Data))
-                            .OnSuccess(() => _fileUploadsValidatorService.ValidateFileForUpload(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, overwrite))
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo))
                             .OnSuccess(() => CreateBasicFileLink(metadataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Metadata))
                             // add message to queue to process these files
@@ -156,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var info = new Dictionary<string, string> {{NameKey, name.ToLower()}};
                     return await
                         _fileUploadsValidatorService
-                            .ValidateFileForUpload(blobContainer, releaseId, file, type, overwrite)
+                            .ValidateFileForUpload(releaseId, file, type, overwrite)
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, file, type, info))
                             .OnSuccess(() => CreateBasicFileLink(file.FileName.ToLower(), releaseId, type))
                             .OnSuccess(() => ListFilesAsync(releaseId, type));
@@ -174,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var blobContainer = await GetCloudBlobContainer();
                     var info = new Dictionary<string, string> {{NameKey, file.FileName.ToLower()}};
                     return await
-                        _fileUploadsValidatorService.ValidateFileForUpload(blobContainer, releaseId, file, ReleaseFileTypes.Chart, true)
+                        _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, ReleaseFileTypes.Chart, true)
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, file, ReleaseFileTypes.Chart, info))
                             .OnSuccess(() => CreateBasicFileLink(file.FileName.ToLower(), releaseId, ReleaseFileTypes.Chart))
                             .OnSuccess(_ =>

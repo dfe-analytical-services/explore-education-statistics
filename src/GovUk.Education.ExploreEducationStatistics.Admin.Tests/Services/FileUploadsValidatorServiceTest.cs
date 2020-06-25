@@ -6,12 +6,14 @@ using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.Blob;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -21,12 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void AncillaryFileCannotBeEmpty()
         {
             var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object);
+            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
 
             var lines = new List<string>().AsEnumerable();
             var file = CreateFormFile(lines, "test.csv", "test.csv");
 
-            var result = service.ValidateFileForUpload(cloudBlobContainer.Object, Guid.NewGuid(),
+            var result = service.ValidateFileForUpload(Guid.NewGuid(),
                 file, ReleaseFileTypes.Ancillary, true).Result;
 
             Assert.True(result.IsLeft);
@@ -39,107 +41,145 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void AncillaryFileIsValid()
         {
             var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object);
 
-            var lines = new List<string>{"line1"}.AsEnumerable();
-            var file = CreateFormFile(lines, "test.csv", "test.csv");
-            
-            var result = service.ValidateFileForUpload(cloudBlobContainer.Object, Guid.NewGuid(),
-                file, ReleaseFileTypes.Ancillary, true).Result;
+            using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-            Assert.True(result.IsRight);
+                var lines = new List<string> {"line1"}.AsEnumerable();
+                var file = CreateFormFile(lines, "test.csv", "test.csv");
+
+                var result = service.ValidateFileForUpload(Guid.NewGuid(),
+                    file, ReleaseFileTypes.Ancillary, true).Result;
+
+                Assert.True(result.IsRight);
+            }
         }
 
         [Fact]
         public void AncillaryFilenameIsInvalid()
         {
             var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object);
-            var lines = new List<string>{"line1"}.AsEnumerable();
-            var file = CreateFormFile(lines, "test 123.csv", "test 123.csv");
-            
-            var result = service.ValidateFileForUpload(cloudBlobContainer.Object, Guid.NewGuid(),
-                file, ReleaseFileTypes.Ancillary, true).Result;
 
-            Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-            var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-            Assert.Equal("FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS", details.Errors[""].First());
+            using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+                var lines = new List<string> {"line1"}.AsEnumerable();
+                var file = CreateFormFile(lines, "test 123.csv", "test 123.csv");
+
+                var result = service.ValidateFileForUpload(Guid.NewGuid(),
+                    file, ReleaseFileTypes.Ancillary, true).Result;
+
+                Assert.True(result.IsLeft);
+                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
+                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
+                Assert.Equal("FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS", details.Errors[""].First());
+            }
         }
 
         [Fact]
-        public void AncillaryCannotOverwriteBlobWhenExisting()
+        public void AncillaryCannotBeOverwritten()
         {
             var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object);
-            
-            var lines = new List<string>{"line1"}.AsEnumerable();
-            var file = CreateFormFile(lines, "test.csv", "test.csv");
-            
-            var result = service.ValidateFileForUpload(cloudBlobContainer.Object, Guid.NewGuid(),
-                file, ReleaseFileTypes.Ancillary, false).Result;
+            using (var context = InMemoryApplicationDbContext())
+            {
+                var releaseId = Guid.NewGuid();
+                
+                context.Add(new ReleaseFile
+                {
+                    
+                    ReleaseId = releaseId,
+                    ReleaseFileReference = new ReleaseFileReference()
+                    {
+                        ReleaseId = releaseId,
+                        ReleaseFileType = ReleaseFileTypes.Ancillary,
+                        Filename = "test.csv"
+                    }
+                });
+                context.SaveChanges();
+                
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-            Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-            var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-            Assert.Equal("CANNOT_OVERWRITE_FILE", details.Errors[""].First());
+                var lines = new List<string> {"line1"}.AsEnumerable();
+                var file = CreateFormFile(lines, "test.csv", "test.csv");
+
+                var result = service.ValidateFileForUpload(releaseId,
+                    file, ReleaseFileTypes.Ancillary, false).Result;
+
+                Assert.True(result.IsLeft);
+                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
+                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
+                Assert.Equal("CANNOT_OVERWRITE_FILE", details.Errors[""].First());
+            }
         }
         
         [Fact]
         public void AncillaryFileTypeIsValid()
         {
             var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object);
 
-            var lines = new List<string>{"line1"}.AsEnumerable();
-            var file = CreateFormFile(lines, "test.csv", "test.csv");
+            using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-            fileTypeService
-                .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
-                .Returns(() => true);
-            var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Ancillary).Result;
-            
-            Assert.True(result.IsRight);
+                var lines = new List<string> {"line1"}.AsEnumerable();
+                var file = CreateFormFile(lines, "test.csv", "test.csv");
+
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
+                    .Returns(() => true);
+                var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Ancillary).Result;
+
+                Assert.True(result.IsRight);
+            }
         }
 
         [Fact]
         public void AncillaryFileTypeIsInvalid()
         {
             var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object);
 
-            var lines = new List<string>{"line1"}.AsEnumerable();
-            var file = CreateFormFile(lines, "test.csv", "test.csv");
-            
-            fileTypeService
-                .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
-                .Returns(() => false);
-            var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Ancillary).Result;
-            
-            Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-            var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-            Assert.Equal("FILE_TYPE_INVALID", details.Errors[""].First());
+            using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+
+                var lines = new List<string> {"line1"}.AsEnumerable();
+                var file = CreateFormFile(lines, "test.csv", "test.csv");
+
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
+                    .Returns(() => false);
+                var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Ancillary).Result;
+
+                Assert.True(result.IsLeft);
+                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
+                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
+                Assert.Equal("FILE_TYPE_INVALID", details.Errors[""].First());
+            }
         }
         
         [Fact]
         public void UploadFileTypeCannotBeDatafile()
         {
             var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
-            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object);
 
-            var lines = new List<string>{"line1"}.AsEnumerable();
-            var file = CreateFormFile(lines, "test.csv", "test.csv");
+            using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-            fileTypeService
-                .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
-                .Returns(() => true);
-            var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Data).Result;
-            
-            Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-            var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-            Assert.Equal("CANNOT_USE_GENERIC_FUNCTION_TO_ADD_DATA_FILE", details.Errors[""].First());
+                var lines = new List<string> {"line1"}.AsEnumerable();
+                var file = CreateFormFile(lines, "test.csv", "test.csv");
+
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
+                    .Returns(() => true);
+                var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Data).Result;
+
+                Assert.True(result.IsLeft);
+                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
+                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
+                Assert.Equal("CANNOT_USE_GENERIC_FUNCTION_TO_ADD_DATA_FILE", details.Errors[""].First());
+            }
         }
         
         private (Mock<ISubjectService>, Mock<IFileTypeService>, Mock<CloudBlobContainer>) Mocks()

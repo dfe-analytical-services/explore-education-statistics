@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var user = await _userManager.GetUserAsync(User);
 
             return await _fileStorageService
-                .UploadDataFilesAsync(releaseId, file, metaFile, name, false, user.Email)
+                .UploadDataFilesAsync(releaseId, file, metaFile, name, user.Email)
                 .HandleFailuresOrOk();
         }
 

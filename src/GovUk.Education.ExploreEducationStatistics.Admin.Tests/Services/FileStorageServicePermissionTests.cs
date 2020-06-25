@@ -60,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new Mock<IFormFile>().Object, 
                         new Mock<IFormFile>().Object, 
                         "", 
-                        false, 
                         ""
                         ), 
                 CanUpdateSpecificRelease);
