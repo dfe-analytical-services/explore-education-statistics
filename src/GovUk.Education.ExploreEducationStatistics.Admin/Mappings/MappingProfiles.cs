@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
         }
 
-        private static bool IsLatestVersionOfRelease(List<Release> releases, Guid releaseId)
+        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
         {
             return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
