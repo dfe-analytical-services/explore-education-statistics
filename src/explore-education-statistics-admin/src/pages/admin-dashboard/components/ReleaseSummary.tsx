@@ -12,9 +12,9 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
 import {
-  formatDayMonthYear,
-  isValidDayMonthYear,
-} from '@common/utils/date/dayMonthYear';
+  formatPartialDate,
+  isValidPartialDate,
+} from '@common/utils/date/partialDate';
 import React, { ReactNode } from 'react';
 import LazyLoad from 'react-lazyload';
 
@@ -72,9 +72,9 @@ const ReleaseSummary = ({
           </FormattedDate>
         </SummaryListItem>
 
-        {isValidDayMonthYear(release.nextReleaseDate) && (
+        {isValidPartialDate(release.nextReleaseDate) && (
           <SummaryListItem term="Next release date">
-            <time>{formatDayMonthYear(release.nextReleaseDate)}</time>
+            <time>{formatPartialDate(release.nextReleaseDate)}</time>
           </SummaryListItem>
         )}
         {release.status === 'Approved' && (

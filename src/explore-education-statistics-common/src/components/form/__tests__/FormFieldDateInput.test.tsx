@@ -1,5 +1,5 @@
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
-import { DayMonthYear } from '@common/utils/date/dayMonthYear';
+import { PartialDate } from '@common/utils/date/partialDate';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Formik } from 'formik';
 import noop from 'lodash/noop';
@@ -224,11 +224,47 @@ describe('FormFieldDateInput', () => {
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
 
-  test('sets a DayMonthYear as a form value when `type` is `dayMonthYear`', () => {
+  test('can hide day field when `type = partialDate` and `partialDateType = monthYear`', () => {
+    render(
+      <Formik<{ startDate?: PartialDate }> initialValues={{}} onSubmit={noop}>
+        <FormFieldDateInput
+          legend="Start date"
+          id="startDate"
+          name="startDate"
+          type="partialDate"
+          partialDateType="monthYear"
+        />
+      </Formik>,
+    );
+
+    expect(screen.queryByLabelText('Day')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Month')).toBeInTheDocument();
+    expect(screen.getByLabelText('Year')).toBeInTheDocument();
+  });
+
+  test('does not hide day field when `type = date` and `partialDateType = monthYear`', () => {
+    render(
+      <Formik<{ startDate?: PartialDate }> initialValues={{}} onSubmit={noop}>
+        <FormFieldDateInput
+          legend="Start date"
+          id="startDate"
+          name="startDate"
+          type="date"
+          partialDateType="monthYear"
+        />
+      </Formik>,
+    );
+
+    expect(screen.getByLabelText('Day')).toBeInTheDocument();
+    expect(screen.getByLabelText('Month')).toBeInTheDocument();
+    expect(screen.getByLabelText('Year')).toBeInTheDocument();
+  });
+
+  test('can set a full PartialDate as a form value when `type = partialDate`', () => {
     const onChange = jest.fn();
 
     render(
-      <Formik<{ startDate?: DayMonthYear }> initialValues={{}} onSubmit={noop}>
+      <Formik<{ startDate?: PartialDate }> initialValues={{}} onSubmit={noop}>
         {form => {
           onChange(form.values.startDate);
 
@@ -237,7 +273,7 @@ describe('FormFieldDateInput', () => {
               legend="Start date"
               id="startDate"
               name="startDate"
-              type="dayMonthYear"
+              type="partialDate"
             />
           );
         }}
@@ -273,11 +309,11 @@ describe('FormFieldDateInput', () => {
     });
   });
 
-  test('can set a partial DayMonthYear as a form value when `type` is `dayMonthYear`', () => {
+  test('can set only a day for a form value when `type = partialDate`', () => {
     const onChange = jest.fn();
 
     render(
-      <Formik<{ startDate?: DayMonthYear }> initialValues={{}} onSubmit={noop}>
+      <Formik<{ startDate?: PartialDate }> initialValues={{}} onSubmit={noop}>
         {form => {
           onChange(form.values.startDate);
 
@@ -286,7 +322,7 @@ describe('FormFieldDateInput', () => {
               legend="Start date"
               id="startDate"
               name="startDate"
-              type="dayMonthYear"
+              type="partialDate"
             />
           );
         }}
@@ -306,11 +342,11 @@ describe('FormFieldDateInput', () => {
     });
   });
 
-  test('can set an invalid DayMonthYear as a form value when `type` is `dayMonthYear`', () => {
+  test('can set an invalid PartialDate as a form value when `type = partialDate`', () => {
     const onChange = jest.fn();
 
     render(
-      <Formik<{ startDate?: DayMonthYear }> initialValues={{}} onSubmit={noop}>
+      <Formik<{ startDate?: PartialDate }> initialValues={{}} onSubmit={noop}>
         {form => {
           onChange(form.values.startDate);
 
@@ -319,7 +355,7 @@ describe('FormFieldDateInput', () => {
               legend="Start date"
               id="startDate"
               name="startDate"
-              type="dayMonthYear"
+              type="partialDate"
             />
           );
         }}

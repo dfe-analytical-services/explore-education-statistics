@@ -1,25 +1,25 @@
 import { format, parse } from 'date-fns';
 
-export interface DayMonthYear {
+export interface PartialDate {
   day?: number | string;
   month?: number | string;
   year: number | string;
 }
 
-export const isDayMonthYearEmpty = (dmy?: DayMonthYear): boolean => {
+export const isPartialDateEmpty = (dmy?: PartialDate): boolean => {
   return !dmy || (!dmy.day && !dmy.month && !dmy.year);
 };
 
-export const isValidDayMonthYear = (
-  dmy?: DayMonthYear | Partial<DayMonthYear>,
-): dmy is DayMonthYear => {
+export const isValidPartialDate = (
+  dmy?: PartialDate | Partial<PartialDate>,
+): dmy is PartialDate => {
   return !!dmy?.year;
 };
 
-export const parseDayMonthYearToUtcDate = (dmy: DayMonthYear): Date => {
-  if (!isValidDayMonthYear(dmy)) {
+export const parsePartialDateToUtcDate = (dmy: PartialDate): Date => {
+  if (!isValidPartialDate(dmy)) {
     throw new Error(
-      `Could not parse invalid DayMonthYear to date: ${JSON.stringify(dmy)}`,
+      `Could not parse invalid PartialDate to date: ${JSON.stringify(dmy)}`,
     );
   }
 
@@ -38,8 +38,8 @@ export const parseDayMonthYearToUtcDate = (dmy: DayMonthYear): Date => {
   );
 };
 
-export const formatDayMonthYear = (
-  dmy: DayMonthYear,
+export const formatPartialDate = (
+  dmy: PartialDate,
   options: {
     monthYearFormat?: string;
     fullFormat?: string;
@@ -51,7 +51,7 @@ export const formatDayMonthYear = (
     ...options,
   };
 
-  const date = parseDayMonthYearToUtcDate(dmy);
+  const date = parsePartialDateToUtcDate(dmy);
 
   try {
     if (!dmy.month && !dmy.day) {
@@ -65,7 +65,7 @@ export const formatDayMonthYear = (
     return format(date, opts.fullFormat);
   } catch (err) {
     throw new Error(
-      `Could not format invalid date from DayMonthYear: ${JSON.stringify(dmy)}`,
+      `Could not format invalid date from PartialDate: ${JSON.stringify(dmy)}`,
     );
   }
 };

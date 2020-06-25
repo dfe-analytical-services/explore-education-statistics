@@ -11,9 +11,9 @@ import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import {
-  formatDayMonthYear,
-  isValidDayMonthYear,
-} from '@common/utils/date/dayMonthYear';
+  formatPartialDate,
+  isValidPartialDate,
+} from '@common/utils/date/partialDate';
 import React, { useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {
@@ -76,11 +76,11 @@ const ReleaseSummaryPage = () => {
               </FormattedDate>
             </SummaryListItem>
             <SummaryListItem term="Next release expected">
-              {isValidDayMonthYear(
+              {isValidPartialDate(
                 model.releaseSummaryDetails.nextReleaseDate,
               ) && (
                 <time>
-                  {formatDayMonthYear(
+                  {formatPartialDate(
                     model.releaseSummaryDetails.nextReleaseDate,
                   )}
                 </time>

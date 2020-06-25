@@ -17,11 +17,11 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import {
-  DayMonthYear,
-  isDayMonthYearEmpty,
-  isValidDayMonthYear,
-  parseDayMonthYearToUtcDate,
-} from '@common/utils/date/dayMonthYear';
+  PartialDate,
+  isPartialDateEmpty,
+  isValidPartialDate,
+  parsePartialDateToUtcDate,
+} from '@common/utils/date/partialDate';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, formatISO, isValid } from 'date-fns';
 import { Formik } from 'formik';
@@ -44,7 +44,7 @@ const errorCodeMappings = [
 interface FormValues {
   publishMethod?: 'Scheduled' | 'Immediate';
   publishScheduled?: Date;
-  nextReleaseDate?: DayMonthYear;
+  nextReleaseDate?: PartialDate;
   status: ReleaseApprovalStatus;
   internalReleaseNote: string;
 }
@@ -195,7 +195,7 @@ const ReleaseStatusPage = () => {
                   },
                 }),
             }),
-            nextReleaseDate: Yup.object<DayMonthYear>({
+            nextReleaseDate: Yup.object<PartialDate>({
               day: Yup.number().notRequired(),
               month: Yup.number(),
               year: Yup.number(),
@@ -204,16 +204,16 @@ const ReleaseStatusPage = () => {
               .test({
                 name: 'validDate',
                 message: 'Enter a valid next release date',
-                test(value: DayMonthYear) {
-                  if (isDayMonthYearEmpty(value)) {
+                test(value: PartialDate) {
+                  if (isPartialDateEmpty(value)) {
                     return true;
                   }
 
-                  if (!isValidDayMonthYear(value)) {
+                  if (!isValidPartialDate(value)) {
                     return false;
                   }
 
-                  return isValid(parseDayMonthYearToUtcDate(value));
+                  return isValid(parsePartialDateToUtcDate(value));
                 },
               }),
           })}
@@ -270,7 +270,8 @@ const ReleaseStatusPage = () => {
                   name="nextReleaseDate"
                   legend="Next release expected (optional)"
                   legendSize="m"
-                  type="dayMonthYear"
+                  type="partialDate"
+                  partialDateType="monthYear"
                 />
 
                 <ButtonGroup>

@@ -2,7 +2,7 @@ import { ContactDetails } from '@admin/services/contactService';
 import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
-import { DayMonthYear } from '@common/utils/date/dayMonthYear';
+import { PartialDate } from '@common/utils/date/partialDate';
 
 export interface Release {
   id: string;
@@ -18,7 +18,7 @@ export interface Release {
   contact: ContactDetails;
   publishScheduled: string;
   published?: string;
-  nextReleaseDate: DayMonthYear;
+  nextReleaseDate: PartialDate;
   internalReleaseNote?: string;
   previousVersionId: string;
   permissions: {
@@ -38,7 +38,7 @@ export interface ReleaseSummary {
   releaseName: string;
   type: IdTitlePair;
   publishScheduled: string;
-  nextReleaseDate?: DayMonthYear;
+  nextReleaseDate?: PartialDate;
   internalReleaseNote: string;
   status: ReleaseApprovalStatus;
   yearTitle: string;
@@ -83,7 +83,7 @@ export interface ReleaseStageStatuses {
 
 export interface ReleasePublicationStatus {
   publishScheduled: string;
-  nextReleaseDate?: DayMonthYear;
+  nextReleaseDate?: PartialDate;
   status: ReleaseApprovalStatus;
   amendment: boolean;
   live: boolean;
@@ -108,7 +108,7 @@ export interface UpdateReleaseSummaryRequest extends BaseReleaseSummaryRequest {
 
 export interface UpdateReleaseStatusRequest {
   publishScheduled: string;
-  nextReleaseDate?: DayMonthYear;
+  nextReleaseDate?: PartialDate;
   status: ReleaseApprovalStatus;
   internalReleaseNote: string;
 }

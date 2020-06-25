@@ -9,9 +9,9 @@ import publicationService, {
   ReleaseType,
 } from '@common/services/publicationService';
 import {
-  formatDayMonthYear,
-  isValidDayMonthYear,
-} from '@common/utils/date/dayMonthYear';
+  formatPartialDate,
+  isValidPartialDate,
+} from '@common/utils/date/partialDate';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -85,12 +85,12 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     <FormattedDate>{data.published}</FormattedDate>
                   </strong>
                 </dd>
-                {isValidDayMonthYear(data.nextReleaseDate) && (
+                {isValidPartialDate(data.nextReleaseDate) && (
                   <div>
                     <dt className="govuk-caption-m">Next update: </dt>
                     <dd data-testid="next-update">
                       <strong>
-                        <time>{formatDayMonthYear(data.nextReleaseDate)}</time>
+                        <time>{formatPartialDate(data.nextReleaseDate)}</time>
                       </strong>
                     </dd>
                   </div>
