@@ -43,7 +43,7 @@ const Page = ({
       />
       <PageHeader />
 
-      <TemporaryNotice expires={new Date('2020-06-257T00:00:00Z')} wide={wide}>
+      <TemporaryNotice expires={new Date('2020-06-27T00:00:00Z')} wide={wide}>
         <p>
           An issue with the connection to an internal DfE Server in the early
           hours of this morning (25 June 2020) has meant that, whilst all data
