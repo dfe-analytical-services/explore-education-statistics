@@ -482,7 +482,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async deletePlan =>
                 {
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                    await _releaseSubjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
+                    await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseId, deletePlan.SubjectId);
 
                     return await _fileStorageService
                         .RemoveDataFileReleaseLinkAsync(releaseId, fileName)

@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IReleaseSubjectService
     {
-        Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, Guid subjectId);
+        Task<bool> SoftDeleteSubjectOrBreakReleaseLinkAsync(Guid releaseId, Guid subjectId);
     }
 }

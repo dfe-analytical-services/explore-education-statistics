@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _footnoteService = footnoteService;
         }
 
-        public async Task<bool> RemoveReleaseSubjectLinkAsync(Guid releaseId, Guid subjectId)
+        public async Task<bool> SoftDeleteSubjectOrBreakReleaseLinkAsync(Guid releaseId, Guid subjectId)
         {
             var releaseSubjectLinkToRemove = await _statisticsDbContext
                 .ReleaseSubject

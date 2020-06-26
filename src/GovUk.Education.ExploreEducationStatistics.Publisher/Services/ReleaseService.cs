@@ -165,8 +165,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             
             foreach (var releaseSubject in await _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)).ToListAsync())
             {
-                await _releaseSubjectService.RemoveReleaseSubjectLinkAsync(releaseSubject.ReleaseId,
-                    releaseSubject.SubjectId);
+                if (!await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseSubject.ReleaseId,
+                    releaseSubject.SubjectId))
+                {
+                    throw new ArgumentException($"An error occurred  while trying to soft delete subject {releaseSubject.SubjectId} or break link with previous amendment version for releaseId {releaseSubject.ReleaseId}");
+                }
             }
         }
     }
