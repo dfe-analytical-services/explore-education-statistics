@@ -44,6 +44,9 @@ const DataBlockRenderer = ({
           includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
         }
       : undefined,
+    {
+      expiresIn: 60 * 60 * 24,
+    },
   );
 
   return (
