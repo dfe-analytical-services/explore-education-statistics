@@ -9,7 +9,7 @@ import tableBuilderService, {
 import { addSeconds } from 'date-fns';
 import { useRef } from 'react';
 
-interface TableQueryOptions {
+export interface TableQueryOptions {
   /**
    * How long to cache the table
    * query response for, in seconds.

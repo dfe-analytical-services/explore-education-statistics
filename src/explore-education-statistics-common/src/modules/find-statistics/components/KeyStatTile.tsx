@@ -1,16 +1,20 @@
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
-import { AxiosErrorHandler } from '@common/services/api/Client';
-import { DataBlock } from '@common/services/types/blocks';
+import useTableQuery, {
+  TableQueryOptions,
+} from '@common/modules/find-statistics/hooks/useTableQuery';
+import { TableDataQuery } from '@common/services/tableBuilderService';
+import { Summary } from '@common/services/types/blocks';
 import formatPretty from '@common/utils/number/formatPretty';
 import React, { ReactNode, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './KeyStatTile.module.scss';
 
-export interface KeyStatProps extends Omit<DataBlock, 'type'> {
+export interface KeyStatProps {
   children?: ReactNode;
-  handleApiErrors?: AxiosErrorHandler;
+  query: TableDataQuery;
+  queryOptions?: TableQueryOptions;
+  summary?: Summary;
 }
 
 export interface KeyStatConfig {
@@ -18,15 +22,20 @@ export interface KeyStatConfig {
   value: string;
 }
 
-const KeyStatTile = ({ dataBlockRequest, summary, children }: KeyStatProps) => {
+const KeyStatTile = ({
+  children,
+  query,
+  queryOptions = {
+    expiresIn: 60 * 60 * 24,
+  },
+  summary,
+}: KeyStatProps) => {
   const { value: tableData, isLoading, error } = useTableQuery(
     {
-      ...dataBlockRequest,
+      ...query,
       includeGeoJson: false,
     },
-    {
-      expiresIn: 60 * 60 * 24,
-    },
+    queryOptions,
   );
 
   const resultValue = useMemo<string>(() => {

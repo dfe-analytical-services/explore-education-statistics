@@ -7,12 +7,14 @@ import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { AxesConfiguration } from '@common/modules/charts/types/chart';
 import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
-import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
+import useTableQuery, {
+  TableQueryOptions,
+} from '@common/modules/find-statistics/hooks/useTableQuery';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
-import React, { MouseEvent, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 export interface DataBlockRendererProps {
   additionalTabContent?: ReactNode;
@@ -21,11 +23,8 @@ export interface DataBlockRendererProps {
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
   id: string;
+  queryOptions?: TableQueryOptions;
   onToggle?: (section: { id: string; title: string }) => void;
-  onSummaryDetailsToggle?: (
-    isOpened: boolean,
-    event: MouseEvent<HTMLElement>,
-  ) => void;
 }
 
 const DataBlockRenderer = ({
@@ -35,19 +34,24 @@ const DataBlockRenderer = ({
   lastTabs,
   getInfographic,
   id,
+  queryOptions = {
+    expiresIn: 60 * 60 * 24,
+  },
   onToggle,
 }: DataBlockRendererProps) => {
-  const { value: fullTable, isLoading } = useTableQuery(
+  const { value: fullTable, isLoading, error } = useTableQuery(
     dataBlock
       ? {
           ...dataBlock.dataBlockRequest,
           includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
         }
       : undefined,
-    {
-      expiresIn: 60 * 60 * 24,
-    },
+    queryOptions,
   );
+
+  if (error) {
+    return null;
+  }
 
   return (
     <ErrorBoundary
