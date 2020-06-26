@@ -14,6 +14,7 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
+import isAxiosError from '@common/utils/error/isAxiosError';
 import React, { ReactNode } from 'react';
 
 export interface DataBlockRendererProps {
@@ -49,46 +50,62 @@ const DataBlockRenderer = ({
     queryOptions,
   );
 
-  if (error) {
+  const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
+
+  if (error && isAxiosError(error) && error.response?.status === 403) {
     return null;
   }
 
   return (
-    <ErrorBoundary
-      fallback={<WarningMessage>Could not load content</WarningMessage>}
-    >
-      <LoadingSpinner loading={isLoading}>
-        <Tabs id={id} onToggle={onToggle}>
-          {firstTabs}
+    <LoadingSpinner loading={isLoading}>
+      <Tabs id={id} onToggle={onToggle}>
+        {firstTabs}
 
-          {dataBlock?.charts?.length && fullTable && (
-            <TabsSection id={`${id}-charts`} title="Chart">
-              <a
-                className="govuk-visually-hidden"
-                href={`#${id}-tables`}
-                aria-live="assertive"
-              >
-                If you are using a keyboard or a screen reader you may wish to
-                view the accessible table instead. Press enter to switch to the
-                data tables tab.
-              </a>
+        {dataBlock?.charts?.length && (
+          <TabsSection id={`${id}-charts`} title="Chart">
+            {error && errorMessage}
 
-              {dataBlock?.charts.map((chart, index) => {
-                const key = index;
+            {fullTable && (
+              <ErrorBoundary fallback={errorMessage}>
+                <a
+                  className="govuk-visually-hidden"
+                  href={`#${id}-tables`}
+                  aria-live="assertive"
+                >
+                  If you are using a keyboard or a screen reader you may wish to
+                  view the accessible table instead. Press enter to switch to
+                  the data tables tab.
+                </a>
 
-                const axes = { ...chart.axes } as Required<AxesConfiguration>;
+                {dataBlock?.charts.map((chart, index) => {
+                  const key = index;
 
-                if (
-                  axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
-                  chart.labels
-                ) {
-                  axes.major.dataSets = getLabelDataSetConfigurations(
-                    chart.labels,
-                    axes.major.dataSets,
-                  );
-                }
+                  const axes = { ...chart.axes } as Required<AxesConfiguration>;
 
-                if (chart.type === 'infographic') {
+                  if (
+                    axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
+                    chart.labels
+                  ) {
+                    axes.major.dataSets = getLabelDataSetConfigurations(
+                      chart.labels,
+                      axes.major.dataSets,
+                    );
+                  }
+
+                  if (chart.type === 'infographic') {
+                    return (
+                      <ChartRenderer
+                        {...chart}
+                        key={key}
+                        axes={axes}
+                        data={fullTable?.results}
+                        meta={fullTable?.subjectMeta}
+                        source={dataBlock?.source}
+                        getInfographic={getInfographic}
+                      />
+                    );
+                  }
+
                   return (
                     <ChartRenderer
                       {...chart}
@@ -97,56 +114,50 @@ const DataBlockRenderer = ({
                       data={fullTable?.results}
                       meta={fullTable?.subjectMeta}
                       source={dataBlock?.source}
-                      getInfographic={getInfographic}
                     />
                   );
-                }
+                })}
 
-                return (
-                  <ChartRenderer
-                    {...chart}
-                    key={key}
-                    axes={axes}
-                    data={fullTable?.results}
-                    meta={fullTable?.subjectMeta}
-                    source={dataBlock?.source}
-                  />
-                );
-              })}
+                {additionalTabContent}
+              </ErrorBoundary>
+            )}
+          </TabsSection>
+        )}
 
-              {additionalTabContent}
-            </TabsSection>
-          )}
+        {dataBlock?.tables?.length && (
+          <TabsSection id={`${id}-tables`} title="Table">
+            {error && errorMessage}
 
-          {dataBlock?.tables?.length && fullTable && (
-            <TabsSection id={`${id}-tables`} title="Table">
-              {dataBlock?.tables.map((table, index) => {
-                return (
-                  <TimePeriodDataTable
-                    key={index}
-                    fullTable={fullTable}
-                    captionTitle={dataBlock?.heading}
-                    source={dataBlock?.source}
-                    tableHeadersConfig={
-                      table.tableHeaders
-                        ? mapTableHeadersConfig(
-                            table.tableHeaders,
-                            fullTable.subjectMeta,
-                          )
-                        : getDefaultTableHeaderConfig(fullTable.subjectMeta)
-                    }
-                  />
-                );
-              })}
+            {fullTable && (
+              <ErrorBoundary fallback={errorMessage}>
+                {dataBlock?.tables.map((table, index) => {
+                  return (
+                    <TimePeriodDataTable
+                      key={index}
+                      fullTable={fullTable}
+                      captionTitle={dataBlock?.heading}
+                      source={dataBlock?.source}
+                      tableHeadersConfig={
+                        table.tableHeaders
+                          ? mapTableHeadersConfig(
+                              table.tableHeaders,
+                              fullTable.subjectMeta,
+                            )
+                          : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                      }
+                    />
+                  );
+                })}
 
-              {additionalTabContent}
-            </TabsSection>
-          )}
+                {additionalTabContent}
+              </ErrorBoundary>
+            )}
+          </TabsSection>
+        )}
 
-          {lastTabs}
-        </Tabs>
-      </LoadingSpinner>
-    </ErrorBoundary>
+        {lastTabs}
+      </Tabs>
+    </LoadingSpinner>
   );
 };
 

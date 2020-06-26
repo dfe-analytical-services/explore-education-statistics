@@ -20,6 +20,7 @@ import {
 } from '@common/services/types/blocks';
 import { waitFor, screen } from '@testing-library/dom';
 import { render } from '@testing-library/react';
+import { AxiosError } from 'axios';
 import React from 'react';
 import DataBlockRenderer from '../DataBlockRenderer';
 
@@ -59,6 +60,71 @@ describe('DataBlockRenderer', () => {
     charts: [],
     tables: [],
   };
+
+  test('renders error message if table response is error', async () => {
+    tableBuilderService.getTableData.mockImplementation(() =>
+      // eslint-disable-next-line prefer-promise-reject-errors
+      Promise.reject({
+        isAxiosError: true,
+        message: 'Something went wrong',
+        response: {
+          status: 500,
+        },
+      } as AxiosError),
+    );
+
+    render(
+      <DataBlockRenderer
+        id="test-datablock"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [testChartConfiguration],
+        }}
+      />,
+    );
+    await waitFor(() => {
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.dataBlockRequest,
+        includeGeoJson: false,
+      } as TableDataQuery);
+
+      expect(screen.getByText('Could not load content')).toBeInTheDocument();
+    });
+  });
+
+  test('renders nothing if table response is 403', async () => {
+    tableBuilderService.getTableData.mockImplementation(() =>
+      // eslint-disable-next-line prefer-promise-reject-errors
+      Promise.reject({
+        isAxiosError: true,
+        message: 'Forbidden',
+        response: {
+          status: 403,
+        },
+      } as AxiosError),
+    );
+
+    render(
+      <DataBlockRenderer
+        id="test-datablock"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [testChartConfiguration],
+        }}
+      />,
+    );
+    await waitFor(() => {
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.dataBlockRequest,
+        includeGeoJson: false,
+      } as TableDataQuery);
+
+      expect(
+        screen.queryByText('Could not load content'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    });
+  });
 
   test('renders line chart', async () => {
     tableBuilderService.getTableData.mockImplementation(() =>
