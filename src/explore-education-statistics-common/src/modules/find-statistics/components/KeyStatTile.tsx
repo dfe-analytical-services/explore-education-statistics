@@ -15,11 +15,7 @@ export interface KeyStatProps {
   query: TableDataQuery;
   queryOptions?: TableQueryOptions;
   summary?: Summary;
-}
-
-export interface KeyStatConfig {
-  indicatorLabel: string;
-  value: string;
+  renderDataSummary?: ReactNode;
 }
 
 const KeyStatTile = ({
@@ -27,6 +23,7 @@ const KeyStatTile = ({
   query,
   queryOptions,
   summary,
+  renderDataSummary,
 }: KeyStatProps) => {
   const { value: tableData, isLoading, error } = useTableQuery(
     {
@@ -70,9 +67,10 @@ const KeyStatTile = ({
                 {resultValue}
               </p>
 
-              {summary?.dataSummary && (
-                <p className="govuk-body-s">{summary.dataSummary}</p>
-              )}
+              {renderDataSummary ||
+                (summary?.dataSummary && (
+                  <p className="govuk-body-s">{summary.dataSummary}</p>
+                ))}
             </div>
 
             {summary?.dataDefinition?.[0] && (
