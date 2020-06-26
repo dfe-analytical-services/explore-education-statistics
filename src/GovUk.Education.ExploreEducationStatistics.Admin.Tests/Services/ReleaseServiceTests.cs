@@ -50,8 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = new ReleaseService(context, AdminMapper(), 
                     publishingService.Object, new PersistenceHelper<ContentDbContext>(context), userService.Object, repository.Object,
                     subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
-                
-                var publishScheduled = new DateTime(2050, 6, 30, 14, 0, 0);
 
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
@@ -59,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publication.Id,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = publishScheduled,
+                        PublishScheduled = "2050-06-30",
                         TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                     });
 
@@ -197,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TemplateReleaseId = templateReleaseId,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = DateTime.Parse("2050/01/01"),
+                        PublishScheduled = "2050-01-01",
                         TypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
                     });
 
@@ -334,8 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
                 context.SaveChanges();
             }
-            
-            var publishScheduledEdited = new DateTime(2051, 6, 30, 14, 0, 0);
+
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var typeEdited = officialStatisticsReleaseType;
             const string releaseNameEdited = "2035";
@@ -353,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         releaseId,
                         new UpdateReleaseSummaryRequest
                         {
-                            PublishScheduled = publishScheduledEdited,
+                            PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             TypeId = typeEdited.Id,
                             ReleaseName = releaseNameEdited,
