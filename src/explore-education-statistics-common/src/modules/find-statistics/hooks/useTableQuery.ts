@@ -1,22 +1,27 @@
 import useAsyncRetry, { AsyncRetryState } from '@common/hooks/useAsyncRetry';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import storageService from '@common/services/storageService';
 import tableBuilderService, {
   TableDataQuery,
+  TableDataResponse,
 } from '@common/services/tableBuilderService';
+import { addSeconds } from 'date-fns';
 import { useRef } from 'react';
 
 interface TableQueryOptions {
-  onSuccess?: (table: FullTable, query: TableDataQuery) => void;
-  onError?: (error: Error) => void;
+  /**
+   * How long to cache the table
+   * query response for, in seconds.
+   */
+  expiresIn?: number;
 }
 
 export default function useTableQuery(
   query: TableDataQuery | undefined,
-  options?: TableQueryOptions,
+  options: TableQueryOptions = {},
 ): AsyncRetryState<FullTable | undefined> {
   const optionsRef = useRef<TableQueryOptions | undefined>(options);
-
   optionsRef.current = options;
 
   return useAsyncRetry(async () => {
@@ -24,21 +29,20 @@ export default function useTableQuery(
       return undefined;
     }
 
-    try {
-      const response = await tableBuilderService.getTableData(query);
-      const fullTable = mapFullTable(response);
+    const queryKey = JSON.stringify(query);
 
-      if (optionsRef.current?.onSuccess) {
-        await optionsRef.current.onSuccess(fullTable, query);
-      }
+    let response = await storageService
+      .get<TableDataResponse>(queryKey)
+      .catch(() => null);
 
-      return fullTable;
-    } catch (error) {
-      if (optionsRef.current?.onError) {
-        await optionsRef.current.onError(error);
-      }
+    if (!response) {
+      response = await tableBuilderService.getTableData(query);
 
-      throw error;
+      await storageService.set(queryKey, response, {
+        expiry: addSeconds(new Date(), options?.expiresIn ?? 0),
+      });
     }
+
+    return mapFullTable(response);
   }, [JSON.stringify(query)]);
 }
