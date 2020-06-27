@@ -7,10 +7,14 @@ type StorageItem<T = unknown> = {
   value: T;
 };
 
+const NAMESPACE = 'ees';
+
+const namespaceKey = (key: string) => `${NAMESPACE}_${key}`;
+
 const storageService = {
   get<T>(key: string): Promise<T | null> {
     return Promise.resolve().then(() => {
-      const item = localStorage.getItem(key);
+      const item = localStorage.getItem(namespaceKey(key));
 
       if (!item) {
         return null;
@@ -46,15 +50,37 @@ const storageService = {
         item = { value, expiry: expiry.toISOString() };
       }
 
-      localStorage.setItem(key, JSON.stringify(item));
+      localStorage.setItem(namespaceKey(key), JSON.stringify(item));
     });
   },
   remove(key: string): Promise<void> {
-    return Promise.resolve().then(() => localStorage.removeItem(key));
+    return Promise.resolve().then(() =>
+      localStorage.removeItem(namespaceKey(key)),
+    );
   },
   clear(): Promise<void> {
     return Promise.resolve().then(() => localStorage.clear());
   },
 };
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => {
+    // Clear local storage of any existing
+    // entries that have expired on startup.
+    Promise.resolve().then(() => {
+      Object.entries(localStorage).forEach(([key, value]) => {
+        if (!key.startsWith(NAMESPACE)) {
+          return;
+        }
+
+        const { expiry } = JSON.parse(value) as StorageItem;
+
+        if (expiry && new Date() >= new Date(expiry)) {
+          storageService.remove(key);
+        }
+      });
+    });
+  });
+}
 
 export default storageService;
