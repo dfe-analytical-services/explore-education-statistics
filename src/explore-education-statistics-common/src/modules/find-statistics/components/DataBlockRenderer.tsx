@@ -35,9 +35,7 @@ const DataBlockRenderer = ({
   lastTabs,
   getInfographic,
   id,
-  queryOptions = {
-    expiresIn: 60 * 60 * 24,
-  },
+  queryOptions,
   onToggle,
 }: DataBlockRendererProps) => {
   const { value: fullTable, isLoading, error } = useTableQuery(

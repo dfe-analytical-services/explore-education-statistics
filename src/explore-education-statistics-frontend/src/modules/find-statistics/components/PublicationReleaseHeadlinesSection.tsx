@@ -41,6 +41,9 @@ const PublicationReleaseHeadlinesSection = ({
                   key={block.id}
                   query={block.dataBlockRequest}
                   summary={block.summary}
+                  queryOptions={{
+                    expiresIn: 60 * 60 * 24,
+                  }}
                 />
               );
             })}

@@ -25,9 +25,7 @@ export interface KeyStatConfig {
 const KeyStatTile = ({
   children,
   query,
-  queryOptions = {
-    expiresIn: 60 * 60 * 24,
-  },
+  queryOptions,
   summary,
 }: KeyStatProps) => {
   const { value: tableData, isLoading, error } = useTableQuery(
