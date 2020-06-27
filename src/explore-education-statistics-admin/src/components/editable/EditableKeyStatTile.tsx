@@ -75,6 +75,7 @@ const EditableKeyStatTile = ({
               }
             >
               <FormFieldTextInput<KeyStatsFormValues>
+                formGroupClass="govuk-!-margin-top-2"
                 id={`key-stat-dataDefinitionTitle-${id}`}
                 name="dataDefinitionTitle"
                 label="Guidance title"
@@ -104,7 +105,7 @@ const EditableKeyStatTile = ({
     </Formik>
   ) : (
     <KeyStatTile query={query} summary={summary}>
-      <div className={styles.keyStatEdit}>
+      <div className="govuk-!-margin-top-2">
         <Button onClick={toggleShowForm.on}>Edit</Button>
 
         {onRemove && (

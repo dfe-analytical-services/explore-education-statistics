@@ -2,8 +2,10 @@ import TabsSection from '@common/components/TabsSection';
 import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
-import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
+import KeyStatTile, {
+  KeyStatTileColumn,
+  KeyStatTileContainer,
+} from '@common/modules/find-statistics/components/KeyStatTile';
 import { Release } from '@common/services/publicationService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
@@ -30,24 +32,25 @@ const PublicationReleaseHeadlinesSection = ({
       dataBlock={keyStatisticsSecondarySection.content?.[0]}
       firstTabs={
         <TabsSection title="Summary">
-          <div className={styles.keyStatsContainer}>
+          <KeyStatTileContainer>
             {keyStatisticsSection.content.map(block => {
               if (block.type !== 'DataBlock') {
                 return null;
               }
 
               return (
-                <KeyStatTile
-                  key={block.id}
-                  query={block.dataBlockRequest}
-                  summary={block.summary}
-                  queryOptions={{
-                    expiresIn: 60 * 60 * 24,
-                  }}
-                />
+                <KeyStatTileColumn key={block.id}>
+                  <KeyStatTile
+                    query={block.dataBlockRequest}
+                    summary={block.summary}
+                    queryOptions={{
+                      expiresIn: 60 * 60 * 24,
+                    }}
+                  />
+                </KeyStatTileColumn>
               );
             })}
-          </div>
+          </KeyStatTileContainer>
 
           {orderBy(headlinesSection.content, 'order').map(block => (
             <ContentBlockRenderer key={block.id} block={block} />

@@ -3,7 +3,10 @@ import useReleaseActions from '@admin/pages/release/edit-release/content/useRele
 import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
-import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
+import {
+  KeyStatTileColumn,
+  KeyStatTileContainer,
+} from '@common/modules/find-statistics/components/KeyStatTile';
 import { Release } from '@common/services/publicationService';
 import React, { useCallback, useState } from 'react';
 import KeyStatSelectForm from './KeyStatSelectForm';
@@ -33,37 +36,38 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           <AddKeyStatistics release={release} />
         </>
       )}
-      <div className={styles.keyStatsContainer}>
-        {release.keyStatisticsSection.content.map(block => {
-          return block.type === 'DataBlock' ? (
-            <EditableKeyStatTile
-              key={block.id}
-              id={block.id}
-              name={block.name}
-              query={block.dataBlockRequest}
-              summary={block.summary}
-              isEditing={isEditing}
-              onRemove={async () => {
-                await deleteContentSectionBlock({
-                  releaseId: release.id,
-                  sectionId: release.keyStatisticsSection.id,
-                  blockId: block.id,
-                  sectionKey: 'keyStatisticsSection',
-                });
-              }}
-              onSubmit={async values => {
-                await updateContentSectionDataBlock({
-                  releaseId: release.id,
-                  sectionId: release.keyStatisticsSection.id,
-                  blockId: block.id,
-                  sectionKey: 'keyStatisticsSection',
-                  values,
-                });
-              }}
-            />
-          ) : null;
-        })}
-      </div>
+      <KeyStatTileContainer>
+        {release.keyStatisticsSection.content
+          .filter(block => block.type === 'DataBlock')
+          .map(block => (
+            <KeyStatTileColumn key={block.id}>
+              <EditableKeyStatTile
+                id={block.id}
+                name={block.name}
+                query={block.dataBlockRequest}
+                summary={block.summary}
+                isEditing={isEditing}
+                onRemove={async () => {
+                  await deleteContentSectionBlock({
+                    releaseId: release.id,
+                    sectionId: release.keyStatisticsSection.id,
+                    blockId: block.id,
+                    sectionKey: 'keyStatisticsSection',
+                  });
+                }}
+                onSubmit={async values => {
+                  await updateContentSectionDataBlock({
+                    releaseId: release.id,
+                    sectionId: release.keyStatisticsSection.id,
+                    blockId: block.id,
+                    sectionKey: 'keyStatisticsSection',
+                    values,
+                  });
+                }}
+              />
+            </KeyStatTileColumn>
+          ))}
+      </KeyStatTileContainer>
     </>
   );
 };

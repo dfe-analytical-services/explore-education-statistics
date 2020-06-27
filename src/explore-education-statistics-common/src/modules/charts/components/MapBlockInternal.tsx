@@ -12,6 +12,10 @@ import createDataSetCategories from '@common/modules/charts/util/createDataSetCa
 import getCategoryDataSetConfigurations, {
   CategoryDataSetConfiguration,
 } from '@common/modules/charts/util/getCategoryDataSetConfigurations';
+import {
+  KeyStatTileColumn,
+  KeyStatTileContainer,
+} from '@common/modules/find-statistics/components/KeyStatTile';
 import stylesIndicators from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import {
   GeoJsonFeature,
@@ -501,7 +505,7 @@ export const MapBlockInternal = ({
           </h3>
 
           {selectedFeature?.properties?.dataSets && selectedDataSetKey && (
-            <dl className={stylesIndicators.keyStatsContainer}>
+            <KeyStatTileContainer>
               {Object.entries(selectedFeature?.properties.dataSets).map(
                 ([dataSetKey, dataSet]) => {
                   if (!dataSetConfigurations[dataSetKey]) {
@@ -514,10 +518,7 @@ export const MapBlockInternal = ({
                   } = dataSetConfigurations[dataSetKey];
 
                   return (
-                    <div
-                      key={dataSetKey}
-                      className={stylesIndicators.keyStatTile}
-                    >
+                    <KeyStatTileColumn key={dataSetKey}>
                       <div
                         className={stylesIndicators.keyStat}
                         data-testid="indicatorTile"
@@ -534,11 +535,11 @@ export const MapBlockInternal = ({
                           )}
                         </dd>
                       </div>
-                    </div>
+                    </KeyStatTileColumn>
                   );
                 },
               )}
-            </dl>
+            </KeyStatTileContainer>
           )}
         </>
       )}
