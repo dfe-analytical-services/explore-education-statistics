@@ -22,6 +22,7 @@ import { waitFor, screen } from '@testing-library/dom';
 import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
 import React from 'react';
+import { forceVisible } from 'react-lazyload';
 import DataBlockRenderer from '../DataBlockRenderer';
 
 jest.mock('@common/services/tableBuilderService');
@@ -82,6 +83,9 @@ describe('DataBlockRenderer', () => {
         }}
       />,
     );
+
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith({
         ...testDataBlock.dataBlockRequest,
@@ -113,6 +117,9 @@ describe('DataBlockRenderer', () => {
         }}
       />,
     );
+
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith({
         ...testDataBlock.dataBlockRequest,
@@ -141,15 +148,15 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith({
         ...testDataBlock.dataBlockRequest,
         includeGeoJson: false,
       } as TableDataQuery);
 
-      expect(
-        container.querySelectorAll('section.govuk-tabs__panel'),
-      ).toHaveLength(1);
+      expect(screen.getAllByRole('tab')).toHaveLength(1);
 
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
     });
@@ -175,16 +182,15 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith({
         ...testDataBlock.dataBlockRequest,
         includeGeoJson: false,
       } as TableDataQuery);
 
-      expect(
-        container.querySelectorAll('section.govuk-tabs__panel'),
-      ).toHaveLength(1);
-
+      expect(screen.getAllByRole('tab')).toHaveLength(1);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
     });
   });
@@ -211,16 +217,15 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith({
         ...testDataBlock.dataBlockRequest,
         includeGeoJson: false,
       } as TableDataQuery);
 
-      expect(
-        container.querySelectorAll('section.govuk-tabs__panel'),
-      ).toHaveLength(1);
-
+      expect(screen.getAllByRole('tab')).toHaveLength(1);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
     });
   });
@@ -255,6 +260,8 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith({
         ...testDataBlock.dataBlockRequest,
@@ -284,6 +291,8 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(getDataBlockForSubject).toBeCalledWith({
         ...testDataBlock.dataBlockRequest,
@@ -308,6 +317,8 @@ describe('DataBlockRenderer', () => {
         }}
       />,
     );
+
+    forceVisible();
 
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith({
@@ -361,6 +372,8 @@ describe('DataBlockRenderer', () => {
         }}
       />,
     );
+
+    forceVisible();
 
     await waitFor(() => {
       expect(screen.getByRole('table')).toBeInTheDocument();
