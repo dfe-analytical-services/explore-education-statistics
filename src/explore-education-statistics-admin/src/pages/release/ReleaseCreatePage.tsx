@@ -6,7 +6,9 @@ import ReleaseSummaryForm, {
 } from '@admin/pages/release/components/ReleaseSummaryForm';
 import appRouteList from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/releaseRoutes';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {
+  BasicPublicationDetails,
+} from '@admin/services/publicationService';
 import releaseService, {
   CreateReleaseRequest,
 } from '@admin/services/releaseService';
@@ -17,9 +19,9 @@ import {
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
-import { Publication } from '@common/services/publicationService';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import Yup from '@common/validation/yup';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 const errorCodeMappings = [
@@ -45,8 +47,8 @@ export interface FormValues extends ReleaseSummaryFormValues {
 }
 
 interface Model {
-  templateRelease: IdTitlePair | undefined;
-  publication: Publication;
+  templateRelease: IdTitlePair;
+  publication: BasicPublicationDetails;
 }
 
 const ReleaseCreatePage = ({
@@ -55,18 +57,16 @@ const ReleaseCreatePage = ({
 }: RouteComponentProps<MatchProps>) => {
   const { publicationId } = match.params;
 
-  const [model, setModel] = useState<Model>();
-
-  useEffect(() => {
-    Promise.all([
+  const { value: model } = useAsyncRetry<Model>(async () => {
+    const [templateRelease, publication] = await Promise.all([
       publicationService.getPublicationReleaseTemplate(publicationId),
       publicationService.getPublication(publicationId),
-    ]).then(([templateRelease, publication]) => {
-      setModel({
-        templateRelease,
-        publication: publication as Publication,
-      });
-    });
+    ]);
+
+    return {
+      templateRelease,
+      publication,
+    } as Model;
   }, [publicationId]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
@@ -129,12 +129,14 @@ const ReleaseCreatePage = ({
           </RelatedInformation>
         </div>
       </div>
+
       <ReleaseSummaryForm<FormValues>
         submitText="Create new release"
         initialValues={timePeriodCoverageGroups =>
           ({
             timePeriodCoverageCode:
-              timePeriodCoverageGroups[0].timeIdentifiers[0].identifier.value,
+              timePeriodCoverageGroups[0]?.timeIdentifiers[0]?.identifier
+                .value ?? '',
             timePeriodCoverageStartYear: '',
             releaseTypeId: '',
             templateReleaseId: '',
@@ -142,34 +144,30 @@ const ReleaseCreatePage = ({
         }
         validationSchema={baseRules =>
           baseRules.shape({
-            templateReleaseId:
-              model && model.templateRelease
-                ? Yup.string().required('Choose a template')
-                : Yup.string(),
+            templateReleaseId: model?.templateRelease
+              ? Yup.string().required('Choose a template')
+              : Yup.string(),
           })
         }
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         additionalFields={
-          model &&
-          model.templateRelease && (
-            <div className="govuk-!-margin-top-9">
-              <FormFieldRadioGroup<FormValues>
-                id="releaseSummaryForm-templateReleaseId"
-                legend="Select template"
-                name="templateReleaseId"
-                options={[
-                  {
-                    label: 'Create new template',
-                    value: 'new',
-                  },
-                  {
-                    label: `Copy existing template (${model.templateRelease.title})`,
-                    value: `${model.templateRelease.id}`,
-                  },
-                ]}
-              />
-            </div>
+          model?.templateRelease && (
+            <FormFieldRadioGroup<FormValues>
+              id="releaseSummaryForm-templateReleaseId"
+              legend="Select template"
+              name="templateReleaseId"
+              options={[
+                {
+                  label: 'Create new template',
+                  value: 'new',
+                },
+                {
+                  label: `Copy existing template (${model.templateRelease.title})`,
+                  value: `${model.templateRelease.id}`,
+                },
+              ]}
+            />
           )
         }
       />

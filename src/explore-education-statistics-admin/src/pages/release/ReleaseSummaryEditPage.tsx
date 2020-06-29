@@ -12,6 +12,8 @@ import {
   errorCodeAndFieldNameToFieldError,
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -30,17 +32,12 @@ const errorCodeMappings = [
 ];
 
 const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
-  const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
-    ReleaseSummary
-  >();
-
   const { releaseId, publication } = useManageReleaseContext();
 
-  useEffect(() => {
-    releaseService.getReleaseSummary(releaseId).then(release => {
-      setReleaseSummaryDetails(release);
-    });
-  }, [releaseId]);
+  const { value: releaseSummaryDetails, isLoading } = useAsyncRetry(
+    () => releaseService.getReleaseSummary(releaseId),
+    [releaseId],
+  );
 
   const handleSubmit = useFormSubmit<ReleaseSummaryFormValues>(async values => {
     const release: UpdateReleaseSummaryRequest = {
@@ -65,7 +62,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     );
 
   return (
-    <>
+    <LoadingSpinner loading={isLoading}>
       {releaseSummaryDetails && (
         <>
           <h2 className="govuk-heading-l">Edit release summary</h2>
@@ -83,7 +80,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
           />
         </>
       )}
-    </>
+    </LoadingSpinner>
   );
 };
 
