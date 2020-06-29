@@ -160,4 +160,6 @@ const DataBlockRenderer = ({
   );
 };
 
-export default withLazyLoad(DataBlockRenderer);
+export default withLazyLoad(DataBlockRenderer, {
+  offset: 100,
+});

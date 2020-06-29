@@ -140,6 +140,10 @@ user reloads page
 user scrolls to the top of the page
   execute javascript      window.scrollTo(0, 0);
 
+user scrolls to element
+  [Arguments]  ${element}
+  scroll element into view  ${element}
+
 user waits until page contains
   [Arguments]    ${pageText}
   wait until page contains   ${pageText}
