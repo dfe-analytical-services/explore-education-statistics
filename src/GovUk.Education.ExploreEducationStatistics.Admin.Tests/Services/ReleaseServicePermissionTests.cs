@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -179,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object, new SequentialGuidGenerator());
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             Assert.Equal(list, result.Right);
@@ -224,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object, new SequentialGuidGenerator());
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             
@@ -251,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object, new SequentialGuidGenerator());
             
             var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseStatus.Approved);
             
@@ -281,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = new ReleaseService(contentDbContext.Object, AdminMapper(), 
                 publishingService.Object, releaseHelper.Object, userService.Object, repository.Object,
-                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object);
+                subjectService.Object, tableStorageService.Object, fileStorageService.Object, importStatusService.Object, footnoteService.Object, statisticsDbContext.Object, dataBlockService.Object, new SequentialGuidGenerator());
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);
         }

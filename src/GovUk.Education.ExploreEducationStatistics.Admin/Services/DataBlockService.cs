@@ -53,16 +53,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
-                    dataBlock.Id = Guid.NewGuid();
+                    
+                    var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 
-                    await _context.DataBlocks.AddAsync(dataBlock);
-            
-                    release.AddContentBlock(dataBlock);
+                    release.AddContentBlock(added);
                     _context.Releases.Update(release);
             
                     await _context.SaveChangesAsync();
 
-                    return await GetAsync(dataBlock.Id);
+                    return await GetAsync(added.Id);
                 });
         }
 

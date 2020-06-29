@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -30,18 +29,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly string _storageConnectionString;
         private readonly ILogger _logger;
         private readonly CloudTable _table;
+        private readonly IGuidGenerator _guidGenerator;
 
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
             ILogger<ImportService> logger,
             IConfiguration config,
-            ITableStorageService tableStorageService)
+            ITableStorageService tableStorageService,
+            IGuidGenerator guidGenerator)
         {
             _context = contentDbContext;
             _mapper = mapper;
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _logger = logger;
             _table = tableStorageService.GetTableAsync("imports").Result;
+            _guidGenerator = guidGenerator;
         }
 
         public async void Import(string dataFileName, Guid releaseId, IFormFile dataFile)
@@ -103,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             return new ImportMessage
             {
-                SubjectId = Guid.NewGuid(),
+                SubjectId = _guidGenerator.NewGuid(),
                 DataFileName = dataFileName,
                 OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
