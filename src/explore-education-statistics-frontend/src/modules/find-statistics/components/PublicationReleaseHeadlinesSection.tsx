@@ -5,7 +5,6 @@ import DataBlockRenderer from '@common/modules/find-statistics/components/DataBl
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import { Release } from '@common/services/publicationService';
-import { DataBlock } from '@common/services/types/blocks';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
@@ -32,14 +31,21 @@ const PublicationReleaseHeadlinesSection = ({
       firstTabs={
         <TabsSection title="Summary">
           <div className={styles.keyStatsContainer}>
-            {keyStatisticsSection.content.map(keyStat => {
-              if (keyStat.type !== 'DataBlock') {
+            {keyStatisticsSection.content.map(block => {
+              if (block.type !== 'DataBlock') {
                 return null;
               }
 
-              const block = keyStat as DataBlock;
-
-              return <KeyStatTile key={block.id} {...block} />;
+              return (
+                <KeyStatTile
+                  key={block.id}
+                  query={block.dataBlockRequest}
+                  summary={block.summary}
+                  queryOptions={{
+                    expiresIn: 60 * 60 * 24,
+                  }}
+                />
+              );
             })}
           </div>
 

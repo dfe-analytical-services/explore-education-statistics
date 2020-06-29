@@ -25,20 +25,21 @@ export interface KeyStatsFormValues {
 }
 
 interface EditableKeyStatProps extends KeyStatProps {
+  id: string;
   isEditing?: boolean;
+  name: string;
   onRemove?: () => void;
   onSubmit: (values: KeyStatsFormValues) => void;
 }
 
 const EditableKeyStatTile = ({
+  id,
   isEditing = false,
+  name,
+  query,
+  summary,
   onRemove,
   onSubmit,
-  dataBlockRequest,
-  id,
-  name,
-  summary,
-  ...props
 }: EditableKeyStatProps) => {
   const [dataBlockResponse, setDataBlockResponse] = useState<
     TableDataResponse | undefined
@@ -54,7 +55,7 @@ const EditableKeyStatTile = ({
     if (!dataBlockResponse) {
       tableBuilderService
         .getTableData({
-          ...dataBlockRequest,
+          ...query,
           includeGeoJson: false,
         })
         .then(newResponse => {
@@ -73,7 +74,7 @@ const EditableKeyStatTile = ({
           }
         });
     }
-  }, [dataBlockRequest, dataBlockResponse]);
+  }, [query, dataBlockResponse]);
 
   if (!dataBlockResponse) {
     return (
@@ -87,15 +88,7 @@ const EditableKeyStatTile = ({
   }
 
   if (!isEditing) {
-    return (
-      <KeyStatTile
-        dataBlockRequest={dataBlockRequest}
-        id={id}
-        name={name}
-        {...props}
-        summary={summary}
-      />
-    );
+    return <KeyStatTile query={query} summary={summary} />;
   }
 
   return (
@@ -188,13 +181,7 @@ const EditableKeyStatTile = ({
           </Formik>
         </div>
       ) : (
-        <KeyStatTile
-          dataBlockRequest={dataBlockRequest}
-          id={id}
-          name={name}
-          {...props}
-          summary={summary}
-        >
+        <KeyStatTile query={query} summary={summary}>
           <div className={styles.keyStatEdit}>
             <Button
               onClick={() => {

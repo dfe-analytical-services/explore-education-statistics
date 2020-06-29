@@ -34,29 +34,32 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         </>
       )}
       <div className={styles.keyStatsContainer}>
-        {release.keyStatisticsSection.content.map(stat => {
-          return stat.type === 'DataBlock' ? (
+        {release.keyStatisticsSection.content.map(block => {
+          return block.type === 'DataBlock' ? (
             <EditableKeyStatTile
-              key={stat.id}
-              {...stat}
+              key={block.id}
+              id={block.id}
+              name={block.name}
+              query={block.dataBlockRequest}
+              summary={block.summary}
               isEditing={isEditing}
-              onRemove={() => {
-                deleteContentSectionBlock({
+              onRemove={async () => {
+                await deleteContentSectionBlock({
                   releaseId: release.id,
                   sectionId: release.keyStatisticsSection.id,
-                  blockId: stat.id,
+                  blockId: block.id,
                   sectionKey: 'keyStatisticsSection',
                 });
               }}
-              onSubmit={values =>
-                updateContentSectionDataBlock({
+              onSubmit={async values => {
+                await updateContentSectionDataBlock({
                   releaseId: release.id,
                   sectionId: release.keyStatisticsSection.id,
-                  blockId: stat.id,
+                  blockId: block.id,
                   sectionKey: 'keyStatisticsSection',
                   values,
-                })
-              }
+                });
+              }}
             />
           ) : null;
         })}
@@ -72,13 +75,13 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const { keyStatisticsSection } = release;
 
   const addKeyStatToSection = useCallback(
-    (datablockId: string) => {
-      attachContentSectionBlock({
+    async (dataBlockId: string) => {
+      await attachContentSectionBlock({
         releaseId: release.id,
         sectionId: release.keyStatisticsSection.id,
         sectionKey: 'keyStatisticsSection',
         block: {
-          contentBlockId: datablockId,
+          contentBlockId: dataBlockId,
           order: release.keyStatisticsSection.content.length || 0,
         },
       });
