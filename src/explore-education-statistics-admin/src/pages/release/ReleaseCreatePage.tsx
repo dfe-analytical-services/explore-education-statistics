@@ -1,5 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import PageTitle from '@admin/components/PageTitle';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
@@ -105,12 +106,10 @@ const ReleaseCreatePage = ({
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            <span className="govuk-caption-xl">
-              {model && model.publication.title}
-            </span>
-            Create new release
-          </h1>
+          <PageTitle
+            title="Create new release"
+            caption={model?.publication.title}
+          />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
