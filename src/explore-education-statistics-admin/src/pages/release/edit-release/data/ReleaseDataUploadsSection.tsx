@@ -492,11 +492,11 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                 )}
                 {deleteDataFile.plan.footnoteIds.length > 0 && (
                   <p>
-                    {deleteDataFile.plan.footnoteIds.length}{' '}
-                    {deleteDataFile.plan.footnoteIds.length > 1
-                      ? 'footnotes'
-                      : 'footnote'}{' '}
-                    will be removed.
+                    {`${deleteDataFile.plan.footnoteIds.length} ${
+                      deleteDataFile.plan.footnoteIds.length > 1
+                        ? 'footnotes'
+                        : 'footnote'
+                    } will be removed.`}
                   </p>
                 )}
               </ModalConfirm>
