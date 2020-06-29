@@ -1,3 +1,4 @@
+import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
@@ -31,6 +32,16 @@ const ReleaseContentPageLoaded = () => {
     >
       {({ isEditing }) => (
         <>
+          {isEditing && (
+            <BrowserWarning>
+              <ul>
+                <li>Editing key statistic guidance text</li>
+                <li>Editing headline text</li>
+                <li>Editing text blocks</li>
+              </ul>
+            </BrowserWarning>
+          )}
+
           {canUpdateRelease && (
             <div className="govuk-form-group">
               {unresolvedComments.length > 0 && (

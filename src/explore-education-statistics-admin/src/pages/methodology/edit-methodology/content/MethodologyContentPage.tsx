@@ -1,3 +1,4 @@
+import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
@@ -31,6 +32,14 @@ const MethodologyContentPageInternal = () => {
             <section
               className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
             >
+              {isEditing && (
+                <BrowserWarning>
+                  <ul>
+                    <li>Editing text blocks</li>
+                  </ul>
+                </BrowserWarning>
+              )}
+
               <h2
                 aria-hidden
                 className="govuk-heading-lg"

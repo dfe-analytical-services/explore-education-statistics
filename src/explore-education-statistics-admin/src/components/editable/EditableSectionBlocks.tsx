@@ -8,6 +8,7 @@ import { EditableBlock } from '@admin/services/types/content';
 import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';
+import isBrowser from '@common/utils/isBrowser';
 import reorder from '@common/utils/reorder';
 import React, { useCallback } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
@@ -103,7 +104,7 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
 
               <EditableBlockRenderer
                 block={block}
-                editable={!isReordering}
+                editable={!isReordering && !isBrowser('IE')}
                 allowHeadings={allowHeadings}
                 getInfographic={getInfographic}
                 onContentSave={onBlockContentSave}
