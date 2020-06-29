@@ -3,6 +3,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
+import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { AxesConfiguration } from '@common/modules/charts/types/chart';
@@ -159,4 +160,4 @@ const DataBlockRenderer = ({
   );
 };
 
-export default DataBlockRenderer;
+export default withLazyLoad(DataBlockRenderer);
