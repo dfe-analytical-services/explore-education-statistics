@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public PartialDate NextReleaseDate { get; set; }
 
+        [JsonConverter(typeof(DateTimeToDateJsonConverter))]
         public DateTime? PublishScheduled { get; set; }
 
         public DateTime? Published { get; set; }

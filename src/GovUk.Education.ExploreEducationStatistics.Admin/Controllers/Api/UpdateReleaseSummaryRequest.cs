@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Required]
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
-        [RegularExpression(@"(\d{4}-\d{2}-\d{2})", ErrorMessage = "Invalid date format. Expected yyyy-MM-dd")]
+        [RegularExpression(@"(^\d{4}-\d{2}-\d{2}$)", ErrorMessage = "Invalid date format. Expected yyyy-MM-dd")]
         public string PublishScheduled { get; set; }
 
         public DateTime? PublishScheduledDate =>

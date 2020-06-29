@@ -22,7 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         [Required]
         public TimeIdentifier TimePeriodCoverage { get; set; }
-        
+
+        [JsonConverter(typeof(DateTimeToDateJsonConverter))]
         public DateTime? PublishScheduled { get; set; }
         
         [PartialDateValidator]

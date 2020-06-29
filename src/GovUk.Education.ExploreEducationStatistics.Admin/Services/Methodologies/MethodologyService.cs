@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodolo
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -51,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     {
                         Title = request.Title,
                         Slug = slug,
-                        PublishScheduled = request.PublishScheduled?.AsStartOfDayUtc()
+                        PublishScheduled = request.PublishScheduledDate
                     };
 
                     var saved = await _context.Methodologies.AddAsync(model);
@@ -105,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     _context.Methodologies.Update(methodology);
                     methodology.InternalReleaseNote = request.InternalReleaseNote ?? methodology.InternalReleaseNote;
-                    methodology.PublishScheduled = request.PublishScheduled?.AsStartOfDayUtc();
+                    methodology.PublishScheduled = request.PublishScheduledDate;
                     methodology.Status = request.Status;
                     methodology.Title = request.Title;
                     methodology.Slug = slug;

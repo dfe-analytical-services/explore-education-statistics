@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
@@ -56,6 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
         public IEnumerable<FileInfo> DownloadFiles { get; set; }
         
+        [JsonConverter(typeof(DateTimeToDateJsonConverter))]
         public DateTime? PublishScheduled { get; set; }
 
         public PartialDate NextReleaseDate { get; set; }
