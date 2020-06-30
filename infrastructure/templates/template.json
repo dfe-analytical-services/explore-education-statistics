@@ -558,16 +558,6 @@
       },
       "resources": [
         {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
-          ],
-          "properties": {
-          }
-        },
-        {
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
@@ -769,16 +759,6 @@
       },
       "resources": [
         {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
-          ],
-          "properties": {
-          }
-        },
-        {
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
@@ -973,16 +953,6 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "resources": [
-        // {
-        //   "type": "siteextensions",
-        //   "name": "Microsoft.ApplicationInsights.AzureWebSites",
-        //   "apiVersion": "2016-08-01",
-        //   "dependsOn": [
-        //     "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
-        //   ],
-        //   "properties": {
-        //   }
-        // },
         {
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
