@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -22,9 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     }
 
     public class ImporterMetaService : IImporterMetaService
-    {        
-        public ImporterMetaService()
+    {
+        private readonly IGuidGenerator _guidGenerator;
+        
+        public ImporterMetaService(IGuidGenerator guidGenerator)
         {
+            _guidGenerator = guidGenerator;
         }
 
         public SubjectMeta Import(DataColumnCollection cols, DataRowCollection rows, Subject subject, StatisticsDbContext context)
@@ -144,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                             i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label &&
                             i.Unit == row.IndicatorUnit) ?? new Indicator
                         {
-                            Id = Guid.NewGuid(),
+                            Id = _guidGenerator.NewGuid(),
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
                             Name = row.ColumnName,

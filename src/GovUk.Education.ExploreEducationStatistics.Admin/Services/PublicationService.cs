@@ -66,9 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult<PublicationViewModel>(SlugNotUnique);
                     }
 
-                    var saved = _context.Publications.Add(new Publication
+                    var saved = await _context.Publications.AddAsync(new Publication
                     {
-                        Id = Guid.NewGuid(),
                         ContactId = publication.ContactId,
                         Title = publication.Title,
                         TopicId = publication.TopicId,
@@ -77,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ExternalMethodology = publication.ExternalMethodology
                     });
 
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return await GetViewModelAsync(saved.Entity.Id);
                 });
         }

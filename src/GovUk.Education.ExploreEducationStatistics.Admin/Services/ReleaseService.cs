@@ -48,23 +48,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
+        private readonly IGuidGenerator _guidGenerator;
 
-        // TODO PP-318 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
+        // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
         public ReleaseService(
-            ContentDbContext context, 
-            IMapper mapper, 
+            ContentDbContext context,
+            IMapper mapper,
             IPublishingService publishingService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper, 
-            IUserService userService, 
-            IReleaseRepository repository, 
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IUserService userService,
+            IReleaseRepository repository,
             ISubjectService subjectService,
-            ITableStorageService coreTableStorageService, 
-            IFileStorageService fileStorageService, 
+            ITableStorageService coreTableStorageService,
+            IFileStorageService fileStorageService,
             IImportStatusService importStatusService,
-	        IFootnoteService footnoteService, 
+            IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
-            IDataBlockService dataBlockService)
+            IDataBlockService dataBlockService, 
+            IGuidGenerator guidGenerator)
         {
             _context = context;
             _publishingService = publishingService;
@@ -79,6 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
+            _guidGenerator = guidGenerator;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
@@ -99,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var release = _mapper.Map<Release>(createRelease);
                     
-                    release.Id = Guid.NewGuid();
+                    release.Id = _guidGenerator.NewGuid();
                     
                     if (createRelease.TemplateReleaseId.HasValue)
                     {

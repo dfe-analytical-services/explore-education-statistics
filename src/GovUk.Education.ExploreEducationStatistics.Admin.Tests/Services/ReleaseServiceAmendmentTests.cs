@@ -4,6 +4,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -390,7 +391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         userService.Object,
                         repository.Object,
                         subjectService.Object, tableStorageService.Object, fileStorageService.Object,
-                        importStatusService.Object, footnoteService.Object, statisticsDbContext, dataBlockService.Object);
+                        importStatusService.Object, footnoteService.Object, statisticsDbContext, dataBlockService.Object, new SequentialGuidGenerator());
 
                     // Method under test 
                     var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;

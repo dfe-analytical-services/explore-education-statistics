@@ -5,6 +5,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
@@ -17,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterService : IImporterService
     {
+        private readonly IGuidGenerator _guidGenerator;
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
@@ -99,10 +101,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         };
         
         public ImporterService(
+            IGuidGenerator guidGenerator,
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService)
         {
+            _guidGenerator = guidGenerator;
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
@@ -231,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             SubjectMeta subjectMeta,
             int csvRowNum)
         {
-            var observationId = Guid.NewGuid();
+            var observationId = _guidGenerator.NewGuid();
 
             return new Observation
             {
