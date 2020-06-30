@@ -2056,7 +2056,7 @@
                         "type": "Copy",
                         "dependsOn": [
                             {
-                                "activity": "Copy_Locations",
+                                "activity": "Disable_Observation_Constraints",
                                 "dependencyConditions": [
                                     "Succeeded"
                                 ]
@@ -2396,6 +2396,60 @@
                                     "type": "Expression"
                                 }
                             }
+                        }
+                    },
+                    {
+                        "name": "Disable_Observation_Constraints",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_Locations",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[dbo].[DisableObservationConstraints]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "ls_sql_public_statistics",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "Enable_Observation_Constraints",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "Copy_ObservationFilterItems",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[dbo].[EnableObservationConstraints]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "ls_sql_public_statistics",
+                            "type": "LinkedServiceReference"
                         }
                     }
                 ],
