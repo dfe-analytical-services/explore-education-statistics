@@ -5,6 +5,8 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
+import FormTextArea from '@common/components/form/FormTextArea';
+import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
 import React, { ChangeEvent, useCallback, useMemo } from 'react';
 
@@ -15,6 +17,7 @@ export interface FormEditorProps {
   hint?: string;
   id: string;
   label: string;
+  name: string;
   toolbarConfig?: string[];
   value: string;
   onChange: (content: string) => void;
@@ -47,6 +50,7 @@ const FormEditor = ({
   hint,
   id,
   label,
+  name,
   toolbarConfig = toolbarConfigs.full,
   value,
   onChange,
@@ -98,6 +102,10 @@ const FormEditor = ({
     },
     [],
   );
+
+  if (isBrowser('IE')) {
+    return <FormTextArea id={id} name={name} label={label} disabled />;
+  }
 
   return (
     <>

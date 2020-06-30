@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
 import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
+import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
 import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
@@ -81,14 +82,14 @@ const ManageReleasePageContainer = ({
         <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
-              <h1 className="govuk-heading-xl">
-                <span className="govuk-caption-xl">
-                  {releasePublicationStatus.amendment
+              <PageTitle
+                title={publication.title}
+                caption={
+                  releasePublicationStatus.amendment
                     ? 'Amend release'
-                    : 'Edit release'}
-                </span>
-                {publication.title}
-              </h1>
+                    : 'Edit release'
+                }
+              />
             </div>
 
             <div className="govuk-grid-column-one-third">

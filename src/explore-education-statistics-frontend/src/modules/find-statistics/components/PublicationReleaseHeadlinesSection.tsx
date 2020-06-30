@@ -2,10 +2,11 @@ import TabsSection from '@common/components/TabsSection';
 import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
-import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
+import KeyStatTile, {
+  KeyStatTileColumn,
+  KeyStatTileContainer,
+} from '@common/modules/find-statistics/components/KeyStatTile';
 import { Release } from '@common/services/publicationService';
-import { DataBlock } from '@common/services/types/blocks';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
@@ -33,17 +34,26 @@ const PublicationReleaseHeadlinesSection = ({
       dataBlock={keyStatisticsSecondarySection.content?.[0]}
       firstTabs={
         <TabsSection title="Summary">
-          <div className={styles.keyStatsContainer}>
-            {keyStatisticsSection.content.map(keyStat => {
-              if (keyStat.type !== 'DataBlock') {
+          <KeyStatTileContainer>
+            {keyStatisticsSection.content.map(block => {
+              if (block.type !== 'DataBlock') {
                 return null;
               }
 
-              const block = keyStat as DataBlock;
-
-              return <KeyStatTile releaseId={id} key={block.id} {...block} />;
+              return (
+                <KeyStatTileColumn key={block.id}>
+                  <KeyStatTile
+                    releaseId={id}
+                    query={block.dataBlockRequest}
+                    summary={block.summary}
+                    queryOptions={{
+                      expiresIn: 60 * 60 * 24,
+                    }}
+                  />
+                </KeyStatTileColumn>
+              );
             })}
-          </div>
+          </KeyStatTileContainer>
 
           {orderBy(headlinesSection.content, 'order').map(block => (
             <ContentBlockRenderer key={block.id} block={block} />

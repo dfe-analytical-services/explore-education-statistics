@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
 import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
+import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import methodologyRoutes, {
   MethodologyRouteParams,
@@ -67,10 +68,7 @@ const MethodologyPage = ({
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
-                <h1 className="govuk-heading-xl">
-                  <span className="govuk-caption-xl">Edit methodology</span>
-                  {value?.title}
-                </h1>
+                <PageTitle title={value.title} caption="Edit methodology" />
               </div>
 
               <div className="govuk-grid-column-one-third">

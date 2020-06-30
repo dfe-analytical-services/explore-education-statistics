@@ -10,12 +10,6 @@ beforeAll(() => {
     originalError.call(console, ...args);
   };
 
-  global.localStorage = {
-    clear: jest.fn(),
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-  };
-
   Element.prototype.scrollIntoView = jest.fn();
 
   window.scroll = jest.fn();
@@ -25,6 +19,14 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
+  // eslint-disable-next-line no-underscore-dangle
+  window._localStorage = {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+  };
+
   window.matchMedia = jest.fn(() => {
     return {
       addListener: jest.fn(),

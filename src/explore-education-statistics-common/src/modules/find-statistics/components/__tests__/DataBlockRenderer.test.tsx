@@ -20,7 +20,9 @@ import {
 } from '@common/services/types/blocks';
 import { waitFor, screen } from '@testing-library/dom';
 import { render } from '@testing-library/react';
+import { AxiosError } from 'axios';
 import React from 'react';
+import { forceVisible } from 'react-lazyload';
 import DataBlockRenderer from '../DataBlockRenderer';
 
 jest.mock('@common/services/tableBuilderService');
@@ -60,6 +62,85 @@ describe('DataBlockRenderer', () => {
     tables: [],
   };
 
+  test('renders error message if table response is error', async () => {
+    tableBuilderService.getTableData.mockImplementation(() =>
+      // eslint-disable-next-line prefer-promise-reject-errors
+      Promise.reject({
+        isAxiosError: true,
+        message: 'Something went wrong',
+        response: {
+          status: 500,
+        },
+      } as AxiosError),
+    );
+
+    render(
+      <DataBlockRenderer
+        releaseId="test-release-id"
+        id="test-datablock"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [testChartConfiguration],
+        }}
+      />,
+    );
+
+    forceVisible();
+
+    await waitFor(() => {
+      expect(tableBuilderService.getTableData).toBeCalledWith(
+        {
+          ...testDataBlock.dataBlockRequest,
+          includeGeoJson: false,
+        } as TableDataQuery,
+        'test-release-id',
+      );
+
+      expect(screen.getByText('Could not load content')).toBeInTheDocument();
+    });
+  });
+
+  test('renders nothing if table response is 403', async () => {
+    tableBuilderService.getTableData.mockImplementation(() =>
+      // eslint-disable-next-line prefer-promise-reject-errors
+      Promise.reject({
+        isAxiosError: true,
+        message: 'Forbidden',
+        response: {
+          status: 403,
+        },
+      } as AxiosError),
+    );
+
+    render(
+      <DataBlockRenderer
+        releaseId="test-release-id"
+        id="test-datablock"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [testChartConfiguration],
+        }}
+      />,
+    );
+
+    forceVisible();
+
+    await waitFor(() => {
+      expect(tableBuilderService.getTableData).toBeCalledWith(
+        {
+          ...testDataBlock.dataBlockRequest,
+          includeGeoJson: false,
+        } as TableDataQuery,
+        'test-release-id',
+      );
+
+      expect(
+        screen.queryByText('Could not load content'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    });
+  });
+
   test('renders line chart', async () => {
     tableBuilderService.getTableData.mockImplementation(() =>
       Promise.resolve(testChartTableData),
@@ -76,6 +157,8 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
@@ -85,9 +168,7 @@ describe('DataBlockRenderer', () => {
         'test-release-id',
       );
 
-      expect(
-        container.querySelectorAll('section.govuk-tabs__panel'),
-      ).toHaveLength(1);
+      expect(screen.getAllByRole('tab')).toHaveLength(1);
 
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
     });
@@ -114,6 +195,8 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
@@ -123,10 +206,7 @@ describe('DataBlockRenderer', () => {
         'test-release-id',
       );
 
-      expect(
-        container.querySelectorAll('section.govuk-tabs__panel'),
-      ).toHaveLength(1);
-
+      expect(screen.getAllByRole('tab')).toHaveLength(1);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
     });
   });
@@ -154,6 +234,8 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
@@ -163,10 +245,7 @@ describe('DataBlockRenderer', () => {
         'test-release-id',
       );
 
-      expect(
-        container.querySelectorAll('section.govuk-tabs__panel'),
-      ).toHaveLength(1);
-
+      expect(screen.getAllByRole('tab')).toHaveLength(1);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
     });
   });
@@ -202,6 +281,8 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
@@ -235,6 +316,8 @@ describe('DataBlockRenderer', () => {
       />,
     );
 
+    forceVisible();
+
     await waitFor(() => {
       expect(getDataBlockForSubject).toBeCalledWith(
         {
@@ -263,6 +346,8 @@ describe('DataBlockRenderer', () => {
         }}
       />,
     );
+
+    forceVisible();
 
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
@@ -319,6 +404,8 @@ describe('DataBlockRenderer', () => {
         }}
       />,
     );
+
+    forceVisible();
 
     await waitFor(() => {
       expect(screen.getByRole('table')).toBeInTheDocument();
