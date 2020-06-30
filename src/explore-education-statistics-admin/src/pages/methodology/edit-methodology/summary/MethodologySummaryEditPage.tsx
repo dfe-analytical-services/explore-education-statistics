@@ -35,7 +35,9 @@ const MethodologySummaryEditPage = ({
               await methodologyService.updateMethodology(methodologyId, {
                 ...methodology,
                 title: values.title,
-                publishScheduled: formatISO(values.publishScheduled),
+                publishScheduled: formatISO(values.publishScheduled, {
+                  representation: 'date',
+                }),
                 contactId: values.contactId,
               });
 

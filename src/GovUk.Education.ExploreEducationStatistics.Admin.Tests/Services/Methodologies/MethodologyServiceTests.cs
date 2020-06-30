@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -10,7 +11,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.DateTimeExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var request = new CreateMethodologyRequest
             {
-                PublishScheduled = new DateTime(2020, 6, 1),
+                PublishScheduled = "2020-06-01",
                 Title = "Pupil absence statistics: methodology"
             };
 
@@ -35,15 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         new PersistenceHelper<ContentDbContext>(context))
                     .CreateMethodologyAsync(request)).Right;
 
-                var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
-                var publishScheduledStartOfDay = new DateTime(2020, 6, 1, 0, 0, 0, DateTimeKind.Unspecified);
-                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay,
-                    gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
-                var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
+                var publishScheduled = new DateTime(2020, 6, 1, 0, 0, 0, DateTimeKind.Unspecified);
 
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
-                Assert.Equal(publishScheduledStartOfDayUtc, viewModel.PublishScheduled);
+                Assert.Equal(publishScheduled, viewModel.PublishScheduled);
                 Assert.Equal(Draft, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
             }
@@ -54,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var request = new CreateMethodologyRequest
             {
-                PublishScheduled = new DateTime(2020, 6, 1),
+                PublishScheduled = "2020-06-01",
                 Title = "Pupil absence statistics: methodology"
             };
 
@@ -137,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Id = Guid.NewGuid(),
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
-                PublishScheduled = new DateTime(2020, 6, 1),
+                PublishScheduled = new DateTime(2020, 6, 1, 0, 0, 0).AsStartOfDayUtc(),
                 Slug = "pupil-absence-statistics-methodology",
                 Status = Approved,
                 Title = "Pupil absence statistics: methodology"
@@ -161,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
                 Assert.Equal(methodology.Published, viewModel.Published);
-                Assert.Equal(methodology.PublishScheduled, viewModel.PublishScheduled);
+                Assert.Equal(new DateTime(2020, 6, 1, 0, 0, 0), viewModel.PublishScheduled);
                 Assert.Equal(methodology.Status, viewModel.Status);
                 Assert.Equal(methodology.Title, viewModel.Title);
             }
@@ -184,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var request = new UpdateMethodologyRequest
             {
                 InternalReleaseNote = null,
-                PublishScheduled = new DateTime(2020, 7, 1),
+                PublishScheduled = "2020-07-01",
                 Status = Draft,
                 Title = "Pupil absence statistics (updated): methodology"
             };
@@ -203,19 +199,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         MockUtils.AlwaysTrueUserService().Object,
                         new PersistenceHelper<ContentDbContext>(context))
                     .UpdateMethodologyAsync(methodology.Id, request)).Right;
-
-                var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
-                var publishScheduledStartOfDay = new DateTime(2020, 7, 1, 0, 0, 0, DateTimeKind.Unspecified);
-                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay,
-                    gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
-                var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
+                
+                var publishScheduled = new DateTime(2020, 7, 1, 0, 0, 0, DateTimeKind.Unspecified);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 // TODO EES-331 is this correct?
                 // Original release note is not cleared if the update is not altering it
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
                 Assert.Equal(methodology.Published, viewModel.Published);
-                Assert.Equal(publishScheduledStartOfDayUtc, viewModel.PublishScheduled);
+                Assert.Equal(publishScheduled, viewModel.PublishScheduled);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
             }
@@ -249,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var request = new UpdateMethodologyRequest
             {
                 InternalReleaseNote = null,
-                PublishScheduled = new DateTime(2020, 6, 1),
+                PublishScheduled = "2020-06-01",
                 Status = Draft,
                 Title = "Pupil exclusion statistics: methodology"
             };

@@ -33,7 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title))
                 .ForMember(dest => dest.PublicationId,
-                    m => m.MapFrom(r => r.Publication.Id));
+                    m => m.MapFrom(r => r.Publication.Id))
+                .ForMember(model => model.PublishScheduled,
+                    m => m.MapFrom(model =>
+                        model.PublishScheduled.HasValue
+                            ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                            : (DateTime?) null));
 
             CreateMap<Release, MyReleaseViewModel>()
                 .ForMember(
@@ -45,20 +50,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Title))
                 .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
+                .ForMember(model => model.PublishScheduled,
+                    m => m.MapFrom(model =>
+                        model.PublishScheduled.HasValue
+                            ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                            : (DateTime?) null))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
 
-            CreateMap<Release, ReleaseSummaryViewModel>();
-
-            CreateMap<ReleaseSummaryViewModel, Release>();
+            CreateMap<Release, ReleaseSummaryViewModel>()
+                .ForMember(model => model.PublishScheduled,
+                    m => m.MapFrom(model =>
+                        model.PublishScheduled.HasValue
+                            ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                            : (DateTime?) null));
 
             CreateMap<CreateReleaseViewModel, Release>()
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
-                    model.PublishScheduled.HasValue ? model.PublishScheduled.Value.AsStartOfDayUtc() : (DateTime?) null));
+                    model.PublishScheduledDate));
 
             CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
-            CreateMap<Methodology, MethodologySummaryViewModel>();
+            CreateMap<Methodology, MethodologySummaryViewModel>().ForMember(model => model.PublishScheduled,
+                m => m.MapFrom(model =>
+                    model.PublishScheduled.HasValue
+                        ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                        : (DateTime?) null));
+
             CreateMap<Methodology, MethodologyTitleViewModel>();
             CreateMap<Methodology, MethodologyPublicationsViewModel>();
 
@@ -153,7 +171,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
                 .ForMember(dest => dest.CoverageTitle,
-                    m => m.MapFrom(r => r.TimePeriodCoverage.GetEnumLabel()));
+                    m => m.MapFrom(r => r.TimePeriodCoverage.GetEnumLabel()))
+                .ForMember(model => model.PublishScheduled,
+                    m => m.MapFrom(model =>
+                        model.PublishScheduled.HasValue
+                            ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                            : (DateTime?) null));
 
             CreateMap<Update, ReleaseNoteViewModel>();
 

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -19,7 +20,6 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.DateTimeExtensions;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -50,26 +50,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context, mocks);
 
-                var publishScheduled = new DateTime(2050, 6, 30, 14, 0, 0);
-
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publication.Id,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = publishScheduled,
+                        PublishScheduled = "2050-06-30",
                         TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                     });
 
-                var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
-                var publishScheduledStartOfDay = new DateTime(2050, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
-                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
-                var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
-                
+                var publishScheduled = new DateTime(2050, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
+
                 Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
                 Assert.Null(result.Result.Right.Published);
-                Assert.Equal(publishScheduledStartOfDayUtc, result.Result.Right.PublishScheduled);
+                Assert.Equal(publishScheduled, result.Result.Right.PublishScheduled);
                 Assert.False(result.Result.Right.LatestRelease); // Most recent - but not published yet.
                 Assert.Equal(TimeIdentifier.AcademicYear, result.Result.Right.TimePeriodCoverage);
             }
@@ -192,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TemplateReleaseId = templateReleaseId,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = DateTime.Parse("2050/01/01"),
+                        PublishScheduled = "2050-01-01",
                         TypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
                     });
 
@@ -323,8 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
                 context.SaveChanges();
             }
-            
-            var publishScheduledEdited = new DateTime(2051, 6, 30, 14, 0, 0);
+
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var typeEdited = officialStatisticsReleaseType;
             const string releaseNameEdited = "2035";
@@ -338,19 +332,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         releaseId,
                         new UpdateReleaseSummaryRequest
                         {
-                            PublishScheduled = publishScheduledEdited,
+                            PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             TypeId = typeEdited.Id,
                             ReleaseName = releaseNameEdited,
                             TimePeriodCoverage = timePeriodCoverageEdited
                         });
 
-                var gmtStandardTimeTimezone = GetGmtStandardTimeTimezone();
-                var publishScheduledStartOfDay = new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
-                var publishScheduledStartOfDayGmtOffset = new DateTimeOffset(publishScheduledStartOfDay, gmtStandardTimeTimezone.GetUtcOffset(publishScheduledStartOfDay));
-                var publishScheduledStartOfDayUtc = publishScheduledStartOfDayGmtOffset.UtcDateTime;
-                
-                Assert.Equal(publishScheduledStartOfDayUtc, edited.Right.PublishScheduled);
+                var publishScheduled = new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
+
+                Assert.Equal(publishScheduled, edited.Right.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, edited.Right.NextReleaseDate);
                 Assert.Equal(typeEdited, edited.Right.Type);
                 Assert.Equal(releaseNameEdited, edited.Right.ReleaseName);
@@ -369,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2"),
                 Title = "Ad Hoc"
             };
-            var publishScheduled = DateTime.Now.AddDays(1);
+            var publishScheduled = new DateTime(2020, 6, 29, 0, 0, 0).AsStartOfDayUtc();
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             const string releaseName = "2035";
             const TimeIdentifier timePeriodCoverage = TimeIdentifier.January;
@@ -410,7 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var summaryResult = await releaseService.GetReleaseSummaryAsync(releaseId);
                 var summary = summaryResult.Right;
                 
-                Assert.Equal(publishScheduled, summary.PublishScheduled);
+                Assert.Equal(new DateTime(2020, 6, 29, 0, 0, 0), summary.PublishScheduled);
                 Assert.Equal(nextReleaseDate, summary.NextReleaseDate);
                 Assert.Equal(adhocReleaseType, summary.Type);
                 Assert.Equal(releaseName, summary.ReleaseName);

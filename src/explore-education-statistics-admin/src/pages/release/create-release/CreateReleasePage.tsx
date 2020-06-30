@@ -6,11 +6,11 @@ import ReleaseSummaryForm, {
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import appRouteList from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import { IdTitlePair } from '@admin/services/types/common';
 import publicationService from '@admin/services/publicationService';
 import releaseService, {
   CreateReleaseRequest,
 } from '@admin/services/releaseService';
+import { IdTitlePair } from '@admin/services/types/common';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import {
   errorCodeAndFieldNameToFieldError,
@@ -19,6 +19,7 @@ import {
 import RelatedInformation from '@common/components/RelatedInformation';
 import { Publication } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
+import { formatISO } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
@@ -75,7 +76,9 @@ const CreateReleasePage = ({
         value: values.timePeriodCoverageCode,
       },
       releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
-      publishScheduled: values.scheduledPublishDate,
+      publishScheduled: formatISO(values.scheduledPublishDate, {
+        representation: 'date',
+      }),
       nextReleaseDate: values.nextReleaseDate,
       typeId: values.releaseTypeId,
       publicationId,

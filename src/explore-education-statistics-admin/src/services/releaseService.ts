@@ -92,7 +92,7 @@ interface BaseReleaseSummaryRequest {
   };
   releaseName: number;
   typeId: string;
-  publishScheduled: Date;
+  publishScheduled: string;
   nextReleaseDate?: DayMonthYear;
 }
 

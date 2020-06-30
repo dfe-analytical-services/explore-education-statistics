@@ -28,7 +28,9 @@ const MethodologyCreatePage = ({ history }: RouteComponentProps) => {
           const createdMethodology = await methodologyService.createMethodology(
             {
               title: values.title,
-              publishScheduled: formatISO(values.publishScheduled),
+              publishScheduled: formatISO(values.publishScheduled, {
+                representation: 'date',
+              }),
               contactId: values.contactId,
             },
           );
