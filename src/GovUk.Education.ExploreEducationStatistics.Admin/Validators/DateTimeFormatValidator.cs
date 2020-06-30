@@ -21,6 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+            if (value == null) {
+                return ValidationResult.Success;
+            }
+
             return DateTime.TryParseExact((string) value, "yyyy-MM-dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.None, out _)
                 ? ValidationResult.Success
