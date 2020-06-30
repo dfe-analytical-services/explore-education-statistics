@@ -132,39 +132,37 @@ const ReleaseStatusPage = () => {
 
   return (
     <>
-      <h2>Release status</h2>
-
       {!showForm ? (
         <>
-          <div className="govuk-!-margin-bottom-6">
-            <SummaryList>
-              <SummaryListItem term="Current status">
-                <StatusBlock
-                  text={statusMap[summary.status]}
-                  id={`CurrentReleaseStatus-${statusMap[summary.status]}`}
-                />
+          <h2>Release status</h2>
+
+          <SummaryList>
+            <SummaryListItem term="Current status">
+              <StatusBlock
+                text={statusMap[summary.status]}
+                id={`CurrentReleaseStatus-${statusMap[summary.status]}`}
+              />
+            </SummaryListItem>
+            {summary.status === 'Approved' && (
+              <SummaryListItem term="Release process status">
+                <ReleaseServiceStatus releaseId={releaseId} />
               </SummaryListItem>
-              {summary.status === 'Approved' && (
-                <SummaryListItem term="Release process status">
-                  <ReleaseServiceStatus releaseId={releaseId} />
-                </SummaryListItem>
+            )}
+            <SummaryListItem term="Scheduled release">
+              {summary.publishScheduled ? (
+                <FormattedDate>{summary.publishScheduled}</FormattedDate>
+              ) : (
+                'Not scheduled'
               )}
-              <SummaryListItem term="Scheduled release">
-                {summary.publishScheduled ? (
-                  <FormattedDate>{summary.publishScheduled}</FormattedDate>
-                ) : (
-                  'Not scheduled'
-                )}
-              </SummaryListItem>
-              <SummaryListItem term="Next release expected">
-                {isValidPartialDate(summary.nextReleaseDate) ? (
-                  <time>{formatPartialDate(summary.nextReleaseDate)}</time>
-                ) : (
-                  'Not set'
-                )}
-              </SummaryListItem>
-            </SummaryList>
-          </div>
+            </SummaryListItem>
+            <SummaryListItem term="Next release expected">
+              {isValidPartialDate(summary.nextReleaseDate) ? (
+                <time>{formatPartialDate(summary.nextReleaseDate)}</time>
+              ) : (
+                'Not set'
+              )}
+            </SummaryListItem>
+          </SummaryList>
 
           {isEditable && (
             <Button
@@ -241,6 +239,8 @@ const ReleaseStatusPage = () => {
           {form => {
             return (
               <Form id={formId}>
+                <h2>Edit release status</h2>
+
                 <FormFieldRadioGroup<FormValues>
                   legend="Status"
                   name="status"
