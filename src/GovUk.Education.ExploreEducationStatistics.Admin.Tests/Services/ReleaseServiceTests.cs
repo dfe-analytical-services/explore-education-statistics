@@ -718,17 +718,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock<IImportStatusService> importStatusService,
                 Mock<IFootnoteService> footnoteService,
                 Mock<StatisticsDbContext> statisticsDbContext,
-                Mock<IDataBlockService> dataBlockService) mocks)
+                Mock<IDataBlockService> dataBlockService,
+                Mock<IReleaseSubjectService> releaseSubjectService) mocks)
         {
             var (userService, publishingService, releaseRepository, subjectService,
                 tableStorageService, fileStorageService, importStatusService, footnoteService, statisticsDbContext,
-                dataBlockService) = mocks;
+                dataBlockService, releaseSubjectService) = mocks;
 
             return new ReleaseService(
                 context, AdminMapper(), publishingService.Object, new PersistenceHelper<ContentDbContext>(context),
                 userService.Object, releaseRepository.Object, subjectService.Object, tableStorageService.Object,
                 fileStorageService.Object, importStatusService.Object, footnoteService.Object,
-                statisticsDbContext.Object, dataBlockService.Object, new SequentialGuidGenerator());
+                statisticsDbContext.Object, dataBlockService.Object, releaseSubjectService.Object, new SequentialGuidGenerator());
         }
 
         private (Mock<IUserService> UserService,
@@ -740,7 +741,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IImportStatusService> ImportStatusService,
             Mock<IFootnoteService> FootnoteService,
             Mock<StatisticsDbContext> StatisticsDbContext,
-            Mock<IDataBlockService> DataBlockService) Mocks()
+            Mock<IDataBlockService> DataBlockService,
+            Mock<IReleaseSubjectService> ReleaseSubjectService) Mocks()
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
@@ -758,7 +760,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
                 new Mock<StatisticsDbContext>(),
-                new Mock<IDataBlockService>());
+                new Mock<IDataBlockService>(),
+                new Mock<IReleaseSubjectService>());
         }
     }
 }

@@ -2070,7 +2070,6 @@
                             },
                             "sink": {
                                 "type": "AzureSqlSink",
-                                "writeBatchSize": 100,
                                 "disableMetricsCollection": false
                             },
                             "enableStaging": false,
@@ -2228,7 +2227,6 @@
                             },
                             "sink": {
                                 "type": "AzureSqlSink",
-                                "writeBatchSize": 100,
                                 "disableMetricsCollection": false
                             },
                             "enableStaging": false,
