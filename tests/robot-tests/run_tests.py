@@ -179,7 +179,7 @@ if args.tests and "general_public" not in args.tests:
                 clear_existing=clear_existing
             )
 
-        # Don't need analyst user if running admin/bau tests
+        # Don't need analyst user if running admin/bau or admin_and_public/bau tests
         if f"{os.sep}bau" not in args.tests:
             authenticate_user(
                 user='ANALYST',

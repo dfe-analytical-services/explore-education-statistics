@@ -36,7 +36,7 @@ const FilterGroupDetails = ({
 
   return (
     <Details
-      summary={`${summary} ${groupIsSelected ? '(All)' : ''}`}
+      summary={`${summary}${groupIsSelected ? ' (All)' : ''}`}
       className="govuk-!-margin-bottom-2"
     >
       {selectAll && groupId && (

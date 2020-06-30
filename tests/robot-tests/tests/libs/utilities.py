@@ -196,7 +196,7 @@ def user_checks_radio_is_checked(radio_label):
 
 
 def user_clicks_checkbox(checkbox_label):
-    sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}"]').click()
+    sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]').click()
 
 
 def capture_large_screenshot():
