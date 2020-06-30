@@ -36,14 +36,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
             }
             
-            var saved = _context.Topics.Add(new Topic
+            var saved = await _context.Topics.AddAsync(new Topic
             {
-                Id = Guid.NewGuid(),
                 Title = topic.Title,
                 Slug = topic.Slug,
                 Description = topic.Description,
                 ThemeId = themeId,
-                Summary = topic.Summary,
+                Summary = topic.Summary
             });
             await _context.SaveChangesAsync();
             return await GetViewModelAsync(saved.Entity.Id);

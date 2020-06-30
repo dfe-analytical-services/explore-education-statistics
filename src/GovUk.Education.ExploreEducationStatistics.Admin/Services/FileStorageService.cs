@@ -324,18 +324,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var fileLink = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 ReleaseId = releaseId,
                 ReleaseFileReference = new ReleaseFileReference
                 {
-                    Id = Guid.NewGuid(),
                     ReleaseId = releaseId,
                     Filename = filename,
                     ReleaseFileType = type
                 }
             };
 
-            _context.ReleaseFiles.Add(fileLink);
+            await _context.ReleaseFiles.AddAsync(fileLink);
             await _context.SaveChangesAsync();
             return true;
         }
