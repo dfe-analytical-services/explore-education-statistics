@@ -264,21 +264,29 @@ user clicks button
   user waits until element is enabled  xpath://button[text()="${text}"]
   click button  ${text}
 
+user waits until page contains button
+  [Arguments]  ${text}
+  user waits until page contains element  xpath://button[text()="${text}"]
+
+user checks page does not contain button
+  [Arguments]  ${text}
+  user checks page does not contain element  xpath://button[text()="${text}"]
+
 user checks page contains tag
   [Arguments]   ${text}
   user checks page contains element  xpath://span[contains(@class, "govuk-tag")][text()="${text}"]
 
-user checks page contains heading 1
+user waits until page contains heading 1
   [Arguments]   ${text}
-  user checks page contains element  xpath://h1[text()="${text}"]
+  user waits until page contains element  xpath://h1[text()="${text}"]
 
-user checks page contains heading 2
+user waits until page contains heading 2
   [Arguments]   ${text}
-  user checks page contains element  xpath://h2[text()="${text}"]
+  user waits until page contains element  xpath://h2[text()="${text}"]
 
-user checks page contains heading 3
+user waits until page contains heading 3
   [Arguments]   ${text}
-  user checks page contains element  xpath://h3[text()="${text}"]
+  user waits until page contains element  xpath://h3[text()="${text}"]
 
 user selects newly opened window
   select window   NEW
@@ -299,7 +307,8 @@ user selects from list by label
 
 user clears element text
   [Arguments]   ${locator}
-  clear element text   ${locator}
+  press keys  ${locator}  CTRL+a
+  press keys  ${locator}  BACKSPACE
 
 user presses keys
   [Arguments]   ${keys}
@@ -309,6 +318,7 @@ user presses keys
 user enters text into element
   [Arguments]   ${selector}   ${text}
   user clicks element   ${selector}
+  user clears element text  ${selector}
   user presses keys     ${text}
 
 user checks element count is x

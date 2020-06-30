@@ -75,7 +75,7 @@ Validate download files
 
 Use Create tables button
     [Tags]  HappyPath
-    user checks page contains heading 2  Create your own tables online
+    user waits until page contains heading 2  Create your own tables online
     user clicks link    Create tables
 
     user waits until page contains heading  Create your own tables online
