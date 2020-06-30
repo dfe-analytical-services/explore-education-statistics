@@ -72,6 +72,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(builder =>
+            {
+                builder.AddApplicationInsights(Configuration.GetSection("AppInsights").GetValue<string>("InstrumentationKey"));
+                builder.AddFilter<ApplicationInsightsLoggerProvider>("", HostingEnvironment.IsDevelopment() ? LogLevel.Debug : LogLevel.Information);
+                builder.AddFilter<ApplicationInsightsLoggerProvider>("Microsoft", LogLevel.Information);
+            });
+            services.AddApplicationInsightsTelemetry();
+            
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -197,13 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
-            services.AddLogging(builder =>
-            {
-                builder.AddApplicationInsights(Configuration.GetSection("AppInsights").GetValue<string>("InstrumentationKey"));
-                builder.AddFilter<ApplicationInsightsLoggerProvider>("", HostingEnvironment.IsDevelopment() ? LogLevel.Debug : LogLevel.Warning);
-                builder.AddFilter<ApplicationInsightsLoggerProvider>("Microsoft", LogLevel.Error);
-            });
-            services.AddApplicationInsightsTelemetry();
+
 
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IImportService, ImportService>();
@@ -281,6 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
+            services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
 

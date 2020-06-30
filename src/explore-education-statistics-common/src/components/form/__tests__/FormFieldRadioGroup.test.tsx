@@ -1,4 +1,3 @@
-import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import Yup from '@common/validation/yup';
 import { waitFor } from '@testing-library/dom';
 import { fireEvent, render, screen } from '@testing-library/react';

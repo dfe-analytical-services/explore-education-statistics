@@ -72,7 +72,7 @@ Validate Analyst1 cannot see data blocks
 Validate Analyst1 can see Manage content page
     [Tags]  HappyPath
     user clicks element  link:Manage content
-    user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]    120
+    user waits until page contains element   xpath://h2[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]    120
 
 Validate Manage content page is in Edit mode
     [Tags]  HappyPath   Failing
@@ -83,6 +83,7 @@ Validate Manage content page is in Edit mode
 Validate Analyst1 can see 'Manage content' page key stats
     [Tags]  HappyPath
     [Documentation]   EES-1508
+    user scrolls to element  id:releaseHeadlines
     user waits until page contains key stat tile   Overall absence rate        4.7%    60
     user waits until page contains key stat tile   Authorised absence rate     3.4%
     user waits until page contains key stat tile   Unauthorised absence rate   1.3%

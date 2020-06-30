@@ -97,7 +97,7 @@ User validates permanent link works correctly
     user waits until page contains heading  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
 
 User validates permalink contains correct date
-    ${date}=  get datetime  %-d %B %Y
+    ${date}=  get datetime  %d %B %Y
     user checks page contains element   xpath://*[@data-testid="created-date"]//time[text()="${date}"]
 
 User validates permalink table headers

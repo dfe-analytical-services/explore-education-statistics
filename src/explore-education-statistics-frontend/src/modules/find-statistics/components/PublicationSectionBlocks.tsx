@@ -3,8 +3,8 @@ import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';
 import { Release } from '@common/services/publicationService';
-import React from 'react';
 import ButtonLink from '@frontend/components/ButtonLink';
+import React from 'react';
 
 export interface PublicationSectionBlocksProps extends SectionBlocksProps {
   release: Release;
@@ -19,6 +19,9 @@ const PublicationSectionBlocks = ({
   return (
     <SectionBlocks
       {...props}
+      queryOptions={{
+        expiresIn: 60 * 60 * 24,
+      }}
       getInfographic={getChartFile}
       additionalTabContent={
         <div className="dfe-print-hidden">

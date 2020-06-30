@@ -15,10 +15,10 @@ import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import React, { useCallback, useMemo } from 'react';
+import { CommentsChangeHandler } from './components/Comments';
 import RelatedInformationSection from './components/RelatedInformationSection';
 import ReleaseHeadlines from './components/ReleaseHeadlines';
 import ReleaseNotesSection from './components/ReleaseNotesSection';
-import { CommentsChangeHandler } from './components/Comments';
 
 const PublicationReleaseContent = () => {
   const { value: config } = useConfig();
@@ -95,10 +95,10 @@ const PublicationReleaseContent = () => {
 
   return (
     <>
-      <h1 className="govuk-heading-l dfe-print-break-before">
+      <h2 className="govuk-heading-l dfe-print-break-before">
         <span className="govuk-caption-l">{release.title}</span>
         {release.publication.title}
-      </h1>
+      </h2>
 
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">

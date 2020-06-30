@@ -99,7 +99,7 @@ const TableToolWizard = ({
     },
   );
 
-  const { value: subjects = [], setValue: setSubjects } = useAsyncRetry<
+  const { value: subjects = [], setState: setSubjects } = useAsyncRetry<
     PublicationSubject[]
   >(async () => {
     if (releaseId) {
@@ -126,7 +126,10 @@ const TableToolWizard = ({
       subjects: publicationSubjects,
     } = await tableBuilderService.getPublicationMeta(selectedPublicationId);
 
-    setSubjects(publicationSubjects);
+    setSubjects({
+      isLoading: false,
+      value: publicationSubjects,
+    });
     setPublication(selectedPublication);
   };
 

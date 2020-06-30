@@ -57,7 +57,7 @@ const ReleaseManageDataBlocksPageTabs = ({
 
   const {
     value: tableState,
-    setValue: setTableState,
+    setState: setTableState,
     error,
     isLoading,
   } = useAsyncRetry<TableState | undefined>(async () => {
@@ -102,8 +102,11 @@ const ReleaseManageDataBlocksPageTabs = ({
       }
 
       setTableState({
-        ...tableState,
-        ...nextTableState,
+        isLoading: false,
+        value: {
+          ...tableState,
+          ...nextTableState,
+        },
       });
     },
     [setTableState, tableState],
@@ -154,9 +157,12 @@ const ReleaseManageDataBlocksPageTabs = ({
       });
 
       setTableState({
-        query,
-        table,
-        tableHeaders,
+        isLoading: false,
+        value: {
+          query,
+          table,
+          tableHeaders,
+        },
       });
 
       await handleDataBlockSave({

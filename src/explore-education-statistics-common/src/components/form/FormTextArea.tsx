@@ -12,6 +12,7 @@ import ErrorMessage from '../ErrorMessage';
 
 export interface FormTextAreaProps extends FormLabelProps {
   className?: string;
+  disabled?: boolean;
   error?: ReactNode | string;
   hint?: string;
   id: string;
@@ -27,6 +28,7 @@ export interface FormTextAreaProps extends FormLabelProps {
 
 const FormTextArea = ({
   className,
+  disabled,
   error,
   hint,
   id,
@@ -62,6 +64,7 @@ const FormTextArea = ({
           'govuk-js-character-count govuk-textarea--error':
             maxLength && (value?.length ?? 0) > maxLength,
         })}
+        disabled={disabled}
         id={id}
         rows={rows}
         value={value}

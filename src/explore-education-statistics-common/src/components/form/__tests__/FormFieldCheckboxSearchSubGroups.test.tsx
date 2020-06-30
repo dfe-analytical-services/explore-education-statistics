@@ -1,5 +1,6 @@
 import Yup from '@common/validation/yup';
-import { fireEvent, render, wait } from '@testing-library/react';
+import { waitFor } from '@testing-library/dom';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Formik } from 'formik';
 import React from 'react';
 import FormFieldCheckboxSearchSubGroups from '../FormFieldCheckboxSearchSubGroups';
@@ -9,8 +10,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     test: string[];
   }
 
-  test('checking option checks it', async () => {
-    const { getByLabelText } = render(
+  test('checking option checks it', () => {
+    render(
       <Formik
         initialValues={{
           test: [],
@@ -43,19 +44,17 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       </Formik>,
     );
 
-    const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
 
     expect(checkbox.checked).toBe(false);
 
     fireEvent.click(checkbox);
 
-    await wait();
-
     expect(checkbox.checked).toBe(true);
   });
 
-  test('un-checking option un-checks it', async () => {
-    const { getByLabelText } = render(
+  test('un-checking option un-checks it', () => {
+    render(
       <Formik
         initialValues={{
           test: ['1'],
@@ -88,19 +87,17 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       </Formik>,
     );
 
-    const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
 
     expect(checkbox.checked).toBe(true);
 
     fireEvent.click(checkbox);
 
-    await wait();
-
     expect(checkbox.checked).toBe(false);
   });
 
-  test('clicking `Select all options` button checks all values for that group', () => {
-    const { getByLabelText, getByText } = render(
+  test('clicking `Select all options` button checks all values for all groups', () => {
+    render(
       <Formik
         initialValues={{
           test: [],
@@ -115,110 +112,51 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             options={[
               {
                 legend: 'Group A',
-                options: [
-                  { value: '1', label: 'Checkbox 1' },
-                  { value: '2', label: 'Checkbox 2' },
-                ],
+                options: [{ value: '1', label: 'Checkbox 1' }],
               },
               {
                 legend: 'Group B',
                 options: [
+                  { value: '2', label: 'Checkbox 2' },
                   { value: '3', label: 'Checkbox 3' },
-                  { value: '4', label: 'Checkbox 4' },
-                  { value: '5', label: 'Checkbox 5' },
                 ],
               },
             ]}
-            selectAll
           />
         )}
       </Formik>,
     );
 
-    const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
-    const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
-    const checkbox3 = getByLabelText('Checkbox 3') as HTMLInputElement;
-    const checkbox4 = getByLabelText('Checkbox 4') as HTMLInputElement;
-    const checkbox5 = getByLabelText('Checkbox 5') as HTMLInputElement;
+    const checkbox1 = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox2 = screen.getByLabelText('Checkbox 2') as HTMLInputElement;
+    const checkbox3 = screen.getByLabelText('Checkbox 3') as HTMLInputElement;
 
     expect(checkbox1.checked).toBe(false);
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(false);
-    expect(checkbox4.checked).toBe(false);
-    expect(checkbox5.checked).toBe(false);
 
-    fireEvent.click(getByText('Select all 2 options'));
-
-    expect(checkbox1.checked).toBe(true);
-    expect(checkbox2.checked).toBe(true);
-    expect(checkbox3.checked).toBe(false);
-    expect(checkbox4.checked).toBe(false);
-    expect(checkbox5.checked).toBe(false);
-  });
-
-  test('clicking all `Select all` buttons checks all values for every group', () => {
-    const { getByLabelText, getByText } = render(
-      <Formik
-        initialValues={{
-          test: [],
-        }}
-        onSubmit={() => undefined}
-      >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
-            name="test"
-            id="checkboxes"
-            legend="Test checkboxes"
-            options={[
-              {
-                legend: 'Group A',
-                options: [
-                  { value: '1', label: 'Checkbox 1' },
-                  { value: '2', label: 'Checkbox 2' },
-                  { value: '3', label: 'Checkbox 3' },
-                ],
-              },
-              {
-                legend: 'Group B',
-                options: [
-                  { value: '4', label: 'Checkbox 4' },
-                  { value: '5', label: 'Checkbox 5' },
-                ],
-              },
-            ]}
-            selectAll
-          />
-        )}
-      </Formik>,
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Select all 3 options',
+      }),
     );
-
-    const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
-    const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
-    const checkbox3 = getByLabelText('Checkbox 3') as HTMLInputElement;
-    const checkbox4 = getByLabelText('Checkbox 4') as HTMLInputElement;
-    const checkbox5 = getByLabelText('Checkbox 5') as HTMLInputElement;
-
-    expect(checkbox1.checked).toBe(false);
-    expect(checkbox2.checked).toBe(false);
-    expect(checkbox3.checked).toBe(false);
-    expect(checkbox4.checked).toBe(false);
-    expect(checkbox5.checked).toBe(false);
-
-    fireEvent.click(getByText('Select all 3 options'));
-    fireEvent.click(getByText('Select all 2 options'));
 
     expect(checkbox1.checked).toBe(true);
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
-    expect(checkbox4.checked).toBe(true);
-    expect(checkbox5.checked).toBe(true);
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Unselect all 3 options',
+      }),
+    ).toBeInTheDocument();
   });
 
-  test('clicking `Unselect all` option un-checks all values for that group', () => {
-    const { getByLabelText, getByText } = render(
+  test('clicking `Unselect all options` button un-checks all options for all groups', () => {
+    render(
       <Formik
         initialValues={{
-          test: ['1', '2'],
+          test: ['1', '2', '3'],
         }}
         onSubmit={() => undefined}
       >
@@ -227,21 +165,16 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
-            selectAll
             options={[
               {
                 legend: 'Group A',
-                options: [
-                  { value: '1', label: 'Checkbox 1' },
-                  { value: '2', label: 'Checkbox 2' },
-                ],
+                options: [{ value: '1', label: 'Checkbox 1' }],
               },
               {
                 legend: 'Group B',
                 options: [
+                  { value: '2', label: 'Checkbox 2' },
                   { value: '3', label: 'Checkbox 3' },
-                  { value: '4', label: 'Checkbox 4' },
-                  { value: '5', label: 'Checkbox 5' },
                 ],
               },
             ]}
@@ -250,29 +183,27 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       </Formik>,
     );
 
-    const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
-    const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
-    const checkbox3 = getByLabelText('Checkbox 3') as HTMLInputElement;
-    const checkbox4 = getByLabelText('Checkbox 4') as HTMLInputElement;
-    const checkbox5 = getByLabelText('Checkbox 5') as HTMLInputElement;
+    const checkbox1 = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox2 = screen.getByLabelText('Checkbox 2') as HTMLInputElement;
+    const checkbox3 = screen.getByLabelText('Checkbox 3') as HTMLInputElement;
 
     expect(checkbox1.checked).toBe(true);
     expect(checkbox2.checked).toBe(true);
-    expect(checkbox3.checked).toBe(false);
-    expect(checkbox4.checked).toBe(false);
-    expect(checkbox5.checked).toBe(false);
+    expect(checkbox3.checked).toBe(true);
 
-    fireEvent.click(getByText('Unselect all 2 options'));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Unselect all 3 options',
+      }),
+    );
 
     expect(checkbox1.checked).toBe(false);
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(false);
-    expect(checkbox4.checked).toBe(false);
-    expect(checkbox5.checked).toBe(false);
   });
 
-  test('checking all options for a group renders the corresponding `Unselect all options` button', async () => {
-    const { getByLabelText, queryByText } = render(
+  test('checking all checkboxes for all groups renders `Unselect all options` button', () => {
+    render(
       <Formik
         initialValues={{
           test: [],
@@ -284,21 +215,16 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
-            selectAll
             options={[
               {
                 legend: 'Group A',
-                options: [
-                  { value: '1', label: 'Checkbox 1' },
-                  { value: '2', label: 'Checkbox 2' },
-                ],
+                options: [{ value: '1', label: 'Checkbox 1' }],
               },
               {
                 legend: 'Group B',
                 options: [
+                  { value: '2', label: 'Checkbox 2' },
                   { value: '3', label: 'Checkbox 3' },
-                  { value: '4', label: 'Checkbox 4' },
-                  { value: '5', label: 'Checkbox 5' },
                 ],
               },
             ]}
@@ -307,32 +233,28 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       </Formik>,
     );
 
-    const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
-    const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
+    expect(
+      screen.queryByRole('button', {
+        name: 'Unselect all 3 options',
+      }),
+    ).not.toBeInTheDocument();
 
-    expect(checkbox1.checked).toBe(false);
-    expect(checkbox2.checked).toBe(false);
+    fireEvent.click(screen.getByLabelText('Checkbox 1'));
+    fireEvent.click(screen.getByLabelText('Checkbox 2'));
+    fireEvent.click(screen.getByLabelText('Checkbox 3'));
 
-    expect(queryByText('Select all 2 options')).not.toBeNull();
-    expect(queryByText('Unselect all 2 options')).toBeNull();
-
-    fireEvent.click(checkbox1);
-    fireEvent.click(checkbox2);
-
-    await wait();
-
-    expect(checkbox1.checked).toBe(true);
-    expect(checkbox2.checked).toBe(true);
-
-    expect(queryByText('Select all 2 options')).toBeNull();
-    expect(queryByText('Unselect all 2 options')).not.toBeNull();
+    expect(
+      screen.getByRole('button', {
+        name: 'Unselect all 3 options',
+      }),
+    ).toBeInTheDocument();
   });
 
-  test('un-checking any options renders the corresponding `Unselect all options` button', () => {
-    const { getByLabelText, queryByText } = render(
+  test('clicking `Select all subgroup options` button for a group checks all values for that group', () => {
+    render(
       <Formik
         initialValues={{
-          test: ['1', '2'],
+          test: [],
         }}
         onSubmit={() => undefined}
       >
@@ -341,21 +263,16 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
-            selectAll
             options={[
               {
                 legend: 'Group A',
-                options: [
-                  { value: '1', label: 'Checkbox 1' },
-                  { value: '2', label: 'Checkbox 2' },
-                ],
+                options: [{ value: '1', label: 'Checkbox 1' }],
               },
               {
                 legend: 'Group B',
                 options: [
+                  { value: '2', label: 'Checkbox 2' },
                   { value: '3', label: 'Checkbox 3' },
-                  { value: '4', label: 'Checkbox 4' },
-                  { value: '5', label: 'Checkbox 5' },
                 ],
               },
             ]}
@@ -364,27 +281,201 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       </Formik>,
     );
 
-    const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
-    const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
+    const group1 = within(screen.getByRole('group', { name: 'Group A' }));
+    const group2 = within(screen.getByRole('group', { name: 'Group B' }));
 
-    expect(checkbox1.checked).toBe(true);
-    expect(checkbox2.checked).toBe(true);
+    const checkbox1 = group1.getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox2 = group2.getByLabelText('Checkbox 2') as HTMLInputElement;
+    const checkbox3 = group2.getByLabelText('Checkbox 3') as HTMLInputElement;
 
-    expect(queryByText('Select all 2 options')).toBeNull();
-    expect(queryByText('Unselect all 2 options')).not.toBeNull();
+    expect(checkbox1.checked).toBe(false);
+    expect(checkbox2.checked).toBe(false);
+    expect(checkbox3.checked).toBe(false);
 
-    fireEvent.click(checkbox1);
+    fireEvent.click(
+      group2.getByRole('button', {
+        name: 'Select all 2 subgroup options',
+      }),
+    );
 
     expect(checkbox1.checked).toBe(false);
     expect(checkbox2.checked).toBe(true);
+    expect(checkbox3.checked).toBe(true);
+  });
 
-    expect(queryByText('Select all 2 options')).not.toBeNull();
-    expect(queryByText('Unselect all 2 options')).toBeNull();
+  test('clicking `Unselect all` button for a group un-checks all values for that group', () => {
+    render(
+      <Formik
+        initialValues={{
+          test: ['2', '3'],
+        }}
+        onSubmit={() => undefined}
+      >
+        {() => (
+          <FormFieldCheckboxSearchSubGroups<FormValues>
+            name="test"
+            id="checkboxes"
+            legend="Test checkboxes"
+            options={[
+              {
+                legend: 'Group A',
+                options: [{ value: '1', label: 'Checkbox 1' }],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '2', label: 'Checkbox 2' },
+                  { value: '3', label: 'Checkbox 3' },
+                ],
+              },
+            ]}
+          />
+        )}
+      </Formik>,
+    );
+
+    const group1 = within(screen.getByRole('group', { name: 'Group A' }));
+    const group2 = within(screen.getByRole('group', { name: 'Group B' }));
+
+    const checkbox1 = group1.getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox2 = group2.getByLabelText('Checkbox 2') as HTMLInputElement;
+    const checkbox3 = group2.getByLabelText('Checkbox 3') as HTMLInputElement;
+
+    expect(checkbox1.checked).toBe(false);
+    expect(checkbox2.checked).toBe(true);
+    expect(checkbox3.checked).toBe(true);
+
+    fireEvent.click(
+      group2.getByRole('button', { name: 'Unselect all 2 subgroup options' }),
+    );
+
+    expect(checkbox1.checked).toBe(false);
+    expect(checkbox2.checked).toBe(false);
+    expect(checkbox3.checked).toBe(false);
+  });
+
+  test('checking all options for a group renders corresponding `Unselect all subgroup options` button', () => {
+    render(
+      <Formik
+        initialValues={{
+          test: [],
+        }}
+        onSubmit={() => undefined}
+      >
+        {() => (
+          <FormFieldCheckboxSearchSubGroups<FormValues>
+            name="test"
+            id="checkboxes"
+            legend="Test checkboxes"
+            options={[
+              {
+                legend: 'Group A',
+                options: [{ value: '1', label: 'Checkbox 1' }],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '2', label: 'Checkbox 2' },
+                  { value: '3', label: 'Checkbox 3' },
+                ],
+              },
+            ]}
+          />
+        )}
+      </Formik>,
+    );
+
+    const group2 = within(screen.getByRole('group', { name: 'Group B' }));
+
+    const checkbox2 = group2.getByLabelText('Checkbox 2') as HTMLInputElement;
+    const checkbox3 = group2.getByLabelText('Checkbox 3') as HTMLInputElement;
+
+    expect(checkbox2.checked).toBe(false);
+    expect(checkbox3.checked).toBe(false);
+
+    expect(
+      group2.getByRole('button', { name: 'Select all 2 subgroup options' }),
+    ).toBeInTheDocument();
+    expect(
+      group2.queryByRole('button', { name: 'Unselect all 2 subgroup options' }),
+    ).toBeNull();
+
+    fireEvent.click(checkbox2);
+    fireEvent.click(checkbox3);
+
+    expect(checkbox2.checked).toBe(true);
+    expect(checkbox3.checked).toBe(true);
+
+    expect(
+      group2.queryByRole('button', { name: 'Select all 2 subgroup options' }),
+    ).toBeNull();
+    expect(
+      group2.getByRole('button', { name: 'Unselect all 2 subgroup options' }),
+    ).not.toBeNull();
+  });
+
+  test('un-checking any options renders the corresponding `Unselect all options` button', () => {
+    render(
+      <Formik
+        initialValues={{
+          test: ['2', '3'],
+        }}
+        onSubmit={() => undefined}
+      >
+        {() => (
+          <FormFieldCheckboxSearchSubGroups<FormValues>
+            name="test"
+            id="checkboxes"
+            legend="Test checkboxes"
+            options={[
+              {
+                legend: 'Group A',
+                options: [{ value: '1', label: 'Checkbox 1' }],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '2', label: 'Checkbox 2' },
+                  { value: '3', label: 'Checkbox 3' },
+                ],
+              },
+            ]}
+          />
+        )}
+      </Formik>,
+    );
+
+    const group2 = within(screen.getByRole('group', { name: 'Group B' }));
+
+    const checkbox2 = group2.getByLabelText('Checkbox 2') as HTMLInputElement;
+    const checkbox3 = group2.getByLabelText('Checkbox 3') as HTMLInputElement;
+
+    expect(checkbox2.checked).toBe(true);
+    expect(checkbox3.checked).toBe(true);
+
+    expect(
+      group2.queryByRole('button', { name: 'Select all 2 subgroup options' }),
+    ).toBeNull();
+    expect(
+      group2.getByRole('button', { name: 'Unselect all 2 subgroup options' }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(checkbox2);
+
+    expect(checkbox2.checked).toBe(false);
+    expect(checkbox3.checked).toBe(true);
+
+    expect(
+      group2.getByRole('button', { name: 'Select all 2 subgroup options' }),
+    ).toBeInTheDocument();
+    expect(
+      group2.queryByRole('name', { name: 'Unselect all 2 subgroup options' }),
+    ).toBeNull();
   });
 
   describe('error messages', () => {
     test('does not display validation message when checkboxes are untouched', async () => {
-      const { queryByText } = render(
+      render(
         <Formik
           initialValues={{
             test: [],
@@ -420,11 +511,11 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
         </Formik>,
       );
 
-      expect(queryByText('Select at least one option')).toBeNull();
+      expect(screen.queryByText('Select at least one option')).toBeNull();
     });
 
     test('displays validation message when no checkboxes are checked', async () => {
-      const { getByLabelText, queryByText } = render(
+      render(
         <Formik
           initialValues={{
             test: ['1'],
@@ -463,21 +554,24 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
         </Formik>,
       );
 
-      const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
+      const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
 
       expect(checkbox.checked).toBe(true);
-      expect(queryByText('Select at least one option')).toBeNull();
+      expect(screen.queryByText('Select at least one option')).toBeNull();
 
       fireEvent.click(checkbox);
 
-      await wait();
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(false);
 
-      expect(checkbox.checked).toBe(false);
-      expect(queryByText('Select at least one option')).not.toBeNull();
+        expect(
+          screen.getByText('Select at least one option'),
+        ).toBeInTheDocument();
+      });
     });
 
-    test('does not display validation message when `showError` is false', async () => {
-      const { getByLabelText, queryByText } = render(
+    test('does not display validation message when `showError` is false', () => {
+      render(
         <Formik
           initialValues={{
             test: ['1'],
@@ -517,24 +611,22 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
         </Formik>,
       );
 
-      const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
+      const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
 
       expect(checkbox.checked).toBe(true);
-      expect(queryByText('Select at least one option')).toBeNull();
+      expect(screen.queryByText('Select at least one option')).toBeNull();
 
       fireEvent.click(checkbox);
 
-      await wait();
-
       expect(checkbox.checked).toBe(false);
-      expect(queryByText('Select at least one option')).toBeNull();
+      expect(screen.queryByText('Select at least one option')).toBeNull();
     });
   });
 
   test('providing a search term does not remove checkboxes that have already been checked', () => {
     jest.useFakeTimers();
 
-    const { getAllByLabelText, getByLabelText } = render(
+    render(
       <Formik
         initialValues={{
           test: ['1'],
@@ -568,9 +660,11 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       </Formik>,
     );
 
-    const searchInput = getByLabelText('Search options') as HTMLInputElement;
+    const searchInput = screen.getByLabelText(
+      'Search options',
+    ) as HTMLInputElement;
 
-    expect(getByLabelText('Checkbox 1')).toHaveAttribute('checked');
+    expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute('checked');
 
     fireEvent.change(searchInput, {
       target: {
@@ -580,8 +674,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
     jest.runAllTimers();
 
-    expect(getAllByLabelText(/Checkbox/)).toHaveLength(2);
-    expect(getByLabelText('Checkbox 1')).toHaveAttribute('checked');
-    expect(getByLabelText('Checkbox 2')).not.toHaveAttribute('checked');
+    expect(screen.getAllByLabelText(/Checkbox/)).toHaveLength(2);
+    expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute('checked');
+    expect(screen.getByLabelText('Checkbox 2')).not.toHaveAttribute('checked');
   });
 });

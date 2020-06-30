@@ -201,6 +201,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> DeleteNonDataFileAsync(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
+            return await DeleteNonDataFilesAsync(releaseId, type, new List<string>(){fileName})
+                .OnSuccess(() => ListFilesAsync(releaseId, type));
+        }
+        
+        public async Task<Either<ActionResult, bool>> DeleteNonDataFilesAsync(Guid releaseId, ReleaseFileTypes type, IEnumerable<string> fileNames)
+        {
             if (type == ReleaseFileTypes.Data || type == ReleaseFileTypes.Metadata)
             {
                 return ValidationActionResult(CannotUseGenericFunctionToDeleteDataFile);
@@ -211,19 +217,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async () =>
                 {
-                    var willOrphanFiles = await CheckFileDeletionWillOrphanFileAsync(releaseId, fileName, type);
-
-                    if (willOrphanFiles)
+                    foreach (var fileName in fileNames)
                     {
-                        return await 
-                            DeleteFileAsync(await GetCloudBlobContainer(), AdminReleasePath(releaseId, type, fileName))
-                            .OnSuccess(() => DeleteFileReference(releaseId, fileName, type))
-                            .OnSuccess(() => ListFilesAsync(releaseId, type));
+                        if (await CheckFileDeletionWillOrphanFileAsync(releaseId, fileName, type))
+                        {
+                            await DeleteFileAsync(await GetCloudBlobContainer(), AdminReleasePath(releaseId, type, fileName))
+                                .OnSuccess(() => DeleteFileReference(releaseId, fileName, type));
+                        }
+                        else
+                        {
+                            await DeleteFileLink(releaseId, fileName, type);
+                        }
                     }
 
-                    return await 
-                        DeleteFileLink(releaseId, fileName, type)
-                        .OnSuccess(() => ListFilesAsync(releaseId, type));
+                    return true;
                 });
         }
 
@@ -358,18 +365,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var fileLink = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 ReleaseId = releaseId,
                 ReleaseFileReference = new ReleaseFileReference
                 {
-                    Id = Guid.NewGuid(),
                     ReleaseId = releaseId,
                     Filename = filename,
                     ReleaseFileType = type
                 }
             };
 
-            _context.ReleaseFiles.Add(fileLink);
+            await _context.ReleaseFiles.AddAsync(fileLink);
             await _context.SaveChangesAsync();
             return true;
         }

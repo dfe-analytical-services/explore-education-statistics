@@ -140,6 +140,10 @@ user reloads page
 user scrolls to the top of the page
   execute javascript      window.scrollTo(0, 0);
 
+user scrolls to element
+  [Arguments]  ${element}
+  scroll element into view  ${element}
+
 user waits until page contains
   [Arguments]    ${pageText}
   wait until page contains   ${pageText}
@@ -153,8 +157,8 @@ user waits until page does not contain
   wait until page does not contain   ${pageText}
 
 user waits until page does not contain element
-  [Arguments]    ${element}
-  wait until page does not contain element  ${element}
+  [Arguments]    ${element}    ${wait}=${timeout}
+  wait until page does not contain element  ${element}   timeout=${wait}
 
 user waits until element contains
   [Arguments]    ${element}    ${text}     ${wait}=${timeout}
@@ -171,6 +175,10 @@ user waits until page contains heading
 user waits until page contains accordion section
   [Arguments]   ${section_title}     ${wait}=${timeout}
   user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
+
+user waits until page does not contain accordion section
+  [Arguments]   ${section_title}     ${wait}=${timeout}
+  user waits until page does not contain element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
 
 user checks element contains
   [Arguments]   ${element}    ${text}
@@ -296,7 +304,7 @@ user clears element text
 user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
-  sleep   0.1
+  sleep  0.1
 
 user enters text into element
   [Arguments]   ${selector}   ${text}

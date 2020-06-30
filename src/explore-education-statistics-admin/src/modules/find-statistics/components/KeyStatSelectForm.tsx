@@ -43,7 +43,7 @@ const KeyStatSelectForm = ({
 
   function getKeyStatPreview() {
     const selectedDataBlock = availableDataBlocks.find(
-      datablock => datablock.id === selectedDataBlockId,
+      dataBlock => dataBlock.id === selectedDataBlockId,
     );
     return selectedDataBlock ? (
       <section>
@@ -51,9 +51,11 @@ const KeyStatSelectForm = ({
           className="govuk-!-margin-top-3"
           summary="Key statistic preview"
           open
-          onToggle={() => {}}
         >
-          <KeyStatTile {...selectedDataBlock} />
+          <KeyStatTile
+            summary={selectedDataBlock.summary}
+            query={selectedDataBlock.dataBlockRequest}
+          />
         </Details>
       </section>
     ) : null;

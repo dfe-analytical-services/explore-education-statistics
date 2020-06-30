@@ -1,3 +1,8 @@
 .govuk-form-group:last-child {
   margin-bottom: 0;
 }
+
+.govuk-input[disabled],
+.govuk-textarea[disabled] {
+  cursor: not-allowed;
+}

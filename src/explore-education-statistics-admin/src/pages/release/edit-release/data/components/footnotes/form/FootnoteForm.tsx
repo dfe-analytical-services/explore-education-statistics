@@ -178,6 +178,7 @@ const FootnoteForm = ({
                           <fieldset
                             key={subjectMetaId}
                             className="govuk-fieldset"
+                            datatest-id={`footnote-subject ${subjectMeta.subjectName}`}
                           >
                             <legend className="govuk-heading-m">
                               Subject: {subjectMeta.subjectName}
@@ -248,7 +249,7 @@ const FootnoteForm = ({
                     type="submit"
                     className="govuk-button govuk-!-margin-right-6"
                   >
-                    {!footnote ? 'Create' : 'Update'} footnote
+                    {`${!footnote ? 'Create' : 'Update'} footnote`}
                   </Button>
                   <ButtonText
                     className="govuk-button govuk-button--secondary"

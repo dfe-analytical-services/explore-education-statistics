@@ -145,12 +145,12 @@ if args.tests and "general_public" not in args.tests:
             cookie_file.unlink(True)
 
         if local_storage_file.exists() and cookie_file.exists():
-            print(f'Getting {user} authentication information from local files... ')
+            print(f'Getting {user} authentication information from local files... ', flush=True)
 
             os.environ[local_storage_name] = local_storage_file.read_text()
             os.environ[cookie_name] = cookie_file.read_text()
         else:
-            print(f'Logging in to obtain {user} authentication information... ')
+            print(f'Logging in to obtain {user} authentication information... ', flush=True)
 
             os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
                 url=os.getenv('ADMIN_URL'),
@@ -163,7 +163,7 @@ if args.tests and "general_public" not in args.tests:
             local_storage_file.write_text(os.environ[local_storage_name])
             cookie_file.write_text(os.environ[cookie_name])
 
-            print('Done!')
+            print('Done!', flush=True)
 
         assert os.getenv(local_storage_name) is not None
         assert os.getenv(cookie_name) is not None
@@ -179,8 +179,8 @@ if args.tests and "general_public" not in args.tests:
                 clear_existing=clear_existing
             )
 
-        # Don't need analyst user if running admin/bau tests
-        if f"admin{os.sep}bau" not in args.tests:
+        # Don't need analyst user if running admin/bau or admin_and_public/bau tests
+        if f"{os.sep}bau" not in args.tests:
             authenticate_user(
                 user='ANALYST',
                 email=os.getenv('ANALYST_EMAIL'),
@@ -197,7 +197,7 @@ if args.tests and "general_public" not in args.tests:
         run_identifier = str(time.time()).split('.')[0]
         os.environ['RUN_IDENTIFIER'] = run_identifier
 
-        print(f'Attempting to create test topic {run_identifier}...')
+        print(f'Attempting to create test topic {run_identifier}...', flush=True)
 
         create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/449d720f-9a87-4895-91fe-70972d1bdc04/topics'
         jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
@@ -218,7 +218,7 @@ if args.tests and "general_public" not in args.tests:
         response = create_test_topic()
 
         if response.status_code in {401, 403}:
-            print('Attempting re-authentication...')
+            print('Attempting re-authentication...', flush=True)
 
             # Delete identify files and re-attempt to fetch them
             setup_authentication(clear_existing=True)
@@ -278,7 +278,7 @@ if args.interp == "robot":
         kp.run_keyword_profile('test-results/output.xml',
                                printresults=False,
                                writepath='test-results/keyword-profiling-results.log')
-        print("\nProfiling logs created in test-results/")
+        print("\nProfiling logs created in test-results/", flush=True)
     else:
         robot_run_cli(robotArgs)
 elif args.interp == "pabot":
@@ -296,6 +296,6 @@ elif args.interp == "pabot":
         kp.run_keyword_profile('test-results/output.xml',
                                printresults=False,
                                writepath='test-results/keyword-profiling-results.log')
-        print("\nProfiling logs created in test-results/")
+        print("\nProfiling logs created in test-results/", flush=True)
     else:
         pabot_run_cli(robotArgs)

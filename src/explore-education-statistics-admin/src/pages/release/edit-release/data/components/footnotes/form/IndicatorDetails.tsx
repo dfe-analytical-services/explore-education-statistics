@@ -26,7 +26,7 @@ const IndicatorDetails = ({
 }: Props) => {
   return (
     <Details
-      summary={`${summary} ${parentSelected ? '(All)' : ''}`}
+      summary={`${summary}${parentSelected ? ' (All)' : ''}`}
       className="govuk-!-margin-bottom-2"
     >
       <div className={styles.filterOverflow}>

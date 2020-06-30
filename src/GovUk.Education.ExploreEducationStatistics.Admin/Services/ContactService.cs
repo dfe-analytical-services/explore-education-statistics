@@ -14,10 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             _context = context;
         }
-        
+
         public List<Contact> GetContacts()
         {
-            return _context.Contacts.ToList();
+            return _context.Contacts.OrderBy(c => c.TeamName).ThenBy(c => c.ContactName).ToList();
         }
     }
 }

@@ -1,5 +1,5 @@
-using System;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +9,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterLocationService : BaseImporterService
     {
-        public ImporterLocationService(ImporterMemoryCache cache) : base(cache)
+        private readonly IGuidGenerator _guidGenerator;
+        
+        public ImporterLocationService(
+            IGuidGenerator guidGenerator,
+            ImporterMemoryCache cache) : base(cache)
         {
+            _guidGenerator = guidGenerator;
         }
 
         public Location Find(
@@ -114,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 var entityEntry = context.Location.Add(new Location
                 {
-                    Id = Guid.NewGuid(),
+                    Id = _guidGenerator.NewGuid(),
                     Country = country ?? Country.Empty(),
                     Institution = institution ?? Institution.Empty(),
                     LocalAuthority = localAuthority ?? LocalAuthority.Empty(),

@@ -53,16 +53,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
-                    dataBlock.Id = Guid.NewGuid();
+                    
+                    var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 
-                    await _context.DataBlocks.AddAsync(dataBlock);
-            
-                    release.AddContentBlock(dataBlock);
+                    release.AddContentBlock(added);
                     _context.Releases.Update(release);
             
                     await _context.SaveChangesAsync();
 
-                    return await GetAsync(dataBlock.Id);
+                    return await GetAsync(added.Id);
                 });
         }
 
@@ -235,13 +234,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
-            var deletes = deletePlan.DependentDataBlocks.SelectMany(block =>
-                block.InfographicFilenames.Select(chartFilename =>
-                    _fileStorageService.DeleteNonDataFileAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart, chartFilename)
-                )
-            );
-            
-            await Task.WhenAll(deletes);
+            var chartFilenames = deletePlan.DependentDataBlocks.SelectMany(block => block.InfographicFilenames);
+
+            await _fileStorageService.DeleteNonDataFilesAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart,
+                chartFilenames);
         }
 
         private async Task DeleteDependentDataBlocks(DeleteDataBlockPlan deletePlan)

@@ -1,8 +1,10 @@
 import useAsyncCallback, {
   AsyncCallbackState,
-  AsyncState,
+  AsyncStateSetter,
 } from '@common/hooks/useAsyncCallback';
-import { DependencyList, useCallback, useEffect } from 'react';
+import usePrevious from '@common/hooks/usePrevious';
+import isEqual from 'lodash/isEqual';
+import { DependencyList, useCallback, useEffect, useMemo } from 'react';
 
 export interface AsyncRetryState<T> extends AsyncCallbackState<T> {
   retry: () => void;
@@ -16,8 +18,12 @@ export interface AsyncRetryState<T> extends AsyncCallbackState<T> {
 export default function useAsyncRetry<T>(
   task: () => Promise<T>,
   deps: DependencyList = [],
-  initialState?: AsyncState<T>,
+  initialState: AsyncStateSetter<T> = {
+    isLoading: true,
+  },
 ): AsyncRetryState<T> {
+  const prevDeps = usePrevious<DependencyList>(deps);
+
   const [state, run] = useAsyncCallback<T, []>(task, deps, initialState);
   const { isLoading } = state;
 
@@ -31,8 +37,23 @@ export default function useAsyncRetry<T>(
     }
   }, [isLoading, run]);
 
-  return {
-    ...state,
-    retry,
-  };
+  return useMemo(() => {
+    // The current state is only valid for the previous
+    // dependencies, so we have to reset to initial
+    // state if the dependencies change.
+    // This avoids potential stale state issues due
+    // to the task not having ran yet.
+    if (prevDeps && !isEqual(prevDeps, deps)) {
+      return {
+        isLoading: true,
+        setState: state.setState,
+        retry,
+      };
+    }
+
+    return {
+      ...state,
+      retry,
+    };
+  }, [deps, prevDeps, retry, state]);
 }

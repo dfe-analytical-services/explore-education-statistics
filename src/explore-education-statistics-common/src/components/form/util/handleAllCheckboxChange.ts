@@ -1,29 +1,20 @@
-import { FieldHelperProps } from 'formik';
+import { FieldHelperProps, FieldMetaProps } from 'formik';
 import difference from 'lodash/difference';
-import {
-  CheckboxGroupAllChangeEvent,
-  CheckboxOption,
-} from '../FormCheckboxGroup';
+import { CheckboxOption } from '../FormCheckboxGroup';
 
 export default function handleAllChange({
   checked,
-  event,
+  meta,
   helpers,
   options,
-  value,
 }: {
   checked: boolean;
-  event: CheckboxGroupAllChangeEvent;
-  helpers: FieldHelperProps<unknown>;
+  meta: FieldMetaProps<string[]>;
+  helpers: FieldHelperProps<string[]>;
   options: CheckboxOption[];
-  value: string[];
 }): void {
-  if (event.isDefaultPrevented()) {
-    return;
-  }
-
   const allOptionValues = options.map(option => option.value);
-  const restValues = difference(value, allOptionValues);
+  const restValues = difference(meta.value, allOptionValues);
 
   if (!checked) {
     helpers.setValue([...restValues, ...allOptionValues]);

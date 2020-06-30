@@ -9,7 +9,11 @@ const PageTitle = ({ caption, title }: Props) => {
   return (
     <>
       <h1 className="govuk-heading-xl" data-testid={`page-title ${title}`}>
-        {caption && <span className="govuk-caption-xl">{caption}</span>}
+        {caption && (
+          <span className="govuk-caption-xl" data-testid="page-title-caption">
+            {caption}
+          </span>
+        )}
         {title}
       </h1>
     </>
