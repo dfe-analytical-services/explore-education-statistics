@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId);
         
-        Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(Guid releaseId, UpdateReleaseSummaryRequest request);
+        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, UpdateReleaseRequest request);
 
         Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId);
 
@@ -37,8 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         
         Task<Either<ActionResult, bool>> PublishReleaseContentAsync(Guid releaseId);
         
-        Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(Guid releaseId, UpdateReleaseStatusRequest request);
-
         Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string dataFileName, string subjectTitle);
         
         Task<Either<ActionResult, IEnumerable<FileInfo>>>  RemoveDataFileReleaseLinkAsync(Guid releaseId, string fileName, string subjectTitle);

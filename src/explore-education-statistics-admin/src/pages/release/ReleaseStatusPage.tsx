@@ -35,12 +35,12 @@ import { StringSchema } from 'yup';
 const errorCodeMappings = [
   errorCodeToFieldError(
     'APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE',
-    'releaseStatus',
+    'status',
     'Enter a publish scheduled date before approving',
   ),
   errorCodeToFieldError(
     'ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE',
-    'releaseStatus',
+    'status',
     'Check all uploaded datafiles are complete before approving',
   ),
 ];
@@ -68,8 +68,8 @@ const ReleaseStatusPage = () => {
 
   const { releaseId, onChangeReleaseStatus } = useManageReleaseContext();
 
-  const { value: summary, setState: setSummary } = useAsyncHandledRetry(
-    () => releaseService.getReleaseSummary(releaseId),
+  const { value: release, setState: setRelease } = useAsyncHandledRetry(
+    () => releaseService.getRelease(releaseId),
     [showForm],
   );
 
@@ -102,7 +102,13 @@ const ReleaseStatusPage = () => {
   );
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
-    const nextSummary = await releaseService.updateReleaseStatus(releaseId, {
+    if (!release) {
+      throw new Error('Could not update missing release');
+    }
+
+    const nextRelease = await releaseService.updateRelease(releaseId, {
+      ...release,
+      typeId: release.type.id,
       ...values,
       publishScheduled:
         values.status === 'Approved' &&
@@ -111,12 +117,12 @@ const ReleaseStatusPage = () => {
           ? formatISO(values.publishScheduled, {
               representation: 'date',
             })
-          : '',
+          : undefined,
     });
 
-    setSummary({
+    setRelease({
       isLoading: false,
-      value: nextSummary,
+      value: nextRelease,
     });
 
     setShowForm(false);
@@ -124,7 +130,7 @@ const ReleaseStatusPage = () => {
     onChangeReleaseStatus();
   }, errorCodeMappings);
 
-  if (!summary) {
+  if (!release) {
     return <LoadingSpinner />;
   }
 
@@ -139,25 +145,25 @@ const ReleaseStatusPage = () => {
           <SummaryList>
             <SummaryListItem term="Current status">
               <StatusBlock
-                text={statusMap[summary.status]}
-                id={`CurrentReleaseStatus-${statusMap[summary.status]}`}
+                text={statusMap[release.status]}
+                id={`CurrentReleaseStatus-${statusMap[release.status]}`}
               />
             </SummaryListItem>
-            {summary.status === 'Approved' && (
+            {release.status === 'Approved' && (
               <SummaryListItem term="Release process status">
                 <ReleaseServiceStatus releaseId={releaseId} />
               </SummaryListItem>
             )}
             <SummaryListItem term="Scheduled release">
-              {summary.publishScheduled ? (
-                <FormattedDate>{summary.publishScheduled}</FormattedDate>
+              {release.publishScheduled ? (
+                <FormattedDate>{release.publishScheduled}</FormattedDate>
               ) : (
                 'Not scheduled'
               )}
             </SummaryListItem>
             <SummaryListItem term="Next release expected">
-              {isValidPartialDate(summary.nextReleaseDate) ? (
-                <time>{formatPartialDate(summary.nextReleaseDate)}</time>
+              {isValidPartialDate(release.nextReleaseDate) ? (
+                <time>{formatPartialDate(release.nextReleaseDate)}</time>
               ) : (
                 'Not set'
               )}
@@ -177,13 +183,13 @@ const ReleaseStatusPage = () => {
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
-            status: summary.status,
-            internalReleaseNote: summary.internalReleaseNote,
-            publishMethod: summary.publishScheduled ? 'Scheduled' : undefined,
-            publishScheduled: summary.publishScheduled
-              ? new Date(summary.publishScheduled)
+            status: release.status,
+            internalReleaseNote: release.internalReleaseNote ?? '',
+            publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
+            publishScheduled: release.publishScheduled
+              ? new Date(release.publishScheduled)
               : undefined,
-            nextReleaseDate: summary.nextReleaseDate,
+            nextReleaseDate: release.nextReleaseDate,
           }}
           onSubmit={handleSubmit}
           validationSchema={Yup.object<FormValues>({

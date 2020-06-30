@@ -274,27 +274,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> EditReleaseSummaryAsync(
-            Guid releaseId, UpdateReleaseSummaryRequest request)
+        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
+            Guid releaseId, UpdateReleaseRequest request)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
-                .OnSuccess(async () =>
+                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
+                .OnSuccessDo(() => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
+                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, request.Status))
+                .OnSuccess(async release =>
                 {
-                    var release = await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(_context.Releases
-                            .Where(r => r.Id == releaseId));
+                    if (request.Status == ReleaseStatus.Approved &&
+                        request.PublishMethod == PublishMethod.Scheduled &&
+                        !request.PublishScheduledDate.HasValue)
+                    {
+                        return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
+                    }
 
                     release.Slug = request.Slug;
                     release.TypeId = request.TypeId;
-                    release.PublishScheduled = request.PublishScheduledDate;
                     release.ReleaseName = request.ReleaseName;
-                    release.NextReleaseDate = request.NextReleaseDate;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
+
+                    var oldStatus = release.Status;
+
+                    release.Status = request.Status;
+                    release.InternalReleaseNote = request.InternalReleaseNote;
+                    release.NextReleaseDate = request.NextReleaseDate;
+
+                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate && 
+                        request.Status == ReleaseStatus.Approved
+                        ? DateTime.UtcNow
+                        : request.PublishScheduledDate;
+
+                    _context.Releases.Update(release);
+                    await _context.SaveChangesAsync();
+
+                    // Only need to inform Publisher if changing release status to or from Approved
+                    if (oldStatus == ReleaseStatus.Approved || request.Status == ReleaseStatus.Approved)
+                    {
+                        await _publishingService.QueueValidateReleaseAsync(releaseId, request.PublishMethod == PublishMethod.Immediate);
+                    }
                     
                     _context.Update(release);
                     await _context.SaveChangesAsync();
+
                     return await GetReleaseForIdAsync(releaseId);
                 });
         }
@@ -420,45 +445,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .First(r => r.Id == releaseId);
                 
             templateRelease.CreateGenericContentFromTemplate(newRelease);
-        }
-
-        public Task<Either<ActionResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
-            Guid releaseId, UpdateReleaseStatusRequest request)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
-                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, request.Status))
-                .OnSuccess(async release =>
-                {
-                    if (request.Status == ReleaseStatus.Approved &&
-                        request.PublishMethod == PublishMethod.Scheduled &&
-                        !request.PublishScheduledDate.HasValue)
-                    {
-                        return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
-                    }
-
-                    var isApproved = release.Status == ReleaseStatus.Approved || request.Status == ReleaseStatus.Approved;
-
-                    release.Status = request.Status;
-                    release.InternalReleaseNote = request.InternalReleaseNote;
-                    release.NextReleaseDate = request.NextReleaseDate;
-
-                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate && isApproved
-                        ? DateTime.UtcNow
-                        : request.PublishScheduledDate;
-
-                    _context.Releases.Update(release);
-                    await _context.SaveChangesAsync();
-
-                    // Only need to inform Publisher if changing release status to or from Approved
-                    if (isApproved)
-                    {
-                        await _publishingService.QueueValidateReleaseAsync(releaseId, request.PublishMethod == PublishMethod.Immediate);
-                    }
-
-                    return await GetReleaseSummaryAsync(releaseId);
-                });
         }
 
         public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId,

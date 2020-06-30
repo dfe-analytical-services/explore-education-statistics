@@ -10,9 +10,7 @@ import { summaryRoute } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
 } from '@admin/services/publicationService';
-import releaseService, {
-  CreateReleaseRequest,
-} from '@admin/services/releaseService';
+import releaseService from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import {
@@ -71,18 +69,16 @@ const ReleaseCreatePage = ({
   }, [publicationId]);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
-    const release: CreateReleaseRequest = {
+    const createdRelease = await releaseService.createRelease({
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
-      releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
+      releaseName: values.timePeriodCoverageStartYear,
       typeId: values.releaseTypeId,
       publicationId,
       templateReleaseId:
         values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
-    };
-
-    const createdRelease = await releaseService.createRelease(release);
+    });
 
     history.push(
       summaryRoute.generateLink({

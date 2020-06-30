@@ -5,14 +5,22 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using static System.Globalization.CultureInfo;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    public class UpdateReleaseSummaryRequest
+    public enum PublishMethod
+    {
+        Scheduled,
+        Immediate
+    }
+
+    public class UpdateReleaseRequest
     {
         [Required]
         public Guid TypeId { get; set; }
@@ -21,6 +29,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Required]
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatus Status { get; set; }
+
+        public string InternalReleaseNote { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PublishMethod? PublishMethod { get; set; }
+
         [DateTimeFormatValidator("yyyy-MM-dd")]
         public string PublishScheduled { get; set; }
 
@@ -28,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             get
             {
-                if (PublishScheduled == null) {
+                if (PublishScheduled == null || PublishScheduled == "") {
                     return null;
                 }
 

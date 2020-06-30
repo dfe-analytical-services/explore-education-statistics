@@ -68,7 +68,7 @@ const ReleaseSummary = ({
       <SummaryList className="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
           <FormattedDate>
-            {release.published || release.publishScheduled}
+            {release.published || release.publishScheduled || ''}
           </FormattedDate>
         </SummaryListItem>
 

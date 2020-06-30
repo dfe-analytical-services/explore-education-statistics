@@ -19,8 +19,8 @@ import React from 'react';
 const ReleaseSummaryPage = () => {
   const { publication, releaseId } = useManageReleaseContext();
 
-  const { value: summary, isLoading } = useAsyncRetry(
-    () => releaseService.getReleaseSummary(releaseId),
+  const { value: release, isLoading } = useAsyncRetry(
+    () => releaseService.getRelease(releaseId),
     [releaseId],
   );
 
@@ -28,7 +28,7 @@ const ReleaseSummaryPage = () => {
     <LoadingSpinner loading={isLoading}>
       <h2 className="govuk-heading-l">Release summary</h2>
 
-      {summary ? (
+      {release ? (
         <>
           <p>
             These details will be shown to users to help identify this release.
@@ -39,30 +39,30 @@ const ReleaseSummaryPage = () => {
               {publication.title}
             </SummaryListItem>
             <SummaryListItem term="Time period">
-              {summary.timePeriodCoverage.label}
+              {release.timePeriodCoverage.label}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <time>{summary.yearTitle}</time>
+              <time>{release.title}</time>
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
               {publication.contact && publication.contact.contactName}
             </SummaryListItem>
             <SummaryListItem term="Scheduled release">
-              {summary.publishScheduled ? (
-                <FormattedDate>{summary.publishScheduled}</FormattedDate>
+              {release.publishScheduled ? (
+                <FormattedDate>{release.publishScheduled}</FormattedDate>
               ) : (
                 'Not scheduled'
               )}
             </SummaryListItem>
             <SummaryListItem term="Next release expected">
-              {isValidPartialDate(summary.nextReleaseDate) ? (
-                <time>{formatPartialDate(summary.nextReleaseDate)}</time>
+              {isValidPartialDate(release.nextReleaseDate) ? (
+                <time>{formatPartialDate(release.nextReleaseDate)}</time>
               ) : (
                 'Not set'
               )}
             </SummaryListItem>
             <SummaryListItem term="Release type">
-              {summary.type.title}
+              {release.type.title}
             </SummaryListItem>
           </SummaryList>
 

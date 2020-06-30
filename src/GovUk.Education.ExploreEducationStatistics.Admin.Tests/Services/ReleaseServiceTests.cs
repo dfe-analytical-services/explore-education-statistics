@@ -279,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void EditReleaseSummary()
+        public async void UpdateRelease()
         {
             var mocks = Mocks();
 
@@ -328,9 +328,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context, mocks);
                 var edited = await releaseService
-                    .EditReleaseSummaryAsync(
+                    .UpdateRelease(
                         releaseId,
-                        new UpdateReleaseSummaryRequest
+                        new UpdateReleaseRequest
                         {
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,

@@ -8,7 +8,7 @@ import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatu
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { summaryRoute } from '@admin/routes/releaseRoutes';
 import loginService from '@admin/services/loginService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
@@ -20,7 +20,7 @@ import ManagePublicationsAndReleasesTab from './components/ManagePublicationsAnd
 const AdminDashboardPage = () => {
   const { user } = useAuthContext();
   const {
-    value = [[], []],
+    value,
     isLoading: loadingReleases,
     retry: reloadDashboard,
   } = useAsyncRetry(async () => {
@@ -29,10 +29,13 @@ const AdminDashboardPage = () => {
       releaseService.getScheduledReleases(),
     ]);
 
-    return [draftReleases, scheduledReleases];
+    return {
+      draftReleases,
+      scheduledReleases,
+    };
   }, []);
 
-  const [draftReleases, scheduledReleases] = value as [Release[], Release[]];
+  const { draftReleases = [], scheduledReleases = [] } = value ?? {};
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>

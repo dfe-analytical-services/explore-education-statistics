@@ -72,48 +72,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public void EditReleaseSummaryAsync()
+        public void UpdateRelease()
         {
             AssertSecurityPoliciesChecked(
-                service => service.EditReleaseSummaryAsync(_release.Id, new UpdateReleaseSummaryRequest()), 
+                service => service.UpdateRelease(_release.Id, new UpdateReleaseRequest()), 
                 _release, 
                 CanUpdateSpecificRelease);
         }
+
+        [Fact]
+        public void UpdateRelease_Draft()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                service.UpdateRelease(_release.Id, new UpdateReleaseRequest() {
+                    Status = ReleaseStatus.Draft
+                }),  
+                _release,
+                CanUpdateSpecificRelease,
+                CanMarkSpecificReleaseAsDraft);
+        }
+        
+        [Fact]
+        public void UpdateRelease_SubmitForHigherLevelReview()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                service.UpdateRelease(_release.Id, new UpdateReleaseRequest() {
+                    Status = ReleaseStatus.HigherLevelReview
+                }),  
+                _release,
+                CanUpdateSpecificRelease,
+                CanSubmitSpecificReleaseToHigherReview);
+        }
+        
+        [Fact]
+        public void UpdateRelease_Approve()
+        {
+            AssertSecurityPoliciesChecked(service => 
+                service.UpdateRelease(_release.Id, new UpdateReleaseRequest() {
+                    Status = ReleaseStatus.Approved
+                }),  
+                _release,
+                CanUpdateSpecificRelease,
+                CanApproveSpecificRelease);
+        }
+        
         
         [Fact]
         public void GetLatestReleaseAsync()
         {
             AssertSecurityPoliciesChecked(
                 service => service.GetLatestReleaseAsync(Publication.Id), 
-                Publication, 
+                Publication,
                 CanViewSpecificPublication);
-        }
-        
-        [Fact]
-        public void UpdateReleaseStatusAsync_Draft()
-        {
-            AssertSecurityPoliciesChecked(service => 
-                service.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.Draft, ""),  
-                _release,
-                CanMarkSpecificReleaseAsDraft);
-        }
-        
-        [Fact]
-        public void UpdateReleaseStatusAsync_SubmitForHigherLevelReview()
-        {
-            AssertSecurityPoliciesChecked(service => 
-                service.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.HigherLevelReview, ""),  
-                _release,
-                CanSubmitSpecificReleaseToHigherReview);
-        }
-        
-        [Fact]
-        public void UpdateReleaseStatusAsync_Approve()
-        {
-            AssertSecurityPoliciesChecked(service => 
-                service.UpdateReleaseStatusAsync(_release.Id, ReleaseStatus.Approved, ""),  
-                _release,
-                CanApproveSpecificRelease);
         }
         
         [Fact]
