@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataBlockService _dataBlockService;
         private readonly IGuidGenerator _guidGenerator;
 
-        // TODO PP-318 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
+        // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
         public ReleaseService(
             ContentDbContext context,
