@@ -17,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         private readonly Guid _validId = Guid.NewGuid();
         private readonly Guid _notFoundId = Guid.NewGuid();
         private readonly CreatePermalinkRequest _request = new CreatePermalinkRequest();
+        private readonly Guid _releaseId = new Guid("03730cff-22d5-446c-8971-68921e933b50");
 
         public PermalinkControllerTests()
         {
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             permalinkService.Setup(s => s.GetAsync(_notFoundId)).ReturnsAsync(new NotFoundResult());
 
-            permalinkService.Setup(s => s.CreateAsync(_request)).ReturnsAsync(
+            permalinkService.Setup(s => s.CreateAsync(_releaseId, _request)).ReturnsAsync(
                 new PermalinkViewModel
                 {
                     Id = _createdId,
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Create_Permalink_Returns_Id()
         {
-            var result = await _controller.CreateAsync(_request);
+            var result = await _controller.CreateAsync(_releaseId, _request);
 
             Assert.IsType<PermalinkViewModel>(result.Value);
             Assert.Equal(_createdId, result.Value.Id);

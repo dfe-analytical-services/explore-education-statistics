@@ -104,15 +104,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public static IEnumerable<FileInfo> ListPublicFilesPreview(string storageConnectionString, string containerName,
-            Guid releaseId)
+            IEnumerable<Guid> referencedReleaseVersions)
         {
             var files = new List<FileInfo>();
 
-            files.AddRange(ListFiles(storageConnectionString, containerName,
-                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data), false));
+            foreach (var version in referencedReleaseVersions)
+            {
+                files.AddRange(ListFiles(storageConnectionString, containerName,
+                    AdminReleaseDirectoryPath(version, ReleaseFileTypes.Data), false));
 
-            files.AddRange(ListFiles(storageConnectionString, containerName,
-                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Ancillary), false));
+                files.AddRange(ListFiles(storageConnectionString, containerName,
+                    AdminReleaseDirectoryPath(version, ReleaseFileTypes.Ancillary), false)); 
+            }
 
             return files.OrderBy(f => f.Name);
         }

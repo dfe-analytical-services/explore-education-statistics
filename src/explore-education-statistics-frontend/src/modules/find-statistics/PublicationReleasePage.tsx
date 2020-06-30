@@ -308,6 +308,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
             return (
               <AccordionSection heading={heading} caption={caption} key={order}>
                 <PublicationSectionBlocks
+                  releaseId={data.id}
                   content={content}
                   release={data}
                   onToggle={(section: { id: string; title: string }) => {

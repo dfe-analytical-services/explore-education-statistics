@@ -176,8 +176,8 @@ export default {
   getPublicationMeta(publicationUuid: string): Promise<PublicationMeta> {
     return dataApi.get(`/meta/publication/${publicationUuid}`);
   },
-  getReleaseMeta(releaseUuid: string): Promise<ReleaseMeta> {
-    return dataApi.get(`/meta/release/${releaseUuid}`);
+  getReleaseMeta(releaseId: string): Promise<ReleaseMeta> {
+    return dataApi.get(`/meta/release/${releaseId}`);
   },
   getPublicationSubjectMeta(
     subjectId: string,
@@ -192,7 +192,13 @@ export default {
   }): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(query: TableDataQuery): Promise<TableDataResponse> {
-    return dataApi.post('/tablebuilder', query);
+  getTableData(
+    query: TableDataQuery,
+    releaseId?: string,
+  ): Promise<TableDataResponse> {
+    if (releaseId) {
+      return dataApi.post(`/tablebuilder/release/${releaseId}`, query);
+    }
+    return dataApi.post(`/tablebuilder`, query);
   },
 };

@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -117,10 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var releases = _context.Releases
                 .Include(r => r.Publication)
-                .Where(release => release.PublicationId == publicationId && !release.SoftDeleted)
+                .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => IsReleasePublished(release, includedReleaseIds) &&
-                                  IsLatestVersionOfRelease(release.Publication, release.Id))
+                                  IsLatestVersionOfRelease(release.Publication.Releases, release.Id, includedReleaseIds))
                 .OrderByDescending(release => release.Year)
                 .ThenByDescending(release => release.TimePeriodCoverage);
             return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
@@ -140,16 +141,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             return !string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()) ||
                    publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
-        }
-
-        private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
-        {
-            return release.Live || includedReleaseIds.Contains(release.Id);
-        }
-        
-        private bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
-        {
-            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
     }
 }

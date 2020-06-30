@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 
@@ -31,7 +32,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 PublicationSlug = release.Publication.Slug,
                 PublishScheduled = release.PublishScheduled.Value,
                 ReleaseSlug = release.Slug,
-                PreviousReleaseSlug = release.PreviousVersion.Slug
+                PreviousVersionSlug = release.PreviousVersion.Slug,
+                ReleaseFileReferences = _releaseService.GetReleaseFileReferences(
+                    releaseId, ReleaseFileTypes.Ancillary, ReleaseFileTypes.Chart, ReleaseFileTypes.Data)
             };
             await _fileStorageService.CopyReleaseFilesToPublicContainer(copyReleaseCommand);
         }

@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Topic> Topic { get; set; }
         
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; }
-
+        public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureBoundaryLevel(modelBuilder);
@@ -69,9 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigurePublication(modelBuilder);
             ConfigureRelease(modelBuilder);
             ConfigureReleaseSubject(modelBuilder);
+            ConfigureReleaseFootnote(modelBuilder);
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
+            ConfigureSubject(modelBuilder);
         }
 
         private static void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
@@ -154,6 +156,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<ReleaseSubject>()
                 .HasOne(r => r.Subject)
                 .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+        }
+        
+        private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ReleaseFootnote>()
+                .HasKey(item => new {item.ReleaseId, item.FootnoteId});
+            
+            modelBuilder.Entity<ReleaseFootnote>()
+                .HasOne(rf => rf.Release)
+                .WithMany(release => release.Footnotes)
+                .HasForeignKey(releaseFootnote => releaseFootnote.ReleaseId)
+                .OnDelete(DeleteBehavior.NoAction);
+            
+            modelBuilder.Entity<ReleaseFootnote>()
+                .HasOne(rf => rf.Footnote)
+                .WithMany(footnote => footnote.Releases)
+                .HasForeignKey(releaseFootnote => releaseFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
 
@@ -390,6 +410,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.PlanningArea,
                     builder => builder.HasIndex(planningArea => planningArea.Code));
+        }
+        
+        private static void ConfigureSubject(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Subject>()
+                .HasQueryFilter(r => !r.SoftDeleted);
         }
         
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)

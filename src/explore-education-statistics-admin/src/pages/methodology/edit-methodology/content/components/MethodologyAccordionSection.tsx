@@ -13,6 +13,7 @@ import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
 
 interface MethodologyAccordionSectionProps {
+  releaseId?: string;
   id: string;
   section: ContentSection<EditableContentBlock>;
   sectionKey: ContentSectionKeys;
@@ -20,6 +21,7 @@ interface MethodologyAccordionSectionProps {
 }
 
 const MethodologyAccordionSection = ({
+  releaseId = '',
   sectionKey,
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   methodologyId,
@@ -145,6 +147,7 @@ const MethodologyAccordionSection = ({
       onRemoveSection={handleRemoveSection}
     >
       <EditableSectionBlocks
+        releaseId={releaseId}
         isReordering={isReordering}
         sectionId={sectionId}
         content={blocks}

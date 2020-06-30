@@ -19,6 +19,7 @@ export interface TableQueryOptions {
 
 export default function useTableQuery(
   query: TableDataQuery | undefined,
+  releaseId: string | undefined,
   options: TableQueryOptions = {},
 ): AsyncRetryState<FullTable | undefined> {
   const optionsRef = useRef<TableQueryOptions | undefined>(options);
@@ -36,7 +37,7 @@ export default function useTableQuery(
       .catch(() => null);
 
     if (!response) {
-      response = await tableBuilderService.getTableData(query);
+      response = await tableBuilderService.getTableData(query, releaseId);
 
       await storageService.set(queryKey, response, {
         expiry: addSeconds(new Date(), options?.expiresIn ?? 0),

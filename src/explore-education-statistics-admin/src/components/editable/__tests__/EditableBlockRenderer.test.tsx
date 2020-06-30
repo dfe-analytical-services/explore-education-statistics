@@ -7,6 +7,7 @@ describe('EditableBlockRenderer', () => {
     test('renders non-editable version correctly', () => {
       const { container, queryByText } = render(
         <EditableBlockRenderer
+          releaseId="test-release-id"
           block={{
             id: 'block-000',
             order: 0,
@@ -27,6 +28,7 @@ describe('EditableBlockRenderer', () => {
     test('renders editable version correctly', () => {
       const { container, queryByText } = render(
         <EditableBlockRenderer
+          releaseId="test-release-id"
           editable
           block={{
             id: 'block-000',
@@ -50,6 +52,7 @@ describe('EditableBlockRenderer', () => {
 
       const { getByText } = render(
         <EditableBlockRenderer
+          releaseId="test-release-id"
           editable
           block={{
             id: 'block-000',
@@ -74,6 +77,7 @@ describe('EditableBlockRenderer', () => {
 
       const { getByText } = render(
         <EditableBlockRenderer
+          releaseId="test-release-id"
           editable
           block={{
             id: 'block-000',

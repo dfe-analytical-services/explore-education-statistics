@@ -14,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     public class TableBuilderControllerTests
     {
         private readonly TableBuilderController _controller;
+        private readonly Guid _releaseId = new Guid("03730cff-22d5-446c-8971-68921e933b50");
 
         private readonly ObservationQueryContext _query = new ObservationQueryContext
         {
@@ -30,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task Query_Post()
         {
-            var result = await _controller.Query(_query);
+            var result = await _controller.Query(_releaseId, _query);
             Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
             Assert.Single(result.Value.Results);
         }
@@ -38,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task Query_Post_NoResult()
         {
-            var result = await _controller.Query(new ObservationQueryContext());
+            var result = await _controller.Query(_releaseId, new ObservationQueryContext());
             Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
             Assert.Empty(result.Value.Results);
         }
@@ -49,13 +50,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var tableBuilderService = new Mock<ITableBuilderService>();
 
-            tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query))).ReturnsAsync(
+            tableBuilderService.Setup(s => s.Query(_releaseId, It.IsNotIn(_query))).ReturnsAsync(
                 new TableBuilderResultViewModel
                 {
                     Results = new List<ObservationViewModel>()
                 });
 
-            tableBuilderService.Setup(s => s.Query(_query)).ReturnsAsync(
+            tableBuilderService.Setup(s => s.Query(_releaseId, _query)).ReturnsAsync(
                 new TableBuilderResultViewModel
                 {
                     Results = new List<ObservationViewModel>

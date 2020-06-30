@@ -24,14 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("subject/{subjectId}")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(Guid subjectId)
         {
-            return _subjectMetaService.GetSubjectMeta(subjectId).HandleFailuresOrOk();
+            return _subjectMetaService.GetSubjectMetaRestricted(subjectId).HandleFailuresOrOk();
         }
 
         [HttpPost("subject")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(
             [FromBody] SubjectMetaQueryContext query)
         {
-            return _subjectMetaService.GetSubjectMeta(query).HandleFailuresOrOk();
+            return _subjectMetaService.GetSubjectMetaRestricted(query).HandleFailuresOrOk();
         }
     }
 }

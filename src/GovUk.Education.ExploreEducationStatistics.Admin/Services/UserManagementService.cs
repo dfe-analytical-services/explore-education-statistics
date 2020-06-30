@@ -30,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
-
         public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext, ContentDbContext contentDbContext,
             IEmailService emailService,
             IConfiguration configuration, UserManager<ApplicationUser> userManager,
@@ -124,11 +123,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<IdTitlePair>> ListReleasesAsync()
         {
-            return await _contentDbContext.Releases.Include(r => r.Publication).Select(r => new IdTitlePair
+            var releases = await _contentDbContext.Releases
+                .Include(r => r.Publication)
+                .ToListAsync();
+                
+            return releases.Where(r => IsLatestVersionOfRelease(r.Publication.Releases, r.Id))
+                .Select(r => new IdTitlePair
             {
                 Id = r.Id,
                 Title = $"{r.Publication.Title} - {r.Title}",
-            }).ToListAsync();
+            }).ToList();
         }
 
         public async Task<List<RoleViewModel>> ListRolesAsync()
@@ -349,6 +353,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             
             return true;
+        }
+        
+        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
+        {
+            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
     }
 }

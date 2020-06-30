@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
@@ -52,6 +53,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 await _contentService.UpdateContentAsync(new[] {message.ReleaseId}, context);
                 await _releaseService.SetPublishedDatesAsync(message.ReleaseId, context.Published);
+                
+                if (!PublisherUtils.IsDevelopment())
+                {
+                    await _releaseService.RemoveDataForPreviousVersions(new[] {message.ReleaseId});
+                }
+                
                 await _notificationsService.NotifySubscribersAsync(new[] {message.ReleaseId});
                 await UpdateStage(message.ReleaseId, releaseStatusId, Stage.Complete);
             }

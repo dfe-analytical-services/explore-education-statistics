@@ -6,6 +6,7 @@ import DataBlockRenderer from '@common/modules/find-statistics/components/DataBl
 import React, { useCallback, useMemo } from 'react';
 
 interface Props {
+  releaseId?: string;
   allowHeadings?: boolean;
   block: EditableBlock;
   editable?: boolean;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 function EditableBlockRenderer({
+  releaseId,
   allowHeadings,
   block,
   editable,
@@ -41,6 +43,7 @@ function EditableBlockRenderer({
         <div className="dfe-content-overflow">
           <EditableBlockWrapper onDelete={editable ? handleDelete : undefined}>
             <DataBlockRenderer
+              releaseId={releaseId}
               id={blockId}
               dataBlock={block}
               getInfographic={getInfographic}

@@ -7,6 +7,7 @@ import DataBlockRenderer from '@common/modules/find-statistics/components/DataBl
 import React, { useState } from 'react';
 
 interface Props {
+  releaseId: string;
   onSelect: (selectedDataBlockId: string) => void;
   onCancel?: () => void;
   hideCancel?: boolean;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const DataBlockSelectForm = ({
+  releaseId,
   onSelect,
   onCancel = () => {},
   hideCancel = false,
@@ -37,6 +39,7 @@ const DataBlockSelectForm = ({
           onToggle={() => {}}
         >
           <DataBlockRenderer
+            releaseId={releaseId}
             dataBlock={selectedDataBlock}
             id={`dataBlockSelectForm-${
               selectedDataBlock ? `${selectedDataBlock.id}-tabs` : 'tabs'

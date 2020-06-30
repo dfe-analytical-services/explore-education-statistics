@@ -30,7 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
-
+        private readonly GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService
+            _commonFootnoteService;
+        
         public FootnoteService(StatisticsDbContext context,
             ILogger<FootnoteService> logger,
             IFilterService filterService,
@@ -39,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IIndicatorService indicatorService,
             ISubjectService subjectService, 
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper, 
-            IUserService userService, 
+            IUserService userService,
+            GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService commonFootnoteService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper) : base(context, logger)
         {
             _filterService = filterService;
@@ -49,10 +52,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
+            _commonFootnoteService = commonFootnoteService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
         }
 
         public async Task<Either<ActionResult, Footnote>> CreateFootnote(
+            Guid releaseId,
             string content,
             IReadOnlyCollection<Guid> filterIds,
             IReadOnlyCollection<Guid> filterGroupIds,
@@ -60,13 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlyCollection<Guid> indicatorIds,
             IReadOnlyCollection<Guid> subjectIds)
         {
-            return await CheckCanUpdateReleases(
-                    filterIds,
-                    filterGroupIds,
-                    filterItemIds,
-                    indicatorIds,
-                    subjectIds)
-                .OnSuccess(releaseIds =>
+            return await _contentPersistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_ =>
                 {
                     var footnote = DbSet().Add(new Footnote
                     {
@@ -76,8 +78,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         FilterItems = new List<FilterItemFootnote>(),
                         Indicators = new List<IndicatorFootnote>(),
                         Subjects = new List<SubjectFootnote>(),
-                        // TODO BAU-384 - this can be removed when this work goes out
-                        ReleaseId = releaseIds.First()
                     }).Entity;
 
                     CreateSubjectLinks(footnote, subjectIds);
@@ -86,31 +86,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     CreateFilterItemLinks(footnote, filterItemIds);
                     CreateIndicatorsLinks(footnote, indicatorIds);
 
+                    _context.ReleaseFootnote
+                        .Add(new ReleaseFootnote()
+                        {
+                            ReleaseId = releaseId,
+                            Footnote = footnote
+                        });
+                    
                     _context.SaveChanges();
                     return footnote;
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteFootnote(Guid id)
+        public async Task<Either<ActionResult, bool>> DeleteFootnote(Guid releaseId, Guid id)
         {
-            return await _statisticsPersistenceHelper
-                .CheckEntityExists<Footnote>(id, HydrateFootnote)
-                .OnSuccess(CheckCanUpdateReleases)
-                .OnSuccess(footnote =>
+            return await _contentPersistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id)
+                .OnSuccess(async footnote =>
                 {
-                    DeleteEntities(footnote.Subjects);
-                    DeleteEntities(footnote.Filters);
-                    DeleteEntities(footnote.FilterGroups);
-                    DeleteEntities(footnote.FilterItems);
-                    DeleteEntities(footnote.Indicators);
-
-                    Remove(id);
-                    _context.SaveChanges();
+                    await _commonFootnoteService.DeleteFootnote(releaseId, footnote.Id);
+                    await _context.SaveChangesAsync();
                     return true;
-                });
+                }));
         }
 
-        public Task<Either<ActionResult, Footnote>> UpdateFootnote(Guid id,
+        public async Task<Either<ActionResult, Footnote>> UpdateFootnote(
+            Guid releaseId,
+            Guid id,
             string content,
             IReadOnlyCollection<Guid> filterIds,
             IReadOnlyCollection<Guid> filterGroupIds,
@@ -118,64 +122,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlyCollection<Guid> indicatorIds,
             IReadOnlyCollection<Guid> subjectIds)
         {
-            return _statisticsPersistenceHelper
-                .CheckEntityExists<Footnote>(id, HydrateFootnote)
-                .OnSuccess(CheckCanUpdateReleases)
-                .OnSuccess(footnote =>
-                {
-                    DbSet().Update(footnote);
-
-                    footnote.Content = content;
-
-                    UpdateFilterLinks(footnote, filterIds.ToList());
-                    UpdateFilterGroupLinks(footnote, filterGroupIds.ToList());
-                    UpdateFilterItemLinks(footnote, filterItemIds.ToList());
-                    UpdateIndicatorLinks(footnote, indicatorIds.ToList());
-                    UpdateSubjectLinks(footnote, subjectIds.ToList());
-
-                    _context.SaveChanges();
-                    return GetFootnote(id);
-                });
-        }
-
-        public async Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId)
-        {
-            var subjectIds = await _context
-                .ReleaseSubject
-                .Where(r => r.ReleaseId == releaseId)
-                .Select(r => r.SubjectId)
-                .ToListAsync();
-            
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => DbSet()
-                    .Where(footnote =>
-                        (!footnote.Subjects.Any() ||
-                         footnote.Subjects.Any(subjectFootnote => subjectIds.Contains(subjectFootnote.SubjectId)))
-                        && (!footnote.Filters.Any() || footnote.Filters.Any(filterFootnote =>
-                                subjectIds.Contains(filterFootnote.Filter.SubjectId)))
-                        && (!footnote.FilterGroups.Any() || footnote.FilterGroups.Any(filterGroupFootnote =>
-                                subjectIds.Contains(filterGroupFootnote.FilterGroup.Filter.SubjectId)))
-                        && (!footnote.FilterItems.Any() || footnote.FilterItems.Any(filterItemFootnote =>
-                                subjectIds.Contains(filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId)))
-                        && (!footnote.Indicators.Any() || footnote.Indicators.Any(indicatorFootnote =>
-                                subjectIds.Contains(indicatorFootnote.Indicator.IndicatorGroup.SubjectId)))
-                        )
-                    .Include(footnote => footnote.Filters)
-                    .ThenInclude(filterFootnote => filterFootnote.Filter)
-                    .Include(footnote => footnote.FilterGroups)
-                    .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-                    .ThenInclude(filterGroup => filterGroup.Filter)
-                    .Include(footnote => footnote.FilterItems)
-                    .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
-                    .ThenInclude(filterItem => filterItem.FilterGroup)
-                    .ThenInclude(filterGroup => filterGroup.Filter)
-                    .Include(footnote => footnote.Indicators)
-                    .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
-                    .ThenInclude(indicator => indicator.IndicatorGroup)
-                    .Include(footnote => footnote.Subjects)
-                    .AsEnumerable()
-                );
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id, HydrateFootnote)
+                .OnSuccess(async footnote =>
+                {
+                    if (await _commonFootnoteService.IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
+                    {
+                        DbSet().Update(footnote);
+
+                        footnote.Content = content;
+
+                        UpdateFilterLinks(footnote, filterIds.ToList());
+                        UpdateFilterGroupLinks(footnote, filterGroupIds.ToList());
+                        UpdateFilterItemLinks(footnote, filterItemIds.ToList());
+                        UpdateIndicatorLinks(footnote, indicatorIds.ToList());
+                        UpdateSubjectLinks(footnote, subjectIds.ToList());
+
+                        _context.SaveChanges();
+                        return GetFootnote(id);
+                    }
+                    
+                    // If this amendment of the footnote affects other release then break the link with the old 
+                    // and create a new one
+                    await _commonFootnoteService.DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
+
+                    return await CreateFootnote(
+                        releaseId,
+                        content,
+                        filterIds,
+                        filterGroupIds,
+                        filterItemIds,
+                        indicatorIds,
+                        subjectIds);
+                }));
+        }
+
+        public Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId)
+        {
+            return _contentPersistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_ => (_commonFootnoteService.GetFootnotes(releaseId)));
+        }
+
+        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)
+        {
+            return _commonFootnoteService.GetFootnotes(releaseId, new List<Guid>(){subjectId});
         }
 
         private void CreateSubjectLinks(Footnote footnote, IEnumerable<Guid> subjectIds)
@@ -294,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 CreateSubjectLinks(footnote, subjectIds);
             }
         }
-
+        
         private static void AddIndicatorLink(ref ICollection<IndicatorFootnote> links, Guid footnoteId, Guid linkId)
         {
             links.Add(new IndicatorFootnote
@@ -340,122 +334,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private void DeleteEntities<T>(IEnumerable<T> entitiesToDelete)
-        {
-            foreach (var t in entitiesToDelete)
-            {
-                _context.Entry(t).State = EntityState.Deleted;
-            }
-        }
-
         private static bool SequencesAreEqualIgnoringOrder(IEnumerable<Guid> left, IEnumerable<Guid> right)
         {
             return left.OrderBy(id => id).SequenceEqual(right.OrderBy(id => id));
         }
-
-        private List<Guid> GetSubjectIdsFromFootnoteLinks(
-            IReadOnlyCollection<Guid>? filterIds,
-            IReadOnlyCollection<Guid>? filterGroupIds,
-            IReadOnlyCollection<Guid>? filterItemIds,
-            IReadOnlyCollection<Guid>? indicatorIds,
-            IReadOnlyCollection<Guid>? subjectIds)
-        {
-            if (filterIds != null && filterIds.Any())
-            {
-                return _context
-                    .Filter
-                    .Where(f => f.Id == filterIds.First())
-                    .Select(f => f.SubjectId)
-                    .ToList();
-            }
-
-            if (filterGroupIds != null && filterGroupIds.Any())
-            {
-                return _context
-                    .FilterGroup
-                    .Include(f => f.Filter)
-                    .Where(f => f.Id == filterGroupIds.First())
-                    .Select(f => f.Filter.SubjectId)
-                    .ToList();
-            }
-            
-            if (filterItemIds != null && filterItemIds.Any())
-            {
-                return _context
-                    .FilterItem
-                    .Include(f => f.FilterGroup)
-                    .ThenInclude(f => f.Filter)
-                    .Where(f => f.Id == filterItemIds.First())
-                    .Select(f => f.FilterGroup.Filter.SubjectId)
-                    .ToList();
-            }
-            
-            if (indicatorIds != null && indicatorIds.Any())
-            {
-                return _context
-                    .Indicator
-                    .Include(i => i.IndicatorGroup)
-                    .Where(i => i.Id == indicatorIds.First())
-                    .Select(i => i.IndicatorGroup.SubjectId)
-                    .ToList();
-            }
-            
-            return subjectIds?.ToList();
-        }
-
-        private Task<Either<ActionResult, Footnote>> CheckCanUpdateReleases(Footnote footnote)
-        {
-            return CheckCanUpdateReleases(
-                    footnote.Filters?.Select(f => f.FilterId).ToList(),
-                    footnote.FilterGroups?.Select(f => f.FilterGroupId).ToList(),
-                    footnote.FilterItems?.Select(f => f.FilterItemId).ToList(),
-                    footnote.Indicators?.Select(i => i.IndicatorId).ToList(),
-                    footnote.Subjects?.Select(s => s.SubjectId).ToList()
-                )
-                .OnSuccess(_ => footnote);
-        }
-
-        // TODO BAU-384 - the returned list of release ids can be removed when this work goes out
-        private async Task<Either<ActionResult, List<Guid>>> CheckCanUpdateReleases(
-            IEnumerable<Guid> filterIds,
-            IEnumerable<Guid> filterGroupIds,
-            IEnumerable<Guid> filterItemIds,
-            IEnumerable<Guid> indicatorIds,
-            IEnumerable<Guid> subjectIds)
-        {
-            var linkedSubjectIds = GetSubjectIdsFromFootnoteLinks(
-                filterIds?.ToList(),
-                filterGroupIds?.ToList(),
-                filterItemIds?.ToList(),
-                indicatorIds?.ToList(),
-                subjectIds?.ToList()
-            );
-
-            var releaseIds = await _context
-                .ReleaseSubject
-                .Where(r => linkedSubjectIds.Contains(r.SubjectId))
-                .Select(r => r.ReleaseId)
-                .ToListAsync();
-
-            foreach (var releaseId in releaseIds)
-            {
-                var canUpdate = await GetContentReleaseById(releaseId)
-                    .OnSuccess(_userService.CheckCanUpdateRelease);
-
-                if (canUpdate.IsLeft)
-                {
-                    return canUpdate.OnSuccess(_ => new List<Guid>());
-                }
-            }
-
-            return releaseIds;
-        }
         
-        private Task<Either<ActionResult, Release>> GetContentReleaseById(Guid releaseId)
-        {
-            return _contentPersistenceHelper.CheckEntityExists<Release>(releaseId);
-        }
-
         private static IQueryable<Footnote> HydrateFootnote(IQueryable<Footnote> query)
         {
             return query

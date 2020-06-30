@@ -41,13 +41,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Release LatestRelease()
         {
-            return Releases?.Where(r => r.Live && !r.SoftDeleted && IsLatestVersionOfRelease(r.Publication, r.Id))
+            return Releases?.Where(r => r.Live && IsLatestVersionOfRelease(r.Publication, r.Id))
                 .OrderBy(r => r.Year)
                 .ThenBy(r => r.TimePeriodCoverage)
                 .LastOrDefault();
         }
         
-        private bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
+        private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
         {
             return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }

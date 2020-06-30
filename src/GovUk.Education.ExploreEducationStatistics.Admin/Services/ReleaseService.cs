@@ -48,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
+        private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly IGuidGenerator _guidGenerator;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
@@ -65,7 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IImportStatusService importStatusService,
             IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
-            IDataBlockService dataBlockService, 
+            IDataBlockService dataBlockService,
+            IReleaseSubjectService releaseSubjectService,
             IGuidGenerator guidGenerator)
         {
             _context = context;
@@ -81,6 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
+            _releaseSubjectService = releaseSubjectService;
             _guidGenerator = guidGenerator;
         }
 
@@ -187,22 +190,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefault(r => r.Id == amendment.PreviousVersionId);
 
             // Release does not have to have stats uploaded but if it has then
-            // create a link row to link back to the original subject
+            // create a link row to link back to the original subject & footnotes
             if (statsRelease != null)
             {
                 var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
 
                 var statsAmendmentSubjectLinks =_statisticsDbContext
                     .ReleaseSubject
-                    .Where(s => s.ReleaseId == amendment.PreviousVersionId)
-                    .Select(s => new ReleaseSubject
+                    .Where(rs => rs.ReleaseId == amendment.PreviousVersionId)
+                    .Select(rs => new ReleaseSubject
                     {
                         ReleaseId = statsAmendment.Id,
-                        SubjectId = s.SubjectId
+                        SubjectId = rs.SubjectId
+                    });
+  
+                var statsAmendmentFootnoteLinks =_statisticsDbContext
+                    .ReleaseFootnote
+                    .Where(rf => rf.ReleaseId == amendment.PreviousVersionId)
+                    .Select(rf => new ReleaseFootnote
+                    {
+                        ReleaseId = statsAmendment.Id,
+                        FootnoteId = rf.FootnoteId
                     });
 
                 _statisticsDbContext.Release.Add(statsAmendment);
                 _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
+                _statisticsDbContext.ReleaseFootnote.AddRange(statsAmendmentFootnoteLinks);
+                
                 await _statisticsDbContext.SaveChangesAsync();
             }
             
@@ -235,9 +249,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
                 .Where(f => f.ReleaseId == originalRelease.Id)
-                .Select(f => f.CreateReleaseAmendment(newRelease));
+                .Select(f => f.CreateReleaseAmendment(newRelease)).ToList();
 
-            await _context.AddRangeAsync(releaseFileCopies);
+            await _context.ReleaseFiles.AddRangeAsync(releaseFileCopies);
             await _context.SaveChangesAsync();
             return newRelease;
         }
@@ -375,6 +389,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }));
         }
 
+        public IEnumerable<Guid> GetReferencedReleaseFileVersions(Guid releaseId, params ReleaseFileTypes[] types)
+        {
+            return _context
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(rf => rf.ReleaseId == releaseId)
+                .Select(rf => rf.ReleaseFileReference)
+                .Where(rfr => types.Contains(rfr.ReleaseFileType))
+                .Select(rfr => rfr.ReleaseId).Distinct();
+        }
+
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
@@ -384,17 +409,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return true;
-        }
-
-        private async Task<List<ContentSection>> GetContentAsync(Guid id)
-        {
-            return await _context
-                .ReleaseContentSections
-                .Include(join => join.ContentSection)
-                .ThenInclude(section => section.Content)
-                .Where(join => join.ReleaseId == id)
-                .Select(join => join.ContentSection)
-                .ToListAsync();
         }
 
         private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
@@ -445,26 +459,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => _footnoteService.GetFootnotesAsync(releaseId))
-                .OnSuccess(async footnotes =>
+                .OnSuccess(async _ => 
                 {
                     var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var orphanFootnotes = subject == null ? new List<Footnote>() : await _subjectService.GetFootnotesOnlyForSubjectAsync(subject.Id);
+                    var footnotes = subject == null ? new List<Footnote>() : _footnoteService.GetFootnotes(releaseId, subject.Id);
                     
                     return new DeleteDataFilePlan
                     {
                         ReleaseId = releaseId,
-                        
                         SubjectId = subject?.Id ?? Guid.Empty,
-                        
                         TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName),
-                        
                         DeleteDataBlockPlan = _dataBlockService.GetDeleteDataBlockPlan(releaseId, subject),
-                        
-                        FootnoteIds = orphanFootnotes
-                           .Select(footnote => footnote.Id)
-                           .ToList()
-                     };
+                        FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
+                    };
                 });
         }
 
@@ -478,7 +485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async deletePlan =>
                 {
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                    await _subjectService.RemoveReleaseSubjectLinkAsync(releaseId, deletePlan.SubjectId);
+                    await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseId, deletePlan.SubjectId);
 
                     return await _fileStorageService
                         .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
@@ -488,7 +495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
         {
-            if (!_subjectService.Exists(deletePlan.SubjectId))
+            if (await _subjectService.GetAsync(deletePlan.SubjectId) == null)
             {
                 return await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
             }
@@ -525,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private bool CanUpdateDataFiles(Guid releaseId)
         {
             var release = _context.Releases.First(r => r.Id == releaseId);
-            return release.Status != ReleaseStatus.Approved && release.Id == release.PreviousVersionId;
+            return release.Status != ReleaseStatus.Approved;
         }
 
         private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string dataFileName)
@@ -544,9 +551,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
             }
 
-            if (!CanUpdateDataFiles(releaseFileReference.ReleaseId))
+            if (!CanUpdateDataFiles(releaseId))
             {
-                return ValidationActionResult(CannotRemoveDataFilesLinkedToAnApprovedRelease);
+                return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
             return true;
@@ -587,7 +594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.Type);
         }
         
-        public static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)
+        private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> values)
         {
             // Require publication / release / contact / type graph to be able to work out:
             // If the release is the latest

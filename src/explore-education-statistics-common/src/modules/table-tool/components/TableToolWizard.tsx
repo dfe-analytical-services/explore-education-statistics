@@ -252,7 +252,7 @@ const TableToolWizard = ({
       filters: Object.values(filters).flat(),
     };
 
-    const tableData = await tableBuilderService.getTableData(query);
+    const tableData = await tableBuilderService.getTableData(query, releaseId);
 
     if (!tableData.results.length || !tableData.subjectMeta) {
       throw new Error(

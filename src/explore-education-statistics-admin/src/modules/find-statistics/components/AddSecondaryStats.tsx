@@ -86,6 +86,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
   return (
     <>
       <DataBlockSelectForm
+        releaseId={release.id}
         label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
         onSelect={async selectedDataBlockId => {
           await Promise.all(

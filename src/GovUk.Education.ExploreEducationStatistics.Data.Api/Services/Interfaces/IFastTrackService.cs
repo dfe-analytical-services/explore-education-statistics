@@ -9,5 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     public interface IFastTrackService
     {
         Task<Either<ActionResult, FastTrackViewModel>> GetAsync(Guid fastTrackId);
+        Task<Either<ActionResult, FastTrackViewModel>> GetAsync(Guid releaseId, Guid fastTrackId);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -40,12 +41,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             RemoveSubjectIfExisting(subjectData.Name, release, context);
             
             var subject = CreateSubject(message.SubjectId, subjectData.Name, release, context);
-            CreateReleaseFileLink(message, contentDbContext, release, subject);
+
+            if (!UpdateReleaseFileReferenceLinks(message, contentDbContext, release, subject))
+            {
+                throw new Exception(
+                    "Unable to create release file links when importing : Check file references are correct");
+            }
             
             return subject;
         }
 
-        private static void CreateReleaseFileLink(ImportMessage message, ContentDbContext contentDbContext, Release release,
+        private static bool UpdateReleaseFileReferenceLinks(ImportMessage message, ContentDbContext contentDbContext, Release release,
             Subject subject)
         {
             var releaseFileLinks = contentDbContext
@@ -54,15 +60,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Where(f => f.ReleaseId == release.Id);
 
             // Make sure the filename predicate is case sensitive by executing in memory rather than in the db
-            var releaseFileLink = releaseFileLinks.ToList()
+            var releaseDataFileLink = releaseFileLinks.ToList()
                 .FirstOrDefault(file => file.ReleaseFileReference.Filename == message.DataFileName);
 
-            if (releaseFileLink != null)
+            if (releaseDataFileLink != null)
             {
-                releaseFileLink.ReleaseFileReference.SubjectId = subject.Id;
-                contentDbContext.Update(releaseFileLink);
+                releaseDataFileLink.ReleaseFileReference.SubjectId = subject.Id;
+                contentDbContext.Update(releaseDataFileLink);
+
+                var associatedMetaReference = contentDbContext.ReleaseFileReferences
+                    .FirstOrDefault(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
+                                  && rfr.ReleaseFileType == ReleaseFileTypes.Metadata);
+
+                if (associatedMetaReference == null)
+                {
+                    return false;
+                }
+
+                associatedMetaReference.SubjectId = subject.Id;
+                contentDbContext.Update(associatedMetaReference);
+
                 contentDbContext.SaveChanges();
+                return true;
             }
+
+            return false;
         }
 
         private void RemoveSubjectIfExisting(string name, Release release, StatisticsDbContext context)
@@ -86,9 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var newSubject = context.Subject.Add(new Subject
                 {
                     Id = subjectId,
-                    Name = name,
-                    // TODO BAU-384 - remove after this work goes out
-                    ReleaseId = release.Id
+                    Name = name
                 }
             ).Entity;
             

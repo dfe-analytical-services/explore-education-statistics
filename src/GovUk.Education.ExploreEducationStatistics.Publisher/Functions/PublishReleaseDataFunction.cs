@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.Azure.Management.DataFactory;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
 
-            if (IsDevelopment())
+            if (PublisherUtils.IsDevelopment())
             {
                 // Skip the ADF Pipeline which doesn't run locally
                 // If the Release is immediate then trigger publishing the content
@@ -118,12 +118,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 SubscriptionId = configuration.SubscriptionId
             };
-        }
-
-        private static bool IsDevelopment()
-        {
-            var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
-            return environment?.Equals(EnvironmentName.Development) ?? false;
         }
 
         private class DataFactoryClientConfiguration

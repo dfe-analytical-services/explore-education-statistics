@@ -109,6 +109,7 @@ const PublicationReleaseContent = () => {
           {release.summarySection && (
             <>
               <EditableSectionBlocks
+                releaseId={release.id}
                 allowComments
                 sectionId={release.summarySection.id}
                 content={release.summarySection.content}

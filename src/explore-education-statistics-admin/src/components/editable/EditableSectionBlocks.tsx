@@ -28,6 +28,7 @@ export interface EditableSectionBlockProps extends SectionBlocksProps {
 
 const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
   const {
+    releaseId,
     content = [],
     sectionId,
     isReordering = false,
@@ -103,6 +104,7 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
               )}
 
               <EditableBlockRenderer
+                releaseId={releaseId}
                 block={block}
                 editable={!isReordering && !isBrowser('IE')}
                 allowHeadings={allowHeadings}

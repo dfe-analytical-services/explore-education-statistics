@@ -157,6 +157,7 @@ const ReleaseContentAccordionSection = ({
       }
     >
       <EditableSectionBlocks
+        releaseId={release.id}
         allowHeadings
         allowComments
         isReordering={isReordering}
@@ -174,7 +175,10 @@ const ReleaseContentAccordionSection = ({
           <Button variant="secondary" onClick={addBlock}>
             Add text block
           </Button>
-          <AddDataBlockButton onAddDataBlock={attachDataBlock} />
+          <AddDataBlockButton
+            releaseId={release.id}
+            onAddDataBlock={attachDataBlock}
+          />
         </div>
       )}
     </EditableAccordionSection>

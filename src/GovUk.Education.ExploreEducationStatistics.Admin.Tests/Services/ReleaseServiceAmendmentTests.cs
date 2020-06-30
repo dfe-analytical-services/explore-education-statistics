@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -12,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -21,6 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
        public void CreateReleaseAmendmentAsync()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService,
-                fileStorageService, importStatusService, footnoteService, _, dataBlockService) = Mocks();
+                fileStorageService, importStatusService, footnoteService, _, dataBlockService, releaseSubjectService) = Mocks();
 
             var releaseId = Guid.NewGuid();
             var releaseType = new ReleaseType
@@ -312,15 +313,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subject1 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Subject 1",
-                ReleaseId = release.Id
+                Name = "Subject 1"
             };
             
             var subject2 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Subject 2",
-                ReleaseId = release.Id
+                Name = "Subject 2"
             };
 
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
@@ -391,7 +390,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         userService.Object,
                         repository.Object,
                         subjectService.Object, tableStorageService.Object, fileStorageService.Object,
-                        importStatusService.Object, footnoteService.Object, statisticsDbContext, dataBlockService.Object, new SequentialGuidGenerator());
+                        importStatusService.Object, footnoteService.Object, statisticsDbContext,
+                        dataBlockService.Object, releaseSubjectService.Object, new SequentialGuidGenerator());
 
                     // Method under test 
                     var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
@@ -616,7 +616,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IImportStatusService>,
             Mock<IFootnoteService>,
             Mock<StatisticsDbContext>,
-            Mock<IDataBlockService>) Mocks()
+            Mock<IDataBlockService>,
+            Mock<IReleaseSubjectService>) Mocks()
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
@@ -639,7 +640,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
                 new Mock<StatisticsDbContext>(),
-                new Mock<IDataBlockService>());
+                new Mock<IDataBlockService>(),
+                new Mock<IReleaseSubjectService>());
         }
     }
 }

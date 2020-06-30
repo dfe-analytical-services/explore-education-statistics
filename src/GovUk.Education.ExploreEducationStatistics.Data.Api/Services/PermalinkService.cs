@@ -23,16 +23,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IFileStorageService _fileStorageService;
         private readonly ISubjectService _subjectService;
+        private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
         public PermalinkService(ITableBuilderService tableBuilderService,
             IFileStorageService fileStorageService,
             ISubjectService subjectService,
+            IReleaseService releaseService,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
             _fileStorageService = fileStorageService;
             _subjectService = subjectService;
+            _releaseService = releaseService;
             _mapper = mapper;
         }
 
@@ -53,7 +56,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request)
         {
-            return await _tableBuilderService.Query(request.Query).OnSuccess(async result =>
+            var publicationId = _subjectService.GetPublicationForSubjectAsync(request.Query.SubjectId).Result.Id;
+            var releaseId = _releaseService.GetLatestPublishedRelease(publicationId);
+
+            return await CreateAsync(releaseId.Value, request);
+        }
+        
+        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(Guid releaseId, CreatePermalinkRequest request)
+        {
+            return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
                 var permalink = new Permalink(request.Configuration, result, request.Query);
                 await _fileStorageService.UploadFromStreamAsync(ContainerName, permalink.Id.ToString(),

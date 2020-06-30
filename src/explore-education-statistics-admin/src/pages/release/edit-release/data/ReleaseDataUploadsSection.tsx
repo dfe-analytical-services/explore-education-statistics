@@ -100,11 +100,6 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
-  // BAU-324 - temporary stopgap until Release Versioning phase 2 is tackled, to prevent data files being changed on a
-  // Release amendment
-  const [canUpdateReleaseDataFiles, setCanUpdateReleaseDataFiles] = useState<
-    boolean
-  >();
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -112,18 +107,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     Promise.all([
       releaseDataFileService.getReleaseDataFiles(releaseId),
       permissionService.canUpdateRelease(releaseId),
-      permissionService.canUpdateReleaseDataFiles(releaseId),
-    ]).then(
-      ([
-        releaseDataFiles,
-        canUpdateReleaseResponse,
-        canUpdateReleaseDataFilesResponse,
-      ]) => {
-        setDataFiles(releaseDataFiles);
-        setCanUpdateRelease(canUpdateReleaseResponse);
-        setCanUpdateReleaseDataFiles(canUpdateReleaseDataFilesResponse);
-      },
-    );
+    ]).then(([releaseDataFiles, canUpdateReleaseResponse]) => {
+      setDataFiles(releaseDataFiles);
+      setCanUpdateRelease(canUpdateReleaseResponse);
+    });
   }, [publicationId, releaseId]);
 
   const resetPage = async ({ resetForm }: FormikHelpers<FormValues>) => {
@@ -238,7 +225,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       {form => {
         return (
           <Form id={formId}>
-            {canUpdateRelease && canUpdateReleaseDataFiles && (
+            {canUpdateRelease && (
               <>
                 {isUploading && (
                   <LoadingSpinner text="Uploading files" overlay />
@@ -310,13 +297,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
             {typeof canUpdateRelease !== 'undefined' &&
               !canUpdateRelease &&
-              !canUpdateReleaseDataFiles &&
               'This release has been approved, and can no longer be updated.'}
-
-            {typeof canUpdateRelease !== 'undefined' &&
-              canUpdateRelease &&
-              !canUpdateReleaseDataFiles &&
-              'This release is an amendment to a live release and so it is not possible to change any data files.'}
 
             {dataFiles.length > 0 && (
               <>
@@ -412,32 +393,30 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                           <SummaryListItem term="Date uploaded">
                             {format(dataFile.created, 'd/M/yyyy HH:mm')}
                           </SummaryListItem>
-                          {canUpdateRelease &&
-                            canUpdateReleaseDataFiles &&
-                            dataFile.canDelete && (
-                              <SummaryListItem
-                                term="Actions"
-                                actions={
-                                  <ButtonText
-                                    onClick={() =>
-                                      releaseDataFileService
-                                        .getDeleteDataFilePlan(
-                                          releaseId,
-                                          dataFile,
-                                        )
-                                        .then(plan => {
-                                          setDeleteDataFile({
-                                            plan,
-                                            file: dataFile,
-                                          });
-                                        })
-                                    }
-                                  >
-                                    Delete files
-                                  </ButtonText>
-                                }
-                              />
-                            )}
+                          {canUpdateRelease && dataFile.canDelete && (
+                            <SummaryListItem
+                              term="Actions"
+                              actions={
+                                <ButtonText
+                                  onClick={() =>
+                                    releaseDataFileService
+                                      .getDeleteDataFilePlan(
+                                        releaseId,
+                                        dataFile,
+                                      )
+                                      .then(plan => {
+                                        setDeleteDataFile({
+                                          plan,
+                                          file: dataFile,
+                                        });
+                                      })
+                                  }
+                                >
+                                  Delete files
+                                </ButtonText>
+                              }
+                            />
+                          )}
                         </SummaryList>
                       </AccordionSection>
                     );
@@ -496,7 +475,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       deleteDataFile.plan.footnoteIds.length > 1
                         ? 'footnotes'
                         : 'footnote'
-                    } will be removed.`}
+                    } will be removed or updated.`}
                   </p>
                 )}
               </ModalConfirm>

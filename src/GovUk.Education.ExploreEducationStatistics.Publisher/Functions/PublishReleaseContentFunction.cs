@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -17,14 +18,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IPublishingService _publishingService;
+        private readonly IReleaseService _releaseService;
 
         public PublishReleaseContentFunction(INotificationsService notificationsService,
             IReleaseStatusService releaseStatusService,
-            IPublishingService publishingService)
+            IPublishingService publishingService,
+            IReleaseService releaseService)
         {
             _notificationsService = notificationsService;
             _releaseStatusService = releaseStatusService;
             _publishingService = publishingService;
+            _releaseService = releaseService;
         }
 
         /**
@@ -51,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     try
                     {
                         await _publishingService.PublishStagedReleaseContentAsync(releaseStatus.ReleaseId);
+
                         published.Add(releaseStatus);
                     }
                     catch (Exception e)
@@ -65,6 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 try
                 {
+                    if (!PublisherUtils.IsDevelopment())
+                    {
+                        await _releaseService.RemoveDataForPreviousVersions(releaseIds);
+                    }
+
                     await _notificationsService.NotifySubscribersAsync(releaseIds);
                     await UpdateStage(published, Complete);
                 }

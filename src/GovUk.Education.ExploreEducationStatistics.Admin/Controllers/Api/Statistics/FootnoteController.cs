@@ -38,11 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _releaseMetaService = releaseMetaService;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(CreateFootnoteViewModel footnote)
+        [HttpPost("release/{releaseId}")]
+        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(Guid releaseId, CreateFootnoteViewModel footnote)
         {
             return await _footnoteService
-                .CreateFootnote(footnote.Content,
+                .CreateFootnote(
+                    releaseId,
+                    footnote.Content,
                     footnote.Filters,
                     footnote.FilterGroups,
                     footnote.FilterItems,
@@ -52,11 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOr(Ok);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteFootnote(Guid id)
+        [HttpDelete("release/{releaseId}/{id}")]
+        public async Task<ActionResult> DeleteFootnote(Guid releaseId, Guid id)
         {
             return await _footnoteService
-                .DeleteFootnote(id)
+                .DeleteFootnote(releaseId, id)
                 .HandleFailuresOrNoContent();
         }
 
@@ -85,17 +87,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     {
                         Footnotes = viewModels,
                         Meta = subjects
-
                     };
                 })
                 .HandleFailuresOr(Ok);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid id, UpdateFootnoteViewModel footnote)
+        [HttpPut("release/{releaseId}/{id}")]
+        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid releaseId, Guid id, UpdateFootnoteViewModel footnote)
         {
             return await _footnoteService
-                .UpdateFootnote(id,
+                .UpdateFootnote(
+                    releaseId,
+                    id,
                     footnote.Content,
                     footnote.Filters,
                     footnote.FilterGroups,

@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -25,13 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _logger = logger;
         }
 
-        [HttpPost]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query([FromBody] ObservationQueryContext query)
+        [HttpPost("release/{releaseId}")]
+        public Task<ActionResult<TableBuilderResultViewModel>> Query(Guid releaseId, [FromBody] ObservationQueryContext query)
         {
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var tableBuilderResultViewModel = _tableBuilderService.Query(query);
+            var tableBuilderResultViewModel = _tableBuilderService.Query(releaseId, query);
 
             stopwatch.Stop();
             _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);

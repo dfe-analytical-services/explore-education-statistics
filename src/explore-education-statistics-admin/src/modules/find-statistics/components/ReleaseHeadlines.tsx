@@ -84,6 +84,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
       )}
 
       <DataBlockRenderer
+        releaseId={release.id}
         id="releaseHeadlines-dataBlock"
         dataBlock={release.keyStatisticsSecondarySection.content[0]}
         getInfographic={getChartFile}
@@ -94,6 +95,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
             </section>
             <section id="releaseHeadlines-headlines">
               <EditableSectionBlocks
+                releaseId={release.id}
                 allowComments
                 sectionId={release.headlinesSection.id}
                 content={release.headlinesSection.content}

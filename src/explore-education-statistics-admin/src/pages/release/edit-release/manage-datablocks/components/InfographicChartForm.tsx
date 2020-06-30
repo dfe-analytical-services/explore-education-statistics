@@ -67,7 +67,7 @@ const InfographicChartForm = ({
         });
         await refreshFiles();
 
-        onSubmit((values.file as File).name);
+        onSubmit((values.file as File).name.toLowerCase());
       } finally {
         setUploading(false);
       }

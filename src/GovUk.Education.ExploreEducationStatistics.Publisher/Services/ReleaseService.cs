@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -18,16 +22,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IFileStorageService fileStorageService,
+            IReleaseSubjectService releaseSubjectService,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _fileStorageService = fileStorageService;
+            _releaseSubjectService = releaseSubjectService;
             _mapper = mapper;
         }
 
@@ -74,8 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => !release.SoftDeleted && IsReleasePublished(release, includedReleaseIds) &&
-                                  IsLatestVersionOfRelease(release.Publication, release.Id))
+                .Where(release => IsReleasePublished(release, includedReleaseIds) &&
+                                  IsLatestVersionOfRelease(release.Publication.Releases, release.Id, includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
@@ -105,6 +112,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 throw new ArgumentException("Content Release does not exist", nameof(id));
             }
 
+            if (contentRelease.Amendment)
+            {
+                var previousVersion = await _contentDbContext.Releases.AsNoTracking()
+                    .SingleOrDefaultAsync(r => r.Id == contentRelease.PreviousVersionId);
+
+                if (previousVersion?.Published == null)
+                {
+                    throw new ArgumentException("Previous version of release does not exist or is not live", nameof(contentRelease.PreviousVersionId));
+                }
+
+                published = previousVersion.Published.Value;
+            }
+
             _contentDbContext.Releases.Update(contentRelease);
             contentRelease.Published ??= published;
 
@@ -125,15 +145,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await _statisticsDbContext.SaveChangesAsync();
             }
         }
-
-        private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
+        
+        public List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types)
         {
-            return release.Live || includedReleaseIds.Contains(release.Id);
+            return _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(rfr => rfr.ReleaseId == releaseId)
+                .Select(rf => rf.ReleaseFileReference)
+                .Where(rfr => types.Contains(rfr.ReleaseFileType))
+                .ToList();
         }
 
-        private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
+        public async Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds)
         {
-            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+            var versions = await _contentDbContext.Releases.Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
+                .ToListAsync();
+            var previousVersions = versions.Select(v => v.PreviousVersionId);
+            
+            foreach (var releaseSubject in await _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)).ToListAsync())
+            {
+                if (!await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseSubject.ReleaseId,
+                    releaseSubject.SubjectId))
+                {
+                    throw new ArgumentException($"An error occurred  while trying to soft delete subject {releaseSubject.SubjectId} or break link with previous amendment version for releaseId {releaseSubject.ReleaseId}");
+                }
+            }
         }
     }
 }

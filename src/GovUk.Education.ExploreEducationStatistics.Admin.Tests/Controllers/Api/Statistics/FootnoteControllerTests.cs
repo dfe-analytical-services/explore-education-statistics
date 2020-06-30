@@ -45,7 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var createFootnoteResult = Task.FromResult(new Either<ActionResult, Footnote>(footnote));
             
-            footnoteService.Setup(s => s.CreateFootnote("Sample footnote",
+            footnoteService.Setup(s => s.CreateFootnote(
+                ReleaseId,
+                "Sample footnote",
                 It.IsAny<IReadOnlyCollection<Guid>>(),
                 It.IsAny<IReadOnlyCollection<Guid>>(),
                 It.IsAny<IReadOnlyCollection<Guid>>(),
@@ -63,7 +65,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Subjects = new List<SubjectFootnote>()
             }));
             
-            footnoteService.Setup(s => s.UpdateFootnote(FootnoteId,
+            footnoteService.Setup(s => s.UpdateFootnote(
+                ReleaseId,
+                FootnoteId,
                 "Updated sample footnote",
                 It.IsAny<IReadOnlyCollection<Guid>>(),
                 It.IsAny<IReadOnlyCollection<Guid>>(),
@@ -79,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             footnoteService.Setup(s => s.GetFootnotesAsync(ReleaseId)).Returns(footnotes);
 
             var deleteFootnoteResult = Task.FromResult(new Either<ActionResult, bool>(true));
-            footnoteService.Setup(s => s.DeleteFootnote(FootnoteId)).Returns(deleteFootnoteResult);
+            footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).Returns(deleteFootnoteResult);
 
             var subjects = subjectIds.Select(id => new IdLabel(id, $"Subject {id}")).ToList();
             releaseMetaService.Setup(s => s.GetSubjectsAsync(ReleaseId)).ReturnsAsync(subjects);
@@ -143,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public void Post_CreateFootnote_Returns_Ok()
         {
-            var result = _controller.CreateFootnote(new CreateFootnoteViewModel
+            var result = _controller.CreateFootnote(ReleaseId, new CreateFootnoteViewModel()
             {
                 Content = "Sample footnote",
                 Filters = new List<Guid>(),
@@ -168,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public void Put_UpdateFootnote_Returns_Ok()
         {
-            var result = _controller.UpdateFootnote(FootnoteId, new UpdateFootnoteViewModel
+            var result = _controller.UpdateFootnote(ReleaseId, FootnoteId, new UpdateFootnoteViewModel
             {
                 Content = "Updated sample footnote",
                 Filters = new List<Guid>(),
@@ -185,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public void Delete_DeleteFootnote_Returns_Ok()
         {
-            var result = _controller.DeleteFootnote(FootnoteId);
+            var result = _controller.DeleteFootnote(ReleaseId, FootnoteId);
             Assert.IsAssignableFrom<NoContentResult>(result.Result);
         }
     }

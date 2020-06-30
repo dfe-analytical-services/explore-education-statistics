@@ -19,6 +19,7 @@ export const KeyStatTileColumn: FunctionComponent = ({ children }) => {
 };
 
 export interface KeyStatProps {
+  releaseId: string;
   children?: ReactNode;
   query: TableDataQuery;
   queryOptions?: TableQueryOptions;
@@ -27,6 +28,7 @@ export interface KeyStatProps {
 }
 
 const KeyStatTile = ({
+  releaseId,
   children,
   query,
   queryOptions,
@@ -38,6 +40,7 @@ const KeyStatTile = ({
       ...query,
       includeGeoJson: false,
     },
+    releaseId,
     queryOptions,
   );
 

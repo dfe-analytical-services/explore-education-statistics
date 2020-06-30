@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -17,11 +18,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             _tableBuilderService = tableBuilderService;
         }
-
+        
         [HttpPost]
         public Task<ActionResult<TableBuilderResultViewModel>> Query([FromBody] ObservationQueryContext query)
         {
             return _tableBuilderService.Query(query).HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/{releaseId}")]
+        public Task<ActionResult<TableBuilderResultViewModel>> Query(Guid releaseId, [FromBody] ObservationQueryContext query)
+        {
+            return _tableBuilderService.Query(releaseId, query).HandleFailuresOrOk();
         }
     }
 }

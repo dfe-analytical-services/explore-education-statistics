@@ -42,6 +42,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           .map(block => (
             <KeyStatTileColumn key={block.id}>
               <EditableKeyStatTile
+                releaseId={release.id}
                 id={block.id}
                 name={block.name}
                 query={block.dataBlockRequest}
@@ -98,6 +99,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
     <>
       {isFormOpen ? (
         <KeyStatSelectForm
+          releaseId={release.id}
           onSelect={addKeyStatToSection}
           onCancel={() => setIsFormOpen(false)}
         />

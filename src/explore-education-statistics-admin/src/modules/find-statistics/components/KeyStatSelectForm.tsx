@@ -7,6 +7,7 @@ import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 
 interface Props {
+  releaseId: string;
   onSelect: (selectedDataBlockId: string) => void;
   onCancel?: () => void;
   hideCancel?: boolean;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const KeyStatSelectForm = ({
+  releaseId,
   onSelect,
   onCancel = () => {},
   hideCancel = false,
@@ -53,6 +55,7 @@ const KeyStatSelectForm = ({
           open
         >
           <KeyStatTile
+            releaseId={releaseId}
             summary={selectedDataBlock.summary}
             query={selectedDataBlock.dataBlockRequest}
           />
