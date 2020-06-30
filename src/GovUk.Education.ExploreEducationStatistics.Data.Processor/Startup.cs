@@ -37,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<IImportStatusService, ImportStatusService>()
                 .AddSingleton<IValidatorService, ValidatorService>()
                 .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
-                .AddApplicationInsightsTelemetry()
                 .BuildServiceProvider();
 
             FailedImportsHandler.CheckIncompleteImports(GetConfigurationValue(serviceProvider, "CoreStorage"));
