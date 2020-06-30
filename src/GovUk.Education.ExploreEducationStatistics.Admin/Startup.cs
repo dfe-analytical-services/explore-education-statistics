@@ -44,7 +44,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -72,12 +71,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging(builder =>
-            {
-                builder.AddApplicationInsights(Configuration.GetSection("AppInsights").GetValue<string>("InstrumentationKey"));
-                builder.AddFilter<ApplicationInsightsLoggerProvider>("", HostingEnvironment.IsDevelopment() ? LogLevel.Debug : LogLevel.Information);
-                builder.AddFilter<ApplicationInsightsLoggerProvider>("Microsoft", LogLevel.Information);
-            });
             services.AddApplicationInsightsTelemetry();
             
             services.Configure<CookiePolicyOptions>(options =>
