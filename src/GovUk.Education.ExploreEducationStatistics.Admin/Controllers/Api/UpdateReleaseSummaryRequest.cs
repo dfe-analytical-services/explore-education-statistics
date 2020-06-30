@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using static System.Globalization.CultureInfo;
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             {
                 DateTime.TryParseExact(PublishScheduled, "yyyy-MM-dd", InvariantCulture,DateTimeStyles.None,
                     out var dateTime);
-                return dateTime;
+                return dateTime.AsStartOfDayUtc();
             }
         }
 

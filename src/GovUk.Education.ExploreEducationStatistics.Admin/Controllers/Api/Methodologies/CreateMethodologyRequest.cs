@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using static System.Globalization.CultureInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             {
                 DateTime.TryParseExact(PublishScheduled, "yyyy-MM-dd", InvariantCulture,DateTimeStyles.None,
                     out var dateTime);
-                return dateTime;
+                return dateTime.AsStartOfDayUtc();
             }
         }
 
