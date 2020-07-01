@@ -1,19 +1,8 @@
 import { dataApi } from '@common/services/api';
-import {
-  TableDataQuery,
-  TableDataResponse,
-} from '@common/services/tableBuilderService';
+import { TableDataQuery } from '@common/services/tableBuilderService';
+import { ConfiguredTable } from '@common/services/types/table';
 
-export interface Permalink {
-  id: string;
-  title: string;
-  created: string;
-  fullTable: TableDataResponse;
-  configuration: {
-    tableHeaders: UnmappedTableHeadersConfig;
-  };
-  query: TableDataQuery;
-}
+export type Permalink = ConfiguredTable;
 
 export type TableHeader =
   | {
