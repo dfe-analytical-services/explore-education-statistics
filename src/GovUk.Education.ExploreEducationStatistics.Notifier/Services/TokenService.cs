@@ -42,9 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
                     email = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                //_logger.LogInformation($"error validating token : {e.Message}");
+                // ignored
             }
 
             return email;
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 
         private static TokenValidationParameters GetValidationParameters(string secretKey)
         {
-            return new TokenValidationParameters()
+            return new TokenValidationParameters
             {
                 ValidateLifetime = true, // Because there is no expiration in the generated token
                 ValidateAudience = false, // Because there is no audience in the generated token
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
                 ValidIssuer = "Sample",
                 ValidAudience = "Sample",
                 IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(secretKey)) // The same key as the one that generate the token
+                    Encoding.UTF8.GetBytes(secretKey)) // The same key as the one that generate the token
             };
         }
     }
