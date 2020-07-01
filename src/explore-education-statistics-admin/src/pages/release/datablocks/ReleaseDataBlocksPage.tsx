@@ -4,8 +4,10 @@ import dataBlocksService, {
   DeleteDataBlockPlan,
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
+import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
+import Gate from '@common/components/Gate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -20,7 +22,7 @@ export interface ReleaseDataBlocksPageParams {
 
 const emptyDataBlocks: ReleaseDataBlock[] = [];
 
-const ReleaseDataBlocksPage = ({
+const ReleaseDataBlocksPageInternal = ({
   match,
   history,
 }: RouteComponentProps<ReleaseDataBlocksPageParams>) => {
@@ -189,6 +191,25 @@ const ReleaseDataBlocksPage = ({
         />
       </LoadingSpinner>
     </>
+  );
+};
+
+const ReleaseDataBlocksPage = (
+  props: RouteComponentProps<ReleaseDataBlocksPageParams>,
+) => {
+  const {
+    match: {
+      params: { releaseId },
+    },
+  } = props;
+
+  return (
+    <Gate
+      condition={() => permissionService.canUpdateRelease(releaseId)}
+      fallback={<p>This release is currently not editable.</p>}
+    >
+      <ReleaseDataBlocksPageInternal {...props} />
+    </Gate>
   );
 };
 

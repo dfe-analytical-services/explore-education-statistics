@@ -6,11 +6,8 @@ import ReleaseDataBlocksPage, {
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
-import permissionService from '@admin/services/permissionService';
-import Gate from '@common/components/Gate';
 import { OmitStrict } from '@common/types';
-import React from 'react';
-import { generatePath, RouteComponentProps, RouteProps } from 'react-router';
+import { generatePath, RouteProps } from 'react-router';
 
 export type ReleaseRouteParams = { publicationId: string; releaseId: string };
 
@@ -65,23 +62,7 @@ export const dataBlocksRoute = createReadonlyRoute<ReleaseDataBlocksPageParams>(
   'datablocks/:dataBlockId?',
   'Manage data blocks',
   {
-    // eslint-disable-next-line react/display-name
-    render: (props: RouteComponentProps<ReleaseDataBlocksPageParams>) => {
-      const {
-        match: {
-          params: { releaseId },
-        },
-      } = props;
-
-      return (
-        <Gate
-          condition={() => permissionService.canUpdateRelease(releaseId)}
-          fallback={<p>This release is currently not editable.</p>}
-        >
-          <ReleaseDataBlocksPage {...props} />
-        </Gate>
-      );
-    },
+    component: ReleaseDataBlocksPage,
   },
 );
 
