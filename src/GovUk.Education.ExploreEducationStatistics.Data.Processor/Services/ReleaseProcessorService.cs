@@ -70,7 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var associatedMetaReference = contentDbContext.ReleaseFileReferences
                     .FirstOrDefault(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
-                                  && rfr.ReleaseFileType == ReleaseFileTypes.Metadata);
+                                  && rfr.ReleaseFileType == ReleaseFileTypes.Metadata
+                                  && rfr.Filename == message.MetaFileName);
 
                 if (associatedMetaReference == null)
                 {

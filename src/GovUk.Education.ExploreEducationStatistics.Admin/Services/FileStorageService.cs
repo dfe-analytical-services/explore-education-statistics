@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo))
                             .OnSuccess(() => CreateBasicFileLink(metadataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Metadata))
                             // add message to queue to process these files
-                            .OnSuccessDo(() => _importService.Import(dataFile.FileName.ToLower(), releaseId, dataFile))
+                            .OnSuccessDo(() => _importService.Import(dataFile.FileName.ToLower(), metadataFile.FileName.ToLower(), releaseId, dataFile))
                             .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata));
                 });
         }
