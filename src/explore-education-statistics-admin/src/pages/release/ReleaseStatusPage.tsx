@@ -43,6 +43,11 @@ const errorCodeMappings = [
     'status',
     'Check all uploaded datafiles are complete before approving',
   ),
+  errorCodeToFieldError(
+    'PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED',
+    'status',
+    'Release has already been published and cannot be un-approved',
+  ),
 ];
 
 interface FormValues {

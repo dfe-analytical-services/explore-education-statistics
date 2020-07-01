@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -285,6 +285,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, request.Status))
                 .OnSuccess(async release =>
                 {
+                    if (request.Status != ReleaseStatus.Approved && release.Published.HasValue)
+                    {
+                        return ValidationActionResult(PublishedReleaseCannotBeUnapproved);
+                    }
+
                     if (request.Status == ReleaseStatus.Approved &&
                         request.PublishMethod == PublishMethod.Scheduled &&
                         !request.PublishScheduledDate.HasValue)
