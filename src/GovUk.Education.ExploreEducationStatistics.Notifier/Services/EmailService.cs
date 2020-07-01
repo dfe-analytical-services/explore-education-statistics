@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             string templateId,
             Dictionary<string, dynamic> values)
         {
-            client.SendEmail(emailAddress: email, templateId: templateId, personalisation: values);
+            client.SendEmail(email, templateId, values);
         }
     }
 }
