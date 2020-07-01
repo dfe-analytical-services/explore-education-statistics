@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _guidGenerator = guidGenerator;
         }
 
-        public async void Import(string dataFileName, Guid releaseId, IFormFile dataFile)
+        public async void Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             pQueue.CreateIfNotExists();
             aQueue.CreateIfNotExists();
             var numRows = FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
-            var message = BuildMessage(dataFileName, releaseId, numRows);
+            var message = BuildMessage(dataFileName, metaFileName, releaseId);
             
             await UpdateImportTableRow(
                 releaseId,
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
         }
 
-        private ImportMessage BuildMessage(string dataFileName, Guid releaseId, int numRows)
+        private ImportMessage BuildMessage(string dataFileName, string metaFileName, Guid releaseId)
         {
             var release = _context.Releases
                 .Where(r => r.Id.Equals(releaseId))
@@ -108,6 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 SubjectId = _guidGenerator.NewGuid(),
                 DataFileName = dataFileName,
                 OrigDataFileName = dataFileName,
+                MetaFileName = metaFileName,
                 Release = importMessageRelease,
                 NumBatches = 1,
                 BatchNo = 1
