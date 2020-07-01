@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Model
         public Guid SubjectId { get; set; }
         public string DataFileName { get; set; }
         public string OrigDataFileName { get; set; }
+        public string MetaFileName { get; set; }
         public Release Release { get; set; }
         public int NumBatches { get; set; }
         public int BatchNo { get; set; }

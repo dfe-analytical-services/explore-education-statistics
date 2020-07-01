@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -70,7 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var associatedMetaReference = contentDbContext.ReleaseFileReferences
                     .FirstOrDefault(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
-                                  && rfr.ReleaseFileType == ReleaseFileTypes.Metadata);
+                                  && rfr.ReleaseFileType == ReleaseFileTypes.Metadata
+                                  && rfr.Filename == message.MetaFileName);
 
                 if (associatedMetaReference == null)
                 {
