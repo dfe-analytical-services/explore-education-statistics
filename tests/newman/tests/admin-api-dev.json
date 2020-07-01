@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5a63a70e-d73b-4ead-9a82-0fb8ff223833",
+		"_postman_id": "55067c45-2f5a-49f1-9544-243a830dd14f",
 		"name": "DfE Admin API - Dev tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -146,7 +146,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "af35f47b-efa1-46f1-b1cc-f3d034e123de",
+								"id": "c41b0f36-83a2-45cd-89bd-d9db4f727fe5",
 								"exec": [
 									""
 								],
@@ -156,7 +156,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fbb1c39d-d5a7-44db-bd5d-445143effe6e",
+								"id": "54a60411-5cee-4fa0-8005-208810b3e0fb",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -241,7 +241,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "17228cfe-0836-497e-ada5-03466b01df74",
+								"id": "b78ece07-cb4f-41e0-82f4-eecd7f49e89d",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -308,7 +308,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b8623ac5-498d-4b88-8fd1-2cb634a289a4",
+								"id": "3527b347-6096-4915-b13c-8163297b8ae3",
 								"exec": [
 									""
 								],
@@ -350,7 +350,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "feb24fae-2c68-4a8c-a4ad-50305388c5dc",
+								"id": "5ad88739-6190-464e-8989-7fec5c8c101b",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -398,7 +398,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "13fed99c-bb40-4394-aaab-c85774bfb139",
+								"id": "734c2941-8f70-48e4-9796-6d1a6512c116",
 								"exec": [
 									""
 								],
@@ -450,7 +450,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "350b9b05-3a41-4ad3-862e-d4512ac7dba0",
+								"id": "6b25c169-a5dd-4a0b-a941-0a1fd9130680",
 								"exec": [
 									"// Wait for subject to be imported from \"Import subject (SUB1)\" request",
 									"if(pm.environment.get('env') === 'local') {",
@@ -465,7 +465,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fdccd19f-6265-4ef8-85e1-91624968e9a9",
+								"id": "49786c45-7cb7-4e8b-afed-4289efafc93e",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -518,7 +518,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e6dff99d-f0b5-46e5-af65-ea89cead4e47",
+								"id": "2d6a71d3-7d20-4d2e-86c5-628ba043bdd4",
 								"exec": [
 									""
 								],
@@ -528,7 +528,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "48a32c5c-06bb-456b-953d-2613a51e516d",
+								"id": "281085f7-6e8a-4c4b-9b08-17d8b77e76f7",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -711,7 +711,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d4ce692e-fc47-4318-97d9-7e7cae9fa149",
+								"id": "5e6b745d-aa7c-4a1a-8b53-97274c4009ab",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -740,7 +740,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "81982cfb-ba11-495d-9ab1-4f13d99b28ec",
+								"id": "2dcd8364-09af-4c03-a4c4-d6cbad842baf",
 								"exec": [
 									""
 								],
@@ -781,7 +781,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1fd58110-eab3-402b-b21a-37c77416053b",
+								"id": "5e91f7d1-a1a2-4871-9369-aca7f7301153",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -819,7 +819,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "52d04c56-a08a-4dfd-b2b4-42948d0ed2e6",
+								"id": "af8c63de-4034-49b6-ba73-f9019d249a7e",
 								"exec": [
 									""
 								],
@@ -860,7 +860,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b14d4029-dd8c-40ae-b207-ce78e8e5c48f",
+								"id": "75fb65c2-c473-4c4a-a2a1-1b868ee9ae36",
 								"exec": [
 									"const respJson = pm.response.json();",
 									"",
@@ -976,7 +976,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "26734b99-bcf8-4bcc-b8c0-86367f2ba699",
+								"id": "c194ff1c-07f2-4550-bc49-523b8d398ada",
 								"exec": [
 									"const respJson = pm.response.json();",
 									"",
@@ -1092,7 +1092,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "d12ece71-61fd-4af2-b647-513c59c3417e",
+								"id": "94ec65eb-0079-4596-a3d5-4fb0eab4b722",
 								"exec": [
 									""
 								],
@@ -1102,7 +1102,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3c55c11e-31f8-4553-9f1a-e735712d1271",
+								"id": "9fceb8a9-1743-4513-b1ea-cae39f1d9d1d",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1165,7 +1165,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "36028011-e066-4947-9dee-8cfc88ddb449",
+								"id": "e91e06a6-6ce3-4542-bc3f-8eb209ac7939",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1191,7 +1191,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0c7b7606-5b2e-4fe6-bcba-5a936bb3a9c2",
+								"id": "9def42ec-26a5-4aa1-aecd-2cf25045e81b",
 								"exec": [
 									""
 								],
@@ -1225,7 +1225,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ad336ba6-0d6b-4fc7-aa46-6ed6b3fad381",
+								"id": "6c747ff9-bee1-497e-8635-688180ec4756",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1245,7 +1245,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "2c78f0d7-a11d-4bd8-aee1-297372dbb780",
+								"id": "c4d215d3-4941-42f3-8a48-3e90303a811c",
 								"exec": [
 									""
 								],
@@ -1285,7 +1285,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "860eead7-864b-4320-9668-48a2ab533fbc",
+								"id": "778681ab-0ca5-4478-bb87-bb3939178faa",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1340,7 +1340,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1b1417cd-8285-44d4-828c-e5a1cd42e352",
+								"id": "2d410bd0-d8dd-4a67-a424-80ce44c20983",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1408,7 +1408,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b3bf8210-5918-40bb-a77b-3b498159044f",
+								"id": "68a2b965-b1d5-4a36-bf39-5a03182c63cf",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1462,7 +1462,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "85324d9d-ee96-4047-97ac-d9823688bee3",
+								"id": "a17ae844-a87f-41e3-9c84-f0a51298275b",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1513,7 +1513,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "902607fc-48a1-48b1-b1b3-86198fe55509",
+								"id": "ad72e5b3-8cbd-4efb-bff2-12284151aed8",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1591,7 +1591,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8bce0a6b-3b43-4b56-bb18-507c1b5c7298",
+								"id": "fad5aa3d-8d21-4bbe-81b1-75b29221d127",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1645,7 +1645,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "d5381d70-653b-43d3-826f-a74c9f19508a",
+								"id": "ce805bc3-8fa5-4535-ad22-04c0290a7c25",
 								"exec": [
 									""
 								],
@@ -1681,7 +1681,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "27398216-18ad-402f-a838-90f76ade29b2",
+								"id": "39f1a4f3-ad47-492d-b169-d8dee8e2ba3f",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1731,7 +1731,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0c6c17e9-7c5e-4108-8e06-6e9f52384149",
+								"id": "02342854-fd2d-4317-a7c3-e28659188238",
 								"exec": [
 									""
 								],
@@ -1761,7 +1761,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f12f90bf-0464-43d2-8035-e9d33a0070df",
+								"id": "51883bdd-7faa-4df3-bccd-74ed38bbf97e",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -1827,7 +1827,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "fbaa73c0-161f-4e38-83ac-a5495c33f502",
+								"id": "e9021054-f5b1-42a1-91c7-4d33636978cc",
 								"exec": [
 									""
 								],
@@ -1869,7 +1869,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "60234297-fb0d-4751-9690-803f18e97aa6",
+												"id": "0dd80945-93b6-43d9-b094-32a4793f566e",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -1899,7 +1899,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "8eaecece-ed14-4c7d-9658-45a123ce0658",
+												"id": "bbe59cf4-1232-4a92-b401-22f3742b9e64",
 												"exec": [
 													"// Wait for subject to be imported from \"Import subject (SUB1)\" request",
 													"setTimeout(function () {}, 5000);"
@@ -1939,7 +1939,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "8016846d-e4d0-441c-bfe2-d17877275491",
+												"id": "ccc0de07-da0e-486d-bff1-5d46ac58cfb0",
 												"exec": [
 													""
 												],
@@ -1949,7 +1949,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "691a1368-a535-44de-bf04-8d0044b8e7f8",
+												"id": "6ab5fd6a-5a23-42f3-a434-d9936d2a2ae4",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2132,7 +2132,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "1dd546bc-2c7c-4c08-bcfe-15ad4b5da14a",
+												"id": "fb5618c5-bab6-43f2-b799-34e7154d7d04",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -2196,7 +2196,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "b3f452bf-af0d-41cd-af6e-4d5767c17048",
+												"id": "1a4c4b6a-e9e4-46d6-b2a5-b82186ce4c79",
 												"exec": [
 													""
 												],
@@ -2249,7 +2249,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9260fd93-6e75-44d0-9723-72aabf1d42cb",
+										"id": "320dcbf4-bf66-42d5-9cfa-3e736e74369c",
 										"exec": [
 											"respJson = pm.response.json();",
 											"",
@@ -2345,7 +2345,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "d0527e83-f5af-40c8-9205-1d355fc9f267",
+										"id": "da2937bd-7942-46d3-8ffc-6b9fe2fababe",
 										"exec": [
 											""
 										],
@@ -2399,7 +2399,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5a94e749-8b10-49e5-ab5d-15174ec831ad",
+										"id": "569a5309-9a51-44e8-8730-9783159c5fc1",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2450,7 +2450,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "09d13f18-d2b2-44e3-8507-e2358ad03d6a",
+										"id": "75ca1472-e10e-46f7-be14-e6990b6f6a1d",
 										"exec": [
 											""
 										],
@@ -2489,7 +2489,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "8d428ddb-6b0c-4d42-b446-c6b5b8250128",
+										"id": "4569370e-e602-4e4a-99a6-ef72117bb0ca",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2513,7 +2513,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "30af3621-ea9d-4176-a7b5-f0452a780a21",
+										"id": "79f0a638-32b5-4e57-a91f-9e151731cfb0",
 										"exec": [
 											""
 										],
@@ -2554,7 +2554,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "aa040a7e-3796-4248-b166-a80f6fdd2959",
+										"id": "89152392-68dc-4e3d-b184-9a7aacb1c276",
 										"exec": [
 											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
 										],
@@ -2564,7 +2564,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "67275b36-3fa5-42af-91ea-59752da435ef",
+										"id": "8c6e3d63-fd12-4092-a489-27c8778e4d79",
 										"exec": [
 											""
 										],
@@ -2595,7 +2595,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "eba0e181-ceac-46b7-adb7-6300b192bca9",
+										"id": "5b75bb80-dd48-46e4-9e1f-cb9495e395d1",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2619,7 +2619,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "cd7252c1-d835-4120-bcfb-f65d06df59cf",
+										"id": "6c15731b-d44d-413b-b83d-272b30d4c5a7",
 										"exec": [
 											""
 										],
@@ -2660,7 +2660,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "38d41a99-9f35-4d85-9b38-aaa5310808eb",
+										"id": "7db77067-27b0-4ace-ad22-dbfac1473e8d",
 										"exec": [
 											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
 										],
@@ -2670,7 +2670,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "aea2e4b6-2cc7-477d-b9fd-8a3297072a3d",
+										"id": "d82b2d04-ff06-418e-837e-7309cf271d51",
 										"exec": [
 											""
 										],
@@ -2701,7 +2701,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "2f67b33a-25ea-45a1-a991-122fcedf041b",
+										"id": "0213b9a6-25d0-43f5-8721-652fe4f56083",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2725,7 +2725,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "9f807cbb-2aa9-4530-9022-5988b94e1863",
+										"id": "e7c319b2-6699-40e9-847b-3231a910fcba",
 										"exec": [
 											""
 										],
@@ -2766,7 +2766,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f3d7f13f-4cc2-4755-a842-8a5d4bebe38e",
+										"id": "cc7f07cb-4863-4fec-83fe-5189ec4f298e",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -2791,7 +2791,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "f3e1c035-dfda-4685-a66a-6b8a3e37fbdf",
+										"id": "441edb7a-6951-406c-a410-69f58cffbf7e",
 										"exec": [
 											""
 										],
@@ -2833,7 +2833,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6ae2244d-50a7-4826-8885-6712cb3cdc0e",
+										"id": "544787b7-6357-4fd5-a68a-cb22bbab9f2e",
 										"exec": [
 											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
 										],
@@ -2843,7 +2843,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "47808be2-2c96-4b26-b342-9f0e1c942d14",
+										"id": "9867ccb7-fea0-4bfc-a3b8-500515a76ad2",
 										"exec": [
 											""
 										],
@@ -2874,7 +2874,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9da5957e-4bfa-423d-b473-daff06a4f4c6",
+										"id": "bb5e624a-f52d-40e2-94ab-08fb847693dc",
 										"exec": [
 											"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
 										],
@@ -2884,7 +2884,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "37ee6733-51d9-41cd-932e-b05a34dd6846",
+										"id": "0ad92a7b-e07b-4086-8e46-4b60d8088b21",
 										"exec": [
 											""
 										],
@@ -2918,7 +2918,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "a1dd24ab-46de-42f1-b2b2-cef169d08925",
+						"id": "202ba067-75b0-4c29-abed-9e5cceb0f480",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2928,7 +2928,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e654d16d-aeff-402d-ba00-46e79c824c02",
+						"id": "ace350cf-f889-4a36-8b33-ea03ae3057c5",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2950,7 +2950,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c7879fff-c1c4-4409-95ad-ad5e6e30a08c",
+										"id": "553e0cc8-b443-4665-826f-d7cbd769cb8c",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3039,7 +3039,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a4f27227-c8d8-47bd-9e10-6f04a9d81db4",
+										"id": "05ca15cf-7628-4219-9252-7b53e0fee42c",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3099,7 +3099,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5cbbc248-fdf5-4fbb-829f-433badbf7cbb",
+										"id": "a3af9fd3-7547-45b9-b662-37e38f271eea",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3157,7 +3157,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b5d9c141-3df6-4912-9a84-f7df767e3827",
+										"id": "1a6330bd-45bf-4292-8f27-35c61300b993",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3219,7 +3219,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "2cf77267-d107-4df0-ad0f-fc442ab09c49",
+										"id": "9520f0bb-e93a-47e2-8313-5734fa45a11c",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3283,7 +3283,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b4161f09-9dff-47d1-8488-37d84c4941b5",
+										"id": "89947036-126b-4618-88da-ed8f0e28d613",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3337,7 +3337,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4e0c838b-401c-47ee-8aba-994d3b210150",
+										"id": "66c6d82c-ebba-4099-8822-6c630641f979",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3395,7 +3395,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "73598f74-b957-465f-aac6-7a0dcba21754",
+										"id": "7487d852-bcfe-4066-bdb9-7734b710a21d",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3449,7 +3449,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "34b0be70-476a-4b17-9eb7-96d3815865a4",
+										"id": "17398793-0221-4b01-b583-51687fe1cdca",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3498,7 +3498,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "348975e3-2c7e-4c8a-bc17-63520fff852d",
+										"id": "be92f879-1533-4dca-bade-a8dd6326019c",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -3559,7 +3559,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "c89c8dd0-2f34-4cbc-b1dd-e263ac0e9de2",
+												"id": "a9c511b4-0375-4590-b4c9-2076edba4929",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3606,7 +3606,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "c31cc040-2df9-4751-8e8e-b2f8baead597",
+												"id": "98f87ff4-db41-4ceb-ac29-3b865635f55d",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3663,7 +3663,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "50ac73fb-0efa-46c1-a367-1d6a4dd0710c",
+												"id": "44e00ffe-407b-4474-98e1-5db3b5793f0b",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -3714,7 +3714,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "bae8edf4-c86b-4514-afbe-27e16e13d8d4",
+												"id": "c71e9562-0b7b-496c-a2bd-9066e72c7420",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3771,7 +3771,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "b1891dc0-a468-47c6-9211-356fa2d33760",
+												"id": "99459562-9f69-48c0-b7c1-62bea750fce5",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3828,7 +3828,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "06088f55-80fd-4c11-8253-7b16b1473e8a",
+												"id": "8bfc4b4e-0793-4d82-a6ac-50f27d86ee17",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -3899,7 +3899,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "2994e3e2-86b1-4f7b-9306-06e77e8cfc1d",
+												"id": "07b233af-48bb-4d92-a998-82000264417e",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -3950,7 +3950,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ad41ead6-abe3-4fe7-b277-e8e2fbceec11",
+												"id": "ca309884-8764-45dc-a0ac-2d58754c7dc5",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4001,7 +4001,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "90b37288-3380-4864-b6de-188419512298",
+												"id": "421172a8-d557-4026-9172-1d814ca322ae",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4052,7 +4052,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ac650c56-5e0c-4fab-83ee-671ba819301a",
+												"id": "2f0059f7-9ec6-4005-b269-78e7a746235f",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4127,7 +4127,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "6efe5ada-2e4c-4e73-82ac-b7251b84099d",
+												"id": "d3f51acc-9187-4e4a-93dc-710de0bfe8f1",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4198,7 +4198,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "88f51180-ac42-4fe8-826a-57570a8fffc8",
+												"id": "11cde875-4517-4875-aefc-115d8d00215b",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4273,7 +4273,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "97b64e1b-cb89-4223-8293-5d672c1a3451",
+												"id": "31952ce9-1151-4549-b349-adfee6334742",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4344,7 +4344,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "c0d39a39-0c3a-43eb-b3db-6a8fcfb6f22a",
+												"id": "96192438-2b12-415d-9d6e-57679679216c",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4410,7 +4410,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f69520da-fdb4-47a2-b9ed-9ff870863270",
+												"id": "93c1351b-dc07-438b-b37e-3e67978f3a85",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4478,7 +4478,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ba217fa5-1bbe-4bdd-ade7-03b89b4587d8",
+												"id": "8b411bca-b1c1-4e0f-9dae-ee67721fa9c0",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4535,7 +4535,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "e45ebad2-c84a-4450-8d0b-3c0f141a8669",
+												"id": "2dde82e1-31de-48c6-ad9f-93ad9659074d",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4608,7 +4608,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "e9425460-7d2e-4640-b755-042bfb3d722b",
+												"id": "fadd5f6c-3d72-45c2-8166-ea12d628fcb3",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4666,7 +4666,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "74e36139-a309-4284-8a60-5b8a5a9008fb",
+												"id": "8b05a759-4b37-4725-9fce-29871f87e596",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4732,7 +4732,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "913fa7a0-51d3-4263-984f-bcce83e120ff",
+												"id": "f159bfc4-fa04-43c3-84e3-f5b99da28069",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4798,7 +4798,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "22cdf92b-30e1-4b2d-bd08-9b937fa0e98f",
+												"id": "5fb395f2-1613-4b07-95b4-5222e8ed040f",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -4868,7 +4868,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "002ad617-58f4-4180-9da2-4dba1922fe7e",
+												"id": "ad24d90e-b31e-43ea-9a44-7d1d99155b74",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4924,7 +4924,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "6b1ce0f4-0099-4da4-b55e-610a5eeb55e8",
+												"id": "3b9fd02f-3efb-4bb5-83b3-17087cc80888",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -4980,7 +4980,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "5e85a7b9-9ab3-496b-ac3c-f429aff8ccf4",
+												"id": "ccf61e14-531c-4039-97cf-b568cbbcba7e",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5046,7 +5046,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "75cd8d62-d1bd-4af3-a408-eb81e6bc4928",
+												"id": "fb974e20-969d-4f1c-977f-0c6bafb50ccb",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5113,7 +5113,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "5af30968-df78-46de-9474-cf41f72d2221",
+												"id": "d1e04819-578f-4b2f-9553-0e8a5ee980f7",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5179,7 +5179,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "c4f78440-5e35-47a4-b7df-dbe2146b258a",
+												"id": "5dd45989-a48d-4014-93f0-4f25805c849a",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5239,7 +5239,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "933d9806-1ae3-4b73-822e-ed515c71fb23",
+												"id": "43edc484-5a5f-4611-a635-59065bdf5c26",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5293,7 +5293,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "341f8cb7-1d9e-4658-aa88-e0d0be6392ef",
+												"id": "beef77e1-e3e6-4bf9-88eb-a4199dd83234",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5340,7 +5340,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ee5a13de-431e-44ae-95b1-d401923ae259",
+												"id": "48fa0fb2-18b9-4bea-bbc2-3def29b64376",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5405,7 +5405,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "02ad2381-f55a-49be-add6-7668bcde312d",
+												"id": "530f908c-0bc5-4ac1-99fc-ad8b7a76b506",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5470,7 +5470,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "c3a1fe4c-2635-4aac-85f7-bbfa65d328e6",
+												"id": "7008b36a-8f30-46e5-be03-6608eba31285",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5526,7 +5526,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "6571e043-82c0-47d4-b0c6-d7d813e14223",
+												"id": "f30616a1-0435-4a37-bf6c-6ee4c837781b",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5594,7 +5594,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "8ae42f4d-e4a3-49ea-8d73-e1cdacfb796a",
+												"id": "04930c98-cb1f-4728-b12d-3fce30d2c3fc",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -5659,7 +5659,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f86f062a-6961-4e60-befa-1ccb4b6a1db9",
+												"id": "08b8dc76-ae15-4731-b63f-f38714c65c14",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5742,7 +5742,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "47e4b1e1-d876-4e4b-b8be-55d274151ff0",
+												"id": "2bf86302-5d9d-49ab-bb9f-89ecb926c357",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5789,7 +5789,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "35be4345-a903-4629-8238-fbb8c8bcc68e",
+												"id": "39bdd9aa-564c-4799-ae0d-2a09d3eed231",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5836,7 +5836,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "329633b4-8a8e-40e5-94e7-383d1453ecdb",
+												"id": "50270b5d-a768-4efc-b0bd-80e110969157",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5883,7 +5883,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "25f0d3ad-dafa-474e-985a-d8173fa05815",
+												"id": "ab0384ab-fc40-46e8-9aa6-bc8abd5c9529",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5930,7 +5930,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "186a14db-da7f-4036-b858-929ec859df15",
+												"id": "a4108365-acb5-4768-93fe-bd1067f2f0ad",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6007,7 +6007,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f75b3a56-0b03-4c8e-bcc0-8b5eef29354b",
+												"id": "aa2f60e1-031d-4455-be92-e616ead54b10",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6190,7 +6190,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "46076754-c831-40ab-9b75-bfcbdfd0cf02",
+												"id": "c14b6d3f-2fe0-4434-bb13-acff802337c4",
 												"exec": [
 													"pm.test(\"Store environment variables\", function() {",
 													"    const respJson = pm.response.json();",
@@ -6237,7 +6237,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "69b6cde5-602a-479b-b4fc-6cc51861ad4c",
+												"id": "67a3eaad-957a-4098-8058-d37b6050dfa5",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6292,7 +6292,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "06603a04-bec2-4f72-b309-457112867960",
+												"id": "052cbb61-ff68-4baa-9d1c-834edcca0152",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6347,7 +6347,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "872c48ea-b041-4c37-a72e-cfdc0b772532",
+												"id": "d1836e24-65e3-49a9-8009-f623866dad06",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6404,7 +6404,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "e4fd01a0-33b8-41e4-a7a4-0418ae10f285",
+												"id": "270ea9c5-6696-40a3-aa06-9a2fab9fd7a5",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6464,7 +6464,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "ac5c7c3e-76fc-4299-a001-6a3e39120d91",
+												"id": "c8a50c74-66f8-42c0-8f20-a4efeb806f78",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6519,7 +6519,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "853775a7-168b-4f0c-92d6-d47c43fb433a",
+												"id": "ee89f0fe-40f2-485f-a9d7-e0f4548e2718",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6574,7 +6574,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "e799bc4a-99ac-4551-82d3-5c504b4689a1",
+												"id": "e512c779-4204-4da0-82d0-e4669252dc0e",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6629,7 +6629,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "3912eb64-ec9f-4376-aaa1-164f33d1b73d",
+												"id": "f5ca5ad0-347c-4334-98bc-a6a2ea4593e3",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6694,7 +6694,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "d88c3b90-1dbb-495b-b68c-f0e00413e3f9",
+												"id": "bdcaba4e-e2d0-43c8-91fc-9a45cdaa762f",
 												"exec": [
 													"var respJson;",
 													"",
@@ -6749,7 +6749,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "5f683fe6-f8b5-4c63-a2bd-a036d4626ee2",
+												"id": "d9ce2ee2-1313-4231-8c10-9180c6f1337c",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6806,7 +6806,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "c774cdfa-b986-4715-bdd0-13748ae0701b",
+												"id": "c284c224-0071-464d-8852-0810ea2e22aa",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6868,7 +6868,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "9c448061-2ad5-4baa-bbd6-9fdb272cccd3",
+												"id": "deb86437-25d2-4e5b-9050-c70825d1f2fe",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -6923,7 +6923,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "5b673902-bf74-41d8-ab4b-84a0184b3d78",
+												"id": "396fe39e-a119-40f5-9e79-6389afd71a11",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -6970,7 +6970,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "8b39b8f6-48c8-499c-89b4-a2863163eb44",
+												"id": "37799f46-730d-45b1-89c0-7d4d57ea098d",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -7035,7 +7035,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "214c5368-c5dc-4056-b052-ac53eeb25ddb",
+												"id": "5428e83b-d4dc-4ed8-9aaf-5501810f7107",
 												"exec": [
 													"const respJson = pm.response.json();",
 													"",
@@ -7081,7 +7081,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "15514fe3-def0-412b-80f8-56b8fb0bd555",
+												"id": "225c676d-cc32-45cf-8794-6f87800d8f0e",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -7263,7 +7263,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "4009852e-cdac-48f9-851c-2a751bcc6411",
+												"id": "77f48d45-187d-4b03-bee0-dbccabca9ae4",
 												"exec": [
 													"pm.test(\"Status code is 204\", function() {",
 													"    pm.response.to.have.status(204);",
@@ -7301,7 +7301,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "dacc040d-302b-49cf-8d54-be052918f62e",
+												"id": "e41e8a8c-1934-4faa-88eb-2d7afde0f1c3",
 												"exec": [
 													"pm.test(\"Status code is 204\", function() {",
 													"    pm.response.to.have.status(204);",
@@ -7351,124 +7351,12 @@
 					"name": "Check status updates",
 					"item": [
 						{
-							"name": "Release - API test publication - 2025",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{admin_api_url}}/releases/{{release_id}}",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"releases",
-										"{{release_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Release summary - API test publication - 2025",
+							"name": "Update Release - API test publication - 2025",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "98320f69-573b-4df3-bab7-33ce979cc916",
-										"exec": [
-											"var respJson = pm.response.json();",
-											"",
-											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-											"",
-											"pm.test(\"Fields are correct\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"type\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"type.id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"type.title\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
-											"    pm.expect(pm.response.to.not.have.jsonBody(\"internalReleaseNote\"));",
-											"});",
-											"",
-											"pm.test(\"Save SUB1 summary id\", function () {",
-											"    pm.globals.set('sub1_summary_id', respJson.id);",
-											"});",
-											"",
-											"pm.test(\"type should should be correct\", function () { ",
-											"    pm.expect(respJson.type.id).to.equal(\"8becd272-1100-4e33-8a7d-1c0c4e3b42b8\");",
-											"    pm.expect(respJson.type.title).to.equal(\"National Statistics\");",
-											"});",
-											"",
-											"pm.test(\"timePeriodCoverage should be correct\", function () {",
-											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"CY\"); ",
-											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
-											"});",
-											"",
-											"pm.test(\"publishScheduled should be correct\", function () {",
-											"    pm.expect(respJson.publishScheduled).to.equal(\"2026-01-01\"); ",
-											"});",
-											"",
-											"pm.test(\"nextReleaseDate should be correct\", function () {",
-											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2027\");",
-											"    pm.expect(respJson.nextReleaseDate.month).to.equal(\"1\");",
-											"    pm.expect(respJson.nextReleaseDate.day).to.equal(\"1\");",
-											"});",
-											"",
-											"pm.test(\"releaseName should be correct\", function() {",
-											"    pm.expect(respJson.releaseName).to.equal(\"2025\"); ",
-											"});",
-											"",
-											"pm.test(\"slug should be correct\", function() {",
-											"    pm.expect(respJson.slug).to.equal(\"2025\");",
-											"});",
-											"",
-											"pm.test(\"status should be correct\", function() {",
-											"    pm.expect(respJson.status).to.equal(\"Draft\"); ",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "9e0a6d36-42a7-4ddd-8d67-0189335545fa",
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{admin_api_url}}/releases/{{release_id}}/summary/",
-									"host": [
-										"{{admin_api_url}}"
-									],
-									"path": [
-										"releases",
-										"{{release_id}}",
-										"summary",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Release Status - API test publication - 2025",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "7e8ef306-1959-4355-841f-ffee322eb510",
+										"id": "88e6e91f-ddfc-4fd6-bc86-af7e0063f0a7",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -7483,13 +7371,12 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match summary id\", function () {",
-											"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_summary_id'));",
+											"pm.test(\"id should be correct\", function () {",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get('release_id'));",
 											"});",
 											"",
 											"pm.test(\"type should should be correct\", function () { ",
@@ -7498,26 +7385,22 @@
 											"});",
 											"",
 											"pm.test(\"timePeriodCoverage should be correct\", function () {",
-											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"CY\"); ",
-											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
+											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"AY\"); ",
+											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Academic Year\");",
 											"});",
 											"",
 											"pm.test(\"publishScheduled should be correct\", function () {",
-											"    pm.expect(respJson.publishScheduled).to.equal(\"2026-01-01\"); ",
+											"    pm.expect(respJson.publishScheduled).to.equal(\"2027-01-01\"); ",
 											"});",
 											"",
 											"pm.test(\"nextReleaseDate should be correct\", function () {",
-											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2027\");",
+											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2028\");",
 											"    pm.expect(respJson.nextReleaseDate.month).to.equal(\"1\");",
 											"    pm.expect(respJson.nextReleaseDate.day).to.equal(\"1\");",
 											"});",
 											"",
 											"pm.test(\"releaseName should be correct\", function() {",
 											"    pm.expect(respJson.releaseName).to.equal(\"2025\"); ",
-											"});",
-											"",
-											"pm.test(\"slug should be correct\", function() {",
-											"    pm.expect(respJson.slug).to.equal(\"2025\");",
 											"});",
 											"",
 											"pm.test(\"status should be correct\", function() {",
@@ -7534,7 +7417,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "611ac319-6664-43b8-920e-fc152fd3571f",
+										"id": "a8b393d8-3611-45c6-865c-749ab0d6598b",
 										"exec": [
 											""
 										],
@@ -7554,29 +7437,28 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"releaseStatus\": \"HigherLevelReview\",\n\t\"internalReleaseNote\": \"API test note - Higher review\"\n}"
+									"raw": "{\n\t\"typeId\": \"8becd272-1100-4e33-8a7d-1c0c4e3b42b8\",\n\t\"releaseName\": \"2025\",\n\t\"timePeriodCoverage\": {\n\t\t\"value\": \"AY\"\n\t},\n\t\"publishScheduled\": \"2027-01-01\",\n\t\"nextReleaseDate\": {\n\t\t\"day\": 1,\n\t\t\"month\": 1,\n\t\t\"year\": 2028\n\t},\n\t\"status\": \"HigherLevelReview\",\n\t\"internalReleaseNote\": \"API test note - Higher review\"\n\n}"
 								},
 								"url": {
-									"raw": "{{admin_api_url}}/releases/{{release_id}}/status",
+									"raw": "{{admin_api_url}}/releases/{{release_id}}",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"releases",
-										"{{release_id}}",
-										"status"
+										"{{release_id}}"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Release summary - API test publication - 2025 - Check 1st change",
+							"name": "Release - API test publication - 2025 - Check 1st change",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "a66fbfe2-e160-43e2-b6ad-c9c78bfcb124",
+										"id": "0dbfc1f2-dfab-46e2-818c-b2ae78bc21b1",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -7591,13 +7473,12 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match summary id\", function () {",
-											"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_summary_id'));",
+											"pm.test(\"id should be correct\", function () {",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get('release_id'));",
 											"});",
 											"",
 											"pm.test(\"type should should be correct\", function () { ",
@@ -7606,26 +7487,22 @@
 											"});",
 											"",
 											"pm.test(\"timePeriodCoverage should be correct\", function () {",
-											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"CY\"); ",
-											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
+											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"AY\"); ",
+											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Academic Year\");",
 											"});",
 											"",
 											"pm.test(\"publishScheduled should be correct\", function () {",
-											"    pm.expect(respJson.publishScheduled).to.equal(\"2026-01-01\"); ",
+											"    pm.expect(respJson.publishScheduled).to.equal(\"2027-01-01\"); ",
 											"});",
 											"",
 											"pm.test(\"nextReleaseDate should be correct\", function () {",
-											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2027\");",
+											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2028\");",
 											"    pm.expect(respJson.nextReleaseDate.month).to.equal(\"1\");",
 											"    pm.expect(respJson.nextReleaseDate.day).to.equal(\"1\");",
 											"});",
 											"",
 											"pm.test(\"releaseName should be correct\", function() {",
 											"    pm.expect(respJson.releaseName).to.equal(\"2025\"); ",
-											"});",
-											"",
-											"pm.test(\"slug should be correct\", function() {",
-											"    pm.expect(respJson.slug).to.equal(\"2025\");",
 											"});",
 											"",
 											"pm.test(\"status should be correct\", function() {",
@@ -7642,7 +7519,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "c2db4165-5202-499f-90ab-9e486f1df508",
+										"id": "58e0c067-419a-4257-9a32-ee4d84d619df",
 										"exec": [
 											""
 										],
@@ -7654,15 +7531,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{admin_api_url}}/releases/{{release_id}}/summary/",
+									"raw": "{{admin_api_url}}/releases/{{release_id}}",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"releases",
-										"{{release_id}}",
-										"summary",
-										""
+										"{{release_id}}"
 									]
 								}
 							},
@@ -7674,7 +7549,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "453cdc64-def0-48d2-bcfa-26895758170c",
+										"id": "50f4710f-3574-464c-9837-e3123cd3a101",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -7689,16 +7564,16 @@
 											"pm.test(\"Should contain API test release\", function() {",
 											"    var testRelease = respJson.find(release => release.id === pm.globals.get('release_id'));",
 											"    pm.expect(testRelease).to.not.be.undefined;",
-											"    pm.expect(testRelease.title).to.equal(\"Calendar Year 2025\");",
+											"    pm.expect(testRelease.title).to.equal(\"Academic Year 2025/26\");",
 											"    pm.expect(testRelease.publicationId).to.equal(pm.globals.get('publication_id'));",
 											"    pm.expect(testRelease.publicationTitle).to.equal(`API test publication ${pm.globals.get('RUN_IDENTIFIER')}`);",
-											"    pm.expect(testRelease.nextReleaseDate.year).to.equal(\"2027\");",
+											"    pm.expect(testRelease.nextReleaseDate.year).to.equal(\"2028\");",
 											"    pm.expect(testRelease.nextReleaseDate.month).to.equal(\"1\");",
 											"    pm.expect(testRelease.nextReleaseDate.day).to.equal(\"1\");",
-											"    pm.expect(testRelease.publishScheduled).to.equal(\"2026-01-01\");",
+											"    pm.expect(testRelease.publishScheduled).to.equal(\"2027-01-01\");",
 											"    pm.expect(testRelease.live).to.equal(false);",
-											"    pm.expect(testRelease.timePeriodCoverage.value).to.equal(\"CY\");",
-											"    pm.expect(testRelease.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
+											"    pm.expect(testRelease.timePeriodCoverage.value).to.equal(\"AY\");",
+											"    pm.expect(testRelease.timePeriodCoverage.label).to.equal(\"Academic Year\");",
 											"    //pm.expect(testRelease.latestRelease).to.equal(false); // Not implemented!",
 											"    //pm.expect(testRelease.type.title).to.equal(\"National Statistics\");",
 											"    pm.expect(testRelease.contact.id).to.equal(\"d246c696-4b3a-4aeb-842c-c1318ee334e8\");",
@@ -7714,7 +7589,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "61b35ee0-debd-4fe3-bb42-0103d4d8b5e2",
+										"id": "cddcc341-c2cc-4745-b132-babca08645e5",
 										"exec": [
 											""
 										],
@@ -7758,7 +7633,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9801f18a-6275-4fa2-9476-a04777d2a529",
+										"id": "7ed8f53a-9ad5-4e35-a443-4c5e389dac88",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -7783,7 +7658,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "92811ec4-8495-46ed-be2d-4947d953bf99",
+										"id": "065c560f-36e8-4d74-9a3d-66b33d7b4e94",
 										"exec": [
 											""
 										],
@@ -7808,12 +7683,12 @@
 							"response": []
 						},
 						{
-							"name": "Update Release Status - API test publication - 2025 - Draft",
+							"name": "Update Release status - API test publication - 2025 - Draft",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "d73e455d-7484-4ec1-aa6c-0fcfe21b805a",
+										"id": "7815a249-0d9b-4d43-bb40-914a1e8fb67a",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -7828,13 +7703,12 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match summary id\", function () {",
-											"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_summary_id'));",
+											"pm.test(\"id should be correct\", function () {",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get('release_id'));",
 											"});",
 											"",
 											"pm.test(\"type should should be correct\", function () { ",
@@ -7843,26 +7717,22 @@
 											"});",
 											"",
 											"pm.test(\"timePeriodCoverage should be correct\", function () {",
-											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"CY\"); ",
-											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
+											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"AY\"); ",
+											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Academic Year\");",
 											"});",
 											"",
 											"pm.test(\"publishScheduled should be correct\", function () {",
-											"    pm.expect(respJson.publishScheduled).to.equal(\"2026-01-01\"); ",
+											"    pm.expect(respJson.publishScheduled).to.equal(\"2027-01-01\"); ",
 											"});",
 											"",
 											"pm.test(\"nextReleaseDate should be correct\", function () {",
-											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2027\");",
+											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2028\");",
 											"    pm.expect(respJson.nextReleaseDate.month).to.equal(\"1\");",
 											"    pm.expect(respJson.nextReleaseDate.day).to.equal(\"1\");",
 											"});",
 											"",
 											"pm.test(\"releaseName should be correct\", function() {",
 											"    pm.expect(respJson.releaseName).to.equal(\"2025\"); ",
-											"});",
-											"",
-											"pm.test(\"slug should be correct\", function() {",
-											"    pm.expect(respJson.slug).to.equal(\"2025\");",
 											"});",
 											"",
 											"pm.test(\"status should be correct\", function() {",
@@ -7879,7 +7749,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "fec7188e-6ba3-481f-83c9-5d65dbfeb2e5",
+										"id": "0f612b04-ebe2-4f33-bb66-f5be52bcb798",
 										"exec": [
 											""
 										],
@@ -7899,29 +7769,28 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"API test note - Draft\"\n}"
+									"raw": "\n{\n\t\"typeId\": \"8becd272-1100-4e33-8a7d-1c0c4e3b42b8\",\n\t\"releaseName\": \"2025\",\n\t\"timePeriodCoverage\": {\n\t\t\"value\": \"AY\"\n\t},\n\t\"publishScheduled\": \"2027-01-01\",\n\t\"nextReleaseDate\": {\n\t\t\"day\": 1,\n\t\t\"month\": 1,\n\t\t\"year\": 2028\n\t},\n\t\"status\": \"Draft\",\n\t\"internalReleaseNote\": \"API test note - Draft\"\n}"
 								},
 								"url": {
-									"raw": "{{admin_api_url}}/releases/{{release_id}}/status",
+									"raw": "{{admin_api_url}}/releases/{{release_id}}",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"releases",
-										"{{release_id}}",
-										"status"
+										"{{release_id}}"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Release summary - API test publication - 2025 - Check 2nd change",
+							"name": "Release - API test publication - 2025 - Check 2nd change",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "f20335c0-85e9-4ab4-953e-0f428099a4e9",
+										"id": "058c72e0-3981-43f1-b703-b56d1648f2db",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -7936,13 +7805,12 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match summary id\", function () {",
-											"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_summary_id'));",
+											"pm.test(\"id should be correct\", function () {",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get('release_id'));",
 											"});",
 											"",
 											"pm.test(\"type should should be correct\", function () { ",
@@ -7951,26 +7819,22 @@
 											"});",
 											"",
 											"pm.test(\"timePeriodCoverage should be correct\", function () {",
-											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"CY\"); ",
-											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
+											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"AY\"); ",
+											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Academic Year\");",
 											"});",
 											"",
 											"pm.test(\"publishScheduled should be correct\", function () {",
-											"    pm.expect(respJson.publishScheduled).to.equal(\"2026-01-01\"); ",
+											"    pm.expect(respJson.publishScheduled).to.equal(\"2027-01-01\"); ",
 											"});",
 											"",
 											"pm.test(\"nextReleaseDate should be correct\", function () {",
-											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2027\");",
+											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2028\");",
 											"    pm.expect(respJson.nextReleaseDate.month).to.equal(\"1\");",
 											"    pm.expect(respJson.nextReleaseDate.day).to.equal(\"1\");",
 											"});",
 											"",
 											"pm.test(\"releaseName should be correct\", function() {",
 											"    pm.expect(respJson.releaseName).to.equal(\"2025\"); ",
-											"});",
-											"",
-											"pm.test(\"slug should be correct\", function() {",
-											"    pm.expect(respJson.slug).to.equal(\"2025\");",
 											"});",
 											"",
 											"pm.test(\"status should be correct\", function() {",
@@ -7987,7 +7851,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "93df3d0b-0221-4364-9385-ed389aac39c8",
+										"id": "c13121ce-6699-4afc-8ffb-e3bccab925b2",
 										"exec": [
 											""
 										],
@@ -7999,27 +7863,25 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{admin_api_url}}/releases/{{release_id}}/summary/",
+									"raw": "{{admin_api_url}}/releases/{{release_id}}",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"releases",
-										"{{release_id}}",
-										"summary",
-										""
+										"{{release_id}}"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Update Release Status - API test publication - 2025 - Approved",
+							"name": "Update Release status - API test publication - 2025 - Approved",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "c9db6425-a1a8-48c2-9a7e-4796ff9a3120",
+										"id": "7478a3d6-5bbb-4db6-a6ef-02083830fa6f",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8034,13 +7896,12 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match summary id\", function () {",
-											"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_summary_id'));",
+											"pm.test(\"id should be correct\", function () {",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get('release_id'));",
 											"});",
 											"",
 											"pm.test(\"type should should be correct\", function () { ",
@@ -8049,26 +7910,22 @@
 											"});",
 											"",
 											"pm.test(\"timePeriodCoverage should be correct\", function () {",
-											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"CY\"); ",
-											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
+											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"AY\"); ",
+											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Academic Year\");",
 											"});",
 											"",
 											"pm.test(\"publishScheduled should be correct\", function () {",
-											"    pm.expect(respJson.publishScheduled).to.equal(\"2026-01-01\"); ",
+											"    pm.expect(respJson.publishScheduled).to.equal(\"2027-01-01\"); ",
 											"});",
 											"",
 											"pm.test(\"nextReleaseDate should be correct\", function () {",
-											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2027\");",
+											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2028\");",
 											"    pm.expect(respJson.nextReleaseDate.month).to.equal(\"1\");",
 											"    pm.expect(respJson.nextReleaseDate.day).to.equal(\"1\");",
 											"});",
 											"",
 											"pm.test(\"releaseName should be correct\", function() {",
 											"    pm.expect(respJson.releaseName).to.equal(\"2025\"); ",
-											"});",
-											"",
-											"pm.test(\"slug should be correct\", function() {",
-											"    pm.expect(respJson.slug).to.equal(\"2025\");",
 											"});",
 											"",
 											"pm.test(\"status should be correct\", function() {",
@@ -8085,7 +7942,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "4d8c6a99-045d-4c59-b330-1af8962adc42",
+										"id": "46486ea6-d4fb-46df-97fc-42442ffe7c6e",
 										"exec": [
 											""
 										],
@@ -8105,29 +7962,28 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"releaseStatus\": \"Approved\",\n\t\"internalReleaseNote\": \"API test note - Approved\"\n}"
+									"raw": "\n{\n\t\"typeId\": \"8becd272-1100-4e33-8a7d-1c0c4e3b42b8\",\n\t\"releaseName\": \"2025\",\n\t\"timePeriodCoverage\": {\n\t\t\"value\": \"AY\"\n\t},\n\t\"publishScheduled\": \"2027-01-01\",\n\t\"nextReleaseDate\": {\n\t\t\"day\": 1,\n\t\t\"month\": 1,\n\t\t\"year\": 2028\n\t},\n\t\"status\": \"Approved\",\n\t\"internalReleaseNote\": \"API test note - Approved\"\n}"
 								},
 								"url": {
-									"raw": "{{admin_api_url}}/releases/{{release_id}}/status",
+									"raw": "{{admin_api_url}}/releases/{{release_id}}",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"releases",
-										"{{release_id}}",
-										"status"
+										"{{release_id}}"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Release summary - API test publication - 2025 - Check 3rd change",
+							"name": "Release - API test publication - 2025 - Check 3rd change",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "31711622-7d4a-4b87-8eba-cea9e3635764",
+										"id": "c5d05247-0d19-4ef0-9d0f-c5963523b6b6",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8142,13 +7998,12 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match summary id\", function () {",
-											"    pm.expect(respJson.id).to.equal(pm.globals.get('sub1_summary_id'));",
+											"pm.test(\"id should be correct\", function () {",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get('release_id'));",
 											"});",
 											"",
 											"pm.test(\"type should should be correct\", function () { ",
@@ -8157,26 +8012,22 @@
 											"});",
 											"",
 											"pm.test(\"timePeriodCoverage should be correct\", function () {",
-											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"CY\"); ",
-											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
+											"    pm.expect(respJson.timePeriodCoverage.value).to.equal(\"AY\"); ",
+											"    pm.expect(respJson.timePeriodCoverage.label).to.equal(\"Academic Year\");",
 											"});",
 											"",
 											"pm.test(\"publishScheduled should be correct\", function () {",
-											"    pm.expect(respJson.publishScheduled).to.equal(\"2026-01-01\"); ",
+											"    pm.expect(respJson.publishScheduled).to.equal(\"2027-01-01\"); ",
 											"});",
 											"",
 											"pm.test(\"nextReleaseDate should be correct\", function () {",
-											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2027\");",
+											"    pm.expect(respJson.nextReleaseDate.year).to.equal(\"2028\");",
 											"    pm.expect(respJson.nextReleaseDate.month).to.equal(\"1\");",
 											"    pm.expect(respJson.nextReleaseDate.day).to.equal(\"1\");",
 											"});",
 											"",
 											"pm.test(\"releaseName should be correct\", function() {",
 											"    pm.expect(respJson.releaseName).to.equal(\"2025\"); ",
-											"});",
-											"",
-											"pm.test(\"slug should be correct\", function() {",
-											"    pm.expect(respJson.slug).to.equal(\"2025\");",
 											"});",
 											"",
 											"pm.test(\"status should be correct\", function() {",
@@ -8193,7 +8044,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "af065952-1b7f-4046-bc2a-69ea66794359",
+										"id": "ae1c67e7-3bf0-4d32-9935-28ae48514fec",
 										"exec": [
 											""
 										],
@@ -8205,15 +8056,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{admin_api_url}}/releases/{{release_id}}/summary/",
+									"raw": "{{admin_api_url}}/releases/{{release_id}}",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"releases",
-										"{{release_id}}",
-										"summary",
-										""
+										"{{release_id}}"
 									]
 								}
 							},
@@ -8225,7 +8074,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "155ecf6e-8d04-4b1a-83f5-e71110b03263",
+										"id": "a548a6b8-8b75-472e-bca0-6541f0b3c614",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8249,7 +8098,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "e9ae76a7-b134-4451-a30b-51e00be2eb76",
+										"id": "d76c9bff-b2c1-40af-a360-50b2d4afd121",
 										"exec": [
 											""
 										],
@@ -8293,7 +8142,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f60a4eab-ead4-4e1c-ba7e-c28eb002d6ce",
+										"id": "459934b1-a845-415d-b89f-5e1d89de099a",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8309,16 +8158,16 @@
 											"pm.test(\"Should contain API test release\", function() {",
 											"    var testRelease = respJson.find(release => release.id === pm.globals.get('release_id'));",
 											"    pm.expect(testRelease).to.not.be.undefined;",
-											"    pm.expect(testRelease.title).to.equal(\"Calendar Year 2025\");",
+											"    pm.expect(testRelease.title).to.equal(\"Academic Year 2025/26\");",
 											"    pm.expect(testRelease.publicationId).to.equal(pm.globals.get('publication_id'));",
 											"    pm.expect(testRelease.publicationTitle).to.equal(`API test publication ${pm.globals.get('RUN_IDENTIFIER')}`);",
-											"    pm.expect(testRelease.nextReleaseDate.year).to.equal(\"2027\");",
+											"    pm.expect(testRelease.nextReleaseDate.year).to.equal(\"2028\");",
 											"    pm.expect(testRelease.nextReleaseDate.month).to.equal(\"1\");",
 											"    pm.expect(testRelease.nextReleaseDate.day).to.equal(\"1\");",
-											"    pm.expect(testRelease.publishScheduled).to.equal(\"2026-01-01\");",
+											"    pm.expect(testRelease.publishScheduled).to.equal(\"2027-01-01\");",
 											"    pm.expect(testRelease.live).to.equal(false);",
-											"    pm.expect(testRelease.timePeriodCoverage.value).to.equal(\"CY\");",
-											"    pm.expect(testRelease.timePeriodCoverage.label).to.equal(\"Calendar Year\");",
+											"    pm.expect(testRelease.timePeriodCoverage.value).to.equal(\"AY\");",
+											"    pm.expect(testRelease.timePeriodCoverage.label).to.equal(\"Academic Year\");",
 											"    //pm.expect(testRelease.latestRelease).to.equal(false); // Not implemented!",
 											"    //pm.expect(testRelease.type.title).to.equal(\"National Statistics\");",
 											"    pm.expect(testRelease.contact.id).to.equal(\"d246c696-4b3a-4aeb-842c-c1318ee334e8\");",
@@ -8334,7 +8183,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "9a0d4976-138b-4790-bc23-584d8097aa78",
+										"id": "c26faac6-a130-4a86-b407-8688982b4edf",
 										"exec": [
 											"postman.setNextRequest(null);"
 										],
@@ -8371,7 +8220,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ab12cd41-c092-42ce-a817-5471a6666770",
+										"id": "0b32f083-594b-4572-80a1-3ec8201e84b7",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8455,7 +8304,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "19d890d6-0476-4daa-8038-a04746ef3ab5",
+										"id": "d267e95d-f6e1-484e-bba7-4ab1d335acb0",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8520,7 +8369,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "826d9e9a-20b0-4ec6-8e27-5df3497e0fe6",
+										"id": "b0fc2c1e-e0b5-43e6-a010-593fce1dde10",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8576,7 +8425,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "cfbe252d-2a86-4c05-842e-7d54dd1e2055",
+										"id": "61c62a34-a780-493b-90b5-eb1d7f02eba8",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8621,7 +8470,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "67848307-4424-4977-855e-62e6fb1d187b",
+										"id": "d9aedf68-f7d1-4abf-ada5-ace6d2e907d9",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8666,7 +8515,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1088f054-a26e-4a28-8c24-1288b51a8a0e",
+										"id": "ea22a300-713a-4190-b250-800bd77d33ed",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8682,7 +8531,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "f481c262-e3f5-4c55-8336-115b7e5bf545",
+										"id": "419fd2e4-dd5b-4fa7-8011-a1df73a9929c",
 										"exec": [
 											""
 										],
@@ -8712,7 +8561,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0ae456a7-8fcc-4984-bfef-b33ddf8b68a5",
+								"id": "c2bd175f-1624-480f-b750-38d07bd52c41",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -8722,7 +8571,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "4e3d0f20-03fb-4cec-826f-d9578e458887",
+								"id": "e1e34ee0-4989-45a3-8ed7-f4fa970be4ec",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -8742,7 +8591,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a2d69017-4faf-4957-befa-6039b7022e45",
+										"id": "b34791be-fda7-4475-96ca-aa7ceefcebc9",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8811,7 +8660,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "257e562e-8f8d-4e53-9ca6-e56baba37e6f",
+										"id": "4977aa68-8b7f-44e7-977f-39fecc18f725",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8866,7 +8715,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3a40be7c-0004-42c9-a41d-e26a5fe09048",
+										"id": "a23163dc-a319-433f-8d1d-9c1220868293",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8919,7 +8768,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "50702b04-9806-4244-8676-385e523e7495",
+										"id": "bbfe9f3b-cc81-4006-a1a5-1fb0adbc931f",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -8963,7 +8812,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6d0619a8-32a7-4944-a2bb-75d64fe24b5e",
+										"id": "6e559a64-dc66-4ed9-b406-8e760f299804",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9007,7 +8856,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "309f1e41-f852-49c3-9dde-4644087a01d9",
+										"id": "791de492-7ace-4944-85b0-51360a57dd12",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9025,7 +8874,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "3c3e650a-2654-484c-87cf-be540729c97e",
+										"id": "29ddd9cf-72c8-4d80-a68e-76355bb43999",
 										"exec": [
 											""
 										],
@@ -9055,7 +8904,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "89645340-a8e1-4766-bcc6-e019edccb434",
+								"id": "6383ee34-9fa2-46ee-8d0b-964e0334c4c2",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9065,7 +8914,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d274a6e8-f6f8-4aeb-95a6-05a9756c06d1",
+								"id": "fc78365e-2dcd-41c2-a57e-1b0455308de1",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9085,7 +8934,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "dc88040f-c15e-4102-8155-4c978ffafe9f",
+										"id": "3c5adc94-7d8d-4070-a4fd-0dbde570a9d4",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9154,7 +9003,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "34fa01ce-2c46-4da0-9406-97a713218c57",
+										"id": "fc4509c2-e582-401d-8d68-4be1efa80042",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9209,7 +9058,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "82b8d4a9-372d-4963-a1dc-d3b1981c1667",
+										"id": "4ba26b4a-3327-4015-869a-dcc8884343d5",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9262,7 +9111,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "09db4df2-dd46-4a9b-ac82-b4dc674043e0",
+										"id": "42238318-90d6-4ee2-9ae7-3fe18a8887c5",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9306,7 +9155,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a95307c0-4f18-489a-a367-988708b9da98",
+										"id": "078cae29-2ed3-46f1-9108-55a092f476a0",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9350,7 +9199,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7945f6d5-f2c1-459d-bda0-0f92441252ab",
+										"id": "b947ec66-dbab-4730-b6ac-6039e2ac70e4",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9368,7 +9217,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "22e738fe-6e38-448b-b466-4e77cf922dcb",
+										"id": "d4b5c165-1944-492a-b968-d3c57c55d517",
 										"exec": [
 											""
 										],
@@ -9398,7 +9247,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "4a0bdf2d-50d3-4fad-89f4-946ee58b4c99",
+								"id": "5d571276-b3da-44f3-8c47-fd7c790038d7",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9408,7 +9257,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e3e08578-7eba-4e17-81d8-66a0bccba199",
+								"id": "4d54d6f9-f101-484a-a0d9-b460bad0f3ba",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9428,7 +9277,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ca12735f-9b59-4cd5-861a-dffe8a1fb9ea",
+										"id": "ceec1e14-1317-4a6c-8238-b5894e5a6787",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9504,7 +9353,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "2f3d2980-13ee-4ca0-a927-346898b59e4f",
+										"id": "4ad23104-aa80-4823-bb80-b312358134ea",
 										"exec": [
 											""
 										],
@@ -9546,7 +9395,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b59aedf2-18f4-4818-aea5-fe80c247f304",
+										"id": "28e708da-ab8c-46fd-a3db-3de6f730c457",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9620,7 +9469,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "df2839bc-72e4-4d05-b8e8-5ea92372b323",
+										"id": "677e84b2-9992-4ea0-a5dc-345b0efaec28",
 										"exec": [
 											""
 										],
@@ -9650,7 +9499,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4080b13a-69c7-41ce-b5c8-200da4c927cc",
+										"id": "74c14a84-7c59-4881-8bbc-0793958257d6",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9682,7 +9531,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1c31f8f6-6ccb-425e-a06b-db296740c3cb",
+										"id": "c55c755e-25a4-4237-b107-86b77d1a26f2",
 										"exec": [
 											""
 										],
@@ -9714,7 +9563,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "269da267-8bbf-43c0-a06d-d36035aea7a9",
+										"id": "bd775156-c92d-44e9-a21e-c10a3f9b3091",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9794,7 +9643,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "3c04f831-4e8a-4438-9a9e-5c66e4a9ea01",
+										"id": "66b5e8ce-77f4-4e59-9f56-0fa05b5aaee0",
 										"exec": [
 											""
 										],
@@ -9835,7 +9684,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b481bab0-7529-4573-8c4f-c521584054a8",
+										"id": "c4306ad1-3216-4858-86d4-0bd2d5ecfc05",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -9919,7 +9768,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "f8961e7b-d294-4d1a-acfd-7e87bd1c3b6b",
+										"id": "ce2a1b5d-4a92-46fc-906d-2fa09ca33a7f",
 										"exec": [
 											""
 										],
@@ -9951,7 +9800,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0ca94be1-4861-43de-b4b5-9b476be30216",
+										"id": "935d2663-1b0a-452d-9c7c-8c7f6dd85122",
 										"exec": [
 											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
 										],
@@ -9961,7 +9810,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "6e92c688-fae4-4211-a39c-e13217dd72d1",
+										"id": "f053aa18-5be0-40f2-b617-eed8358c94a7",
 										"exec": [
 											""
 										],
@@ -9991,7 +9840,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6b0394f2-a42a-45b6-8974-2555ea25de9f",
+										"id": "79b74939-3633-4add-8405-86c82d64b9be",
 										"exec": [
 											"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
 										],
@@ -10001,7 +9850,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "04778915-00e4-4cb8-b0d2-e997a16deaa5",
+										"id": "fd7a7168-c831-4275-b785-c48bbd6acb4a",
 										"exec": [
 											"postman.setNextRequest(null);"
 										],
@@ -10030,7 +9879,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "6113bbfa-122b-4178-b8f8-2b03d5a501f4",
+								"id": "e04905c3-5fe0-42d7-860e-d3fc411bd375",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -10040,7 +9889,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f992d367-66f5-4dcf-bdef-0905b062180b",
+								"id": "355f83e7-cd3c-45e2-9000-30db31b5e1e6",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -10060,7 +9909,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "815f6ca2-b206-4b22-83e0-1d90deecdb60",
+										"id": "497ceb62-02eb-46ad-b169-12ca2b1d0c94",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10143,7 +9992,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "728294da-ef7f-4f9c-9e3f-73279860edf0",
+										"id": "8a04287f-c409-45fd-8dda-9cc4182689e3",
 										"exec": [
 											""
 										],
@@ -10185,7 +10034,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "75261dde-1e11-410d-90c3-e2f8bbf85e0c",
+										"id": "09d7418e-5e4f-4494-b482-d652ddb915e7",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10231,7 +10080,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "65d8a4d3-ac4d-4559-a268-2faf73fbc5ff",
+										"id": "5433b1a8-c3db-4e3b-b8b8-8a84478296f3",
 										"exec": [
 											""
 										],
@@ -10275,7 +10124,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b4640722-c28e-4fb6-8c56-69af8e4c73f7",
+										"id": "cc8b08a7-c94a-49ea-83aa-5444a9557bb4",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -10304,7 +10153,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "acf06a5a-b514-40a7-bd2d-8925e39f22cd",
+										"id": "335092d6-e395-4100-a362-f9cfb725e91d",
 										"exec": [
 											""
 										],
@@ -10344,7 +10193,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7a29fc51-f9bc-4bfa-b971-a9f03dfdabe0",
+								"id": "74690032-f3d7-4090-82fc-8e7ef967eee7",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10417,7 +10266,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "9b61b6ec-9b12-40c6-b2ae-e07c27097dbd",
+								"id": "35a46a68-d45d-4549-b37c-6f569212f0c6",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10472,7 +10321,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f337f5ab-7773-4b32-aaf1-5ac7460fd7fb",
+								"id": "b8363505-8228-4b6f-93a3-29ac2759a971",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10545,7 +10394,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2ad77da7-8402-425f-a1f2-38267f5f4eff",
+								"id": "891034f5-ee93-4c86-bef2-923a244492b8",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10600,7 +10449,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3716b267-4d3a-4f94-b855-d6fae2ce7032",
+								"id": "2095ff36-e946-48fa-90aa-0f8378001925",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10673,7 +10522,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6fe8b6ac-1dbb-449d-87ea-88bfeea74263",
+								"id": "f29e5f35-cbbb-4ce2-83d4-2d5c1e3582bb",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10728,7 +10577,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e7cef74b-8568-4cf4-915c-a8db7556ee23",
+								"id": "8b8c2044-cfd9-4089-a3e8-f26601cbbcee",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10801,7 +10650,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0f4f6652-c17d-448c-a603-1b8ceb45c6d8",
+								"id": "4ff09242-626d-4541-b92d-84fa27e23fb2",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10856,7 +10705,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "67d4dfec-d546-47c4-8149-bc377a1b04b0",
+								"id": "378181a4-b324-46f8-b837-bec553e397ae",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10929,7 +10778,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a8bc003a-de1a-4e75-8627-e5dc59fc8c3f",
+								"id": "d5163a5e-d7d5-42f8-8842-9b99722bea34",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -10984,7 +10833,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d4a99562-ab3e-47ad-85d8-b5c3fb4fff85",
+								"id": "f654e359-5b22-40cd-a940-993792e0af61",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11057,7 +10906,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "24e84a26-ad04-489a-964a-fca3a999dc1d",
+								"id": "53f58e8e-e15f-4551-80ca-9acec12c682c",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11112,7 +10961,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "71917005-4da4-4cca-8d7b-13e6690c4718",
+								"id": "d8eb24d4-b880-4bb2-a6b2-fae0da8abd22",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11185,7 +11034,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a4737960-c2a9-4b9b-a07b-d03b395705d8",
+								"id": "18486554-784f-4d70-a1f7-75f9d9b6e4ce",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11240,7 +11089,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f49bf72f-9281-4823-88a8-44bd4baf2f3d",
+								"id": "c8090a48-08c1-4364-97a8-ba4fa4ce9856",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11313,7 +11162,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8d6d4ca0-5633-419f-b451-523569f93326",
+								"id": "82206615-033f-4ce2-92c9-5078938db3aa",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11368,7 +11217,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "58cde79b-1b13-4df4-a965-2f774148e26e",
+								"id": "0524c0af-ac59-4f62-a954-2d7fc364d4a0",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11441,7 +11290,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5d3def70-0df6-4511-ae43-936b4ad59f2a",
+								"id": "f461deff-aa03-4983-be3d-5b968fe707e5",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11496,7 +11345,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3682e0b6-b9ae-4129-b9f9-41ed0277913c",
+								"id": "92b70aba-29fd-4137-a6b1-16872a067667",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11569,7 +11418,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bb8a6319-e38c-430a-b4e3-d5a30dd6a153",
+								"id": "d584d8f6-3e69-4e96-9541-cdaf6088698f",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11624,7 +11473,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f4e60209-432c-437f-bba1-c8a8645b21c9",
+								"id": "afe3e110-fe41-4a3d-b063-21b1f96e8134",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11697,7 +11546,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3550dba6-f0bb-43f5-b698-6822e581633d",
+								"id": "ac9fde23-ed46-41d2-807a-b860ebdd59d0",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11752,7 +11601,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "932a8733-f84d-42a9-9d8f-9a58ba368e4a",
+								"id": "e9fc6eef-930a-4b65-920c-44006aac933a",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11825,7 +11674,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d0c7f3eb-0011-4298-8299-da8bfe7316b5",
+								"id": "1aa238fd-c823-4e58-8d98-2fcfd8e4034a",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11880,7 +11729,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2f6b94ae-b70e-4b1f-aceb-fdaa6fd57c87",
+								"id": "10a243da-2a8a-495e-9e55-0710495259fe",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -11953,7 +11802,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e2a5a35c-4496-4776-9706-10bd4744cbf2",
+								"id": "c171ad39-e57a-4d36-8ac3-0a1630239f2e",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12008,7 +11857,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "81039d5c-fe2e-4bb7-bf11-0802162e7388",
+								"id": "927d04eb-7bf5-405e-9d97-a78ab533fce5",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12081,7 +11930,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "15f1c791-1911-4bf3-9a5f-213a59f870d1",
+								"id": "2f803006-205e-4faf-be1c-5a33eb728a1b",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12136,7 +11985,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1350290b-76f6-4b93-92f6-6e35b467d637",
+								"id": "ee965887-d9da-4405-b412-944f0f345520",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -12209,7 +12058,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3559b465-e84a-41bb-9032-41a513dab9f7",
+								"id": "98d89420-7671-4dc0-9429-cd3c400f6612",
 								"exec": [
 									"/*",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -15569,7 +15418,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ca800fc5-4cbf-4e6d-952a-5ba92dc28b8f",
+								"id": "4c98d011-82ea-4e91-beec-d416491ec4ab",
 								"exec": [
 									"var respJson = pm.response.json();\r",
 									"\r",
@@ -15605,7 +15454,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "373e7602-f521-4f69-9671-1f3443327b4e",
+								"id": "ecc3b73c-7143-4ea2-a5c4-7e556ec26e1b",
 								"exec": [
 									"var respJson = pm.response.json();\r",
 									"\r",
@@ -15654,7 +15503,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "ec0c4f5a-db0f-45d2-87b3-068fc72f4800",
+				"id": "1b0e78e4-7d84-4617-bae7-d37831e48e7c",
 				"type": "text/javascript",
 				"exec": [
 					"pm.globals.set(\"7F_AbsenceRatePercentBands_SchoolType\", \"51e645c1-4a37-4938-8b20-1244b15048f9\");",
@@ -15680,7 +15529,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "8e87df78-0551-459e-9384-1ab507c9ca95",
+				"id": "a8428909-096b-4a5f-b8e8-9e0226292cfb",
 				"type": "text/javascript",
 				"exec": [
 					""
