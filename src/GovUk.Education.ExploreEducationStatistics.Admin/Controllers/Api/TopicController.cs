@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
@@ -13,7 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
      */
     [Route("api")]
     [ApiController]
-    [Authorize(Roles = "BAU User")]
     public class TopicController : ControllerBase
     {
         private readonly ITopicService _topicService;
@@ -25,12 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         // POST api/theme/{themeId}/topics
         [HttpPost("theme/{themeId}/topics")]
-        public async Task<ActionResult<TopicViewModel>> CreateTopicAsync(
+        public async Task<ActionResult<TopicViewModel>> CreateTopic(
             CreateTopicRequest topic, Guid themeId)
         {
             return await _topicService
-                .CreateTopicAsync(themeId, topic)
-                .HandleFailuresOr(Ok);
+                .CreateTopic(themeId, topic)
+                .HandleFailuresOrOk();
         }
     }
 }

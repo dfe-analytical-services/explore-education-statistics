@@ -4,15 +4,8 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtil
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    public class CreateTopicRequest
+    public class CreateThemeRequest
     {
-        [Required]
-        public string Title { get; set; }
-
-        public string Description { get; set; }
-
-        public string Summary { get; set; }
-
         private string _slug;
 
         public string Slug
@@ -20,5 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             get => IsNullOrEmpty(_slug) ? SlugFromTitle(Title) : _slug;
             set => _slug = value;
         }
+
+        public string Summary { get; set; }
+
+        [Required]
+        public string Title { get; set; }
     }
 }

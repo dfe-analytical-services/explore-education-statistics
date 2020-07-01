@@ -40,7 +40,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanViewPrereleaseContacts,
         CanAssignPrereleaseContactsToSpecificRelease,
 
-        
+        /**
+         * Publication management
+         */
+        CanManageAllTaxonomy,
+
         /**
          * Topic / Theme management
          */

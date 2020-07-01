@@ -9,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface ITopicService
     {
-        Task<Either<ActionResult, TopicViewModel>> CreateTopicAsync(Guid themeId, CreateTopicRequest topic);
+        Task<Either<ActionResult, TopicViewModel>> CreateTopic(Guid themeId, CreateTopicRequest request);
     }
 }

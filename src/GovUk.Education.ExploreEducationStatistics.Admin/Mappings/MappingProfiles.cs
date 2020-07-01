@@ -103,6 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<CreateDataBlockViewModel, DataBlock>();
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
 
+            CreateMap<Theme, ViewModels.ThemeViewModel>();
             CreateMap<Topic, ApiTopicViewModel>();
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
