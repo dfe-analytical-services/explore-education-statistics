@@ -294,7 +294,6 @@ const TableToolWizard = ({
                   <PublicationForm
                     {...stepProps}
                     publicationId={publicationId}
-                    publicationTitle={publication ? publication.title : ''}
                     options={themeMeta}
                     onSubmit={handlePublicationFormSubmit}
                   />

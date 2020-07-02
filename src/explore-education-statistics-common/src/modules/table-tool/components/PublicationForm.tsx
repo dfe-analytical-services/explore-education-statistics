@@ -28,8 +28,9 @@ interface Props {
   onSubmit: PublicationFormSubmitHandler;
   options: ThemeMeta[];
   publicationId?: string;
-  publicationTitle?: string;
 }
+
+const formId = 'publicationForm';
 
 const PublicationForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -38,13 +39,10 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     isActive,
     goToNextStep,
     publicationId = '',
-    publicationTitle = '',
   } = props;
 
   const [searchTerm, setSearchTerm] = useState('');
   const lowercaseSearchTerm = searchTerm.toLowerCase();
-
-  const formId = 'publicationForm';
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -106,102 +104,107 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
               })),
           }));
 
-        return (
-          <>
-            {isActive ? (
-              <Form {...form} id={formId} showSubmitError>
-                <FormFieldset
-                  error={getError('publicationId')}
-                  id={`${formId}-publicationId`}
-                  legend={stepHeading}
-                >
-                  <FormGroup>
-                    <FormTextSearchInput
-                      id={`${formId}-publicationIdSearch`}
-                      label="Search publications"
-                      name="publicationSearch"
-                      onChange={event => setSearchTerm(event.target.value)}
-                      onKeyPress={event => {
-                        if (event.key === 'Enter') {
-                          event.preventDefault();
-                        }
-                      }}
-                      width={20}
-                    />
-                  </FormGroup>
+        if (isActive) {
+          return (
+            <Form {...form} id={formId} showSubmitError>
+              <FormFieldset
+                error={getError('publicationId')}
+                id={`${formId}-publicationId`}
+                legend={stepHeading}
+              >
+                <FormGroup>
+                  <FormTextSearchInput
+                    id={`${formId}-publicationIdSearch`}
+                    label="Search publications"
+                    name="publicationSearch"
+                    onChange={event => setSearchTerm(event.target.value)}
+                    onKeyPress={event => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                      }
+                    }}
+                    width={20}
+                  />
+                </FormGroup>
 
-                  <FormGroup>
-                    <div aria-live="assertive">
-                      {filteredOptions.length > 0 ? (
-                        filteredOptions.map(theme => (
-                          <DetailsMenu
-                            jsRequired
-                            summary={theme.title}
-                            key={theme.id}
-                            id={`${formId}-theme-${theme.id}`}
-                            open={
-                              searchTerm !== '' ||
-                              theme.topics.some(topic =>
+                <FormGroup>
+                  <div aria-live="assertive">
+                    {filteredOptions.length > 0 ? (
+                      filteredOptions.map(theme => (
+                        <DetailsMenu
+                          jsRequired
+                          summary={theme.title}
+                          key={theme.id}
+                          id={`${formId}-theme-${theme.id}`}
+                          open={
+                            searchTerm !== '' ||
+                            theme.topics.some(topic =>
+                              topic.publications.some(
+                                publication =>
+                                  publication.id === values.publicationId,
+                              ),
+                            )
+                          }
+                        >
+                          {theme.topics.map(topic => (
+                            <DetailsMenu
+                              summary={topic.title}
+                              key={topic.id}
+                              id={`${formId}-topic-${topic.id}`}
+                              open={
+                                searchTerm !== '' ||
                                 topic.publications.some(
                                   publication =>
                                     publication.id === values.publicationId,
-                                ),
-                              )
-                            }
-                          >
-                            {theme.topics.map(topic => (
-                              <DetailsMenu
-                                summary={topic.title}
-                                key={topic.id}
-                                id={`${formId}-topic-${topic.id}`}
-                                open={
-                                  searchTerm !== '' ||
-                                  topic.publications.some(
-                                    publication =>
-                                      publication.id === values.publicationId,
-                                  )
-                                }
-                              >
-                                <FormFieldRadioGroup
-                                  legend={`Choose option from ${topic.title}`}
-                                  legendHidden
-                                  small
-                                  showError={false}
-                                  name="publicationId"
-                                  id={`${formId}-publicationId-${camelCase(
-                                    topic.title,
-                                  )}`}
-                                  disabled={form.isSubmitting}
-                                  options={topic.publications.map(
-                                    publication => ({
-                                      label: publication.title,
-                                      value: publication.id,
-                                    }),
-                                  )}
-                                />
-                              </DetailsMenu>
-                            ))}
-                          </DetailsMenu>
-                        ))
-                      ) : (
-                        <p>No publications found</p>
-                      )}
-                    </div>
-                  </FormGroup>
-                </FormFieldset>
+                                )
+                              }
+                            >
+                              <FormFieldRadioGroup
+                                legend={`Choose option from ${topic.title}`}
+                                legendHidden
+                                small
+                                showError={false}
+                                name="publicationId"
+                                id={`${formId}-publicationId-${camelCase(
+                                  topic.title,
+                                )}`}
+                                disabled={form.isSubmitting}
+                                options={topic.publications.map(
+                                  publication => ({
+                                    label: publication.title,
+                                    value: publication.id,
+                                  }),
+                                )}
+                              />
+                            </DetailsMenu>
+                          ))}
+                        </DetailsMenu>
+                      ))
+                    ) : (
+                      <p>No publications found</p>
+                    )}
+                  </div>
+                </FormGroup>
+              </FormFieldset>
 
-                <WizardStepFormActions {...props} form={form} formId={formId} />
-              </Form>
-            ) : (
-              <>
-                {stepHeading}
-                <SummaryList noBorder>
-                  <SummaryListItem term="Publication">
-                    {publicationTitle}
-                  </SummaryListItem>
-                </SummaryList>
-              </>
-            )}
+              <WizardStepFormActions {...props} form={form} formId={formId} />
+            </Form>
+          );
+        }
+
+        const publication = options
+          .flatMap(option => option.topics)
+          .flatMap(option => option.publications)
+          .find(option => option.id === form.values.publicationId);
+
+        return (
+          <>
+            {stepHeading}
+            <SummaryList noBorder>
+              <SummaryListItem term="Publication">
+                {publication?.title}
+              </SummaryListItem>
+            </SummaryList>
           </>
         );
       }}
