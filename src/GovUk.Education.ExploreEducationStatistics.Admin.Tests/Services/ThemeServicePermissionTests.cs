@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -13,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetMyThemes_CanViewAllTopics()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var (contentDbContext, userService, repository, persistenceHelper) = Mocks();
 
             var themeList = new List<Theme>
             {
@@ -44,9 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetAllThemesAsync())
                 .ReturnsAsync(themeList);
             
-            var service = new ThemeService(userService.Object, repository.Object, persistenceHelper.Object);
+            var service = new ThemeService(contentDbContext.Object, AdminMapper(), userService.Object, repository.Object, persistenceHelper.Object);
 
-            var result = await service.GetMyThemesAsync();
+            var result = await service.GetMyThemes();
             Assert.Equal(themeList, result.Right);
             
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetMyThemes_CanViewLinkedTopics()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var (contentDbContext, userService, repository, persistenceHelper) = Mocks();
 
             var userId = Guid.NewGuid();
 
@@ -84,9 +84,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetThemesRelatedToUserAsync(userId))
                 .ReturnsAsync(themeList);
             
-            var service = new ThemeService(userService.Object, repository.Object, persistenceHelper.Object);
+            var service = new ThemeService(contentDbContext.Object, AdminMapper(), userService.Object, repository.Object, persistenceHelper.Object);
 
-            var result = await service.GetMyThemesAsync();
+            var result = await service.GetMyThemes();
             Assert.Equal(themeList, result.Right);
             
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
@@ -101,15 +101,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetMyThemes_NoAccessToSystem()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var (contentDbContext, userService, repository, persistenceHelper) = Mocks();
 
             userService
                 .Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
                 .ReturnsAsync(false);
 
-            var service = new ThemeService(userService.Object, repository.Object, persistenceHelper.Object);
+            var service = new ThemeService(contentDbContext.Object, AdminMapper(), userService.Object, repository.Object, persistenceHelper.Object);
 
-            var result = await service.GetMyThemesAsync();
+            var result = await service.GetMyThemes();
             Assert.IsAssignableFrom<ForbidResult>(result.Left);
             
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetSummaryAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.GetSummaryAsync(_theme.Id),  
+                    service.GetSummary(_theme.Id),  
                 _theme,
                 SecurityPolicies.CanViewSpecificTheme);
         }
@@ -131,16 +131,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Func<ThemeService, Task<Either<ActionResult, T>>> protectedAction, TEntity protectedEntity, params SecurityPolicies[] policies)
             where TEntity : class
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var (contentDbContext, userService, repository, persistenceHelper) = Mocks();
 
-            var service = new ThemeService(userService.Object, repository.Object, persistenceHelper.Object);
+            var service = new ThemeService(contentDbContext.Object, AdminMapper(), userService.Object, repository.Object, persistenceHelper.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);
         }
         
-        private (Mock<IUserService>, Mock<IThemeRepository>, Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
+        private (
+            Mock<ContentDbContext>,
+            Mock<IUserService>,
+            Mock<IThemeRepository>,
+            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
         {
             return (
+                new Mock<ContentDbContext>(),
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IThemeRepository>(), 
                 MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme));

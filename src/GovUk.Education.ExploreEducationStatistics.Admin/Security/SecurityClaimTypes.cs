@@ -35,6 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanViewPrereleaseContacts,
 
         /**
+         * Taxonomy management
+         */
+        ManageAllTaxonomy,
+
+        /**
          * Topic / Theme management
          */
         AccessAllTopics,

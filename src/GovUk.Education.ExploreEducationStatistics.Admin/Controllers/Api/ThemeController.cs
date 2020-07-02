@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     // TODO rename to Themes once the current Crud theme controller is removed
+    [Route("api")]
     [Authorize]
     [ApiController]
     public class ThemeController : ControllerBase
@@ -23,22 +24,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _themeService = themeService;
         }
 
+        // POST api/theme/
+        [HttpPost("theme")]
+        public async Task<ActionResult<ThemeViewModel>> CreateTheme(CreateThemeRequest request)
+        {
+            return await _themeService
+                .CreateTheme(request)
+                .HandleFailuresOrOk();
+        }
+
         // GET api/me/themes/
-        [HttpGet("api/me/themes")]
+        [HttpGet("me/themes")]
         public async Task<ActionResult<List<Theme>>> GetMyThemes()
         {
             return await _themeService
-                .GetMyThemesAsync()
-                .HandleFailuresOr(Ok);
+                .GetMyThemes()
+                .HandleFailuresOrOk();
         }
 
         // GET api/theme/{themeId}/summary
-        [HttpGet("api/theme/{themeId}/summary")]
+        [HttpGet("theme/{themeId}/summary")]
         public async Task<ActionResult<TitleAndIdViewModel>> GetThemeById([Required] Guid themeId)
         {
             return await _themeService
-                .GetSummaryAsync(themeId)
-                .HandleFailuresOr(Ok);
+                .GetSummary(themeId)
+                .HandleFailuresOrOk();
         }
     }
 }

@@ -43,10 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * Publication management
                  */
-                // does this user have permission to create a publication under a specific topic?
-                options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy =>
-                    policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
-
                 // does this user have permission to view a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationRequirement()));
@@ -113,7 +109,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * Pre Release management
                  */
-
                 // does this user have permissions to view the prerelease contacts list?
                 options.AddPolicy(SecurityPolicies.CanViewPrereleaseContacts.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.CanViewPrereleaseContacts.ToString()));
@@ -121,6 +116,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // does this user have permission to assign prerelease contacts to a specific Release?
                 options.AddPolicy(SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement()));
+
+                /**
+                 * Taxonomy management
+                 */
+                // does this user have permission to manage all taxonomy?
+                options.AddPolicy(SecurityPolicies.CanManageAllTaxonomy.ToString(), policy =>
+                    policy.Requirements.Add(new ManageTaxonomyRequirement()));
+
+                // does this user have permission to create a publication under a specific topic?
+                options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy =>
+                    policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
 
                 /**
                  * Topic / Theme management
@@ -174,9 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              * Publication management
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
-            services
-                .AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler
-                >();
+            services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
 
             /**
@@ -198,7 +202,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              * Pre Release management
              */
             services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
-            
+
+            /**
+             * Taxonomy management
+             */
+            services.AddTransient<IAuthorizationHandler, ManageTaxonomyAuthorizationHandler>();
+
             /**
              * Topic / Theme management
              */

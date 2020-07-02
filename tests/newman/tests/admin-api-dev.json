@@ -9,12 +9,12 @@
 			"name": "Test data",
 			"item": [
 				{
-					"name": "Create topic",
+					"name": "Create theme",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "dc7887a5-27d0-48db-9712-d9d9daca1aec",
+								"id": "e550daf2-1286-432a-b433-0b8fe1a8b517",
 								"exec": [
 									"pm.globals.clear();",
 									"",
@@ -35,7 +35,67 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c20c89b4-77cb-4f30-be87-f720f61ef984",
+								"id": "97d2933f-7412-42c6-ac82-6454752da416",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.globals.set('theme_id', respJson.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"summary\": \"API test theme {{RUN_IDENTIFIER}} summary\",\n\t\"title\": \"API test theme {{RUN_IDENTIFIER}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/theme/",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"theme",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create topic",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2be12a17-6abf-4dd7-9a00-226778545efd",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3746514c-70b7-445f-8b03-afc8f705a516",
 								"exec": [
 									"var respJson = pm.response.json();",
 									"",
@@ -67,13 +127,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{admin_api_url}}/theme/449d720f-9a87-4895-91fe-70972d1bdc04/topics",
+							"raw": "{{admin_api_url}}/theme/{{theme_id}}/topics",
 							"host": [
 								"{{admin_api_url}}"
 							],
 							"path": [
 								"theme",
-								"449d720f-9a87-4895-91fe-70972d1bdc04",
+								"{{theme_id}}",
 								"topics"
 							]
 						}
@@ -1468,10 +1528,10 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].topics\"));",
 									"});",
 									"",
-									"pm.test(\"Created topic should exist\", function () {",
-									"   var testTheme = respJson.find(theme => theme.title === \"Test theme\");",
-									"   pm.expect(testTheme, 'Couldn\\'t find \"Test theme\"!').to.not.be.undefined;",
-									"   ",
+									"pm.test(\"Created theme and topic should exist\", function () {",
+									"   var testTheme = respJson.find(theme => theme.title === `API test theme ${pm.globals.get('RUN_IDENTIFIER')}`);",
+									"   pm.expect(testTheme, `Couldn\\'t find \"API test theme ${pm.globals.get('RUN_IDENTIFIER')}\"`).to.not.be.undefined;",
+									"",
 									"   var testTopic = testTheme.topics.find(topic => topic.title === `API test topic ${pm.globals.get('RUN_IDENTIFIER')}`);",
 									"   pm.expect(testTopic, `Couldn't find \"API test topic ${pm.globals.get('RUN_IDENTIFIER')}\"`).to.not.be.undefined;",
 									"});",
