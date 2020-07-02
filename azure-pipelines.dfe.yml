@@ -6,11 +6,11 @@ trigger:
   branches:
     include:
       - master
-      - development
+      - dev
   paths:
     exclude:
     - infrastructure/
-pr: [ 'master', 'development' ]
+pr: [ 'master', 'dev' ]
 
 jobs:
   - job: 'Backend'

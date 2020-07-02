@@ -46,6 +46,9 @@
     },
     "publicAppGATrackingId": {
       "value": "UA-139424173-3"
+    },
+    "branch": {
+      "value": "dev"
     }
   }
 }
