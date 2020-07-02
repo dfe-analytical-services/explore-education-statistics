@@ -20,9 +20,9 @@ import AdminDocumentationUsingDashboard from '@admin/pages/documentation/Documen
 import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePage';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
-import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
-import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
-import PreReleasePage from '@admin/pages/release/prerelease/PreReleasePage';
+import CreateReleasePage from '@admin/pages/release/ReleaseCreatePage';
+import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
+import PreReleasePage from '@admin/pages/release/PreReleasePage';
 import ThemeTopicWrapper, {
   themeTopicPath,
 } from '@admin/pages/theme/ThemeTopicWrapper';
@@ -150,7 +150,7 @@ const appRouteList: Dictionary<ProtectedRouteProps> = {
   manageRelease: {
     path: '/publication/:publicationId/release/:releaseId',
     protectedAction: user => user.permissions.canAccessAnalystPages,
-    component: ManageReleasePageContainer,
+    component: ReleasePageContainer,
   },
   documentation: {
     path: '/documentation',

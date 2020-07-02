@@ -2,7 +2,7 @@ import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import {
   getReleaseStatusLabel,
   getReleaseSummaryLabel,
-} from '@admin/pages/release/util/releaseSummaryUtil';
+} from '@admin/pages/release/utils/releaseSummaryUtil';
 import { Release } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';

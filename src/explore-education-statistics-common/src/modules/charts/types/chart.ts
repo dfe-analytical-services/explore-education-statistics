@@ -7,8 +7,6 @@ import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { NestedPartial } from '@common/types';
-import { ReactNode } from 'react';
-import { LegendProps } from 'recharts';
 
 export type ChartType =
   | 'line'

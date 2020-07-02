@@ -1,4 +1,4 @@
-import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
+import styles from '@admin/pages/release/data/components/ReleaseDataUploadsSection.module.scss';
 import { DataFile } from '@admin/services/releaseDataFileService';
 import importStatusService, {
   ImportStatus,

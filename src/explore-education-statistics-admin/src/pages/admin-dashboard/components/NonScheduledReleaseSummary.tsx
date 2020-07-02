@@ -1,7 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
-import { getReleaseSummaryLabel } from '@admin/pages/release/util/releaseSummaryUtil';
-import { summaryRoute } from '@admin/routes/edit-release/routes';
+import { getReleaseSummaryLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
+import { summaryRoute } from '@admin/routes/releaseRoutes';
 import { Release } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import React from 'react';

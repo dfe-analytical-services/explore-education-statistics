@@ -1,7 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
+import releaseRoutes, { summaryRoute } from '@admin/routes/releaseRoutes';
 import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ModalConfirm from '@common/components/ModalConfirm';

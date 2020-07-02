@@ -212,11 +212,9 @@ describe('DataBlockRenderer', () => {
   });
 
   test('renders vertical chart', async () => {
-    tableBuilderService.getTableData.mockImplementation(
-      (_: DataBlockRequest, releaseId?: string) => {
-        return Promise.resolve(testChartTableData);
-      },
-    );
+    tableBuilderService.getTableData.mockImplementation(() => {
+      return Promise.resolve(testChartTableData);
+    });
 
     const { container } = render(
       <DataBlockRenderer
@@ -251,11 +249,9 @@ describe('DataBlockRenderer', () => {
   });
 
   test('renders table', async () => {
-    tableBuilderService.getTableData.mockImplementation(
-      (_: DataBlockRequest, releaseId?: string) => {
-        return Promise.resolve(testChartTableData);
-      },
-    );
+    tableBuilderService.getTableData.mockImplementation(() => {
+      return Promise.resolve(testChartTableData);
+    });
 
     const fullTable = mapFullTable(testChartTableData);
 
@@ -300,9 +296,7 @@ describe('DataBlockRenderer', () => {
 
   test('renders map', async () => {
     const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      (_: DataBlockRequest, releaseId?: string) => {
-        return Promise.resolve(testMapTableData);
-      },
+      () => Promise.resolve(testMapTableData),
     );
 
     const { container } = render(

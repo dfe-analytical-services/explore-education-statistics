@@ -1,5 +1,5 @@
 import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
-import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
+import styles from '@admin/pages/release/data/components/ReleaseDataUploadsSection.module.scss';
 import releaseService, {
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
