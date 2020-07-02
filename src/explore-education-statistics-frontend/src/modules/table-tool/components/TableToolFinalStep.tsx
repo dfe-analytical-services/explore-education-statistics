@@ -5,20 +5,14 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
-import TableToolWizard, {
-  FinalStepRenderProps,
-  TableToolWizardProps,
-} from '@common/modules/table-tool/components/TableToolWizard';
+import { FinalStepRenderProps } from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import permalinkService from '@common/services/permalinkService';
 import publicationService from '@common/services/publicationService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
-import { OmitStrict } from '@common/types';
 import Link from '@frontend/components/Link';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -186,33 +180,4 @@ const TableToolFinalStep = ({
   );
 };
 
-type TableToolProps = OmitStrict<TableToolWizardProps, 'finalStep'>;
-
-const TableTool = (props: TableToolProps) => (
-  <TableToolWizard
-    {...props}
-    finalStep={({ publication, query, response }) => (
-      <WizardStep>
-        {wizardStepProps => (
-          <>
-            <WizardStepHeading {...wizardStepProps}>
-              Explore data
-            </WizardStepHeading>
-
-            {response && query && (
-              <TableToolFinalStep
-                publication={publication}
-                query={query}
-                table={response?.table}
-                tableHeaders={response?.tableHeaders}
-                releaseId={props.releaseId}
-              />
-            )}
-          </>
-        )}
-      </WizardStep>
-    )}
-  />
-);
-
-export default TableTool;
+export default TableToolFinalStep;

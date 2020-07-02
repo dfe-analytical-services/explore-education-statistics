@@ -169,7 +169,7 @@ export interface TableDataResponse {
   subjectMeta: TableDataSubjectMeta;
 }
 
-export default {
+const tableBuilderService = {
   getThemes(): Promise<ThemeMeta[]> {
     return dataApi.get(`/meta/themes`);
   },
@@ -202,3 +202,5 @@ export default {
     return dataApi.post(`/tablebuilder`, query);
   },
 };
+
+export default tableBuilderService;

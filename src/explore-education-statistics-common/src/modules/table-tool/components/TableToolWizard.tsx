@@ -29,19 +29,8 @@ import tableBuilderService, {
   TableDataQuery,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import { useImmer } from 'use-immer';
-
-const getDefaultSubjectMeta = (): PublicationSubjectMeta => ({
-  timePeriod: {
-    hint: '',
-    legend: '',
-    options: [],
-  },
-  locations: {},
-  indicators: {},
-  filters: {},
-});
 
 interface Publication {
   id: string;
@@ -70,34 +59,45 @@ export interface FinalStepRenderProps {
 
 export interface TableToolWizardProps {
   themeMeta: ThemeMeta[];
-  publicationId?: string;
   releaseId?: string;
-  initialState?: TableToolState;
+  initialState?: Partial<TableToolState>;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   scrollOnMount?: boolean;
 }
 
 const TableToolWizard = ({
   themeMeta,
-  publicationId,
   releaseId,
-  initialState,
+  initialState = {},
   finalStep,
 }: TableToolWizardProps) => {
-  const [publication, setPublication] = useState<Publication>();
-
-  const [state, updateState] = useImmer<TableToolState>(
-    initialState ?? {
-      initialStep: 1,
-      subjectMeta: getDefaultSubjectMeta(),
-      query: {
-        subjectId: '',
-        indicators: [],
-        filters: [],
-        locations: {},
+  const [state, updateState] = useImmer<TableToolState>({
+    initialStep: 1,
+    subjectMeta: {
+      timePeriod: {
+        hint: '',
+        legend: '',
+        options: [],
       },
+      locations: {},
+      indicators: {},
+      filters: {},
     },
-  );
+    query: {
+      subjectId: '',
+      indicators: [],
+      filters: [],
+      locations: {},
+    },
+    ...initialState,
+  });
+
+  const publication = useMemo<Publication | undefined>(() => {
+    return themeMeta
+      .flatMap(option => option.topics)
+      .flatMap(option => option.publications)
+      .find(option => option.id === state.query.publicationId);
+  }, [state.query.publicationId, themeMeta]);
 
   const { value: subjects = [], setState: setSubjects } = useAsyncRetry<
     PublicationSubject[]
@@ -107,30 +107,31 @@ const TableToolWizard = ({
       return meta.subjects;
     }
 
+    if (state.query.publicationId) {
+      const meta = await tableBuilderService.getPublicationMeta(
+        state.query.publicationId,
+      );
+      return meta.subjects;
+    }
+
     return [];
-  }, [releaseId]);
+  }, [releaseId, state.query.publicationId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
   }) => {
-    const selectedPublication = themeMeta
-      .flatMap(option => option.topics)
-      .flatMap(option => option.publications)
-      .find(option => option.id === selectedPublicationId);
-
-    if (!selectedPublication) {
-      return;
-    }
-
-    const {
-      subjects: publicationSubjects,
-    } = await tableBuilderService.getPublicationMeta(selectedPublicationId);
+    const publicationMeta = await tableBuilderService.getPublicationMeta(
+      selectedPublicationId,
+    );
 
     setSubjects({
       isLoading: false,
-      value: publicationSubjects,
+      value: publicationMeta.subjects,
     });
-    setPublication(selectedPublication);
+
+    updateState(draft => {
+      draft.query.publicationId = selectedPublicationId;
+    });
   };
 
   const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
@@ -293,7 +294,7 @@ const TableToolWizard = ({
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
-                    publicationId={publicationId}
+                    publicationId={state.query.publicationId}
                     options={themeMeta}
                     onSubmit={handlePublicationFormSubmit}
                   />
@@ -304,8 +305,8 @@ const TableToolWizard = ({
               {stepProps => (
                 <PublicationSubjectForm
                   {...stepProps}
-                  options={subjects}
                   initialValues={state.query}
+                  options={subjects}
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
               )}
@@ -314,8 +315,8 @@ const TableToolWizard = ({
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
-                  options={state.subjectMeta.locations}
                   initialValues={state.query.locations}
+                  options={state.subjectMeta.locations}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
               )}
