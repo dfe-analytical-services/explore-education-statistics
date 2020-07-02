@@ -294,7 +294,9 @@ const TableToolWizard = ({
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
-                    publicationId={state.query.publicationId}
+                    initialValues={{
+                      publicationId: state.query.publicationId ?? '',
+                    }}
                     options={themeMeta}
                     onSubmit={handlePublicationFormSubmit}
                   />
@@ -305,7 +307,9 @@ const TableToolWizard = ({
               {stepProps => (
                 <PublicationSubjectForm
                   {...stepProps}
-                  initialValues={state.query}
+                  initialValues={{
+                    subjectId: state.query.subjectId,
+                  }}
                   options={subjects}
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
@@ -325,7 +329,9 @@ const TableToolWizard = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={state.query}
+                  initialValues={{
+                    timePeriod: state.query.timePeriod,
+                  }}
                   options={state.subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
@@ -335,9 +341,12 @@ const TableToolWizard = ({
               {stepProps => (
                 <FiltersForm
                   {...stepProps}
-                  onSubmit={handleFiltersFormSubmit}
-                  initialValues={state.query}
+                  initialValues={{
+                    indicators: state.query.indicators,
+                    filters: state.query.filters,
+                  }}
                   subjectMeta={state.subjectMeta}
+                  onSubmit={handleFiltersFormSubmit}
                 />
               )}
             </WizardStep>

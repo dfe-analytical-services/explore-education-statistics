@@ -25,6 +25,7 @@ interface FormValues {
 export type PublicationFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
+  initialValues?: FormValues;
   onSubmit: PublicationFormSubmitHandler;
   options: ThemeMeta[];
   publicationId?: string;
@@ -38,7 +39,9 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     onSubmit,
     isActive,
     goToNextStep,
-    publicationId = '',
+    initialValues = {
+      publicationId: '',
+    },
   } = props;
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,9 +56,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
   return (
     <Formik<FormValues>
       enableReinitialize
-      initialValues={{
-        publicationId,
-      }}
+      initialValues={initialValues}
       validateOnBlur={false}
       validateOnChange={false}
       validationSchema={Yup.object<FormValues>({
