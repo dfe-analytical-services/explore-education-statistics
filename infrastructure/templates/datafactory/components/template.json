@@ -2427,7 +2427,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.Footnote WITH (NOLOCK) WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')",
+                                    "value": "SELECT * FROM dbo.Footnote WITH (NOLOCK) WHERE Id IN (SELECT FootnoteId FROM dbo.ReleaseFootnote RF WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseFootnote WHERE ReleaseId != RF.ReleaseId AND FootnoteId = RF.FootnoteId))",
                                     "type": "Expression"
                                 },
                                 "queryTimeout": "02:00:00"
