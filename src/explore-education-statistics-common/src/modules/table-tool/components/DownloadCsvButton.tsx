@@ -7,6 +7,8 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import cartesian from '@common/utils/cartesian';
+import camelCase from 'lodash/camelCase';
+import snakeCase from 'lodash/snakeCase';
 import React from 'react';
 import { utils, writeFile } from 'xlsx';
 
@@ -33,24 +35,25 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
     locations,
     timePeriodRange,
     ...Object.values(filters).map(filterGroup => filterGroup.options),
-  ).map(row => {
-    // TODO: Remove ignore when Prettier stops adding trailing comma to tuple type
-    // prettier-ignore
-    const [location, timePeriod, ...filterOptions] = row as [
+  ).map(filterCombination => {
+    const [location, timePeriod, ...filterOptions] = filterCombination as [
       LocationFilter,
       TimePeriodFilter,
-      ...CategoryFilter[]
+      ...CategoryFilter[],
     ];
 
     const indicatorCells = indicators.map(indicator => {
       const matchingResult = results.find(result => {
-        return Boolean(
+        const geographicLevel = camelCase(result.geographicLevel);
+
+        return (
           filterOptions.every(filter =>
             result.filters.includes(filter.value),
           ) &&
-            result.timePeriod === timePeriod.value &&
-            result.location[location.level] &&
-            result.location[location.level].code === location.value,
+          result.location[geographicLevel] &&
+          result.location[geographicLevel].code === location.value &&
+          location.level === geographicLevel &&
+          result.timePeriod === timePeriod.value
         );
       });
 

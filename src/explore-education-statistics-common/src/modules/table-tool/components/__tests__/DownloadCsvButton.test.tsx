@@ -5,8 +5,8 @@ import {
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
+import React from 'react';
 import { writeFile } from 'xlsx';
 import DownloadCsvButton, { getCsvData } from '../DownloadCsvButton';
 
@@ -75,59 +75,8 @@ describe('DownloadCsvButton', () => {
       <DownloadCsvButton
         fileName="pupil-absence"
         fullTable={{
-          subjectMeta: {
-            ...basicSubjectMeta,
-            filters: {
-              ...basicSubjectMeta.filters,
-              'School Type': {
-                name: 'school_type',
-                options: [
-                  new CategoryFilter({
-                    value: 'school_primary',
-                    label: 'State-funded primary',
-                    category: 'School Type',
-                  }),
-                  new CategoryFilter({
-                    value: 'school_secondary',
-                    label: 'State-funded secondary',
-                    category: 'School Type',
-                  }),
-                ],
-              },
-            },
-          },
-          results: [
-            {
-              filters: ['gender_female', 'school_primary'],
-              timePeriod: '2015_AY',
-              geographicLevel: 'Country',
-              location: {
-                country: {
-                  code: 'england',
-                  name: 'England',
-                },
-              },
-              measures: {
-                authAbsRate: '123',
-                authAbsSess: '456',
-              },
-            },
-            {
-              filters: ['gender_female', 'school_secondary'],
-              timePeriod: '2015_AY',
-              geographicLevel: 'Country',
-              location: {
-                country: {
-                  code: 'england',
-                  name: 'England',
-                },
-              },
-              measures: {
-                authAbsRate: '234',
-                authAbsSess: '567',
-              },
-            },
-          ],
+          subjectMeta: basicSubjectMeta,
+          results: [],
         }}
       />,
     );
@@ -166,6 +115,14 @@ describe('DownloadCsvButton', () => {
               ],
             },
           },
+          locations: [
+            ...basicSubjectMeta.locations,
+            new LocationFilter({
+              value: 'barnsley',
+              label: 'Barnsley',
+              level: 'localAuthority',
+            }),
+          ],
         },
         results: [
           {
@@ -179,8 +136,8 @@ describe('DownloadCsvButton', () => {
               },
             },
             measures: {
-              authAbsRate: '123',
-              authAbsSess: '456',
+              authAbsRate: '111',
+              authAbsSess: '222',
             },
           },
           {
@@ -194,24 +151,62 @@ describe('DownloadCsvButton', () => {
               },
             },
             measures: {
-              authAbsRate: '234',
-              authAbsSess: '567',
+              authAbsRate: '333',
+              authAbsSess: '444',
+            },
+          },
+          {
+            filters: ['gender_female', 'school_primary'],
+            timePeriod: '2015_AY',
+            geographicLevel: 'LocalAuthority',
+            location: {
+              localAuthority: {
+                code: 'barnsley',
+                name: 'Barnsley',
+              },
+            },
+            measures: {
+              authAbsRate: '555',
+              authAbsSess: '666',
+            },
+          },
+          {
+            filters: ['gender_female', 'school_secondary'],
+            timePeriod: '2015_AY',
+            geographicLevel: 'LocalAuthority',
+            location: {
+              localAuthority: {
+                code: 'barnsley',
+                name: 'Barnsley',
+              },
+            },
+            measures: {
+              authAbsRate: '777',
+              authAbsSess: '888',
             },
           },
         ],
       });
 
-      expect(data).toHaveLength(3);
+      expect(data).toHaveLength(5);
 
       expect(data[0]).toHaveLength(8);
 
       expect(data[1]).toHaveLength(8);
-      expect(data[1][6]).toBe('123');
-      expect(data[1][7]).toBe('456');
+      expect(data[1][6]).toBe('111');
+      expect(data[1][7]).toBe('222');
 
       expect(data[2]).toHaveLength(8);
-      expect(data[2][6]).toBe('234');
-      expect(data[2][7]).toBe('567');
+      expect(data[2][6]).toBe('333');
+      expect(data[2][7]).toBe('444');
+
+      expect(data[3]).toHaveLength(8);
+      expect(data[3][6]).toBe('555');
+      expect(data[3][7]).toBe('666');
+
+      expect(data[4]).toHaveLength(8);
+      expect(data[4][6]).toBe('777');
+      expect(data[4][7]).toBe('888');
 
       expect(data).toMatchSnapshot();
     });
@@ -251,8 +246,8 @@ describe('DownloadCsvButton', () => {
               },
             },
             measures: {
-              authAbsRate: '123',
-              authAbsSess: '456',
+              authAbsRate: '111',
+              authAbsSess: '222',
             },
           },
         ],
@@ -263,8 +258,8 @@ describe('DownloadCsvButton', () => {
       expect(data[0]).toHaveLength(8);
 
       expect(data[1]).toHaveLength(8);
-      expect(data[1][6]).toBe('123');
-      expect(data[1][7]).toBe('456');
+      expect(data[1][6]).toBe('111');
+      expect(data[1][7]).toBe('222');
 
       expect(data[2]).toHaveLength(8);
       expect(data[2][6]).toBe('n/a');
@@ -305,7 +300,7 @@ describe('DownloadCsvButton', () => {
               },
             },
             measures: {
-              authAbsSess: '123',
+              authAbsSess: '111',
             },
           },
         ],
@@ -317,7 +312,7 @@ describe('DownloadCsvButton', () => {
 
       expect(data[1]).toHaveLength(7);
       expect(data[1][5]).toBe('n/a');
-      expect(data[1][6]).toBe('123');
+      expect(data[1][6]).toBe('111');
 
       expect(data).toMatchSnapshot();
     });

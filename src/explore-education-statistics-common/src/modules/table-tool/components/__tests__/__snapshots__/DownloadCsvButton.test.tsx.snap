@@ -7,16 +7,12 @@ Object {
   ],
   "Sheets": Object {
     "Sheet1": Object {
-      "!ref": "A1:H3",
+      "!ref": "A1:G2",
       "A1": Object {
         "t": "s",
         "v": "location",
       },
       "A2": Object {
-        "t": "s",
-        "v": "England",
-      },
-      "A3": Object {
         "t": "s",
         "v": "England",
       },
@@ -28,19 +24,11 @@ Object {
         "t": "s",
         "v": "england",
       },
-      "B3": Object {
-        "t": "s",
-        "v": "england",
-      },
       "C1": Object {
         "t": "s",
         "v": "geographic_level",
       },
       "C2": Object {
-        "t": "s",
-        "v": "country",
-      },
-      "C3": Object {
         "t": "s",
         "v": "country",
       },
@@ -52,10 +40,6 @@ Object {
         "t": "s",
         "v": "201516",
       },
-      "D3": Object {
-        "t": "s",
-        "v": "201516",
-      },
       "E1": Object {
         "t": "s",
         "v": "characteristic",
@@ -64,45 +48,21 @@ Object {
         "t": "s",
         "v": "Female",
       },
-      "E3": Object {
-        "t": "s",
-        "v": "Female",
-      },
       "F1": Object {
-        "t": "s",
-        "v": "school_type",
-      },
-      "F2": Object {
-        "t": "s",
-        "v": "State-funded primary",
-      },
-      "F3": Object {
-        "t": "s",
-        "v": "State-funded secondary",
-      },
-      "G1": Object {
         "t": "s",
         "v": "sess_authorised_percent",
       },
-      "G2": Object {
+      "F2": Object {
         "t": "s",
-        "v": "123",
+        "v": "n/a",
       },
-      "G3": Object {
-        "t": "s",
-        "v": "234",
-      },
-      "H1": Object {
+      "G1": Object {
         "t": "s",
         "v": "sess_authorised",
       },
-      "H2": Object {
+      "G2": Object {
         "t": "s",
-        "v": "456",
-      },
-      "H3": Object {
-        "t": "s",
-        "v": "567",
+        "v": "n/a",
       },
     },
   },
@@ -151,8 +111,8 @@ Array [
     "201516",
     "Female",
     "State-funded primary",
-    "123",
-    "456",
+    "111",
+    "222",
   ],
   Array [
     "England",
@@ -161,8 +121,28 @@ Array [
     "201516",
     "Female",
     "State-funded secondary",
-    "234",
-    "567",
+    "333",
+    "444",
+  ],
+  Array [
+    "Barnsley",
+    "barnsley",
+    "localAuthority",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "555",
+    "666",
+  ],
+  Array [
+    "Barnsley",
+    "barnsley",
+    "localAuthority",
+    "201516",
+    "Female",
+    "State-funded secondary",
+    "777",
+    "888",
   ],
 ]
 `;
@@ -185,7 +165,7 @@ Array [
     "201516",
     "Female",
     "n/a",
-    "123",
+    "111",
   ],
 ]
 `;
@@ -232,8 +212,8 @@ Array [
     "201516",
     "Female",
     "State-funded primary",
-    "123",
-    "456",
+    "111",
+    "222",
   ],
   Array [
     "England",
