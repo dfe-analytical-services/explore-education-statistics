@@ -159,19 +159,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddIdentityServerJwt();
 
             // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
-            // This config tells UserManager to expect the logged in user's id to be in a Claim called
-            // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub" (because
-            // this Claim is renamed via the DefaultInboundClaimTypeMap earlier in the login process).
-            //
-            // It doesn't seem to be possible to remove the renaming (via
-            // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because some mechanism earlier in the 
-            // authentication process requires it to be in the Claim named
-            // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub".
             services.Configure<IdentityOptions>(options =>
             {
+                // This config tells UserManager to expect the logged in user's id to be in a Claim called
+                // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub" (because
+                // this Claim is renamed via the DefaultInboundClaimTypeMap earlier in the login process).
+                //
+                // It doesn't seem to be possible to remove the renaming (via
+                // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because some mechanism earlier in the 
+                // authentication process requires it to be in the Claim named
+                // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub".
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
+
+                // Default User settings
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'";
             });
-            
+
             services.Configure<PreReleaseOptions>(Configuration);
 
             // here we configure our security policies
