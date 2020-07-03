@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DataBlockSummary Summary { get; set; }
 
-        public List<TableBuilderConfiguration> Tables { get; set; }
+        public TableBuilderConfiguration Table { get; set; }
 
         public override string Type { get; set; } = ContentBlockType.DataBlock.ToString();
     }

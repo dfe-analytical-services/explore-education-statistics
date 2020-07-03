@@ -93,7 +93,7 @@ export interface DataBlock extends BaseBlock {
   source: string;
   query: TableDataQuery;
   charts: Chart[];
-  tables: Table[];
+  table: Table;
   summary?: Summary;
 }
 

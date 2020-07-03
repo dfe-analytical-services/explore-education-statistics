@@ -55,7 +55,15 @@ describe('DataBlockRenderer', () => {
       locations: {},
     },
     charts: [],
-    tables: [],
+    table: {
+      indicators: [],
+      tableHeaders: {
+        columnGroups: [],
+        columns: [],
+        rowGroups: [],
+        rows: [],
+      },
+    },
   };
 
   test('renders error message if table response is error', async () => {
@@ -257,18 +265,16 @@ describe('DataBlockRenderer', () => {
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          tables: [
-            {
-              tableHeaders: mapUnmappedTableHeaders(
-                getDefaultTableHeaderConfig(fullTable.subjectMeta),
-              ),
-              indicators: [
-                'authorised-absence-rate',
-                'unauthorised-absence-rate',
-                'overall-absence-rate',
-              ],
-            },
-          ],
+          table: {
+            tableHeaders: mapUnmappedTableHeaders(
+              getDefaultTableHeaderConfig(fullTable.subjectMeta),
+            ),
+            indicators: [
+              'authorised-absence-rate',
+              'unauthorised-absence-rate',
+              'overall-absence-rate',
+            ],
+          },
         }}
       />,
     );
@@ -379,18 +385,16 @@ describe('DataBlockRenderer', () => {
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          tables: [
-            {
-              tableHeaders: mapUnmappedTableHeaders(
-                getDefaultTableHeaderConfig(fullTable.subjectMeta),
-              ),
-              indicators: [
-                'authorised-absence-rate',
-                'unauthorised-absence-rate',
-                'overall-absence-rate',
-              ],
-            },
-          ],
+          table: {
+            tableHeaders: mapUnmappedTableHeaders(
+              getDefaultTableHeaderConfig(fullTable.subjectMeta),
+            ),
+            indicators: [
+              'authorised-absence-rate',
+              'unauthorised-absence-rate',
+              'overall-absence-rate',
+            ],
+          },
         }}
       />,
     );
@@ -450,27 +454,25 @@ describe('DataBlockRenderer', () => {
               indicators: ['authorised-absence-sessions'],
               locations: {},
             },
-            tables: [
-              {
-                tableHeaders: {
-                  columnGroups: [],
-                  rowGroups: [],
-                  columns: [
-                    {
-                      type: 'TimePeriod',
-                      value: '2018_AY',
-                    },
-                  ],
-                  rows: [
-                    {
-                      type: 'Indicator',
-                      value: 'authorised-absence-sessions',
-                    },
-                  ],
-                },
-                indicators: ['authorised-absence-sessions'],
+            table: {
+              tableHeaders: {
+                columnGroups: [],
+                rowGroups: [],
+                columns: [
+                  {
+                    type: 'TimePeriod',
+                    value: '2018_AY',
+                  },
+                ],
+                rows: [
+                  {
+                    type: 'Indicator',
+                    value: 'authorised-absence-sessions',
+                  },
+                ],
               },
-            ],
+              indicators: ['authorised-absence-sessions'],
+            },
           }}
         />,
       );

@@ -9,8 +9,18 @@ import {
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
-import { DataBlock } from '@common/services/types/blocks';
+import { DataBlock, Table } from '@common/services/types/blocks';
 import { produce } from 'immer';
+
+const emptyTable: Table = {
+  indicators: [],
+  tableHeaders: {
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: [],
+  },
+};
 
 const basicRelease: EditableRelease = {
   id: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
@@ -122,7 +132,7 @@ const basicRelease: EditableRelease = {
             includeGeoJson: true,
           },
           charts: [],
-          tables: [],
+          table: emptyTable,
           type: 'DataBlock',
           id: '69a9522d-501d-441a-9ee5-260ede5cd85c',
           order: 1,
@@ -187,7 +197,7 @@ const basicRelease: EditableRelease = {
           includeGeoJson: true,
         },
         charts: [],
-        tables: [],
+        table: emptyTable,
         type: 'DataBlock',
         id: 'e2db1389-8220-41f0-a29a-bb8dd1ccfc9c',
         order: 0,
@@ -214,7 +224,7 @@ const basicRelease: EditableRelease = {
           includeGeoJson: true,
         },
         charts: [],
-        tables: [],
+        table: emptyTable,
         type: 'DataBlock',
         id: 'aa9f1b63-abb3-41a2-bd57-fcf24dfd71ed',
         order: 1,
@@ -241,7 +251,7 @@ const basicRelease: EditableRelease = {
           includeGeoJson: true,
         },
         charts: [],
-        tables: [],
+        table: emptyTable,
         type: 'DataBlock',
         id: 'ba1ff405-1f44-4509-9dcf-5822df5b6f8c',
         order: 2,
@@ -281,7 +291,7 @@ const basicRelease: EditableRelease = {
           includeGeoJson: true,
         },
         charts: [],
-        tables: [],
+        table: emptyTable,
         type: 'DataBlock',
         id: 'a3197018-66b6-4ce5-97fa-da2355270c40',
         order: 0,
@@ -310,7 +320,7 @@ const basicDataBlock: DataBlock = {
   heading: '',
   source: '',
   charts: [],
-  tables: [],
+  table: emptyTable,
   query: {
     filters: [],
     indicators: [],
@@ -601,7 +611,7 @@ describe('ReleaseContentContext', () => {
           includeGeoJson: true,
         },
         charts: [],
-        tables: [],
+        table: emptyTable,
         type: 'DataBlock',
         id: '69a9522d-501d-441a-9ee5-260ede5cd85c',
         order: 0,
