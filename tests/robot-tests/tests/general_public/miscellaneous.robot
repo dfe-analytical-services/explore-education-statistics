@@ -127,7 +127,7 @@ Validate Accessibility statement page
     [Tags]  HappyPath
     user clicks link  Accessibility statement
     user waits until page contains heading  Accessibility statement for Explore education statistics
-    user checks page contains heading 2  What we’re doing to improve accessibility
+    user waits until page contains heading 2  What we’re doing to improve accessibility
 
     user checks url contains  %{PUBLIC_URL}/accessibility-statement
 

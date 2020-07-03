@@ -6,9 +6,9 @@ import Tag from '@common/components/Tag';
 import { Release } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import {
-  formatDayMonthYear,
-  isValidDayMonthYear,
-} from '@common/utils/date/dayMonthYear';
+  formatPartialDate,
+  isValidPartialDate,
+} from '@common/utils/date/partialDate';
 import React, { useEffect, useState } from 'react';
 import styles from './BasicReleaseSummary.module.scss';
 
@@ -69,12 +69,12 @@ const BasicReleaseSummary = ({ release }: Props) => {
                   </strong>
                 )}
               </dd>
-              {isValidDayMonthYear(release.nextReleaseDate) && (
+              {isValidPartialDate(release.nextReleaseDate) && (
                 <div>
                   <dt className="govuk-caption-m">Next update: </dt>
                   <dd>
                     <strong>
-                      <time>{formatDayMonthYear(release.nextReleaseDate)}</time>
+                      <time>{formatPartialDate(release.nextReleaseDate)}</time>
                     </strong>
                   </dd>
                 </div>

@@ -30,6 +30,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         {
             get
             {
+                if (PublishScheduled == null) {
+                    return null;
+                }
+
                 DateTime.TryParseExact(PublishScheduled, "yyyy-MM-dd", InvariantCulture, DateTimeStyles.None,
                     out var dateTime);
                 return dateTime.AsStartOfDayUtc();

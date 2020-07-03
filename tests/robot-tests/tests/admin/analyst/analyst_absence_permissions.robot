@@ -35,7 +35,7 @@ Validate Analyst1 cannot create a publication for Pupils absence topic
     [Tags]  HappyPath
     user clicks element   id:my-publications-tab
     user waits until page contains element   id:selectTheme
-    user waits until page contains element   xpath://h3[text()="Pupil absence"]
+    user waits until page contains heading 3  Pupil absence
     user checks page does not contain element   link:Create new publication
 
 Validate Analyst1 cannot create a release for Pupil absence topic
@@ -48,14 +48,14 @@ Validate Analyst1 can see Absence release summary
     [Tags]  HappyPath
     user opens details dropdown  Academic Year 2016/17 (Live - Latest release)
     user clicks element  css:[data-testid="Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)"]
-    user waits until page contains heading  Pupil absence in schools in England
-    user waits until page contains element  xpath://h2[text()="Release summary"]
+    user waits until page contains heading 1  Pupil absence in schools in England
+    user waits until page contains heading 2  Release summary
     user checks summary list item "Publication title" should be "Pupil absence in schools in England"
     user checks summary list item "Time period" should be "Academic Year"
     user checks summary list item "Release period" should be "2016/17"
     user checks summary list item "Lead statistician" should be "Sean Gibson"
-    user checks summary list item "Scheduled release" should be ""
-    user checks summary list item "Next release expected" should be ""
+    user checks summary list item "Scheduled release" should be "25 April 2018"
+    user checks summary list item "Next release expected" should be "22 March 2019"
     user checks summary list item "Release type" should be "Official Statistics"
 
 Validate Analyst1 cannot see 'Upload data files' button
@@ -108,6 +108,6 @@ Validate Analyst1 can see 'Manage content' page accordion sections
 Validate Analyst1 cannot Approve the 'Pupil absence in schools in England' release
     [Tags]  HappyPath   NotAgainstDev
     user clicks element  link:Release status
-    user waits until page contains element  xpath://h2[text()="Release Status"]
-    user checks page contains   The current release status is: Approved
-    user checks page does not contain  xpath://button[text()="Update release status"]
+    user waits until page contains heading 2  Release status
+    user checks summary list item "Current status" should be "Approved"
+    user checks page does not contain  xpath://button[text()="Edit release status"]

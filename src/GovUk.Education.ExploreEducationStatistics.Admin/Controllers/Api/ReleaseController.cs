@@ -204,12 +204,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("releases/{releaseId}/summary")]
-        public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseSummaryAsync(UpdateReleaseSummaryRequest request,
+        [HttpPut("releases/{releaseId}")]
+        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(UpdateReleaseRequest request,
             Guid releaseId)
         {
             return await _releaseService
-                .EditReleaseSummaryAsync(releaseId, request)
+                .UpdateRelease(releaseId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -288,15 +288,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseStatusService
                 .GetReleaseStatusAsync(releaseId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPut("releases/{releaseId}/status")]
-        public async Task<ActionResult<ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
-            UpdateReleaseStatusRequest updateRequest, Guid releaseId)
-        {
-            return await _releaseService
-                .UpdateReleaseStatusAsync(releaseId, updateRequest.ReleaseStatus, updateRequest.InternalReleaseNote)
                 .HandleFailuresOrOk();
         }
     }

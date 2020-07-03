@@ -1,11 +1,11 @@
 import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
 import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseService, { MyRelease } from '@admin/services/releaseService';
 import React, { useState } from 'react';
 
 interface Props {
-  releases: Release[];
+  releases: MyRelease[];
   onChangeRelease: () => void;
 }
 

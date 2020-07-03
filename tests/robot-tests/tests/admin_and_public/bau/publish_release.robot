@@ -7,61 +7,48 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Go to Create publication page for "UI tests topic" topic
+Create new publication for "UI tests topic" topic
     [Tags]  HappyPath
     environment variable should be set   RUN_IDENTIFIER
     user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
-    user waits until page contains element    xpath://a[text()="Create new publication"]     60
-    user checks page does not contain element   xpath://button[text()="UI tests - publish release %{RUN_IDENTIFIER}"]
+    user waits until page contains link    Create new publication
+    user checks page does not contain button   UI tests - publish release %{RUN_IDENTIFIER}
     user clicks link  Create new publication
-    user waits until page contains heading    Create new publication
+    user creates publication  UI tests - publish release %{RUN_IDENTIFIER}   Test methodology   Tingting Shu - (Attainment statistics team)
 
-Enter new publication title
-    [Tags]  HappyPath
-    user enters text into element  css:#createPublicationForm-publicationTitle   UI tests - publish release %{RUN_IDENTIFIER}
-    user checks element is not visible  css:#createPublicationForm-publicationTitle-error
-
-Select "Select a methodology later"
-    [Tags]  HappyPath
-    user waits until page contains element   xpath://label[text()="Choose an existing methodology"]
-    user clicks element          xpath://label[text()="Select a methodology later"]
-
-Select contact "Tingting Shu"
-    [Tags]  HappyPath
-    user selects from list by label  css:#createPublicationForm-selectedContactId   Tingting Shu - (Attainment statistics team)
-    user checks summary list item "Email" should be "Attainment.STATISTICS@education.gov.uk"
-    user checks summary list item "Telephone" should be "0370 000 2288"
-
-User redirects to the dashboard when clicking the Create publication button
-    [Tags]  HappyPath
-    user clicks button   Create publication
-    user waits until page contains element   xpath://span[text()="Welcome"]
-
-Verify that new publication has been created
+Verify new publication
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
-    user waits until page contains element   xpath://button[text()="UI tests - publish release %{RUN_IDENTIFIER}"]
+    user waits until page contains button  UI tests - publish release %{RUN_IDENTIFIER}
     user checks page contains accordion   UI tests - publish release %{RUN_IDENTIFIER}
     user opens accordion section  UI tests - publish release %{RUN_IDENTIFIER}
-    user checks summary list item "Methodology" should be "No methodology assigned"
+    user checks summary list item "Methodology" should be "Test methodology"
     user checks summary list item "Releases" should be "No releases created"
 
 Create new release
     [Tags]   HappyPath
     user clicks element  css:[data-testid="Create new release link for UI tests - publish release %{RUN_IDENTIFIER}"]
+    user creates release for publication  UI tests - publish release %{RUN_IDENTIFIER}  Financial Year  2000
 
-Check release page has correct fields
+Verify release summary
     [Tags]  HappyPath
-    user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverage
-    user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverageStartYear
-    user waits until page contains element  css:#releaseSummaryForm-scheduledPublishDate-day
-    user waits until page contains element  css:#releaseSummaryForm-scheduledPublishDate-month
-    user waits until page contains element  css:#releaseSummaryForm-scheduledPublishDate-year
-    user waits until page contains element  css:#releaseSummaryForm-nextReleaseDate-day
-    user waits until page contains element  css:#releaseSummaryForm-nextReleaseDate-month
-    user waits until page contains element  css:#releaseSummaryForm-nextReleaseDate-year
+    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user waits until page contains heading 2  Release summary
+    user checks summary list item "Publication title" should be "UI tests - publish release %{RUN_IDENTIFIER}"
+    user checks summary list item "Time period" should be "Financial Year"
+    user checks summary list item "Release period" should be "2000"
+    user checks summary list item "Lead statistician" should be "Tingting Shu"
+    user checks summary list item "Scheduled release" should be "Not scheduled"
+    user checks summary list item "Next release expected" should be "Not set"
+    user checks summary list item "Release type" should be "National Statistics"
 
-User fills in form
+Go to "Release status" tab
+    [Tags]  HappyPath
+    user clicks link   Release status
+    user waits until page contains heading 2  Release status
+    user waits until page contains button  Edit release status
+
+Approve the release
     [Tags]  HappyPath
     ${PUBLISH_DATE_DAY}=  get datetime  %d
     ${PUBLISH_DATE_MONTH}=  get datetime  %m
@@ -74,60 +61,30 @@ User fills in form
     set suite variable  ${PUBLISH_DATE_YEAR}
     set suite variable  ${NEXT_RELEASE_YEAR}
 
-    user selects from list by label  css:#releaseSummaryForm-timePeriodCoverage  Financial Year
-    user enters text into element  css:#releaseSummaryForm-timePeriodCoverageStartYear  2000
+    user clicks button  Edit release status
+    user waits until page contains heading 2  Edit release status
 
-    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-day  ${PUBLISH_DATE_DAY}
-    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-month  ${PUBLISH_DATE_MONTH}
-    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-year   ${PUBLISH_DATE_YEAR}
-
-    user enters text into element  css:#releaseSummaryForm-nextReleaseDate-month  ${PUBLISH_DATE_MONTH}
-    user enters text into element  css:#releaseSummaryForm-nextReleaseDate-year  ${NEXT_RELEASE_YEAR}
-    user clicks element   css:[data-testid="National Statistics"]
-
-Click Create new release button
-    [Tags]   HappyPath
-    user clicks button   Create new release
-    user waits until page contains element  xpath://h1/span[text()="Edit release"]
-    user checks page contains heading 1  UI tests - publish release %{RUN_IDENTIFIER}
-
-Verify Release summary
-    [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user checks page contains heading 2    Release summary
-    user checks summary list item "Publication title" should be "UI tests - publish release %{RUN_IDENTIFIER}"
-    user checks summary list item "Time period" should be "Financial Year"
-    user checks summary list item "Release period" should be "2000"
-    user checks summary list item "Lead statistician" should be "Tingting Shu"
-
-    # EES-952
-    #user checks summary list item "Scheduled release" should be "${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}"
-
-    user checks summary list item "Next release expected" should be "${PUBLISH_DATE_MONTH_WORD} ${NEXT_RELEASE_YEAR}"
-    user checks summary list item "Release type" should be "National Statistics"
-
-Go to Release status tab
-    [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until page contains element  xpath://h2[text()="Release Status"]
-    user waits until element is enabled  xpath://button[text()="Update release status"]
-
-Approve the release
-    [Tags]  HappyPath
-    user clicks button  Update release status
-
-    user waits until page contains element  xpath://input[@data-testid="Approved for publication"]
-    user waits until element is enabled   xpath://input[@data-testid="Approved for publication"]
-    user clicks element   xpath://input[@data-testid="Approved for publication"]
-
-    user clicks element   xpath://textarea[@id="releaseStatusForm-internalReleaseNote"]
+    user clicks element   css:input[data-testid="Approved for publication"]
+    user clicks element   id:releaseStatusForm-internalReleaseNote
     user presses keys  Approved by UI tests on ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user clicks element  css:input[data-testid="On a specific date"]
 
-    user clicks button   Update
+    user enters text into element  id:releaseStatusForm-publishScheduled-day  ${PUBLISH_DATE_DAY}
+    user enters text into element  id:releaseStatusForm-publishScheduled-month  ${PUBLISH_DATE_MONTH}
+    user enters text into element  id:releaseStatusForm-publishScheduled-year   ${PUBLISH_DATE_YEAR}
+
+    user enters text into element  id:releaseStatusForm-nextReleaseDate-month  ${PUBLISH_DATE_MONTH}
+    user enters text into element  id:releaseStatusForm-nextReleaseDate-year  ${NEXT_RELEASE_YEAR}
+
+    user clicks button   Update status
 
 Verify that the release is Scheduled
     [Tags]  HappyPath
-    user waits until page contains element  css:#release-process-status-Scheduled   180
+    user waits until page contains heading 2  Release status
+    user waits until page contains element  id:release-process-status-Scheduled   180
+    # EES-1029
+    #user checks summary list item "Scheduled release" should be "${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}"
+    user checks summary list item "Next release expected" should be "${PUBLISH_DATE_MONTH_WORD} ${NEXT_RELEASE_YEAR}"
 
 Trigger release on demand
     [Tags]  HappyPath
@@ -135,17 +92,10 @@ Trigger release on demand
     ${RELEASE_GUID}=  get release guid from release status page url  ${CURRENT_URL}
     user triggers release on demand  ${RELEASE_GUID}
 
-Verify that the release is Started
-    [Tags]  HappyPath
-    # EES-1007 - Release process status doesn't automatically update
-    user waits for release process status to be  Started   180
-    #user waits until page contains element  css:#release-process-status-Started   600
-
 Wait for release process status to be Complete
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
     user waits for release process status to be  Complete    900
-    #user waits until page contains element  css:#release-process-status-Complete   600
 
 User goes to public Find Statistics page
     [Tags]  HappyPath
@@ -184,5 +134,6 @@ Verify publish and update dates
 
 Verify accordions are correct
     [Tags]  HappyPath
-    user checks accordion is in position   National Statistics   1
-    user checks accordion is in position   Contact us            2
+    user checks accordion is in position   Methodology  1
+    user checks accordion is in position   National Statistics  2
+    user checks accordion is in position   Contact us  3

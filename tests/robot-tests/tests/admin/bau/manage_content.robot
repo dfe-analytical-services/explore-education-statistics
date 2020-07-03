@@ -26,7 +26,7 @@ Verify Manage content test publication is created
 Create release
     [Tags]  HappyPath
     user clicks element  css:[data-testid="Create new release link for Manage content test %{RUN_IDENTIFIER}"]
-    user creates a new release for publication "Manage content test %{RUN_IDENTIFIER}" for start year "2025"
+    user creates release for publication  Manage content test %{RUN_IDENTIFIER}  Academic Year  2025
     user checks summary list item "Publication title" should be "Manage content test %{RUN_IDENTIFIER}"
 
 Navigate to Manage content tab

@@ -197,20 +197,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void Edit_Release_Summary_Returns_Ok()
+        public async void UpdateRelease_Returns_Ok()
         {
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(s => s.EditReleaseSummaryAsync(
+                .Setup(s => s.UpdateRelease(
                     It.Is<Guid>(id => id.Equals(_releaseId)), 
-                    It.IsAny<UpdateReleaseSummaryRequest>())
+                    It.IsAny<UpdateReleaseRequest>())
                 )
                 .ReturnsAsync(new ReleaseViewModel {Id = _releaseId});
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.UpdateReleaseSummaryAsync(new UpdateReleaseSummaryRequest(), _releaseId);
+            var result = await controller.UpdateRelease(new UpdateReleaseRequest(), _releaseId);
             var unboxed = AssertOkResult(result);
             Assert.Equal(_releaseId, unboxed.Id);
         }

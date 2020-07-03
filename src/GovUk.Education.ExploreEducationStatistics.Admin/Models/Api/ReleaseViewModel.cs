@@ -45,5 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public ReleaseStatus Status { get; set; }
 
         public string InternalReleaseNote { get; set; }
+
+        public bool Amendment { get; set; }
+        
+        public Guid PreviousVersionId { get; set; }
     }
 }

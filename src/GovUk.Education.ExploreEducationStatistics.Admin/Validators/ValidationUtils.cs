@@ -86,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UnableToCancelInvite,
         InvalidEmailAddress,
         ApprovedReleaseMustHavePublishScheduledDate,
+        PublishedReleaseCannotBeUnapproved,
         PublicationDoesNotExist,
         PublicationHasMethodologyAssigned,
         MethodologyDoesNotExist, 

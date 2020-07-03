@@ -1,7 +1,7 @@
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { FormGroup } from '@common/components/form/index';
-import { DayMonthYear } from '@common/utils/date/dayMonthYear';
+import { PartialDate } from '@common/utils/date/partialDate';
 import delay from '@common/utils/delay';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isValid, parse } from 'date-fns';
@@ -15,8 +15,9 @@ interface Props<FormValues> {
   legend: string;
   legendSize?: 'xl' | 'l' | 'm' | 's';
   name: keyof FormValues | string;
+  partialDateType?: 'dayMonthYear' | 'monthYear';
   showError?: boolean;
-  type?: 'date' | 'dayMonthYear';
+  type?: 'date' | 'partialDate';
 }
 
 const FormFieldDateInput = <FormValues extends {}>({
@@ -26,15 +27,16 @@ const FormFieldDateInput = <FormValues extends {}>({
   hint,
   legend,
   legendSize = 'l',
+  partialDateType = 'dayMonthYear',
   type = 'date',
 }: Props<FormValues>) => {
   const isFocused = useRef(false);
 
   const [field, meta, helpers] = useField<
-    Date | Partial<DayMonthYear> | undefined
+    Date | Partial<PartialDate> | undefined
   >(name as string);
 
-  const [values, setValues] = useState<Partial<DayMonthYear>>(() => {
+  const [values, setValues] = useState<Partial<PartialDate>>(() => {
     if (field.value instanceof Date) {
       return {
         day: field.value?.getDate(),
@@ -54,7 +56,7 @@ const FormFieldDateInput = <FormValues extends {}>({
 
   const error =
     showError && meta.error && meta.touched
-      ? (meta.error as FormikErrors<DayMonthYear> | string)
+      ? (meta.error as FormikErrors<PartialDate> | string)
       : {};
 
   const errorMessage =
@@ -62,7 +64,7 @@ const FormFieldDateInput = <FormValues extends {}>({
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const key = last(event.target.name.split('.')) as keyof DayMonthYear;
+      const key = last(event.target.name.split('.')) as keyof PartialDate;
 
       if (!['day', 'month', 'year'].includes(key)) {
         throw new Error(`Invalid key for day/month/year field: ${key}`);
@@ -114,16 +116,18 @@ const FormFieldDateInput = <FormValues extends {}>({
         isFocused.current = true;
       }}
     >
-      <FormGroup className="govuk-date-input__item">
-        <FormNumberInput
-          id={`${id}-day`}
-          name={`${name}.day`}
-          label="Day"
-          width={2}
-          value={parseNumber(values.day)}
-          onChange={handleChange}
-        />
-      </FormGroup>
+      {(partialDateType === 'dayMonthYear' || type === 'date') && (
+        <FormGroup className="govuk-date-input__item">
+          <FormNumberInput
+            id={`${id}-day`}
+            name={`${name}.day`}
+            label="Day"
+            width={2}
+            value={parseNumber(values.day)}
+            onChange={handleChange}
+          />
+        </FormGroup>
+      )}
 
       <FormGroup className="govuk-date-input__item">
         <FormNumberInput

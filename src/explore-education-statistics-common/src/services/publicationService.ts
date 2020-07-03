@@ -1,5 +1,5 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
-import { DayMonthYear } from '@common/utils/date/dayMonthYear';
+import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
 export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
@@ -107,7 +107,7 @@ export interface Release<
   publication: PublicationType;
   latestRelease: boolean;
   publishScheduled?: string;
-  nextReleaseDate: DayMonthYear;
+  nextReleaseDate: PartialDate;
   status: ReleaseApprovalStatus;
   relatedInformation: BasicLink[];
   type: {

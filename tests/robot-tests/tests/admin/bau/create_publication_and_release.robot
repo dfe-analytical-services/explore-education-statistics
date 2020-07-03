@@ -11,8 +11,8 @@ Go to Create publication page for "UI tests topic" topic
     [Tags]  HappyPath
     environment variable should be set   RUN_IDENTIFIER
     user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
-    user waits until page contains element    xpath://a[text()="Create new publication"]     60
-    user checks page does not contain element   xpath://button[text()="UI tests - create publication %{RUN_IDENTIFIER}"]
+    user waits until page contains link    Create new publication
+    user checks page does not contain button  UI tests - create publication %{RUN_IDENTIFIER}
     user clicks link  Create new publication
     user waits until page contains heading    Create new publication
 
@@ -48,7 +48,7 @@ User redirects to the dashboard when clicking the Create publication button
 Verify that new publication has been created
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
-    user waits until page contains element   xpath://button[text()="UI tests - create publication %{RUN_IDENTIFIER}"]
+    user waits until page contains button   UI tests - create publication %{RUN_IDENTIFIER}
     user checks page contains accordion   UI tests - create publication %{RUN_IDENTIFIER}
     user opens accordion section  UI tests - create publication %{RUN_IDENTIFIER}
     user checks page contains element   xpath://div/dt[text()="Methodology"]/../dd/a[text()="Test methodology"]
@@ -57,51 +57,45 @@ Verify that new publication has been created
 Create new release
     [Tags]   HappyPath
     user clicks element  css:[data-testid="Create new release link for UI tests - create publication %{RUN_IDENTIFIER}"]
-
-Check release page has correct fields
-    [Tags]  HappyPath
-    user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverage
-    user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverageStartYear
-    user waits until page contains element  css:#releaseSummaryForm-scheduledPublishDate-day
-    user waits until page contains element  css:#releaseSummaryForm-scheduledPublishDate-month
-    user waits until page contains element  css:#releaseSummaryForm-scheduledPublishDate-year
-    user waits until page contains element  css:#releaseSummaryForm-nextReleaseDate-day
-    user waits until page contains element  css:#releaseSummaryForm-nextReleaseDate-month
-    user waits until page contains element  css:#releaseSummaryForm-nextReleaseDate-year
-
-User fills in form
-    [Tags]  HappyPath
-    user selects from list by label  css:#releaseSummaryForm-timePeriodCoverage  Spring Term
-    user enters text into element  css:#releaseSummaryForm-timePeriodCoverageStartYear  2025
-    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-day  24
-    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-month  10
-    user enters text into element  css:#releaseSummaryForm-scheduledPublishDate-year   2025
-    user enters text into element  css:#releaseSummaryForm-nextReleaseDate-day  25
-    user enters text into element  css:#releaseSummaryForm-nextReleaseDate-month  10
-    user enters text into element  css:#releaseSummaryForm-nextReleaseDate-year  2026
-    user clicks element   css:[data-testid="National Statistics"]
-
-Click Create new release button
-    [Tags]   HappyPath
+    user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
+    user waits until page contains element  id:releaseSummaryForm-timePeriodCoverageStartYear
+    user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  Spring Term
+    user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2025
+    user clicks element   css:input[data-testid="National Statistics"]
     user clicks button   Create new release
     user waits until page contains element  xpath://h1/span[text()="Edit release"]
-    user checks page contains heading 1  UI tests - create publication %{RUN_IDENTIFIER}
+    user waits until page contains heading 1  UI tests - create publication %{RUN_IDENTIFIER}
 
-Verify Release summary
+Verify created release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user checks page contains heading 2    Release summary
+    user waits until page contains heading 2  Release summary
     user checks summary list item "Publication title" should be "UI tests - create publication %{RUN_IDENTIFIER}"
     user checks summary list item "Time period" should be "Spring Term"
     user checks summary list item "Release period" should be "2025/26"
     user checks summary list item "Lead statistician" should be "Sean Gibson"
-
-    # EES-952
-    #user checks summary list item "Scheduled release" should be "24 October 2025"
-
-    user checks summary list item "Next release expected" should be "25 October 2026"
+    user checks summary list item "Scheduled release" should be "Not scheduled"
+    user checks summary list item "Next release expected" should be "Not set"
     user checks summary list item "Release type" should be "National Statistics"
 
-# TODO: Edit release
+Edit release summary
+    [Tags]  HappyPath
+    user clicks link  Edit release summary
+    user waits until page contains heading 2  Edit release summary
+    user waits until page contains element  id:releaseSummaryForm-timePeriodCoverageStartYear
+    user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  Summer Term
+    user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2026
+    user clicks element   css:input[data-testid="Official Statistics"]
+    user clicks button   Update release summary
 
-
+Verify updated release summary
+    [Tags]  HappyPath
+    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user waits until page contains heading 2  Release summary
+    user checks summary list item "Publication title" should be "UI tests - create publication %{RUN_IDENTIFIER}"
+    user checks summary list item "Time period" should be "Summer Term"
+    user checks summary list item "Release period" should be "2026/27"
+    user checks summary list item "Lead statistician" should be "Sean Gibson"
+    user checks summary list item "Scheduled release" should be "Not scheduled"
+    user checks summary list item "Next release expected" should be "Not set"
+    user checks summary list item "Release type" should be "Official Statistics"

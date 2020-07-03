@@ -341,7 +341,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                         )}
                         <SummaryList
                           key={dataFile.filename}
-                          additionalClassName="govuk-!-margin-bottom-9"
+                          className="govuk-!-margin-bottom-9"
                         >
                           <SummaryListItem term="Subject title">
                             <h4 className="govuk-heading-m">

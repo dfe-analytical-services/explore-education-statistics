@@ -1,14 +1,14 @@
 import {
-  formatDayMonthYear,
-  parseDayMonthYearToUtcDate,
-} from '@common/utils/date/dayMonthYear';
+  formatPartialDate,
+  parsePartialDateToUtcDate,
+} from '@common/utils/date/partialDate';
 import { isValid } from 'date-fns';
 
-describe('dayMonthYear', () => {
-  describe('parseDayMonthYearToUtcDate', () => {
+describe('partialDate', () => {
+  describe('parsePartialDateToUtcDate', () => {
     test('returns fully parsed UTC date', () => {
       expect(
-        parseDayMonthYearToUtcDate({
+        parsePartialDateToUtcDate({
           year: 2020,
           month: 7,
           day: 13,
@@ -18,7 +18,7 @@ describe('dayMonthYear', () => {
 
     test('returns parsed UTC date when there is only a year', () => {
       expect(
-        parseDayMonthYearToUtcDate({
+        parsePartialDateToUtcDate({
           year: 2020,
         }),
       ).toEqual(new Date('2020-01-01'));
@@ -26,7 +26,7 @@ describe('dayMonthYear', () => {
 
     test('returns parsed UTC date when there is only a year and month', () => {
       expect(
-        parseDayMonthYearToUtcDate({
+        parsePartialDateToUtcDate({
           year: 2020,
           month: 7,
         }),
@@ -36,7 +36,7 @@ describe('dayMonthYear', () => {
     test('returns invalid UTC date when month is invalid number', () => {
       expect(
         isValid(
-          parseDayMonthYearToUtcDate({
+          parsePartialDateToUtcDate({
             year: 2020,
             month: 40,
           }),
@@ -47,7 +47,7 @@ describe('dayMonthYear', () => {
     test('returns invalid UTC date when day is invalid number', () => {
       expect(
         isValid(
-          parseDayMonthYearToUtcDate({
+          parsePartialDateToUtcDate({
             year: 2020,
             month: 7,
             day: 40,
@@ -58,19 +58,19 @@ describe('dayMonthYear', () => {
 
     test('throw error if missing year', () => {
       expect(() =>
-        parseDayMonthYearToUtcDate({
+        parsePartialDateToUtcDate({
           year: 0,
           month: 7,
           day: 13,
         }),
-      ).toThrowError(/Could not parse invalid DayMonthYear to date/);
+      ).toThrowError(/Could not parse invalid PartialDate to date/);
     });
   });
 
-  describe('formatDayMonthYear', () => {
+  describe('formatPartialDate', () => {
     test('returns fully formatted date using default format', () => {
       expect(
-        formatDayMonthYear({
+        formatPartialDate({
           year: 2020,
           month: 7,
           day: 13,
@@ -80,7 +80,7 @@ describe('dayMonthYear', () => {
 
     test('returns full formatted date using custom format', () => {
       expect(
-        formatDayMonthYear(
+        formatPartialDate(
           {
             year: 2020,
             month: 7,
@@ -95,7 +95,7 @@ describe('dayMonthYear', () => {
 
     test('returns formatted date from only a year and month using default format', () => {
       expect(
-        formatDayMonthYear({
+        formatPartialDate({
           year: 2020,
           month: 7,
         }),
@@ -104,7 +104,7 @@ describe('dayMonthYear', () => {
 
     test('returns formatted date from only a year and a month using custom format', () => {
       expect(
-        formatDayMonthYear(
+        formatPartialDate(
           {
             year: 2020,
             month: 7,
@@ -116,7 +116,7 @@ describe('dayMonthYear', () => {
 
     test('returns formatted date from only a year', () => {
       expect(
-        formatDayMonthYear({
+        formatPartialDate({
           year: 2020,
         }),
       ).toBe('2020');
