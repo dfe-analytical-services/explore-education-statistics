@@ -28,7 +28,6 @@ interface Props {
   initialValues?: FormValues;
   onSubmit: PublicationFormSubmitHandler;
   options: ThemeMeta[];
-  publicationId?: string;
 }
 
 const formId = 'publicationForm';

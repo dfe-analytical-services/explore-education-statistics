@@ -39,6 +39,7 @@ const WizardStep = ({ children, id, ...restProps }: WizardStepProps) => {
         [styles.stepActive]: isActive,
         [styles.stepHidden]: stepNumber > currentStep,
       })}
+      data-testid={`wizardStep-${stepNumber}`}
       id={id}
       ref={ref}
       tabIndex={-1}

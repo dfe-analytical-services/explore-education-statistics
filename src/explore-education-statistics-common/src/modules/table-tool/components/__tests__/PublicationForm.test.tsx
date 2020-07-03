@@ -346,7 +346,9 @@ describe('PublicationForm', () => {
     const { container } = render(
       <PublicationForm
         {...wizardProps}
-        publicationId="7a57d4c0-5233-4d46-8e27-748fbc365715"
+        initialValues={{
+          publicationId: '7a57d4c0-5233-4d46-8e27-748fbc365715',
+        }}
         isActive={false}
         onSubmit={noop}
         options={testOptions}
