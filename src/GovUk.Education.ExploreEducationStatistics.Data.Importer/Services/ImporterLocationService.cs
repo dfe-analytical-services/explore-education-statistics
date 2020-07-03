@@ -166,20 +166,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .And(location => location.Institution.Code == (institution != null ? institution.Code : null) 
                                  && location.Institution.Name == (institution != null ? institution.Name : null));
 
-            // If no LA code then try using the old code
-            if (localAuthority != null && localAuthority.Code == null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.LocalAuthority.OldCode == (localAuthority != null && localAuthority.OldCode != null ? localAuthority.OldCode : null)
-                                     && location.LocalAuthority.Name == (localAuthority != null ? localAuthority.Name : null));
-            }
-            else
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.LocalAuthority.Code == (localAuthority != null && localAuthority.Code != null ? localAuthority.Code : null)
-                                     && location.LocalAuthority.Name == (localAuthority != null ? localAuthority.Name : null)); 
-            }
-        
+            // Also match the old LA code even if blank
+            predicateBuilder = predicateBuilder
+                .And(location =>
+                    location.LocalAuthority.Code == (localAuthority != null && localAuthority.Code != null ? localAuthority.Code : null)
+                    && location.LocalAuthority.OldCode == (localAuthority != null && localAuthority.OldCode != null ? localAuthority.OldCode : null)
+                    && location.LocalAuthority.Name == (localAuthority != null ? localAuthority.Name : null));
+
             predicateBuilder = predicateBuilder
                 .And(location => location.LocalAuthorityDistrict.Code == (localAuthorityDistrict != null ? localAuthorityDistrict.Code : null)
                                  && location.LocalAuthorityDistrict.Name == (localAuthorityDistrict != null ? localAuthorityDistrict.Name : null));
