@@ -279,7 +279,7 @@ const TableToolWizard = ({
         <>
           <Wizard
             initialStep={state.initialStep}
-            id="tableTool-steps"
+            id="tableToolWizard"
             onStepChange={async (nextStep, previousStep) => {
               if (nextStep < previousStep) {
                 const confirmed = await askConfirm();
