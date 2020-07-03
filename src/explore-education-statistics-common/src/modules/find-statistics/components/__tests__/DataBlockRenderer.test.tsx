@@ -13,12 +13,8 @@ import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappe
 import _tableBuilderService, {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
-import {
-  Chart,
-  DataBlock,
-  DataBlockRequest,
-} from '@common/services/types/blocks';
-import { waitFor, screen } from '@testing-library/dom';
+import { Chart, DataBlock } from '@common/services/types/blocks';
+import { screen, waitFor } from '@testing-library/dom';
 import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
 import React from 'react';

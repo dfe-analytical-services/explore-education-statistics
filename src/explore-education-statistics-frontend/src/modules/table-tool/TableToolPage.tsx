@@ -70,7 +70,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         tableHeaders,
       },
     };
-  }, [fastTrack, publicationSlug, subjectMeta]);
+  }, [fastTrack, publicationSlug, subjectMeta, themeMeta]);
 
   return (
     <Page title="Create your own tables online" caption="Table Tool" wide>

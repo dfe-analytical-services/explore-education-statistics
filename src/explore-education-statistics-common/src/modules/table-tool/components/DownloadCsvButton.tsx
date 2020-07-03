@@ -8,7 +8,6 @@ import {
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import cartesian from '@common/utils/cartesian';
 import camelCase from 'lodash/camelCase';
-import snakeCase from 'lodash/snakeCase';
 import React from 'react';
 import { utils, writeFile } from 'xlsx';
 

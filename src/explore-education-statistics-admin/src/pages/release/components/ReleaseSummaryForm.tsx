@@ -17,7 +17,7 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import { Formik, FormikHelpers } from 'formik';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode } from 'react';
 import { ObjectSchema } from 'yup';
 
 export interface ReleaseSummaryFormValues {
