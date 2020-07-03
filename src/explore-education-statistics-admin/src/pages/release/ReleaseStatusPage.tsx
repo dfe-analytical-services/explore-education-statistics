@@ -201,7 +201,7 @@ const ReleaseStatusPage = () => {
             status: Yup.string().required('Choose a status') as StringSchema<
               FormValues['status']
             >,
-            internalReleaseNote: Yup.string().when('releaseStatus', {
+            internalReleaseNote: Yup.string().when('status', {
               is: value => ['Approved', 'HigherLevelReview'].includes(value),
               then: Yup.string().required('Provide an internal release note'),
             }),
