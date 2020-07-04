@@ -12,9 +12,13 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
-import TableToolFinalStep from '@frontend/modules/table-tool/components/TableToolFinalStep';
 import { GetServerSideProps, NextPage } from 'next';
+import dynamic from 'next/dynamic';
 import React, { useMemo } from 'react';
+
+const TableToolFinalStep = dynamic(() =>
+  import('@frontend/modules/table-tool/components/TableToolFinalStep'),
+);
 
 export interface TableToolPageProps {
   publicationSlug?: string;
