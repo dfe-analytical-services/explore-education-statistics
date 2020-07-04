@@ -7,23 +7,28 @@ import Form from '@common/components/form/Form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React from 'react';
-
-const errorCodeMappings = [
-  errorCodeToFieldError('SLUG_NOT_UNIQUE', 'title', 'Choose a unique title'),
-];
 
 export interface MethodologySummaryFormValues {
   title: string;
   contactId: string;
   publishScheduled: Date;
 }
+
+const errorMappings = [
+  mapFieldErrors<MethodologySummaryFormValues>({
+    target: 'title',
+    messages: {
+      SLUG_NOT_UNIQUE: 'Choose a unique title',
+    },
+  }),
+];
 
 interface Props {
   id: string;
@@ -52,7 +57,7 @@ const MethodologySummaryForm = ({
     async values => {
       onSubmit(values as MethodologySummaryFormValues);
     },
-    errorCodeMappings,
+    errorMappings,
   );
 
   // TODO EES-899 - Save methodology contact in backend

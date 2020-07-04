@@ -5,29 +5,30 @@ import releaseChartFileService, {
 import Button from '@common/components/Button';
 import Form from '@common/components/form/Form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
-
-const errorCodeMappings = [
-  errorCodeToFieldError('FILE_TYPE_INVALID', 'file', 'Choose an image file'),
-  errorCodeToFieldError(
-    'CANNOT_OVERWRITE_FILE',
-    'file',
-    'Choose a unique file',
-  ),
-];
 
 interface FormValues {
   file: File | null;
   fileId: string;
 }
+
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'file',
+    messages: {
+      FILE_TYPE_INVALID: 'Choose an image file',
+      CANNOT_OVERWRITE_FILE: 'Choose a unique file',
+    },
+  }),
+];
 
 interface Props {
   canSaveChart: boolean;
@@ -71,7 +72,7 @@ const InfographicChartForm = ({
         setUploading(false);
       }
     }
-  }, errorCodeMappings);
+  }, errorMappings);
 
   const selectedFile = files.find(fileOption => fileOption.filename === fileId);
 

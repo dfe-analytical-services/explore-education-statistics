@@ -1,8 +1,10 @@
-import handleServerSideValidation, {
-  ServerValidationErrors,
-  ServerValidationMessageMapper,
-} from '@common/components/form/util/serverValidationHandler';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
+import isAxiosError from '@common/utils/error/isAxiosError';
+import {
+  convertServerFieldErrors,
+  ServerValidationErrorResponse,
+  FieldMessageMapper,
+} from '@common/validation/serverValidations';
 import { AxiosError } from 'axios';
 import { FormikHelpers } from 'formik';
 import { useMemo } from 'react';
@@ -12,13 +14,15 @@ export type UseFormSubmit<FormValues> = (
   formikActions: FormikHelpers<FormValues>,
 ) => Promise<void> | void;
 
-const isServerValidationError = (error: AxiosError) => {
-  if (!error.isAxiosError || !error.response?.data) {
+const isServerValidationError = (
+  error: Error,
+): error is AxiosError<ServerValidationErrorResponse> => {
+  if (!isAxiosError(error) || !error.response?.data) {
     return false;
   }
 
   const errorDataAsValidationError = error.response
-    .data as ServerValidationErrors;
+    .data as ServerValidationErrorResponse;
 
   return (
     errorDataAsValidationError.errors !== undefined &&
@@ -28,7 +32,7 @@ const isServerValidationError = (error: AxiosError) => {
 };
 function useFormSubmit<FormValues>(
   onSubmit: UseFormSubmit<FormValues>,
-  errorMappers: ServerValidationMessageMapper[] = [],
+  errorMappers: FieldMessageMapper<FormValues>[] = [],
 ) {
   const { handleApiErrors } = useErrorControl();
 
@@ -37,21 +41,19 @@ function useFormSubmit<FormValues>(
       try {
         await onSubmit(values, actions);
       } catch (error) {
-        const typedError: AxiosError = error;
-
-        if (!isServerValidationError(typedError)) {
-          handleApiErrors(typedError);
-        } else {
-          const isErrorHandled = handleServerSideValidation(
+        if (isServerValidationError(error) && error.response?.data) {
+          const errors = convertServerFieldErrors(
+            error.response?.data,
             errorMappers,
-            typedError.response?.data,
-            actions.setFieldError,
-            actions.setStatus,
           );
 
-          if (!isErrorHandled) {
-            handleApiErrors(typedError);
+          if (Object.values(errors).length) {
+            actions.setErrors(errors);
+          } else {
+            handleApiErrors(error);
           }
+        } else {
+          handleApiErrors(error);
         }
       }
     },

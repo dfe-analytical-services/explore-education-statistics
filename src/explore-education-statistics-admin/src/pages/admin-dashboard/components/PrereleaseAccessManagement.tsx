@@ -8,21 +8,30 @@ import ButtonText from '@common/components/ButtonText';
 import Form from '@common/components/form/Form';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
+
+interface FormValues {
+  email: string;
+}
+
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'email',
+    messages: {
+      USER_ALREADY_EXISTS: 'User already exists',
+    },
+  }),
+];
 
 interface Model {
   preReleaseContactsForRelease: PrereleaseContactDetails[];
   inviting: boolean;
   removing: boolean;
-}
-
-interface FormValues {
-  email: string;
 }
 
 interface Props {
@@ -45,14 +54,6 @@ const PrereleaseAccessManagement = ({ release }: Props) => {
   }, [release.id]);
 
   const formId = `invitePrereleaseAccessUsers-${release.id}`;
-
-  const errorCodeMappings = [
-    errorCodeToFieldError(
-      'USER_ALREADY_EXISTS',
-      'userEmail',
-      'User already exists',
-    ),
-  ];
 
   const inviteUserByEmail: (
     email: string,
@@ -78,7 +79,7 @@ const PrereleaseAccessManagement = ({ release }: Props) => {
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
     await inviteUserByEmail(values.email, actions.resetForm);
-  }, errorCodeMappings);
+  }, errorMappings);
 
   return (
     <>

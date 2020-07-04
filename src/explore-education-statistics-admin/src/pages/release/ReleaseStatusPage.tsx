@@ -12,7 +12,6 @@ import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
@@ -21,34 +20,37 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import {
-  PartialDate,
+  formatPartialDate,
   isPartialDateEmpty,
   isValidPartialDate,
   parsePartialDateToUtcDate,
-  formatPartialDate,
+  PartialDate,
 } from '@common/utils/date/partialDate';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { endOfDay, format, formatISO, isValid } from 'date-fns';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { StringSchema } from 'yup';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE',
-    'status',
-    'Enter a publish scheduled date before approving',
-  ),
-  errorCodeToFieldError(
-    'ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE',
-    'status',
-    'Check all uploaded datafiles are complete before approving',
-  ),
-  errorCodeToFieldError(
-    'PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED',
-    'status',
-    'Release has already been published and cannot be un-approved',
-  ),
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'status',
+    messages: {
+      APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE:
+        'Enter a publish scheduled date before approving',
+      ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE:
+        'Enter a publish scheduled date before approving',
+      PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED:
+        'Release has already been published and cannot be un-approved',
+    },
+  }),
+  mapFieldErrors<FormValues>({
+    target: 'nextReleaseDate',
+    messages: {
+      PARTIAL_DATE_NOT_VALID: 'Enter a valid date',
+    },
+  }),
 ];
 
 interface FormValues {
@@ -110,7 +112,7 @@ const ReleaseStatusPage = () => {
     setShowForm(false);
 
     onChangeReleaseStatus();
-  }, errorCodeMappings);
+  }, errorMappings);
 
   if (!release) {
     return <LoadingSpinner />;

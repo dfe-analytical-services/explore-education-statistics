@@ -13,36 +13,29 @@ import publicationService, {
 import releaseService from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
-import {
-  errorCodeAndFieldNameToFieldError,
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'SLUG_NOT_UNIQUE',
-    'timePeriodCoverageStartYear',
-    'Choose a unique combination of time period and start year',
-  ),
-  errorCodeAndFieldNameToFieldError(
-    'PARTIAL_DATE_NOT_VALID',
-    'NextReleaseDate',
-    'nextReleaseDate',
-    'Enter a valid date',
-  ),
+export interface FormValues extends ReleaseSummaryFormValues {
+  templateReleaseId: string;
+}
+
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'timePeriodCoverageStartYear',
+    messages: {
+      SLUG_NOT_UNIQUE:
+        'Choose a unique combination of time period and start year',
+    },
+  }),
 ];
 
 interface MatchProps {
   publicationId: string;
-}
-
-export interface FormValues extends ReleaseSummaryFormValues {
-  templateReleaseId: string;
 }
 
 interface Model {
@@ -86,7 +79,7 @@ const ReleaseCreatePage = ({
         releaseId: createdRelease.id,
       }),
     );
-  }, errorCodeMappings);
+  }, errorMappings);
 
   const handleCancel = () =>
     history.push(appRouteList.adminDashboard.path as string);

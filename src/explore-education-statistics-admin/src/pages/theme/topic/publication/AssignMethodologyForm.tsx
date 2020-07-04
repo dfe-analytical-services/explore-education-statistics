@@ -11,40 +11,33 @@ import {
   FormFieldTextInput,
   FormGroup,
 } from '@common/components/form';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Form, Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
-
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'METHODOLOGY_DOES_NOT_EXIST',
-    'methodologyChoice',
-    'There was a problem adding the selected methodology',
-  ),
-  errorCodeToFieldError(
-    'METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED',
-    'methodologyChoice',
-    'Choose a methodology that is Live or ready to be published',
-  ),
-  errorCodeToFieldError(
-    'METHODOLOGY_OR_EXTERNAL_METHODOLOGY_LINK_MUST_BE_DEFINED',
-    'methodologyChoice',
-    'Either an existing methodology or an external methodology link must be provided',
-  ),
-  errorCodeToFieldError(
-    'CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY',
-    'methodologyChoice',
-    'Either an existing methodology or an external methodology link must be provided',
-  ),
-];
 
 export interface AssignMethodologyFormValues {
   methodologyChoice?: 'existing' | 'external' | 'later';
   selectedMethodologyId?: string;
   externalMethodology?: ExternalMethodology;
 }
+
+const errorMappings = [
+  mapFieldErrors<AssignMethodologyFormValues>({
+    target: 'methodologyChoice',
+    messages: {
+      METHODOLOGY_DOES_NOT_EXIST:
+        'There was a problem adding the selected methodology',
+      METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED:
+        'Choose a methodology that is Live or ready to be published',
+      METHODOLOGY_OR_EXTERNAL_METHODOLOGY_LINK_MUST_BE_DEFINED:
+        'Either an existing methodology or an external methodology link must be provided',
+      CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY:
+        'Either an existing methodology or an external methodology link must be provided',
+    },
+  }),
+];
 
 interface Props {
   methodology?: BasicMethodology;
@@ -84,7 +77,7 @@ const AssignMethodologyForm = ({
         ...newMethodology,
       });
     },
-    errorCodeMappings,
+    errorMappings,
   );
 
   if (!formOpen)

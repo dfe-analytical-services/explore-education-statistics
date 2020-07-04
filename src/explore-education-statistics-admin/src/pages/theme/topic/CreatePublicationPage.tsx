@@ -18,10 +18,10 @@ import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
@@ -29,18 +29,19 @@ import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { AssignMethodologyFormValues } from './publication/AssignMethodologyForm';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'SLUG_NOT_UNIQUE',
-    'publicationTitle',
-    'Choose a unique title',
-  ),
-];
-
 interface FormValues extends AssignMethodologyFormValues {
   publicationTitle: string;
   selectedContactId: string;
 }
+
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'publicationTitle',
+    messages: {
+      SLUG_NOT_UNIQUE: 'Choose a unique title',
+    },
+  }),
+];
 
 interface CreatePublicationModel {
   methodologies: BasicMethodology[];
@@ -86,7 +87,7 @@ const CreatePublicationPage = ({
     });
 
     history.push(appRouteList.adminDashboard.path as string);
-  }, errorCodeMappings);
+  }, errorMappings);
 
   const cancelHandler = () => {
     history.push(appRouteList.adminDashboard.path as string);
