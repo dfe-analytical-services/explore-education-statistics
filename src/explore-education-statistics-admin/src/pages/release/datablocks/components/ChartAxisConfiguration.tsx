@@ -387,13 +387,13 @@ const ChartAxisConfiguration = ({
                 )}
 
                 <FormFieldset id={`${id}-axis`} legend="Labels" legendSize="s">
-                  <FormFieldTextInput<AxisConfiguration>
+                  <FormFieldTextInput
                     id={`${id}-label-text`}
                     label="Label"
                     name="label.text"
                   />
 
-                  <FormFieldNumberInput<AxisConfiguration>
+                  <FormFieldNumberInput
                     id={`${id}-label-width`}
                     label="Width (px)"
                     name="label.width"
@@ -403,7 +403,7 @@ const ChartAxisConfiguration = ({
 
                   {(validationSchema.fields.label as ObjectSchema<Label>).fields
                     .rotated && (
-                    <FormFieldCheckbox<AxisConfiguration>
+                    <FormFieldCheckbox
                       id={`${id}-label-rotated`}
                       name="label.rotated"
                       label="Rotate 90 degrees"

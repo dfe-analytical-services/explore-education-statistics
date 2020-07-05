@@ -169,7 +169,7 @@ const AssignMethodologyForm = ({
         >
           {form => (
             <Form id={formId}>
-              <FormFieldRadioGroup
+              <FormFieldRadioGroup<AssignMethodologyFormValues>
                 id={`${formId}-methodologyChoice`}
                 legend="Choose a methodology for this publication"
                 legendSize="m"
@@ -179,7 +179,7 @@ const AssignMethodologyForm = ({
                     value: 'existing',
                     label: 'Choose an existing methodology',
                     conditional: (
-                      <FormFieldSelect
+                      <FormFieldSelect<AssignMethodologyFormValues>
                         id={`${formId}-selectedMethodologyId`}
                         name="selectedMethodologyId"
                         label="Select methodology"

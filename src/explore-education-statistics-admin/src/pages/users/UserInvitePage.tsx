@@ -100,7 +100,7 @@ const UserInvitePage = ({
             selectedRoleId:
               orderBy(model.roles, role => role.name)?.[0]?.id ?? '',
           }}
-          validationSchema={Yup.object({
+          validationSchema={Yup.object<FormValues>({
             userEmail: Yup.string()
               .required('Provide the users email')
               .email('Provide a valid email address'),
@@ -117,7 +117,7 @@ const UserInvitePage = ({
                   legendSize="m"
                   hint="The invited user must have a @education.gov.uk email address"
                 >
-                  <FormFieldTextInput
+                  <FormFieldTextInput<FormValues>
                     id={`${formId}-userEmail`}
                     label="User email"
                     name="userEmail"
@@ -130,7 +130,7 @@ const UserInvitePage = ({
                   legendSize="m"
                   hint="The users role within the service."
                 >
-                  <FormFieldSelect
+                  <FormFieldSelect<FormValues>
                     id={`${formId}-selectedRoleId`}
                     label="Role"
                     name="selectedRoleId"

@@ -8,7 +8,7 @@ import styles from './FormFieldSortableListGroup.module.scss';
 
 interface Props<FormValues> {
   id: string;
-  name: keyof FormValues & string;
+  name: FormValues extends {} ? keyof FormValues : string;
   legend: string;
   groupLegend: string;
 }
@@ -19,10 +19,10 @@ const FormFieldSortableListGroup = <FormValues extends {}>({
   legend,
   groupLegend,
 }: Props<FormValues>) => {
-  const [field, meta] = useField(name);
+  const [field, meta] = useField(name as string);
 
   return (
-    <Droppable droppableId={name} direction="horizontal">
+    <Droppable droppableId={name as string} direction="horizontal">
       {(droppableProvided, droppableSnapshot) => (
         <div
           {...droppableProvided.droppableProps}
@@ -60,7 +60,7 @@ const FormFieldSortableListGroup = <FormValues extends {}>({
                       })}
                       ref={draggableProvided.innerRef}
                     >
-                      <FormFieldSortableList<FormValues>
+                      <FormFieldSortableList
                         name={`${name}[${index}]`}
                         id={`${id}-${index}`}
                         legend={`${groupLegend} ${index + 1}`}

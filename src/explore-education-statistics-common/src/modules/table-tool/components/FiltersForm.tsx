@@ -151,7 +151,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                             const filterName = `filters.${filterKey}`;
 
                             return (
-                              <FormFieldCheckboxGroupsMenu<FormValues>
+                              <FormFieldCheckboxGroupsMenu
                                 key={filterKey}
                                 name={filterName}
                                 id={`${formId}-${camelCase(filterKey)}`}

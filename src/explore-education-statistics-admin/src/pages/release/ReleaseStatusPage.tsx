@@ -256,7 +256,7 @@ const ReleaseStatusPage = () => {
                     },
                   ]}
                 />
-                <FormFieldTextArea
+                <FormFieldTextArea<FormValues>
                   name="internalReleaseNote"
                   className="govuk-!-width-one-half"
                   id={`${formId}-internalReleaseNote`}

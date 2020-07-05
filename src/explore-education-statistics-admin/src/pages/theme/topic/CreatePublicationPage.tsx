@@ -184,7 +184,7 @@ const CreatePublicationPage = ({
                   label="Enter publication title"
                   name="publicationTitle"
                 />
-                <FormFieldRadioGroup
+                <FormFieldRadioGroup<FormValues>
                   id={`${formId}-methodologyChoice`}
                   legend="Choose a methodology for this publication"
                   legendSize="m"
@@ -194,7 +194,7 @@ const CreatePublicationPage = ({
                       value: 'existing',
                       label: 'Choose an existing methodology',
                       conditional: (
-                        <FormFieldSelect
+                        <FormFieldSelect<FormValues>
                           id={`${formId}-selectedMethodologyId`}
                           name="selectedMethodologyId"
                           label="Select methodology"
@@ -276,7 +276,7 @@ const CreatePublicationPage = ({
                   legendSize="m"
                   hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
                 >
-                  <FormFieldSelect
+                  <FormFieldSelect<FormValues>
                     id={`${formId}-selectedContactId`}
                     label="Publication and release contact"
                     name="selectedContactId"

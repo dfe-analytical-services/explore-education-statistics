@@ -131,7 +131,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
               initialValues={{
                 selectedRoleId: model.user.role ?? '',
               }}
-              validationSchema={Yup.object({
+              validationSchema={Yup.object<UpdateRoleFormValues>({
                 selectedRoleId: Yup.string().required(
                   'Choose role for the user',
                 ),
@@ -166,7 +166,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                     >
                       <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-quarter">
-                          <FormFieldSelect
+                          <FormFieldSelect<UpdateRoleFormValues>
                             id={`${formId}-selectedRoleId`}
                             label="Role"
                             name="selectedRoleId"
@@ -212,7 +212,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                     >
                       <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-half">
-                          <FormFieldSelect
+                          <FormFieldSelect<AddReleaseRoleFormValues>
                             id={`${formId}-selectedReleaseId`}
                             label="Release"
                             name="selectedReleaseId"
@@ -224,7 +224,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                         </div>
 
                         <div className="govuk-grid-column-one-quarter">
-                          <FormFieldSelect
+                          <FormFieldSelect<AddReleaseRoleFormValues>
                             id={`${formId}-selectedReleaseRoleId`}
                             label="Release role"
                             name="selectedReleaseRoleId"

@@ -103,7 +103,7 @@ const PrereleaseAccessManagement = ({ release }: Props) => {
                     legendSize="s"
                     id={`pre-release-selection-${release.id}`}
                   >
-                    <FormFieldTextInput
+                    <FormFieldTextInput<FormValues>
                       id={`${formId}-email`}
                       label="Invite a new user"
                       name="email"
