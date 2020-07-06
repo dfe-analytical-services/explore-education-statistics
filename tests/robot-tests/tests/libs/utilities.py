@@ -216,20 +216,20 @@ def capture_large_screenshot():
 def user_checks_previous_table_tool_step_contains(step, key, value):
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableTool-steps-step-{step}"]//*[text()="Go to this step"]')
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]')
         sl.driver.find_element_by_xpath(
-            f'//*[@id="tableTool-steps-step-{step}"]//*[text()="Go to this step"]')
+            f'//*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]')
     except:
         sl.capture_page_screenshot()
         raise_assertion_error(f'Previous step wasn\'t found!')
 
     try:
         sl.driver.find_element_by_xpath(
-            f'.//*[@id="tableTool-steps-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]')
+            f'.//*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]')
     except:
         sl.capture_page_screenshot()
         raise_assertion_error(
-            f'Element "#tableTool-steps-step-{step}" containing "{key}" and "{value}" not found!')
+            f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
 
 
 def user_selects_start_date(start_date):

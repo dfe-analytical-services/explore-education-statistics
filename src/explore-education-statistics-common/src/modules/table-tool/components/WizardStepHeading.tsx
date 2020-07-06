@@ -28,7 +28,7 @@ const WizardStepHeading = ({
             'govuk-fieldset__heading': fieldsetHeading,
           })}
         >
-          <span className="govuk-visually-hidden">{`Step ${stepNumber}:`}</span>
+          <span className="govuk-visually-hidden">{`Step ${stepNumber} (current): `}</span>
           {children}
         </h2>
       ) : (
@@ -42,7 +42,7 @@ const WizardStepHeading = ({
             onClick={() => setCurrentStep(stepNumber)}
             className={styles.stepButton}
           >
-            <span className="govuk-visually-hidden">{`Step ${stepNumber}:`}</span>
+            <span className="govuk-visually-hidden">{`Step ${stepNumber}: `}</span>
             {children}
 
             {stepEnabled && (

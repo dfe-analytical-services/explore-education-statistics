@@ -1,7 +1,8 @@
 import PublicationForm from '@common/modules/table-tool/components/PublicationForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
+import noop from 'lodash/noop';
 
 describe('PublicationForm', () => {
   const testOptions = [
@@ -170,17 +171,17 @@ describe('PublicationForm', () => {
   test('renders publication options filtered by title when using search field', () => {
     jest.useFakeTimers();
 
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <PublicationForm
         {...wizardProps}
-        onSubmit={() => undefined}
+        onSubmit={noop}
         options={testOptions}
       />,
     );
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(10);
 
-    fireEvent.change(getByLabelText('Search publications'), {
+    fireEvent.change(screen.getByLabelText('Search publications'), {
       target: {
         value: 'Early years',
       },
@@ -190,24 +191,24 @@ describe('PublicationForm', () => {
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(1);
     expect(
-      getByLabelText('Early years foundation stage profile results'),
+      screen.getByLabelText('Early years foundation stage profile results'),
     ).toHaveAttribute('type', 'radio');
   });
 
   test('renders publication options filtered by case-insensitive title', () => {
     jest.useFakeTimers();
 
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <PublicationForm
         {...wizardProps}
-        onSubmit={() => undefined}
+        onSubmit={noop}
         options={testOptions}
       />,
     );
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(10);
 
-    fireEvent.change(getByLabelText('Search publications'), {
+    fireEvent.change(screen.getByLabelText('Search publications'), {
       target: {
         value: 'early years',
       },
@@ -217,22 +218,22 @@ describe('PublicationForm', () => {
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(1);
     expect(
-      getByLabelText('Early years foundation stage profile results'),
+      screen.getByLabelText('Early years foundation stage profile results'),
     ).toHaveAttribute('type', 'radio');
   });
 
   test('does not throw error if regex sensitive search term is used', () => {
     jest.useFakeTimers();
 
-    const { getByLabelText } = render(
+    render(
       <PublicationForm
         {...wizardProps}
-        onSubmit={() => undefined}
+        onSubmit={noop}
         options={testOptions}
       />,
     );
 
-    fireEvent.change(getByLabelText('Search publications'), {
+    fireEvent.change(screen.getByLabelText('Search publications'), {
       target: {
         value: '[',
       },
@@ -244,33 +245,29 @@ describe('PublicationForm', () => {
   });
 
   test('renders empty message when there are no publication options', () => {
-    const { container, queryByText } = render(
-      <PublicationForm
-        {...wizardProps}
-        onSubmit={() => undefined}
-        options={[]}
-      />,
+    const { container } = render(
+      <PublicationForm {...wizardProps} onSubmit={noop} options={[]} />,
     );
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(0);
-    expect(queryByText('No publications found')).not.toBeNull();
+    expect(screen.queryByText('No publications found')).not.toBeNull();
   });
 
   test('renders empty message when there are no filtered publication options', async () => {
     jest.useFakeTimers();
 
-    const { container, queryByText, getByLabelText } = render(
+    const { container } = render(
       <PublicationForm
         {...wizardProps}
-        onSubmit={() => undefined}
+        onSubmit={noop}
         options={testOptions}
       />,
     );
 
-    expect(queryByText('No publications found')).toBeNull();
+    expect(screen.queryByText('No publications found')).toBeNull();
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(10);
 
-    fireEvent.change(getByLabelText('Search publications'), {
+    fireEvent.change(screen.getByLabelText('Search publications'), {
       target: {
         value: 'not a publication',
       },
@@ -279,26 +276,28 @@ describe('PublicationForm', () => {
     jest.runOnlyPendingTimers();
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(0);
-    expect(queryByText('No publications found')).not.toBeNull();
+    expect(screen.queryByText('No publications found')).not.toBeNull();
   });
 
   test('renders selected publication option even if it does not match search field', () => {
     jest.useFakeTimers();
 
-    const { container, queryByText, getByLabelText, queryByLabelText } = render(
+    const { container } = render(
       <PublicationForm
         {...wizardProps}
-        onSubmit={() => undefined}
+        onSubmit={noop}
         options={testOptions}
       />,
     );
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(10);
-    expect(queryByText('No publications found')).toBeNull();
+    expect(screen.queryByText('No publications found')).toBeNull();
 
-    fireEvent.click(getByLabelText('Pupil absence in schools in England'));
+    fireEvent.click(
+      screen.getByLabelText('Pupil absence in schools in England'),
+    );
 
-    fireEvent.change(getByLabelText('Search publications'), {
+    fireEvent.change(screen.getByLabelText('Search publications'), {
       target: {
         value: 'not a publication',
       },
@@ -308,36 +307,89 @@ describe('PublicationForm', () => {
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(1);
     expect(
-      queryByLabelText('Pupil absence in schools in England'),
+      screen.queryByLabelText('Pupil absence in schools in England'),
     ).not.toBeNull();
-    expect(queryByText('No publications found')).toBeNull();
+    expect(screen.queryByText('No publications found')).toBeNull();
   });
 
   test('renders dropdown for selected publication option as open', () => {
-    const { container, getByLabelText, getByTestId } = render(
+    const { container } = render(
       <PublicationForm
         {...wizardProps}
-        onSubmit={() => undefined}
+        onSubmit={noop}
         options={testOptions}
       />,
     );
 
     expect(container.querySelectorAll('details[open]')).toHaveLength(0);
 
-    fireEvent.click(getByLabelText('Pupil absence in schools in England'));
+    fireEvent.click(
+      screen.getByLabelText('Pupil absence in schools in England'),
+    );
 
     expect(container.querySelectorAll('details[open]')).toHaveLength(2);
 
-    const details1 = getByTestId(
+    const details1 = screen.getByTestId(
       'publicationForm-theme-ee1855ca-d1e1-4f04-a795-cbd61d326a1f',
     );
     expect(details1).toHaveAttribute('open');
     expect(details1).toHaveTextContent('Pupils and schools');
 
-    const details2 = getByTestId(
+    const details2 = screen.getByTestId(
       'publicationForm-topic-67c249de-1cca-446e-8ccb-dcdac542f460',
     );
     expect(details2).toHaveAttribute('open');
     expect(details2).toHaveTextContent('Pupil absence');
+  });
+
+  test('renders read-only view with initial `publicationId` when step is not active', () => {
+    const { container } = render(
+      <PublicationForm
+        {...wizardProps}
+        initialValues={{
+          publicationId: '7a57d4c0-5233-4d46-8e27-748fbc365715',
+        }}
+        isActive={false}
+        onSubmit={noop}
+        options={testOptions}
+      />,
+    );
+
+    expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(0);
+
+    expect(screen.getByRole('term')).toHaveTextContent('Publication');
+    expect(screen.getByRole('definition')).toHaveTextContent(
+      'National achievement rates tables',
+    );
+  });
+
+  test('renders read-only view with selected publication when step is not active', () => {
+    const { container, rerender } = render(
+      <PublicationForm
+        {...wizardProps}
+        onSubmit={noop}
+        options={testOptions}
+      />,
+    );
+
+    fireEvent.click(
+      screen.getByLabelText('Pupil absence in schools in England'),
+    );
+
+    rerender(
+      <PublicationForm
+        {...wizardProps}
+        isActive={false}
+        onSubmit={noop}
+        options={testOptions}
+      />,
+    );
+
+    expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(0);
+
+    expect(screen.getByRole('term')).toHaveTextContent('Publication');
+    expect(screen.getByRole('definition')).toHaveTextContent(
+      'Pupil absence in schools in England',
+    );
   });
 });

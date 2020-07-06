@@ -78,7 +78,7 @@ const Wizard = ({
   }, [initialStep]);
 
   return (
-    <ol className={styles.stepNav}>
+    <ol className={styles.stepNav} id={id}>
       {filteredChildren.map((child, index) => {
         const stepNumber = index + 1;
 

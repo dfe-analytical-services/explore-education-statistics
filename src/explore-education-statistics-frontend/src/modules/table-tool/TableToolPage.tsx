@@ -1,17 +1,81 @@
+import TableToolWizard, {
+  TableToolState,
+} from '@common/modules/table-tool/components/TableToolWizard';
+import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import { FastTrackTable } from '@common/services/fastTrackService';
 import tableBuilderService, {
+  PublicationSubjectMeta,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
-import TableTool from '@frontend/modules/table-tool/components/TableTool';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import dynamic from 'next/dynamic';
+import React, { useMemo } from 'react';
 
-interface Props {
+const TableToolFinalStep = dynamic(() =>
+  import('@frontend/modules/table-tool/components/TableToolFinalStep'),
+);
+
+export interface TableToolPageProps {
+  publicationSlug?: string;
+  fastTrack?: FastTrackTable;
+  subjectMeta?: PublicationSubjectMeta;
   themeMeta: ThemeMeta[];
-  publicationId: string;
 }
 
-const TableToolPage: NextPage<Props> = ({ themeMeta, publicationId }) => {
+const TableToolPage: NextPage<TableToolPageProps> = ({
+  publicationSlug,
+  fastTrack,
+  subjectMeta,
+  themeMeta,
+}) => {
+  const initialTableToolState = useMemo<
+    Partial<TableToolState> | undefined
+  >(() => {
+    if (publicationSlug) {
+      const publicationId =
+        themeMeta
+          .flatMap(option => option.topics)
+          .flatMap(option => option.publications)
+          .find(option => option.slug === publicationSlug)?.id ?? '';
+
+      return {
+        initialStep: 1,
+        query: {
+          publicationId,
+          subjectId: '',
+          indicators: [],
+          filters: [],
+          locations: {},
+        },
+      };
+    }
+
+    if (!fastTrack || !subjectMeta) {
+      return undefined;
+    }
+
+    const fullTable = mapFullTable(fastTrack.fullTable);
+    const tableHeaders = mapTableHeadersConfig(
+      fastTrack.configuration.tableHeaders,
+      fullTable.subjectMeta,
+    );
+
+    return {
+      initialStep: 6,
+      query: fastTrack.query,
+      subjectMeta,
+      response: {
+        table: fullTable,
+        tableHeaders,
+      },
+    };
+  }, [fastTrack, publicationSlug, subjectMeta, themeMeta]);
+
   return (
     <Page title="Create your own tables online" caption="Table Tool" wide>
       <p>
@@ -24,25 +88,45 @@ const TableToolPage: NextPage<Props> = ({ themeMeta, publicationId }) => {
         for your own offline analysis.
       </p>
 
-      <TableTool themeMeta={themeMeta} publicationId={publicationId} />
+      <TableToolWizard
+        themeMeta={themeMeta}
+        initialState={initialTableToolState}
+        finalStep={({ publication, query, response }) => (
+          <WizardStep>
+            {wizardStepProps => (
+              <>
+                <WizardStepHeading {...wizardStepProps}>
+                  Explore data
+                </WizardStepHeading>
+
+                {response && query && (
+                  <TableToolFinalStep
+                    publication={publication}
+                    query={query}
+                    table={response.table}
+                    tableHeaders={response.tableHeaders}
+                  />
+                )}
+              </>
+            )}
+          </WizardStep>
+        )}
+      />
     </Page>
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
+export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async ({
   query,
 }) => {
-  const themeMeta = await tableBuilderService.getThemes();
+  const { publicationSlug = '' } = query as Dictionary<string>;
 
-  const publication = themeMeta
-    .flatMap(option => option.topics)
-    .flatMap(option => option.publications)
-    .find(option => option.slug === query.publication);
+  const themeMeta = await tableBuilderService.getThemes();
 
   return {
     props: {
       themeMeta,
-      publicationId: publication ? publication.id : '',
+      publicationSlug,
     },
   };
 };
