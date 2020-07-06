@@ -80,27 +80,27 @@ const ReleaseStatusPage = () => {
 
   const { value: statusOptions = [] } = useAsyncRetry<RadioOption[]>(
     async () => {
-      const [canMarkAsDraft, canSubmit, canApprove] = await Promise.all([
-        permissionService.canMarkReleaseAsDraft(releaseId),
-        permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
-        permissionService.canApproveRelease(releaseId),
-      ]);
+      const {
+        canMarkDraft,
+        canMarkHigherLevelReview,
+        canMarkApproved,
+      } = await permissionService.getReleaseStatusPermissions(releaseId);
 
       return [
         {
           label: 'In draft',
           value: 'Draft',
-          disabled: !canMarkAsDraft,
+          disabled: !canMarkDraft,
         },
         {
           label: 'Ready for higher review',
           value: 'HigherLevelReview',
-          disabled: !canSubmit,
+          disabled: !canMarkHigherLevelReview,
         },
         {
           label: 'Approved for publication',
           value: 'Approved',
-          disabled: !canApprove,
+          disabled: !canMarkApproved,
         },
       ];
     },
