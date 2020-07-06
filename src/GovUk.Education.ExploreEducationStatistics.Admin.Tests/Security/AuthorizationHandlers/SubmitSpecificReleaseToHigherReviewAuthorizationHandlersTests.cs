@@ -1,3 +1,4 @@
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
@@ -15,21 +16,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             // Assert that any users with the "SubmitAllReleasesToHigherReview" claim can submit an arbitrary Release to higher review
             // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
-                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(), SubmitAllReleasesToHigherReview);
+                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(), 
+                SubmitAllReleasesToHigherReview
+            );
         }
         
         [Fact]
-        public void CanSubmitAllReleasesToHigherReviewAuthorizationHandler_ReleaseApproved()
+        public void CanSubmitAllReleasesToHigherReviewAuthorizationHandler_ReleaseUnpublished()
         {
             var release = new Release
             {
                 Status = ReleaseStatus.Approved
             };
             
+            // Assert that any users with the "SubmitAllReleasesToHigherReview" claim can submit an arbitrary Release to higher review
+            AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
+                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(),
+                release,
+                SubmitAllReleasesToHigherReview
+            );
+        }
+
+        [Fact]
+        public void CanSubmitAllReleasesToHigherReviewAuthorizationHandler_ReleasePublished()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Approved,
+                Published = DateTime.Now
+            };
+            
             // Assert that no users can submit an approved Release to higher review
             AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
                 new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(),
-                release);
+                release
+            );
         }
         
         [Fact]
