@@ -58,6 +58,9 @@
     },
     "enableSwagger": {
        "value": true
+    },
+    "branch": {
+       "value": "dev"
     }
   }
 }
