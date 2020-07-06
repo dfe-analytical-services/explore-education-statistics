@@ -2640,6 +2640,9 @@
           },
           "keyVaultName": {
             "value": "[variables('keyVaultName')]"
+          },
+          "branch": {
+            "value": "[parameters('branch')]"
           }
         }
       },
