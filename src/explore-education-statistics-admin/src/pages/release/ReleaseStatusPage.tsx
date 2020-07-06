@@ -2,7 +2,9 @@ import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
-import permissionService from '@admin/services/permissionService';
+import permissionService, {
+  ReleaseStatusPermissions,
+} from '@admin/services/permissionService';
 import releaseService from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -10,7 +12,6 @@ import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -78,32 +79,8 @@ const ReleaseStatusPage = () => {
     [showForm],
   );
 
-  const { value: statusOptions = [] } = useAsyncRetry<RadioOption[]>(
-    async () => {
-      const {
-        canMarkDraft,
-        canMarkHigherLevelReview,
-        canMarkApproved,
-      } = await permissionService.getReleaseStatusPermissions(releaseId);
-
-      return [
-        {
-          label: 'In draft',
-          value: 'Draft',
-          disabled: !canMarkDraft,
-        },
-        {
-          label: 'Ready for higher review',
-          value: 'HigherLevelReview',
-          disabled: !canMarkHigherLevelReview,
-        },
-        {
-          label: 'Approved for publication',
-          value: 'Approved',
-          disabled: !canMarkApproved,
-        },
-      ];
-    },
+  const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
+    () => permissionService.getReleaseStatusPermissions(releaseId),
   );
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
@@ -139,7 +116,9 @@ const ReleaseStatusPage = () => {
     return <LoadingSpinner />;
   }
 
-  const isEditable = statusOptions?.some(option => !option.disabled);
+  const isEditable = Object.values(statusPermissions ?? {}).some(
+    permission => !!permission,
+  );
 
   return (
     <>
@@ -256,8 +235,24 @@ const ReleaseStatusPage = () => {
                   legend="Status"
                   name="status"
                   id={`${formId}-status`}
-                  options={statusOptions}
                   orderDirection={[]}
+                  options={[
+                    {
+                      label: 'In draft',
+                      value: 'Draft',
+                      disabled: !statusPermissions?.canMarkDraft,
+                    },
+                    {
+                      label: 'Ready for higher review',
+                      value: 'HigherLevelReview',
+                      disabled: !statusPermissions?.canMarkHigherLevelReview,
+                    },
+                    {
+                      label: 'Approved for publication',
+                      value: 'Approved',
+                      disabled: !statusPermissions?.canMarkApproved,
+                    },
+                  ]}
                 />
                 <FormFieldTextArea
                   name="internalReleaseNote"
