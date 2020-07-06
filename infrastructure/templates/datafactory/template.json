@@ -29,10 +29,18 @@
       "metadata": {
         "description": "The name of the key vault"
       }
+    },
+    "branch": {
+      "type": "string",
+      "defaultValue": "master",
+      "allowedValues": [
+        "master",
+        "dev"
+      ]
     }
   },
   "variables":{
-    "templateBaseUrl": "https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/master/infrastructure/templates/"
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
   },
   "resources":[
     {
