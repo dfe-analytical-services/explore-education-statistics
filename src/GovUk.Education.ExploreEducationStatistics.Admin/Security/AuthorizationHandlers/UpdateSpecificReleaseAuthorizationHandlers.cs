@@ -22,12 +22,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             public CanUpdateAllReleasesAuthorizationHandler()
                 : base(ctx =>
-                    ctx.Entity.Status != ReleaseStatus.Approved && 
-                    SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases)
-                )
-            {
-            
-            }
+                {
+                    if (ctx.Entity.Published != null) 
+                    {
+                        return false;
+                    }
+
+                    return SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases);
+                }) {}
         }
 
         public class HasEditorRoleOnReleaseAuthorizationHandler

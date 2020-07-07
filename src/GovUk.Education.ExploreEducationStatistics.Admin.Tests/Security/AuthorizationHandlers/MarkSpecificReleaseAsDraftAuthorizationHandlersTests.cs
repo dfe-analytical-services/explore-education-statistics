@@ -1,3 +1,4 @@
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
@@ -12,24 +13,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void CanMarkAllReleasesAsDraftAuthorizationHandler()
         {
-            // Assert that any users with the "MarkAllReleasesAsDraft" claim can mark an arbitrary Release as draft
+            // Assert that any users with the "MarkAllReleasesAsDraft" claim can mark an arbitrary Release as Draft
             // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaims<MarkSpecificReleaseAsDraftRequirement>(
-                new CanMarkAllReleasesAsDraftAuthorizationHandler(), MarkAllReleasesAsDraft);
+                new CanMarkAllReleasesAsDraftAuthorizationHandler(),
+                MarkAllReleasesAsDraft
+            );
         }
-        
+
         [Fact]
-        public void CanMarkAllReleasesAsDraftAuthorizationHandler_ReleaseApproved()
+        public void CanMarkAllReleasesAsDraftAuthorizationHandler_ReleaseNotPublished()
         {
             var release = new Release
             {
-                Status = ReleaseStatus.Approved
+                Status = ReleaseStatus.Approved,
             };
             
-            // Assert that no users can mark an approved Release as Draft
+            // Assert that any users with the "MarkAllReleasesAsDraft" claim can mark an arbitrary Release as Draft
             AssertReleaseHandlerSucceedsWithCorrectClaims<MarkSpecificReleaseAsDraftRequirement>(
                 new CanMarkAllReleasesAsDraftAuthorizationHandler(),
-                release);
+                release,
+                MarkAllReleasesAsDraft
+            );
+        }
+
+        [Fact]
+        public void CanMarkAllReleasesAsDraftAuthorizationHandler_ReleasePublished()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Approved,
+                Published = DateTime.Now
+            };
+            
+            // Assert that no users can mark a published Release as Draft
+            AssertReleaseHandlerSucceedsWithCorrectClaims<MarkSpecificReleaseAsDraftRequirement>(
+                new CanMarkAllReleasesAsDraftAuthorizationHandler(),
+                release
+            );
         }
         
         [Fact]
