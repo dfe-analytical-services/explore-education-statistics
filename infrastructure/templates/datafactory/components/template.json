@@ -293,7 +293,7 @@
             "properties": {
                 "activities": [
                     {
-                        "name": "Copy_Theme",
+                        "name": "Copy_Theme_Test",
                         "type": "Copy",
                         "dependsOn": [],
                         "policy": {
@@ -379,7 +379,7 @@
                         "type": "Copy",
                         "dependsOn": [
                             {
-                                "activity": "Copy_Theme",
+                                "activity": "Copy_Theme_Test",
                                 "dependencyConditions": [
                                     "Succeeded"
                                 ]
@@ -1166,7 +1166,7 @@
                         "type": "ExecutePipeline",
                         "dependsOn": [
                             {
-                                "activity": "Copy_Theme",
+                                "activity": "Copy_Theme_Test",
                                 "dependencyConditions": [
                                     "Failed"
                                 ]
@@ -1181,7 +1181,7 @@
                             "waitOnCompletion": true,
                             "parameters": {
                                 "ErrorMessage": {
-                                    "value": "@{activity('Copy_Theme').Error.Message}",
+                                    "value": "@{activity('Copy_Theme_Test').Error.Message}",
                                     "type": "Expression"
                                 },
                                 "ReleaseStatus": "Failed",
