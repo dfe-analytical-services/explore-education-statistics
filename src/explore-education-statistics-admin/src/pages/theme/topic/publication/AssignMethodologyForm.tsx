@@ -158,7 +158,15 @@ const AssignMethodologyForm = ({
               is: 'external',
               then: Yup.object().shape({
                 title: Yup.string().required('Enter a link title'),
-                url: Yup.string().url('Enter a valid URL'),
+                url: Yup.string()
+                  .required('Enter a URL')
+                  .url('Enter a valid URL')
+                  .test({
+                    name: 'currentHostUrl',
+                    message: 'URL cannot be for this website',
+                    test: (value: string) =>
+                      Boolean(value && !value.includes(window.location.host)),
+                  }),
               }),
             }),
           })}
