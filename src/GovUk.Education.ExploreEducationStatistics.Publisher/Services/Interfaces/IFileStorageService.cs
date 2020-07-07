@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
 {
@@ -15,6 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task MoveStagedContentAsync();
 
-        Task UploadContentFromStreamAsync(string blobName, string contentType, string content);
+        Task UploadAsJson(string blobName, object value, JsonSerializerSettings settings);
     }
 }

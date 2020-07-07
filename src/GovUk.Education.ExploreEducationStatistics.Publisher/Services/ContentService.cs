@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
@@ -163,8 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var pathPrefix = context.Staging ? PublicContentStagingPath() : null;
             var blobName = pathFunction.Invoke(pathPrefix);
-            var json = JsonConvert.SerializeObject(value, null, settings);
-            await _fileStorageService.UploadContentFromStreamAsync(blobName, MediaTypeNames.Application.Json, json);
+            await _fileStorageService.UploadAsJson(blobName, value, settings);
         }
     }
 }

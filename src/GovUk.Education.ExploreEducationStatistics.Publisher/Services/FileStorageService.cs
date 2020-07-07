@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -14,12 +15,12 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ZipFileUtil;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
-using Task = System.Threading.Tasks.Task;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -131,12 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await DeleteBlobsAsync(container, sourceDirectoryPath);
         }
 
-        public async Task UploadContentFromStreamAsync(string blobName, string contentType, string content)
-        {
-            await UploadFromStreamAsync(_publicStorageConnectionString, PublicContentContainerName,
-                blobName, contentType, content);
-        }
-
         private async Task<List<CloudBlockBlob>> CopyDirectoryAsync(string sourceDirectoryPath, string destinationDirectoryPath,
             CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer,
             CopyReleaseFilesCommand copyReleaseFilesCommand, ShouldTransferCallbackAsync shouldTransferCallbackAsync)
@@ -165,13 +160,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return allFilesTransferred;
         }
 
-        private async Task ZipFiles(CloudBlobContainer destinationContainer, List<CloudBlockBlob> allFilesTransferred, string destinationDirectoryPath, CopyReleaseFilesCommand copyReleaseFilesCommand)
+        private static async Task ZipFiles(CloudBlobContainer destinationContainer, List<CloudBlockBlob> allFilesTransferred, string destinationDirectoryPath, CopyReleaseFilesCommand copyReleaseFilesCommand)
         {
             var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
-
             await ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, copyReleaseFilesCommand);
         }
 
+        // ReSharper disable once UnusedParameter.Local
         private void FileTransferredCallback(object sender, TransferEventArgs e, List<CloudBlockBlob> allFilesStream)
         {
             var source = (CloudBlockBlob) e.Source;
@@ -292,6 +287,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     })
                 );
             } while (token != null);
+        }
+
+        public async Task UploadAsJson(string blobName, object value, JsonSerializerSettings settings)
+        {
+            var json = JsonConvert.SerializeObject(value, null, settings);
+            await UploadFromStreamAsync(_publicStorageConnectionString, PublicContentContainerName,
+                blobName, MediaTypeNames.Application.Json, json);
         }
     }
 }
