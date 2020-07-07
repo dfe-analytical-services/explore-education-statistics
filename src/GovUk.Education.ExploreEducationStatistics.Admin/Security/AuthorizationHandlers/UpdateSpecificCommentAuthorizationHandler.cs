@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,10 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         UpdateSpecificCommentAuthorizationHandler : AuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
     {
         private readonly ContentDbContext _contentDbContext;
+        private readonly IReleaseStatusRepository _releaseStatusRepository;
 
-        public UpdateSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext)
+        public UpdateSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext, IReleaseStatusRepository releaseStatusRepository)
         {
             _contentDbContext = contentDbContext;
+            _releaseStatusRepository = releaseStatusRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -30,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var release = GetRelease(_contentDbContext, resource);
             var updateSpecificReleaseContext = new AuthorizationHandlerContext(
                 new[] {new UpdateSpecificReleaseRequirement()}, context.User, release);
-            await new UpdateSpecificReleaseAuthorizationHandler(_contentDbContext).HandleAsync(
+            await new UpdateSpecificReleaseAuthorizationHandler(_contentDbContext, _releaseStatusRepository).HandleAsync(
                 updateSpecificReleaseContext);
 
             if (!updateSpecificReleaseContext.HasSucceeded)

@@ -1,8 +1,11 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
+using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
+using ReleaseStatusOverallStage = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -11,25 +14,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
     public class UpdateSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
     {
-        public UpdateSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
-            new CanUpdateAllReleasesAuthorizationHandler(),
+        public UpdateSpecificReleaseAuthorizationHandler(ContentDbContext context, IReleaseStatusRepository releaseStatusRepository) : base(
+            new CanUpdateAllReleasesAuthorizationHandler(releaseStatusRepository),
             new HasEditorRoleOnReleaseAuthorizationHandler(context))
         {
             
         }
     
-        public class CanUpdateAllReleasesAuthorizationHandler : EntityAuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
+        public class CanUpdateAllReleasesAuthorizationHandler : AuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
         {
-            public CanUpdateAllReleasesAuthorizationHandler()
-                : base(ctx =>
-                {
-                    if (ctx.Entity.Published != null) 
-                    {
-                        return false;
-                    }
+            private readonly IReleaseStatusRepository _releaseStatusRepository;
 
-                    return SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.UpdateAllReleases);
-                }) {}
+            public CanUpdateAllReleasesAuthorizationHandler(IReleaseStatusRepository releaseStatusRepository) 
+            {
+                _releaseStatusRepository = releaseStatusRepository;
+            }
+
+            protected override async Task HandleRequirementAsync(
+                AuthorizationHandlerContext context, 
+                UpdateSpecificReleaseRequirement requirement,
+                Release release)
+            {
+                var statuses = await _releaseStatusRepository.GetAllByOverallStage(
+                    release.Id, 
+                    ReleaseStatusOverallStage.Started, 
+                    ReleaseStatusOverallStage.Complete
+                );
+
+                if (statuses.Any() || release.Published != null) 
+                {
+                    return;
+                }
+
+                if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.UpdateAllReleases)) 
+                {
+                    context.Succeed(requirement);
+                }
+            }
         }
 
         public class HasEditorRoleOnReleaseAuthorizationHandler
