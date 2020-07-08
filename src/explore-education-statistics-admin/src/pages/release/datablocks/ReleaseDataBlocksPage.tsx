@@ -98,35 +98,36 @@ const ReleaseDataBlocksPageInternal = ({
   return (
     <>
       {dataBlockOptions.length > 0 && (
-        <FormSelect
-          id="selectDataBlock"
-          name="selectDataBlock"
-          label="Select an existing data block to edit or create a new one"
-          disabled={isLoading}
-          order={[]}
-          value={dataBlockId}
-          optGroups={{
-            'Create data block': [
-              {
-                label: 'Create new data block',
-                value: '',
-              },
-            ],
-            'Edit existing': dataBlockOptions,
-          }}
-          onChange={e => {
-            history.push(
-              dataBlocksRoute.generateLink({
-                publicationId,
-                releaseId,
-                dataBlockId: e.target.value ? e.target.value : undefined,
-              }),
-            );
-          }}
-        />
+        <>
+          <FormSelect
+            id="selectDataBlock"
+            name="selectDataBlock"
+            label="Select an existing data block to edit or create a new one"
+            disabled={isLoading}
+            order={[]}
+            value={dataBlockId}
+            optGroups={{
+              'Create data block': [
+                {
+                  label: 'Create new data block',
+                  value: '',
+                },
+              ],
+              'Edit existing': dataBlockOptions,
+            }}
+            onChange={e => {
+              history.push(
+                dataBlocksRoute.generateLink({
+                  publicationId,
+                  releaseId,
+                  dataBlockId: e.target.value ? e.target.value : undefined,
+                }),
+              );
+            }}
+          />
+          <hr />
+        </>
       )}
-
-      <hr />
 
       <LoadingSpinner loading={isLoading}>
         <h2>{selectedDataBlock?.name ?? 'Create new data block'}</h2>

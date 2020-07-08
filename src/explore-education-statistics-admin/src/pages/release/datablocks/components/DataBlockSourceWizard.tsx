@@ -101,8 +101,6 @@ const DataBlockSourceWizardFinalStep = ({
         />
       </div>
 
-      <hr />
-
       <DataBlockDetailsForm
         initialValues={{
           heading: dataBlock?.heading ?? generateTableTitle(table.subjectMeta),
