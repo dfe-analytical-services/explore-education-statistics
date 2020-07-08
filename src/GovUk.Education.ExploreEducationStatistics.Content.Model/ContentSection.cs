@@ -138,12 +138,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Heading { get; set; }
 
         public string Name { get; set; }
-        
+
         public string HighlightName { get; set; }
         
         public string Source { get; set; }
 
-        public ObservationQueryContext DataBlockRequest { get; set; }
+        public ObservationQueryContext Query { get; set; }
 
         public List<IContentBlockChart> Charts { get; set; }
 

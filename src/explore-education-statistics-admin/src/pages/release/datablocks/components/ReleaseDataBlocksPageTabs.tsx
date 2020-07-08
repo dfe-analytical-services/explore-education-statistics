@@ -66,7 +66,7 @@ const ReleaseDataBlocksPageTabs = ({
     }
 
     const query = {
-      ...selectedDataBlock.dataBlockRequest,
+      ...selectedDataBlock.query,
       includeGeoJson: selectedDataBlock.charts.some(
         chart => chart.type === 'map',
       ),
@@ -118,8 +118,8 @@ const ReleaseDataBlocksPageTabs = ({
 
       const dataBlockToSave: SavedDataBlock = {
         ...dataBlock,
-        dataBlockRequest: {
-          ...dataBlock.dataBlockRequest,
+        query: {
+          ...dataBlock.query,
           includeGeoJson: dataBlock.charts[0]?.type === 'map',
         },
       };
@@ -168,7 +168,7 @@ const ReleaseDataBlocksPageTabs = ({
       await handleDataBlockSave({
         ...(selectedDataBlock ?? {}),
         ...details,
-        dataBlockRequest: query,
+        query,
         charts,
         tables: [
           {

@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public string Source { get; set; }
 
-        public ObservationQueryContext DataBlockRequest { get; set; }
+        public ObservationQueryContext Query { get; set; }
 
         public List<IContentBlockChart> Charts { get; set; }
 
