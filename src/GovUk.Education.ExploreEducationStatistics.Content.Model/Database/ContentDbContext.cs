@@ -351,6 +351,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasColumnName("DataBlock_Heading");
 
             modelBuilder.Entity<DataBlock>()
+                .Property(block => block.HighlightName)
+                .HasColumnName("DataBlock_HighlightName");
+
+            modelBuilder.Entity<DataBlock>()
                 .Property(block => block.DataBlockRequest)
                 .HasColumnName("DataBlock_Request")
                 .HasConversion(
