@@ -6,13 +6,20 @@ import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PageBanner from './PageBanner';
 import PageHeader from './PageHeader';
 
-type Props = {
+export type PageProps = {
   children: ReactNode;
   wide?: boolean;
   pageTitle?: string;
+  pageBanner?: ReactNode;
 } & BreadcrumbsProps;
 
-const Page = ({ children, wide, pageTitle, ...breadcrumbProps }: Props) => {
+const Page = ({
+  children,
+  wide,
+  pageTitle,
+  pageBanner,
+  ...breadcrumbProps
+}: PageProps) => {
   return (
     <>
       <Helmet>
@@ -30,7 +37,7 @@ const Page = ({ children, wide, pageTitle, ...breadcrumbProps }: Props) => {
           'dfe-width-container--wide': wide,
         })}
       >
-        <PageBanner />
+        {pageBanner ?? <PageBanner />}
 
         <Breadcrumbs {...breadcrumbProps} />
 

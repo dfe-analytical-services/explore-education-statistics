@@ -6,21 +6,21 @@ export interface BreadcrumbsProps {
     link?: string;
     name: string;
   }[];
-  includeHomeBreadcrumb?: boolean;
+  homePath?: string;
 }
 
 const Breadcrumbs = ({
   breadcrumbs = [],
-  includeHomeBreadcrumb = true,
+  homePath = '/',
 }: BreadcrumbsProps) => {
   const currentBreadcrumbIndex = breadcrumbs.length - 1;
 
   return (
     <div className="govuk-breadcrumbs">
       <ol className="govuk-breadcrumbs__list" data-testid="breadcrumbs--list">
-        {includeHomeBreadcrumb && (
+        {homePath && (
           <li className="govuk-breadcrumbs__list-item">
-            <Link className="govuk-breadcrumbs__link" to="/">
+            <Link className="govuk-breadcrumbs__link" to={homePath}>
               Home
             </Link>
           </li>
