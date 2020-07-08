@@ -20,6 +20,7 @@ export const KeyStatTileColumn: FunctionComponent = ({ children }) => {
 
 export interface KeyStatProps {
   releaseId: string;
+  dataLastPublished?: string;
   children?: ReactNode;
   query: TableDataQuery;
   queryOptions?: TableQueryOptions;
@@ -29,6 +30,7 @@ export interface KeyStatProps {
 
 const KeyStatTile = ({
   releaseId,
+  dataLastPublished = '',
   children,
   query,
   queryOptions,
@@ -42,6 +44,7 @@ const KeyStatTile = ({
     },
     releaseId,
     queryOptions,
+    dataLastPublished,
   );
 
   const resultValue = useMemo<string>(() => {

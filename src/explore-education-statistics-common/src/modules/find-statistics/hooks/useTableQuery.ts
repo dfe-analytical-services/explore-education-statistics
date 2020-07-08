@@ -5,6 +5,8 @@ import storageService from '@common/services/storageService';
 import tableBuilderService, {
   TableDataQuery,
   TableDataResponse,
+  TableDataResult,
+  TableDataSubjectMeta,
 } from '@common/services/tableBuilderService';
 import { addSeconds } from 'date-fns';
 import { useRef } from 'react';
@@ -17,10 +19,16 @@ export interface TableQueryOptions {
   expiresIn?: number;
 }
 
+export interface TableDataStorageItem {
+  dataLastPublished: string;
+  response: TableDataResponse;
+}
+
 export default function useTableQuery(
   query: TableDataQuery | undefined,
   releaseId: string | undefined,
   options: TableQueryOptions = {},
+  dataLastPublished: string,
 ): AsyncRetryState<FullTable | undefined> {
   const optionsRef = useRef<TableQueryOptions | undefined>(options);
   optionsRef.current = options;
@@ -32,18 +40,28 @@ export default function useTableQuery(
 
     const queryKey = JSON.stringify(query);
 
-    let response = await storageService
-      .get<TableDataResponse>(queryKey)
+    let item = await storageService
+      .get<TableDataStorageItem>(queryKey)
       .catch(() => null);
 
-    if (!response) {
-      response = await tableBuilderService.getTableData(query, releaseId);
+    const dataExpired =
+      item != null &&
+      dataLastPublished !== '' &&
+      new Date(dataLastPublished) > new Date(item.dataLastPublished);
 
-      await storageService.set(queryKey, response, {
+    if (item == null || dataExpired) {
+      const response = await tableBuilderService.getTableData(query, releaseId);
+
+      item = {
+        dataLastPublished,
+        response,
+      };
+
+      await storageService.set(queryKey, item, {
         expiry: addSeconds(new Date(), options?.expiresIn ?? 0),
       });
     }
 
-    return mapFullTable(response);
+    return mapFullTable(item.response);
   }, [JSON.stringify(query)]);
 }

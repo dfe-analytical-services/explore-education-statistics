@@ -28,6 +28,7 @@ export interface DataBlockRendererProps {
   id: string;
   queryOptions?: TableQueryOptions;
   onToggle?: (section: { id: string; title: string }) => void;
+  dataLastPublished?: string;
 }
 
 const DataBlockRenderer = ({
@@ -40,6 +41,7 @@ const DataBlockRenderer = ({
   id,
   queryOptions,
   onToggle,
+  dataLastPublished = '',
 }: DataBlockRendererProps) => {
   const { value: fullTable, isLoading, error } = useTableQuery(
     dataBlock
@@ -50,6 +52,7 @@ const DataBlockRenderer = ({
       : undefined,
     releaseId || undefined,
     queryOptions,
+    dataLastPublished,
   );
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
