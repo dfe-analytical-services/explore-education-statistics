@@ -17,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Name { get; set; }
 
+        public string HighlightName { get; set; }
+
         public string Source { get; set; }
 
         public ObservationQueryContext Query { get; set; }

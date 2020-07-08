@@ -88,6 +88,7 @@ export type ContentBlock = MarkdownBlock | HtmlBlock;
 export interface DataBlock extends BaseBlock {
   type: 'DataBlock';
   name: string;
+  highlightName?: string;
   heading: string;
   source: string;
   query: TableDataQuery;
