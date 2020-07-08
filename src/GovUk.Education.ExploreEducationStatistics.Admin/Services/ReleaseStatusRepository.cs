@@ -6,13 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.Azure.Cosmos.Table;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseStatusRepository : IReleaseStatusRepository
     {
-        private const string TableName = "ReleaseStatus";
-
         private readonly ITableStorageService _publisherTableStorageService;
 
         public ReleaseStatusRepository(ITableStorageService publisherTableStorageService)
@@ -46,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var query = new TableQuery<ReleaseStatus>().Where(filter);
-            return _publisherTableStorageService.ExecuteQueryAsync(TableName, query);
+            return _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
         }
     }
 }

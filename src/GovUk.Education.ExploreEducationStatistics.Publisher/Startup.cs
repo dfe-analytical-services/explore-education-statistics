@@ -40,6 +40,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new TableStorageService(GetConfigurationValue(provider, "PublisherStorage")))
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
+                .AddScoped<IFastTrackService, FastTrackService>(provider => 
+                    new FastTrackService(provider.GetService<ContentDbContext>(),
+                        provider.GetService<IFileStorageService>(),
+                        new TableStorageService(GetConfigurationValue(provider, "PublicStorage"))))
                 .AddScoped<IMethodologyService, MethodologyService>()
                 .AddScoped<INotificationsService, NotificationsService>()
                 .AddScoped<IQueueService, QueueService>()

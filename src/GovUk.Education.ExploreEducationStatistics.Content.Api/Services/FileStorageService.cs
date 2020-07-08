@@ -1,13 +1,12 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
     public class FileStorageService : IFileStorageService
     {
-        private const string PublicContentContainerName = "cache";
         private readonly string _storageConnectionString;
 
         public FileStorageService(string connectionString)
@@ -17,8 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<string> DownloadTextAsync(string blobName)
         {
-            return await FileStorageUtils.DownloadTextAsync(_storageConnectionString, PublicContentContainerName,
-                blobName);
+            return await FileStorageUtils.DownloadTextAsync(_storageConnectionString, PublicContentContainerName, blobName);
         }
     }
 }

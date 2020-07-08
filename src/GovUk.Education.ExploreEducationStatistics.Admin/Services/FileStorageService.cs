@@ -20,6 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -33,8 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IImportService _importService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
-
-        private const string ContainerName = "releases";
+        
         private const string NameKey = "name";
 
         public FileStorageService(IConfiguration config, IUserService userService,
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release =>
-                    FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, ContainerName,
+                    FileStorageUtils.ListPublicFilesPreview(_storageConnectionString, PrivateFilesContainerName,
                         referencedReleaseVersions));
         }
 
@@ -407,7 +407,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
-            return await GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
+            return await GetCloudBlobContainerAsync(_storageConnectionString, PrivateFilesContainerName);
         }
 
         private static async Task<string> UploadToTemporaryFile(IFormFile file)

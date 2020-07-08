@@ -17,12 +17,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return $"{AppendPathSeparator(prefix)}download";
         }
-        
+
+        private static string PublicContentFastTrackPath(string prefix = null)
+        {
+            return $"{AppendPathSeparator(prefix)}fast-track";
+        }
+
         private static string PublicContentMethodologiesPath(string prefix = null)
         {
             return $"{AppendPathSeparator(prefix)}methodology";
         }
-        
+
         private static string PublicContentPublicationsPath(string prefix = null)
         {
             return $"{AppendPathSeparator(prefix)}publications";
@@ -31,6 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicContentDownloadTreePath(string prefix = null)
         {
             return $"{PublicContentDownloadPath(prefix)}/tree.json";
+        }
+
+        public static string PublicContentFastTrackPath(string releaseId, string id, string prefix = null)
+        {
+            return $"{PublicContentFastTrackPath(prefix)}/{releaseId}/{id}.json";
         }
 
         public static string PublicContentMethodologyTreePath(string prefix = null)
