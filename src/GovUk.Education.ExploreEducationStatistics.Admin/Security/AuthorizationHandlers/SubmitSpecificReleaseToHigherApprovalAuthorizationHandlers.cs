@@ -24,8 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             public CanSubmitAllReleasesToHigherReviewAuthorizationHandler() 
                 : base(ctx => 
-                    ctx.Entity.Status != ReleaseStatus.Approved 
-                    && SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.SubmitAllReleasesToHigherReview)) {}
+                {
+                    if (ctx.Entity.Published != null) 
+                    {
+                        return false;
+                    }
+
+                    return SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.SubmitAllReleasesToHigherReview);
+                }) {}
         }
 
         public class HasEditorRoleOnReleaseAuthorizationHandler

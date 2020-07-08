@@ -127,13 +127,13 @@ const ReleaseSummaryForm = <
               legend="Select time period coverage"
               legendSize="m"
             >
-              <FormFieldSelect<FormValues>
+              <FormFieldSelect<ReleaseSummaryFormValues>
                 id={`${formId}-timePeriodCoverage`}
                 label="Type"
                 name="timePeriodCoverageCode"
                 optGroups={timePeriodOptions}
               />
-              <FormFieldNumberInput<FormValues>
+              <FormFieldNumberInput<ReleaseSummaryFormValues>
                 id={`${formId}-timePeriodCoverageStartYear`}
                 name="timePeriodCoverageStartYear"
                 label={`
@@ -149,7 +149,7 @@ const ReleaseSummaryForm = <
               />
             </FormFieldset>
 
-            <FormFieldRadioGroup<FormValues>
+            <FormFieldRadioGroup<ReleaseSummaryFormValues>
               id={`${formId}-releaseTypeId`}
               legend="Release Type"
               name="releaseTypeId"

@@ -4,10 +4,12 @@ import React from 'react';
 import FormSortableList, { FormSortableListProps } from './FormSortableList';
 
 type Props<FormValues> = {
-  name: keyof FormValues | string;
+  name: FormValues extends {} ? keyof FormValues : string;
 } & OmitStrict<FormSortableListProps, 'value'>;
 
-const FormFieldSortableList = <T extends {}>(props: Props<T>) => {
+const FormFieldSortableList = <FormValues extends {}>(
+  props: Props<FormValues>,
+) => {
   const { name } = props;
 
   return (

@@ -14,75 +14,55 @@ import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'CANNOT_OVERWRITE_DATA_FILE',
-    'dataFile',
-    'Choose a unique data file name',
-  ),
-  errorCodeToFieldError(
-    'CANNOT_OVERWRITE_METADATA_FILE',
-    'metadataFile',
-    'Choose a unique metadata file name',
-  ),
-  errorCodeToFieldError(
-    'DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME',
-    'dataFile',
-    'Choose a different file name for data and metadata files',
-  ),
-  errorCodeToFieldError(
-    'DATA_FILE_CANNOT_BE_EMPTY',
-    'dataFile',
-    'Choose a data file that is not empty',
-  ),
-  errorCodeToFieldError(
-    'METADATA_FILE_CANNOT_BE_EMPTY',
-    'metadataFile',
-    'Choose a metadata file that is not empty',
-  ),
-  errorCodeToFieldError(
-    'DATA_FILE_MUST_BE_CSV_FILE',
-    'dataFile',
-    'Data file must be a csv file with UTF-8 encoding',
-  ),
-  errorCodeToFieldError(
-    'META_FILE_MUST_BE_CSV_FILE',
-    'metadataFile',
-    'Meta file must be a csv file with UTF-8 encoding',
-  ),
-  errorCodeToFieldError(
-    'SUBJECT_TITLE_MUST_BE_UNIQUE',
-    'subjectTitle',
-    'Subject title must be unique',
-  ),
-  errorCodeToFieldError(
-    'DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
-    'dataFile',
-    'Data filename cannot contain spaces or special characters',
-  ),
-  errorCodeToFieldError(
-    'META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
-    'metadataFile',
-    'Meta filename cannot contain spaces or special characters',
-  ),
-];
-
 interface FormValues {
   subjectTitle: string;
   dataFile: File | null;
   metadataFile: File | null;
 }
+
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'dataFile',
+    messages: {
+      CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique data file name',
+      DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
+        'Choose a different file name for data and metadata files',
+      DATA_FILE_CANNOT_BE_EMPTY: 'Choose a data file that is not empty',
+      DATA_FILE_MUST_BE_CSV_FILE:
+        'Data file must be a csv file with UTF-8 encoding',
+      DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        'Data filename cannot contain spaces or special characters',
+    },
+  }),
+  mapFieldErrors<FormValues>({
+    target: 'metadataFile',
+    messages: {
+      CANNOT_OVERWRITE_METADATA_FILE: 'Choose a unique metadata file name',
+      METADATA_FILE_CANNOT_BE_EMPTY: 'Choose a metadata file that is not empty',
+      META_FILE_MUST_BE_CSV_FILE:
+        'Meta file must be a csv file with UTF-8 encoding',
+      META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        'Meta filename cannot contain spaces or special characters',
+    },
+  }),
+  mapFieldErrors<FormValues>({
+    target: 'subjectTitle',
+    messages: {
+      SUBJECT_TITLE_MUST_BE_UNIQUE: 'Subject title must be unique',
+    },
+  }),
+];
 
 interface Props {
   publicationId: string;
@@ -175,7 +155,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       .finally(() => {
         setIsUploading(false);
       });
-  }, errorCodeMappings);
+  }, errorMappings);
 
   const handleDelete = async (
     dataFileToDelete: DeleteDataFile,

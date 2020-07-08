@@ -10,41 +10,46 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldSelect, FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'ROLE_DOES_NOT_EXIST',
-    'selectedRoleId',
-    'Role does not exist',
-  ),
-  errorCodeToFieldError(
-    'USER_ALREADY_HAS_RELEASE_ROLE',
-    'selectedReleaseRoleId',
-    'The user already has this release role',
-  ),
-];
-
-interface Model {
-  user: User;
-}
-
 interface UpdateRoleFormValues {
   selectedRoleId: string;
 }
 
+const updateRoleFormErrorMappings = [
+  mapFieldErrors<UpdateRoleFormValues>({
+    target: 'selectedRoleId',
+    messages: {
+      ROLE_DOES_NOT_EXIST: 'Role does not exist',
+    },
+  }),
+];
+
 interface AddReleaseRoleFormValues {
   selectedReleaseId: string;
   selectedReleaseRoleId: string;
+}
+
+const addReleaseFormErrorMappings = [
+  mapFieldErrors<AddReleaseRoleFormValues>({
+    target: 'selectedReleaseRoleId',
+    messages: {
+      USER_ALREADY_HAS_RELEASE_ROLE: 'The user already has this release role',
+    },
+  }),
+];
+
+interface Model {
+  user: User;
 }
 
 const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
@@ -84,7 +89,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
 
     await userService.updateUser(submission);
     getUser();
-  }, errorCodeMappings);
+  }, updateRoleFormErrorMappings);
 
   const addReleaseRole = useFormSubmit<AddReleaseRoleFormValues>(
     async values => {
@@ -97,7 +102,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
 
       getUser();
     },
-    errorCodeMappings,
+    addReleaseFormErrorMappings,
   );
 
   useEffect(() => {
@@ -126,7 +131,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
               initialValues={{
                 selectedRoleId: model.user.role ?? '',
               }}
-              validationSchema={Yup.object({
+              validationSchema={Yup.object<UpdateRoleFormValues>({
                 selectedRoleId: Yup.string().required(
                   'Choose role for the user',
                 ),
@@ -161,7 +166,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                     >
                       <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-quarter">
-                          <FormFieldSelect
+                          <FormFieldSelect<UpdateRoleFormValues>
                             id={`${formId}-selectedRoleId`}
                             label="Role"
                             name="selectedRoleId"
@@ -207,7 +212,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                     >
                       <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-half">
-                          <FormFieldSelect
+                          <FormFieldSelect<AddReleaseRoleFormValues>
                             id={`${formId}-selectedReleaseId`}
                             label="Release"
                             name="selectedReleaseId"
@@ -219,7 +224,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                         </div>
 
                         <div className="govuk-grid-column-one-quarter">
-                          <FormFieldSelect
+                          <FormFieldSelect<AddReleaseRoleFormValues>
                             id={`${formId}-selectedReleaseRoleId`}
                             label="Release role"
                             name="selectedReleaseRoleId"

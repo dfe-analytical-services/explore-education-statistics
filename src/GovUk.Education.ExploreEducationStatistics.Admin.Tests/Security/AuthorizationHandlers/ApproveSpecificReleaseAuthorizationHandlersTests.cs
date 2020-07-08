@@ -1,3 +1,4 @@
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
@@ -15,21 +16,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             // Assert that any users with the "ApproveAllReleases" claim can approve an arbitrary Release
             // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaims<ApproveSpecificReleaseRequirement>(
-                new CanApproveAllReleasesAuthorizationHandler(), ApproveAllReleases);
+                new CanApproveAllReleasesAuthorizationHandler(), 
+                ApproveAllReleases
+            );
         }
-        
+
         [Fact]
-        public void CanApproveAllReleasesAuthorizationHandler_ReleaseApproved()
+        public void CanApproveAllReleasesAuthorizationHandler_ReleaseUnpublished()
         {
             var release = new Release
             {
                 Status = ReleaseStatus.Approved
             };
             
+            // Assert that any users with the "ApproveAllReleases" claim can approve an arbitrary Release
+            AssertReleaseHandlerSucceedsWithCorrectClaims<ApproveSpecificReleaseRequirement>(
+                new CanApproveAllReleasesAuthorizationHandler(),
+                release,
+                ApproveAllReleases
+            );
+        }
+
+        [Fact]
+        public void CanApproveAllReleasesAuthorizationHandler_ReleasePublished()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Approved,
+                Published = DateTime.Now
+            };
+            
             // Assert that no users can approve an approved Release
             AssertReleaseHandlerSucceedsWithCorrectClaims<ApproveSpecificReleaseRequirement>(
                 new CanApproveAllReleasesAuthorizationHandler(),
-                release);
+                release
+            );
         }
         
         [Fact]

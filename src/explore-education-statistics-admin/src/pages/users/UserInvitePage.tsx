@@ -8,27 +8,28 @@ import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'USER_ALREADY_EXISTS',
-    'userEmail',
-    'User already exists',
-  ),
-];
-
 interface FormValues {
   userEmail: string;
   selectedRoleId: string;
 }
+
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'userEmail',
+    messages: {
+      USER_ALREADY_EXISTS: 'User already exists',
+    },
+  }),
+];
 
 interface InviteUserModel {
   roles: Role[];
@@ -59,7 +60,7 @@ const UserInvitePage = ({
     await userService.inviteUser(submission);
 
     history.push(`/administration/users/invites`);
-  }, errorCodeMappings);
+  }, errorMappings);
 
   return (
     <Page
@@ -99,7 +100,7 @@ const UserInvitePage = ({
             selectedRoleId:
               orderBy(model.roles, role => role.name)?.[0]?.id ?? '',
           }}
-          validationSchema={Yup.object({
+          validationSchema={Yup.object<FormValues>({
             userEmail: Yup.string()
               .required('Provide the users email')
               .email('Provide a valid email address'),
@@ -116,7 +117,7 @@ const UserInvitePage = ({
                   legendSize="m"
                   hint="The invited user must have a @education.gov.uk email address"
                 >
-                  <FormFieldTextInput
+                  <FormFieldTextInput<FormValues>
                     id={`${formId}-userEmail`}
                     label="User email"
                     name="userEmail"
@@ -129,7 +130,7 @@ const UserInvitePage = ({
                   legendSize="m"
                   hint="The users role within the service."
                 >
-                  <FormFieldSelect
+                  <FormFieldSelect<FormValues>
                     id={`${formId}-selectedRoleId`}
                     label="Role"
                     name="selectedRoleId"

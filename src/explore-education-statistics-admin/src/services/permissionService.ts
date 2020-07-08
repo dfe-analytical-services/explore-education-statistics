@@ -1,14 +1,6 @@
 import { User } from '@admin/contexts/AuthContext';
 import client from '@admin/services/utils/service';
 
-export type PreReleaseAccess = 'Before' | 'After' | 'Within' | 'NoneSet';
-
-export interface PreReleaseWindowStatus {
-  access: PreReleaseAccess;
-  start: Date;
-  end: Date;
-}
-
 export interface GlobalPermissions {
   canAccessSystem: boolean;
   canAccessPrereleasePages: boolean;
@@ -17,54 +9,62 @@ export interface GlobalPermissions {
   canAccessMethodologyAdministrationPages: boolean;
 }
 
+export interface ReleaseStatusPermissions {
+  canMarkDraft: boolean;
+  canMarkHigherLevelReview: boolean;
+  canMarkApproved: boolean;
+}
+
+export type PreReleaseAccess = 'Before' | 'After' | 'Within' | 'NoneSet';
+
+export interface PreReleaseWindowStatus {
+  access: PreReleaseAccess;
+  start: Date;
+  end: Date;
+}
+
 const permissionService = {
-  getGlobalPermissions: (): Promise<GlobalPermissions> => {
+  getGlobalPermissions(): Promise<GlobalPermissions> {
     return client.get(`/permissions/access`);
   },
-  canAccessPrereleasePages: (user?: User): Promise<boolean> => {
+  canAccessPrereleasePages(user?: User): Promise<boolean> {
     return Promise.resolve(
       user ? user.permissions.canAccessPrereleasePages : false,
     );
   },
-  canUpdateRelease: (releaseId: string): Promise<boolean> => {
+  canUpdateRelease(releaseId: string): Promise<boolean> {
     return client.get(`/permissions/release/${releaseId}/update`);
   },
-  canMarkReleaseAsDraft: (releaseId: string): Promise<boolean> => {
-    return client.get(`/permissions/release/${releaseId}/status/draft`);
-  },
-  canSubmitReleaseForHigherLevelReview: (
+  getReleaseStatusPermissions(
     releaseId: string,
-  ): Promise<boolean> => {
-    return client.get(`/permissions/release/${releaseId}/status/submit`);
+  ): Promise<ReleaseStatusPermissions> {
+    return client.get(`/permissions/release/${releaseId}/status`);
   },
-  canApproveRelease: (releaseId: string): Promise<boolean> => {
-    return client.get(`/permissions/release/${releaseId}/status/approve`);
-  },
-  canMakeAmendmentOfRelease: (releaseId: string): Promise<boolean> => {
+  canMakeAmendmentOfRelease(releaseId: string): Promise<boolean> {
     return client.get(`/permissions/release/${releaseId}/amend`);
   },
-  canCreatePublicationForTopic: (topicId: string): Promise<boolean> => {
+  canCreatePublicationForTopic(topicId: string): Promise<boolean> {
     return client.get(`/permissions/topic/${topicId}/publication/create`);
   },
-  canCreateReleaseForPublication: (publicationId: string): Promise<boolean> => {
+  canCreateReleaseForPublication(publicationId: string): Promise<boolean> {
     return client.get(
       `/permissions/publication/${publicationId}/release/create`,
     );
   },
-  canUpdateMethodology: (methodologyId: string): Promise<boolean> => {
+  canUpdateMethodology(methodologyId: string): Promise<boolean> {
     return client.get(`/permissions/methodology/${methodologyId}/update`);
   },
-  canMarkMethodologyAsDraft: (methodologyId: string): Promise<boolean> => {
+  canMarkMethodologyAsDraft(methodologyId: string): Promise<boolean> {
     return client.get(`/permissions/methodology/${methodologyId}/status/draft`);
   },
-  canApproveMethodology: (methodologyId: string): Promise<boolean> => {
+  canApproveMethodology(methodologyId: string): Promise<boolean> {
     return client.get(
       `/permissions/methodology/${methodologyId}/status/approve`,
     );
   },
-  getPreReleaseWindowStatus: (
+  getPreReleaseWindowStatus(
     releaseId: string,
-  ): Promise<PreReleaseWindowStatus> => {
+  ): Promise<PreReleaseWindowStatus> {
     return client
       .get<{
         access: PreReleaseAccess;
