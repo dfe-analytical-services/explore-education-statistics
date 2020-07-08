@@ -20,10 +20,10 @@ export type FormFieldComponentProps<Props, FormValues> = FormFieldProps<
 > &
   Omit<Props, 'value' | 'error'>;
 
-export interface FormFieldProps<FormValues = {}> {
+export interface FormFieldProps<FormValues = unknown> {
   formGroup?: boolean;
   formGroupClass?: string;
-  name: string | keyof FormValues;
+  name: FormValues extends {} ? keyof FormValues : string;
   showError?: boolean;
 }
 

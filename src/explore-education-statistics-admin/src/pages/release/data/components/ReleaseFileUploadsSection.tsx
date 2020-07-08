@@ -10,43 +10,33 @@ import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import remove from 'lodash/remove';
 import React, { useEffect, useState } from 'react';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'CANNOT_OVERWRITE_FILE',
-    'file',
-    'Choose a unique file name',
-  ),
-  errorCodeToFieldError(
-    'FILE_CANNOT_BE_EMPTY',
-    'file',
-    'Choose a file that is not empty',
-  ),
-  errorCodeToFieldError(
-    'FILE_TYPE_INVALID',
-    'file',
-    'Choose a file of an allowed format',
-  ),
-  errorCodeToFieldError(
-    'FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS',
-    'file',
-    'Filename cannot contain spaces or special characters',
-  ),
-];
-
 interface FormValues {
   name: string;
   file: File | null;
 }
+
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'file',
+    messages: {
+      CANNOT_OVERWRITE_FILE: 'Choose a unique file name',
+      FILE_CANNOT_BE_EMPTY: 'Choose a file that is not empty',
+      FILE_TYPE_INVALID: 'Choose a file of an allowed format',
+      FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        'Filename cannot contain spaces or special characters',
+    },
+  }),
+];
 
 interface Props {
   publicationId: string;
@@ -101,7 +91,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
       .finally(() => {
         setIsUploading(false);
       });
-  }, errorCodeMappings);
+  }, errorMappings);
 
   const setDeleting = (ancillaryFile: string, deleting: boolean) => {
     setFiles(

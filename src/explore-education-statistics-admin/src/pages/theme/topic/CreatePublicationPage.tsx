@@ -18,10 +18,10 @@ import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
@@ -29,18 +29,19 @@ import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { AssignMethodologyFormValues } from './publication/AssignMethodologyForm';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'SLUG_NOT_UNIQUE',
-    'publicationTitle',
-    'Choose a unique title',
-  ),
-];
-
 interface FormValues extends AssignMethodologyFormValues {
   publicationTitle: string;
   selectedContactId: string;
 }
+
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'publicationTitle',
+    messages: {
+      SLUG_NOT_UNIQUE: 'Choose a unique title',
+    },
+  }),
+];
 
 interface CreatePublicationModel {
   methodologies: BasicMethodology[];
@@ -86,7 +87,7 @@ const CreatePublicationPage = ({
     });
 
     history.push(appRouteList.adminDashboard.path as string);
-  }, errorCodeMappings);
+  }, errorMappings);
 
   const cancelHandler = () => {
     history.push(appRouteList.adminDashboard.path as string);
@@ -183,7 +184,7 @@ const CreatePublicationPage = ({
                   label="Enter publication title"
                   name="publicationTitle"
                 />
-                <FormFieldRadioGroup
+                <FormFieldRadioGroup<FormValues>
                   id={`${formId}-methodologyChoice`}
                   legend="Choose a methodology for this publication"
                   legendSize="m"
@@ -193,7 +194,7 @@ const CreatePublicationPage = ({
                       value: 'existing',
                       label: 'Choose an existing methodology',
                       conditional: (
-                        <FormFieldSelect
+                        <FormFieldSelect<FormValues>
                           id={`${formId}-selectedMethodologyId`}
                           name="selectedMethodologyId"
                           label="Select methodology"
@@ -275,7 +276,7 @@ const CreatePublicationPage = ({
                   legendSize="m"
                   hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
                 >
-                  <FormFieldSelect
+                  <FormFieldSelect<FormValues>
                     id={`${formId}-selectedContactId`}
                     label="Publication and release contact"
                     name="selectedContactId"
