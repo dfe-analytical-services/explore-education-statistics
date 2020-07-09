@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -20,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ContentDbContext _context;
         private readonly ILogger<ReleaseStatusService> _logger;
         private readonly ITableStorageService _tableStorageService;
-        private const string TableName = "ReleaseStatus";
 
         public ReleaseStatusService(ContentDbContext context,
             ILogger<ReleaseStatusService> logger,
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             var query = new TableQuery<ReleaseStatus>().Where(filter);
-            return _tableStorageService.ExecuteQueryAsync(TableName, query);
+            return _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
         }
 
         public async Task<ReleaseStatus> GetLatestAsync(Guid releaseId)
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
                     QueryComparisons.Equal, releaseId.ToString()));
 
-            var result = await _tableStorageService.ExecuteQueryAsync(TableName, query);
+            var result = await _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
             return result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
         }
 
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
         {
-            return _tableStorageService.ExecuteQueryAsync(TableName, query);
+            return _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
         }
 
         public async Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusState state)
@@ -231,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task<CloudTable> GetTableAsync()
         {
-            return await _tableStorageService.GetTableAsync(TableName);
+            return await _tableStorageService.GetTableAsync(PublisherReleaseStatusTableName);
         }
     }
 }

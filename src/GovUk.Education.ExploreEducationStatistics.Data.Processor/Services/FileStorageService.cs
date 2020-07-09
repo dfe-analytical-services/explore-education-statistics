@@ -10,12 +10,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.Storage.Blob;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class FileStorageService : IFileStorageService
     {
-        private const string ContainerName = "releases";
         private readonly CloudBlobContainer _blobContainer;
 
         public FileStorageService(string connectionString)
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public static async Task<CloudBlobContainer> GetOrCreateBlobContainer(string storageConnectionString)
         {
-            return await FileStorageUtils.GetCloudBlobContainerAsync(storageConnectionString, ContainerName,
+            return await FileStorageUtils.GetCloudBlobContainerAsync(storageConnectionString, PrivateFilesContainerName,
                 new BlobContainerPermissions
                 {
                     PublicAccess = BlobContainerPublicAccessType.Blob

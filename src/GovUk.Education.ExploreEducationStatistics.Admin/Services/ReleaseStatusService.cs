@@ -9,18 +9,17 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
+using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseStatusService : IReleaseStatusService
     {
-        private const string TableName = "ReleaseStatus";
-
         private readonly IMapper _mapper;
         private readonly ITableStorageService _publisherTableStorageService;
         private readonly IUserService _userService;
@@ -46,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
                             QueryComparisons.Equal, releaseId.ToString()));
 
-                    var result = await _publisherTableStorageService.ExecuteQueryAsync(TableName, query);
+                    var result = await _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
                     var first = result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
                     return _mapper.Map<ReleaseStatusViewModel>(first);
                 });

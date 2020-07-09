@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DataBlockSummary Summary { get; set; }
 
-        public List<TableBuilderConfiguration> Tables { get; set; }
+        public TableBuilderConfiguration Table { get; set; }
 
         public ContentBlockType Type => ContentBlockType.DataBlock;
     }

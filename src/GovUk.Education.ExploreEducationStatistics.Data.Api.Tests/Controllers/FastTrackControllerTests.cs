@@ -15,13 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private readonly Guid _validId = Guid.NewGuid();
         private readonly Guid _notFoundId = Guid.NewGuid();
-        private readonly Guid _releaseId = new Guid("03730cff-22d5-446c-8971-68921e933b50");
-        
+
         public FastTrackControllerTests()
         {
             var fastTrackService = new Mock<IFastTrackService>();
 
-            fastTrackService.Setup(s => s.GetAsync(_releaseId, _validId)).ReturnsAsync(
+            fastTrackService.Setup(s => s.Get(_validId)).ReturnsAsync(
                 new FastTrackViewModel
                 {
                     Id = _validId,
@@ -29,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 }
             );
 
-            fastTrackService.Setup(s => s.GetAsync(_releaseId, _notFoundId)).ReturnsAsync(new NotFoundResult());
+            fastTrackService.Setup(s => s.Get(_notFoundId)).ReturnsAsync(new NotFoundResult());
 
             _controller = new FastTrackController(fastTrackService.Object);
         }
@@ -37,23 +36,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async void Get_FastTrack()
         {
-            var result = await _controller.GetAsync(_releaseId.ToString(), _validId.ToString());
-
+            var result = await _controller.Get(_validId.ToString());
             Assert.IsType<FastTrackViewModel>(result.Value);
             Assert.Equal(_validId, result.Value.Id);
         }
 
         [Fact]
-        public async void Get_FastTrack_NotFound()
+        public async void Get_NotFound()
         {
-            var result = await _controller.GetAsync(_releaseId.ToString(), _notFoundId.ToString());
+            var result = await _controller.Get(_notFoundId.ToString());
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
-        public async void Get_FastTrack_InvalidId()
+        public async void Get_InvalidId()
         {
-            var result = await _controller.GetAsync(_releaseId.ToString(), "InvalidGuid");
+            var result = await _controller.Get("InvalidGuid");
             Assert.IsType<NotFoundResult>(result.Result);
         }
     }

@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
@@ -13,14 +12,13 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Seed.ValidationErro
 using static GovUk.Education.ExploreEducationStatistics.Data.Seed.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 {
     public class FileStorageService : IFileStorageService
     {
         private readonly string _storageConnectionString;
-
-        private const string ContainerName = "releases";
 
         private const string NameKey = "name";
 
@@ -42,9 +40,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         public async Task<Either<ValidationResult, Either<ValidationResult, bool>>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite)
         {
-            var blobContainer =
-                await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
-            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {NumberOfRows, CalculateNumberOfRows(dataFile.OpenReadStream()).ToString()}};
+            var blobContainer = await GetCloudBlobContainerAsync(_storageConnectionString, PrivateFilesContainerName);
+            var dataInfo = new Dictionary<string, string>
+            {
+                {NameKey, name},
+                {MetaFileKey, metadataFile.FileName},
+                {NumberOfRows, CalculateNumberOfRows(dataFile.OpenReadStream()).ToString()}
+            };
             var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
             return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, overwrite)
                 .OnSuccess(() =>

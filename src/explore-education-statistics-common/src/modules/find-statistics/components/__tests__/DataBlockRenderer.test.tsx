@@ -55,7 +55,83 @@ describe('DataBlockRenderer', () => {
       locations: {},
     },
     charts: [],
-    tables: [],
+    table: {
+      indicators: [],
+      tableHeaders: {
+        columnGroups: [],
+        columns: [
+          { value: '2012_AY', type: 'TimePeriod' },
+          { value: '2013_AY', type: 'TimePeriod' },
+          { value: '2014_AY', type: 'TimePeriod' },
+          { value: '2015_AY', type: 'TimePeriod' },
+          { value: '2016_AY', type: 'TimePeriod' },
+        ],
+        rowGroups: [],
+        rows: [
+          {
+            value: 'authorised-absence-rate',
+            type: 'Indicator',
+          },
+          {
+            value: 'unauthorised-absence-rate',
+            type: 'Indicator',
+          },
+          {
+            value: 'overall-absence-rate',
+            type: 'Indicator',
+          },
+        ],
+      },
+    },
+  };
+
+  const testDataBlockMap: DataBlock = {
+    id: 'test-id',
+    type: 'DataBlock',
+    heading: '',
+    order: 0,
+    name: 'Test data block',
+    source: '',
+    query: {
+      subjectId: '1',
+      geographicLevel: 'country',
+      timePeriod: {
+        startYear: 2016,
+        startCode: 'AY',
+        endYear: 2016,
+        endCode: 'AY',
+      },
+      filters: ['characteristic-total', 'school-type-total'],
+      indicators: [
+        'authorised-absence-rate',
+        'unauthorised-absence-rate',
+        'overall-absence-rate',
+      ],
+      locations: {},
+    },
+    charts: [testMapConfiguration],
+    table: {
+      indicators: [],
+      tableHeaders: {
+        columnGroups: [],
+        columns: [{ value: '2016_AY', type: 'TimePeriod' }],
+        rowGroups: [],
+        rows: [
+          {
+            value: 'authorised-absence-rate',
+            type: 'Indicator',
+          },
+          {
+            value: 'unauthorised-absence-rate',
+            type: 'Indicator',
+          },
+          {
+            value: 'overall-absence-rate',
+            type: 'Indicator',
+          },
+        ],
+      },
+    },
   };
 
   test('renders error message if table response is error', async () => {
@@ -92,7 +168,7 @@ describe('DataBlockRenderer', () => {
         'test-release-id',
       );
 
-      expect(screen.getByText('Could not load content')).toBeInTheDocument();
+      expect(screen.getAllByText('Could not load content')).toHaveLength(2);
     });
   });
 
@@ -164,7 +240,7 @@ describe('DataBlockRenderer', () => {
         'test-release-id',
       );
 
-      expect(screen.getAllByRole('tab')).toHaveLength(1);
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
 
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
     });
@@ -202,7 +278,7 @@ describe('DataBlockRenderer', () => {
         'test-release-id',
       );
 
-      expect(screen.getAllByRole('tab')).toHaveLength(1);
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
     });
   });
@@ -239,7 +315,7 @@ describe('DataBlockRenderer', () => {
         'test-release-id',
       );
 
-      expect(screen.getAllByRole('tab')).toHaveLength(1);
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
     });
   });
@@ -257,18 +333,16 @@ describe('DataBlockRenderer', () => {
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          tables: [
-            {
-              tableHeaders: mapUnmappedTableHeaders(
-                getDefaultTableHeaderConfig(fullTable.subjectMeta),
-              ),
-              indicators: [
-                'authorised-absence-rate',
-                'unauthorised-absence-rate',
-                'overall-absence-rate',
-              ],
-            },
-          ],
+          table: {
+            tableHeaders: mapUnmappedTableHeaders(
+              getDefaultTableHeaderConfig(fullTable.subjectMeta),
+            ),
+            indicators: [
+              'authorised-absence-rate',
+              'unauthorised-absence-rate',
+              'overall-absence-rate',
+            ],
+          },
         }}
       />,
     );
@@ -299,10 +373,7 @@ describe('DataBlockRenderer', () => {
       <DataBlockRenderer
         releaseId="test-release-id"
         id="test-block"
-        dataBlock={{
-          ...testDataBlock,
-          charts: [testMapConfiguration],
-        }}
+        dataBlock={testDataBlockMap}
       />,
     );
 
@@ -311,7 +382,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(getDataBlockForSubject).toBeCalledWith(
         {
-          ...testDataBlock.query,
+          ...testDataBlockMap.query,
           includeGeoJson: true,
         } as TableDataQuery,
         'test-release-id',
@@ -348,9 +419,7 @@ describe('DataBlockRenderer', () => {
         'test-release-id',
       );
 
-      expect(
-        container.querySelectorAll('section.govuk-tabs__panel'),
-      ).toHaveLength(1);
+      expect(screen.getAllByRole('tabpanel')).toHaveLength(1);
 
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
 
@@ -379,18 +448,16 @@ describe('DataBlockRenderer', () => {
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          tables: [
-            {
-              tableHeaders: mapUnmappedTableHeaders(
-                getDefaultTableHeaderConfig(fullTable.subjectMeta),
-              ),
-              indicators: [
-                'authorised-absence-rate',
-                'unauthorised-absence-rate',
-                'overall-absence-rate',
-              ],
-            },
-          ],
+          table: {
+            tableHeaders: mapUnmappedTableHeaders(
+              getDefaultTableHeaderConfig(fullTable.subjectMeta),
+            ),
+            indicators: [
+              'authorised-absence-rate',
+              'unauthorised-absence-rate',
+              'overall-absence-rate',
+            ],
+          },
         }}
       />,
     );
@@ -450,27 +517,25 @@ describe('DataBlockRenderer', () => {
               indicators: ['authorised-absence-sessions'],
               locations: {},
             },
-            tables: [
-              {
-                tableHeaders: {
-                  columnGroups: [],
-                  rowGroups: [],
-                  columns: [
-                    {
-                      type: 'TimePeriod',
-                      value: '2018_AY',
-                    },
-                  ],
-                  rows: [
-                    {
-                      type: 'Indicator',
-                      value: 'authorised-absence-sessions',
-                    },
-                  ],
-                },
-                indicators: ['authorised-absence-sessions'],
+            table: {
+              tableHeaders: {
+                columnGroups: [],
+                rowGroups: [],
+                columns: [
+                  {
+                    type: 'TimePeriod',
+                    value: '2018_AY',
+                  },
+                ],
+                rows: [
+                  {
+                    type: 'Indicator',
+                    value: 'authorised-absence-sessions',
+                  },
+                ],
               },
-            ],
+              indicators: ['authorised-absence-sessions'],
+            },
           }}
         />,
       );

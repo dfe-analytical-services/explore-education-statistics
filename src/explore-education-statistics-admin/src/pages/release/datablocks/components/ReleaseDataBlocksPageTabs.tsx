@@ -83,7 +83,7 @@ const ReleaseDataBlocksPageTabs = ({
 
     const tableHeaders = selectedDataBlock
       ? mapTableHeadersConfig(
-          selectedDataBlock.tables[0].tableHeaders,
+          selectedDataBlock.table.tableHeaders,
           table.subjectMeta,
         )
       : getDefaultTableHeaderConfig(table.subjectMeta);
@@ -170,12 +170,10 @@ const ReleaseDataBlocksPageTabs = ({
         ...details,
         query,
         charts,
-        tables: [
-          {
-            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-            indicators: [],
-          },
-        ],
+        table: {
+          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+          indicators: [],
+        },
       });
     },
     [handleDataBlockSave, selectedDataBlock, setTableState],
@@ -193,12 +191,10 @@ const ReleaseDataBlocksPageTabs = ({
 
       await handleDataBlockSave({
         ...selectedDataBlock,
-        tables: [
-          {
-            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-            indicators: [],
-          },
-        ],
+        table: {
+          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+          indicators: [],
+        },
       });
     },
     [handleDataBlockSave, selectedDataBlock, updateTableState],
