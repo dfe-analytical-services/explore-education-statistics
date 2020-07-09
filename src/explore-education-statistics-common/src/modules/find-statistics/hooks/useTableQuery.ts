@@ -5,8 +5,6 @@ import storageService from '@common/services/storageService';
 import tableBuilderService, {
   TableDataQuery,
   TableDataResponse,
-  TableDataResult,
-  TableDataSubjectMeta,
 } from '@common/services/tableBuilderService';
 import { addSeconds } from 'date-fns';
 import { useRef } from 'react';
@@ -17,11 +15,6 @@ export interface TableQueryOptions {
    * query response for, in seconds.
    */
   expiresIn?: number;
-}
-
-export interface TableDataStorageItem {
-  dataLastPublished: string;
-  response: TableDataResponse;
 }
 
 export default function useTableQuery(
@@ -38,30 +31,23 @@ export default function useTableQuery(
       return undefined;
     }
 
-    const queryKey = JSON.stringify(query);
+    const queryKey = JSON.stringify({
+      ...query,
+      dataLastPublished,
+    });
 
-    let item = await storageService
-      .get<TableDataStorageItem>(queryKey)
+    let response = await storageService
+      .get<TableDataResponse>(queryKey)
       .catch(() => null);
 
-    const dataExpired =
-      item != null &&
-      dataLastPublished !== '' &&
-      new Date(dataLastPublished) > new Date(item.dataLastPublished);
+    if (response == null) {
+      response = await tableBuilderService.getTableData(query, releaseId);
 
-    if (item == null || dataExpired) {
-      const response = await tableBuilderService.getTableData(query, releaseId);
-
-      item = {
-        dataLastPublished,
-        response,
-      };
-
-      await storageService.set(queryKey, item, {
+      await storageService.set(queryKey, response, {
         expiry: addSeconds(new Date(), options?.expiresIn ?? 0),
       });
     }
 
-    return mapFullTable(item.response);
+    return mapFullTable(response);
   }, [JSON.stringify(query)]);
 }
