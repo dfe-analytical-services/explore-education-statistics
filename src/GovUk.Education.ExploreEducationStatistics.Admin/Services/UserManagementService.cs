@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -270,16 +269,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public List<UserReleaseRoleViewModel> GetUserReleaseRoles(string userId)
         {
-            var userReleases = _contentDbContext.UserReleaseRoles
+            return _contentDbContext.UserReleaseRoles
                 .Include(urr => urr.Release)
                 .ThenInclude(r => r.Publication)
-                .Where(x => x.UserId == Guid.Parse(userId)).Select(urr => urr.Release).Distinct();
-            
-            var latestReleases = userReleases.Where(r => IsLatestVersionOfRelease(r.Publication.Releases, r.Id))
-                .Select(r => r.Id).ToList();
-                
-            return _contentDbContext.UserReleaseRoles
-                .Where(x => x.UserId == Guid.Parse(userId) && latestReleases.Contains(x.ReleaseId))
+                .Where(x => x.UserId == Guid.Parse(userId))
+                .ToList()
+                .Where(urr => IsLatestVersionOfRelease(urr.Release.Publication.Releases, urr.Release.Id))
                 .Select(x => new UserReleaseRoleViewModel
                 {
                     Id = x.Id,
