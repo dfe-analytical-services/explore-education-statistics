@@ -1,7 +1,12 @@
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using Moq;
 using Xunit;
+using ReleaseStatusOverallStage = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
+using PublisherReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.SubmitSpecificReleaseToHigherReviewAuthorizationHandler;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.ReleaseAuthorizationHandlersTestUtil;
@@ -13,10 +18,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public void CanSubmitAllReleasesToHigherReviewAuthorizationHandler()
         {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+
+            releaseStatusRepository.Setup(s => s.GetAllByOverallStage(
+                release.Id, 
+                ReleaseStatusOverallStage.Started, 
+                ReleaseStatusOverallStage.Complete
+            ))
+                .ReturnsAsync(new List<PublisherReleaseStatus> {});
+
             // Assert that any users with the "SubmitAllReleasesToHigherReview" claim can submit an arbitrary Release to higher review
             // (and no other claim allows this)
             AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
-                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(), 
+                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(releaseStatusRepository.Object), 
                 SubmitAllReleasesToHigherReview
             );
         }
@@ -26,14 +45,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             var release = new Release
             {
+                Id = Guid.NewGuid(),
                 Status = ReleaseStatus.Approved
             };
+
+            var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+
+            releaseStatusRepository.Setup(s => s.GetAllByOverallStage(
+                release.Id, 
+                ReleaseStatusOverallStage.Started, 
+                ReleaseStatusOverallStage.Complete
+            ))
+                .ReturnsAsync(new List<PublisherReleaseStatus> {});
             
             // Assert that any users with the "SubmitAllReleasesToHigherReview" claim can submit an arbitrary Release to higher review
             AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
-                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(),
+                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(releaseStatusRepository.Object),
                 release,
                 SubmitAllReleasesToHigherReview
+            );
+        }
+
+        [Fact]
+        public void CanSubmitAllReleasesToHigherReviewAuthorizationHandler_ReleaseStartedPublishing()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Status = ReleaseStatus.Approved,
+                Published = DateTime.Now
+            };
+
+            var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+
+            releaseStatusRepository.Setup(s => s.GetAllByOverallStage(
+                release.Id, 
+                ReleaseStatusOverallStage.Started, 
+                ReleaseStatusOverallStage.Complete
+            ))
+                .ReturnsAsync(new List<PublisherReleaseStatus> {});
+            
+            // Assert that no users can submit a Release to higher review once it has started publishing
+            AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
+                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(releaseStatusRepository.Object),
+                release
             );
         }
 
@@ -42,13 +97,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             var release = new Release
             {
+                Id = Guid.NewGuid(),
                 Status = ReleaseStatus.Approved,
                 Published = DateTime.Now
             };
+
+            var releaseStatusRepository = new Mock<IReleaseStatusRepository>();
+
+            releaseStatusRepository.Setup(s => s.GetAllByOverallStage(
+                release.Id, 
+                ReleaseStatusOverallStage.Started, 
+                ReleaseStatusOverallStage.Complete
+            ))
+                .ReturnsAsync(new List<PublisherReleaseStatus> {});
             
-            // Assert that no users can submit an approved Release to higher review
+            // Assert that no users can submit a Release to higher review once it has published
             AssertReleaseHandlerSucceedsWithCorrectClaims<SubmitSpecificReleaseToHigherReviewRequirement>(
-                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(),
+                new CanSubmitAllReleasesToHigherReviewAuthorizationHandler(releaseStatusRepository.Object),
                 release
             );
         }
