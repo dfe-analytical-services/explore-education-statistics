@@ -6,12 +6,12 @@
   flex-direction: column;
   margin-bottom: govuk-spacing(6);
 
-  button {
+  > * {
     margin-bottom: govuk-spacing(4);
-    margin-right: govuk-spacing(2);
+    margin-right: 0;
   }
 
-  button:last-child {
+  > :last-child {
     margin-right: 0;
   }
 
@@ -19,8 +19,9 @@
   @include govuk-media-query($from: tablet) {
     flex-direction: row;
 
-    button {
+    > * {
       margin-bottom: 0;
+      margin-right: govuk-spacing(2);
     }
   }
 }

@@ -5,6 +5,7 @@ import AccordionSection, {
   AccordionSectionProps,
 } from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import { FormTextInput } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
@@ -139,7 +140,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
             heading={heading}
             header={header}
           >
-            <div>
+            <ButtonGroup>
               {onHeadingChange &&
                 (isEditingHeading ? (
                   <Button onClick={saveHeading}>Save section title</Button>
@@ -176,7 +177,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
                   </ModalConfirm>
                 </>
               )}
-            </div>
+            </ButtonGroup>
 
             {children}
           </AccordionSection>

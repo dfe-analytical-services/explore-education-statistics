@@ -8,6 +8,7 @@ import useReleaseContentActions from '@admin/pages/release/content/contexts/useR
 import { EditableRelease } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
@@ -171,7 +172,7 @@ const ReleaseContentAccordionSection = ({
       />
 
       {isEditing && !isReordering && (
-        <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+        <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
           <Button variant="secondary" onClick={addBlock}>
             Add text block
           </Button>
@@ -179,7 +180,7 @@ const ReleaseContentAccordionSection = ({
             releaseId={release.id}
             onAddDataBlock={attachDataBlock}
           />
-        </div>
+        </ButtonGroup>
       )}
     </EditableAccordionSection>
   );

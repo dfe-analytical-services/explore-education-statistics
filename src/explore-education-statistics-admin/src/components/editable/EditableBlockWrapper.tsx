@@ -1,5 +1,6 @@
 import styles from '@admin/components/editable/EditableBlockWrapper.module.scss';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode } from 'react';
@@ -20,7 +21,7 @@ const EditableBlockWrapper = ({
     <article>
       <div className={styles.block}>{children}</div>
 
-      <div className={styles.buttons}>
+      <ButtonGroup className={styles.buttons}>
         {onEdit && (
           <Button variant="secondary" onClick={() => onEdit()}>
             Edit block
@@ -47,7 +48,7 @@ const EditableBlockWrapper = ({
             </ModalConfirm>
           </>
         )}
-      </div>
+      </ButtonGroup>
     </article>
   );
 };
