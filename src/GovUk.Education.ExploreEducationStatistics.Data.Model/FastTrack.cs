@@ -14,10 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public ObservationQueryContext Query { get; set; }
 
-        public FastTrack()
+        public Guid ReleaseId { get; set; }
+
+        public FastTrack(Guid id,
+            TableBuilderConfiguration configuration,
+            ObservationQueryContext query,
+            Guid releaseId)
         {
-            Id = Guid.NewGuid();
+            Id = id;
             Created = DateTime.UtcNow;
+            Configuration = configuration;
+            Query = query;
+            ReleaseId = releaseId;
         }
     }
 }

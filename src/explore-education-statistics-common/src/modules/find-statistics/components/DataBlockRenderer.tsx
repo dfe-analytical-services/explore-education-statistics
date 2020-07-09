@@ -46,7 +46,7 @@ const DataBlockRenderer = ({
   const { value: fullTable, isLoading, error } = useTableQuery(
     dataBlock
       ? {
-          ...dataBlock.dataBlockRequest,
+          ...dataBlock.query,
           includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
         }
       : undefined,
@@ -129,30 +129,26 @@ const DataBlockRenderer = ({
           </TabsSection>
         )}
 
-        {dataBlock?.tables?.length && (
+        {dataBlock?.table && (
           <TabsSection id={`${id}-tables`} title="Table">
             {error && errorMessage}
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
-                {dataBlock?.tables.map((table, index) => {
-                  return (
-                    <TimePeriodDataTable
-                      key={index}
-                      fullTable={fullTable}
-                      captionTitle={dataBlock?.heading}
-                      source={dataBlock?.source}
-                      tableHeadersConfig={
-                        table.tableHeaders
-                          ? mapTableHeadersConfig(
-                              table.tableHeaders,
-                              fullTable.subjectMeta,
-                            )
-                          : getDefaultTableHeaderConfig(fullTable.subjectMeta)
-                      }
-                    />
-                  );
-                })}
+                <TimePeriodDataTable
+                  key={dataBlock.id}
+                  fullTable={fullTable}
+                  captionTitle={dataBlock?.heading}
+                  source={dataBlock?.source}
+                  tableHeadersConfig={
+                    dataBlock.table.tableHeaders
+                      ? mapTableHeadersConfig(
+                          dataBlock.table.tableHeaders,
+                          fullTable.subjectMeta,
+                        )
+                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                  }
+                />
 
                 {additionalTabContent}
               </ErrorBoundary>

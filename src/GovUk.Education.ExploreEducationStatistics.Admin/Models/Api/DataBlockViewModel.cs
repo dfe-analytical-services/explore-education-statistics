@@ -17,9 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Name { get; set; }
 
+        public string HighlightName { get; set; }
+
         public string Source { get; set; }
 
-        public ObservationQueryContext DataBlockRequest { get; set; }
+        public ObservationQueryContext Query { get; set; }
 
         public List<IContentBlockChart> Charts { get; set; }
 
@@ -27,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DataBlockSummary Summary { get; set; }
 
-        public List<TableBuilderConfiguration> Tables { get; set; }
+        public TableBuilderConfiguration Table { get; set; }
 
         public ContentBlockType Type => ContentBlockType.DataBlock;
     }

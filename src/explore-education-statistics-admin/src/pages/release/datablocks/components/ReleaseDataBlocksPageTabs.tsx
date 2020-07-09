@@ -66,7 +66,7 @@ const ReleaseDataBlocksPageTabs = ({
     }
 
     const query = {
-      ...selectedDataBlock.dataBlockRequest,
+      ...selectedDataBlock.query,
       includeGeoJson: selectedDataBlock.charts.some(
         chart => chart.type === 'map',
       ),
@@ -83,7 +83,7 @@ const ReleaseDataBlocksPageTabs = ({
 
     const tableHeaders = selectedDataBlock
       ? mapTableHeadersConfig(
-          selectedDataBlock.tables[0].tableHeaders,
+          selectedDataBlock.table.tableHeaders,
           table.subjectMeta,
         )
       : getDefaultTableHeaderConfig(table.subjectMeta);
@@ -118,8 +118,8 @@ const ReleaseDataBlocksPageTabs = ({
 
       const dataBlockToSave: SavedDataBlock = {
         ...dataBlock,
-        dataBlockRequest: {
-          ...dataBlock.dataBlockRequest,
+        query: {
+          ...dataBlock.query,
           includeGeoJson: dataBlock.charts[0]?.type === 'map',
         },
       };
@@ -168,14 +168,12 @@ const ReleaseDataBlocksPageTabs = ({
       await handleDataBlockSave({
         ...(selectedDataBlock ?? {}),
         ...details,
-        dataBlockRequest: query,
+        query,
         charts,
-        tables: [
-          {
-            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-            indicators: [],
-          },
-        ],
+        table: {
+          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+          indicators: [],
+        },
       });
     },
     [handleDataBlockSave, selectedDataBlock, setTableState],
@@ -193,12 +191,10 @@ const ReleaseDataBlocksPageTabs = ({
 
       await handleDataBlockSave({
         ...selectedDataBlock,
-        tables: [
-          {
-            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-            indicators: [],
-          },
-        ],
+        table: {
+          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+          indicators: [],
+        },
       });
     },
     [handleDataBlockSave, selectedDataBlock, updateTableState],

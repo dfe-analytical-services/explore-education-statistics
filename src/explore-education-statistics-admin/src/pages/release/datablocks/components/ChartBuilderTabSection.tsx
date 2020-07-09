@@ -45,7 +45,7 @@ const ChartBuilderTabSection = ({
     async (chart: Chart) => {
       await onDataBlockSave({
         ...dataBlock,
-        dataBlockRequest: query,
+        query,
         charts: [chart],
       });
     },

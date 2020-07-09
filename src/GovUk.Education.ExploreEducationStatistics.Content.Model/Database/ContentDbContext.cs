@@ -351,8 +351,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasColumnName("DataBlock_Heading");
 
             modelBuilder.Entity<DataBlock>()
-                .Property(block => block.DataBlockRequest)
-                .HasColumnName("DataBlock_Request")
+                .Property(block => block.HighlightName)
+                .HasColumnName("DataBlock_HighlightName");
+
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.Query)
+                .HasColumnName("DataBlock_Query")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
@@ -372,11 +376,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.DeserializeObject<DataBlockSummary>(v));
 
             modelBuilder.Entity<DataBlock>()
-                .Property(block => block.Tables)
-                .HasColumnName("DataBlock_Tables")
+                .Property(block => block.Table)
+                .HasColumnName("DataBlock_Table")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<TableBuilderConfiguration>>(v));
+                    v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v));
 
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
@@ -2857,7 +2861,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Order = 1,
                     Name = "Key Stat 1",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -2907,28 +2911,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils.",
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Overall_absence_rate).ToString(), TableHeaderType.Indicator)
                             }
                         }
                     },
@@ -3010,7 +3013,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3060,28 +3063,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Number of authorised absences as a percentage of the overall school population.",
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Authorised_absence_rate).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     },
@@ -3139,7 +3142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3189,28 +3192,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Number of unauthorised absences as a percentage of the overall school population."
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Unauthorised_absence_rate).ToString(), TableHeaderType.Indicator)
                             }
                         }
                     },
@@ -3292,7 +3294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3356,34 +3358,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Number of unauthorised absences as a percentage of the overall school population."
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2012_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2013_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2014_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2012_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2013_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2014_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Authorised_absence_rate).ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Unauthorised_absence_rate).ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Overall_absence_rate).ToString(), TableHeaderType.Indicator)
                             }
                         }
                     },
@@ -3480,7 +3485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                     Name = "Generic data block - National",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3513,34 +3518,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 IndicatorName.Authorised_absence_rate)
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2012_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2013_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2014_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2012_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2013_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2014_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Authorised_absence_rate).ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Unauthorised_absence_rate).ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
+                                        IndicatorName.Overall_absence_rate).ToString(), TableHeaderType.Indicator)
                             }
                         }
                     },
@@ -3636,7 +3644,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
                     ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
                     Name = "Generic data block - LA",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3759,7 +3767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 1",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -3808,32 +3816,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Number of permanent exclusions as a percentage of the overall school population.",
                         },
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Permanent_exclusion_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Permanent_exclusion_rate).ToString(), TableHeaderType.Indicator)
                             }
                         }
                     },
-
                     Charts = new List<IContentBlockChart>
                     {
                         new LineChart
@@ -3898,7 +3904,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -3947,28 +3953,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Number of fixed-period exclusions as a percentage of the overall school population.",
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Fixed_period_exclusion_rate).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     },
@@ -4026,7 +4032,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4075,32 +4081,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of permanent exclusions within a school year."
                         },
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Number_of_permanent_exclusions).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     },
-
                     Charts = new List<IContentBlockChart>
                     {
                         new LineChart
@@ -4155,7 +4159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4226,38 +4230,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of permanent exclusions within a school year."
                         },
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2012_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2013_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2014_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2012_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2013_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2014_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Permanent_exclusion_rate).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Permanent_exclusion_rate).ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Fixed_period_exclusion_rate).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Number_of_permanent_exclusions).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     },
-
                     Charts = new List<IContentBlockChart>
                     {
                         new LineChart
@@ -4330,7 +4338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
                     Heading = "Chart showing permanent exclusions in England",
                     Name = "Generic data block 1",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4362,34 +4370,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 IndicatorName.Number_of_permanent_exclusions)
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2012_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2013_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2014_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2012_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2013_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2014_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_pupils).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Permanent_exclusion_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Number_of_pupils).ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Number_of_permanent_exclusions).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Permanent_exclusion_rate).ToString(), TableHeaderType.Indicator)
                             }
                         }
                     },
@@ -4445,7 +4457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
                     Heading = "Chart showing fixed-period exclusions in England",
                     Name = "Generic data block 2",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4478,34 +4490,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 IndicatorName.Number_of_fixed_period_exclusions)
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2012_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2013_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2014_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2012_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2013_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2014_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_pupils).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_fixed_period_exclusions).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Fixed_period_exclusion_rate).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Number_of_pupils).ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Number_of_fixed_period_exclusions).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Fixed_period_exclusion_rate).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     },
@@ -4566,7 +4583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = null, // not yet used in any Content
                     Name = "Available Data Block",
                     Order = 0,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4615,36 +4632,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of permanent exclusions within a school year."
                         },
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2012_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2013_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2014_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2012_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2013_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2014_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Number_of_permanent_exclusions).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     },
-
                     Charts = new List<IContentBlockChart>
                     {
                         new LineChart
@@ -4699,7 +4715,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = null, // not yet used in any Content
                     Name = "Available Data Block 2",
                     Order = 0,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4748,36 +4764,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of permanent exclusions within a school year."
                         },
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>(),
+                            Columns = new List<TableHeader>
                             {
-                                ColumnGroups = new List<List<TableHeader>>(),
-                                Columns = new List<TableHeader>
+                                new TableHeader("2012_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2013_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2014_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_AY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_AY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
                                 {
-                                    new TableHeader("2012_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2013_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2014_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_AY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_AY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel], IndicatorName.Number_of_permanent_exclusions).ToString(), TableHeaderType.Indicator)
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                                 }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.ExclusionsByGeographicLevel],
+                                        IndicatorName.Number_of_permanent_exclusions).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     },
-
                     Charts = new List<IContentBlockChart>
                     {
                         new LineChart
@@ -4832,7 +4847,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 1",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -4880,43 +4895,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of applications received for places at primary and secondary schools.",
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>
                             {
-                                ColumnGroups = new List<List<TableHeader>>
+                                new List<TableHeader>
                                 {
-                                    new List<TableHeader>
-                                    {
-                                        new TableHeader(FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString(), TableHeaderType.Filter)
-                                    }
-                                },
-                                Columns = new List<TableHeader>
-                                {
-                                    new TableHeader("2014_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2017_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2018_CY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_applications_received).ToString(), TableHeaderType.Indicator)
+                                    new TableHeader(
+                                        FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            FilterItemName.Year_of_admission__Primary_All_primary).ToString(),
+                                        TableHeaderType.Filter)
                                 }
+                            },
+                            Columns = new List<TableHeader>
+                            {
+                                new TableHeader("2014_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2017_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2018_CY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
+                                {
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                                }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_of_applications_received).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     }
                 },
-
                 // Secondary and primary schools applications offers key statistics tile 2
                 new DataBlock
                 {
@@ -4924,7 +4941,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -4972,38 +4989,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of first preferences offered to applicants by schools."
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>
                             {
-                                ColumnGroups = new List<List<TableHeader>>
+                                new List<TableHeader>
                                 {
-                                    new List<TableHeader>
-                                    {
-                                        new TableHeader(FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString(), TableHeaderType.Filter)
-                                    }
-                                },
-                                Columns = new List<TableHeader>
-                                {
-                                    new TableHeader("2014_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2017_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2018_CY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_first_preferences_offered).ToString(), TableHeaderType.Indicator)
+                                    new TableHeader(
+                                        FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            FilterItemName.Year_of_admission__Primary_All_primary).ToString(),
+                                        TableHeaderType.Filter)
                                 }
+                            },
+                            Columns = new List<TableHeader>
+                            {
+                                new TableHeader("2014_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2017_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2018_CY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
+                                {
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                                }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_of_first_preferences_offered).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     }
@@ -5016,7 +5036,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -5064,38 +5084,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of second preferences offered to applicants by schools."
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>
                             {
-                                ColumnGroups = new List<List<TableHeader>>
+                                new List<TableHeader>
                                 {
-                                    new List<TableHeader>
-                                    {
-                                        new TableHeader(FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString(), TableHeaderType.Filter)
-                                    }
-                                },
-                                Columns = new List<TableHeader>
-                                {
-                                    new TableHeader("2014_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2017_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2018_CY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_second_preferences_offered).ToString(), TableHeaderType.Indicator)
+                                    new TableHeader(
+                                        FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            FilterItemName.Year_of_admission__Primary_All_primary).ToString(),
+                                        TableHeaderType.Filter)
                                 }
+                            },
+                            Columns = new List<TableHeader>
+                            {
+                                new TableHeader("2014_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2017_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2018_CY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
+                                {
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                                }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_of_second_preferences_offered).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     }
@@ -5108,7 +5131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -5182,44 +5205,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             @"Total number of second preferences offered to applicants by schools."
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>
                             {
-                                ColumnGroups = new List<List<TableHeader>>
+                                new List<TableHeader>
                                 {
-                                    new List<TableHeader>
-                                    {
-                                        new TableHeader(FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString(), TableHeaderType.Filter)
-                                    }
-                                },
-                                Columns = new List<TableHeader>
-                                {
-                                    new TableHeader("2014_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2017_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2018_CY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_applications_received).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_admissions).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_first_preferences_offered).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_second_preferences_offered).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_of_third_preferences_offered).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_did_not_receive_an_offer).ToString(), TableHeaderType.Indicator)
+                                    new TableHeader(
+                                        FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            FilterItemName.Year_of_admission__Primary_All_primary).ToString(),
+                                        TableHeaderType.Filter)
                                 }
+                            },
+                            Columns = new List<TableHeader>
+                            {
+                                new TableHeader("2014_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2017_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2018_CY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
+                                {
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                                }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_of_applications_received).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_of_admissions).ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_of_first_preferences_offered).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_of_second_preferences_offered).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_of_third_preferences_offered).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school)
+                                        .ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_that_did_not_receive_an_offer).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     }
@@ -5232,7 +5275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading =
                         "Table of Timeseries of key secondary preference rates, England",
                     Name = "Generic data block 1",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -5267,40 +5310,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA)
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>
                             {
-                                ColumnGroups = new List<List<TableHeader>>
+                                new List<TableHeader>
                                 {
-                                    new List<TableHeader>
-                                    {
-                                        new TableHeader(FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Secondary_All_secondary).ToString(), TableHeaderType.Filter)
-                                    }
-                                },
-                                Columns = new List<TableHeader>
-                                {
-                                    new TableHeader("2014_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2017_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2018_CY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_preferred_school).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_did_not_receive_an_offer).ToString(), TableHeaderType.Indicator)
+                                    new TableHeader(
+                                        FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            FilterItemName.Year_of_admission__Secondary_All_secondary).ToString(),
+                                        TableHeaderType.Filter)
                                 }
+                            },
+                            Columns = new List<TableHeader>
+                            {
+                                new TableHeader("2014_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2017_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2018_CY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
+                                {
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                                }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_that_received_an_offer_for_a_preferred_school).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school)
+                                        .ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_that_did_not_receive_an_offer).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     }
@@ -5312,7 +5364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading =
                         "Table showing Timeseries of key primary preference rates, England Entry into academic year",
                     Name = "Generic data block 2",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -5347,40 +5399,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA)
                         }
                     },
-                    Tables = new List<TableBuilderConfiguration>
+                    Table = new TableBuilderConfiguration
                     {
-                        new TableBuilderConfiguration
+                        TableHeaders = new TableHeaders
                         {
-                            TableHeaders = new TableHeaders
+                            ColumnGroups = new List<List<TableHeader>>
                             {
-                                ColumnGroups = new List<List<TableHeader>>
+                                new List<TableHeader>
                                 {
-                                    new List<TableHeader>
-                                    {
-                                        new TableHeader(FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers], FilterItemName.Year_of_admission__Primary_All_primary).ToString(), TableHeaderType.Filter)
-                                    }
-                                },
-                                Columns = new List<TableHeader>
-                                {
-                                    new TableHeader("2014_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2015_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2016_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2017_CY", TableHeaderType.TimePeriod),
-                                    new TableHeader("2018_CY", TableHeaderType.TimePeriod)
-                                },
-                                RowGroups = new List<List<TableHeader>>
-                                {
-                                    new List<TableHeader>
-                                    {
-                                        TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                                    }
-                                },
-                                Rows = new List<TableHeader>
-                                {
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_preferred_school).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school).ToString(), TableHeaderType.Indicator),
-                                    new TableHeader(Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers], IndicatorName.Number_that_did_not_receive_an_offer).ToString(), TableHeaderType.Indicator)
+                                    new TableHeader(
+                                        FItem(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            FilterItemName.Year_of_admission__Primary_All_primary).ToString(),
+                                        TableHeaderType.Filter)
                                 }
+                            },
+                            Columns = new List<TableHeader>
+                            {
+                                new TableHeader("2014_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2015_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2016_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2017_CY", TableHeaderType.TimePeriod),
+                                new TableHeader("2018_CY", TableHeaderType.TimePeriod)
+                            },
+                            RowGroups = new List<List<TableHeader>>
+                            {
+                                new List<TableHeader>
+                                {
+                                    TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                                }
+                            },
+                            Rows = new List<TableHeader>
+                            {
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_that_received_an_offer_for_a_preferred_school).ToString(),
+                                    TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                            IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school)
+                                        .ToString(), TableHeaderType.Indicator),
+                                new TableHeader(
+                                    Indicator(SubjectIds[SubjectName.SchoolApplicationsAndOffers],
+                                        IndicatorName.Number_that_did_not_receive_an_offer).ToString(),
+                                    TableHeaderType.Indicator)
                             }
                         }
                     }

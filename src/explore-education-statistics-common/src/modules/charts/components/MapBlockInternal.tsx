@@ -505,7 +505,7 @@ export const MapBlockInternal = ({
           </h3>
 
           {selectedFeature?.properties?.dataSets && selectedDataSetKey && (
-            <KeyStatTileContainer>
+            <KeyStatTileContainer tag="dl">
               {Object.entries(selectedFeature?.properties.dataSets).map(
                 ([dataSetKey, dataSet]) => {
                   if (!dataSetConfigurations[dataSetKey]) {
