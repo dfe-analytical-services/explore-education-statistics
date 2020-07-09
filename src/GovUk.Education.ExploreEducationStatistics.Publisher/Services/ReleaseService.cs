@@ -157,11 +157,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        public async Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds)
+        public async Task SoftDeletePreviousVersions(IEnumerable<Guid> releaseIds)
         {
             var versions = await _contentDbContext.Releases.Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
                 .ToListAsync();
             var previousVersions = versions.Select(v => v.PreviousVersionId);
+            
+            var previousStatisticalReleases = await _statisticsDbContext.Release
+                .Where(r => previousVersions.Contains(r.Id)).ToListAsync();
+            
+            previousStatisticalReleases.ForEach(r => r.SoftDeleted = true);
+            
+            _statisticsDbContext.Release.UpdateRange(previousStatisticalReleases);
+            await _statisticsDbContext.SaveChangesAsync();
             
             foreach (var releaseSubject in await _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)).ToListAsync())
             {
