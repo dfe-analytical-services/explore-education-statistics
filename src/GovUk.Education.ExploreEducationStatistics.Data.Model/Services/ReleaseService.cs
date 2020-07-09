@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public Guid? GetLatestPublishedRelease(Guid publicationId)
         {
             return DbSet()
-                .Where(release => release.PublicationId.Equals(publicationId))
+                .Where(release => release.PublicationId.Equals(publicationId) && !release.SoftDeleted)
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimeIdentifier)
                 .ToList()
