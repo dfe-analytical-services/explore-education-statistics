@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ExternalMethodology = new ExternalMethodology
             {
               Title  = "external methodology title",
-              Url = new Uri("http://external.methodology/")
+              Url = "http://external.methodology/"
             },
             LegacyReleases = new List<LegacyRelease>
             {
