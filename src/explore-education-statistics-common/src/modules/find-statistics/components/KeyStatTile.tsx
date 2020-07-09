@@ -10,8 +10,16 @@ import React, { FunctionComponent, ReactNode, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './KeyStatTile.module.scss';
 
-export const KeyStatTileContainer: FunctionComponent = ({ children }) => {
-  return <div className={styles.container}>{children}</div>;
+interface KeyStatTileContainerProps {
+  children: ReactNode;
+  tag?: keyof JSX.IntrinsicElements;
+}
+
+export const KeyStatTileContainer = ({
+  children,
+  tag: ElementTag = 'div',
+}: KeyStatTileContainerProps) => {
+  return <ElementTag className={styles.container}>{children}</ElementTag>;
 };
 
 export const KeyStatTileColumn: FunctionComponent = ({ children }) => {
