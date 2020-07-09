@@ -10,6 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [Required]
         [Url]
-        public Uri Url { get; set; }
+        public string Url { get; set; }
     }
 }
