@@ -281,8 +281,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
-                .OnSuccessDo(() => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
-                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, request.Status))
+                .OnSuccessDo(release => ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
+                .OnSuccessDo(release => CheckAllDataFilesUploaded(release, request.Status))
+                .OnSuccessDo(release => CheckMethodologyHasBeenApproved(release, request.Status))
                 .OnSuccess(async release =>
                 {
                     if (request.Status != ReleaseStatus.Approved && release.Published.HasValue)
@@ -488,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return await _fileStorageService
                         .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
-                        .OnSuccessDo(() => RemoveFileImportEntryIfOrphaned(deletePlan));
+                        .OnSuccessDo(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
         }
 
@@ -557,26 +558,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return true;
         }
+
+        private async Task<Either<ActionResult, bool>> CheckMethodologyHasBeenApproved(Release release, ReleaseStatus status)
+        {
+            if (status == ReleaseStatus.Approved)
+            {
+                var publication = await _context.Publications
+                    .Include(publication => publication.Methodology)
+                    .FirstAsync(publication => publication.Id == release.PublicationId);
+
+                if (publication.Methodology != null && publication.Methodology.Status != MethodologyStatus.Approved)
+                {
+                    return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
+                }
+            }
+
+            return true;
+        }
         
-        private async Task<Either<ActionResult,bool>> CheckAllDatafilesUploadedComplete(Guid releaseId, ReleaseStatus status)
+        private async Task<Either<ActionResult, bool>> CheckAllDataFilesUploaded(Release release, ReleaseStatus status)
         {
             if (status == ReleaseStatus.Approved)
             {
                 var filters = TableQuery.CombineFilters(
-                    TableQuery.GenerateFilterCondition("PartitionKey", 
-                        QueryComparisons.Equal, releaseId.ToString())
-                    , TableOperators.And, 
-                    TableQuery.GenerateFilterCondition("Status", 
-                        QueryComparisons.NotEqual, IStatus.COMPLETE.ToString()));
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, release.Id.ToString()), 
+                    TableOperators.And, 
+                    TableQuery.GenerateFilterCondition("Status", QueryComparisons.NotEqual, IStatus.COMPLETE.ToString())
+                );
                 
                 var query = new TableQuery<DatafileImport>().Where(filters);
                 var cloudTable = await _coreTableStorageService.GetTableAsync("imports");
                 var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
+                
                 if (results.Results.Count != 0)
                 {
                     return ValidationActionResult(AllDatafilesUploadedMustBeComplete);
                 }
             }
+
             return true;
         }
 

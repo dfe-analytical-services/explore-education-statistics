@@ -44,6 +44,8 @@ const errorMappings = [
         'Enter a publish scheduled date before approving',
       PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED:
         'Release has already been published and cannot be un-approved',
+      METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED:
+        "The publication's methodology must be approved before release can be approved",
     },
   }),
   mapFieldErrors<FormValues>({
