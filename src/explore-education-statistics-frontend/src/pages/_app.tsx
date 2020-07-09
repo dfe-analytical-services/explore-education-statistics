@@ -24,6 +24,10 @@ const ApplicationInsightsTracking = () => {
   const router = useRouter();
 
   useEffect(() => {
+    if (!appInsights) {
+      return;
+    }
+
     appInsights.trackPageView({
       uri: router.pathname,
     });
