@@ -264,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList()
                 .Select(join => join.ContentBlock)
                 .OfType<DataBlock>()
-                .Where(block => block.DataBlockRequest.SubjectId == subjectId)
+                .Where(block => block.Query.SubjectId == subjectId)
                 .ToList();
         }
         

@@ -37,7 +37,7 @@ describe('DataBlockRenderer', () => {
     order: 0,
     name: 'Test data block',
     source: '',
-    dataBlockRequest: {
+    query: {
       subjectId: '1',
       geographicLevel: 'country',
       timePeriod: {
@@ -86,7 +86,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
-          ...testDataBlock.dataBlockRequest,
+          ...testDataBlock.query,
           includeGeoJson: false,
         } as TableDataQuery,
         'test-release-id',
@@ -124,7 +124,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
-          ...testDataBlock.dataBlockRequest,
+          ...testDataBlock.query,
           includeGeoJson: false,
         } as TableDataQuery,
         'test-release-id',
@@ -158,7 +158,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
-          ...testDataBlock.dataBlockRequest,
+          ...testDataBlock.query,
           includeGeoJson: false,
         } as TableDataQuery,
         'test-release-id',
@@ -196,7 +196,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
-          ...testDataBlock.dataBlockRequest,
+          ...testDataBlock.query,
           includeGeoJson: false,
         } as TableDataQuery,
         'test-release-id',
@@ -233,7 +233,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
-          ...testDataBlock.dataBlockRequest,
+          ...testDataBlock.query,
           includeGeoJson: false,
         } as TableDataQuery,
         'test-release-id',
@@ -278,7 +278,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
-          ...testDataBlock.dataBlockRequest,
+          ...testDataBlock.query,
           includeGeoJson: false,
         } as TableDataQuery,
         'test-release-id',
@@ -311,7 +311,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(getDataBlockForSubject).toBeCalledWith(
         {
-          ...testDataBlock.dataBlockRequest,
+          ...testDataBlock.query,
           includeGeoJson: true,
         } as TableDataQuery,
         'test-release-id',
@@ -342,7 +342,7 @@ describe('DataBlockRenderer', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toBeCalledWith(
         {
-          ...testDataBlock.dataBlockRequest,
+          ...testDataBlock.query,
           includeGeoJson: false,
         } as TableDataQuery,
         'test-release-id',
@@ -437,7 +437,7 @@ describe('DataBlockRenderer', () => {
           id="test-block"
           dataBlock={{
             ...testDataBlock,
-            dataBlockRequest: {
+            query: {
               subjectId: '1',
               geographicLevel: 'country',
               timePeriod: {

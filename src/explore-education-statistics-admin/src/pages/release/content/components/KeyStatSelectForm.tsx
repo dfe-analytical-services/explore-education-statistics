@@ -26,7 +26,7 @@ const KeyStatSelectForm = ({
 
   const keyStatDataBlocks = useMemo(() => {
     return availableDataBlocks.filter(dataBlock => {
-      const { timePeriod, locations, indicators } = dataBlock.dataBlockRequest;
+      const { timePeriod, locations, indicators } = dataBlock.query;
 
       const locationLevels = Object.values(locations);
 
@@ -57,7 +57,7 @@ const KeyStatSelectForm = ({
           <KeyStatTile
             releaseId={releaseId}
             summary={selectedDataBlock.summary}
-            query={selectedDataBlock.dataBlockRequest}
+            query={selectedDataBlock.query}
           />
         </Details>
       </section>

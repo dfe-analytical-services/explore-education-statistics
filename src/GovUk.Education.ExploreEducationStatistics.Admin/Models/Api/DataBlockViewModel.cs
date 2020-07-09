@@ -17,9 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Name { get; set; }
 
+        public string HighlightName { get; set; }
+
         public string Source { get; set; }
 
-        public ObservationQueryContext DataBlockRequest { get; set; }
+        public ObservationQueryContext Query { get; set; }
 
         public List<IContentBlockChart> Charts { get; set; }
 

@@ -45,7 +45,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                 releaseId={release.id}
                 id={block.id}
                 name={block.name}
-                query={block.dataBlockRequest}
+                query={block.query}
                 summary={block.summary}
                 isEditing={isEditing}
                 onRemove={async () => {

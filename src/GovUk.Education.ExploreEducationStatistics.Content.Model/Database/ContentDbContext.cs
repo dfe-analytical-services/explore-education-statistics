@@ -351,8 +351,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasColumnName("DataBlock_Heading");
 
             modelBuilder.Entity<DataBlock>()
-                .Property(block => block.DataBlockRequest)
-                .HasColumnName("DataBlock_Request")
+                .Property(block => block.HighlightName)
+                .HasColumnName("DataBlock_HighlightName");
+
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.Query)
+                .HasColumnName("DataBlock_Query")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
@@ -2857,7 +2861,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Order = 1,
                     Name = "Key Stat 1",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3010,7 +3014,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3139,7 +3143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7b779d79-6caa-43fd-84ba-b8efd219b3c8"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3292,7 +3296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("30d74065-66b8-4843-9761-4578519e1394"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3480,7 +3484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                     Name = "Generic data block - National",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3636,7 +3640,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
                     ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
                     Name = "Generic data block - LA",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.AbsenceByCharacteristic],
                         Locations = new LocationQuery
@@ -3759,7 +3763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 1",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -3898,7 +3902,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4026,7 +4030,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("991a436a-9c7a-418b-ab06-60f2610b4bc6"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4155,7 +4159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("e8a813ce-c68a-417b-af31-91db19377b10"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4330,7 +4334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
                     Heading = "Chart showing permanent exclusions in England",
                     Name = "Generic data block 1",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4445,7 +4449,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
                     Heading = "Chart showing fixed-period exclusions in England",
                     Name = "Generic data block 2",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4566,7 +4570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = null, // not yet used in any Content
                     Name = "Available Data Block",
                     Order = 0,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4699,7 +4703,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = null, // not yet used in any Content
                     Name = "Available Data Block 2",
                     Order = 0,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.ExclusionsByGeographicLevel],
                         Locations = new LocationQuery
@@ -4832,7 +4836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 1",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -4924,7 +4928,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 2",
                     Order = 2,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -5016,7 +5020,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("de8f8547-cbae-4d52-88ec-d78d0ad836ae"),
                     Name = "Key Stat 3",
                     Order = 3,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -5108,7 +5112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = new Guid("39c298e9-6c5f-47be-85cb-6e49b1b1931f"),
                     Name = "Key Stats aggregate table",
                     Order = 1,
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -5232,7 +5236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading =
                         "Table of Timeseries of key secondary preference rates, England",
                     Name = "Generic data block 1",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery
@@ -5312,7 +5316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Heading =
                         "Table showing Timeseries of key primary preference rates, England Entry into academic year",
                     Name = "Generic data block 2",
-                    DataBlockRequest = new ObservationQueryContext
+                    Query = new ObservationQueryContext
                     {
                         SubjectId = SubjectIds[SubjectName.SchoolApplicationsAndOffers],
                         Locations = new LocationQuery

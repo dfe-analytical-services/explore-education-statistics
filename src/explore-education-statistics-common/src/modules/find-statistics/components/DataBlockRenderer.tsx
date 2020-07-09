@@ -44,7 +44,7 @@ const DataBlockRenderer = ({
   const { value: fullTable, isLoading, error } = useTableQuery(
     dataBlock
       ? {
-          ...dataBlock.dataBlockRequest,
+          ...dataBlock.query,
           includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
         }
       : undefined,

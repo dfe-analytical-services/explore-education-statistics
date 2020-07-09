@@ -17,10 +17,10 @@ export default function useDataBlockQuery(
       return undefined;
     }
 
-    const { dataBlockRequest, dataBlockResponse } = dataBlock;
+    const { query, dataBlockResponse } = dataBlock;
 
     if (!dataBlockResponse) {
-      return tableBuilderService.getTableData(dataBlockRequest, releaseId);
+      return tableBuilderService.getTableData(query, releaseId);
     }
 
     return dataBlockResponse;

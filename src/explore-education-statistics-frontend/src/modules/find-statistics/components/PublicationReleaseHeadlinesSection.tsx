@@ -44,7 +44,7 @@ const PublicationReleaseHeadlinesSection = ({
                 <KeyStatTileColumn key={block.id}>
                   <KeyStatTile
                     releaseId={id}
-                    query={block.dataBlockRequest}
+                    query={block.query}
                     summary={block.summary}
                     queryOptions={{
                       expiresIn: 60 * 60 * 24,

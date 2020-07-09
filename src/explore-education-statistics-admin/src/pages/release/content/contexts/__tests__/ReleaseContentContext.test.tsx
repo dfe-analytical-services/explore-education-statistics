@@ -101,7 +101,7 @@ const basicRelease: EditableRelease = {
           customFootnotes: '',
           name: 'DataBlock 1',
           source: '',
-          dataBlockRequest: {
+          query: {
             subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
             timePeriod: {
               startYear: 2017,
@@ -171,7 +171,7 @@ const basicRelease: EditableRelease = {
         customFootnotes: '',
         name: 'Holiday (Key Stat)',
         source: '',
-        dataBlockRequest: {
+        query: {
           subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
           timePeriod: {
             startYear: 2017,
@@ -198,7 +198,7 @@ const basicRelease: EditableRelease = {
           "Table showing Main reason for issue: Arriving late for 'prma' from 'My Pub' in England for 2017/18",
         name: 'Main Reason (Key Stat)',
         source: '',
-        dataBlockRequest: {
+        query: {
           subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
           timePeriod: {
             startYear: 2017,
@@ -225,7 +225,7 @@ const basicRelease: EditableRelease = {
           "Table showing Main reason for issue: Absence due to other unauthorised circumstances for 'prma' from 'My Pub' in England for 2017/18",
         name: "Unauth'd (Key Stat)",
         source: '',
-        dataBlockRequest: {
+        query: {
           subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
           timePeriod: {
             startYear: 2017,
@@ -261,7 +261,7 @@ const basicRelease: EditableRelease = {
         customFootnotes: '',
         name: 'Aggregate table (Secondary)',
         source: '',
-        dataBlockRequest: {
+        query: {
           subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
           timePeriod: {
             startYear: 2017,
@@ -311,7 +311,7 @@ const basicDataBlock: DataBlock = {
   source: '',
   charts: [],
   tables: [],
-  dataBlockRequest: {
+  query: {
     filters: [],
     indicators: [],
     locations: {},
@@ -580,7 +580,7 @@ describe('ReleaseContentContext', () => {
         name: 'Test datablock',
         heading: "Table showing 'prma' from 'My Pub' in England for 2017/18",
         source: '',
-        dataBlockRequest: {
+        query: {
           subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
           timePeriod: {
             startYear: 2017,

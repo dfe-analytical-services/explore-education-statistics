@@ -83,16 +83,15 @@ export interface HtmlBlock extends BaseBlock {
   body: string;
 }
 
-export type DataBlockRequest = TableDataQuery;
-
 export type ContentBlock = MarkdownBlock | HtmlBlock;
 
 export interface DataBlock extends BaseBlock {
   type: 'DataBlock';
   name: string;
+  highlightName?: string;
   heading: string;
   source: string;
-  dataBlockRequest: DataBlockRequest;
+  query: TableDataQuery;
   charts: Chart[];
   tables: Table[];
   summary?: Summary;
