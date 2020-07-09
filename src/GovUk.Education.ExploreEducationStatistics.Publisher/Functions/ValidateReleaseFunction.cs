@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusOverallStage;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusStates;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -38,10 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            await MarkScheduledReleaseStatusAsSuperseded(message);
             await ValidateReleaseAsync(message, async () =>
             {
-                await MarkScheduledReleaseStatusAsSuperseded(message);
-
                 if (message.Immediate)
                 {
                     var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
@@ -71,8 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             // There may be an existing scheduled ReleaseStatus entry if this release has been validated before
             // If so, mark it as superseded
-            var scheduled =
-                await _releaseStatusService.GetAllAsync(message.ReleaseId, ReleaseStatusOverallStage.Scheduled);
+            var scheduled = await _releaseStatusService.GetAllByOverallStage(message.ReleaseId, Scheduled);
             foreach (var releaseStatus in scheduled)
             {
                 await _releaseStatusService.UpdateStateAsync(message.ReleaseId, releaseStatus.Id, SupersededState);

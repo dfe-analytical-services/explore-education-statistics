@@ -37,27 +37,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var (approvalValid, approvalMessages) = ValidateApproval(release);
             var (scheduledPublishDateValid, scheduledPublishDateMessages) = ValidateScheduledPublishDate(release);
-            var (notStarted, notStartedMessages) = await ValidateNotStarted(release);
+            var (publishingStateValid, publishingStateMessages) = await ValidatePublishingState(release);
 
             var valid = approvalValid
                         && scheduledPublishDateValid
-                        && notStarted;
+                        && publishingStateValid;
 
             var logMessages = approvalMessages
                 .Concat(scheduledPublishDateMessages)
-                .Concat(notStartedMessages);
+                .Concat(publishingStateMessages);
 
             return Result(valid, logMessages);
         }
 
-        private async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidateNotStarted(
+        private async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidatePublishingState(
             Release release)
         {
-            var started = (await _releaseStatusService.GetAllAsync(release.Id, Started)).ToList();
-            return !started.Any()
+            var releaseStatuses =
+                (await _releaseStatusService.GetAllByOverallStage(release.Id, Scheduled, Started)).ToList();
+            var scheduled = releaseStatuses.FirstOrDefault(status => status.OverallStage == Scheduled.ToString());
+            var started = releaseStatuses.FirstOrDefault(status => status.OverallStage == Started.ToString());
+
+            // Should never happen as we mark scheduled releases as superseded prior to validation
+            if (scheduled != null)
+            {
+                return Failure(ValidationStage.ReleasePublishingStateNotScheduledOrStarted,
+                    $"Publishing is already scheduled. ReleaseStatus: {scheduled.Id}");
+            }
+
+            return started == null
                 ? Success()
-                : Failure(ValidationStage.ReleasePublishingMustNotBeInStartedState,
-                    $"Publishing has already started. ReleaseStatus: {started.First().Id}");
+                : Failure(ValidationStage.ReleasePublishingStateNotScheduledOrStarted,
+                    $"Publishing has already started. ReleaseStatus: {started.Id}");
         }
 
         private static (bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages) ValidateApproval(Release release)
@@ -114,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             ReleaseMustBeApproved,
             ReleaseMustHavePublishScheduledDate,
-            ReleasePublishingMustNotBeInStartedState
+            ReleasePublishingStateNotScheduledOrStarted
         }
     }
 }
