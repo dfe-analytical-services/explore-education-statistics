@@ -3,7 +3,7 @@ import Link from '@frontend/components/Link';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import { AxiosError } from 'axios';
 import { NextPageContext } from 'next';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Page from '../components/Page';
 
 interface Props {
@@ -14,16 +14,18 @@ interface Props {
 const ErrorPage = ({ statusCode, error }: Props) => {
   const appInsights = useApplicationInsights();
 
-  if (error) {
-    // `error` is not actually an Error instance,
-    // (it's an object) so we have to convert
-    // it into one first before tracking it.
-    const exception = new Error(error.message);
-    exception.name = error.name;
-    exception.stack = error.stack;
+  useEffect(() => {
+    if (error && appInsights) {
+      // `error` is not actually an Error instance,
+      // (it's an object) so we have to convert
+      // it into one first before tracking it.
+      const exception = new Error(error.message);
+      exception.name = error.name;
+      exception.stack = error.stack;
 
-    appInsights.trackException({ exception });
-  }
+      appInsights.trackException({ exception });
+    }
+  }, [appInsights, error]);
 
   switch (statusCode) {
     case 404:
