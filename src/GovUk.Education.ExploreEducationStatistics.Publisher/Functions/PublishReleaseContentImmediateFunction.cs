@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 
                 if (!PublisherUtils.IsDevelopment())
                 {
-                    await _releaseService.RemoveDataForPreviousVersions(new[] {message.ReleaseId});
+                    await _releaseService.SoftDeletePreviousVersions(new[] {message.ReleaseId});
                 }
                 
                 await _notificationsService.NotifySubscribersAsync(new[] {message.ReleaseId});
