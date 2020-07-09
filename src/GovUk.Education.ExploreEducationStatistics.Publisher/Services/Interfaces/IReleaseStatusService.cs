@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<ReleaseStatus> GetAsync(Guid releaseId, Guid releaseStatusId);
 
-        Task<IEnumerable<ReleaseStatus>> GetAllAsync(Guid releaseId, ReleaseStatusOverallStage? overallStage);
+        Task<IEnumerable<ReleaseStatus>> GetAllByOverallStage(Guid releaseId, params ReleaseStatusOverallStage[] overallStages);
 
         Task<ReleaseStatus> GetLatestAsync(Guid releaseId);
 

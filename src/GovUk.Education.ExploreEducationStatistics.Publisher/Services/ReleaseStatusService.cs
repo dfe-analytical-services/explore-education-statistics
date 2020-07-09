@@ -66,18 +66,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return tableResult.Result as ReleaseStatus;
         }
 
-        public Task<IEnumerable<ReleaseStatus>> GetAllAsync(Guid releaseId, ReleaseStatusOverallStage? overallStage)
+        public Task<IEnumerable<ReleaseStatus>> GetAllByOverallStage(Guid releaseId, params ReleaseStatusOverallStage[] overallStages)
         {
             var filter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
                     QueryComparisons.Equal, releaseId.ToString());
 
-            if (overallStage.HasValue)
+            if (overallStages.Any())
             {
-                var stageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.OverallStage),
-                    QueryComparisons.Equal, overallStage.Value.ToString());
+                var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) => 
+                {
+                    var stageFilter = TableQuery.GenerateFilterCondition(
+                        nameof(ReleaseStatus.OverallStage),
+                        QueryComparisons.Equal,
+                        stage.ToString()
+                    );
                 
-                filter = TableQuery.CombineFilters(filter, TableOperators.And,
-                    stageFilter);
+                    if (acc == "")  {
+                        return stageFilter;
+                    }
+
+                    return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter); 
+                });
+                
+                filter = TableQuery.CombineFilters(filter, TableOperators.And,allStageFilters);
             }
 
             var query = new TableQuery<ReleaseStatus>().Where(filter);
