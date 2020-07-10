@@ -446,7 +446,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var templateRelease = _context.Releases.AsNoTracking()
                 .Include(r => r.Content)
                 .ThenInclude(c => c.ContentSection)
-                .ThenInclude(cs => cs.Content)
                 .First(r => r.Id == releaseId);
                 
             templateRelease.CreateGenericContentFromTemplate(newRelease);
