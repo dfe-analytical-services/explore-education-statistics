@@ -69,6 +69,7 @@ const TableToolWizard = ({
   themeMeta,
   releaseId,
   initialState = {},
+  scrollOnMount,
   finalStep,
 }: TableToolWizardProps) => {
   const [state, updateState] = useImmer<TableToolState>({
@@ -278,6 +279,7 @@ const TableToolWizard = ({
       {({ askConfirm }) => (
         <>
           <Wizard
+            scrollOnMount={scrollOnMount}
             initialStep={state.initialStep}
             id="tableToolWizard"
             onStepChange={async (nextStep, previousStep) => {

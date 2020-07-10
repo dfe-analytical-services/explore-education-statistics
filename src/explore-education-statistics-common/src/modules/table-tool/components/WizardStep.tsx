@@ -23,12 +23,16 @@ const WizardStep = ({ children, id, ...restProps }: WizardStepProps) => {
   const ref = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    if (isActive && shouldScroll && ref.current) {
-      ref.current.scrollIntoView({
-        block: 'start',
-        behavior: 'smooth',
-      });
-      ref.current.focus();
+    if (isActive && shouldScroll) {
+      setTimeout(() => {
+        if (ref.current) {
+          ref.current.scrollIntoView({
+            block: 'start',
+            behavior: 'smooth',
+          });
+          ref.current.focus();
+        }
+      }, 300);
     }
   }, [currentStep, isActive, shouldScroll]);
 
