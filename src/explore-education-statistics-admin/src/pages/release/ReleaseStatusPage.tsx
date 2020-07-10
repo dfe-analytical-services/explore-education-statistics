@@ -41,9 +41,11 @@ const errorMappings = [
       APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE:
         'Enter a publish scheduled date before approving',
       ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE:
-        'Enter a publish scheduled date before approving',
+        'Check all uploaded datafiles are complete before approving',
       PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED:
         'Release has already been published and cannot be un-approved',
+      METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED:
+        "The publication's methodology must be approved before release can be approved",
     },
   }),
   mapFieldErrors<FormValues>({
@@ -311,7 +313,9 @@ const ReleaseStatusPage = () => {
                 />
 
                 <ButtonGroup>
-                  <Button type="submit">Update status</Button>
+                  <Button type="submit" disabled={form.isSubmitting}>
+                    Update status
+                  </Button>
                   <ButtonText
                     onClick={() => {
                       form.resetForm();
