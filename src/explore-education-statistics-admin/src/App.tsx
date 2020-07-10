@@ -26,15 +26,17 @@ function ApplicationInsightsTracking() {
   const history = useHistory();
 
   useEffect(() => {
-    appInsights.trackPageView({
-      uri: history.location.pathname,
-    });
-
-    history.listen(location => {
+    if (appInsights) {
       appInsights.trackPageView({
-        uri: location.pathname,
+        uri: history.location.pathname,
       });
-    });
+
+      history.listen(location => {
+        appInsights.trackPageView({
+          uri: location.pathname,
+        });
+      });
+    }
   }, [appInsights, history]);
 
   return null;
