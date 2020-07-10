@@ -22,6 +22,7 @@ const PublicationReleaseHeadlinesSection = ({
     headlinesSection,
     publication,
     slug,
+    dataLastPublished,
   },
 }: Props) => {
   const getChartFile = useGetChartFile(publication.slug, slug);
@@ -29,6 +30,7 @@ const PublicationReleaseHeadlinesSection = ({
   return (
     <DataBlockRenderer
       releaseId={id}
+      dataLastPublished={dataLastPublished}
       id="releaseHeadlines-dataBlock"
       getInfographic={getChartFile}
       dataBlock={keyStatisticsSecondarySection.content?.[0]}
@@ -44,6 +46,7 @@ const PublicationReleaseHeadlinesSection = ({
                 <KeyStatTileColumn key={block.id}>
                   <KeyStatTile
                     releaseId={id}
+                    dataLastPublished={dataLastPublished}
                     query={block.query}
                     summary={block.summary}
                     queryOptions={{

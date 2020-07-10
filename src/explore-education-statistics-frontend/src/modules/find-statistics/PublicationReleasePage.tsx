@@ -318,6 +318,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                       window.location.pathname,
                     );
                   }}
+                  dataLastPublished={data.dataLastPublished}
                 />
               </AccordionSection>
             );

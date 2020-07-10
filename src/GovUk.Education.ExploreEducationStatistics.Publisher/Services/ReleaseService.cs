@@ -127,6 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             _contentDbContext.Releases.Update(contentRelease);
             contentRelease.Published ??= published;
+            contentRelease.DataLastPublished = DateTime.UtcNow;
 
             // TODO EES-913 Remove this when methodologies are published independently 
             if (methodology != null)

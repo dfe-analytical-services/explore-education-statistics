@@ -21,6 +21,7 @@ export default function useTableQuery(
   query: TableDataQuery | undefined,
   releaseId: string | undefined,
   options: TableQueryOptions = {},
+  dataLastPublished: string,
 ): AsyncRetryState<FullTable | undefined> {
   const optionsRef = useRef<TableQueryOptions | undefined>(options);
   optionsRef.current = options;
@@ -30,7 +31,10 @@ export default function useTableQuery(
       return undefined;
     }
 
-    const queryKey = JSON.stringify(query);
+    const queryKey = JSON.stringify({
+      ...query,
+      dataLastPublished,
+    });
 
     let response = await storageService
       .get<TableDataResponse>(queryKey)
