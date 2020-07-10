@@ -162,15 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var versions = await _contentDbContext.Releases.Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
                 .ToListAsync();
             var previousVersions = versions.Select(v => v.PreviousVersionId);
-            
-            var previousStatisticalReleases = await _statisticsDbContext.Release
-                .Where(r => previousVersions.Contains(r.Id)).ToListAsync();
-            
-            previousStatisticalReleases.ForEach(r => r.SoftDeleted = true);
-            
-            _statisticsDbContext.Release.UpdateRange(previousStatisticalReleases);
-            await _statisticsDbContext.SaveChangesAsync();
-            
+
             foreach (var releaseSubject in await _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)).ToListAsync())
             {
                 if (!await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseSubject.ReleaseId,
@@ -179,6 +171,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     throw new ArgumentException($"An error occurred  while trying to soft delete subject {releaseSubject.SubjectId} or break link with previous amendment version for releaseId {releaseSubject.ReleaseId}");
                 }
             }
+            
+            // Now can remove any previous stats Release rows
+            var previousStatisticalReleases = await _statisticsDbContext.Release
+                .Where(r => previousVersions.Contains(r.Id)).ToListAsync();
+            
+            _statisticsDbContext.Release.RemoveRange(previousStatisticalReleases);
+            await _statisticsDbContext.SaveChangesAsync();
         }
     }
 }
