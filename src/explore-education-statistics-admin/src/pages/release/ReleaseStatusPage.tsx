@@ -313,7 +313,9 @@ const ReleaseStatusPage = () => {
                 />
 
                 <ButtonGroup>
-                  <Button type="submit">Update status</Button>
+                  <Button type="submit" disabled={form.isSubmitting}>
+                    Update status
+                  </Button>
                   <ButtonText
                     onClick={() => {
                       form.resetForm();
