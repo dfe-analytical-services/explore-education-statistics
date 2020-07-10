@@ -40,7 +40,7 @@ export default function useTableQuery(
       .get<TableDataResponse>(queryKey)
       .catch(() => null);
 
-    if (response == null) {
+    if (!response) {
       response = await tableBuilderService.getTableData(query, releaseId);
 
       await storageService.set(queryKey, response, {
