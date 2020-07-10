@@ -13,7 +13,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import UrlContainer from '@common/components/UrlContainer';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 export interface ReleaseDataBlocksPageParams {
@@ -29,6 +29,8 @@ const ReleaseDataBlocksPageInternal = ({
   history,
 }: RouteComponentProps<ReleaseDataBlocksPageParams>) => {
   const { publicationId, releaseId, dataBlockId } = match.params;
+
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const { value: config } = useConfig();
 
@@ -82,6 +84,13 @@ const ReleaseDataBlocksPageInternal = ({
         isLoading: false,
         value: nextDataBlocks,
       });
+
+      if (pageRef.current) {
+        pageRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
     },
     [dataBlocks, setDataBlocks, history, publicationId, releaseId],
   );
@@ -100,7 +109,7 @@ const ReleaseDataBlocksPageInternal = ({
   }, [fetchDataBlocks, history, publicationId, releaseId, selectedDataBlock]);
 
   return (
-    <>
+    <div ref={pageRef}>
       {dataBlockOptions.length > 0 && (
         <>
           <FormSelect
@@ -206,7 +215,7 @@ const ReleaseDataBlocksPageInternal = ({
           onDataBlockSave={handleDataBlockSave}
         />
       </LoadingSpinner>
-    </>
+    </div>
   );
 };
 

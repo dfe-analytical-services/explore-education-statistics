@@ -21,7 +21,6 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 
@@ -135,8 +134,6 @@ const DataBlockSourceWizard = ({
   tableHeaders,
   onSave,
 }: DataBlockSourceWizardProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-
   const initialTableToolState = useMemo<TableToolState | undefined>(() => {
     if (!initialQuery || !table || !tableHeaders || !subjectMeta) {
       return undefined;
@@ -153,22 +150,8 @@ const DataBlockSourceWizard = ({
     };
   }, [initialQuery, subjectMeta, table, tableHeaders]);
 
-  const handleSave: DataBlockSourceWizardSaveHandler = useCallback(
-    state => {
-      if (ref.current) {
-        ref.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-
-      onSave(state);
-    },
-    [onSave],
-  );
-
   return (
-    <div ref={ref} className="govuk-!-margin-bottom-8">
+    <div className="govuk-!-margin-bottom-8">
       <p>Configure data source for the data block</p>
 
       <TableToolWizard
@@ -189,7 +172,7 @@ const DataBlockSourceWizard = ({
                     query={query}
                     table={response.table}
                     tableHeaders={response.tableHeaders}
-                    onSave={handleSave}
+                    onSave={onSave}
                   />
                 )}
               </>

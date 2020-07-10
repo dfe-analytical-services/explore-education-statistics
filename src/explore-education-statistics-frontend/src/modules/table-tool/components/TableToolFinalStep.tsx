@@ -102,7 +102,7 @@ const TableToolFinalStep = ({
                 Generated permanent link:
               </p>
 
-              <p className="govuk-!-margin-0">
+              <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-2">
                 <UrlContainer
                   data-testid="permalink-generated-url"
                   url={`${window.location.origin}/data-tables/permalink/${permalinkId}`}
@@ -110,7 +110,7 @@ const TableToolFinalStep = ({
               </p>
 
               <Link
-                className="govuk-!-margin-top-2"
+                className="govuk-!-margin-top-0"
                 to="/data-tables/permalink/[permalink]"
                 as={`/data-tables/permalink/${permalinkId}`}
                 title="View created table permalink"
