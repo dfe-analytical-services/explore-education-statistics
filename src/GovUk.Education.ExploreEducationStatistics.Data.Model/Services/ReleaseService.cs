@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         
         private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
         {
-            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Live && r.Id != releaseId);
         }
     }
 }

@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // create a link row to link back to the original subject & footnotes
             if (statsRelease != null)
             {
-                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
+                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id, amendment.PreviousVersionId);
 
                 var statsAmendmentSubjectLinks =_statisticsDbContext
                     .ReleaseSubject
@@ -213,7 +213,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         FootnoteId = rf.FootnoteId
                     });
 
-                statsAmendment.PreviousVersionId = amendment.PreviousVersionId;
                 _statisticsDbContext.Release.Add(statsAmendment);
                 _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
                 _statisticsDbContext.ReleaseFootnote.AddRange(statsAmendmentFootnoteLinks);

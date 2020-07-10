@@ -658,6 +658,16 @@
                                             "name": "PublicationId",
                                             "type": "Guid"
                                         }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "PreviousVersionId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "PreviousVersionId",
+                                            "type": "Guid"
+                                        }
                                     }
                                 ]
                             }

@@ -24,10 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public bool Live => Published.HasValue && Compare(UtcNow, Published.Value) > 0;
         public Guid PreviousVersionId { get; set; }
         
-        public Release CreateReleaseAmendment(Guid contentReleaseAmendmentId)
+        public Release CreateReleaseAmendment(Guid contentReleaseAmendmentId, Guid previousReleaseAmendment)
         {
             var copy = MemberwiseClone() as Release;
             copy.Id = contentReleaseAmendmentId;
+            copy.Published = null;
+            copy.PreviousVersionId = previousReleaseAmendment;
             return copy;
         }
     }
