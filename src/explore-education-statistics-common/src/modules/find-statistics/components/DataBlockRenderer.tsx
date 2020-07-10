@@ -20,8 +20,10 @@ import React, { ReactNode } from 'react';
 
 export interface DataBlockRendererProps {
   releaseId?: string;
-  additionalTabContent?: ReactNode;
-  dataBlock?: DataBlock;
+  additionalTabContent?:
+    | ((props: { dataBlock: DataBlock }) => ReactNode)
+    | ReactNode;
+  dataBlock: DataBlock;
   firstTabs?: ReactNode;
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
@@ -61,12 +63,17 @@ const DataBlockRenderer = ({
     return null;
   }
 
+  const additionTabContentElement =
+    typeof additionalTabContent === 'function'
+      ? additionalTabContent({ dataBlock })
+      : additionalTabContent;
+
   return (
     <LoadingSpinner loading={isLoading}>
       <Tabs id={id} onToggle={onToggle}>
         {firstTabs}
 
-        {dataBlock?.charts?.length && (
+        {dataBlock.charts?.length && (
           <TabsSection id={`${id}-charts`} title="Chart">
             {error && errorMessage}
 
@@ -82,7 +89,7 @@ const DataBlockRenderer = ({
                   the data tables tab.
                 </a>
 
-                {dataBlock?.charts.map((chart, index) => {
+                {dataBlock.charts.map((chart, index) => {
                   const key = index;
 
                   const axes = { ...chart.axes } as Required<AxesConfiguration>;
@@ -123,13 +130,13 @@ const DataBlockRenderer = ({
                   );
                 })}
 
-                {additionalTabContent}
+                {additionTabContentElement}
               </ErrorBoundary>
             )}
           </TabsSection>
         )}
 
-        {dataBlock?.table && (
+        {dataBlock.table && (
           <TabsSection id={`${id}-tables`} title="Table">
             {error && errorMessage}
 
@@ -150,7 +157,7 @@ const DataBlockRenderer = ({
                   }
                 />
 
-                {additionalTabContent}
+                {additionTabContentElement}
               </ErrorBoundary>
             )}
           </TabsSection>

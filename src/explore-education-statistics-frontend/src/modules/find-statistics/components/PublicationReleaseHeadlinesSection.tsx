@@ -33,7 +33,7 @@ const PublicationReleaseHeadlinesSection = ({
       dataLastPublished={dataLastPublished}
       id="releaseHeadlines-dataBlock"
       getInfographic={getChartFile}
-      dataBlock={keyStatisticsSecondarySection.content?.[0]}
+      dataBlock={keyStatisticsSecondarySection.content[0]}
       firstTabs={
         <TabsSection title="Summary">
           <KeyStatTileContainer>

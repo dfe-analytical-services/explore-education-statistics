@@ -1,0 +1,9 @@
+@import '../styles/govuk-base';
+
+.url {
+  background: govuk-colour('light-grey');
+  display: inline-block;
+  padding: govuk-spacing(2) govuk-spacing(4);
+  user-select: all;
+  white-space: pre-wrap;
+}

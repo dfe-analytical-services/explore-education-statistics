@@ -89,6 +89,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       </p>
 
       <TableToolWizard
+        scrollOnMount
         themeMeta={themeMeta}
         initialState={initialTableToolState}
         finalStep={({ publication, query, response }) => (
