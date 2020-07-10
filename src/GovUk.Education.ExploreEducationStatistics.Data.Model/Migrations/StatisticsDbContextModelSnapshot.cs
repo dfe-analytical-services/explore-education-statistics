@@ -370,9 +370,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("TimeIdentifier")
                         .IsRequired()
                         .HasColumnType("nvarchar(6)")
