@@ -270,7 +270,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public List<UserReleaseRoleViewModel> GetUserReleaseRoles(string userId)
         {
             return _contentDbContext.UserReleaseRoles
+                .Include(urr => urr.Release)
+                .ThenInclude(r => r.Publication)
                 .Where(x => x.UserId == Guid.Parse(userId))
+                .ToList()
+                .Where(urr => IsLatestVersionOfRelease(urr.Release.Publication.Releases, urr.Release.Id))
                 .Select(x => new UserReleaseRoleViewModel
                 {
                     Id = x.Id,
