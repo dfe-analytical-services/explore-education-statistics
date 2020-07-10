@@ -137,6 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                 RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
                         
                         release.RemoveGenericContentSection(sectionToRemove);
+                        _context.ContentSections.Remove(sectionToRemove);
 
                         var removedSectionOrder = sectionToRemove.Order;
                         
