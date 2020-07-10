@@ -148,8 +148,7 @@ def user_clicks_methodology_link(topic, methodology):
 # Table tool
 def user_checks_generated_permalink_is_valid():
     elem = sl.driver.find_element_by_css_selector('[data-testid="permalink-generated-url"]')
-    url_without_http = re.sub(r'https?://', '', os.environ['PUBLIC_URL'])
-    url_without_basic_auth = re.sub(r'.*@', '', url_without_http)
+    url_without_basic_auth = re.sub(r'.*@', '', os.environ['PUBLIC_URL'])
     if not elem.text.startswith(f"{url_without_basic_auth}/data-tables/permalink/"):
         raise_assertion_error(
             f'Generated permalink "{elem.text}" is invalid! Should match "{url_without_basic_auth}"')

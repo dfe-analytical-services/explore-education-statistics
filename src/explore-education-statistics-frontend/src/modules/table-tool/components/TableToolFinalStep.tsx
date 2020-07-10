@@ -105,7 +105,7 @@ const TableToolFinalStep = ({
               <p className="govuk-!-margin-0">
                 <UrlContainer
                   data-testid="permalink-generated-url"
-                  url={`${window.location.host}/data-tables/permalink/${permalinkId}`}
+                  url={`${window.location.origin}/data-tables/permalink/${permalinkId}`}
                 />
               </p>
 
