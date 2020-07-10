@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class EnumerableExtensions
     {

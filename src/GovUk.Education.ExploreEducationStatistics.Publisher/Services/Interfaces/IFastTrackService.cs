@@ -7,5 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     public interface IFastTrackService
     {
         Task CreateAllByRelease(Guid releaseId, PublishContext context);
+
+        Task DeleteAllReleaseFastTracks();
     }
 }

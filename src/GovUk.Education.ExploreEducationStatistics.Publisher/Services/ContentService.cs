@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var includedReleaseIds = Enumerable.Empty<Guid>();
             var context = new PublishContext(DateTime.UtcNow, false);
 
-            await _fileStorageService.DeleteAllContentAsyncExcludingStaging();
+            await DeleteAllContent();
             await UpdateTrees(includedReleaseIds, context);
 
             var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();
@@ -98,6 +98,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
+        private async Task DeleteAllContent()
+        {
+            await _fastTrackService.DeleteAllReleaseFastTracks();
+            await _fileStorageService.DeleteAllContentAsyncExcludingStaging();
+        }
+        
         private async Task UpdateDownloadTreeAsync(IEnumerable<Guid> includedReleaseIds, PublishContext context)
         {
             // This assumes the files have been copied first
