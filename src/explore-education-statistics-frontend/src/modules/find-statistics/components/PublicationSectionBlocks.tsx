@@ -23,24 +23,20 @@ const PublicationSectionBlocks = ({
         expiresIn: 60 * 60 * 24,
       }}
       getInfographic={getChartFile}
-      additionalTabContent={
+      additionalTabContent={({ dataBlock }) => (
         <div className="dfe-print-hidden">
-          <h2 className="govuk-heading-m govuk-!-margin-top-9">
-            Explore and edit this data online
-          </h2>
+          <h3 className="govuk-heading-m">Explore and edit this data online</h3>
+
           <p>Use our table tool to explore this data.</p>
-          {publication ? (
-            <ButtonLink
-              to="/data-tables/[publication]"
-              as={`/data-tables/${publication.slug}`}
-            >
-              Explore data
-            </ButtonLink>
-          ) : (
-            <ButtonLink href="/data-tables">Explore data</ButtonLink>
-          )}
+
+          <ButtonLink
+            to="/data-tables/fast-track/[fastTrackId]"
+            as={`/data-tables/fast-track/${dataBlock.id}`}
+          >
+            Explore data
+          </ButtonLink>
         </div>
-      }
+      )}
     />
   );
 };
