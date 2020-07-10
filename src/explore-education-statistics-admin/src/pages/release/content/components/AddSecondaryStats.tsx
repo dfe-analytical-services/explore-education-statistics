@@ -3,6 +3,7 @@ import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlo
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';
 
@@ -28,7 +29,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
 
   if (!isFormOpen) {
     return (
-      <>
+      <ButtonGroup>
         <Button
           className="govuk-!-margin-top-4 govuk-!-margin-bottom-4"
           onClick={() => {
@@ -79,7 +80,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
             Are you sure you want to remove this this secondary stats section?
           </p>
         </ModalConfirm>
-      </>
+      </ButtonGroup>
     );
   }
 

@@ -16,15 +16,15 @@ exports[`EditableBlockRenderer MarkDownBlock renders editable version correctly 
       </div>
     </div>
   </div>
-  <div class="buttons">
+  <div class="group buttons">
     <button aria-disabled="false"
-            class="govuk-button button govuk-button--secondary"
+            class="govuk-button govuk-button--secondary"
             type="button"
     >
       Edit block
     </button>
     <button aria-disabled="false"
-            class="govuk-button button govuk-button--warning"
+            class="govuk-button govuk-button--warning"
             type="button"
     >
       Remove block
@@ -44,7 +44,7 @@ exports[`EditableBlockRenderer MarkDownBlock renders non-editable version correc
       </div>
     </div>
   </div>
-  <div class="buttons">
+  <div class="group buttons">
   </div>
 </article>
 `;

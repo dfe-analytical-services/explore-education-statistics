@@ -3,6 +3,7 @@ import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/Cha
 import ChartBuilderSaveButton from '@admin/pages/release/datablocks/components/ChartBuilderSaveButton';
 import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Effect from '@common/components/Effect';
 import {
   Form,
@@ -636,15 +637,17 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          <ChartBuilderSaveButton
-            formId={id}
-            forms={forms}
-            showSubmitError={
-              form.isValid && form.submitCount > 0 && !canSaveChart
-            }
-          />
+          <ButtonGroup>
+            <ChartBuilderSaveButton
+              formId={id}
+              forms={forms}
+              showSubmitError={
+                form.isValid && form.submitCount > 0 && !canSaveChart
+              }
+            />
 
-          {buttons}
+            {buttons}
+          </ButtonGroup>
         </Form>
       )}
     </Formik>

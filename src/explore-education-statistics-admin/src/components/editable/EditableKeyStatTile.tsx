@@ -3,6 +3,7 @@ import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import useToggle from '@common/hooks/useToggle';
 import KeyStatTile, {
@@ -93,16 +94,18 @@ const EditableKeyStatTile = ({
                 label="Guidance text"
               />
 
-              <Button
-                disabled={!form.isValid}
-                type="submit"
-                className="govuk-!-margin-right-2"
-              >
-                Save
-              </Button>
-              <Button variant="secondary" onClick={toggleShowForm.off}>
-                Cancel
-              </Button>
+              <ButtonGroup>
+                <Button
+                  disabled={!form.isValid}
+                  type="submit"
+                  className="govuk-!-margin-right-2"
+                >
+                  Save
+                </Button>
+                <Button variant="secondary" onClick={toggleShowForm.off}>
+                  Cancel
+                </Button>
+              </ButtonGroup>
             </KeyStatTile>
           </Form>
         );
@@ -110,7 +113,7 @@ const EditableKeyStatTile = ({
     </Formik>
   ) : (
     <KeyStatTile releaseId={releaseId} query={query} summary={summary}>
-      <div className="govuk-!-margin-top-2">
+      <ButtonGroup className="govuk-!-margin-top-2">
         <Button onClick={toggleShowForm.on}>Edit</Button>
 
         {onRemove && (
@@ -125,7 +128,7 @@ const EditableKeyStatTile = ({
             Remove
           </Button>
         )}
-      </div>
+      </ButtonGroup>
     </KeyStatTile>
   );
 };

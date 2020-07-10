@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import React, { MouseEventHandler, ReactNode } from 'react';
-import styles from './Button.module.scss';
 
 export interface ButtonProps {
   children: ReactNode;
@@ -27,7 +26,6 @@ const Button = ({
       aria-disabled={disabled}
       className={classNames(
         'govuk-button',
-        styles.button,
         {
           'govuk-button--disabled': disabled,
           'govuk-button--secondary': variant === 'secondary',

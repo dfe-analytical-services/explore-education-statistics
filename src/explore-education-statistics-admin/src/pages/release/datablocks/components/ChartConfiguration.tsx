@@ -5,6 +5,7 @@ import {
   ChartOptions,
   FormState,
 } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Effect from '@common/components/Effect';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
@@ -286,15 +287,17 @@ const ChartConfiguration = ({
               </>
             )}
 
-            <ChartBuilderSaveButton
-              formId={formId}
-              forms={forms}
-              showSubmitError={
-                form.isValid && form.submitCount > 0 && !canSaveChart
-              }
-            />
+            <ButtonGroup>
+              <ChartBuilderSaveButton
+                formId={formId}
+                forms={forms}
+                showSubmitError={
+                  form.isValid && form.submitCount > 0 && !canSaveChart
+                }
+              />
 
-            {buttons}
+              {buttons}
+            </ButtonGroup>
           </Form>
         )}
       </Formik>

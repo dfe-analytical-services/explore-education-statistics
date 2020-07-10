@@ -16,6 +16,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
@@ -288,6 +289,13 @@ const ReleaseStatusPage = () => {
                       {
                         label: 'As soon as possible',
                         value: 'Immediate',
+                        conditional: (
+                          <WarningMessage className="govuk-!-width-two-thirds">
+                            This will start the release process immediately and
+                            make statistics available to the public. Make sure
+                            this is okay before continuing.
+                          </WarningMessage>
+                        ),
                       },
                     ]}
                   />
