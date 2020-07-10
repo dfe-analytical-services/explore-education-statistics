@@ -11,6 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         Percent,
         
         [EnumLabelValue("£", "£")]
-        Pound
+        Pound,
+
+        [EnumLabelValue("pp", "pp")]
+        PercentagePoint
     }
 }
