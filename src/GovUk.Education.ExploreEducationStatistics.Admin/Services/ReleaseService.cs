@@ -213,6 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         FootnoteId = rf.FootnoteId
                     });
 
+                statsAmendment.PreviousVersionId = amendment.PreviousVersionId;
                 _statisticsDbContext.Release.Add(statsAmendment);
                 _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
                 _statisticsDbContext.ReleaseFootnote.AddRange(statsAmendmentFootnoteLinks);

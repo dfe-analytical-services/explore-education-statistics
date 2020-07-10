@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -16,11 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public Guid? GetLatestPublishedRelease(Guid publicationId)
         {
             return DbSet()
+                .Include(release => release.Publication)
                 .Where(release => release.PublicationId.Equals(publicationId))
+                .ToList()
+                .Where(release => release.Live && IsLatestVersionOfRelease(release.Publication, release.Id))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimeIdentifier)
-                .ToList()
-                .LastOrDefault(release => release.Live)?.Id;
+                .LastOrDefault()?.Id;
+        }
+        
+        private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
+        {
+            return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
     }
 }

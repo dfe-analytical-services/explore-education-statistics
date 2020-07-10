@@ -142,8 +142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
             
-            modelBuilder.Entity<Subject>()
-                .HasQueryFilter(r => !r.SoftDeleted);
+            modelBuilder.Entity<Release>()
+                .HasIndex(data => data.PreviousVersionId);
         }
         
         private static void ConfigureReleaseSubject(ModelBuilder modelBuilder)
