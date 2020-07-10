@@ -1,5 +1,5 @@
 import ButtonText from '@common/components/ButtonText';
-import LinkContainer from '@common/components/LinkContainer';
+import UrlContainer from '@common/components/UrlContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
@@ -98,22 +98,27 @@ const TableToolFinalStep = ({
         <li>
           {permalinkId ? (
             <>
-              <div>Generated permanent link:</div>
-              <LinkContainer
-                url={`${window.location.host}/data-tables/permalink/${permalinkId}`}
-                datatestid="permalink-generated-url"
-              />
-              <div>
-                <Link
-                  to="/data-tables/permalink/[permalink]"
-                  as={`/data-tables/permalink/${permalinkId}`}
-                  title="View created table permalink"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View permanent link
-                </Link>
-              </div>
+              <p className="govuk-!-margin-bottom-2">
+                Generated permanent link:
+              </p>
+
+              <p className="govuk-!-margin-0">
+                <UrlContainer
+                  data-testid="permalink-generated-url"
+                  url={`${window.location.host}/data-tables/permalink/${permalinkId}`}
+                />
+              </p>
+
+              <Link
+                className="govuk-!-margin-top-2"
+                to="/data-tables/permalink/[permalink]"
+                as={`/data-tables/permalink/${permalinkId}`}
+                title="View created table permalink"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View permanent link
+              </Link>
             </>
           ) : (
             <LoadingSpinner
