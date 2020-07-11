@@ -19,7 +19,7 @@ import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
 import React from 'react';
 import { forceVisible } from 'react-lazyload';
-import DataBlockRenderer from '../DataBlockRenderer';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 
 jest.mock('@common/services/tableBuilderService');
 
@@ -29,7 +29,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
 
-describe('DataBlockRenderer', () => {
+describe('DataBlockTabs', () => {
   const testDataBlock: DataBlock = {
     id: 'test-id',
     type: 'DataBlock',
@@ -147,7 +147,7 @@ describe('DataBlockRenderer', () => {
     );
 
     render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
@@ -183,7 +183,7 @@ describe('DataBlockRenderer', () => {
     );
 
     render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
@@ -215,7 +215,7 @@ describe('DataBlockRenderer', () => {
     );
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
@@ -246,7 +246,7 @@ describe('DataBlockRenderer', () => {
     );
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-block"
         dataBlock={{
@@ -281,7 +281,7 @@ describe('DataBlockRenderer', () => {
     });
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-block"
         dataBlock={{
@@ -318,7 +318,7 @@ describe('DataBlockRenderer', () => {
     const fullTable = mapFullTable(testChartTableData);
 
     render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-block"
         dataBlock={{
@@ -358,7 +358,7 @@ describe('DataBlockRenderer', () => {
     );
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-block"
         dataBlock={testDataBlockMap}
@@ -384,7 +384,7 @@ describe('DataBlockRenderer', () => {
     );
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
@@ -428,7 +428,7 @@ describe('DataBlockRenderer', () => {
     const fullTable = mapFullTable(testChartTableData);
 
     const { rerender } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -484,7 +484,7 @@ describe('DataBlockRenderer', () => {
 
     expect(() => {
       rerender(
-        <DataBlockRenderer
+        <DataBlockTabs
           id="test-block"
           dataBlock={{
             ...testDataBlock,

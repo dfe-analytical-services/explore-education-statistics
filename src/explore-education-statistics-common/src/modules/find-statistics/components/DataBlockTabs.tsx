@@ -18,7 +18,7 @@ import { DataBlock } from '@common/services/types/blocks';
 import isAxiosError from '@common/utils/error/isAxiosError';
 import React, { ReactNode } from 'react';
 
-export interface DataBlockRendererProps {
+export interface DataBlockTabsProps {
   additionalTabContent?:
     | ((props: { dataBlock: DataBlock }) => ReactNode)
     | ReactNode;
@@ -32,7 +32,7 @@ export interface DataBlockRendererProps {
   onToggle?: (section: { id: string; title: string }) => void;
 }
 
-const DataBlockRenderer = ({
+const DataBlockTabs = ({
   additionalTabContent,
   dataBlock,
   firstTabs,
@@ -42,7 +42,7 @@ const DataBlockRenderer = ({
   releaseId,
   queryOptions,
   onToggle,
-}: DataBlockRendererProps) => {
+}: DataBlockTabsProps) => {
   const { value: fullTable, isLoading, error } = useTableQuery(
     {
       ...dataBlock.query,
@@ -164,6 +164,6 @@ const DataBlockRenderer = ({
   );
 };
 
-export default withLazyLoad(DataBlockRenderer, {
+export default withLazyLoad(DataBlockTabs, {
   offset: 100,
 });
