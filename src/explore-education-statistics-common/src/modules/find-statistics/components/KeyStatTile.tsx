@@ -3,7 +3,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useTableQuery, {
   TableQueryOptions,
 } from '@common/modules/find-statistics/hooks/useTableQuery';
-import { TableDataQuery } from '@common/services/tableBuilderService';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import { Summary } from '@common/services/types/blocks';
 import formatPretty from '@common/utils/number/formatPretty';
 import React, { FunctionComponent, ReactNode, useMemo } from 'react';
@@ -27,18 +27,14 @@ export const KeyStatTileColumn: FunctionComponent = ({ children }) => {
 };
 
 export interface KeyStatProps {
-  releaseId: string;
-  dataLastPublished?: string;
   children?: ReactNode;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
   queryOptions?: TableQueryOptions;
   summary?: Summary;
   renderDataSummary?: ReactNode;
 }
 
 const KeyStatTile = ({
-  releaseId,
-  dataLastPublished = '',
   children,
   query,
   queryOptions,
@@ -50,9 +46,7 @@ const KeyStatTile = ({
       ...query,
       includeGeoJson: false,
     },
-    releaseId,
     queryOptions,
-    dataLastPublished,
   );
 
   const resultValue = useMemo<string>(() => {

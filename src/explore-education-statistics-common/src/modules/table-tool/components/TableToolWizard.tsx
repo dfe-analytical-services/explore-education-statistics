@@ -26,7 +26,7 @@ import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTu
 import tableBuilderService, {
   PublicationSubject,
   PublicationSubjectMeta,
-  TableDataQuery,
+  ReleaseTableDataQuery,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, useMemo } from 'react';
@@ -41,7 +41,7 @@ interface Publication {
 export interface TableToolState {
   initialStep: number;
   subjectMeta: PublicationSubjectMeta;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
   response?: {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
@@ -50,7 +50,7 @@ export interface TableToolState {
 
 export interface FinalStepRenderProps {
   publication?: Publication;
-  query?: TableDataQuery;
+  query?: ReleaseTableDataQuery;
   response?: {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
@@ -59,7 +59,6 @@ export interface FinalStepRenderProps {
 
 export interface TableToolWizardProps {
   themeMeta: ThemeMeta[];
-  releaseId?: string;
   initialState?: Partial<TableToolState>;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   scrollOnMount?: boolean;
@@ -67,7 +66,6 @@ export interface TableToolWizardProps {
 
 const TableToolWizard = ({
   themeMeta,
-  releaseId,
   initialState = {},
   scrollOnMount,
   finalStep,
@@ -103,20 +101,20 @@ const TableToolWizard = ({
   const { value: subjects = [], setState: setSubjects } = useAsyncRetry<
     PublicationSubject[]
   >(async () => {
+    const { releaseId, publicationId } = state.query;
+
     if (releaseId) {
       const meta = await tableBuilderService.getReleaseMeta(releaseId);
       return meta.subjects;
     }
 
-    if (state.query.publicationId) {
-      const meta = await tableBuilderService.getPublicationMeta(
-        state.query.publicationId,
-      );
+    if (publicationId) {
+      const meta = await tableBuilderService.getPublicationMeta(publicationId);
       return meta.subjects;
     }
 
     return [];
-  }, [releaseId, state.query.publicationId]);
+  }, [state.query]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -248,13 +246,13 @@ const TableToolWizard = ({
       draft.response = undefined;
     });
 
-    const query: TableDataQuery = {
+    const query: ReleaseTableDataQuery = {
       ...state.query,
       indicators,
       filters: Object.values(filters).flat(),
     };
 
-    const tableData = await tableBuilderService.getTableData(query, releaseId);
+    const tableData = await tableBuilderService.getTableData(query);
 
     if (!tableData.results.length || !tableData.subjectMeta) {
       throw new Error(
@@ -291,7 +289,7 @@ const TableToolWizard = ({
               return nextStep;
             }}
           >
-            {releaseId === undefined && (
+            {!state.query.releaseId && (
               <WizardStep>
                 {stepProps => (
                   <PublicationForm

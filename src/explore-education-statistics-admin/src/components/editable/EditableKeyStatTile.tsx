@@ -25,7 +25,6 @@ interface EditableKeyStatProps extends KeyStatProps {
   name: string;
   onRemove?: () => void;
   onSubmit: (values: KeyStatsFormValues) => void;
-  releaseId: string;
 }
 
 const EditableKeyStatTile = ({
@@ -36,15 +35,12 @@ const EditableKeyStatTile = ({
   summary,
   onRemove,
   onSubmit,
-  releaseId,
 }: EditableKeyStatProps) => {
   const [showForm, toggleShowForm] = useToggle(false);
   const [removing, toggleRemoving] = useToggle(false);
 
   if (!isEditing) {
-    return (
-      <KeyStatTile releaseId={releaseId} query={query} summary={summary} />
-    );
+    return <KeyStatTile query={query} summary={summary} />;
   }
 
   return showForm ? (
@@ -70,7 +66,6 @@ const EditableKeyStatTile = ({
             <h3 className="govuk-heading-s">{name}</h3>
 
             <KeyStatTile
-              releaseId={releaseId}
               query={query}
               renderDataSummary={
                 <FormFieldTextInput<KeyStatsFormValues>
@@ -112,7 +107,7 @@ const EditableKeyStatTile = ({
       }}
     </Formik>
   ) : (
-    <KeyStatTile releaseId={releaseId} query={query} summary={summary}>
+    <KeyStatTile query={query} summary={summary}>
       <ButtonGroup className="govuk-!-margin-top-2">
         <Button onClick={toggleShowForm.on}>Edit</Button>
 

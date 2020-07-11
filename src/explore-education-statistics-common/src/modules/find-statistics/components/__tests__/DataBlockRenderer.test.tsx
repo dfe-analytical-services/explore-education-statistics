@@ -11,7 +11,7 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService, {
-  TableDataQuery,
+  ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import { Chart, DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor } from '@testing-library/dom';
@@ -160,13 +160,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.query,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(screen.getAllByText('Could not load content')).toHaveLength(2);
     });
@@ -198,13 +196,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.query,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(
         screen.queryByText('Could not load content'),
@@ -232,13 +228,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.query,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
 
@@ -270,13 +264,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.query,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
@@ -307,13 +299,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.query,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
@@ -350,13 +340,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.query,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(screen.getByRole('table')).toBeInTheDocument();
       expect(screen.getAllByRole('row')).toHaveLength(4);
@@ -380,13 +368,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(getDataBlockForSubject).toBeCalledWith(
-        {
-          ...testDataBlockMap.query,
-          includeGeoJson: true,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(getDataBlockForSubject).toBeCalledWith({
+        ...testDataBlockMap.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: true,
+      } as ReleaseTableDataQuery);
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
@@ -411,13 +397,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.query,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(screen.getAllByRole('tabpanel')).toHaveLength(1);
 

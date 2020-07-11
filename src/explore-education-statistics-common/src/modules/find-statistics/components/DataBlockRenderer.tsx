@@ -19,7 +19,6 @@ import isAxiosError from '@common/utils/error/isAxiosError';
 import React, { ReactNode } from 'react';
 
 export interface DataBlockRendererProps {
-  releaseId?: string;
   additionalTabContent?:
     | ((props: { dataBlock: DataBlock }) => ReactNode)
     | ReactNode;
@@ -28,33 +27,29 @@ export interface DataBlockRendererProps {
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
   id: string;
+  releaseId?: string;
   queryOptions?: TableQueryOptions;
   onToggle?: (section: { id: string; title: string }) => void;
-  dataLastPublished?: string;
 }
 
 const DataBlockRenderer = ({
-  releaseId,
   additionalTabContent,
   dataBlock,
   firstTabs,
   lastTabs,
   getInfographic,
   id,
+  releaseId,
   queryOptions,
   onToggle,
-  dataLastPublished = '',
 }: DataBlockRendererProps) => {
   const { value: fullTable, isLoading, error } = useTableQuery(
-    dataBlock
-      ? {
-          ...dataBlock.query,
-          includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
-        }
-      : undefined,
-    releaseId || undefined,
+    {
+      ...dataBlock.query,
+      releaseId,
+      includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
+    },
     queryOptions,
-    dataLastPublished,
   );
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
