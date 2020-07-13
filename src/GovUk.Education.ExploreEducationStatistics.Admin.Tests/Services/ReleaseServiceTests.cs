@@ -205,8 +205,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Template heading index 0", contentSections[0].Heading);
                 Assert.Single(contentSections);
                 Assert.Equal(1, contentSections[0].Order);
-                Assert.Equal(2, contentSections[0].Content.Count);
-                Assert.Equal(2, contentSections[0].Content.AsReadOnly().Count);
+                // Content should not be copied when create from template
+                Assert.Empty(contentSections[0].Content);
+                Assert.Empty(contentSections[0].Content.AsReadOnly());
 
                 Assert.Equal(ContentSectionType.ReleaseSummary, newRelease.SummarySection.Type);
                 Assert.Equal(ContentSectionType.Headlines, newRelease.HeadlinesSection.Type);
