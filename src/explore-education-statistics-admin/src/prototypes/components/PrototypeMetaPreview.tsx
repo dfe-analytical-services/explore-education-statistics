@@ -3,74 +3,30 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import MetaVariables from './PrototypeMetaVariables';
 
-const CreateMetaForms = () => {
+interface Props {
+  description?: string;
+}
+
+const CreateMetaForms = (description: Props) => {
+  const previewText = description;
+
   return (
     <>
       <h2 className="govuk-heading-l">An example publication, 2018/19</h2>
-      <h3 className="govuk-heading-m">Meta guidance document, July 2020</h3>
+      <h3 className="govuk-heading-m">Meta guidance document</h3>
 
-      <section>
-        <h2 className="govuk-heading-m">Description</h2>
-        <p>
-          This document describes the data included in the ‘Pupil absence in
-          schools in England: 2018/19’ National Statistics release’s underlying
-          data files. This data is released under the terms of the Open
-          Government License and is intended to meet at least 3 stars for Open
-          Data
-        </p>
-        <p>
-          The Guide to absence statistics should be referenced alongside this
-          data. It provides information on the data sources, their coverage and
-          quality as well as explaining methodology used in producing the data.
-        </p>
-      </section>
-      <section>
-        <h2 className="govuk-heading-m">Coverage</h2>
-        <p>
-          This release provides information on the levels of overall, authorised
-          and unauthorised absence in:
-        </p>
-        <ul className="govuk-list--bullet">
-          <li>state-funded primary schools</li>
-          <li>state-funded secondary schools</li>
-          <li>state-funded special schools</li>
-        </ul>
-        <p>it includes information on:</p>
+      <p className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">July 2020</p>
 
-        <ul className="govuk-list--bullet">
-          <li>reasons for absence</li>
-          <li>persistent absentees</li>
-          <li>pupil characteristics</li>
-          <li>absence information for pupil referral units</li>
-          <li>absence by term</li>
-        </ul>
-
-        <p>
-          The information is based on pupil level absence data collected via the
-          school census.
-        </p>
-
-        <p>
-          A guide on how we produce pupil absence statistics is also available
-          with further detail on the methods used. The underlying data files
-          include national, regional, local authority, local authority district
-          and school level absence information from 2006/07 to 2018/19 for
-          schools in England.
-        </p>
-      </section>
-
-      <section>
-        <h2 className="govuk-heading-m">File formats and conventions</h2>
-        <h3 className="govuk-heading-s">Rounding</h3>
-        <p>This dataset has not had suppression applied.</p>
-        <h3 className="govuk-heading-s">Conventions</h3>
-        <p>The following convention is used throughout the underlying data</p>
-      </section>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: `${previewText.description}`,
+        }}
+      />
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Data files</h2>
       <Accordion id="dataFiles">
         <AccordionSection heading="Absence by geography" goToTop={false}>
-          <dl className="govuk-summary-list">
+          <dl className="govuk-summary-list govuk-!-margin-bottom-9">
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Filename</dt>
               <dd className="govuk-summary-list__value">
@@ -104,7 +60,7 @@ const CreateMetaForms = () => {
           heading="Absence by Local Authority by characteristics"
           goToTop={false}
         >
-          <dl className="govuk-summary-list">
+          <dl className="govuk-summary-list govuk-!-margin-bottom-9">
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Filename</dt>
               <dd className="govuk-summary-list__value">
@@ -132,7 +88,7 @@ const CreateMetaForms = () => {
           heading="Absence by Local Authority District by characteristics"
           goToTop={false}
         >
-          <dl className="govuk-summary-list">
+          <dl className="govuk-summary-list  govuk-!-margin-bottom-9">
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Filename</dt>
               <dd className="govuk-summary-list__value">
