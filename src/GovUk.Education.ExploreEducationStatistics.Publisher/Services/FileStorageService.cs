@@ -56,13 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug,
                         copyReleaseFilesCommand.PreviousVersionSlug);
                 await DeleteBlobsAsync(publicContainer, previousDestinationDirectoryPath);
-                
-                // Delete previous content
-                var publicCacheContainer =
-                    await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
-                var fullPath = PublicContentReleasePath(copyReleaseFilesCommand.PublicationSlug,
-                    copyReleaseFilesCommand.PreviousVersionSlug);
-                await DeleteBlobAsync(publicCacheContainer, fullPath);
             }
             
             var destinationDirectoryPath =
@@ -100,6 +93,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await DeleteBlobsAsync(publicContainer, string.Empty, excludePattern);
         }
 
+        public async Task DeletePreviousVersionOfRelease(string publicationSlug, string previousVersionSlug)
+        {
+            // Delete previous content
+            var publicCacheContainer =
+                await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+            var fullPath = PublicContentReleasePath(publicationSlug,previousVersionSlug);
+            await DeleteBlobAsync(publicCacheContainer, fullPath);
+        }
+        
         public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
         {
             return FileStorageUtils.ListPublicFiles(_publicStorageConnectionString, PublicFilesContainerName,

@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types);
         
-        Task SoftDeletePreviousVersions(IEnumerable<Guid> releaseIds);
+        Task DeleteContentForPreviousVersions(IEnumerable<Guid> releaseIds);
+
+        Task DeleteStatisticalDataForPreviousVersions(IEnumerable<Guid> releaseIds);
     }
 }
