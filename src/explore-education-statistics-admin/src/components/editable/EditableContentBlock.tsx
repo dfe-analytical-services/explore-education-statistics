@@ -1,3 +1,4 @@
+import ButtonGroup from '@common/components/ButtonGroup';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import FormEditor, { FormEditorProps } from '@admin/components/form/FormEditor';
@@ -70,12 +71,12 @@ const EditableContentBlock = ({
           onChange={setContent}
         />
 
-        <div>
+        <ButtonGroup>
           <Button onClick={handleSave}>Save</Button>
           <Button variant="secondary" onClick={handleCancel}>
             Cancel
           </Button>
-        </div>
+        </ButtonGroup>
       </>
     );
   }
