@@ -14,6 +14,7 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
+import { parseISO } from 'date-fns';
 import React from 'react';
 
 const ReleaseSummaryPage = () => {
@@ -49,7 +50,9 @@ const ReleaseSummaryPage = () => {
             </SummaryListItem>
             <SummaryListItem term="Scheduled release">
               {release.publishScheduled ? (
-                <FormattedDate>{release.publishScheduled}</FormattedDate>
+                <FormattedDate>
+                  {parseISO(release.publishScheduled)}
+                </FormattedDate>
               ) : (
                 'Not scheduled'
               )}

@@ -29,7 +29,7 @@ import {
 } from '@common/utils/date/partialDate';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { endOfDay, format, formatISO, isValid } from 'date-fns';
+import { endOfDay, format, formatISO, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { StringSchema } from 'yup';
@@ -145,7 +145,9 @@ const ReleaseStatusPage = () => {
             )}
             <SummaryListItem term="Scheduled release">
               {release.publishScheduled ? (
-                <FormattedDate>{release.publishScheduled}</FormattedDate>
+                <FormattedDate>
+                  {parseISO(release.publishScheduled)}
+                </FormattedDate>
               ) : (
                 'Not scheduled'
               )}
@@ -176,7 +178,7 @@ const ReleaseStatusPage = () => {
             internalReleaseNote: release.internalReleaseNote ?? '',
             publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
             publishScheduled: release.publishScheduled
-              ? new Date(release.publishScheduled)
+              ? parseISO(release.publishScheduled)
               : undefined,
             nextReleaseDate: release.nextReleaseDate,
           }}
