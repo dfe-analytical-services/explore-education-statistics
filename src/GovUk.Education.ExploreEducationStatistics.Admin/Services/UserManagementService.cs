@@ -110,15 +110,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<UserReleaseRole>(userReleaseRoleId)
-                .OnSuccessDo(async () =>
+                .OnSuccess(async () =>
                 {
-                    var entityToRemove =
-                        await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
+                    var entityToRemove = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
                             r.Id == userReleaseRoleId && r.UserId == userId);
                     _contentDbContext.Remove(entityToRemove);
                     await _contentDbContext.SaveChangesAsync();
-                })
-                .OnSuccess(_ => true);
+                    return true;
+                });
         }
 
         public async Task<List<IdTitlePair>> ListReleasesAsync()
