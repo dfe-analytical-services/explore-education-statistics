@@ -73,7 +73,7 @@ const DataBlockRenderer = ({
       <Tabs id={id} onToggle={onToggle}>
         {firstTabs}
 
-        {dataBlock.charts?.length && (
+        {dataBlock?.charts?.length && (
           <TabsSection id={`${id}-charts`} title="Chart">
             {error && errorMessage}
 
@@ -136,7 +136,7 @@ const DataBlockRenderer = ({
           </TabsSection>
         )}
 
-        {dataBlock.table && (
+        {dataBlock?.table && (
           <TabsSection id={`${id}-tables`} title="Table">
             {error && errorMessage}
 
