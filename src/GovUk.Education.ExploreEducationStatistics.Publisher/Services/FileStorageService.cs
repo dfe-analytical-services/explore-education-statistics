@@ -48,20 +48,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var publicContainer =
                 await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicFilesContainerName);
 
-            // Slug may have changed for the amendment so also remove the previous contents if it has
-            if (copyReleaseFilesCommand.ReleaseSlug != copyReleaseFilesCommand.PreviousVersionSlug)
-            {
-                // Delete previously uploaded files
-                var previousDestinationDirectoryPath =
-                    PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug,
-                        copyReleaseFilesCommand.PreviousVersionSlug);
-                await DeleteBlobsAsync(publicContainer, previousDestinationDirectoryPath);
-            }
-            
             var destinationDirectoryPath =
                 PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug, copyReleaseFilesCommand.ReleaseSlug);
 
             await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
+            
+            copyReleaseFilesCommand.AdditionalDeleteDirectoryPaths.ForEach(async directoryPath =>
+            {
+                await DeleteBlobsAsync(publicContainer, directoryPath);
+            });
 
             var referencedReleaseVersions = copyReleaseFilesCommand.ReleaseFileReferences
                 .Select(rfr => rfr.ReleaseId).Distinct();
@@ -88,20 +83,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task DeleteAllContentAsyncExcludingStaging()
         {
-            var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
             var excludePattern = $"^{PublicContentStagingPath()}/.+$";
-            await DeleteBlobsAsync(publicContainer, string.Empty, excludePattern);
+            await DeletePublicBlobs(string.Empty, excludePattern);
         }
 
-        public async Task DeletePreviousVersionContent(string publicationSlug, string previousVersionSlug)
+        public async Task DeletePublicBlobs(string directoryPath, string excludePattern = null)
         {
-            // Delete previous content
-            var publicCacheContainer =
-                await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
-            var fullPath = PublicContentReleasePath(publicationSlug,previousVersionSlug);
-            await DeleteBlobAsync(publicCacheContainer, fullPath);
+            var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+            await DeleteBlobsAsync(publicContainer, directoryPath, excludePattern);
         }
-        
+
+        public async Task DeletePublicBlob(string blobName)
+        {    
+            var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+            await DeleteBlobAsync(publicContainer, blobName);
+        }
+
         public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
         {
             return FileStorageUtils.ListPublicFiles(_publicStorageConnectionString, PublicFilesContainerName,
@@ -291,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             } while (token != null);
         }
 
-        private async Task DeleteBlobAsync(CloudBlobContainer container, string fullPath)
+        private static async Task DeleteBlobAsync(CloudBlobContainer container, string fullPath)
         {
             await container.GetBlockBlobReference(fullPath).DeleteIfExistsAsync();
         }

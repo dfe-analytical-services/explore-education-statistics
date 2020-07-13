@@ -31,6 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task CreateAllByRelease(Guid releaseId, PublishContext context)
         {
+            // Delete any existing FastTracks in case of republishing
+            await DeleteAllFastTracksByRelease(releaseId);
+
             var dataBlocks = await _contentDbContext.ReleaseContentBlocks
                 .Include(block => block.ContentBlock)
                 .Where(block => block.ReleaseId == releaseId)
@@ -63,6 +66,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Distinct();
 
             await _tableStorageService.DeleteByPartitionKeys(PublicReleaseFastTrackTableName, allPartitionKeys);
+        }
+
+        private async Task DeleteAllFastTracksByRelease(Guid releaseId)
+        {
+            await _fileStorageService.DeletePublicBlobs(PublicContentReleaseFastTrackPath(releaseId.ToString()));
+            await _tableStorageService.DeleteByPartitionKey(PublicReleaseFastTrackTableName, releaseId.ToString());
         }
 
         private async Task Upload(Guid releaseId, FastTrack fastTrack, PublishContext context)
