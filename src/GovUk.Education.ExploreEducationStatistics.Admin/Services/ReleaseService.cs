@@ -451,27 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
-
-        private async Task<IEnumerable<Guid>> GetAllVersions(Guid releaseId)
-        {
-            var versions = new List<Guid>();
-            while (true)
-            {
-                versions.Add(releaseId);
-                var release = await _context.Releases.FirstAsync(r => r.Id == releaseId);
-                if (release.Id == release.PreviousVersionId)
-                {
-                    break;
-                }
-                else
-                {
-                    releaseId = release.PreviousVersionId;
-                }
-            }
-
-            return versions;
-        }
-
+        
         private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
         { 
             var templateRelease = _context.Releases.AsNoTracking()
