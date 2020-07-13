@@ -47,22 +47,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await GetCloudBlobContainerAsync(_privateStorageConnectionString, PrivateFilesContainerName);
             var publicContainer =
                 await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicFilesContainerName);
-            
+
             // Slug may have changed for the amendment so also remove the previous contents if it has
             if (copyReleaseFilesCommand.ReleaseSlug != copyReleaseFilesCommand.PreviousVersionSlug)
             {
-                // Delete previously uploaded files
                 var previousDestinationDirectoryPath =
                     PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug,
                         copyReleaseFilesCommand.PreviousVersionSlug);
                 await DeleteBlobsAsync(publicContainer, previousDestinationDirectoryPath);
-                
-                // Delete previous content
-                var publicCacheContainer =
-                    await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
-                previousDestinationDirectoryPath = PublicContentReleasePath(copyReleaseFilesCommand.PublicationSlug,
-                    copyReleaseFilesCommand.PreviousVersionSlug);
-                await DeleteBlobsAsync(publicCacheContainer, previousDestinationDirectoryPath);
             }
             
             var destinationDirectoryPath =
