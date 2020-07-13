@@ -54,6 +54,14 @@ const CreateMetaForms = (description: Props) => {
               <dt className="govuk-summary-list__key">Years</dt>
               <dd className="govuk-summary-list__value">2006/07 to 2018/19</dd>
             </div>
+            <div className="govuk-summary-list__row">
+              <dt className="govuk-summary-list__key">
+                Variable names and descriptions
+              </dt>
+              <dd className="govuk-summary-list__value">
+                <MetaVariables />
+              </dd>
+            </div>
           </dl>
         </AccordionSection>
         <AccordionSection
@@ -82,6 +90,14 @@ const CreateMetaForms = (description: Props) => {
               <dt className="govuk-summary-list__key">Years</dt>
               <dd className="govuk-summary-list__value">2012/13 to 2018/19</dd>
             </div>
+            <div className="govuk-summary-list__row">
+              <dt className="govuk-summary-list__key">
+                Variable names and descriptions
+              </dt>
+              <dd className="govuk-summary-list__value">
+                <MetaVariables />
+              </dd>
+            </div>
           </dl>
         </AccordionSection>
         <AccordionSection
@@ -92,14 +108,14 @@ const CreateMetaForms = (description: Props) => {
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Filename</dt>
               <dd className="govuk-summary-list__value">
-                Absence_3term201819_la_characteristics
+                Absence_3term201819_lad_characteristics
               </dd>
             </div>
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Content</dt>
               <dd className="govuk-summary-list__value">
                 Absence information by pupil characteristics such as age, gender
-                and ethnicity by local authority.
+                and ethnicity by local authority district.
               </dd>
             </div>
             <div className="govuk-summary-list__row">
@@ -110,10 +126,17 @@ const CreateMetaForms = (description: Props) => {
               <dt className="govuk-summary-list__key">Years</dt>
               <dd className="govuk-summary-list__value">2012/13 to 2018/19</dd>
             </div>
+            <div className="govuk-summary-list__row">
+              <dt className="govuk-summary-list__key">
+                Variable names and descriptions
+              </dt>
+              <dd className="govuk-summary-list__value">
+                <MetaVariables />
+              </dd>
+            </div>
           </dl>
         </AccordionSection>
       </Accordion>
-      <MetaVariables />
     </>
   );
 };

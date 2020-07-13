@@ -15,12 +15,22 @@ import MetaVariables from './PrototypeMetaVariables';
 interface Props {
   editing?: boolean;
   description?: string;
-  coverage?: string;
-  fileFormat?: string;
+  subject1?: string;
+  subject2?: string;
+  subject3?: string;
 }
 
-const CreateMetaForms = ({ editing, description }: Props) => {
+const CreateMetaForms = ({
+  editing,
+  description,
+  subject1,
+  subject2,
+  subject3,
+}: Props) => {
   const [addNewMeta, setAddNewMeta] = useState(false);
+  const [valueSubject1, setValueSubject1] = useState('');
+  const [valueSubject2, setValueSubject2] = useState('');
+  const [valueSubject3, setValueSubject3] = useState('');
 
   const formExample = {
     descriptionPlaceholder: {
@@ -28,14 +38,20 @@ const CreateMetaForms = ({ editing, description }: Props) => {
       ${description}
       `,
     },
-    coveragePlaceholder: {
+    subject1: {
       text: `
-      <p>test2</p>
+      ${subject1}
       `,
     },
-    fileFormatPlaceholder: {
+    subject2: {
       text: `
-      <p>test3</p>`,
+      ${subject2}
+      `,
+    },
+    subject3: {
+      text: `
+      ${subject3}
+      `,
     },
   };
 
@@ -51,7 +67,7 @@ const CreateMetaForms = ({ editing, description }: Props) => {
           <FormEditor
             id="description"
             name="description"
-            label="Description"
+            label="Public metadata introduction"
             value={editing ? formExample.descriptionPlaceholder.text : ''}
             onChange={() => setAddNewMeta(true)}
           />
@@ -70,12 +86,17 @@ const CreateMetaForms = ({ editing, description }: Props) => {
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Content</dt>
               <dd className="govuk-summary-list__value">
-                Absence information for all enrolments in state-funded primary,
-                secondary and special schools including information on overall
-                absence, persistent absence and reason for absence for pupils
-                aged 5-15, based on all 5 half terms data from 2006/07 to
-                2011/12 inclusive and based on 6 half term data from 2012/13
-                onwards
+                <FormTextArea
+                  id="data1"
+                  name="data1"
+                  label="Details"
+                  value={
+                    editing ? formExample.subject1.text.trim() : valueSubject1
+                  }
+                  onChange={event => {
+                    setValueSubject1(event.target.value);
+                  }}
+                />
               </dd>
             </div>
             <div className="govuk-summary-list__row">
@@ -89,9 +110,11 @@ const CreateMetaForms = ({ editing, description }: Props) => {
               <dd className="govuk-summary-list__value">2006/07 to 2018/19</dd>
             </div>
             <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Optional information</dt>
+              <dt className="govuk-summary-list__key">
+                Variable names and descriptions
+              </dt>
               <dd className="govuk-summary-list__value">
-                <FormTextArea id="data1" name="data1" label="Details" />
+                <MetaVariables />
               </dd>
             </div>
           </dl>
@@ -110,8 +133,17 @@ const CreateMetaForms = ({ editing, description }: Props) => {
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Content</dt>
               <dd className="govuk-summary-list__value">
-                Absence information by pupil characteristics such as age, gender
-                and ethnicity by local authority.
+                <FormTextArea
+                  id="data2"
+                  name="data2"
+                  label="Details"
+                  value={
+                    editing ? formExample.subject2.text.trim() : valueSubject2
+                  }
+                  onChange={event => {
+                    setValueSubject2(event.target.value);
+                  }}
+                />
               </dd>
             </div>
             <div className="govuk-summary-list__row">
@@ -123,9 +155,11 @@ const CreateMetaForms = ({ editing, description }: Props) => {
               <dd className="govuk-summary-list__value">2012/13 to 2018/19</dd>
             </div>
             <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Optional information</dt>
+              <dt className="govuk-summary-list__key">
+                Variable names and descriptions
+              </dt>
               <dd className="govuk-summary-list__value">
-                <FormTextArea id="data2" name="data2" label="Details" />
+                <MetaVariables />
               </dd>
             </div>
           </dl>
@@ -138,14 +172,23 @@ const CreateMetaForms = ({ editing, description }: Props) => {
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Filename</dt>
               <dd className="govuk-summary-list__value">
-                Absence_3term201819_la_characteristics
+                Absence_3term201819_lad_characteristics
               </dd>
             </div>
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Content</dt>
               <dd className="govuk-summary-list__value">
-                Absence information by pupil characteristics such as age, gender
-                and ethnicity by local authority.
+                <FormTextArea
+                  id="data3"
+                  name="data3"
+                  label="Details"
+                  value={
+                    editing ? formExample.subject3.text.trim() : valueSubject3
+                  }
+                  onChange={event => {
+                    setValueSubject3(event.target.value);
+                  }}
+                />
               </dd>
             </div>
             <div className="govuk-summary-list__row">
@@ -157,14 +200,15 @@ const CreateMetaForms = ({ editing, description }: Props) => {
               <dd className="govuk-summary-list__value">2012/13 to 2018/19</dd>
             </div>
             <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Optional information</dt>
+              <dt className="govuk-summary-list__key">
+                Variable names and descriptions
+              </dt>
               <dd className="govuk-summary-list__value">
-                <FormTextArea id="data3" name="data3" label="Details" />
+                <MetaVariables />
               </dd>
             </div>
           </dl>
         </AccordionSection>
-        <MetaVariables />
       </Accordion>
     </>
   );
