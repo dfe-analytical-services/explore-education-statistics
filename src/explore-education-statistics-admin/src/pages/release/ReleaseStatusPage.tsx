@@ -24,7 +24,7 @@ import {
   formatPartialDate,
   isPartialDateEmpty,
   isValidPartialDate,
-  parsePartialDateToUtcDate,
+  parsePartialDateToLocalDate,
   PartialDate,
 } from '@common/utils/date/partialDate';
 import { mapFieldErrors } from '@common/validation/serverValidations';
@@ -228,7 +228,7 @@ const ReleaseStatusPage = () => {
                     return false;
                   }
 
-                  return isValid(parsePartialDateToUtcDate(value));
+                  return isValid(parsePartialDateToLocalDate(value));
                 },
               }),
           })}
