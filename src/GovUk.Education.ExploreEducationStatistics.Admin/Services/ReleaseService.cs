@@ -435,9 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
-            var releases = await _context.Releases
-                .Include(r => r.Publication)
-                .Where(r => r.PublicationId == publicationId).ToListAsync();
+            var releases = await _context.Releases.Where(r => r.PublicationId == publicationId).ToListAsync();
              
             if (releases.Any(release => release.Slug == slug && release.Id != releaseId && IsLatestVersionOfRelease(releases, release.Id)))
             {
