@@ -132,6 +132,10 @@ export interface TableDataQuery {
   boundaryLevel?: number;
 }
 
+export interface ReleaseTableDataQuery extends TableDataQuery {
+  releaseId?: string;
+}
+
 export interface TableDataSubjectMeta {
   publicationName: string;
   subjectName: string;
@@ -192,12 +196,9 @@ const tableBuilderService = {
   }): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(
-    query: TableDataQuery,
-    releaseId?: string,
-  ): Promise<TableDataResponse> {
-    if (releaseId) {
-      return dataApi.post(`/tablebuilder/release/${releaseId}`, query);
+  getTableData(query: ReleaseTableDataQuery): Promise<TableDataResponse> {
+    if (query.releaseId) {
+      return dataApi.post(`/tablebuilder/release/${query.releaseId}`, query);
     }
     return dataApi.post(`/tablebuilder`, query);
   },

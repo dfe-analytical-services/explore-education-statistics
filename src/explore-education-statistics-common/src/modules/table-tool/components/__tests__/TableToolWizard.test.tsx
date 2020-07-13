@@ -180,12 +180,12 @@ describe('TableToolWizard', () => {
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}
-        releaseId="release-1"
         initialState={{
           initialStep: 1,
           subjectMeta: testSubjectMeta,
           query: {
             subjectId: '',
+            releaseId: 'release-1',
             locations: {},
             filters: [],
             indicators: [],
@@ -222,12 +222,12 @@ describe('TableToolWizard', () => {
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}
-        releaseId="release-1"
         initialState={{
           initialStep: 1,
           subjectMeta: testSubjectMeta,
           query: {
             publicationId: 'publication-1',
+            releaseId: 'release-1',
             subjectId: '',
             locations: {},
             filters: [],

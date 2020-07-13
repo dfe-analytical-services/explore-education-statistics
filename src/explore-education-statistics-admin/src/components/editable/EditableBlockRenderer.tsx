@@ -2,7 +2,7 @@ import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrappe
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { EditableBlock } from '@admin/services/types/content';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
-import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import React, { useCallback, useMemo } from 'react';
 
 interface Props {
@@ -42,7 +42,7 @@ function EditableBlockRenderer({
       return (
         <div className="dfe-content-overflow">
           <EditableBlockWrapper onDelete={editable ? handleDelete : undefined}>
-            <DataBlockRenderer
+            <DataBlockTabs
               releaseId={releaseId}
               id={blockId}
               dataBlock={block}

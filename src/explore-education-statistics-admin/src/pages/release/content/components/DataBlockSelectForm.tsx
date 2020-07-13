@@ -4,7 +4,7 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import React, { useState } from 'react';
 
 interface Props {
@@ -39,7 +39,7 @@ const DataBlockSelectForm = ({
           open
           onToggle={() => {}}
         >
-          <DataBlockRenderer
+          <DataBlockTabs
             releaseId={releaseId}
             dataBlock={selectedDataBlock}
             id={`dataBlockSelectForm-${

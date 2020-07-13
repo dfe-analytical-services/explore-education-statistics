@@ -21,7 +21,7 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import tableBuilderService, {
   PublicationSubjectMeta,
-  TableDataQuery,
+  ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
 import produce from 'immer';
@@ -34,7 +34,7 @@ export type SavedDataBlock = CreateReleaseDataBlock & {
 interface TableState {
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
 }
 
 interface Props {
@@ -65,14 +65,15 @@ const ReleaseDataBlocksPageTabs = ({
       return undefined;
     }
 
-    const query = {
+    const query: ReleaseTableDataQuery = {
       ...selectedDataBlock.query,
+      releaseId,
       includeGeoJson: selectedDataBlock.charts.some(
         chart => chart.type === 'map',
       ),
     };
 
-    const tableData = await tableBuilderService.getTableData(query, releaseId);
+    const tableData = await tableBuilderService.getTableData(query);
     const nextSubjectMeta = await tableBuilderService.getPublicationSubjectMeta(
       query.subjectId,
     );
@@ -217,7 +218,6 @@ const ReleaseDataBlocksPageTabs = ({
             {!isLoading && (
               <DataBlockSourceWizard
                 key={saveNumber}
-                releaseId={releaseId}
                 dataBlock={selectedDataBlock}
                 query={query}
                 subjectMeta={subjectMeta}
