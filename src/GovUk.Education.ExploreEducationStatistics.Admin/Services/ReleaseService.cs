@@ -194,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // create a link row to link back to the original subject & footnotes
             if (statsRelease != null)
             {
-                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
+                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id, amendment.PreviousVersionId);
 
                 var statsAmendmentSubjectLinks =_statisticsDbContext
                     .ReleaseSubject
@@ -457,7 +457,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var templateRelease = _context.Releases.AsNoTracking()
                 .Include(r => r.Content)
                 .ThenInclude(c => c.ContentSection)
-                .ThenInclude(cs => cs.Content)
                 .First(r => r.Id == releaseId);
                 
             templateRelease.CreateGenericContentFromTemplate(newRelease);

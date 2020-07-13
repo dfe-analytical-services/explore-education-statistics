@@ -32,15 +32,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message,
-            StatisticsDbContext context, ContentDbContext contentDbContext)
+            StatisticsDbContext statisticsDbContext, ContentDbContext contentDbContext)
         {
             // Avoid potential collisions
             Thread.Sleep(new Random().Next(1, 5) * 1000);
             
-            var release = CreateOrUpdateRelease(message, context);
-            RemoveSubjectIfExisting(subjectData.Name, release, context);
+            var release = CreateOrUpdateRelease(message, statisticsDbContext);
+            RemoveSubjectIfExisting(subjectData.Name, release, statisticsDbContext);
             
-            var subject = CreateSubject(message.SubjectId, subjectData.Name, release, context);
+            var subject = CreateSubject(message.SubjectId, subjectData.Name, release, statisticsDbContext);
 
             if (!UpdateReleaseFileReferenceLinks(message, contentDbContext, release, subject))
             {
@@ -88,9 +88,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return false;
         }
 
-        private void RemoveSubjectIfExisting(string name, Release release, StatisticsDbContext context)
+        private void RemoveSubjectIfExisting(string name, Release release, StatisticsDbContext statisticsDbContext)
         {
-            var releaseSubject = context.ReleaseSubject
+            var releaseSubject = statisticsDbContext.ReleaseSubject
                 .Include(rs => rs.Subject)
                 .FirstOrDefault(r => r.Subject.Name == name && r.ReleaseId == release.Id);
             
@@ -98,111 +98,112 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             if (releaseSubject != null)
             {
                 var subject = releaseSubject.Subject;
-                context.ReleaseSubject.Remove(releaseSubject);
-                context.Subject.Remove(subject);
-                context.SaveChanges();
+                statisticsDbContext.ReleaseSubject.Remove(releaseSubject);
+                statisticsDbContext.Subject.Remove(subject);
+                statisticsDbContext.SaveChanges();
             }
         }
 
-        private Subject CreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext context)
+        private Subject CreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext statisticsDbContext)
         {
-            var newSubject = context.Subject.Add(new Subject
+            var newSubject = statisticsDbContext.Subject.Add(new Subject
                 {
                     Id = subjectId,
                     Name = name
                 }
             ).Entity;
             
-            context.ReleaseSubject.Add(
+            statisticsDbContext.ReleaseSubject.Add(
                 new ReleaseSubject
                 {
                     ReleaseId = release.Id,
                     SubjectId = subjectId
                 });
             
-            context.SaveChanges();
+            statisticsDbContext.SaveChanges();
 
             return newSubject;
         }
 
-        private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext context)
+        private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext statisticsDbContext)
         {
             Release release;
 
-            if (!context.Release.Any((r => r.Id.Equals(message.Release.Id))))
+            if (!statisticsDbContext.Release.Any((r => r.Id.Equals(message.Release.Id))))
             {
                 release = new Release
                 {
                     Id = message.Release.Id,
                     Slug = message.Release.Slug,
-                    Publication = CreateOrUpdatePublication(message, context),
+                    Publication = CreateOrUpdatePublication(message, statisticsDbContext),
                     TimeIdentifier = message.Release.TimeIdentifier,
-                    Year = message.Release.Year
+                    Year = message.Release.Year,
+                    PreviousVersionId = message.Release.Id
                 };
 
-                release = context.Release.Add(release).Entity;
+                release = statisticsDbContext.Release.Add(release).Entity;
             }
             else
             {
                 release = _mapper.Map(message.Release, (Release) null);
-                release = context.Release.Update(release).Entity;
+                release = statisticsDbContext.Release.Update(release).Entity;
             }
-            context.SaveChanges();
+            statisticsDbContext.SaveChanges();
             return release;
         }
 
-        private Publication CreateOrUpdatePublication(ImportMessage message, StatisticsDbContext context)
+        private Publication CreateOrUpdatePublication(ImportMessage message, StatisticsDbContext statisticsDbContext)
         {
             Publication publication;
 
-            if (!context.Publication.Any(p => p.Id.Equals(message.Release.Publication.Id)))
+            if (!statisticsDbContext.Publication.Any(p => p.Id.Equals(message.Release.Publication.Id)))
             {
                 publication = new Publication
                 {
                     Id = message.Release.Publication.Id,
                     Title = message.Release.Publication.Title,
                     Slug = message.Release.Publication.Slug,
-                    Topic = CreateOrUpdateTopic(message, context)
+                    Topic = CreateOrUpdateTopic(message, statisticsDbContext)
                 };
-                publication = context.Publication.Add(publication).Entity;
+                publication = statisticsDbContext.Publication.Add(publication).Entity;
             }
             else
             {
                 publication = _mapper.Map(message.Release.Publication, (Publication) null);
-                publication = context.Publication.Update(publication).Entity;
+                publication = statisticsDbContext.Publication.Update(publication).Entity;
             }
-            context.SaveChanges();
+            statisticsDbContext.SaveChanges();
             return publication;
         }
 
-        private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext context)
+        private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext statisticsDbContext)
         {
             Topic topic;
             
-            if (!context.Topic.Any(t => t.Id.Equals(message.Release.Publication.Topic.Id)))
+            if (!statisticsDbContext.Topic.Any(t => t.Id.Equals(message.Release.Publication.Topic.Id)))
             {
                 topic = new Topic
                 {
                     Id = message.Release.Publication.Topic.Id,
                     Title = message.Release.Publication.Topic.Title,
                     Slug = message.Release.Publication.Topic.Slug,
-                    Theme = CreateOrUpdateTheme(message, context)
+                    Theme = CreateOrUpdateTheme(message, statisticsDbContext)
                 };
-                topic = context.Topic.Add(topic).Entity;
+                topic = statisticsDbContext.Topic.Add(topic).Entity;
             }
             else
             {
                 topic = _mapper.Map(message.Release.Publication.Topic, (Topic) null);
-                topic = context.Topic.Update(topic).Entity;
+                topic = statisticsDbContext.Topic.Update(topic).Entity;
             }
-            context.SaveChanges();
+            statisticsDbContext.SaveChanges();
             return topic;
         }
 
-        private Theme CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext context)
+        private Theme CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext statisticsDbContext)
         {
             Theme theme;
-            if (!context.Theme
+            if (!statisticsDbContext.Theme
                 .Any(t => t.Id.Equals(message.Release.Publication.Topic.Theme.Id)))
             {
                 theme = new Theme
@@ -211,14 +212,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Slug = message.Release.Publication.Topic.Theme.Slug,
                     Title = message.Release.Publication.Topic.Theme.Title
                 };
-                theme = context.Theme.Add(theme).Entity;
+                theme = statisticsDbContext.Theme.Add(theme).Entity;
             }
             else
             {
                 theme = _mapper.Map(message.Release.Publication.Topic.Theme, (Theme) null);
-                theme = context.Theme.Update(theme).Entity;  
+                theme = statisticsDbContext.Theme.Update(theme).Entity;  
             }
-            context.SaveChanges();
+            statisticsDbContext.SaveChanges();
             return theme;
         }
     }

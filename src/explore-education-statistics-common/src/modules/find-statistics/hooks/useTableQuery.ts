@@ -3,13 +3,18 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import storageService from '@common/services/storageService';
 import tableBuilderService, {
-  TableDataQuery,
+  ReleaseTableDataQuery,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 import { addSeconds } from 'date-fns';
 import { useRef } from 'react';
 
 export interface TableQueryOptions {
+  /**
+   * When was the data last published.
+   * This is used for cache invalidation.
+   */
+  dataLastPublished?: string;
   /**
    * How long to cache the table
    * query response for, in seconds.
@@ -18,18 +23,14 @@ export interface TableQueryOptions {
 }
 
 export default function useTableQuery(
-  query: TableDataQuery | undefined,
-  releaseId: string | undefined,
+  query: ReleaseTableDataQuery,
   options: TableQueryOptions = {},
-  dataLastPublished: string,
 ): AsyncRetryState<FullTable | undefined> {
-  const optionsRef = useRef<TableQueryOptions | undefined>(options);
+  const optionsRef = useRef<TableQueryOptions>(options);
   optionsRef.current = options;
 
   return useAsyncRetry(async () => {
-    if (!query) {
-      return undefined;
-    }
+    const { dataLastPublished, expiresIn } = optionsRef.current;
 
     const queryKey = JSON.stringify({
       ...query,
@@ -41,10 +42,10 @@ export default function useTableQuery(
       .catch(() => null);
 
     if (!response) {
-      response = await tableBuilderService.getTableData(query, releaseId);
+      response = await tableBuilderService.getTableData(query);
 
       await storageService.set(queryKey, response, {
-        expiry: addSeconds(new Date(), options?.expiresIn ?? 0),
+        expiry: addSeconds(new Date(), expiresIn ?? 0),
       });
     }
 

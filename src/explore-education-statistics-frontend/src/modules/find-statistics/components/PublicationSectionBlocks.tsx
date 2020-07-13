@@ -3,15 +3,17 @@ import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';
 import { Release } from '@common/services/publicationService';
+import { OmitStrict } from '@common/types';
 import ButtonLink from '@frontend/components/ButtonLink';
 import React from 'react';
 
-export interface PublicationSectionBlocksProps extends SectionBlocksProps {
+export interface PublicationSectionBlocksProps
+  extends OmitStrict<SectionBlocksProps, 'queryOptions' | 'releaseId'> {
   release: Release;
 }
 
 const PublicationSectionBlocks = ({
-  release: { slug, publication },
+  release: { id, dataLastPublished, slug, publication },
   ...props
 }: PublicationSectionBlocksProps) => {
   const getChartFile = useGetChartFile(publication.slug, slug);
@@ -19,8 +21,10 @@ const PublicationSectionBlocks = ({
   return (
     <SectionBlocks
       {...props}
+      releaseId={id}
       queryOptions={{
         expiresIn: 60 * 60 * 24,
+        dataLastPublished,
       }}
       getInfographic={getChartFile}
       additionalTabContent={({ dataBlock }) => (

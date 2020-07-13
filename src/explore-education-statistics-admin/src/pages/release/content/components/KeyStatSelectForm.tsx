@@ -56,9 +56,11 @@ const KeyStatSelectForm = ({
           open
         >
           <KeyStatTile
-            releaseId={releaseId}
             summary={selectedDataBlock.summary}
-            query={selectedDataBlock.query}
+            query={{
+              ...selectedDataBlock.query,
+              releaseId,
+            }}
           />
         </Details>
       </section>

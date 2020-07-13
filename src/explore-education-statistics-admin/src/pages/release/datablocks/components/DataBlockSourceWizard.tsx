@@ -14,7 +14,7 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import {
   PublicationSubjectMeta,
-  TableDataQuery,
+  ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import React, {
   createRef,
@@ -28,12 +28,12 @@ export type DataBlockSourceWizardSaveHandler = (params: {
   details: DataBlockDetailsFormValues;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
 }) => void;
 
 interface DataBlockSourceWizardFinalStepProps {
   dataBlock?: ReleaseDataBlock;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   onSave: DataBlockSourceWizardSaveHandler;
@@ -115,10 +115,9 @@ const DataBlockSourceWizardFinalStep = ({
 };
 
 interface DataBlockSourceWizardProps {
-  releaseId: string;
   dataBlock?: ReleaseDataBlock;
   initialTableToolState?: TableToolState;
-  query?: TableDataQuery;
+  query?: ReleaseTableDataQuery;
   subjectMeta?: PublicationSubjectMeta;
   table?: FullTable;
   tableHeaders?: TableHeadersConfig;
@@ -126,7 +125,6 @@ interface DataBlockSourceWizardProps {
 }
 
 const DataBlockSourceWizard = ({
-  releaseId,
   dataBlock,
   query: initialQuery,
   subjectMeta,
@@ -155,7 +153,6 @@ const DataBlockSourceWizard = ({
       <p>Configure data source for the data block</p>
 
       <TableToolWizard
-        releaseId={releaseId}
         themeMeta={[]}
         initialState={initialTableToolState}
         finalStep={({ response, query }) => (
