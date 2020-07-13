@@ -47,6 +47,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
+        public async Task DeleteAllReleaseFastTracks()
+        {
+            var allPartitionKeys = (await _tableStorageService.ExecuteQueryAsync(PublicReleaseFastTrackTableName,
+                    new TableQuery<ReleaseFastTrack>()))
+                .Select(track => track.PartitionKey)
+                .Distinct();
+
+            await _tableStorageService.DeleteByPartitionKeys(PublicReleaseFastTrackTableName, allPartitionKeys);
+        }
+
         private async Task CreateReleaseFastTrack(Guid releaseId, FastTrack fastTrack)
         {
             var table = await GetTableAsync();
@@ -61,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 : PublicContentFastTrackPath(releaseId.ToString(), fastTrack.Id.ToString());
             await _fileStorageService.UploadAsJson(blobName, fastTrack);
         }
-        
+
         private async Task<CloudTable> GetTableAsync()
         {
             return await _tableStorageService.GetTableAsync(PublicReleaseFastTrackTableName);
