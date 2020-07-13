@@ -51,10 +51,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // Slug may have changed for the amendment so also remove the previous contents if it has
             if (copyReleaseFilesCommand.ReleaseSlug != copyReleaseFilesCommand.PreviousVersionSlug)
             {
+                // Delete previously uploaded files
                 var previousDestinationDirectoryPath =
                     PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug,
                         copyReleaseFilesCommand.PreviousVersionSlug);
                 await DeleteBlobsAsync(publicContainer, previousDestinationDirectoryPath);
+                
+                // Delete previous content
+                var publicCacheContainer =
+                    await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+                var fullPath = PublicContentReleasePath(copyReleaseFilesCommand.PublicationSlug,
+                    copyReleaseFilesCommand.PreviousVersionSlug);
+                await DeleteBlobAsync(publicCacheContainer, fullPath);
             }
             
             var destinationDirectoryPath =
@@ -279,6 +287,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     })
                 );
             } while (token != null);
+        }
+
+        private async Task DeleteBlobAsync(CloudBlobContainer container, string fullPath)
+        {
+            await container.GetBlockBlobReference(fullPath).DeleteIfExistsAsync();
         }
 
         public async Task UploadAsJson(string blobName, object value, JsonSerializerSettings settings = null)
