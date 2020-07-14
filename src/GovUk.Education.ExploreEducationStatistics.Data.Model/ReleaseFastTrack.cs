@@ -7,15 +7,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     {
         public Guid FastTrackId => Guid.Parse(RowKey);
         public Guid ReleaseId => Guid.Parse(PartitionKey);
+        public string HighlightName { get; set; }
 
         public ReleaseFastTrack()
         {
         }
 
-        public ReleaseFastTrack(Guid releaseId, Guid fastTrackId)
+        public ReleaseFastTrack(Guid releaseId, Guid fastTrackId, string highlightName)
         {
             PartitionKey = releaseId.ToString();
             RowKey = fastTrackId.ToString();
+            HighlightName = highlightName;
         }
     }
 }

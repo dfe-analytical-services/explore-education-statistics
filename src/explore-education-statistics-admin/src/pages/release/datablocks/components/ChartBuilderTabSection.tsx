@@ -93,7 +93,7 @@ const ChartBuilderTabSection = ({
         query: nextQuery,
       });
     },
-    [onTableUpdate, query, releaseId],
+    [onTableUpdate, query],
   );
 
   return (

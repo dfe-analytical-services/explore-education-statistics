@@ -22,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -434,14 +435,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
-            if (await _context.Releases.AnyAsync(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
+            var releases = await _context.Releases.Where(r => r.PublicationId == publicationId).ToListAsync();
+             
+            if (releases.Any(release => release.Slug == slug && release.Id != releaseId && IsLatestVersionOfRelease(releases, release.Id)))
             {
                 return ValidationActionResult(SlugNotUnique);
             }
 
             return true;
         }
-
+        
+        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
+        {
+            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+        }
+        
         private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
         { 
             var templateRelease = _context.Releases.AsNoTracking()

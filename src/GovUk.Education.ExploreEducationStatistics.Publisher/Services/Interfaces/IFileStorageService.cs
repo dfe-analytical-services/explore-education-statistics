@@ -17,5 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task MoveStagedContentAsync();
 
         Task UploadAsJson(string blobName, object value, JsonSerializerSettings settings = null);
+
+        Task DeletePreviousVersionContent(string publicationSlug, string previousVersionSlug);
     }
 }

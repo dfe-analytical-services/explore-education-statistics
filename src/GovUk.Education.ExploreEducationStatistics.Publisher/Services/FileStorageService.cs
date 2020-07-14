@@ -51,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // Slug may have changed for the amendment so also remove the previous contents if it has
             if (copyReleaseFilesCommand.ReleaseSlug != copyReleaseFilesCommand.PreviousVersionSlug)
             {
+                // Delete previously uploaded files
                 var previousDestinationDirectoryPath =
                     PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug,
                         copyReleaseFilesCommand.PreviousVersionSlug);
@@ -92,6 +93,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await DeleteBlobsAsync(publicContainer, string.Empty, excludePattern);
         }
 
+        public async Task DeletePreviousVersionContent(string publicationSlug, string previousVersionSlug)
+        {
+            // Delete previous content
+            var publicCacheContainer =
+                await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+            var fullPath = PublicContentReleasePath(publicationSlug,previousVersionSlug);
+            await DeleteBlobAsync(publicCacheContainer, fullPath);
+        }
+        
         public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
         {
             return FileStorageUtils.ListPublicFiles(_publicStorageConnectionString, PublicFilesContainerName,
@@ -279,6 +289,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     })
                 );
             } while (token != null);
+        }
+
+        private async Task DeleteBlobAsync(CloudBlobContainer container, string fullPath)
+        {
+            await container.GetBlockBlobReference(fullPath).DeleteIfExistsAsync();
         }
 
         public async Task UploadAsJson(string blobName, object value, JsonSerializerSettings settings = null)
