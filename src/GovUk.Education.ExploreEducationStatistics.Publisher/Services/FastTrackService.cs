@@ -31,20 +31,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task CreateAllByRelease(Guid releaseId, PublishContext context)
         {
-            // Create one FastTrack per DataBlock using the DataBlock id as the FastTrack id
-            var fastTracks = await _contentDbContext.ReleaseContentBlocks
+            var dataBlocks = await _contentDbContext.ReleaseContentBlocks
                 .Include(block => block.ContentBlock)
                 .Where(block => block.ReleaseId == releaseId)
                 .Select(block => block.ContentBlock)
                 .OfType<DataBlock>()
-                .Select(block => new FastTrack(block.Id, block.Table, block.Query, releaseId))
                 .ToListAsync();
 
-            foreach (var fastTrack in fastTracks)
+            foreach (var dataBlock in dataBlocks)
             {
-                await CreateReleaseFastTrack(releaseId, fastTrack);
+                // Create one FastTrack per DataBlock
+                var fastTrack = await CreateFastTrack(releaseId, dataBlock);
                 await Upload(releaseId, fastTrack, context);
             }
+        }
+
+        private async Task<FastTrack> CreateFastTrack(Guid releaseId, DataBlock dataBlock)
+        {
+            var table = await GetTableAsync();
+            // Use the DataBlock id as the FastTrack id
+            var releaseFastTrack = new ReleaseFastTrack(releaseId, dataBlock.Id, dataBlock.HighlightName);
+            await table.ExecuteAsync(TableOperation.Insert(releaseFastTrack));
+            return new FastTrack(dataBlock.Id, dataBlock.Table, dataBlock.Query, releaseId);
         }
 
         public async Task DeleteAllReleaseFastTracks()
@@ -55,13 +63,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Distinct();
 
             await _tableStorageService.DeleteByPartitionKeys(PublicReleaseFastTrackTableName, allPartitionKeys);
-        }
-
-        private async Task CreateReleaseFastTrack(Guid releaseId, FastTrack fastTrack)
-        {
-            var table = await GetTableAsync();
-            var releaseFastTrack = new ReleaseFastTrack(releaseId, fastTrack.Id);
-            await table.ExecuteAsync(TableOperation.Insert(releaseFastTrack));
         }
 
         private async Task Upload(Guid releaseId, FastTrack fastTrack, PublishContext context)
