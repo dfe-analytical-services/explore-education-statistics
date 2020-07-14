@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _tableStorageService.DeleteByPartitionKeys(PublicReleaseFastTrackTableName, allPartitionKeys);
         }
 
-        private async Task DeleteAllFastTracksByRelease(Guid releaseId)
+        public async Task DeleteAllFastTracksByRelease(Guid releaseId)
         {
             await _fileStorageService.DeletePublicBlobs(PublicContentReleaseFastTrackPath(releaseId.ToString()));
             await _tableStorageService.DeleteByPartitionKey(PublicReleaseFastTrackTableName, releaseId.ToString());

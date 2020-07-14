@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
 
@@ -52,6 +51,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _contentDbContext.Releases
                 .Where(release => ids.Contains(release.Id))
                 .Include(release => release.Publication)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Release>> GetAmendedReleases(IEnumerable<Guid> releaseIds)
+        {
+            return await _contentDbContext.Releases
+                .Include(r => r.Publication)
+                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
                 .ToListAsync();
         }
 
@@ -159,24 +166,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        public async Task DeletePreviousVersionsContent(IEnumerable<Guid> releaseIds)
-        {
-            var releases = await _contentDbContext.Releases
-                .Include(r => r.Publication)
-                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id && r.Slug != r.PreviousVersion.Slug)
-                .ToListAsync();
-
-            foreach (var r in releases)
-            {
-                await _fileStorageService.DeletePublicBlob(PublicContentReleasePath(r.Publication.Slug,r.PreviousVersion.Slug));
-            }
-        }
-
         public async Task DeletePreviousVersionsStatisticalData(IEnumerable<Guid> releaseIds)
         {
-            var releases = await _contentDbContext.Releases
-                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
-                .ToListAsync();
+            var releases = await GetAmendedReleases(releaseIds);
             
             var previousVersions = releases.Select(v => v.PreviousVersionId);
 
