@@ -52,12 +52,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<IEnumerable<IdLabel>> GetHighlights(Guid releaseId)
         {
-            var filter = TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.PartitionKey),
+            var releaseFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.PartitionKey),
                 QueryComparisons.Equal, releaseId.ToString());
-            var query = new TableQuery<ReleaseFastTrack>().Where(filter);
+            
+            var highlightFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.HighlightName), QueryComparisons.NotEqual,
+                    string.Empty);
+            
+            var combineFilter = TableQuery.CombineFilters(releaseFilter, TableOperators.And, highlightFilter);
+            var query = new TableQuery<ReleaseFastTrack>().Where(combineFilter);
 
             return (await _tableStorageService.ExecuteQueryAsync(PublicReleaseFastTrackTableName, query))
-                .Where(releaseFastTrack => !string.IsNullOrEmpty(releaseFastTrack.HighlightName))
                 .Select(releaseFastTrack => new IdLabel(releaseFastTrack.FastTrackId, releaseFastTrack.HighlightName));
         }
 

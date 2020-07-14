@@ -104,10 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 SubjectId = publicationRelease3Subject.Id
             };
 
-            var releaseFastTrack1 = new ReleaseFastTrack(publicationRelease1.Id, Guid.NewGuid(), null);
+            var releaseFastTrack1 = new ReleaseFastTrack(publicationRelease1.Id, Guid.NewGuid(), "table 1");
             var releaseFastTrack2 = new ReleaseFastTrack(publicationRelease1.Id, Guid.NewGuid(), "table 2");
-            var releaseFastTrack3 = new ReleaseFastTrack(publicationRelease1.Id, Guid.NewGuid(), "table 3");
-            var releaseFastTrack4 = new ReleaseFastTrack(publicationRelease1.Id, Guid.NewGuid(), "");
 
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -146,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     storageService.ExecuteQueryAsync(PublicReleaseFastTrackTableName,
                         It.IsAny<TableQuery<ReleaseFastTrack>>())).ReturnsAsync(new List<ReleaseFastTrack>
                 {
-                    releaseFastTrack1, releaseFastTrack2, releaseFastTrack3, releaseFastTrack4
+                    releaseFastTrack1, releaseFastTrack2
                 });
 
                 var service = BuildPublicationMetaService(context, mocks);
@@ -157,10 +155,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(publication.Id, result.PublicationId);
                 Assert.Equal(2, highlights.Count);
-                Assert.Equal(releaseFastTrack2.FastTrackId, highlights[0].Id);
-                Assert.Equal(releaseFastTrack2.HighlightName, highlights[0].Label);
-                Assert.Equal(releaseFastTrack3.FastTrackId, highlights[1].Id);
-                Assert.Equal(releaseFastTrack3.HighlightName, highlights[1].Label);
+                Assert.Equal(releaseFastTrack1.FastTrackId, highlights[0].Id);
+                Assert.Equal(releaseFastTrack1.HighlightName, highlights[0].Label);
+                Assert.Equal(releaseFastTrack2.FastTrackId, highlights[1].Id);
+                Assert.Equal(releaseFastTrack2.HighlightName, highlights[1].Label);
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(publicationRelease1Subject1.Id, subjects[0].Id);
                 Assert.Equal(publicationRelease1Subject1.Name, subjects[0].Label);
