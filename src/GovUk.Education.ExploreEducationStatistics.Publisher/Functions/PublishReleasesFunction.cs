@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusStates;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseStatusTableQueryUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -58,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
         {
-            var query = QueryPublishLessThanEndOfTodayWithStages(overall: ReleaseStatusOverallStage.Scheduled);
-            return await _releaseStatusService.ExecuteQueryAsync(query);
+            return await _releaseStatusService.GetWherePublishingDueTodayWithStages(
+                overall: ReleaseStatusOverallStage.Scheduled);
         }
     }
 }

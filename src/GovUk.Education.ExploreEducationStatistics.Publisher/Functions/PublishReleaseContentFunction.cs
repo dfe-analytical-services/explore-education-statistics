@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseStatusTableQueryUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -95,12 +93,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
         {
-            var query = QueryPublishLessThanEndOfTodayWithStages(
+            return await _releaseStatusService.GetWherePublishingDueTodayWithStages(
                 content: ReleaseStatusContentStage.Complete,
                 data: ReleaseStatusDataStage.Complete,
                 publishing: Scheduled);
-
-            return await _releaseStatusService.ExecuteQueryAsync(query);
         }
 
         private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, ReleaseStatusPublishingStage stage,
