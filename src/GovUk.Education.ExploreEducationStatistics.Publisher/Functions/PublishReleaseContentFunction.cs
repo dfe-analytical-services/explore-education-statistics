@@ -9,6 +9,7 @@ using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseStatusTableQueryUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -94,21 +95,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
         {
-            var dateFilter = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
-                QueryComparisons.LessThan, DateTime.Today.AddDays(1));
-            var contentStageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.ContentStage),
-                QueryComparisons.Equal, ReleaseStatusContentStage.Complete.ToString());
-            var dataStageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.DataStage),
-                QueryComparisons.Equal, ReleaseStatusDataStage.Complete.ToString());
-            var publishingStageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PublishingStage),
-                QueryComparisons.Equal, Scheduled.ToString());
+            var query = QueryPublishLessThanEndOfTodayWithStages(
+                content: ReleaseStatusContentStage.Complete,
+                data: ReleaseStatusDataStage.Complete,
+                publishing: Scheduled);
 
-            var stageFilter = TableQuery.CombineFilters(
-                TableQuery.CombineFilters(contentStageFilter, TableOperators.And, dataStageFilter),
-                TableOperators.And, publishingStageFilter);
-            var combinedFilter = TableQuery.CombineFilters(dateFilter, TableOperators.And, stageFilter);
-
-            return await _releaseStatusService.ExecuteQueryAsync(new TableQuery<ReleaseStatus>().Where(combinedFilter));
+            return await _releaseStatusService.ExecuteQueryAsync(query);
         }
 
         private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, ReleaseStatusPublishingStage stage,

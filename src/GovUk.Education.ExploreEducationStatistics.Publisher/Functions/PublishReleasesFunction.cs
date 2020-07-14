@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusStates;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseStatusTableQueryUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -58,14 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
         {
-            var dateFilter = TableQuery.GenerateFilterConditionForDate(nameof(ReleaseStatus.Publish),
-                QueryComparisons.LessThan, DateTime.Today.AddDays(1));
-            var stageFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.OverallStage),
-                QueryComparisons.Equal,
-                ReleaseStatusOverallStage.Scheduled.ToString());
-            var combinedFilter = TableQuery.CombineFilters(dateFilter, TableOperators.And, stageFilter);
-            var query = new TableQuery<ReleaseStatus>().Where(combinedFilter);
-
+            var query = QueryPublishLessThanEndOfTodayWithStages(overall: ReleaseStatusOverallStage.Scheduled);
             return await _releaseStatusService.ExecuteQueryAsync(query);
         }
     }
