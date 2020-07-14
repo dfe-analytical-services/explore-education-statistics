@@ -1,42 +1,42 @@
 import {
   formatPartialDate,
-  parsePartialDateToUtcDate,
+  parsePartialDateToLocalDate,
 } from '@common/utils/date/partialDate';
 import { isValid } from 'date-fns';
 
 describe('partialDate', () => {
-  describe('parsePartialDateToUtcDate', () => {
+  describe('parsePartialDateToLocalDate', () => {
     test('returns fully parsed UTC date', () => {
       expect(
-        parsePartialDateToUtcDate({
+        parsePartialDateToLocalDate({
           year: 2020,
           month: 7,
           day: 13,
         }),
-      ).toEqual(new Date('2020-07-13'));
+      ).toEqual(new Date(2020, 6, 13));
     });
 
     test('returns parsed UTC date when there is only a year', () => {
       expect(
-        parsePartialDateToUtcDate({
+        parsePartialDateToLocalDate({
           year: 2020,
         }),
-      ).toEqual(new Date('2020-01-01'));
+      ).toEqual(new Date(2020, 0, 1));
     });
 
     test('returns parsed UTC date when there is only a year and month', () => {
       expect(
-        parsePartialDateToUtcDate({
+        parsePartialDateToLocalDate({
           year: 2020,
           month: 7,
         }),
-      ).toEqual(new Date('2020-07-01'));
+      ).toEqual(new Date(2020, 6));
     });
 
     test('returns invalid UTC date when month is invalid number', () => {
       expect(
         isValid(
-          parsePartialDateToUtcDate({
+          parsePartialDateToLocalDate({
             year: 2020,
             month: 40,
           }),
@@ -47,7 +47,7 @@ describe('partialDate', () => {
     test('returns invalid UTC date when day is invalid number', () => {
       expect(
         isValid(
-          parsePartialDateToUtcDate({
+          parsePartialDateToLocalDate({
             year: 2020,
             month: 7,
             day: 40,
@@ -58,7 +58,7 @@ describe('partialDate', () => {
 
     test('throw error if missing year', () => {
       expect(() =>
-        parsePartialDateToUtcDate({
+        parsePartialDateToLocalDate({
           year: 0,
           month: 7,
           day: 13,
