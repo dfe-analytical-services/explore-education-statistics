@@ -189,48 +189,82 @@ if args.tests and "general_public" not in args.tests:
             )
 
 
-    def create_test_topic():
+    def admin_request(method, endpoint, body=None):
+        assert method and endpoint
+        assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
+        if method == 'POST':
+            assert body is not None, 'POST requests require a body'
+
         # To prevent InsecureRequestWarning
         requests.packages.urllib3.disable_warnings()
 
-        # Create topic to be used by UI tests
-        run_identifier = str(time.time()).split('.')[0]
-        os.environ['RUN_IDENTIFIER'] = run_identifier
-
-        print(f'Attempting to create test topic {run_identifier}...', flush=True)
-
-        create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/449d720f-9a87-4895-91fe-70972d1bdc04/topics'
-        jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
+        jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_BAU'))['access_token']
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {jwt_token}',
         }
-
-        body = {'title': f'UI test topic {run_identifier}'}
-
-        return requests.post(create_topic_endpoint, headers=headers, json=body, verify=False)
-
-
-    setup_authentication()
-
-    # NOTE(mark): Tests that alter data only occur on local and dev environments
-    if args.env in ['local', 'dev']:
-        response = create_test_topic()
-
+        response = requests.request(method, endpoint, headers=headers, json=body, verify=False)
         if response.status_code in {401, 403}:
             print('Attempting re-authentication...', flush=True)
 
             # Delete identify files and re-attempt to fetch them
             setup_authentication(clear_existing=True)
-            response = create_test_topic()
+            jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {jwt_token}',
+            }
+            response = requests.request(method, endpoint, headers=headers, json=body, verify=False)
 
             assert response.status_code not in {401, 403}, \
-                'Failed to authenticate. Check that identity files exist or are not expired.'
+                'Failed to reauthenticate.'
+        assert response.status_code == 200, 'Admin request status_code wasn\'t 200!'
+        return response
 
-        assert response.status_code == 200, \
-            'Failed to create topic! Have you created the Test theme?'
+    def get_test_themes():
+        assert os.getenv('ADMIN_URL') is not None
 
+        get_themes_endpoint = f'{os.getenv("ADMIN_URL")}/api/me/themes'
+        return admin_request('GET', get_themes_endpoint)
+
+
+    def create_test_theme():
+        assert os.getenv('ADMIN_URL') is not None
+
+        create_theme_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme'
+        body = {'title': 'Test theme', 'summary': 'Test theme summary'}
+        return admin_request('POST', create_theme_endpoint, body)
+
+
+    def create_test_topic(theme_id):
+        assert theme_id
+        assert os.getenv('ADMIN_URL') is not None
         assert os.getenv('RUN_IDENTIFIER') is not None
+
+        create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/{theme_id}/topics'
+        body = {'title': f'UI test topic {os.getenv("RUN_IDENTIFIER")}'}
+        return admin_request('POST', create_topic_endpoint, body)
+
+    setup_authentication()
+
+    # NOTE(mark): Tests that alter data only occur on local and dev environments
+    if args.env in ['local', 'dev']:
+        os.environ['RUN_IDENTIFIER'] = str(time.time()).split('.')[0]
+
+        get_themes_resp = admin_request('GET', f'{os.getenv("ADMIN_URL")}/api/me/themes')
+        test_theme_guid = None
+        for theme in get_themes_resp.json():
+            if theme['title'] == 'Test theme':
+                test_theme_guid = theme['id']
+                break
+        if not test_theme_guid:
+            create_theme_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme'
+            body = {'title': 'Test theme', 'summary': 'Test theme summary'}
+            create_theme_resp = admin_request('POST', create_theme_endpoint, body)
+            test_theme_guid = create_theme_resp.json()['id']
+        assert test_theme_guid is not None, 'test_theme_guid hasn\'t been set!'
+
+        create_test_topic(test_theme_guid)
 
 if args.env == 'local':
     robotArgs += ['--include', 'Local']
