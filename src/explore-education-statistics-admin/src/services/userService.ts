@@ -109,7 +109,7 @@ const userService: UsersService = {
     userReleaseRole: UserReleaseRole,
   ): Promise<boolean> {
     return client.delete(
-      `/user-management/users/${userId}/release-role/${userReleaseRole.id}`,
+      `/user-management/users/release-role/${userReleaseRole.id}`,
     );
   },
 

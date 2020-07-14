@@ -94,27 +94,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
             return await _userManagementService.AddUserReleaseRole(userId, releaseRole).HandleFailuresOrOk();
         }
 
-        [HttpGet("user-management/users/{userId}/release-role/{userReleaseRoleId}")]
+        [HttpDelete("user-management/users/release-role/{userReleaseRoleId}")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<UserReleaseRoleViewModel>> GetUserReleaseRole(Guid userId,
-            Guid userReleaseRoleId)
+        public async Task<ActionResult<bool>> DeleteUserReleaseRole(Guid userReleaseRoleId)
         {
-            var userReleaseRole = await _userManagementService.GetUserReleaseRole(userId, userReleaseRoleId);
-
-            if (userReleaseRole != null)
-            {
-                return Ok(userReleaseRole);
-            }
-
-            return NotFound();
-        }
-
-        [HttpDelete("user-management/users/{userId}/release-role/{userReleaseRoleId}")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<bool>> DeleteUserReleaseRole(Guid userId, Guid userReleaseRoleId)
-        {
-            return await _userManagementService.RemoveUserReleaseRole(userId, userReleaseRoleId).HandleFailuresOrOk();
+            return await _userManagementService.RemoveUserReleaseRole(userReleaseRoleId).HandleFailuresOrOk();
         }
 
         /// <summary>
