@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await DeleteBlobsAsync(publicContainer, string.Empty, excludePattern);
         }
 
-        public async Task DeletePreviousVersionOfRelease(string publicationSlug, string previousVersionSlug)
+        public async Task DeletePreviousVersionContent(string publicationSlug, string previousVersionSlug)
         {
             // Delete previous content
             var publicCacheContainer =

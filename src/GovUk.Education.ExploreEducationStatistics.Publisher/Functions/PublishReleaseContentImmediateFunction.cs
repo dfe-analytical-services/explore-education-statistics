@@ -56,10 +56,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 
                 if (!PublisherUtils.IsDevelopment())
                 {
-                    await _releaseService.DeleteStatisticalDataForPreviousVersions(new[] {message.ReleaseId});
+                    await _releaseService.DeletePreviousVersionsStatisticalData(new[] {message.ReleaseId});
                 }
                 
-                await _releaseService.DeleteContentForPreviousVersions(new[] {message.ReleaseId});
+                await _releaseService.DeletePreviousVersionsContent(new[] {message.ReleaseId});
                 await _notificationsService.NotifySubscribersAsync(new[] {message.ReleaseId});
                 await UpdateStage(message.ReleaseId, releaseStatusId, Stage.Complete);
             }

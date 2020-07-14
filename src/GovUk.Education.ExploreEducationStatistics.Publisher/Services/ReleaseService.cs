@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        public async Task DeleteContentForPreviousVersions(IEnumerable<Guid> releaseIds)
+        public async Task DeletePreviousVersionsContent(IEnumerable<Guid> releaseIds)
         {
             var releases = await _contentDbContext.Releases
                 .Include(r => r.Publication)
@@ -167,12 +167,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var r in releases)
             {
-                await _fileStorageService.DeletePreviousVersionOfRelease(r.Publication.Slug,
+                await _fileStorageService.DeletePreviousVersionContent(r.Publication.Slug,
                     r.PreviousVersion.Slug);
             }
         }
 
-        public async Task DeleteStatisticalDataForPreviousVersions(IEnumerable<Guid> releaseIds)
+        public async Task DeletePreviousVersionsStatisticalData(IEnumerable<Guid> releaseIds)
         {
             var releases = await _contentDbContext.Releases
                 .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
