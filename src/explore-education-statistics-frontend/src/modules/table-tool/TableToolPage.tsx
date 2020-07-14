@@ -11,6 +11,7 @@ import tableBuilderService, {
   ThemeMeta,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
@@ -89,9 +90,32 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       </p>
 
       <TableToolWizard
+        key={fastTrack?.id}
         scrollOnMount
         themeMeta={themeMeta}
         initialState={initialTableToolState}
+        renderHighlights={highlights => (
+          <aside>
+            <h3>Table highlights</h3>
+
+            <p>View popular tables related to this publication:</p>
+
+            <ul>
+              {highlights
+                .filter(highlight => highlight.id !== fastTrack?.id)
+                .map(highlight => (
+                  <li key={highlight.id}>
+                    <Link
+                      to="/data-tables/fast-track/[fastTrackId]"
+                      as={`/data-tables/fast-track/${highlight.id}`}
+                    >
+                      {highlight.label}
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+          </aside>
+        )}
         finalStep={({ publication, query, response }) => (
           <WizardStep>
             {wizardStepProps => (

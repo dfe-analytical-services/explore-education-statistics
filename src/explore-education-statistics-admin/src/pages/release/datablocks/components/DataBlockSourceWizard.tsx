@@ -116,8 +116,8 @@ const DataBlockSourceWizardFinalStep = ({
 
 interface DataBlockSourceWizardProps {
   dataBlock?: ReleaseDataBlock;
-  initialTableToolState?: TableToolState;
   query?: ReleaseTableDataQuery;
+  releaseId?: string;
   subjectMeta?: PublicationSubjectMeta;
   table?: FullTable;
   tableHeaders?: TableHeadersConfig;
@@ -127,6 +127,7 @@ interface DataBlockSourceWizardProps {
 const DataBlockSourceWizard = ({
   dataBlock,
   query: initialQuery,
+  releaseId,
   subjectMeta,
   table,
   tableHeaders,
@@ -154,7 +155,17 @@ const DataBlockSourceWizard = ({
 
       <TableToolWizard
         themeMeta={[]}
-        initialState={initialTableToolState}
+        initialState={
+          initialTableToolState ?? {
+            query: {
+              releaseId,
+              subjectId: '',
+              indicators: [],
+              filters: [],
+              locations: {},
+            },
+          }
+        }
         finalStep={({ response, query }) => (
           <WizardStep>
             {wizardStepProps => (

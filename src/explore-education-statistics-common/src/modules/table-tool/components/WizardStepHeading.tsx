@@ -38,6 +38,7 @@ const WizardStepHeading = ({
           })}
         >
           <button
+            data-testid={`wizardStep-${stepNumber}-goToButton`}
             type="button"
             onClick={() => setCurrentStep(stepNumber)}
             className={styles.stepButton}

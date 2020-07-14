@@ -219,6 +219,7 @@ const ReleaseDataBlocksPageTabs = ({
               <DataBlockSourceWizard
                 key={saveNumber}
                 dataBlock={selectedDataBlock}
+                releaseId={releaseId}
                 query={query}
                 subjectMeta={subjectMeta}
                 table={table}
