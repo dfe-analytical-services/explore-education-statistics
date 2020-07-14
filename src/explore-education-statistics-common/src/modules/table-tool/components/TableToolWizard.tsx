@@ -332,8 +332,8 @@ const TableToolWizard = ({
                       onSubmit={handlePublicationSubjectFormSubmit}
                     />
                   </div>
-                  {renderHighlights &&
-                    highlights.length &&
+                  {!!renderHighlights &&
+                    highlights.length > 0 &&
                     stepProps.isActive && (
                       <div className="govuk-grid-column-one-half">
                         {renderHighlights(highlights)}
