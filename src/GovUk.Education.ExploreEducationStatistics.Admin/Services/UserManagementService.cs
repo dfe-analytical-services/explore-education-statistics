@@ -112,10 +112,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<UserReleaseRole>(userReleaseRoleId)
                 .OnSuccess(async () =>
                 {
-                    var entityToRemove = await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>
-                            r.Id == userReleaseRoleId && r.UserId == userId);
-                    _contentDbContext.Remove(entityToRemove);
-                    await _contentDbContext.SaveChangesAsync();
+                    var entity = await _contentDbContext.UserReleaseRoles
+                        .FirstOrDefaultAsync(r => r.Id == userReleaseRoleId && r.UserId == userId);
+                    
+                    if (entity != null)
+                    {
+                        _contentDbContext.Remove(entity);
+                        await _contentDbContext.SaveChangesAsync();
+                    }
+
                     return true;
                 });
         }
