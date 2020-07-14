@@ -33,13 +33,13 @@ Upload subject
     [Tags]  HappyPath
     user waits until page contains element    xpath://h2[text()="Release summary"]
     user checks summary list item "Publication title" should be "Datablock test %{RUN_IDENTIFIER}"
-    user clicks element  xpath://li/a[text()="Manage data"]
+    user clicks link  Manage data
     user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
     choose file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
     choose file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
-    user clicks element   xpath://button[text()="Upload data files"]
+    user clicks button  Upload data files
 
-    user waits until page contains element   xpath://h2[text()="Uploaded data files"]
+    user waits until page contains heading 2  Uploaded data files
     user waits until page contains accordion section   UI test subject
     user opens accordion section   UI test subject
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
@@ -47,9 +47,8 @@ Upload subject
 
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
-    scroll element into view  xpath://li/a[text()="Manage data blocks"]
-    user clicks element  xpath://li/a[text()="Manage data blocks"]
-    user waits until page contains element   xpath://h2[text()="Choose a subject"]
+    user clicks link    Manage data blocks
+    user waits until page contains heading 2   Choose a subject
 
 Select subject "UI test subject"
     [Tags]  HappyPath
@@ -170,10 +169,9 @@ Validate table rows for Syon
 
 Save data block
     [Tags]  HappyPath
-    user enters text into element  css:#data-block-name        UI Test data block name
-    user clears element text   css:#data-block-title
-    user enters text into element  css:#data-block-title       UI Test table title
-    user enters text into element  css:#data-block-source      UI Test source
+    user enters text into element  id:dataBlockDetailsForm-name         UI Test data block name
+    user enters text into element  id:dataBlockDetailsForm-heading      UI Test table title
+    user enters text into element  id:dataBlockDetailsForm-source       UI Test source
     user clicks button   Save data block
     user waits until page contains    Delete this data block
 
