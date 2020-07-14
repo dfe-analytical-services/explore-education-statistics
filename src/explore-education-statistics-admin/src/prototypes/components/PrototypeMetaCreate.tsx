@@ -3,6 +3,9 @@ import CreateMetaForms from './PrototypeMetaForms';
 import PreviewMeta from './PrototypeMetaPreview';
 
 const CreateMeta = () => {
+  const query = new URLSearchParams(window.location.search);
+  const dialog = query.has('showDialog');
+
   const [createMeta, setCreateMeta] = useState(true);
   const [addNewMeta, setAddNewMeta] = useState(false);
   const [previewMeta, setPreviewMeta] = useState(false);
@@ -27,40 +30,40 @@ const CreateMeta = () => {
         <hr />
         <h2>Coverage</h2>
         <p>
-        This release provides information on the levels of overall, authorised
-        and unauthorised absence in:
-      </p>
-      <ul className="govuk-list--bullet">
-        <li>state-funded primary schools</li>
-        <li>state-funded secondary schools</li>
-        <li>state-funded special schools</li>
-      </ul>
-      <p>it includes information on:</p>
-      <ul className="govuk-list--bullet">
-        <li>reasons for absence</li>
-        <li>persistent absentees</li>
-        <li>pupil characteristics</li>
-        <li>absence information for pupil referral units</li>
-        <li>absence by term</li>
-      </ul>
-      <p>
-        The information is based on pupil level absence data collected via the
-        school census.
-      </p>
-      <p>
-        A guide on how we produce pupil absence statistics is also available
-        with further detail on the methods used. The underlying data files
-        include national, regional, local authority, local authority district
-        and school level absence information from 2006/07 to 2018/19 for
-        schools in England.
-      </p>
-      <hr />
-      <h2>File format and conventions</h2>
-      <h3 className="govuk-heading-s">Rounding</h3>
-      <p>This dataset has not had suppression applied.</p>
-      <h3 className="govuk-heading-s">Conventions</h3>
-      <p>The following convention is used throughout the underlying data</p>
-      <hr />
+          This release provides information on the levels of overall, authorised
+          and unauthorised absence in:
+        </p>
+        <ul className="govuk-list--bullet">
+          <li>state-funded primary schools</li>
+          <li>state-funded secondary schools</li>
+          <li>state-funded special schools</li>
+        </ul>
+        <p>it includes information on:</p>
+        <ul className="govuk-list--bullet">
+          <li>reasons for absence</li>
+          <li>persistent absentees</li>
+          <li>pupil characteristics</li>
+          <li>absence information for pupil referral units</li>
+          <li>absence by term</li>
+        </ul>
+        <p>
+          The information is based on pupil level absence data collected via the
+          school census.
+        </p>
+        <p>
+          A guide on how we produce pupil absence statistics is also available
+          with further detail on the methods used. The underlying data files
+          include national, regional, local authority, local authority district
+          and school level absence information from 2006/07 to 2018/19 for
+          schools in England.
+        </p>
+        <hr />
+        <h2>File format and conventions</h2>
+        <h3 className="govuk-heading-s">Rounding</h3>
+        <p>This dataset has not had suppression applied.</p>
+        <h3 className="govuk-heading-s">Conventions</h3>
+        <p>The following convention is used throughout the underlying data</p>
+        <hr />
       `,
     },
     subject1: {
@@ -79,7 +82,7 @@ const CreateMeta = () => {
 
   return (
     <>
-      {createMeta && (
+      {createMeta && !dialog && (
         <>
           <div className="govuk-inset-text">
             <h2 className="govuk-heading-m">Before you start</h2>
@@ -139,22 +142,26 @@ const CreateMeta = () => {
           </button>
         </>
       )}
-      {previewMeta && (
-        <>
-          <PreviewMeta description={formText.descriptionPlaceholder.text} />
-          <button
-            className="govuk-button govuk-!-margin-right-3"
-            type="submit"
-            onClick={() => {
-              setPreviewMeta(false);
-              setEditMeta(true);
-              setAddNewMeta(true);
-            }}
-          >
-            Edit public metadata
-          </button>
-        </>
-      )}
+      {previewMeta ||
+        (dialog && (
+          <>
+            <PreviewMeta
+              description={formText.descriptionPlaceholder.text}
+              showDialog={dialog}
+            />
+            <button
+              className="govuk-button govuk-!-margin-right-3"
+              type="submit"
+              onClick={() => {
+                setPreviewMeta(false);
+                setEditMeta(true);
+                setAddNewMeta(true);
+              }}
+            >
+              Edit public metadata
+            </button>
+          </>
+        ))}
     </>
   );
 };

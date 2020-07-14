@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import FormEditor, { FormEditorProps } from '@admin/components/form/FormEditor';
-import {
-  Form,
-  FormFieldTextInput,
-  FormGroup,
-  FormTextInput,
-} from '@common/components/form';
-
+import FormEditor from '@admin/components/form/FormEditor';
 import FormTextArea from '@common/components/form/FormTextArea';
 import MetaVariables from './PrototypeMetaVariables';
 

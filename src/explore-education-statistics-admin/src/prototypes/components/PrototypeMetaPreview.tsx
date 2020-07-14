@@ -5,13 +5,26 @@ import MetaVariables from './PrototypeMetaVariables';
 
 interface Props {
   description?: string;
+  showDialog?: boolean;
 }
 
-const CreateMetaForms = (description: Props) => {
-  const previewText = description;
-
+const CreateMetaForms = ({ description, showDialog }: Props) => {
   return (
     <>
+      {showDialog && (
+        <div className="govuk-warning-text govuk-!-margin-bottom-9">
+          <span className="govuk-warning-text__icon" aria-hidden="true">
+            !
+          </span>
+          <strong className="govuk-warning-text__text">
+            <span className="govuk-warning-text__assistive">Warning</span>
+            Some data files have been added or changed since this page was
+            created. <br />
+            Please check all the details of this page and edit where necessary.
+          </strong>
+        </div>
+      )}
+
       <h2 className="govuk-heading-l">An example publication, 2018/19</h2>
       <h3 className="govuk-heading-m">Meta guidance document</h3>
 
@@ -19,7 +32,7 @@ const CreateMetaForms = (description: Props) => {
 
       <div
         dangerouslySetInnerHTML={{
-          __html: `${previewText.description}`,
+          __html: `${description}`,
         }}
       />
 
