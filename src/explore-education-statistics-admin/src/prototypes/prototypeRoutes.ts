@@ -1,6 +1,7 @@
 import { RouteProps } from 'react-router';
 import PrototypeExamplePage from './PrototypeExamplePage';
 import PrototypePublicMetadata from './PrototypePublicMetadata';
+import PrototypeBauGlossary from './PrototypeBauGlossary';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -17,6 +18,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Public metadata',
     path: '/prototypes/public-metadata',
     component: PrototypePublicMetadata,
+  },
+  {
+    name: 'BAU manage glossary',
+    path: '/prototypes/manage-glossary',
+    component: PrototypeBauGlossary,
   },
 ];
 
