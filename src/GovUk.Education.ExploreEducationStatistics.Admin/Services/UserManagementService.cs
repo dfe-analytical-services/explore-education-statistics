@@ -61,23 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return users.Where(u => u.Role != "Prerelease User").ToList();
         }
 
-        public async Task<UserReleaseRoleViewModel> GetUserReleaseRole(Guid userId, Guid userReleaseRoleId)
-        {
-            return await _contentDbContext.UserReleaseRoles
-                .Where(x => x.Id == userReleaseRoleId && x.UserId == userId)
-                .Select(x => new UserReleaseRoleViewModel
-                {
-                    Id = x.Id,
-                    Publication = _contentDbContext.Publications
-                        .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
-                        .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
-                    Release = _contentDbContext.Releases
-                        .Where(r => r.Id == x.ReleaseId)
-                        .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
-                    ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
-                }).FirstOrDefaultAsync();
-        }
-
         public async Task<Either<ActionResult, UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId,
             UserReleaseRoleRequest userReleaseRole)
         {
@@ -97,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _contentDbContext.SaveChangesAsync();
 
-                    var response = await GetUserReleaseRole(userId, newReleaseRole.Id);
+                    var response = await GetUserReleaseRole(newReleaseRole.Id);
 
                     SendNewReleaseRoleEmail(userId, response.Publication, response.Release, response.ReleaseRole);
 
@@ -106,21 +89,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
 
-        public async Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userId, Guid userReleaseRoleId)
+        public async Task<Either<ActionResult, bool>> RemoveUserReleaseRole(Guid userReleaseRoleId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<UserReleaseRole>(userReleaseRoleId)
-                .OnSuccess(async () =>
+                .OnSuccess(async (userReleaseRole) =>
                 {
-                    var entity = await _contentDbContext.UserReleaseRoles
-                        .FirstOrDefaultAsync(r => r.Id == userReleaseRoleId && r.UserId == userId);
-                    
-                    if (entity != null)
-                    {
-                        _contentDbContext.Remove(entity);
-                        await _contentDbContext.SaveChangesAsync();
-                    }
-
+                    _contentDbContext.Remove(userReleaseRole);
+                    await _contentDbContext.SaveChangesAsync();
                     return true;
                 });
         }
@@ -294,6 +270,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OrderBy(x => x.Publication.Title)
                 .ThenBy(x => x.Release.Title)
                 .ToList();
+        }
+
+        private async Task<UserReleaseRoleViewModel> GetUserReleaseRole(Guid userReleaseRoleId)
+        {
+            return await _contentDbContext.UserReleaseRoles
+                .Where(x => x.Id == userReleaseRoleId)
+                .Select(x => new UserReleaseRoleViewModel
+                {
+                    Id = x.Id,
+                    Publication = _contentDbContext.Publications
+                        .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
+                        .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
+                    Release = _contentDbContext.Releases
+                        .Where(r => r.Id == x.ReleaseId)
+                        .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
+                    ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
+                }).FirstOrDefaultAsync();
         }
 
         private string GetRoleName(string roleId)

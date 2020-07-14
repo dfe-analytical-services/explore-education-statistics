@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -119,48 +118,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = new UsersController(userManagementService.Object);
 
             var result = controller.GetUserReleaseRoles(userId);
-
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
-        }
-
-        [Fact]
-        public async void GetUserReleaseRole_Returns_Ok()
-        {
-            var userId = Guid.NewGuid();
-            var releaseRoleId = Guid.NewGuid();
-
-            var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.GetUserReleaseRole(userId, releaseRoleId))
-                .ReturnsAsync(new UserReleaseRoleViewModel
-                {
-                    Publication = new IdTitlePair {Id = Guid.NewGuid(), Title = "Pub A"}
-                });
-
-            var controller = new UsersController(userManagementService.Object);
-
-            var result = await controller.GetUserReleaseRole(userId, releaseRoleId);
-
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-
-            var model = (UserReleaseRoleViewModel) ((OkObjectResult) result.Result).Value;
-
-            Assert.IsAssignableFrom<UserReleaseRoleViewModel>(model);
-            Assert.Equal("Pub A", model.Publication.Title);
-        }
-
-        [Fact]
-        public async void GetUserReleaseRole_Returns_Not_Found()
-        {
-            var userId = Guid.NewGuid();
-            var releaseRoleId = Guid.NewGuid();
-
-            var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.GetUserReleaseRole(userId, releaseRoleId))
-                .ReturnsAsync((UserReleaseRoleViewModel) null);
-
-            var controller = new UsersController(userManagementService.Object);
-
-            var result = await controller.GetUserReleaseRole(userId, releaseRoleId);
 
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
