@@ -140,6 +140,7 @@ describe('TableToolWizard', () => {
       Promise.resolve<PublicationMeta>({
         publicationId: 'publication-1',
         subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+        highlights: [],
       }),
     );
 
@@ -169,7 +170,7 @@ describe('TableToolWizard', () => {
     });
   });
 
-  test('does not render publication step if `releaseId` is set', async () => {
+  test('does not render publication step if `initialState.query.releaseId` is set', async () => {
     tableBuilderService.getReleaseMeta.mockImplementation(() =>
       Promise.resolve<ReleaseMeta>({
         releaseId: 'release-1',
@@ -204,11 +205,12 @@ describe('TableToolWizard', () => {
     });
   });
 
-  test('renders fetched publication release subjects if `releaseId` is set', async () => {
+  test('renders fetched publication release subjects if `initialState.query.releaseId` is set', async () => {
     tableBuilderService.getPublicationMeta.mockImplementation(() =>
       Promise.resolve<PublicationMeta>({
         publicationId: 'publication-1',
         subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+        highlights: [],
       }),
     );
 
@@ -248,11 +250,127 @@ describe('TableToolWizard', () => {
     });
   });
 
+  test('renders table highlights on step 2 when it is the current step', async () => {
+    tableBuilderService.getPublicationMeta.mockImplementation(() =>
+      Promise.resolve<PublicationMeta>({
+        publicationId: 'publication-1',
+        subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+        highlights: [
+          { id: 'highlight-1', label: 'Test highlight 1' },
+          { id: 'highlight-2', label: 'Test highlight 2' },
+          { id: 'highlight-3', label: 'Test highlight 3' },
+        ],
+      }),
+    );
+
+    render(
+      <TableToolWizard
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 2,
+          subjectMeta: testSubjectMeta,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: '',
+            locations: {},
+            filters: [],
+            indicators: [],
+          },
+        }}
+        renderHighlights={highlights => (
+          <ul>
+            {highlights.map(highlight => (
+              <li key={highlight.id} id={highlight.id}>
+                {highlight.label}
+              </li>
+            ))}
+          </ul>
+        )}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
+        'aria-current',
+        'step',
+      );
+
+      const step2 = within(screen.getByTestId('wizardStep-2'));
+
+      expect(step2.getByText('Test highlight 1')).toHaveAttribute(
+        'id',
+        'highlight-1',
+      );
+      expect(step2.getByText('Test highlight 2')).toHaveAttribute(
+        'id',
+        'highlight-2',
+      );
+      expect(step2.getByText('Test highlight 3')).toHaveAttribute(
+        'id',
+        'highlight-3',
+      );
+    });
+  });
+
+  test('does not render table highlights when step 2 is not the current step', async () => {
+    tableBuilderService.getPublicationMeta.mockImplementation(() =>
+      Promise.resolve<PublicationMeta>({
+        publicationId: 'publication-1',
+        subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+        highlights: [
+          { id: 'highlight-1', label: 'Test highlight 1' },
+          { id: 'highlight-2', label: 'Test highlight 2' },
+          { id: 'highlight-3', label: 'Test highlight 3' },
+        ],
+      }),
+    );
+
+    render(
+      <TableToolWizard
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 3,
+          subjectMeta: testSubjectMeta,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: 'subject-1',
+            locations: {},
+            filters: [],
+            indicators: [],
+          },
+        }}
+        renderHighlights={highlights => (
+          <ul>
+            {highlights.map(highlight => (
+              <li key={highlight.id} id={highlight.id}>
+                {highlight.label}
+              </li>
+            ))}
+          </ul>
+        )}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
+        'aria-current',
+        'step',
+      );
+
+      const step2 = within(screen.getByTestId('wizardStep-2'));
+
+      expect(step2.queryByText('Test highlight 1')).not.toBeInTheDocument();
+      expect(step2.queryByText('Test highlight 2')).not.toBeInTheDocument();
+      expect(step2.queryByText('Test highlight 3')).not.toBeInTheDocument();
+    });
+  });
+
   test('renders all steps correctly when full `initialState` is provided', async () => {
     tableBuilderService.getPublicationMeta.mockImplementation(() =>
       Promise.resolve<PublicationMeta>({
         publicationId: 'publication-1',
         subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+        highlights: [],
       }),
     );
 

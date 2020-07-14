@@ -79,9 +79,15 @@ export interface PublicationSubject {
   label: string;
 }
 
+export interface TableHighlight {
+  id: string;
+  label: string;
+}
+
 export interface PublicationMeta {
   publicationId: string;
   subjects: PublicationSubject[];
+  highlights: TableHighlight[];
 }
 
 export interface ReleaseMeta {
