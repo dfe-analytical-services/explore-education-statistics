@@ -72,9 +72,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {
                     if (!PublisherUtils.IsDevelopment())
                     {
-                        await _releaseService.SoftDeletePreviousVersions(releaseIds);
+                        await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
-
+                    
+                    await _releaseService.DeletePreviousVersionsContent(releaseIds);
                     await _notificationsService.NotifySubscribersAsync(releaseIds);
                     await UpdateStage(published, Complete);
                 }
