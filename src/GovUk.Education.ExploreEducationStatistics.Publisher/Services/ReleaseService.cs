@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
 
@@ -167,8 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var r in releases)
             {
-                await _fileStorageService.DeletePreviousVersionContent(r.Publication.Slug,
-                    r.PreviousVersion.Slug);
+                await _fileStorageService.DeletePublicBlob(PublicContentReleasePath(r.Publication.Slug,r.PreviousVersion.Slug));
             }
         }
 

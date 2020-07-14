@@ -38,9 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentDownloadPath(prefix)}/tree.json";
         }
 
+        public static string PublicContentReleaseFastTrackPath(string releaseId, string prefix = null)
+        {
+            return $"{PublicContentFastTrackPath(prefix)}/{releaseId}";
+        }
+        
         public static string PublicContentFastTrackPath(string releaseId, string id, string prefix = null)
         {
-            return $"{PublicContentFastTrackPath(prefix)}/{releaseId}/{id}.json";
+            return $"{PublicContentReleaseFastTrackPath(releaseId, prefix)}/{id}.json";
         }
 
         public static string PublicContentMethodologyTreePath(string prefix = null)

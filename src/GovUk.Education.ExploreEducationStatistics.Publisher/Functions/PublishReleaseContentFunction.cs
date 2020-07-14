@@ -74,7 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     {
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
-                    
+
+                    // TODO EES-1161 Delete any FastTracks for old versions
                     await _releaseService.DeletePreviousVersionsContent(releaseIds);
                     await _notificationsService.NotifySubscribersAsync(releaseIds);
                     await UpdateStage(published, Complete);
