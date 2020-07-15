@@ -45,6 +45,10 @@ import {
 import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
+import {
+  isServerValidationError,
+  ServerValidationErrorResponse,
+} from '@common/validation/serverValidations';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import React, {
@@ -83,6 +87,12 @@ export interface ChartBuilderForm extends FormState {
   id: string;
 }
 
+type ChartBuilderForms = {
+  options: ChartBuilderForm;
+  data: ChartBuilderForm;
+  [key: string]: ChartBuilderForm;
+};
+
 export type TableQueryUpdateHandler = (
   query: Partial<ReleaseTableDataQuery>,
 ) => Promise<void>;
@@ -92,7 +102,7 @@ interface Props {
   meta: FullTableMeta;
   releaseId: string;
   initialConfiguration?: Chart;
-  onChartSave: (chart: Chart, file?: File) => void;
+  onChartSave: (chart: Chart, file?: File) => Promise<void>;
   onChartDelete: (chart: Chart) => void;
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
@@ -121,11 +131,7 @@ const ChartBuilder = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
-  const forms: {
-    options: ChartBuilderForm;
-    data: ChartBuilderForm;
-    [key: string]: ChartBuilderForm;
-  } = useMemo(() => {
+  const forms: ChartBuilderForms = useMemo(() => {
     const formTitles: Dictionary<string> = {
       ...mapValues(
         (definition?.axes as Required<ChartDefinition['axes']>) ?? {},
@@ -141,6 +147,10 @@ const ChartBuilder = ({
       id: `chartBuilder-${formKey}`,
     }));
   }, [definition, formStates]);
+
+  const [submitError, setSubmitError] = useState<
+    ServerValidationErrorResponse
+  >();
 
   const canSaveChart = useMemo(
     () => Object.values(forms).every(form => form.isValid),
@@ -213,6 +223,7 @@ const ChartBuilder = ({
     }
 
     setShouldSave(false);
+    setSubmitError(undefined);
 
     if (containerRef.current) {
       containerRef.current.scrollIntoView({
@@ -221,7 +232,13 @@ const ChartBuilder = ({
       });
     }
 
-    onChartSave(filterChartProps(chartProps), chartProps.file);
+    onChartSave(filterChartProps(chartProps), chartProps.file).catch(error => {
+      if (isServerValidationError(error) && error.response?.data) {
+        setSubmitError(error.response.data);
+      } else {
+        throw error;
+      }
+    });
   }, [canSaveChart, chartProps, onChartSave, shouldSave]);
 
   const handleChartDelete = useCallback(async () => {
@@ -338,6 +355,7 @@ const ChartBuilder = ({
               buttons={deleteButton}
               canSaveChart={canSaveChart}
               hasSubmittedChart={hasSubmittedChart}
+              submitError={submitError}
               forms={forms}
               definition={definition}
               chartOptions={options}
