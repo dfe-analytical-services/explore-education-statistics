@@ -15,6 +15,11 @@ import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
+import {
+  convertServerFieldErrors,
+  mapFieldErrors,
+  ServerValidationErrorResponse,
+} from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import mapValues from 'lodash/mapValues';
@@ -22,6 +27,17 @@ import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema, Schema } from 'yup';
+
+export const errorMappings = [
+  mapFieldErrors<ChartOptions>({
+    target: 'file',
+    messages: {
+      FILE_TYPE_INVALID: 'The selected infographic must be an image',
+      CANNOT_OVERWRITE_FILE:
+        'The selected infographic has a non-unique file name',
+    },
+  }),
+];
 
 const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
   // eslint-disable-next-line no-param-reassign
@@ -38,6 +54,7 @@ interface Props {
   forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
   meta: FullTableMeta;
+  submitError?: ServerValidationErrorResponse;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
   onFormStateChange: (
@@ -58,6 +75,7 @@ const ChartConfiguration = ({
   forms,
   hasSubmittedChart,
   meta,
+  submitError,
   onBoundaryLevelChange,
   onChange,
   onFormStateChange,
@@ -156,6 +174,11 @@ const ChartConfiguration = ({
   return (
     <Formik<FormValues>
       enableReinitialize
+      initialErrors={
+        submitError
+          ? convertServerFieldErrors(submitError, errorMappings)
+          : undefined
+      }
       initialValues={initialValues}
       initialTouched={
         hasSubmittedChart
