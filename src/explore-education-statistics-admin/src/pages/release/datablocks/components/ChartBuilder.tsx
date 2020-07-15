@@ -62,10 +62,20 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-const filterChartProps = (props: ChartProps): Chart => {
+type ChartBuilderChartProps = ChartRendererProps & {
+  file?: File;
+};
+
+const filterChartProps = (props: ChartBuilderChartProps): Chart => {
   // We don't want to persist data set labels
   // anymore in the deprecated format.
-  return omit(props, ['data', 'meta', 'labels']) as Chart;
+  return omit(props, [
+    'data',
+    'meta',
+    'labels',
+    'getInfographic',
+    'file',
+  ]) as Chart;
 };
 
 export interface ChartBuilderForm extends FormState {
@@ -82,7 +92,7 @@ interface Props {
   meta: FullTableMeta;
   releaseId: string;
   initialConfiguration?: Chart;
-  onChartSave: (chart: Chart) => void;
+  onChartSave: (chart: Chart, file?: File) => void;
   onChartDelete: (chart: Chart) => void;
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
@@ -142,7 +152,7 @@ const ChartBuilder = ({
     [forms],
   );
 
-  const chartProps = useMemo<ChartRendererProps | undefined>(() => {
+  const chartProps = useMemo<ChartBuilderChartProps | undefined>(() => {
     if (!definition) {
       return undefined;
     }
@@ -160,8 +170,10 @@ const ChartBuilder = ({
           ...baseProps,
           labels: [],
           type: 'infographic',
-          fileId: options.fileId ?? '',
-          getInfographic: getChartFile,
+          fileId: options.file ? options.file.name : options.fileId ?? '',
+          getInfographic: options.file
+            ? () => Promise.resolve(options.file as File)
+            : getChartFile,
         };
       case 'line':
         return {
@@ -209,7 +221,7 @@ const ChartBuilder = ({
       });
     }
 
-    onChartSave(filterChartProps(chartProps));
+    onChartSave(filterChartProps(chartProps), chartProps.file);
   }, [canSaveChart, chartProps, onChartSave, shouldSave]);
 
   const handleChartDelete = useCallback(async () => {
@@ -330,7 +342,6 @@ const ChartBuilder = ({
               definition={definition}
               chartOptions={options}
               meta={meta}
-              releaseId={releaseId}
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={handleChartConfigurationChange}
               onFormStateChange={actions.updateFormState}

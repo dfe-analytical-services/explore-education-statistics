@@ -1,6 +1,5 @@
 import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
 import ChartBuilderSaveButton from '@admin/pages/release/datablocks/components/ChartBuilderSaveButton';
-import InfographicChartForm from '@admin/pages/release/datablocks/components/InfographicChartForm';
 import {
   ChartOptions,
   FormState,
@@ -9,6 +8,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import Effect from '@common/components/Effect';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
@@ -37,7 +37,6 @@ interface Props {
   definition: ChartDefinition;
   forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
-  releaseId: string;
   meta: FullTableMeta;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
@@ -59,14 +58,11 @@ const ChartConfiguration = ({
   forms,
   hasSubmittedChart,
   meta,
-  releaseId,
   onBoundaryLevelChange,
   onChange,
   onFormStateChange,
   onSubmit,
 }: Props) => {
-  const { fileId } = chartOptions;
-
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
       title: Yup.string().required('Enter chart title'),
@@ -104,8 +100,22 @@ const ChartConfiguration = ({
       });
     }
 
+    if (definition.type === 'infographic') {
+      schema = schema.shape({
+        fileId: Yup.string(),
+        file: Yup.mixed().when('fileId', {
+          is: value => !value,
+          then: Yup.mixed().required('Choose an infographic file to upload'),
+        }),
+      });
+    }
+
     return schema;
-  }, [definition.capabilities.hasLegend, definition.capabilities.stackable]);
+  }, [
+    definition.capabilities.hasLegend,
+    definition.capabilities.stackable,
+    definition.type,
+  ]);
 
   const initialValues = useMemo<FormValues>(() => {
     return pick(chartOptions, Object.keys(validationSchema.fields));
@@ -132,48 +142,24 @@ const ChartConfiguration = ({
   );
 
   return (
-    <>
-      {definition.type === 'infographic' && (
-        <>
-          <InfographicChartForm
-            canSaveChart={canSaveChart}
-            releaseId={releaseId}
-            fileId={fileId}
-            subjectName={meta.subjectName}
-            onSubmit={async nextFileId => {
-              onChange({
-                ...chartOptions,
-                fileId: nextFileId,
-              });
-            }}
-            onDelete={async () => {
-              onSubmit({
-                ...chartOptions,
-                fileId: '',
-              });
-            }}
-          />
-          <hr />
-        </>
-      )}
-
-      <Formik<FormValues>
-        enableReinitialize
-        initialValues={initialValues}
-        initialTouched={
-          hasSubmittedChart
-            ? mapValues(validationSchema.fields, () => true)
-            : undefined
+    <Formik<FormValues>
+      enableReinitialize
+      initialValues={initialValues}
+      initialTouched={
+        hasSubmittedChart
+          ? mapValues(validationSchema.fields, () => true)
+          : undefined
+      }
+      validateOnMount
+      validationSchema={validationSchema}
+      onSubmit={values => {
+        if (canSaveChart) {
+          onSubmit(normalizeValues(values));
         }
-        validateOnMount
-        validationSchema={validationSchema}
-        onSubmit={values => {
-          if (canSaveChart) {
-            onSubmit(normalizeValues(values));
-          }
-        }}
-      >
-        {form => (
+      }}
+    >
+      {form => {
+        return (
           <Form id={formId}>
             <Effect
               value={{
@@ -193,7 +179,15 @@ const ChartConfiguration = ({
               onMount={onFormStateChange}
             />
 
-            <FormFieldTextArea<ChartOptions>
+            {validationSchema.fields.file && (
+              <FormFieldFileInput<FormValues>
+                id={`${formId}-file`}
+                name="file"
+                label="Upload new infographic"
+              />
+            )}
+
+            <FormFieldTextArea<FormValues>
               id={`${formId}-title`}
               name="title"
               label="Title"
@@ -203,7 +197,7 @@ const ChartConfiguration = ({
               onChange={replaceNewLines}
             />
 
-            <FormFieldTextArea<ChartOptions>
+            <FormFieldTextArea<FormValues>
               id={`${formId}-alt`}
               className="govuk-!-width-three-quarters"
               name="alt"
@@ -215,7 +209,7 @@ const ChartConfiguration = ({
             />
 
             {validationSchema.fields.stacked && (
-              <FormFieldCheckbox<ChartOptions>
+              <FormFieldCheckbox<FormValues>
                 id={`${formId}-stacked`}
                 name="stacked"
                 label="Stacked bars"
@@ -223,7 +217,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.legend && (
-              <FormFieldSelect<ChartOptions>
+              <FormFieldSelect<FormValues>
                 id={`${formId}-position`}
                 name="legend"
                 label="Legend position"
@@ -237,7 +231,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.height && (
-              <FormFieldNumberInput<ChartOptions>
+              <FormFieldNumberInput<FormValues>
                 id={`${formId}-height`}
                 name="height"
                 label="Height (px)"
@@ -246,7 +240,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.width && (
-              <FormFieldNumberInput<ChartOptions>
+              <FormFieldNumberInput<FormValues>
                 id={`${formId}-width`}
                 name="width"
                 label="Width (px)"
@@ -264,7 +258,7 @@ const ChartConfiguration = ({
                 )}
                 {meta.boundaryLevels.length > 1 && (
                   <FormGroup>
-                    <FormFieldSelect<ChartOptions>
+                    <FormFieldSelect<FormValues>
                       id={`${formId}-geographicId`}
                       label="Select a version of geographical data to use"
                       name="geographicId"
@@ -299,9 +293,9 @@ const ChartConfiguration = ({
               {buttons}
             </ButtonGroup>
           </Form>
-        )}
-      </Formik>
-    </>
+        );
+      }}
+    </Formik>
   );
 };
 
