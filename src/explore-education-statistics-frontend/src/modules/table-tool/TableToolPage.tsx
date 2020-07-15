@@ -13,6 +13,7 @@ import tableBuilderService, {
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useMemo } from 'react';
@@ -101,7 +102,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             <p>View popular tables related to this publication:</p>
 
             <ul>
-              {highlights
+              {orderBy(highlights, ['label'], ['asc'])
                 .filter(highlight => highlight.id !== fastTrack?.id)
                 .map(highlight => (
                   <li key={highlight.id}>
