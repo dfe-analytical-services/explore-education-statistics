@@ -32,9 +32,11 @@ export const errorMappings = [
   mapFieldErrors<ChartOptions>({
     target: 'file',
     messages: {
-      FILE_TYPE_INVALID: 'The selected infographic must be an image',
-      CANNOT_OVERWRITE_FILE:
-        'The selected infographic has a non-unique file name',
+      FILE_TYPE_INVALID: 'The infographic must be an image',
+      CANNOT_OVERWRITE_FILE: 'The infographic does not have a unique filename',
+      FILE_CANNOT_BE_EMPTY: 'The infographic cannot be an empty file',
+      FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        'The infographic filename cannot contain spaces or special characters',
     },
   }),
 ];
@@ -128,7 +130,7 @@ const ChartConfiguration = ({
           })
           .test({
             name: 'imageType',
-            message: 'The selected infographic must be an image',
+            message: 'The infographic must be an image',
             test(value?: File) {
               if (!value) {
                 return true;
