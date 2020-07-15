@@ -1,6 +1,7 @@
 import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import SanitizeHtml from '@common/components/SanitizeHtml';
 import MetaVariables from './PrototypeMetaVariables';
 
 interface Props {
@@ -30,11 +31,7 @@ const CreateMetaForms = ({ description, showDialog }: Props) => {
 
       <p className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">July 2020</p>
 
-      <div
-        dangerouslySetInnerHTML={{
-          __html: `${description}`,
-        }}
-      />
+      <SanitizeHtml dirtyHtml={description || ''} />
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Data files</h2>
       <Accordion id="dataFiles">

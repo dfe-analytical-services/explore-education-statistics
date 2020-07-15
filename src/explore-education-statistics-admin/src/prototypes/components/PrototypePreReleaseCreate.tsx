@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import FormEditor from '@admin/components/form/FormEditor';
+import SanitizeHtml from '@common/components/SanitizeHtml';
 
 const CreatePreRelease = () => {
   const query = new URLSearchParams(window.location.search);
@@ -113,12 +114,9 @@ const CreatePreRelease = () => {
             Published 15 July 2020
           </p>
 
-          <div
-            className="govuk-!-margin-bottom-9"
-            dangerouslySetInnerHTML={{
-              __html: `${formText}`,
-            }}
-          />
+          <div className="govuk-!-margin-bottom-9">
+            <SanitizeHtml dirtyHtml={formText || ''} />
+          </div>
           <button
             className="govuk-button govuk-!-margin-right-3"
             type="submit"
