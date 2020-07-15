@@ -15,16 +15,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishReleaseContentFunction
     {
+        private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
 
-        public PublishReleaseContentFunction(INotificationsService notificationsService,
+        public PublishReleaseContentFunction(IContentService contentService,
+            INotificationsService notificationsService,
             IReleaseStatusService releaseStatusService,
             IPublishingService publishingService,
             IReleaseService releaseService)
         {
+            _contentService = contentService;
             _notificationsService = notificationsService;
             _releaseStatusService = releaseStatusService;
             _publishingService = publishingService;
@@ -74,9 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     {
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
-
-                    // TODO EES-1161 Delete any FastTracks for old versions
-                    await _releaseService.DeletePreviousVersionsContent(releaseIds);
+                    
+                    await _contentService.DeletePreviousVersionsContent(releaseIds);
                     await _notificationsService.NotifySubscribersAsync(releaseIds);
                     await UpdateStage(published, Complete);
                 }

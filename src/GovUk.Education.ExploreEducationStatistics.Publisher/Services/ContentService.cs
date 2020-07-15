@@ -38,6 +38,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
         }
 
+
+        public async Task DeletePreviousVersionsContent(IEnumerable<Guid> releaseIds)
+        {
+            var releases = await _releaseService.GetAmendedReleases(releaseIds);
+
+            foreach (var release in releases)
+            {
+                await _fastTrackService.DeleteAllFastTracksByRelease(release.PreviousVersionId);
+
+                // Delete content which hasn't been overwritten because the Slug has changed
+                if (release.Slug != release.PreviousVersion.Slug)
+                {
+                    await _fileStorageService.DeletePublicBlob(
+                        PublicReleaseDirectoryPath(release.Publication.Slug, release.PreviousVersion.Slug));
+                }
+            }
+        }
+
         /**
          * Intended to be used as a Development / BAU Function to perform a full content refresh
          */

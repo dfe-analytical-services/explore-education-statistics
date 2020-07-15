@@ -8,6 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task CreateAllByRelease(Guid releaseId, PublishContext context);
 
+        Task DeleteAllFastTracksByRelease(Guid releaseId);
+
         Task DeleteAllReleaseFastTracks();
     }
 }
