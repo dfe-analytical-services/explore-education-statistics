@@ -8,6 +8,7 @@ import React, {
 import ErrorMessage from '../ErrorMessage';
 
 export interface FormFileInputProps {
+  accept?: string;
   disabled?: boolean;
   error?: ReactNode | string;
   hint?: string;
@@ -20,6 +21,7 @@ export interface FormFileInputProps {
 }
 
 const FormFileInput = ({
+  accept,
   disabled,
   error,
   hint,
@@ -53,6 +55,7 @@ const FormFileInput = ({
         type="file"
         disabled={disabled}
         name={name}
+        accept={accept}
         onChange={onChange}
         onClick={onClick}
         onKeyPress={onKeyPress}

@@ -103,10 +103,22 @@ const ChartConfiguration = ({
     if (definition.type === 'infographic') {
       schema = schema.shape({
         fileId: Yup.string(),
-        file: Yup.mixed().when('fileId', {
-          is: value => !value,
-          then: Yup.mixed().required('Choose an infographic file to upload'),
-        }),
+        file: Yup.mixed()
+          .when('fileId', {
+            is: value => !value,
+            then: Yup.mixed().required('Select an infographic file to upload'),
+          })
+          .test({
+            name: 'imageType',
+            message: 'The selected infographic must be an image',
+            test(value?: File) {
+              if (!value) {
+                return true;
+              }
+
+              return value?.type.startsWith('image');
+            },
+          }),
       });
     }
 
@@ -184,6 +196,7 @@ const ChartConfiguration = ({
                 id={`${formId}-file`}
                 name="file"
                 label="Upload new infographic"
+                accept="image/*"
               />
             )}
 
