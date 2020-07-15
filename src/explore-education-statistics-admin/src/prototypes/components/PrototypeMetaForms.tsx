@@ -50,7 +50,7 @@ const CreateMetaForms = ({
 
   return (
     <>
-      <form id="createMetaForm" className="govuk-!-marin-bottom-9">
+      <form id="createMetaForm" className="govuk-!-margin-bottom-9">
         <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
           <h2 className="govuk-fieldset__heading">
             Example publication, 2018/19

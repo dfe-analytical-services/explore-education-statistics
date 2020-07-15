@@ -9,8 +9,6 @@ const PrototypeExamplePage = () => {
   const [edit, setEdit] = useState(false);
   const [newEntry, setNewEntry] = useState(false);
   const [editItem, setEditItem] = useState('');
-  const [editItemName, setEditItemName] = useState('');
-  const [editItemDescription, setEditItemDescription] = useState('');
   const [showDeleteModal, toggleDeleteModal] = useToggle(false);
 
   const glossaryList = [
@@ -34,17 +32,34 @@ const PrototypeExamplePage = () => {
       description: `<p>Releases of statistics which are not part of DfE's regular annual official statistical release calendar.</p>`,
       log: '-',
     },
+    {
+      name: 'Dual main registered pupils',
+      description: `<p>Dual registered pupils who are enrolled at more than 1 school have a dual main registration (at their main school) and 1 or more subsidiary registrations (at their additional schools).</p><p>See also <a href="/glossary#dual-registered-pupils">Dual registered pupils</a>.</p>`,
+      log: '-',
+    },
+    {
+      name: 'Dual registered pupils',
+      description: `<p>Pupils who are enrolled at more than 1 school.</p><p>See also <a href="/glossary#dual-main-registered-pupils">dual main registered pupils</a>.</p>`,
+      log: '10 July 2020 12:34',
+    },
+    {
+      name: 'Exclusion',
+      description: `<p>When a pupil is not allowed to attend (or is excluded from) a school.</p><p>There are 2 types of exclusion:</p><ul><li><a href="/glossary#fixed-period-exclusion">fixed-period exclusion</a></li><li><a href="/glossary#permanent-exclusion">permanent exclusion</a></li></ul>`,
+      log: '-',
+    },
   ];
 
   glossaryList.sort((a, b) => (a.name > b.name ? 1 : -1));
 
   const findItem = glossaryList.find(item => item.name === editItem);
 
+  let glossaryName = findItem?.name;
+
   return (
     <PrototypePage
       wide
       breadcrumbs={[
-        { name: 'Platform adminisration', link: '#' },
+        { name: 'Platform administration', link: '#' },
         { name: 'Manage glossary', link: '#' },
       ]}
     >
@@ -61,17 +76,19 @@ const PrototypeExamplePage = () => {
         <>
           <form id="createMetaForm" className="govuk-!-marin-bottom-9">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-              <h2 className="govuk-heading-m">Update glossary item</h2>
+              <h2 className="govuk-heading-m">
+                {newEntry ? 'Add new glossary item' : 'Update glossary item'}
+              </h2>
             </legend>
             <FormGroup>
               <FormTextInput
                 id="name"
                 name="name"
                 label="Glossary item"
-                value={findItem?.name ? findItem?.name : ''}
+                value={glossaryName}
                 className="govuk-!-width-one-half"
                 onChange={event => {
-                  setEditItemName(event.target.value);
+                  glossaryName = event.target.value;
                 }}
               />
             </FormGroup>
@@ -80,7 +97,7 @@ const PrototypeExamplePage = () => {
               name="description"
               label="Item description"
               value={findItem?.description ? findItem?.description : ''}
-              onChange={event => {
+              onChange={() => {
                 setEdit(true);
               }}
             />
@@ -135,6 +152,17 @@ const PrototypeExamplePage = () => {
       )}
       {!edit && (
         <>
+          <button
+            className="govuk-button govuk-!-margin-right-3"
+            type="submit"
+            onClick={() => {
+              setEdit(true);
+              setNewEntry(true);
+              setEditItem('');
+            }}
+          >
+            Add new item
+          </button>
           <table className="govuk-table">
             <thead>
               <tr>
@@ -148,7 +176,7 @@ const PrototypeExamplePage = () => {
                   <td>
                     <a
                       href="#"
-                      onClick={event => {
+                      onClick={() => {
                         setEditItem(item.name);
                         setEdit(true);
                         setNewEntry(false);
@@ -162,18 +190,6 @@ const PrototypeExamplePage = () => {
               ))}
             </tbody>
           </table>
-          <button
-            className="govuk-button govuk-!-margin-right-3"
-            type="submit"
-            onClick={() => {
-              setEdit(true);
-              setNewEntry(true);
-              setEditItemName('');
-              setEditItemDescription('');
-            }}
-          >
-            Add new item
-          </button>
         </>
       )}
     </PrototypePage>
