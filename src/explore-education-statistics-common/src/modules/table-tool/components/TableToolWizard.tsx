@@ -22,6 +22,7 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
+import logger from '@common/services/logger';
 import tableBuilderService, {
   PublicationSubject,
   PublicationSubjectMeta,
@@ -29,6 +30,7 @@ import tableBuilderService, {
   TableHighlight,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
+import { AxiosError } from 'axios';
 import classNames from 'classnames';
 import React, {
   ReactElement,
@@ -114,18 +116,32 @@ const TableToolWizard = ({
     const { releaseId, publicationId } = state.query;
 
     if (releaseId) {
-      tableBuilderService.getReleaseMeta(releaseId).then(meta => {
-        setSubjects(meta.subjects);
-      });
+      tableBuilderService
+        .getReleaseMeta(releaseId)
+        .then(meta => {
+          setSubjects(meta.subjects);
+        })
+        .catch((err: AxiosError) => {
+          if (err.response?.status !== 404) {
+            logger.error(err);
+          }
+        });
 
       return;
     }
 
     if (publicationId) {
-      tableBuilderService.getPublicationMeta(publicationId).then(meta => {
-        setSubjects(meta.subjects);
-        setHighlights(meta.highlights);
-      });
+      tableBuilderService
+        .getPublicationMeta(publicationId)
+        .then(meta => {
+          setSubjects(meta.subjects);
+          setHighlights(meta.highlights);
+        })
+        .catch((err: AxiosError) => {
+          if (err.response?.status !== 404) {
+            logger.error(err);
+          }
+        });
     }
   }, [state.query]);
 
