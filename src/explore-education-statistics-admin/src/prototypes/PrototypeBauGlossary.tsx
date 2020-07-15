@@ -54,6 +54,7 @@ const PrototypeExamplePage = () => {
   const findItem = glossaryList.find(item => item.name === editItem);
 
   let glossaryName = findItem?.name;
+  const glossaryDescription = findItem?.description;
 
   return (
     <PrototypePage
@@ -96,7 +97,7 @@ const PrototypeExamplePage = () => {
               id="description"
               name="description"
               label="Item description"
-              value={findItem?.description ? findItem?.description : ''}
+              value={glossaryDescription || ''}
               onChange={() => {
                 setEdit(true);
               }}
