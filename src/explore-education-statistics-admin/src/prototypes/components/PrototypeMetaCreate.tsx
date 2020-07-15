@@ -142,26 +142,25 @@ const CreateMeta = () => {
           </button>
         </>
       )}
-      {previewMeta ||
-        (dialog && (
-          <>
-            <PreviewMeta
-              description={formText.descriptionPlaceholder.text}
-              showDialog={dialog}
-            />
-            <button
-              className="govuk-button govuk-!-margin-right-3"
-              type="submit"
-              onClick={() => {
-                setPreviewMeta(false);
-                setEditMeta(true);
-                setAddNewMeta(true);
-              }}
-            >
-              Edit public metadata
-            </button>
-          </>
-        ))}
+      {previewMeta && (
+        <>
+          <PreviewMeta
+            description={formText.descriptionPlaceholder.text}
+            showDialog={dialog}
+          />
+          <button
+            className="govuk-button govuk-!-margin-right-3"
+            type="submit"
+            onClick={() => {
+              setPreviewMeta(false);
+              setEditMeta(true);
+              setAddNewMeta(true);
+            }}
+          >
+            Edit public metadata
+          </button>
+        </>
+      )}
     </>
   );
 };

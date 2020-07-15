@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import MetaVariables from './PrototypeMetaVariables';

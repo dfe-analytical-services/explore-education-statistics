@@ -13,21 +13,22 @@ const NavBar = () => {
     >
       <ul className={classNames(styles.list, 'govuk-!-margin-bottom-0')}>
         <li>
-          <NavLink to="example">Release summary</NavLink>
+          <NavLink to="/prototypes1">Release summary</NavLink>
         </li>
         <li>
-          <NavLink to="public-metadata">Manage data</NavLink>
+          <NavLink to="public-metadata#test-4">Manage data</NavLink>
         </li>
         <li>
-          <NavLink to="example">Manage data blocks</NavLink>
+          <NavLink to="/prototypes2">Manage data blocks</NavLink>
         </li>
         <li>
-          <NavLink to="example">Manage content</NavLink>
+          <NavLink to="/prototypes3">Manage content</NavLink>
         </li>
         <li>
-          <NavLink key="5" to="example">
-            Release status
-          </NavLink>
+          <NavLink to="/prototypes4">Release status</NavLink>
+        </li>
+        <li>
+          <NavLink to="pre-release">Pre-release access</NavLink>
         </li>
       </ul>
     </nav>

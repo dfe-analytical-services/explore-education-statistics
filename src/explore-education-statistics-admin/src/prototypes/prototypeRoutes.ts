@@ -2,6 +2,7 @@ import { RouteProps } from 'react-router';
 import PrototypeExamplePage from './PrototypeExamplePage';
 import PrototypePublicMetadata from './PrototypePublicMetadata';
 import PrototypeBauGlossary from './PrototypeBauGlossary';
+import PrototypePreRelease from './PrototypePreRelease';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -23,6 +24,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'BAU manage glossary',
     path: '/prototypes/manage-glossary',
     component: PrototypeBauGlossary,
+  },
+  {
+    name: 'Pre release access',
+    path: '/prototypes/pre-release',
+    component: PrototypePreRelease,
   },
 ];
 
