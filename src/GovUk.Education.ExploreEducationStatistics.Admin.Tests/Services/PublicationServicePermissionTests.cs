@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -56,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Setup(s => s.GetAllPublicationsForTopicAsync(topicId)).
                 ReturnsAsync(list);
             
-            var result = publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId).Result.Left;
+            var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Left;
             Assert.IsAssignableFrom<ForbidResult>(result);
             
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
@@ -95,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Setup(s => s.GetAllPublicationsForTopicAsync(topicId)).
                 ReturnsAsync(list);
             
-            var result = publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId).Result.Right;
+            var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Right;
             Assert.Equal(list, result);
             
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
@@ -141,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Setup(s => s.GetPublicationsForTopicRelatedToUserAsync(topicId, userId)).
                 ReturnsAsync(list);
             
-            var result = publicationService.GetMyPublicationsAndReleasesByTopicAsync(topicId).Result.Right;
+            var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Right;
             Assert.Equal(list, result);
             
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
@@ -157,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void CreatePublicationAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                service.CreatePublicationAsync(new CreatePublicationViewModel
+                service.CreatePublication(new CreatePublicationViewModel
                 {
                     TopicId = _topic.Id
                 }), 
@@ -169,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetViewModelAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.GetViewModelAsync(_publication.Id), 
+                    service.GetViewModel(_publication.Id), 
                 _publication,
                 SecurityPolicies.CanViewSpecificPublication);
         }

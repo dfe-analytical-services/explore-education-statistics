@@ -3,7 +3,6 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -19,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class PublicationServiceTests
     {
         [Fact]
-        public async void CreatePublicationWithoutMethodology()
+        public async void CreatePublication_WithoutMethodology()
         {
             var (userService, repository, _) = Mocks();
             
@@ -36,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
                 // Service method under test
-                var result = await publicationService.CreatePublicationAsync(new CreatePublicationViewModel()
+                var result = await publicationService.CreatePublication(new CreatePublicationViewModel()
                 {
                     Title = "Publication Title",
                     ContactId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942"),
@@ -52,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublicationWithMethodology()
+        public async void CreatePublication_WithMethodology()
         {
             var (userService, repository, _) = Mocks();
             
@@ -77,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
                 // Service method under test
-                var result = await publicationService.CreatePublicationAsync(new CreatePublicationViewModel()
+                var result = await publicationService.CreatePublication(new CreatePublicationViewModel()
                 {
                     Title = "Publication Title",
                     ContactId = new Guid("cd6c265b-7fbc-4c15-ab36-7c3e0ea216d5"),
@@ -100,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublicationFailsWithNonUniqueSlug()
+        public async void CreatePublication_FailsWithNonUniqueSlug()
         {
             var (userService, repository, persistenceHelper) = Mocks();
 
@@ -111,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, persistenceHelper.Object);
                 
-                var result = await publicationService.CreatePublicationAsync(
+                var result = await publicationService.CreatePublication(
                     new CreatePublicationViewModel
                     {
                         Title = titleToBeDuplicated
@@ -125,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService.Object, repository.Object, persistenceHelper.Object);
                 
                 // Service method under test
-                var result = await publicationService.CreatePublicationAsync(
+                var result = await publicationService.CreatePublication(
                     new CreatePublicationViewModel()
                     {
                         Title = titleToBeDuplicated,
@@ -140,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async void UpdatePublicationMethodologyWithId()
+        public async void UpdatePublicationMethodology_WithId()
         {
             var (userService, repository, _) = Mocks();
             var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
@@ -165,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
-                await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
                 {
                     ExternalMethodology = null,
                     MethodologyId = testMethodologyId
@@ -178,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async void UpdatePublicationMethodologyWithId_Draft()
+        public async void UpdatePublicationMethodology_WithId_Draft()
         {
             var (userService, repository, _) = Mocks();
             var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
@@ -197,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
-                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                var result = await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
                 {
                     ExternalMethodology = null,
                     MethodologyId = testMethodologyId
@@ -210,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async void UpdatePublicationMethodologyWithId_NotExists()
+        public async void UpdatePublicationMethodology_WithId_NotExists()
         {
             var (userService, repository, _) = Mocks();
             var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
@@ -228,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
-                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                var result = await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
                 {
                     ExternalMethodology = null,
                     MethodologyId = testMethodologyId
@@ -241,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async void UpdatePublicationMethodologyWithExternal()
+        public async void UpdatePublicationMethodology_WithExternal()
         {
             var (userService, repository, _) = Mocks();
             var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
@@ -258,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
-                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                var result = await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
                 {
                     ExternalMethodology = new ExternalMethodology
                     {
@@ -275,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async void UpdatePublicationMethodologyInvalidRequest()
+        public async void UpdatePublicationMethodology_InvalidRequest()
         {
             var (userService, repository, _) = Mocks();
             var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
@@ -292,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = new PublicationService(context, AdminMapper(),
                     userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
                 
-                var result = await publicationService.UpdatePublicationMethodologyAsync(testPublicationId, new UpdatePublicationMethodologyViewModel
+                var result = await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
                 {
                     ExternalMethodology = null,
                     MethodologyId = null
