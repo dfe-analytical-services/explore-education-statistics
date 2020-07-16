@@ -1,5 +1,6 @@
 import { User } from '@admin/contexts/AuthContext';
 import client from '@admin/services/utils/service';
+import { parseISO } from 'date-fns';
 
 export interface GlobalPermissions {
   canAccessSystem: boolean;
@@ -73,8 +74,8 @@ const permissionService = {
       }>(`/permissions/release/${releaseId}/prerelease/status`)
       .then(status => ({
         access: status.access,
-        start: new Date(status.start),
-        end: new Date(status.end),
+        start: parseISO(status.start),
+        end: parseISO(status.end),
       }));
   },
 };
