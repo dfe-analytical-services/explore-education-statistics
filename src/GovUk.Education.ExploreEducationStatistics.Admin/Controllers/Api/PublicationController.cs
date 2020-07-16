@@ -24,21 +24,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
-        public async Task<ActionResult<List<MyPublicationViewModel>>> GetMyPublicationsAsync(
+        public async Task<ActionResult<List<MyPublicationViewModel>>> GetMyPublications(
             [FromQuery(Name = "topicId"), Required] Guid topicId)
         {
             return await _publicationService
-                .GetMyPublicationsAndReleasesByTopicAsync(topicId)
+                .GetMyPublicationsAndReleasesByTopic(topicId)
                 .HandleFailuresOr(Ok);
         }
 
         // GET api/publications/{publicationId}
         [HttpGet("api/publications/{publicationId}")]
-        public async Task<ActionResult<PublicationViewModel>> GetPublicationByIdAsync(
+        public async Task<ActionResult<PublicationViewModel>> GetPublicationById(
             [Required] Guid publicationId)
         {
             return await _publicationService
-                .GetViewModelAsync(publicationId)
+                .GetViewModel(publicationId)
                 .HandleFailuresOr(Ok);
         }
         
@@ -48,19 +48,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             UpdatePublicationMethodologyViewModel model, Guid publicationId)
         {
             return await _publicationService
-                .UpdatePublicationMethodologyAsync(publicationId, model)
+                .UpdatePublicationMethodology(publicationId, model)
                 .HandleFailuresOr(result => Ok());
         }
         
         // POST api/topic/{topicId}/publications
         [HttpPost("api/topic/{topicId}/publications")]
-        public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(
+        public async Task<ActionResult<PublicationViewModel>> CreatePublication(
             CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;
             
             return await _publicationService
-                .CreatePublicationAsync(publication)
+                .CreatePublication(publication)
                 .HandleFailuresOr(Ok);
         }
     }

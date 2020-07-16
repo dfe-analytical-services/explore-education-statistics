@@ -9,14 +9,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationService
     {
-        Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopicAsync(Guid topicId);
+        Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
 
-        Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(
+        Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
             CreatePublicationViewModel publication);
 
-        Task<Either<ActionResult, PublicationViewModel>> GetViewModelAsync(Guid publicationId);
+        Task<Either<ActionResult, PublicationViewModel>> GetViewModel(Guid publicationId);
         
-        Task<Either<ActionResult, bool>> UpdatePublicationMethodologyAsync(Guid publicationId, UpdatePublicationMethodologyViewModel methodology);
-
+        Task<Either<ActionResult, bool>> UpdatePublicationMethodology(Guid publicationId, UpdatePublicationMethodologyViewModel methodology);
     }
 }

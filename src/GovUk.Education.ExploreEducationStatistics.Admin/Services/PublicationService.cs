@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopicAsync(
+        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
             Guid topicId)
         {
             return await _userService
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(
+        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
             CreatePublicationViewModel publication)
         {
             return await _persistenceHelper
@@ -77,11 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
 
                     await _context.SaveChangesAsync();
-                    return await GetViewModelAsync(saved.Entity.Id);
+                    return await GetViewModel(saved.Entity.Id);
                 });
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> GetViewModelAsync(Guid publicationId)
+        public async Task<Either<ActionResult, PublicationViewModel>> GetViewModel(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, HydratePublicationForPublicationViewModel)
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
 
-        public async Task<Either<ActionResult, bool>> UpdatePublicationMethodologyAsync(Guid publicationId,
+        public async Task<Either<ActionResult, bool>> UpdatePublicationMethodology(Guid publicationId,
             UpdatePublicationMethodologyViewModel methodology)
         {
             return await _persistenceHelper
