@@ -1,5 +1,6 @@
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
@@ -26,7 +27,7 @@ const KeyStatSelectForm = ({
 
   const keyStatDataBlocks = useMemo(() => {
     return availableDataBlocks.filter(dataBlock => {
-      const { timePeriod, locations, indicators } = dataBlock.dataBlockRequest;
+      const { timePeriod, locations, indicators } = dataBlock.query;
 
       const locationLevels = Object.values(locations);
 
@@ -55,9 +56,11 @@ const KeyStatSelectForm = ({
           open
         >
           <KeyStatTile
-            releaseId={releaseId}
             summary={selectedDataBlock.summary}
-            query={selectedDataBlock.dataBlockRequest}
+            query={{
+              ...selectedDataBlock.query,
+              releaseId,
+            }}
           />
         </Details>
       </section>
@@ -89,14 +92,17 @@ const KeyStatSelectForm = ({
         ]}
       />
       {getKeyStatPreview()}
-      {selectedDataBlockId !== '' && (
-        <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
-      )}
-      {!hideCancel && (
-        <Button className="govuk-button--secondary" onClick={onCancel}>
-          Cancel
-        </Button>
-      )}
+
+      <ButtonGroup>
+        {selectedDataBlockId !== '' && (
+          <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
+        )}
+        {!hideCancel && (
+          <Button className="govuk-button--secondary" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
+      </ButtonGroup>
     </>
   );
 };

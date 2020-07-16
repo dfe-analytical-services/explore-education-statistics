@@ -139,15 +139,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Name { get; set; }
 
+        public string HighlightName { get; set; }
+        
         public string Source { get; set; }
 
-        public ObservationQueryContext DataBlockRequest { get; set; }
+        public ObservationQueryContext Query { get; set; }
 
         public List<IContentBlockChart> Charts { get; set; }
 
         public DataBlockSummary Summary { get; set; }
 
-        public List<TableBuilderConfiguration> Tables { get; set; }
+        public TableBuilderConfiguration Table { get; set; }
 
         public override string Type { get; set; } = ContentBlockType.DataBlock.ToString();
     }

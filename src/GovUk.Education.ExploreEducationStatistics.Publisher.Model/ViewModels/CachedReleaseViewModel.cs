@@ -26,7 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
             ContentSectionViewModel keyStatisticsSection,
             ContentSectionViewModel keyStatisticsSecondarySection,
             List<FileInfo> downloadFiles,
-            List<LinkViewModel> relatedInformation)
+            List<LinkViewModel> relatedInformation,
+            DateTime? dataLastPublished)
         {
             Id = id;
             Title = title;
@@ -45,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
             KeyStatisticsSecondarySection = keyStatisticsSecondarySection;
             DownloadFiles = downloadFiles;
             RelatedInformation = relatedInformation;
+            DataLastPublished = dataLastPublished;
         }
 
         public Guid Id { get; set; }
@@ -80,5 +82,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         public List<FileInfo> DownloadFiles { get; set; }
 
         public List<LinkViewModel> RelatedInformation { get; set; }
+
+        private DateTime? dataLastPublished;
+        
+        public DateTime? DataLastPublished
+        {
+            get => dataLastPublished;
+            set => dataLastPublished = value ?? DateTime.UtcNow;
+        }
     }
 }

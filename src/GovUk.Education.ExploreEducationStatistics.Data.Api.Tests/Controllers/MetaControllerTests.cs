@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -20,8 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var publicationMetaService = new Mock<IPublicationMetaService>();
             var themeMetaService = new Mock<IThemeMetaService>();
 
-            publicationMetaService.Setup(s => s.GetSubjectsForLatestRelease(_publicationId))
-                .Returns(new PublicationSubjectsMetaViewModel());
+            publicationMetaService
+                .Setup(s => s.GetSubjectsForLatestRelease(_publicationId))
+                .ReturnsAsync(new PublicationSubjectsMetaViewModel());
+
+            publicationMetaService
+                .Setup(s => s.GetSubjectsForLatestRelease(It.Is<Guid>(guid => guid != _publicationId)))
+                .ReturnsAsync(new NotFoundResult());
 
             themeMetaService.Setup(s => s.GetThemes())
                 .Returns(new List<ThemeMetaViewModel>
@@ -33,18 +39,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public void Get_SubjectsForLatestRelease_Returns_Ok()
+        public async Task Get_SubjectsForLatestRelease_Returns_Ok()
         {
-            var result = _controller.GetSubjectsForLatestRelease(_publicationId);
-
+            var result = await _controller.GetSubjectsForLatestRelease(_publicationId);
             Assert.IsAssignableFrom<PublicationSubjectsMetaViewModel>(result.Value);
         }
 
         [Fact]
-        public void Get_SubjectsForLatestRelease_Returns_NotFound()
+        public async Task Get_SubjectsForLatestRelease_Returns_NotFound()
         {
-            var result = _controller.GetSubjectsForLatestRelease(new Guid("9ad58d8b-997a-4dba-9255-d0caeae176ab"));
-
+            var result = await _controller.GetSubjectsForLatestRelease(Guid.NewGuid());
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
 

@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ExternalMethodology = new ExternalMethodology
                     {
                         Title = "title",
-                        Url = new Uri("https://example.com")
+                        Url = "https://example.com"
                     },
                     MethodologyId = null
                 });

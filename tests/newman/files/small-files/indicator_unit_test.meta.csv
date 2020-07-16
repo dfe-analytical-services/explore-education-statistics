@@ -2,3 +2,4 @@ col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hi
 number,Indicator,All the numbers,Number,,,,
 percent,Indicator,All the percents,Percents,%,,,
 pound,Indicator,All the pounds,Pounds,£,,,
+pp,Indicator,All the pps,PP,pp,,,

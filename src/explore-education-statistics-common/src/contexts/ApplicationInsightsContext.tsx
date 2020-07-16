@@ -20,7 +20,6 @@ export const ApplicationInsightsContextProvider = ({
   children,
   instrumentationKey,
 }: ApplicationInsightsContextProviderProps) => {
-  const [isLoading, setLoading] = useState(true);
   const [appInsights, setAppInsights] = useState<ApplicationInsights>();
 
   useEffect(() => {
@@ -31,26 +30,17 @@ export const ApplicationInsightsContextProvider = ({
         );
 
         setAppInsights(applicationInsights);
-        setLoading(false);
       },
     );
   }, [instrumentationKey]);
 
   return (
     <ApplicationInsightsContext.Provider value={appInsights}>
-      {!isLoading ? children : null}
+      {children}
     </ApplicationInsightsContext.Provider>
   );
 };
 
-export function useApplicationInsights(): ApplicationInsights {
-  const appInsights = useContext(ApplicationInsightsContext);
-
-  if (!appInsights) {
-    throw new Error(
-      'ApplicationInsightsContextProvider has not been initialised',
-    );
-  }
-
-  return appInsights;
+export function useApplicationInsights(): ApplicationInsights | undefined {
+  return useContext(ApplicationInsightsContext);
 }

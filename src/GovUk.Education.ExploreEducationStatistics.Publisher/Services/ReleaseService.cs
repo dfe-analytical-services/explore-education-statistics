@@ -54,6 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Release>> GetAmendedReleases(IEnumerable<Guid> releaseIds)
+        {
+            return await _contentDbContext.Releases
+                .Include(r => r.Publication)
+                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
+                .ToListAsync();
+        }
+
         public CachedReleaseViewModel GetReleaseViewModel(Guid id, PublishContext context)
         {
             var release = _contentDbContext.Releases
@@ -127,6 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             _contentDbContext.Releases.Update(contentRelease);
             contentRelease.Published ??= published;
+            contentRelease.DataLastPublished = DateTime.UtcNow;
 
             // TODO EES-913 Remove this when methodologies are published independently 
             if (methodology != null)
@@ -157,12 +166,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        public async Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds)
+        public async Task DeletePreviousVersionsStatisticalData(IEnumerable<Guid> releaseIds)
         {
-            var versions = await _contentDbContext.Releases.Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
-                .ToListAsync();
-            var previousVersions = versions.Select(v => v.PreviousVersionId);
+            var releases = await GetAmendedReleases(releaseIds);
             
+            var previousVersions = releases.Select(v => v.PreviousVersionId);
+
             foreach (var releaseSubject in await _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)).ToListAsync())
             {
                 if (!await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseSubject.ReleaseId,
@@ -171,6 +180,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     throw new ArgumentException($"An error occurred  while trying to soft delete subject {releaseSubject.SubjectId} or break link with previous amendment version for releaseId {releaseSubject.ReleaseId}");
                 }
             }
+            
+            // Now can remove any previous stats Release rows
+            var previousStatisticalReleases = await _statisticsDbContext.Release
+                .Where(r => previousVersions.Contains(r.Id))
+                .ToListAsync();
+            
+            _statisticsDbContext.Release.RemoveRange(previousStatisticalReleases);
+            
+            await _statisticsDbContext.SaveChangesAsync();
         }
     }
 }

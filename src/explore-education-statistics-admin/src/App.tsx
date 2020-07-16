@@ -4,53 +4,62 @@ import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopic from '@admin/components/ThemeAndTopic';
 import { getConfig } from '@admin/config';
 import { AuthContextProvider } from '@admin/contexts/AuthContext';
+import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import {
   ApplicationInsightsContextProvider,
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
-import React, { useEffect } from 'react';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import './App.scss';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import appRouteList from './routes/dashboard/routes';
 
+const PrototypeIndexPage = lazy(() =>
+  import('@admin/prototypes/PrototypeIndexPage'),
+);
+
 function ApplicationInsightsTracking() {
   const appInsights = useApplicationInsights();
   const history = useHistory();
 
   useEffect(() => {
-    appInsights.trackPageView({
-      uri: history.location.pathname,
-    });
-
-    history.listen(location => {
+    if (appInsights) {
       appInsights.trackPageView({
-        uri: location.pathname,
+        uri: history.location.pathname,
       });
-    });
+
+      history.listen(location => {
+        appInsights.trackPageView({
+          uri: location.pathname,
+        });
+      });
+    }
   }, [appInsights, history]);
 
   return null;
 }
 
-function App() {
-  const authRoutes = Object.entries(apiAuthorizationRouteList).map(
-    ([key, authRoute]) => {
-      return <Route exact key={`authRoute-${key}`} {...authRoute} />;
-    },
+function PrototypesEntry() {
+  const { value: routes = [] } = useAsyncRetry(() =>
+    import('./prototypes/prototypeRoutes').then(module => module.default),
   );
 
-  const appRoutes = Object.entries(appRouteList).map(([key, appRoute]) => {
-    return (
-      <ProtectedRoute
-        key={`appRoute-${key}`}
-        protectionAction={appRoute.protectedAction}
-        {...appRoute}
-      />
-    );
-  });
+  return (
+    <Suspense fallback={<ServiceProblemsPage />}>
+      <Switch>
+        <Route exact path="/prototypes" component={PrototypeIndexPage} />
+        {routes?.map(route => (
+          <Route key={route.path} exact={route.exact ?? true} {...route} />
+        ))}
+      </Switch>
+    </Suspense>
+  );
+}
 
+function App() {
   return (
     <ApplicationInsightsContextProvider
       instrumentationKey={getConfig().then(config => config.AppInsightsKey)}
@@ -62,8 +71,28 @@ function App() {
           <AuthContextProvider>
             <PageErrorBoundary>
               <Switch>
-                {authRoutes}
-                {appRoutes}
+                {Object.entries(apiAuthorizationRouteList).map(
+                  ([key, authRoute]) => (
+                    <Route exact key={key} {...authRoute} />
+                  ),
+                )}
+
+                {Object.entries(appRouteList).map(([key, appRoute]) => (
+                  <ProtectedRoute
+                    key={key}
+                    protectionAction={appRoute.protectedAction}
+                    {...appRoute}
+                  />
+                ))}
+
+                <ProtectedRoute
+                  path="/prototypes"
+                  protectionAction={user =>
+                    user.permissions.canAccessUserAdministrationPages
+                  }
+                  component={PrototypesEntry}
+                />
+
                 <ProtectedRoute
                   allowAnonymousUsers
                   component={PageNotFoundPage}

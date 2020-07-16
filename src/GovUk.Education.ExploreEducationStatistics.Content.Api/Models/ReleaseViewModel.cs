@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             release.KeyStatisticsSection,
             release.KeyStatisticsSecondarySection,
             release.DownloadFiles,
-            release.RelatedInformation)
+            release.RelatedInformation,
+            release.DataLastPublished)
         {
             var otherReleases = publication.Releases.Where(model => Id != model.Id).ToList();
             Publication = new PublicationViewModel(

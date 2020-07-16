@@ -185,7 +185,7 @@ Validate Regional and local authority (LA) breakdown table
     ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Harlow   Unauthorised absence rate
     user checks row contains heading  ${row}   Unauthorised absence rate
     user checks row cell contains text  ${row}   1    1.1%
-    
+
     ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Authorised absence rate
     user checks row contains heading  ${row}   Authorised absence rate
     user checks row cell contains text  ${row}   1    2.7%

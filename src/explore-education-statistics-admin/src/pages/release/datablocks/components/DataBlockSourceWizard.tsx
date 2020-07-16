@@ -14,14 +14,13 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import {
   PublicationSubjectMeta,
-  TableDataQuery,
+  ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import React, {
   createRef,
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 
@@ -29,12 +28,12 @@ export type DataBlockSourceWizardSaveHandler = (params: {
   details: DataBlockDetailsFormValues;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
 }) => void;
 
 interface DataBlockSourceWizardFinalStepProps {
   dataBlock?: ReleaseDataBlock;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   onSave: DataBlockSourceWizardSaveHandler;
@@ -101,11 +100,10 @@ const DataBlockSourceWizardFinalStep = ({
         />
       </div>
 
-      <hr />
-
       <DataBlockDetailsForm
         initialValues={{
           heading: dataBlock?.heading ?? generateTableTitle(table.subjectMeta),
+          highlightName: dataBlock?.highlightName ?? '',
           name: dataBlock?.name ?? '',
           source: dataBlock?.source ?? '',
         }}
@@ -117,10 +115,9 @@ const DataBlockSourceWizardFinalStep = ({
 };
 
 interface DataBlockSourceWizardProps {
-  releaseId: string;
   dataBlock?: ReleaseDataBlock;
-  initialTableToolState?: TableToolState;
-  query?: TableDataQuery;
+  query?: ReleaseTableDataQuery;
+  releaseId?: string;
   subjectMeta?: PublicationSubjectMeta;
   table?: FullTable;
   tableHeaders?: TableHeadersConfig;
@@ -128,16 +125,14 @@ interface DataBlockSourceWizardProps {
 }
 
 const DataBlockSourceWizard = ({
-  releaseId,
   dataBlock,
   query: initialQuery,
+  releaseId,
   subjectMeta,
   table,
   tableHeaders,
   onSave,
 }: DataBlockSourceWizardProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-
   const initialTableToolState = useMemo<TableToolState | undefined>(() => {
     if (!initialQuery || !table || !tableHeaders || !subjectMeta) {
       return undefined;
@@ -154,28 +149,23 @@ const DataBlockSourceWizard = ({
     };
   }, [initialQuery, subjectMeta, table, tableHeaders]);
 
-  const handleSave: DataBlockSourceWizardSaveHandler = useCallback(
-    state => {
-      if (ref.current) {
-        ref.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-
-      onSave(state);
-    },
-    [onSave],
-  );
-
   return (
-    <div ref={ref} className="govuk-!-margin-bottom-8">
+    <div className="govuk-!-margin-bottom-8">
       <p>Configure data source for the data block</p>
 
       <TableToolWizard
-        releaseId={releaseId}
         themeMeta={[]}
-        initialState={initialTableToolState}
+        initialState={
+          initialTableToolState ?? {
+            query: {
+              releaseId,
+              subjectId: '',
+              indicators: [],
+              filters: [],
+              locations: {},
+            },
+          }
+        }
         finalStep={({ response, query }) => (
           <WizardStep>
             {wizardStepProps => (
@@ -190,7 +180,7 @@ const DataBlockSourceWizard = ({
                     query={query}
                     table={response.table}
                     tableHeaders={response.tableHeaders}
-                    onSave={handleSave}
+                    onSave={onSave}
                   />
                 )}
               </>

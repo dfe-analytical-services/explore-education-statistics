@@ -9,6 +9,7 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
+import { parseISO } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import styles from './BasicReleaseSummary.module.scss';
 
@@ -65,7 +66,9 @@ const BasicReleaseSummary = ({ release }: Props) => {
               <dd>
                 {release.publishScheduled && (
                   <strong>
-                    <FormattedDate>{release.publishScheduled}</FormattedDate>
+                    <FormattedDate>
+                      {parseISO(release.publishScheduled)}
+                    </FormattedDate>
                   </strong>
                 )}
               </dd>

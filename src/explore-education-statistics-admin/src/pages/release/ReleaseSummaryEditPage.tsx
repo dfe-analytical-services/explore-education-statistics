@@ -5,27 +5,20 @@ import ReleaseSummaryForm, {
 import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
 import { summaryRoute } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
-import {
-  errorCodeAndFieldNameToFieldError,
-  errorCodeToFieldError,
-} from '@common/components/form/util/serverValidationHandler';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'SLUG_NOT_UNIQUE',
-    'timePeriodCoverageStartYear',
-    'Choose a unique combination of time period and start year',
-  ),
-  errorCodeAndFieldNameToFieldError(
-    'PARTIAL_DATE_NOT_VALID',
-    'NextReleaseDate',
-    'nextReleaseDate',
-    'Enter a valid date',
-  ),
+const errorMappings = [
+  mapFieldErrors<ReleaseSummaryFormValues>({
+    target: 'timePeriodCoverageStartYear',
+    messages: {
+      SLUG_NOT_UNIQUE:
+        'Choose a unique combination of time period and start year',
+    },
+  }),
 ];
 
 const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
@@ -42,10 +35,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     }
 
     await releaseService.updateRelease(releaseId, {
-      internalReleaseNote: release.internalReleaseNote,
-      nextReleaseDate: release.nextReleaseDate,
-      publishScheduled: release.publishScheduled,
-      status: release.status,
+      ...release,
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
@@ -56,7 +46,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     history.push(
       summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
     );
-  }, errorCodeMappings);
+  }, errorMappings);
 
   const handleCancel = () =>
     history.push(

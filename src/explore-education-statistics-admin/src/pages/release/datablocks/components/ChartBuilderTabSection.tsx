@@ -7,7 +7,7 @@ import releaseChartFileService from '@admin/services/releaseChartFileService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderService, {
-  TableDataQuery,
+  ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
 import isEqual from 'lodash/isEqual';
@@ -16,10 +16,13 @@ import { useParams } from 'react-router';
 
 interface Props {
   dataBlock: ReleaseDataBlock;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
   table: FullTable;
   onDataBlockSave: (dataBlock: SavedDataBlock) => void;
-  onTableUpdate: (params: { table: FullTable; query: TableDataQuery }) => void;
+  onTableUpdate: (params: {
+    table: FullTable;
+    query: ReleaseTableDataQuery;
+  }) => void;
 }
 
 const ChartBuilderTabSection = ({
@@ -45,7 +48,7 @@ const ChartBuilderTabSection = ({
     async (chart: Chart) => {
       await onDataBlockSave({
         ...dataBlock,
-        dataBlockRequest: query,
+        query,
         charts: [chart],
       });
     },
@@ -73,7 +76,7 @@ const ChartBuilderTabSection = ({
 
   const handleTableQueryUpdate: TableQueryUpdateHandler = useCallback(
     async updatedQuery => {
-      const nextQuery: TableDataQuery = {
+      const nextQuery: ReleaseTableDataQuery = {
         ...query,
         ...updatedQuery,
       };
@@ -83,17 +86,14 @@ const ChartBuilderTabSection = ({
         return;
       }
 
-      const tableData = await tableBuilderService.getTableData(
-        nextQuery,
-        releaseId,
-      );
+      const tableData = await tableBuilderService.getTableData(nextQuery);
 
       onTableUpdate({
         table: mapFullTable(tableData),
         query: nextQuery,
       });
     },
-    [onTableUpdate, query, releaseId],
+    [onTableUpdate, query],
   );
 
   return (

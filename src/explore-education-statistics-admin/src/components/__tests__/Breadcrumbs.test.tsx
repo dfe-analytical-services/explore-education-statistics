@@ -105,17 +105,17 @@ describe('Breadcrumbs', () => {
     expect(lastBreadcrumb.querySelector('a')).toBeNull();
   });
 
-  test('does not render Home breadcrumb if explicitly asked to exclude', () => {
+  test('does not render Home breadcrumb if empty path', () => {
     const { container } = render(
       <MemoryRouter>
         <Breadcrumbs
+          homePath=""
           breadcrumbs={[
             {
               link: '/publications',
               name: 'Publications',
             },
           ]}
-          includeHomeBreadcrumb={false}
         />
         ,
       </MemoryRouter>,

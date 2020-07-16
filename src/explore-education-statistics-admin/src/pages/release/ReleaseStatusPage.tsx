@@ -2,7 +2,9 @@ import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
-import permissionService from '@admin/services/permissionService';
+import permissionService, {
+  ReleaseStatusPermissions,
+} from '@admin/services/permissionService';
 import releaseService from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -10,44 +12,48 @@ import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import { RadioOption } from '@common/components/form/FormRadioGroup';
-import { errorCodeToFieldError } from '@common/components/form/util/serverValidationHandler';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import {
-  PartialDate,
+  formatPartialDate,
   isPartialDateEmpty,
   isValidPartialDate,
-  parsePartialDateToUtcDate,
-  formatPartialDate,
+  parsePartialDateToLocalDate,
+  PartialDate,
 } from '@common/utils/date/partialDate';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { endOfDay, format, formatISO, isValid } from 'date-fns';
+import { endOfDay, format, formatISO, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { StringSchema } from 'yup';
 
-const errorCodeMappings = [
-  errorCodeToFieldError(
-    'APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE',
-    'status',
-    'Enter a publish scheduled date before approving',
-  ),
-  errorCodeToFieldError(
-    'ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE',
-    'status',
-    'Check all uploaded datafiles are complete before approving',
-  ),
-  errorCodeToFieldError(
-    'PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED',
-    'status',
-    'Release has already been published and cannot be un-approved',
-  ),
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'status',
+    messages: {
+      APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE:
+        'Enter a publish scheduled date before approving',
+      ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE:
+        'Check all uploaded datafiles are complete before approving',
+      PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED:
+        'Release has already been published and cannot be un-approved',
+      METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED:
+        "The publication's methodology must be approved before release can be approved",
+    },
+  }),
+  mapFieldErrors<FormValues>({
+    target: 'nextReleaseDate',
+    messages: {
+      PARTIAL_DATE_NOT_VALID: 'Enter a valid date',
+    },
+  }),
 ];
 
 interface FormValues {
@@ -78,32 +84,8 @@ const ReleaseStatusPage = () => {
     [showForm],
   );
 
-  const { value: statusOptions = [] } = useAsyncRetry<RadioOption[]>(
-    async () => {
-      const [canMarkAsDraft, canSubmit, canApprove] = await Promise.all([
-        permissionService.canMarkReleaseAsDraft(releaseId),
-        permissionService.canSubmitReleaseForHigherLevelReview(releaseId),
-        permissionService.canApproveRelease(releaseId),
-      ]);
-
-      return [
-        {
-          label: 'In draft',
-          value: 'Draft',
-          disabled: !canMarkAsDraft,
-        },
-        {
-          label: 'Ready for higher review',
-          value: 'HigherLevelReview',
-          disabled: !canSubmit,
-        },
-        {
-          label: 'Approved for publication',
-          value: 'Approved',
-          disabled: !canApprove,
-        },
-      ];
-    },
+  const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
+    () => permissionService.getReleaseStatusPermissions(releaseId),
   );
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
@@ -133,13 +115,15 @@ const ReleaseStatusPage = () => {
     setShowForm(false);
 
     onChangeReleaseStatus();
-  }, errorCodeMappings);
+  }, errorMappings);
 
   if (!release) {
     return <LoadingSpinner />;
   }
 
-  const isEditable = statusOptions?.some(option => !option.disabled);
+  const isEditable = Object.values(statusPermissions ?? {}).some(
+    permission => !!permission,
+  );
 
   return (
     <>
@@ -161,7 +145,9 @@ const ReleaseStatusPage = () => {
             )}
             <SummaryListItem term="Scheduled release">
               {release.publishScheduled ? (
-                <FormattedDate>{release.publishScheduled}</FormattedDate>
+                <FormattedDate>
+                  {parseISO(release.publishScheduled)}
+                </FormattedDate>
               ) : (
                 'Not scheduled'
               )}
@@ -192,7 +178,7 @@ const ReleaseStatusPage = () => {
             internalReleaseNote: release.internalReleaseNote ?? '',
             publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
             publishScheduled: release.publishScheduled
-              ? new Date(release.publishScheduled)
+              ? parseISO(release.publishScheduled)
               : undefined,
             nextReleaseDate: release.nextReleaseDate,
           }}
@@ -242,7 +228,7 @@ const ReleaseStatusPage = () => {
                     return false;
                   }
 
-                  return isValid(parsePartialDateToUtcDate(value));
+                  return isValid(parsePartialDateToLocalDate(value));
                 },
               }),
           })}
@@ -256,10 +242,26 @@ const ReleaseStatusPage = () => {
                   legend="Status"
                   name="status"
                   id={`${formId}-status`}
-                  options={statusOptions}
                   orderDirection={[]}
+                  options={[
+                    {
+                      label: 'In draft',
+                      value: 'Draft',
+                      disabled: !statusPermissions?.canMarkDraft,
+                    },
+                    {
+                      label: 'Ready for higher review',
+                      value: 'HigherLevelReview',
+                      disabled: !statusPermissions?.canMarkHigherLevelReview,
+                    },
+                    {
+                      label: 'Approved for publication',
+                      value: 'Approved',
+                      disabled: !statusPermissions?.canMarkApproved,
+                    },
+                  ]}
                 />
-                <FormFieldTextArea
+                <FormFieldTextArea<FormValues>
                   name="internalReleaseNote"
                   className="govuk-!-width-one-half"
                   id={`${formId}-internalReleaseNote`}
@@ -291,6 +293,13 @@ const ReleaseStatusPage = () => {
                       {
                         label: 'As soon as possible',
                         value: 'Immediate',
+                        conditional: (
+                          <WarningMessage className="govuk-!-width-two-thirds">
+                            This will start the release process immediately and
+                            make statistics available to the public. Make sure
+                            this is okay before continuing.
+                          </WarningMessage>
+                        ),
                       },
                     ]}
                   />
@@ -306,7 +315,9 @@ const ReleaseStatusPage = () => {
                 />
 
                 <ButtonGroup>
-                  <Button type="submit">Update status</Button>
+                  <Button type="submit" disabled={form.isSubmitting}>
+                    Update status
+                  </Button>
                   <ButtonText
                     onClick={() => {
                       form.resetForm();

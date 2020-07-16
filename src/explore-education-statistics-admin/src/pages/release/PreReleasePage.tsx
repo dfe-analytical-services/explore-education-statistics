@@ -79,7 +79,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
           ? [{ name: 'Pre Release access' }]
           : []
       }
-      includeHomeBreadcrumb={user && user.permissions.canAccessAnalystPages}
+      homePath={user?.permissions.canAccessAnalystPages ? '/' : ''}
     >
       {preReleaseWindowStatus?.access === 'Within' && content && (
         <ReleaseContentProvider

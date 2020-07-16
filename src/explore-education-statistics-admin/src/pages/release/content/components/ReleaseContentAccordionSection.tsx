@@ -3,11 +3,13 @@ import EditableAccordionSection from '@admin/components/editable/EditableAccordi
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
-import AddDataBlockButton from '@admin/pages/release/content/components/AddDataBlockButton';
+import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
+import useToggle from '@common/hooks/useToggle';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
@@ -28,6 +30,8 @@ const ReleaseContentAccordionSection = ({
   const actions = useReleaseContentActions();
 
   const [isReordering, setIsReordering] = useState(false);
+  const [showDataBlockForm, toggleDataBlockForm] = useToggle(false);
+
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
   useEffect(() => {
@@ -171,15 +175,29 @@ const ReleaseContentAccordionSection = ({
       />
 
       {isEditing && !isReordering && (
-        <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-          <Button variant="secondary" onClick={addBlock}>
-            Add text block
-          </Button>
-          <AddDataBlockButton
-            releaseId={release.id}
-            onAddDataBlock={attachDataBlock}
-          />
-        </div>
+        <>
+          {showDataBlockForm && (
+            <DataBlockSelectForm
+              releaseId={release.id}
+              onSelect={async selectedDataBlockId => {
+                await attachDataBlock(selectedDataBlockId);
+                toggleDataBlockForm.off();
+              }}
+              onCancel={toggleDataBlockForm.off}
+            />
+          )}
+
+          <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
+            <Button variant="secondary" onClick={addBlock}>
+              Add text block
+            </Button>
+            {!showDataBlockForm && (
+              <Button variant="secondary" onClick={toggleDataBlockForm.on}>
+                Add data block
+              </Button>
+            )}
+          </ButtonGroup>
+        </>
       )}
     </EditableAccordionSection>
   );

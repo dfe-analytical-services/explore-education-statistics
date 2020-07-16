@@ -4,6 +4,7 @@ import ChartDataConfiguration from '@admin/pages/release/datablocks/components/C
 import styles from '@admin/pages/release/datablocks/components/ChartDataSelector.module.scss';
 import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect } from '@common/components/form';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
@@ -306,20 +307,22 @@ const ChartDataSelector = ({
                 })}
               </ul>
 
-              <ChartBuilderSaveButton
-                formId={formId}
-                forms={forms}
-                showSubmitError={submitCount > 0 && !canSaveChart}
-                onClick={() => {
-                  setSubmitCount(submitCount + 1);
+              <ButtonGroup>
+                <ChartBuilderSaveButton
+                  formId={formId}
+                  forms={forms}
+                  showSubmitError={submitCount > 0 && !canSaveChart}
+                  onClick={() => {
+                    setSubmitCount(submitCount + 1);
 
-                  if (canSaveChart) {
-                    onSubmit(dataSetConfigs);
-                  }
-                }}
-              />
+                    if (canSaveChart) {
+                      onSubmit(dataSetConfigs);
+                    }
+                  }}
+                />
 
-              {buttons}
+                {buttons}
+              </ButtonGroup>
             </>
           )}
         </>

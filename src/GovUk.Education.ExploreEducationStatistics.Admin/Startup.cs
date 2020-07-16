@@ -213,6 +213,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))));
+            services.AddTransient<IReleaseStatusRepository, ReleaseStatusRepository>(s => 
+                new ReleaseStatusRepository(
+                    new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))
+                )
+            );
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IThemeRepository, ThemeRepository>();
             services.AddTransient<ITopicService, TopicService>();

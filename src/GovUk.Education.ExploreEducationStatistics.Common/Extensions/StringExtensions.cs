@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
 
             var cultInfo = CultureInfo.CurrentCulture.TextInfo;
-            input = input.Replace("_", " ");
+            input = Regex.Replace(input, "[^A-Za-z0-9]", " ");
             input = Regex.Replace(input, "([A-Z]+)", " $1");
             input = cultInfo.ToTitleCase(input);
             input = input.Replace(" ", "");

@@ -6,8 +6,9 @@ import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
+import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import React, { useCallback } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
 
@@ -71,50 +72,56 @@ const ReleaseHeadlines = ({ release }: Props) => {
     [actions, release.headlinesSection.id],
   );
 
+  const headlinesTab = (
+    <TabsSection title="Headlines">
+      <section id="releaseHeadlines-keyStatistics">
+        <KeyStatistics release={release} isEditing={isEditing} />
+      </section>
+      <section id="releaseHeadlines-headlines">
+        <EditableSectionBlocks
+          releaseId={release.id}
+          allowComments
+          sectionId={release.headlinesSection.id}
+          content={release.headlinesSection.content}
+          onBlockContentSave={updateBlock}
+          onBlockDelete={removeBlock}
+          onBlockCommentsChange={updateBlockComments}
+        />
+
+        {isEditing && release.headlinesSection.content?.length === 0 && (
+          <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+            <Button variant="secondary" onClick={addBlock}>
+              Add a headlines text block
+            </Button>
+          </div>
+        )}
+      </section>
+    </TabsSection>
+  );
+
   return (
     <section id="releaseHeadlines">
       <h2 className="dfe-print-break-before">
         Headline facts and figures - {release.yearTitle}
       </h2>
 
-      {release.keyStatisticsSecondarySection?.content?.length ? (
-        <AddSecondaryStats release={release} isEditing={isEditing} updating />
+      {release.keyStatisticsSecondarySection.content?.length ? (
+        <>
+          <AddSecondaryStats release={release} isEditing={isEditing} updating />
+          <DataBlockTabs
+            releaseId={release.id}
+            id="releaseHeadlines-dataBlock"
+            dataBlock={release.keyStatisticsSecondarySection.content[0]}
+            getInfographic={getChartFile}
+            firstTabs={headlinesTab}
+          />
+        </>
       ) : (
-        <AddSecondaryStats release={release} isEditing={isEditing} />
+        <>
+          <AddSecondaryStats release={release} isEditing={isEditing} />
+          <Tabs id="releaseHeadlines-dataBlock">{headlinesTab}</Tabs>
+        </>
       )}
-
-      <DataBlockRenderer
-        releaseId={release.id}
-        id="releaseHeadlines-dataBlock"
-        dataBlock={release.keyStatisticsSecondarySection.content[0]}
-        getInfographic={getChartFile}
-        firstTabs={
-          <TabsSection title="Headlines">
-            <section id="releaseHeadlines-keyStatistics">
-              <KeyStatistics release={release} isEditing={isEditing} />
-            </section>
-            <section id="releaseHeadlines-headlines">
-              <EditableSectionBlocks
-                releaseId={release.id}
-                allowComments
-                sectionId={release.headlinesSection.id}
-                content={release.headlinesSection.content}
-                onBlockContentSave={updateBlock}
-                onBlockDelete={removeBlock}
-                onBlockCommentsChange={updateBlockComments}
-              />
-
-              {isEditing && release.headlinesSection.content?.length === 0 && (
-                <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-                  <Button variant="secondary" onClick={addBlock}>
-                    Add a headlines text block
-                  </Button>
-                </div>
-              )}
-            </section>
-          </TabsSection>
-        }
-      />
     </section>
   );
 };

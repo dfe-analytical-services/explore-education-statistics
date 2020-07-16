@@ -3,15 +3,23 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useTableQuery, {
   TableQueryOptions,
 } from '@common/modules/find-statistics/hooks/useTableQuery';
-import { TableDataQuery } from '@common/services/tableBuilderService';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import { Summary } from '@common/services/types/blocks';
 import formatPretty from '@common/utils/number/formatPretty';
 import React, { FunctionComponent, ReactNode, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './KeyStatTile.module.scss';
 
-export const KeyStatTileContainer: FunctionComponent = ({ children }) => {
-  return <div className={styles.container}>{children}</div>;
+interface KeyStatTileContainerProps {
+  children: ReactNode;
+  tag?: keyof JSX.IntrinsicElements;
+}
+
+export const KeyStatTileContainer = ({
+  children,
+  tag: ElementTag = 'div',
+}: KeyStatTileContainerProps) => {
+  return <ElementTag className={styles.container}>{children}</ElementTag>;
 };
 
 export const KeyStatTileColumn: FunctionComponent = ({ children }) => {
@@ -19,16 +27,14 @@ export const KeyStatTileColumn: FunctionComponent = ({ children }) => {
 };
 
 export interface KeyStatProps {
-  releaseId: string;
   children?: ReactNode;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
   queryOptions?: TableQueryOptions;
   summary?: Summary;
   renderDataSummary?: ReactNode;
 }
 
 const KeyStatTile = ({
-  releaseId,
   children,
   query,
   queryOptions,
@@ -40,7 +46,6 @@ const KeyStatTile = ({
       ...query,
       includeGeoJson: false,
     },
-    releaseId,
     queryOptions,
   );
 

@@ -5,12 +5,13 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -19,9 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly ILogger _logger;
-
-        private const string PermalinkContainerName = PermalinkService.ContainerName;
-        private const string MigrationContainerName = "permalink-migrations";
 
         public PermalinkMigrationService(IFileStorageService fileStorageService,
             ILogger<PermalinkMigrationService> logger)
@@ -34,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             Func<T, Task<Either<string, Permalink>>> transformFunc)
         {
             var migrationHistoryWriter =
-                await MigrationHistoryWriter.CreateAsync(MigrationContainerName, migrationId, _fileStorageService);
+                await MigrationHistoryWriter.CreateAsync(PublicPermalinkMigrationContainerName, migrationId, _fileStorageService);
             var shouldRun = await CheckMigrationShouldRunAndRecordHistoryAsync(migrationHistoryWriter);
             if (!shouldRun)
             {
@@ -94,9 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private async Task<List<T>> DownloadPermalinksAsync<T>()
         {
-            _logger.LogDebug("Listing blobs in container: {Container}", PermalinkContainerName);
-            var blobs = _fileStorageService.ListBlobs(PermalinkContainerName).ToList();
-            _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, PermalinkContainerName);
+            _logger.LogDebug("Listing blobs in container: {Container}", PublicPermalinkContainerName);
+            var blobs = _fileStorageService.ListBlobs(PublicPermalinkContainerName).ToList();
+            _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, PublicPermalinkContainerName);
             var strings = await Task.WhenAll(blobs.Select(blob => blob.DownloadTextAsync()));
             _logger.LogDebug("Downloaded {Count} blobs", strings.Length);
             var deserialized = new List<T>();
@@ -121,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger.LogDebug("Uploading {Count} Permalinks", permalinks.Count);
             await migrationHistoryWriter.WriteHistoryAsync($"Uploading {permalinks.Count} Permalinks");
             await Task.WhenAll(permalinks.Select(permalink =>
-                _fileStorageService.UploadFromStreamAsync(PermalinkContainerName,
+                _fileStorageService.UploadFromStreamAsync(PublicPermalinkContainerName,
                     permalink.Id.ToString(),
                     MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink))));

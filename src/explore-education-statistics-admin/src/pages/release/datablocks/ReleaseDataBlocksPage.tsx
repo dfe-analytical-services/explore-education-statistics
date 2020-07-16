@@ -1,3 +1,4 @@
+import useConfig from '@admin/hooks/useConfig';
 import ReleaseDataBlocksPageTabs from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
 import { dataBlocksRoute } from '@admin/routes/releaseRoutes';
 import dataBlocksService, {
@@ -10,8 +11,9 @@ import { FormSelect } from '@common/components/form';
 import Gate from '@common/components/Gate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
+import UrlContainer from '@common/components/UrlContainer';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 export interface ReleaseDataBlocksPageParams {
@@ -27,6 +29,10 @@ const ReleaseDataBlocksPageInternal = ({
   history,
 }: RouteComponentProps<ReleaseDataBlocksPageParams>) => {
   const { publicationId, releaseId, dataBlockId } = match.params;
+
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  const { value: config } = useConfig();
 
   const [deletePlan, setDeletePlan] = useState<DeleteDataBlockPlan>();
 
@@ -78,6 +84,13 @@ const ReleaseDataBlocksPageInternal = ({
         isLoading: false,
         value: nextDataBlocks,
       });
+
+      if (pageRef.current) {
+        pageRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
     },
     [dataBlocks, setDataBlocks, history, publicationId, releaseId],
   );
@@ -96,43 +109,55 @@ const ReleaseDataBlocksPageInternal = ({
   }, [fetchDataBlocks, history, publicationId, releaseId, selectedDataBlock]);
 
   return (
-    <>
+    <div ref={pageRef}>
       {dataBlockOptions.length > 0 && (
-        <FormSelect
-          id="selectDataBlock"
-          name="selectDataBlock"
-          label="Select an existing data block to edit or create a new one"
-          disabled={isLoading}
-          order={[]}
-          value={dataBlockId}
-          optGroups={{
-            'Create data block': [
-              {
-                label: 'Create new data block',
-                value: '',
-              },
-            ],
-            'Edit existing': dataBlockOptions,
-          }}
-          onChange={e => {
-            history.push(
-              dataBlocksRoute.generateLink({
-                publicationId,
-                releaseId,
-                dataBlockId: e.target.value ? e.target.value : undefined,
-              }),
-            );
-          }}
-        />
+        <>
+          <FormSelect
+            id="selectDataBlock"
+            name="selectDataBlock"
+            label="Select an existing data block to edit or create a new one"
+            disabled={isLoading}
+            order={[]}
+            value={dataBlockId}
+            optGroups={{
+              'Create data block': [
+                {
+                  label: 'Create new data block',
+                  value: '',
+                },
+              ],
+              'Edit existing': dataBlockOptions,
+            }}
+            onChange={e => {
+              history.push(
+                dataBlocksRoute.generateLink({
+                  publicationId,
+                  releaseId,
+                  dataBlockId: e.target.value ? e.target.value : undefined,
+                }),
+              );
+            }}
+          />
+          <hr />
+        </>
       )}
-
-      <hr />
 
       <LoadingSpinner loading={isLoading}>
         <h2>{selectedDataBlock?.name ?? 'Create new data block'}</h2>
 
         {selectedDataBlock && (
           <>
+            {config && (
+              <p className="govuk-!-margin-bottom-6">
+                <strong>Fast track URL:</strong>
+
+                <UrlContainer
+                  className="govuk-!-margin-left-4"
+                  url={`${config.PublicAppUrl}/data-tables/fast-track/${selectedDataBlock.id}`}
+                />
+              </p>
+            )}
+
             <Button
               type="button"
               variant="warning"
@@ -190,7 +215,7 @@ const ReleaseDataBlocksPageInternal = ({
           onDataBlockSave={handleDataBlockSave}
         />
       </LoadingSpinner>
-    </>
+    </div>
   );
 };
 

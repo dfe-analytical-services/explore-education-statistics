@@ -13,13 +13,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class PermalinkService : IPermalinkService
     {
-        public const string ContainerName = "permalinks";
-
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IFileStorageService _fileStorageService;
         private readonly ISubjectService _subjectService;
@@ -43,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             try
             {
-                var text = await _fileStorageService.DownloadTextAsync(ContainerName, id.ToString());
+                var text = await _fileStorageService.DownloadTextAsync(PublicPermalinkContainerName, id.ToString());
                 var permalink = JsonConvert.DeserializeObject<Permalink>(text);
                 return BuildViewModel(permalink);
             }
@@ -61,13 +60,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return await CreateAsync(releaseId.Value, request);
         }
-        
-        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(Guid releaseId, CreatePermalinkRequest request)
+
+        public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(Guid releaseId,
+            CreatePermalinkRequest request)
         {
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
                 var permalink = new Permalink(request.Configuration, result, request.Query);
-                await _fileStorageService.UploadFromStreamAsync(ContainerName, permalink.Id.ToString(),
+                await _fileStorageService.UploadFromStreamAsync(PublicPermalinkContainerName, permalink.Id.ToString(),
                     MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink));
                 return BuildViewModel(permalink);

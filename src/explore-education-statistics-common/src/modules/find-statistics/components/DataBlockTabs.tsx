@@ -18,37 +18,37 @@ import { DataBlock } from '@common/services/types/blocks';
 import isAxiosError from '@common/utils/error/isAxiosError';
 import React, { ReactNode } from 'react';
 
-export interface DataBlockRendererProps {
-  releaseId?: string;
-  additionalTabContent?: ReactNode;
-  dataBlock?: DataBlock;
+export interface DataBlockTabsProps {
+  additionalTabContent?:
+    | ((props: { dataBlock: DataBlock }) => ReactNode)
+    | ReactNode;
+  dataBlock: DataBlock;
   firstTabs?: ReactNode;
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
   id: string;
+  releaseId?: string;
   queryOptions?: TableQueryOptions;
   onToggle?: (section: { id: string; title: string }) => void;
 }
 
-const DataBlockRenderer = ({
-  releaseId,
+const DataBlockTabs = ({
   additionalTabContent,
   dataBlock,
   firstTabs,
   lastTabs,
   getInfographic,
   id,
+  releaseId,
   queryOptions,
   onToggle,
-}: DataBlockRendererProps) => {
+}: DataBlockTabsProps) => {
   const { value: fullTable, isLoading, error } = useTableQuery(
-    dataBlock
-      ? {
-          ...dataBlock.dataBlockRequest,
-          includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
-        }
-      : undefined,
-    releaseId || undefined,
+    {
+      ...dataBlock.query,
+      releaseId,
+      includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
+    },
     queryOptions,
   );
 
@@ -58,12 +58,17 @@ const DataBlockRenderer = ({
     return null;
   }
 
+  const additionTabContentElement =
+    typeof additionalTabContent === 'function'
+      ? additionalTabContent({ dataBlock })
+      : additionalTabContent;
+
   return (
     <LoadingSpinner loading={isLoading}>
       <Tabs id={id} onToggle={onToggle}>
         {firstTabs}
 
-        {dataBlock?.charts?.length && (
+        {dataBlock.charts?.length && (
           <TabsSection id={`${id}-charts`} title="Chart">
             {error && errorMessage}
 
@@ -79,7 +84,7 @@ const DataBlockRenderer = ({
                   the data tables tab.
                 </a>
 
-                {dataBlock?.charts.map((chart, index) => {
+                {dataBlock.charts.map((chart, index) => {
                   const key = index;
 
                   const axes = { ...chart.axes } as Required<AxesConfiguration>;
@@ -120,38 +125,34 @@ const DataBlockRenderer = ({
                   );
                 })}
 
-                {additionalTabContent}
+                {additionTabContentElement}
               </ErrorBoundary>
             )}
           </TabsSection>
         )}
 
-        {dataBlock?.tables?.length && (
+        {dataBlock.table && (
           <TabsSection id={`${id}-tables`} title="Table">
             {error && errorMessage}
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
-                {dataBlock?.tables.map((table, index) => {
-                  return (
-                    <TimePeriodDataTable
-                      key={index}
-                      fullTable={fullTable}
-                      captionTitle={dataBlock?.heading}
-                      source={dataBlock?.source}
-                      tableHeadersConfig={
-                        table.tableHeaders
-                          ? mapTableHeadersConfig(
-                              table.tableHeaders,
-                              fullTable.subjectMeta,
-                            )
-                          : getDefaultTableHeaderConfig(fullTable.subjectMeta)
-                      }
-                    />
-                  );
-                })}
+                <TimePeriodDataTable
+                  key={dataBlock.id}
+                  fullTable={fullTable}
+                  captionTitle={dataBlock?.heading}
+                  source={dataBlock?.source}
+                  tableHeadersConfig={
+                    dataBlock.table.tableHeaders
+                      ? mapTableHeadersConfig(
+                          dataBlock.table.tableHeaders,
+                          fullTable.subjectMeta,
+                        )
+                      : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+                  }
+                />
 
-                {additionalTabContent}
+                {additionTabContentElement}
               </ErrorBoundary>
             )}
           </TabsSection>
@@ -163,6 +164,6 @@ const DataBlockRenderer = ({
   );
 };
 
-export default withLazyLoad(DataBlockRenderer, {
+export default withLazyLoad(DataBlockTabs, {
   offset: 100,
 });

@@ -16,24 +16,16 @@ export const isValidPartialDate = (
   return !!dmy?.year;
 };
 
-export const parsePartialDateToUtcDate = (dmy: PartialDate): Date => {
+export const parsePartialDateToLocalDate = (dmy: PartialDate): Date => {
   if (!isValidPartialDate(dmy)) {
     throw new Error(
       `Could not parse invalid PartialDate to date: ${JSON.stringify(dmy)}`,
     );
   }
 
-  if (!dmy.month && !dmy.day) {
-    return parse(`${dmy.year}Z`, 'yyyyX', new Date());
-  }
-
-  if (!dmy.day) {
-    return parse(`${dmy.year}-${dmy.month}Z`, `yyyy-MX`, new Date());
-  }
-
   return parse(
-    `${dmy.year}-${dmy.month}-${dmy.day}Z`,
-    `yyyy-M-ddX`,
+    `${dmy.year}-${dmy.month || 1}-${dmy.day || 1}`,
+    'yyyy-M-dd',
     new Date(),
   );
 };
@@ -51,7 +43,7 @@ export const formatPartialDate = (
     ...options,
   };
 
-  const date = parsePartialDateToUtcDate(dmy);
+  const date = parsePartialDateToLocalDate(dmy);
 
   try {
     if (!dmy.month && !dmy.day) {

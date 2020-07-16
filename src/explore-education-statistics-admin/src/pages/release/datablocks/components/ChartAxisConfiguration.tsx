@@ -3,6 +3,7 @@ import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/Cha
 import ChartBuilderSaveButton from '@admin/pages/release/datablocks/components/ChartBuilderSaveButton';
 import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Effect from '@common/components/Effect';
 import {
   Form,
@@ -387,13 +388,13 @@ const ChartAxisConfiguration = ({
                 )}
 
                 <FormFieldset id={`${id}-axis`} legend="Labels" legendSize="s">
-                  <FormFieldTextInput<AxisConfiguration>
+                  <FormFieldTextInput
                     id={`${id}-label-text`}
                     label="Label"
                     name="label.text"
                   />
 
-                  <FormFieldNumberInput<AxisConfiguration>
+                  <FormFieldNumberInput
                     id={`${id}-label-width`}
                     label="Width (px)"
                     name="label.width"
@@ -403,7 +404,7 @@ const ChartAxisConfiguration = ({
 
                   {(validationSchema.fields.label as ObjectSchema<Label>).fields
                     .rotated && (
-                    <FormFieldCheckbox<AxisConfiguration>
+                    <FormFieldCheckbox
                       id={`${id}-label-rotated`}
                       name="label.rotated"
                       label="Rotate 90 degrees"
@@ -636,15 +637,17 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          <ChartBuilderSaveButton
-            formId={id}
-            forms={forms}
-            showSubmitError={
-              form.isValid && form.submitCount > 0 && !canSaveChart
-            }
-          />
+          <ButtonGroup>
+            <ChartBuilderSaveButton
+              formId={id}
+              forms={forms}
+              showSubmitError={
+                form.isValid && form.submitCount > 0 && !canSaveChart
+              }
+            />
 
-          {buttons}
+            {buttons}
+          </ButtonGroup>
         </Form>
       )}
     </Formik>

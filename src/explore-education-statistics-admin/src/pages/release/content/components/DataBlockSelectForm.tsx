@@ -1,9 +1,10 @@
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import DataBlockRenderer from '@common/modules/find-statistics/components/DataBlockRenderer';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import React, { useState } from 'react';
 
 interface Props {
@@ -38,7 +39,7 @@ const DataBlockSelectForm = ({
           open
           onToggle={() => {}}
         >
-          <DataBlockRenderer
+          <DataBlockTabs
             releaseId={releaseId}
             dataBlock={selectedDataBlock}
             id={`dataBlockSelectForm-${
@@ -72,19 +73,22 @@ const DataBlockSelectForm = ({
           })),
         ]}
       />
+
       <Button className="govuk-button--secondary" onClick={onCancel}>
         Cancel
       </Button>
+
       {getDataBlockPreview(selectedDataBlockId)}
+
       {selectedDataBlockId !== '' && (
-        <>
+        <ButtonGroup>
           <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
           {!hideCancel && (
             <Button className="govuk-button--secondary" onClick={onCancel}>
               Cancel
             </Button>
           )}
-        </>
+        </ButtonGroup>
       )}
     </div>
   );

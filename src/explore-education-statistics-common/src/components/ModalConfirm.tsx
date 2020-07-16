@@ -1,3 +1,4 @@
+import ButtonGroup from '@common/components/ButtonGroup';
 import React, { ReactNode } from 'react';
 import Button from './Button';
 import Modal from './Modal';
@@ -27,10 +28,12 @@ const ModalConfirm = ({
     <Modal focusDialog title={title} onExit={onExit} mounted={mounted}>
       {children}
 
-      <Button variant="secondary" onClick={onCancel}>
-        {cancelText}
-      </Button>
-      <Button onClick={onConfirm}>{confirmText}</Button>
+      <ButtonGroup>
+        <Button variant="secondary" onClick={onCancel}>
+          {cancelText}
+        </Button>
+        <Button onClick={onConfirm}>{confirmText}</Button>
+      </ButtonGroup>
     </Modal>
   );
 };

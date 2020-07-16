@@ -7,7 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IContentService
     {
+        Task DeletePreviousVersionsContent(IEnumerable<Guid> releaseIds);
+
         Task UpdateAllContentAsync();
+
         Task UpdateContentAsync(IEnumerable<Guid> releaseIds, PublishContext context);
     }
 }

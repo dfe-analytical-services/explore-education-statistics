@@ -22,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -193,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // create a link row to link back to the original subject & footnotes
             if (statsRelease != null)
             {
-                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
+                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id, amendment.PreviousVersionId);
 
                 var statsAmendmentSubjectLinks =_statisticsDbContext
                     .ReleaseSubject
@@ -281,8 +282,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
-                .OnSuccessDo(() => ValidateReleaseSlugUniqueToPublication(request.Slug, releaseId, releaseId))
-                .OnSuccessDo(() => CheckAllDatafilesUploadedComplete(releaseId, request.Status))
+                .OnSuccessDo(release => ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
+                .OnSuccessDo(release => CheckAllDataFilesUploaded(release, request.Status))
+                .OnSuccessDo(release => CheckMethodologyHasBeenApproved(release, request.Status))
                 .OnSuccess(async release =>
                 {
                     if (request.Status != ReleaseStatus.Approved && release.Published.HasValue)
@@ -433,20 +435,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
-            if (await _context.Releases.AnyAsync(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
+            var releases = await _context.Releases.Where(r => r.PublicationId == publicationId).ToListAsync();
+             
+            if (releases.Any(release => release.Slug == slug && release.Id != releaseId && IsLatestVersionOfRelease(releases, release.Id)))
             {
                 return ValidationActionResult(SlugNotUnique);
             }
 
             return true;
         }
-
+        
+        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
+        {
+            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+        }
+        
         private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
         { 
             var templateRelease = _context.Releases.AsNoTracking()
                 .Include(r => r.Content)
                 .ThenInclude(c => c.ContentSection)
-                .ThenInclude(cs => cs.Content)
                 .First(r => r.Id == releaseId);
                 
             templateRelease.CreateGenericContentFromTemplate(newRelease);
@@ -488,7 +496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return await _fileStorageService
                         .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
-                        .OnSuccessDo(() => RemoveFileImportEntryIfOrphaned(deletePlan));
+                        .OnSuccessDo(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
         }
 
@@ -557,26 +565,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return true;
         }
+
+        private async Task<Either<ActionResult, bool>> CheckMethodologyHasBeenApproved(Release release, ReleaseStatus status)
+        {
+            if (status == ReleaseStatus.Approved)
+            {
+                var publication = await _context.Publications
+                    .Include(publication => publication.Methodology)
+                    .FirstAsync(publication => publication.Id == release.PublicationId);
+
+                if (publication.Methodology != null && publication.Methodology.Status != MethodologyStatus.Approved)
+                {
+                    return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
+                }
+            }
+
+            return true;
+        }
         
-        private async Task<Either<ActionResult,bool>> CheckAllDatafilesUploadedComplete(Guid releaseId, ReleaseStatus status)
+        private async Task<Either<ActionResult, bool>> CheckAllDataFilesUploaded(Release release, ReleaseStatus status)
         {
             if (status == ReleaseStatus.Approved)
             {
                 var filters = TableQuery.CombineFilters(
-                    TableQuery.GenerateFilterCondition("PartitionKey", 
-                        QueryComparisons.Equal, releaseId.ToString())
-                    , TableOperators.And, 
-                    TableQuery.GenerateFilterCondition("Status", 
-                        QueryComparisons.NotEqual, IStatus.COMPLETE.ToString()));
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, release.Id.ToString()), 
+                    TableOperators.And, 
+                    TableQuery.GenerateFilterCondition("Status", QueryComparisons.NotEqual, IStatus.COMPLETE.ToString())
+                );
                 
                 var query = new TableQuery<DatafileImport>().Where(filters);
                 var cloudTable = await _coreTableStorageService.GetTableAsync("imports");
                 var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
+                
                 if (results.Results.Count != 0)
                 {
                     return ValidationActionResult(AllDatafilesUploadedMustBeComplete);
                 }
             }
+
             return true;
         }
 

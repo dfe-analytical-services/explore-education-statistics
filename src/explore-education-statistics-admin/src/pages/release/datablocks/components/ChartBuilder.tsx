@@ -39,7 +39,7 @@ import {
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import {
-  TableDataQuery,
+  ReleaseTableDataQuery,
   TableDataResult,
 } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
@@ -74,7 +74,7 @@ export interface ChartBuilderForm extends FormState {
 }
 
 export type TableQueryUpdateHandler = (
-  query: Partial<TableDataQuery>,
+  query: Partial<ReleaseTableDataQuery>,
 ) => Promise<void>;
 
 interface Props {

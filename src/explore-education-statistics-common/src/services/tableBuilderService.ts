@@ -79,9 +79,15 @@ export interface PublicationSubject {
   label: string;
 }
 
+export interface TableHighlight {
+  id: string;
+  label: string;
+}
+
 export interface PublicationMeta {
   publicationId: string;
   subjects: PublicationSubject[];
+  highlights: TableHighlight[];
 }
 
 export interface ReleaseMeta {
@@ -130,6 +136,10 @@ export interface TableDataQuery {
   locations: Dictionary<string[]>;
   includeGeoJson?: boolean;
   boundaryLevel?: number;
+}
+
+export interface ReleaseTableDataQuery extends TableDataQuery {
+  releaseId?: string;
 }
 
 export interface TableDataSubjectMeta {
@@ -192,12 +202,9 @@ const tableBuilderService = {
   }): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(
-    query: TableDataQuery,
-    releaseId?: string,
-  ): Promise<TableDataResponse> {
-    if (releaseId) {
-      return dataApi.post(`/tablebuilder/release/${releaseId}`, query);
+  getTableData(query: ReleaseTableDataQuery): Promise<TableDataResponse> {
+    if (query.releaseId) {
+      return dataApi.post(`/tablebuilder/release/${query.releaseId}`, query);
     }
     return dataApi.post(`/tablebuilder`, query);
   },

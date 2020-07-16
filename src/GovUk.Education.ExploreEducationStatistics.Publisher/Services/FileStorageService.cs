@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -14,12 +15,13 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ZipFileUtil;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
-using Task = System.Threading.Tasks.Task;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -29,10 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private readonly string _privateStorageConnectionString;
         private readonly string _publicStorageConnectionString;
-
-        private const string PrivateFilesContainerName = "releases";
-        private const string PublicFilesContainerName = "downloads";
-        private const string PublicContentContainerName = "cache";
 
         public FileStorageService(
             IConfiguration configuration,
@@ -46,25 +44,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand)
         {
             var privateContainer =
-                await GetCloudBlobContainerAsync(_privateStorageConnectionString,
-                    PrivateFilesContainerName);
+                await GetCloudBlobContainerAsync(_privateStorageConnectionString, PrivateFilesContainerName);
             var publicContainer =
-                await GetCloudBlobContainerAsync(_publicStorageConnectionString,
-                    PublicFilesContainerName);
+                await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicFilesContainerName);
 
-            // Slug may have changed for the amendment so also remove the previous contents if it has
-            if (copyReleaseFilesCommand.ReleaseSlug != copyReleaseFilesCommand.PreviousVersionSlug)
-            {
-                var previousDestinationDirectoryPath =
-                    PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug,
-                        copyReleaseFilesCommand.PreviousVersionSlug);
-                await DeleteBlobsAsync(publicContainer, previousDestinationDirectoryPath);
-            }
-            
             var destinationDirectoryPath =
                 PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug, copyReleaseFilesCommand.ReleaseSlug);
 
             await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
+            
+            copyReleaseFilesCommand.AdditionalDeleteDirectoryPaths.ForEach(async directoryPath =>
+            {
+                await DeleteBlobsAsync(publicContainer, directoryPath);
+            });
 
             var referencedReleaseVersions = copyReleaseFilesCommand.ReleaseFileReferences
                 .Select(rfr => rfr.ReleaseId).Distinct();
@@ -91,10 +83,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task DeleteAllContentAsyncExcludingStaging()
         {
-            var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString,
-                PublicContentContainerName);
             var excludePattern = $"^{PublicContentStagingPath()}/.+$";
-            await DeleteBlobsAsync(publicContainer, string.Empty, excludePattern);
+            await DeletePublicBlobs(string.Empty, excludePattern);
+        }
+
+        public async Task DeletePublicBlobs(string directoryPath, string excludePattern = null)
+        {
+            var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+            await DeleteBlobsAsync(publicContainer, directoryPath, excludePattern);
+        }
+
+        public async Task DeletePublicBlob(string blobName)
+        {    
+            var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
+            await DeleteBlobAsync(publicContainer, blobName);
         }
 
         public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
@@ -105,9 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task MoveStagedContentAsync()
         {
-            var container = await GetCloudBlobContainerAsync(_publicStorageConnectionString,
-                PublicContentContainerName);
-
+            var container = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
             var sourceDirectoryPath = PublicContentStagingPath();
             var sourceDirectory = container.GetDirectoryReference(sourceDirectoryPath);
             var destinationDirectory = container.GetDirectoryReference(string.Empty);
@@ -129,12 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 CopyMethod.ServiceSideAsyncCopy, options, context);
 
             await DeleteBlobsAsync(container, sourceDirectoryPath);
-        }
-
-        public async Task UploadContentFromStreamAsync(string blobName, string contentType, string content)
-        {
-            await UploadFromStreamAsync(_publicStorageConnectionString, PublicContentContainerName,
-                blobName, contentType, content);
         }
 
         private async Task<List<CloudBlockBlob>> CopyDirectoryAsync(string sourceDirectoryPath, string destinationDirectoryPath,
@@ -165,13 +159,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return allFilesTransferred;
         }
 
-        private async Task ZipFiles(CloudBlobContainer destinationContainer, List<CloudBlockBlob> allFilesTransferred, string destinationDirectoryPath, CopyReleaseFilesCommand copyReleaseFilesCommand)
+        private static async Task ZipFiles(CloudBlobContainer destinationContainer, List<CloudBlockBlob> allFilesTransferred, string destinationDirectoryPath, CopyReleaseFilesCommand copyReleaseFilesCommand)
         {
             var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
-
             await ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, copyReleaseFilesCommand);
         }
 
+        // ReSharper disable once UnusedParameter.Local
         private void FileTransferredCallback(object sender, TransferEventArgs e, List<CloudBlockBlob> allFilesStream)
         {
             var source = (CloudBlockBlob) e.Source;
@@ -292,6 +286,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     })
                 );
             } while (token != null);
+        }
+
+        private static async Task DeleteBlobAsync(CloudBlobContainer container, string fullPath)
+        {
+            await container.GetBlockBlobReference(fullPath).DeleteIfExistsAsync();
+        }
+
+        public async Task UploadAsJson(string blobName, object value, JsonSerializerSettings settings = null)
+        {
+            var json = JsonConvert.SerializeObject(value, null, settings);
+            await UploadFromStreamAsync(_publicStorageConnectionString, PublicContentContainerName,
+                blobName, MediaTypeNames.Application.Json, json);
         }
     }
 }

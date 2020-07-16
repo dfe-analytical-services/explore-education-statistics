@@ -42,10 +42,12 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           .map(block => (
             <KeyStatTileColumn key={block.id}>
               <EditableKeyStatTile
-                releaseId={release.id}
                 id={block.id}
                 name={block.name}
-                query={block.dataBlockRequest}
+                query={{
+                  ...block.query,
+                  releaseId: release.id,
+                }}
                 summary={block.summary}
                 isEditing={isEditing}
                 onRemove={async () => {

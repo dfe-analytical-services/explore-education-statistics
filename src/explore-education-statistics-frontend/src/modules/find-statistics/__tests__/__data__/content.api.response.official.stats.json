@@ -7,51 +7,49 @@
     "dataSource": "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
     "summary": "",
     "latestReleaseId": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
-    "otherReleases": [
-      {
-        "id": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
-        "slug": "2016-17",
-        "title": "Academic Year 2016/17"
-      }
-    ],
+    "otherReleases": [],
     "legacyReleases": [
       {
-        "id": "89c02688-646d-45b5-8919-9a3fafcfe0e9",
-        "description": "2009 to 2010",
-        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010"
-      },
-      {
-        "id": "81d91c86-9bf2-496c-b026-9dc255c35635",
-        "description": "2010 to 2011",
-        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011"
-      },
-      {
-        "id": "e20141d0-d894-4b8d-a78f-e41c23500786",
-        "description": "2011 to 2012",
-        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics"
-      },
-      {
-        "id": "ce15f487-87b0-4c07-98f1-6c6732196be7",
-        "description": "2012 to 2013",
-        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013"
+        "id": "28e53936-5a52-44be-a7a6-d2f14a426d28",
+        "description": "Academic Year 2014/15",
+        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015"
       },
       {
         "id": "75991639-ad77-4ba6-91fc-ac08c00a4ce8",
-        "description": "2013 to 2014",
+        "description": "Academic Year 2013/14",
         "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014"
       },
       {
-        "id": "28e53936-5a52-44be-a7a6-d2f14a426d28",
-        "description": "2014 to 2015",
-        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015"
+        "id": "ce15f487-87b0-4c07-98f1-6c6732196be7",
+        "description": "Academic Year 2012/13",
+        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013"
+      },
+      {
+        "id": "e20141d0-d894-4b8d-a78f-e41c23500786",
+        "description": "Academic Year 2011/12",
+        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics"
+      },
+      {
+        "id": "81d91c86-9bf2-496c-b026-9dc255c35635",
+        "description": "Academic Year 2010/11",
+        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011"
+      },
+      {
+        "id": "89c02688-646d-45b5-8919-9a3fafcfe0e9",
+        "description": "Academic Year 2009/10",
+        "url": "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010"
       }
     ],
-    "topic": { "theme": { "title": "Pupils and schools" } },
+    "topic": {
+      "theme": {
+        "title": "Pupils and schools"
+      }
+    },
     "contact": {
       "teamName": "School absence and exclusions team",
       "teamEmail": "schools.statistics@education.gov.uk",
-      "contactName": "Mark Pearson",
-      "contactTelNo": "01142742585"
+      "contactName": "Sean Gibson",
+      "contactTelNo": "0370 000 2288"
     },
     "methodology": {
       "id": "caa8e56f-41d2-4129-a5c3-53b051134bd7",
@@ -65,8 +63,12 @@
   "yearTitle": "2016/17",
   "coverageTitle": "Academic Year",
   "releaseName": "2016",
-  "nextReleaseDate": { "year": "2019", "month": "3", "day": "22" },
-  "published": "2018-03-22T00:00:00",
+  "nextReleaseDate": {
+    "year": "2019",
+    "month": "3",
+    "day": "22"
+  },
+  "published": "2018-04-25T09:30:00",
   "slug": "2016-17",
   "type": {
     "id": "9d333457-9132-4e55-ae78-c55cb3673d7c",
@@ -94,7 +96,7 @@
         {
           "id": "7eeb1478-ab26-4b70-9128-b976429efa2f",
           "order": 0,
-          "body": "The statistics and data cover the absence of pupils of compulsory school age during the 2016/17 academic year in the following state-funded school types:\n\n- primary schools\n- secondary schools\n- special schools\n\nThey also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.\n\nWe use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).\n\nThe statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.\n\nThey're also used for policy development as key indicators in behaviour and school attendance policy.",
+          "body": "The statistics and data cover the absence of pupils of compulsory school age during the 2016/17 academic year in the following state-funded school types:\n\n- primary schools\n- secondary schools\n- special schools\n\nThey also include information for [pupil referral units](/glossary#pupil-referral-unit) and pupils aged 4 years.\n\nWe use the key measures of [overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).\n\nThe statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.\n\nThey're also used for policy development as key indicators in behaviour and school attendance policy.\n\nWithin this release, absence by reason is broken down in three different ways:\n\n* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences\n\n* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions\n\n* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason",
           "type": "MarkDownBlock"
         }
       ]
@@ -108,7 +110,7 @@
         {
           "id": "2c369594-3bbc-40b4-ad19-196c923f5c7f",
           "order": 0,
-          "body": "**Overall absence**\n\nThe [overall absence](../glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.\n\nIt increased from 4.6% to 4.7% over this period while the [unauthorised absence](../glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.\n\nThe rate stayed the same at 4% in primary schools but increased from 5.2% to 5.4% for secondary schools. However, in special schools it was much higher and rose to 9.7%.\n\nThe overall and [authorised absence](../glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14.",
+          "body": "**Overall absence**\n\nThe [overall absence](/glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.\n\nIt increased from 4.6% to 4.7% over this period while the [unauthorised absence](/glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.\n\nThe rate stayed the same at 4% in primary schools but increased from 5.2% to 5.4% for secondary schools. However, in special schools it was much higher and rose to 9.7%.\n\nThe overall and [authorised absence](/glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14.",
           "type": "MarkDownBlock"
         },
         {
@@ -132,7 +134,9 @@
               "92d3437a-0a62-4cd7-8dfb-bcceba7eef61",
               "f9ae4976-7cd3-4718-834a-09349b6eb377"
             ],
-            "country": ["E92000001"]
+            "locations": {
+              "country": ["E92000001"]
+            }
           },
           "charts": [
             {
@@ -188,73 +192,86 @@
                       ]
                     }
                   ],
+                  "referenceLines": [],
                   "visible": true,
                   "title": "School Year",
                   "showGrid": true,
-                  "labelPosition": "axis",
                   "tickConfig": "default"
                 },
                 "minor": {
                   "type": "major",
                   "groupBy": "timePeriod",
                   "sortAsc": true,
+                  "dataSets": [],
+                  "referenceLines": [],
                   "visible": true,
                   "title": "Absence Rate",
                   "showGrid": true,
-                  "labelPosition": "axis",
                   "min": 0,
                   "tickConfig": "default"
                 }
               },
               "type": "line",
-              "width": 0,
-              "height": 0,
-              "legendHeight": 0
+              "legendHeight": 0,
+              "height": 0
             }
           ],
-          "tables": [
-            {
-              "tableHeaders": {
-                "columnGroups": [],
-                "columns": [
-                  { "label": "2012/13", "value": "2012_AY" },
-                  { "label": "2013/14", "value": "2013_AY" },
-                  { "label": "2014/15", "value": "2014_AY" },
-                  { "label": "2015/16", "value": "2015_AY" },
-                  { "label": "2016/17", "value": "2016_AY" }
-                ],
-                "rowGroups": [
-                  [
-                    {
-                      "label": "England",
-                      "level": "country",
-                      "value": "E92000001"
-                    }
-                  ]
-                ],
-                "rows": [
+          "table": {
+            "tableHeaders": {
+              "columnGroups": [],
+              "columns": [
+                {
+                  "value": "2012_AY",
+                  "type": "TimePeriod"
+                },
+                {
+                  "value": "2013_AY",
+                  "type": "TimePeriod"
+                },
+                {
+                  "value": "2014_AY",
+                  "type": "TimePeriod"
+                },
+                {
+                  "value": "2015_AY",
+                  "type": "TimePeriod"
+                },
+                {
+                  "value": "2016_AY",
+                  "type": "TimePeriod"
+                }
+              ],
+              "rowGroups": [
+                [
                   {
-                    "label": "Authorised absence rate",
-                    "value": "f9ae4976-7cd3-4718-834a-09349b6eb377"
-                  },
-                  {
-                    "label": "Unauthorised absence rate",
-                    "value": "ccfe716a-6976-4dc3-8fde-a026cd30f3ae"
-                  },
-                  {
-                    "label": "Overall absence rate",
-                    "value": "92d3437a-0a62-4cd7-8dfb-bcceba7eef61"
+                    "level": "country",
+                    "value": "E92000001",
+                    "type": "Location"
                   }
                 ]
-              }
+              ],
+              "rows": [
+                {
+                  "value": "f9ae4976-7cd3-4718-834a-09349b6eb377",
+                  "type": "Indicator"
+                },
+                {
+                  "value": "ccfe716a-6976-4dc3-8fde-a026cd30f3ae",
+                  "type": "Indicator"
+                },
+                {
+                  "value": "92d3437a-0a62-4cd7-8dfb-bcceba7eef61",
+                  "type": "Indicator"
+                }
+              ]
             }
-          ],
+          },
           "type": "DataBlock"
         },
         {
           "id": "3913a0af-9455-4802-a037-c4cfd4719b18",
           "order": 0,
-          "body": "**Unauthorised absence**\n\nThe [unauthorised absence](../glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.\n\nThis is due to an increase in absence due to family holidays not agreed by schools.\n\n**Authorised absence**\n\nThe [authorised absence](../glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.\n\n**Total number of days missed**\n\nThe total number of days missed for [overall absence](../glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.\n\nThis partly reflects a rise in the total number of pupils with the average number of days missed per pupil slightly increased to 8.2 days from 8.1 days in 2015/16.\n\nIn 2016/17, 91.8% of primary, secondary and special school pupils missed at least 1 session during the school year - similar to the 91.7% figure from 2015/16.",
+          "body": "**Unauthorised absence**\n\nThe [unauthorised absence](/glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.\n\nThis is due to an increase in absence due to family holidays not agreed by schools.\n\n**Authorised absence**\n\nThe [authorised absence](/glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.\n\n**Total number of days missed**\n\nThe total number of days missed for [overall absence](/glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.\n\nThis partly reflects a rise in the total number of pupils with the average number of days missed per pupil slightly increased to 8.2 days from 8.1 days in 2015/16.\n\nIn 2016/17, 91.8% of primary, secondary and special school pupils missed at least 1 session during the school year - similar to the 91.7% figure from 2015/16.",
           "type": "MarkDownBlock"
         }
       ]
@@ -268,13 +285,13 @@
         {
           "id": "8a8add13-368c-4067-9210-166bb19a00c1",
           "order": 0,
-          "body": "The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015 to 16 but still down from 43.3% in 2011 to 12.\n\nIt also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).\n\nOverall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16.",
+          "body": "The [persistent absence](/glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015/16 but still down from 43.3% in 2011/12.\n\nIt also accounted for almost a third (31.6%) of all [authorised absence](/glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](/glossary#unauthorised-absence).\n\nOverall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015/16.",
           "type": "MarkDownBlock"
         },
         {
           "id": "4aa06200-406b-4f5a-bee4-19e3b83eb1d2",
           "order": 0,
-          "body": "**Persistent absentees**\n\nThe [overall absence](../glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.\n\n**Illness absence rate**\n\nThe illness absence rate is almost 4 times higher for persistent absentees at 7.6% compared to 2% for other pupils.",
+          "body": "**Persistent absentees**\n\nThe [overall absence](/glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.\n\n**Illness absence rate**\n\nThe illness absence rate is almost 4 times higher for persistent absentees at 7.6% compared to 2% for other pupils.",
           "type": "MarkDownBlock"
         }
       ]
@@ -288,13 +305,7 @@
         {
           "id": "2ef5f84f-e151-425d-8906-2921712f9157",
           "order": 0,
-          "body": "**Illness**\n\nThis is the main driver behind [overall absence](../glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.\n\nWhile the overall absence rate has slightly increased since 2015/16 the illness rate has stayed the same at 2.6%.\n\nThe absence rate due to other unauthorised circumstances has also stayed the same since 2015/16 at 0.7%.\n\n**Absence due to family holiday**\n\nThe unauthorised holiday absence rate has increased gradually since 2006/07 while authorised holiday absence rates are much lower than in 2006/07 and remained steady over recent years.\n\nThe percentage of pupils who missed at least 1 session due to family holiday increased to 16.9% - up from 14.7% in 2015/16.\n\nThe absence rate due to family holidays agreed by the school stayed at 0.1%.\n\nMeanwhile, the percentage of all possible sessions missed due to unauthorised family holidays increased to 0.4% - up from 0.3% in 2015/16.\n\n**Regulation amendment**\n\nA regulation amendment in September 2013 stated that term-time leave could only be granted in exceptional circumstances which explains the sharp fall in authorised holiday absence between 2012/13 and 2013/14.\n\nThese statistics and data relate to the period after the [Isle of Wight Council v Jon Platt High Court judgment (May 2016)](https://commonslibrary.parliament.uk/insights/term-time-holidays-supreme-court-judgment/) where the High Court supported a local magistrates’ ruling that there was no case to answer.\n\nThey also partially relate to the period after the April 2017 Supreme Court judgment where it unanimously agreed that no children should be taken out of school without good reason and clarified that 'regularly' means 'in accordance with the rules prescribed by the school'.",
-          "type": "MarkDownBlock"
-        },
-        {
-          "id": "33c3a82e-7d8d-47fc-9019-2fe5344ec32d",
-          "order": 0,
-          "body": "These have been broken down into the following:\n\n* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences\n\n* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions\n\n* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason",
+          "body": "**Illness**\n\nThis is the main driver behind [overall absence](/glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.\n\nWhile the overall absence rate has slightly increased since 2015/16 the illness rate has stayed the same at 2.6%.\n\nThe absence rate due to other unauthorised circumstances has also stayed the same since 2015/16 at 0.7%.\n\n**Absence due to family holiday**\n\nThe unauthorised holiday absence rate has increased gradually since 2006/07 while authorised holiday absence rates are much lower than in 2006/07 and remained steady over recent years.\n\nThe percentage of pupils who missed at least 1 session due to family holiday increased to 16.9% - up from 14.7% in 2015/16.\n\nThe absence rate due to family holidays agreed by the school stayed at 0.1%.\n\nMeanwhile, the percentage of all possible sessions missed due to unauthorised family holidays increased to 0.4% - up from 0.3% in 2015/16.\n\n**Regulation amendment**\n\nA regulation amendment in September 2013 stated that term-time leave could only be granted in exceptional circumstances which explains the sharp fall in authorised holiday absence between 2012/13 and 2013/14.\n\nThese statistics and data relate to the period after the [Isle of Wight Council v Jon Platt High Court judgment (May 2016)](https://commonslibrary.parliament.uk/insights/term-time-holidays-supreme-court-judgment/) where the High Court supported a local magistrates’ ruling that there was no case to answer.\n\nThey also partially relate to the period after the April 2017 Supreme Court judgment where it unanimously agreed that no children should be taken out of school without good reason and clarified that 'regularly' means 'in accordance with the rules prescribed by the school'.",
           "type": "MarkDownBlock"
         }
       ]
@@ -308,7 +319,7 @@
         {
           "id": "cf01208f-cbab-41d1-9fa5-4793d2a0bc13",
           "order": 0,
-          "body": "Nearly half of all pupils (48.9%) were absent for 5 days or less across primary, secondary and special schools - down from 49.1% in 2015/16.\n\nThe average total absence for primary school pupils was 7.2 days compared to 16.9 days for special school and 9.3 day for secondary school pupils.\n\nThe rate of pupils who had more than 25 days of absence stayed the same as in 2015/16 at 4.3%.\n\nThese pupils accounted for 23.5% of days missed while 8.2% of pupils had no absence.\n\n**Absence by term**\n\nAcross all schools:\n\n* [overall absence](../glossary#overall-absence) - highest in summer and lowest in autumn\n\n* [authorised absence](../glossary#authorised-absence) - highest in spring and lowest in summer\n\n* [unauthorised absence](../glossary#unauthorised-absence) - highest in summer",
+          "body": "Nearly half of all pupils (48.9%) were absent for 5 days or less across primary, secondary and special schools - down from 49.1% in 2015/16.\n\nThe average total absence for primary school pupils was 7.2 days compared to 16.9 days for special school and 9.3 day for secondary school pupils.\n\nThe rate of pupils who had more than 25 days of absence stayed the same as in 2015/16 at 4.3%.\n\nThese pupils accounted for 23.5% of days missed while 8.2% of pupils had no absence.\n\n**Absence by term**\n\nAcross all schools:\n\n* [overall absence](/glossary#overall-absence) - highest in summer and lowest in autumn\n\n* [authorised absence](/glossary#authorised-absence) - highest in spring and lowest in summer\n\n* [unauthorised absence](/glossary#unauthorised-absence) - highest in summer",
           "type": "MarkDownBlock"
         }
       ]
@@ -322,7 +333,7 @@
         {
           "id": "eb4318f9-11e0-46ea-9796-c36a9dc25014",
           "order": 0,
-          "body": "The [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\n**Ethnic groups**\n\nOverall absence rate:\n\n* Travellers of Irish heritage and Gypsy / Roma pupils - highest at 18.1% and 12.9% respectively\n\n* Chinese and Black African ethnicity pupils - substantially lower than the national average of 4.7% at 2.4% and 2.9% respectively\n\nPersistent absence rate:\n\n* Travellers of Irish heritage pupils - highest at 64%\n\n* Chinese pupils - lowest at 3.1%\n\n**Free school meals (FSM) eligibility**\n\nOverall absence rate:\n\n* pupils known to be eligible for and claiming FSM - higher at 7.3% compared to 4.2% for non-FSM pupils\n\nPersistent absence rate:\n\n* pupils known to be eligible for and claiming FSM - more than double the rate of non-FSM pupils\n\n**Gender**\n\nOverall absence rate:\n\n* boys and girls - very similar at 4.7% and 4.6% respectively\n\nPersistent absence rate:\n\n* boys and girls - similar at 10.9% and 10.6% respectively\n\n**National curriculum year group**\n\nOverall absence rate:\n\n* pupils in national curriculum year groups 3 and 4 - lowest at 3.9% and 4% respectively\n\n* pupils in national curriculum year groups 10 and 11 - highest at 6.1% and 6.2% respectively\n\nThis trend is repeated for the persistent absence rate.\n\n**Special educational need (SEN)**\n\nOverall absence rate:\n\n* pupils with a SEN statement or education healthcare (EHC) plan - 8.2% compared to 4.3% for those with no identified SEN\n\nPersistent absence rate:\n\n* pupils with a SEN statement or education healthcare (EHC) plan - more than 2 times higher than pupils with no identified SEN",
+          "body": "The [overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\n**Ethnic groups**\n\nOverall absence rate:\n\n* Travellers of Irish heritage and Gypsy / Roma pupils - highest at 18.1% and 12.9% respectively\n\n* Chinese and Black African ethnicity pupils - substantially lower than the national average of 4.7% at 2.4% and 2.9% respectively\n\nPersistent absence rate:\n\n* Travellers of Irish heritage pupils - highest at 64%\n\n* Chinese pupils - lowest at 3.1%\n\n**Free school meals (FSM) eligibility**\n\nOverall absence rate:\n\n* pupils known to be eligible for and claiming FSM - higher at 7.3% compared to 4.2% for non-FSM pupils\n\nPersistent absence rate:\n\n* pupils known to be eligible for and claiming FSM - more than double the rate of non-FSM pupils\n\n**Gender**\n\nOverall absence rate:\n\n* boys and girls - very similar at 4.7% and 4.6% respectively\n\nPersistent absence rate:\n\n* boys and girls - similar at 10.9% and 10.6% respectively\n\n**National curriculum year group**\n\nOverall absence rate:\n\n* pupils in national curriculum year groups 3 and 4 - lowest at 3.9% and 4% respectively\n\n* pupils in national curriculum year groups 10 and 11 - highest at 6.1% and 6.2% respectively\n\nThis trend is repeated for the persistent absence rate.\n\n**Special educational need (SEN)**\n\nOverall absence rate:\n\n* pupils with a SEN statement or education healthcare (EHC) plan - 8.2% compared to 4.3% for those with no identified SEN\n\nPersistent absence rate:\n\n* pupils with a SEN statement or education healthcare (EHC) plan - more than 2 times higher than pupils with no identified SEN",
           "type": "MarkDownBlock"
         }
       ]
@@ -336,7 +347,7 @@
         {
           "id": "97c54e5f-2406-4333-851d-b6c9cc4bf612",
           "order": 0,
-          "body": "The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous 2 years.\n\nAbsence recorded for 4-year-olds is not treated as authorised or unauthorised and only reported as overall absence.",
+          "body": "The [overall absence](/glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous two years.\n\nAbsence recorded for 4-year-olds is not treated as authorised or unauthorised and only reported as overall absence.",
           "type": "MarkDownBlock"
         }
       ]
@@ -350,7 +361,7 @@
         {
           "id": "3aaafa20-bc32-4523-bb23-dd55c458f928",
           "order": 0,
-          "body": "The [overall absence](../glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.\n\nThe [persistent absence](../glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16.",
+          "body": "The [overall absence](/glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.\n\nThe [persistent absence](/glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16.",
           "type": "MarkDownBlock"
         }
       ]
@@ -364,7 +375,7 @@
         {
           "id": "7d97f8ed-e1d0-4244-bec3-3432af356f57",
           "order": 0,
-          "body": "[Overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).\n\n**Overall absence**\n\nSimilar to 2015/16, the 3 regions with the highest rates across all school types were:\n\n* North East - 4.9%\n\n* Yorkshire and the Humber - 4.9%\n\n* South West - 4.8%\n\nMeanwhile, Inner and Outer London had the lowest rates at 4.4%.\n\n**Persistent absence**\n\nThe region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.",
+          "body": "[Overall absence](/glossary#overall-absence) and [persistent absence](/glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).\n\n**Overall absence**\n\nSimilar to 2015/16, the three regions with the highest rates across all school types were:\n\n* North East - 4.9%\n\n* Yorkshire and the Humber - 4.9%\n\n* South West - 4.8%\n\nMeanwhile, Inner and Outer London had the lowest rates at 4.4%.\n\n**Persistent absence**\n\nThe region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.",
           "type": "MarkDownBlock"
         },
         {
@@ -383,12 +394,14 @@
               "183f94c3-b5d7-4868-892d-c948e256744d",
               "cb9b57e8-9965-4cb6-b61a-acc6d34b32be"
             ],
-            "geographicLevel": 1,
             "indicators": [
               "ccfe716a-6976-4dc3-8fde-a026cd30f3ae",
               "92d3437a-0a62-4cd7-8dfb-bcceba7eef61",
               "f9ae4976-7cd3-4718-834a-09349b6eb377"
-            ]
+            ],
+            "locations": {
+              "geographicLevel": "LocalAuthorityDistrict"
+            }
           },
           "charts": [
             {
@@ -443,29 +456,28 @@
                       ]
                     }
                   ],
+                  "referenceLines": [],
                   "visible": true,
                   "title": "School Year",
                   "showGrid": true,
-                  "labelPosition": "axis",
                   "tickConfig": "default"
                 },
                 "minor": {
                   "type": "major",
                   "groupBy": "timePeriod",
                   "sortAsc": true,
+                  "dataSets": [],
+                  "referenceLines": [],
                   "visible": true,
                   "title": "Absence Rate",
                   "showGrid": true,
-                  "labelPosition": "axis",
                   "tickConfig": "default"
                 }
               },
               "type": "map",
-              "width": 0,
               "height": 0
             }
           ],
-          "tables": [],
           "type": "DataBlock"
         }
       ]
@@ -480,7 +492,7 @@
       {
         "id": "a0b85d7d-a9bd-48b5-82c6-a119adc74ca2",
         "order": 1,
-        "body": "Read national statistical summaries, view charts and tables and download data files.\n\nFind out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
+        "body": "Read national statistical summaries, view charts and tables and download data files.\n\nFind out how and why these statistics are collected and published - [Pupil absence statistics: methodology](/methodology/pupil-absence-in-schools-in-england).\n\nThis release was created as example content during the platform’s Private Beta phase, whilst it provides access to real data, the below release should be used with some caution. To access the original, release please see [Pupil absence in schools in England: 2016 to 2017](https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2016-to-2017)",
         "type": "MarkDownBlock"
       }
     ]
@@ -490,7 +502,14 @@
     "order": 1,
     "heading": "",
     "caption": "",
-    "content": []
+    "content": [
+      {
+        "id": "b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9",
+        "order": 1,
+        "body": "* pupils missed on average 8.2 school days\n* overall and unauthorised absence rates up on 2015/16\n* unauthorised absence rise due to higher rates of unauthorised holidays\n* 10% of pupils persistently absent during 2016/17\n",
+        "type": "MarkDownBlock"
+      }
+    ]
   },
   "keyStatisticsSection": {
     "id": "7b779d79-6caa-43fd-84ba-b8efd219b3c8",
@@ -505,7 +524,7 @@
         "dataBlockRequest": {
           "subjectId": "803fbf56-600f-490f-8409-6413a891720d",
           "timePeriod": {
-            "startYear": 2012,
+            "startYear": 2016,
             "startCode": "AY",
             "endYear": 2016,
             "endCode": "AY"
@@ -515,7 +534,9 @@
             "cb9b57e8-9965-4cb6-b61a-acc6d34b32be"
           ],
           "indicators": ["92d3437a-0a62-4cd7-8dfb-bcceba7eef61"],
-          "country": ["E92000001"]
+          "locations": {
+            "country": ["E92000001"]
+          }
         },
         "charts": [
           {
@@ -557,67 +578,64 @@
                     ]
                   }
                 ],
+                "referenceLines": [],
                 "visible": true,
                 "title": "School Year",
                 "showGrid": true,
-                "labelPosition": "axis",
                 "tickConfig": "default"
               },
               "minor": {
                 "type": "major",
                 "groupBy": "timePeriod",
                 "sortAsc": true,
+                "dataSets": [],
+                "referenceLines": [],
                 "visible": true,
                 "title": "Absence Rate",
                 "showGrid": true,
-                "labelPosition": "axis",
                 "min": 0,
                 "tickConfig": "default"
               }
             },
             "type": "line",
-            "width": 0,
-            "height": 0,
-            "legendHeight": 0
+            "legendHeight": 0,
+            "height": 0
           }
         ],
         "summary": {
           "dataKeys": ["92d3437a-0a62-4cd7-8dfb-bcceba7eef61"],
           "dataSummary": ["Up from 4.6% in 2015/16"],
           "dataDefinition": [
-            "Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=\"/glossary#overall-absence\">More >>></a>"
+            "Total number of all authorised and unauthorised absences from possible school sessions for all pupils."
           ],
           "dataDefinitionTitle": ["What is overall absence?"]
         },
-        "tables": [
-          {
-            "tableHeaders": {
-              "columnGroups": [],
-              "columns": [
-                { "label": "2012/13", "value": "2012_AY" },
-                { "label": "2013/14", "value": "2013_AY" },
-                { "label": "2014/15", "value": "2014_AY" },
-                { "label": "2015/16", "value": "2015_AY" },
-                { "label": "2016/17", "value": "2016_AY" }
-              ],
-              "rowGroups": [
-                [
-                  {
-                    "label": "England",
-                    "level": "country",
-                    "value": "E92000001"
-                  }
-                ]
-              ],
-              "rows": [
+        "table": {
+          "tableHeaders": {
+            "columnGroups": [],
+            "columns": [
+              {
+                "value": "2016_AY",
+                "type": "TimePeriod"
+              }
+            ],
+            "rowGroups": [
+              [
                 {
-                  "label": "Overall absence rate",
-                  "value": "92d3437a-0a62-4cd7-8dfb-bcceba7eef61"
+                  "level": "country",
+                  "value": "E92000001",
+                  "type": "Location"
                 }
               ]
-            }
+            ],
+            "rows": [
+              {
+                "value": "92d3437a-0a62-4cd7-8dfb-bcceba7eef61",
+                "type": "Indicator"
+              }
+            ]
           }
-        ],
+        },
         "type": "DataBlock"
       },
       {
@@ -627,7 +645,7 @@
         "dataBlockRequest": {
           "subjectId": "803fbf56-600f-490f-8409-6413a891720d",
           "timePeriod": {
-            "startYear": 2012,
+            "startYear": 2016,
             "startCode": "AY",
             "endYear": 2016,
             "endCode": "AY"
@@ -637,7 +655,9 @@
             "cb9b57e8-9965-4cb6-b61a-acc6d34b32be"
           ],
           "indicators": ["f9ae4976-7cd3-4718-834a-09349b6eb377"],
-          "country": ["E92000001"]
+          "locations": {
+            "country": ["E92000001"]
+          }
         },
         "charts": [
           {
@@ -665,67 +685,64 @@
                     ]
                   }
                 ],
+                "referenceLines": [],
                 "visible": true,
                 "title": "School Year",
                 "showGrid": true,
-                "labelPosition": "axis",
                 "tickConfig": "default"
               },
               "minor": {
                 "type": "major",
                 "groupBy": "timePeriod",
                 "sortAsc": true,
+                "dataSets": [],
+                "referenceLines": [],
                 "visible": true,
                 "title": "Absence Rate",
                 "showGrid": true,
-                "labelPosition": "axis",
                 "min": 0,
                 "tickConfig": "default"
               }
             },
             "type": "line",
-            "width": 0,
-            "height": 0,
-            "legendHeight": 0
+            "legendHeight": 0,
+            "height": 0
           }
         ],
         "summary": {
           "dataKeys": ["f9ae4976-7cd3-4718-834a-09349b6eb377"],
           "dataSummary": ["Similar to previous years"],
           "dataDefinition": [
-            "Number of authorised absences as a percentage of the overall school population. <a href=\"/glossary#authorised-absence\">More >>></a>"
+            "Number of authorised absences as a percentage of the overall school population."
           ],
           "dataDefinitionTitle": ["What is authorized absence rate?"]
         },
-        "tables": [
-          {
-            "tableHeaders": {
-              "columnGroups": [],
-              "columns": [
-                { "label": "2012/13", "value": "2012_AY" },
-                { "label": "2013/14", "value": "2013_AY" },
-                { "label": "2014/15", "value": "2014_AY" },
-                { "label": "2015/16", "value": "2015_AY" },
-                { "label": "2016/17", "value": "2016_AY" }
-              ],
-              "rowGroups": [
-                [
-                  {
-                    "label": "England",
-                    "level": "country",
-                    "value": "E92000001"
-                  }
-                ]
-              ],
-              "rows": [
+        "table": {
+          "tableHeaders": {
+            "columnGroups": [],
+            "columns": [
+              {
+                "value": "2016_AY",
+                "type": "TimePeriod"
+              }
+            ],
+            "rowGroups": [
+              [
                 {
-                  "label": "Authorised absence rate",
-                  "value": "f9ae4976-7cd3-4718-834a-09349b6eb377"
+                  "level": "country",
+                  "value": "E92000001",
+                  "type": "Location"
                 }
               ]
-            }
+            ],
+            "rows": [
+              {
+                "value": "f9ae4976-7cd3-4718-834a-09349b6eb377",
+                "type": "Indicator"
+              }
+            ]
           }
-        ],
+        },
         "type": "DataBlock"
       },
       {
@@ -735,7 +752,7 @@
         "dataBlockRequest": {
           "subjectId": "803fbf56-600f-490f-8409-6413a891720d",
           "timePeriod": {
-            "startYear": 2012,
+            "startYear": 2016,
             "startCode": "AY",
             "endYear": 2016,
             "endCode": "AY"
@@ -745,7 +762,9 @@
             "cb9b57e8-9965-4cb6-b61a-acc6d34b32be"
           ],
           "indicators": ["ccfe716a-6976-4dc3-8fde-a026cd30f3ae"],
-          "country": ["E92000001"]
+          "locations": {
+            "country": ["E92000001"]
+          }
         },
         "charts": [
           {
@@ -787,67 +806,64 @@
                     ]
                   }
                 ],
+                "referenceLines": [],
                 "visible": true,
                 "title": "School Year",
                 "showGrid": true,
-                "labelPosition": "axis",
                 "tickConfig": "default"
               },
               "minor": {
                 "type": "major",
                 "groupBy": "timePeriod",
                 "sortAsc": true,
+                "dataSets": [],
+                "referenceLines": [],
                 "visible": true,
                 "title": "Absence Rate",
                 "showGrid": true,
-                "labelPosition": "axis",
                 "min": 0,
                 "tickConfig": "default"
               }
             },
             "type": "line",
-            "width": 0,
-            "height": 0,
-            "legendHeight": 0
+            "legendHeight": 0,
+            "height": 0
           }
         ],
         "summary": {
           "dataKeys": ["ccfe716a-6976-4dc3-8fde-a026cd30f3ae"],
           "dataSummary": ["Up from 1.1% in 2015/16"],
           "dataDefinition": [
-            "Number of unauthorised absences as a percentage of the overall school population. <a href=\"/glossary#unauthorised-absence\">More >>></a>"
+            "Number of unauthorised absences as a percentage of the overall school population."
           ],
           "dataDefinitionTitle": ["What is unauthorized absence rate?"]
         },
-        "tables": [
-          {
-            "tableHeaders": {
-              "columnGroups": [],
-              "columns": [
-                { "label": "2012/13", "value": "2012_AY" },
-                { "label": "2013/14", "value": "2013_AY" },
-                { "label": "2014/15", "value": "2014_AY" },
-                { "label": "2015/16", "value": "2015_AY" },
-                { "label": "2016/17", "value": "2016_AY" }
-              ],
-              "rowGroups": [
-                [
-                  {
-                    "label": "England",
-                    "level": "country",
-                    "value": "E92000001"
-                  }
-                ]
-              ],
-              "rows": [
+        "table": {
+          "tableHeaders": {
+            "columnGroups": [],
+            "columns": [
+              {
+                "value": "2016_AY",
+                "type": "TimePeriod"
+              }
+            ],
+            "rowGroups": [
+              [
                 {
-                  "label": "Unauthorised absence rate",
-                  "value": "ccfe716a-6976-4dc3-8fde-a026cd30f3ae"
+                  "level": "country",
+                  "value": "E92000001",
+                  "type": "Location"
                 }
               ]
-            }
+            ],
+            "rows": [
+              {
+                "value": "ccfe716a-6976-4dc3-8fde-a026cd30f3ae",
+                "type": "Indicator"
+              }
+            ]
           }
-        ],
+        },
         "type": "DataBlock"
       }
     ]
@@ -879,7 +895,9 @@
             "92d3437a-0a62-4cd7-8dfb-bcceba7eef61",
             "f9ae4976-7cd3-4718-834a-09349b6eb377"
           ],
-          "country": ["E92000001"]
+          "locations": {
+            "country": ["E92000001"]
+          }
         },
         "charts": [
           {
@@ -935,28 +953,28 @@
                     ]
                   }
                 ],
+                "referenceLines": [],
                 "visible": true,
                 "title": "School Year",
                 "showGrid": true,
-                "labelPosition": "axis",
                 "tickConfig": "default"
               },
               "minor": {
                 "type": "major",
                 "groupBy": "timePeriod",
                 "sortAsc": true,
+                "dataSets": [],
+                "referenceLines": [],
                 "visible": true,
                 "title": "Absence Rate",
                 "showGrid": true,
-                "labelPosition": "axis",
                 "min": 0,
                 "tickConfig": "default"
               }
             },
             "type": "line",
-            "width": 0,
-            "height": 0,
-            "legendHeight": 0
+            "legendHeight": 0,
+            "height": 0
           }
         ],
         "summary": {
@@ -971,9 +989,9 @@
             "Up from 1.1% in 2015/16"
           ],
           "dataDefinition": [
-            "Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=\"/glossary#overall-absence\">More >>></a>",
-            "Number of authorised absences as a percentage of the overall school population. <a href=\"/glossary#authorised-absence\">More >>></a>",
-            "Number of unauthorised absences as a percentage of the overall school population. <a href=\"/glossary#unauthorised-absence\">More >>></a>"
+            "Total number of all authorised and unauthorised absences from possible school sessions for all pupils.",
+            "Number of authorised absences as a percentage of the overall school population.",
+            "Number of unauthorised absences as a percentage of the overall school population."
           ],
           "dataDefinitionTitle": [
             "What is overall absence?",
@@ -981,43 +999,56 @@
             "What is unauthorized absence?"
           ]
         },
-        "tables": [
-          {
-            "tableHeaders": {
-              "columnGroups": [],
-              "columns": [
-                { "label": "2012/13", "value": "2012_AY" },
-                { "label": "2013/14", "value": "2013_AY" },
-                { "label": "2014/15", "value": "2014_AY" },
-                { "label": "2015/16", "value": "2015_AY" },
-                { "label": "2016/17", "value": "2016_AY" }
-              ],
-              "rowGroups": [
-                [
-                  {
-                    "label": "England",
-                    "level": "country",
-                    "value": "E92000001"
-                  }
-                ]
-              ],
-              "rows": [
+        "table": {
+          "tableHeaders": {
+            "columnGroups": [],
+            "columns": [
+              {
+                "value": "2012_AY",
+                "type": "TimePeriod"
+              },
+              {
+                "value": "2013_AY",
+                "type": "TimePeriod"
+              },
+              {
+                "value": "2014_AY",
+                "type": "TimePeriod"
+              },
+              {
+                "value": "2015_AY",
+                "type": "TimePeriod"
+              },
+              {
+                "value": "2016_AY",
+                "type": "TimePeriod"
+              }
+            ],
+            "rowGroups": [
+              [
                 {
-                  "label": "Authorised absence rate",
-                  "value": "f9ae4976-7cd3-4718-834a-09349b6eb377"
-                },
-                {
-                  "label": "Unauthorised absence rate",
-                  "value": "ccfe716a-6976-4dc3-8fde-a026cd30f3ae"
-                },
-                {
-                  "label": "Overall absence rate",
-                  "value": "92d3437a-0a62-4cd7-8dfb-bcceba7eef61"
+                  "level": "country",
+                  "value": "E92000001",
+                  "type": "Location"
                 }
               ]
-            }
+            ],
+            "rows": [
+              {
+                "value": "f9ae4976-7cd3-4718-834a-09349b6eb377",
+                "type": "Indicator"
+              },
+              {
+                "value": "ccfe716a-6976-4dc3-8fde-a026cd30f3ae",
+                "type": "Indicator"
+              },
+              {
+                "value": "92d3437a-0a62-4cd7-8dfb-bcceba7eef61",
+                "type": "Indicator"
+              }
+            ]
           }
-        ],
+        },
         "type": "DataBlock"
       }
     ]

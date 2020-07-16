@@ -1,11 +1,11 @@
-import { fireEvent, render, wait } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import Wizard from '../Wizard';
 import WizardStep from '../WizardStep';
 
 describe('Wizard', () => {
   test('does not render children that are not WizardSteps', () => {
-    const { queryByText } = render(
+    render(
       <Wizard id="test-wizard">
         <WizardStep>Step 1</WizardStep>
         <p>Not a wizard step</p>
@@ -13,13 +13,13 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    expect(queryByText('Step 1')).not.toBeNull();
-    expect(queryByText('Step 2')).not.toBeNull();
-    expect(queryByText('Not a wizard step')).toBeNull();
+    expect(screen.getByText('Step 1')).toBeInTheDocument();
+    expect(screen.getByText('Step 2')).toBeInTheDocument();
+    expect(screen.queryByText('Not a wizard step')).toBeNull();
   });
 
   test('renders correctly with default `initialStep of Step 1`', () => {
-    const { container } = render(
+    render(
       <Wizard id="test-wizard">
         <WizardStep>Step 1</WizardStep>
         <WizardStep>Step 2</WizardStep>
@@ -27,19 +27,19 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
 
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
 
   test('renders correctly with `initialStep` set to Step 2', () => {
-    const { container } = render(
+    render(
       <Wizard id="test-wizard" initialStep={2}>
         <WizardStep>Step 1</WizardStep>
         <WizardStep>Step 2</WizardStep>
@@ -47,18 +47,18 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
-    expect(step2).toHaveClass('stepActive');
+    expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
   });
 
   test('calling `setCurrentStep` render prop moves wizard to that step', () => {
-    const { container, getByText } = render(
+    render(
       <Wizard id="test-wizard">
         <WizardStep>
           {({ setCurrentStep }) => (
@@ -72,25 +72,25 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(getByText('Go to step 3'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
-    expect(step3).toHaveClass('stepActive');
+    expect(step3).toHaveAttribute('aria-current', 'step');
   });
 
   test('calling `setCurrentStep` with a step greater than the last step will not change the wizard', () => {
-    const { container, getByText } = render(
+    render(
       <Wizard id="test-wizard">
         <WizardStep>
           {({ setCurrentStep }) => {
@@ -106,25 +106,25 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(getByText('Go to step 4'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to step 4' }));
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
 
   test('calling `setCurrentStep` with a step less than the first step will not change the wizard', () => {
-    const { container, getByText } = render(
+    render(
       <Wizard id="test-wizard">
         <WizardStep>
           {({ setCurrentStep }) => {
@@ -140,25 +140,25 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(getByText('Go to step -1'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to step -1' }));
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
 
   test('calling `goToPreviousStep` render prop moves wizard to previous step', () => {
-    const { container, getByText } = render(
+    render(
       <Wizard id="test-wizard" initialStep={2}>
         <WizardStep>Step 1</WizardStep>
         <WizardStep>
@@ -172,25 +172,27 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
-    expect(step2).toHaveClass('stepActive');
+    expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(getByText('Go to previous step'));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Go to previous step' }),
+    );
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
 
   test('calling `goToPreviousStep` on first step does not change wizard', () => {
-    const { container, getByText } = render(
+    render(
       <Wizard id="test-wizard">
         <WizardStep>
           {({ goToPreviousStep }) => (
@@ -204,25 +206,27 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(getByText('Go to previous step'));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Go to previous step' }),
+    );
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
   });
 
   test('calling `goToNextStep` render prop moves wizard to next step', () => {
-    const { container, getByText } = render(
+    render(
       <Wizard id="test-wizard" initialStep={2}>
         <WizardStep>Step 1</WizardStep>
         <WizardStep>
@@ -236,25 +240,25 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
-    expect(step2).toHaveClass('stepActive');
+    expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(getByText('Go to next step'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
-    expect(step3).toHaveClass('stepActive');
+    expect(step3).toHaveAttribute('aria-current', 'step');
   });
 
   test('calling `goToNextStep` on last step does not change wizard', () => {
-    const { container, getByText } = render(
+    render(
       <Wizard id="test-wizard" initialStep={3}>
         <WizardStep>Step 1</WizardStep>
         <WizardStep>Step 2</WizardStep>
@@ -268,25 +272,25 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
-    expect(step3).toHaveClass('stepActive');
+    expect(step3).toHaveAttribute('aria-current', 'step');
 
-    fireEvent.click(getByText('Go to next step'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
-    expect(step3).toHaveClass('stepActive');
+    expect(step3).toHaveAttribute('aria-current', 'step');
   });
 
   test('does not scroll or focus first step when mounted by default', () => {
-    const { container } = render(
+    render(
       <Wizard id="test-wizard">
         <WizardStep>Step 1</WizardStep>
         <WizardStep>Step 2</WizardStep>
@@ -294,9 +298,9 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).not.toHaveFocus();
     expect(step1).not.toHaveScrolledIntoView();
@@ -309,7 +313,9 @@ describe('Wizard', () => {
   });
 
   test('scrolls to and focuses first step when `scrollOnMount` is true', () => {
-    const { container } = render(
+    jest.useFakeTimers();
+
+    render(
       <Wizard id="test-wizard" scrollOnMount>
         <WizardStep>Step 1</WizardStep>
         <WizardStep>Step 2</WizardStep>
@@ -317,9 +323,11 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
+
+    jest.runAllTimers();
 
     expect(step1).toHaveFocus();
     expect(step1).toHaveScrolledIntoView();
@@ -332,7 +340,9 @@ describe('Wizard', () => {
   });
 
   test('scrolls to and focuses step when step changes', () => {
-    const { container, getByText } = render(
+    jest.useFakeTimers();
+
+    render(
       <Wizard id="test-wizard">
         <WizardStep>
           {({ setCurrentStep }) => (
@@ -346,11 +356,13 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
-    fireEvent.click(getByText('Go to step 3'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
+
+    jest.runAllTimers();
 
     expect(step1).not.toHaveFocus();
     expect(step1).not.toHaveScrolledIntoView();
@@ -365,7 +377,7 @@ describe('Wizard', () => {
   test('calls `onStepChange` handler when step changes', () => {
     const onStepChange = jest.fn();
 
-    const { getByText } = render(
+    render(
       <Wizard id="test-wizard" onStepChange={onStepChange}>
         <WizardStep>
           {({ setCurrentStep }) => (
@@ -381,13 +393,13 @@ describe('Wizard', () => {
 
     expect(onStepChange).not.toHaveBeenCalled();
 
-    fireEvent.click(getByText('Go to step 3'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
     expect(onStepChange).toHaveBeenCalledWith(3, 1);
   });
 
   test('can change to a different step by returning a number from `onStepChange` handler', async () => {
-    const { container, getByText } = render(
+    render(
       <Wizard id="test-wizard" onStepChange={() => 2}>
         <WizardStep>
           {({ setCurrentStep }) => (
@@ -401,29 +413,29 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
-    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
-    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
 
     expect(step1).toBeVisible();
-    expect(step1).toHaveClass('stepActive');
+    expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(getByText('Go to step 3'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
-    await wait();
-
-    expect(step1).toBeVisible();
-    expect(step2).toBeVisible();
-    expect(step2).toHaveClass('stepActive');
-    expect(step3).not.toBeVisible();
+    await waitFor(() => {
+      expect(step1).toBeVisible();
+      expect(step2).toBeVisible();
+      expect(step2).toHaveAttribute('aria-current', 'step');
+      expect(step3).not.toBeVisible();
+    });
   });
 
   test('moving back calls the step `onBack` handler', async () => {
     const onBack = jest.fn();
 
-    const { getByText } = render(
+    render(
       <Wizard id="test-wizard" initialStep={2}>
         <WizardStep onBack={onBack}>Step 1</WizardStep>
         <WizardStep>
@@ -437,17 +449,17 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    fireEvent.click(getByText('Go to step 1'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to step 1' }));
 
-    await wait();
-
-    expect(onBack).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(onBack).toHaveBeenCalledTimes(1);
+    });
   });
 
   test('moving forward does not call the step `onBack` handler', async () => {
     const onBack = jest.fn();
 
-    const { getByText } = render(
+    render(
       <Wizard id="test-wizard">
         <WizardStep>
           {({ setCurrentStep }) => (
@@ -461,10 +473,10 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    fireEvent.click(getByText('Go to step 2'));
+    fireEvent.click(screen.getByRole('button', { name: 'Go to step 2' }));
 
-    await wait();
-
-    expect(onBack).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onBack).not.toHaveBeenCalled();
+    });
   });
 });

@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<IEnumerable<Release>> GetAsync(IEnumerable<Guid> ids);
 
+        Task<IEnumerable<Release>> GetAmendedReleases(IEnumerable<Guid> releaseIds);
+
         CachedReleaseViewModel GetReleaseViewModel(Guid id, PublishContext context);
 
         Release GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds);
@@ -24,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task SetPublishedDatesAsync(Guid id, DateTime published);
 
         List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types);
-        
-        Task RemoveDataForPreviousVersions(IEnumerable<Guid> releaseIds);
+
+        Task DeletePreviousVersionsStatisticalData(IEnumerable<Guid> releaseIds);
     }
 }

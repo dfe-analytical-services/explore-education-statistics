@@ -21,7 +21,7 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import tableBuilderService, {
   PublicationSubjectMeta,
-  TableDataQuery,
+  ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
 import produce from 'immer';
@@ -34,7 +34,7 @@ export type SavedDataBlock = CreateReleaseDataBlock & {
 interface TableState {
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
 }
 
 interface Props {
@@ -65,14 +65,15 @@ const ReleaseDataBlocksPageTabs = ({
       return undefined;
     }
 
-    const query = {
-      ...selectedDataBlock.dataBlockRequest,
+    const query: ReleaseTableDataQuery = {
+      ...selectedDataBlock.query,
+      releaseId,
       includeGeoJson: selectedDataBlock.charts.some(
         chart => chart.type === 'map',
       ),
     };
 
-    const tableData = await tableBuilderService.getTableData(query, releaseId);
+    const tableData = await tableBuilderService.getTableData(query);
     const nextSubjectMeta = await tableBuilderService.getPublicationSubjectMeta(
       query.subjectId,
     );
@@ -83,7 +84,7 @@ const ReleaseDataBlocksPageTabs = ({
 
     const tableHeaders = selectedDataBlock
       ? mapTableHeadersConfig(
-          selectedDataBlock.tables[0].tableHeaders,
+          selectedDataBlock.table.tableHeaders,
           table.subjectMeta,
         )
       : getDefaultTableHeaderConfig(table.subjectMeta);
@@ -118,8 +119,8 @@ const ReleaseDataBlocksPageTabs = ({
 
       const dataBlockToSave: SavedDataBlock = {
         ...dataBlock,
-        dataBlockRequest: {
-          ...dataBlock.dataBlockRequest,
+        query: {
+          ...dataBlock.query,
           includeGeoJson: dataBlock.charts[0]?.type === 'map',
         },
       };
@@ -168,14 +169,12 @@ const ReleaseDataBlocksPageTabs = ({
       await handleDataBlockSave({
         ...(selectedDataBlock ?? {}),
         ...details,
-        dataBlockRequest: query,
+        query,
         charts,
-        tables: [
-          {
-            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-            indicators: [],
-          },
-        ],
+        table: {
+          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+          indicators: [],
+        },
       });
     },
     [handleDataBlockSave, selectedDataBlock, setTableState],
@@ -193,12 +192,10 @@ const ReleaseDataBlocksPageTabs = ({
 
       await handleDataBlockSave({
         ...selectedDataBlock,
-        tables: [
-          {
-            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-            indicators: [],
-          },
-        ],
+        table: {
+          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+          indicators: [],
+        },
       });
     },
     [handleDataBlockSave, selectedDataBlock, updateTableState],
@@ -221,8 +218,8 @@ const ReleaseDataBlocksPageTabs = ({
             {!isLoading && (
               <DataBlockSourceWizard
                 key={saveNumber}
-                releaseId={releaseId}
                 dataBlock={selectedDataBlock}
+                releaseId={releaseId}
                 query={query}
                 subjectMeta={subjectMeta}
                 table={table}

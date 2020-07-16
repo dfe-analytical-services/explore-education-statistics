@@ -11,7 +11,7 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService, {
-  TableDataQuery,
+  ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import { Chart, DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor } from '@testing-library/dom';
@@ -19,7 +19,7 @@ import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
 import React from 'react';
 import { forceVisible } from 'react-lazyload';
-import DataBlockRenderer from '../DataBlockRenderer';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 
 jest.mock('@common/services/tableBuilderService');
 
@@ -29,7 +29,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
 
-describe('DataBlockRenderer', () => {
+describe('DataBlockTabs', () => {
   const testDataBlock: DataBlock = {
     id: 'test-id',
     type: 'DataBlock',
@@ -37,7 +37,7 @@ describe('DataBlockRenderer', () => {
     order: 0,
     name: 'Test data block',
     source: '',
-    dataBlockRequest: {
+    query: {
       subjectId: '1',
       geographicLevel: 'country',
       timePeriod: {
@@ -55,7 +55,83 @@ describe('DataBlockRenderer', () => {
       locations: {},
     },
     charts: [],
-    tables: [],
+    table: {
+      indicators: [],
+      tableHeaders: {
+        columnGroups: [],
+        columns: [
+          { value: '2012_AY', type: 'TimePeriod' },
+          { value: '2013_AY', type: 'TimePeriod' },
+          { value: '2014_AY', type: 'TimePeriod' },
+          { value: '2015_AY', type: 'TimePeriod' },
+          { value: '2016_AY', type: 'TimePeriod' },
+        ],
+        rowGroups: [],
+        rows: [
+          {
+            value: 'authorised-absence-rate',
+            type: 'Indicator',
+          },
+          {
+            value: 'unauthorised-absence-rate',
+            type: 'Indicator',
+          },
+          {
+            value: 'overall-absence-rate',
+            type: 'Indicator',
+          },
+        ],
+      },
+    },
+  };
+
+  const testDataBlockMap: DataBlock = {
+    id: 'test-id',
+    type: 'DataBlock',
+    heading: '',
+    order: 0,
+    name: 'Test data block',
+    source: '',
+    query: {
+      subjectId: '1',
+      geographicLevel: 'country',
+      timePeriod: {
+        startYear: 2016,
+        startCode: 'AY',
+        endYear: 2016,
+        endCode: 'AY',
+      },
+      filters: ['characteristic-total', 'school-type-total'],
+      indicators: [
+        'authorised-absence-rate',
+        'unauthorised-absence-rate',
+        'overall-absence-rate',
+      ],
+      locations: {},
+    },
+    charts: [testMapConfiguration],
+    table: {
+      indicators: [],
+      tableHeaders: {
+        columnGroups: [],
+        columns: [{ value: '2016_AY', type: 'TimePeriod' }],
+        rowGroups: [],
+        rows: [
+          {
+            value: 'authorised-absence-rate',
+            type: 'Indicator',
+          },
+          {
+            value: 'unauthorised-absence-rate',
+            type: 'Indicator',
+          },
+          {
+            value: 'overall-absence-rate',
+            type: 'Indicator',
+          },
+        ],
+      },
+    },
   };
 
   test('renders error message if table response is error', async () => {
@@ -71,7 +147,7 @@ describe('DataBlockRenderer', () => {
     );
 
     render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
@@ -84,15 +160,13 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.dataBlockRequest,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
-      expect(screen.getByText('Could not load content')).toBeInTheDocument();
+      expect(screen.getAllByText('Could not load content')).toHaveLength(2);
     });
   });
 
@@ -109,7 +183,7 @@ describe('DataBlockRenderer', () => {
     );
 
     render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
@@ -122,13 +196,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.dataBlockRequest,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(
         screen.queryByText('Could not load content'),
@@ -143,7 +215,7 @@ describe('DataBlockRenderer', () => {
     );
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
@@ -156,15 +228,13 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.dataBlockRequest,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
-      expect(screen.getAllByRole('tab')).toHaveLength(1);
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
 
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
     });
@@ -176,7 +246,7 @@ describe('DataBlockRenderer', () => {
     );
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-block"
         dataBlock={{
@@ -194,15 +264,13 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.dataBlockRequest,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
-      expect(screen.getAllByRole('tab')).toHaveLength(1);
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
     });
   });
@@ -213,7 +281,7 @@ describe('DataBlockRenderer', () => {
     });
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-block"
         dataBlock={{
@@ -231,15 +299,13 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.dataBlockRequest,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
-      expect(screen.getAllByRole('tab')).toHaveLength(1);
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
     });
   });
@@ -252,23 +318,21 @@ describe('DataBlockRenderer', () => {
     const fullTable = mapFullTable(testChartTableData);
 
     render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          tables: [
-            {
-              tableHeaders: mapUnmappedTableHeaders(
-                getDefaultTableHeaderConfig(fullTable.subjectMeta),
-              ),
-              indicators: [
-                'authorised-absence-rate',
-                'unauthorised-absence-rate',
-                'overall-absence-rate',
-              ],
-            },
-          ],
+          table: {
+            tableHeaders: mapUnmappedTableHeaders(
+              getDefaultTableHeaderConfig(fullTable.subjectMeta),
+            ),
+            indicators: [
+              'authorised-absence-rate',
+              'unauthorised-absence-rate',
+              'overall-absence-rate',
+            ],
+          },
         }}
       />,
     );
@@ -276,13 +340,11 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.dataBlockRequest,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
       expect(screen.getByRole('table')).toBeInTheDocument();
       expect(screen.getAllByRole('row')).toHaveLength(4);
@@ -296,26 +358,21 @@ describe('DataBlockRenderer', () => {
     );
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-block"
-        dataBlock={{
-          ...testDataBlock,
-          charts: [testMapConfiguration],
-        }}
+        dataBlock={testDataBlockMap}
       />,
     );
 
     forceVisible();
 
     await waitFor(() => {
-      expect(getDataBlockForSubject).toBeCalledWith(
-        {
-          ...testDataBlock.dataBlockRequest,
-          includeGeoJson: true,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(getDataBlockForSubject).toBeCalledWith({
+        ...testDataBlockMap.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: true,
+      } as ReleaseTableDataQuery);
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
@@ -327,7 +384,7 @@ describe('DataBlockRenderer', () => {
     );
 
     const { container } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         releaseId="test-release-id"
         id="test-datablock"
         dataBlock={{
@@ -340,17 +397,13 @@ describe('DataBlockRenderer', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith(
-        {
-          ...testDataBlock.dataBlockRequest,
-          includeGeoJson: false,
-        } as TableDataQuery,
-        'test-release-id',
-      );
+      expect(tableBuilderService.getTableData).toBeCalledWith({
+        ...testDataBlock.query,
+        releaseId: 'test-release-id',
+        includeGeoJson: false,
+      } as ReleaseTableDataQuery);
 
-      expect(
-        container.querySelectorAll('section.govuk-tabs__panel'),
-      ).toHaveLength(1);
+      expect(screen.getAllByRole('tabpanel')).toHaveLength(1);
 
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
 
@@ -375,22 +428,20 @@ describe('DataBlockRenderer', () => {
     const fullTable = mapFullTable(testChartTableData);
 
     const { rerender } = render(
-      <DataBlockRenderer
+      <DataBlockTabs
         id="test-block"
         dataBlock={{
           ...testDataBlock,
-          tables: [
-            {
-              tableHeaders: mapUnmappedTableHeaders(
-                getDefaultTableHeaderConfig(fullTable.subjectMeta),
-              ),
-              indicators: [
-                'authorised-absence-rate',
-                'unauthorised-absence-rate',
-                'overall-absence-rate',
-              ],
-            },
-          ],
+          table: {
+            tableHeaders: mapUnmappedTableHeaders(
+              getDefaultTableHeaderConfig(fullTable.subjectMeta),
+            ),
+            indicators: [
+              'authorised-absence-rate',
+              'unauthorised-absence-rate',
+              'overall-absence-rate',
+            ],
+          },
         }}
       />,
     );
@@ -433,11 +484,11 @@ describe('DataBlockRenderer', () => {
 
     expect(() => {
       rerender(
-        <DataBlockRenderer
+        <DataBlockTabs
           id="test-block"
           dataBlock={{
             ...testDataBlock,
-            dataBlockRequest: {
+            query: {
               subjectId: '1',
               geographicLevel: 'country',
               timePeriod: {
@@ -450,27 +501,25 @@ describe('DataBlockRenderer', () => {
               indicators: ['authorised-absence-sessions'],
               locations: {},
             },
-            tables: [
-              {
-                tableHeaders: {
-                  columnGroups: [],
-                  rowGroups: [],
-                  columns: [
-                    {
-                      type: 'TimePeriod',
-                      value: '2018_AY',
-                    },
-                  ],
-                  rows: [
-                    {
-                      type: 'Indicator',
-                      value: 'authorised-absence-sessions',
-                    },
-                  ],
-                },
-                indicators: ['authorised-absence-sessions'],
+            table: {
+              tableHeaders: {
+                columnGroups: [],
+                rowGroups: [],
+                columns: [
+                  {
+                    type: 'TimePeriod',
+                    value: '2018_AY',
+                  },
+                ],
+                rows: [
+                  {
+                    type: 'Indicator',
+                    value: 'authorised-absence-sessions',
+                  },
+                ],
               },
-            ],
+              indicators: ['authorised-absence-sessions'],
+            },
           }}
         />,
       );

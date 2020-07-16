@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Models
         public string PublicationSlug { get; set; }
         public string ReleaseSlug { get; set; }
         public DateTime PublishScheduled { get; set; }
-        public string PreviousVersionSlug { get; set; }
         public List<ReleaseFileReference> ReleaseFileReferences { get; set; }
+        public List<string> AdditionalDeleteDirectoryPaths { get; set; }
     }
 }

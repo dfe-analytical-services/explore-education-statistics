@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -11,7 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class DownloadController : ControllerBase
     {
-        private const string ContainerName = "downloads";
         private readonly IFileStorageService _fileStorageService;
 
         public DownloadController(IFileStorageService fileStorageService)
@@ -40,13 +40,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private async Task<ActionResult> GetFile(string publication, string release, ReleaseFileTypes type,
             string filename)
         {
-            if (!_fileStorageService.FileExistsAndIsReleased(ContainerName,
+            if (!_fileStorageService.FileExistsAndIsReleased(PublicFilesContainerName,
                 PublicReleasePath(publication, release, type, filename)))
             {
                 return NotFound();
             }
 
-            return await _fileStorageService.StreamFile(ContainerName,
+            return await _fileStorageService.StreamFile(PublicFilesContainerName,
                 PublicReleasePath(publication, release, type, filename), filename);
         }
     }

@@ -205,6 +205,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
         
         public List<Link> RelatedInformation { get; set; }
+        
+        public DateTime? DataLastPublished { get; set; }
 
         public Release CreateReleaseAmendment(DateTime createdDate, Guid createdByUserId)
         {
