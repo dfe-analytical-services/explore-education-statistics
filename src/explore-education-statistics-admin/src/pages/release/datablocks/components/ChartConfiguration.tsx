@@ -123,22 +123,14 @@ const ChartConfiguration = ({
     if (definition.type === 'infographic') {
       schema = schema.shape({
         fileId: Yup.string(),
-        file: Yup.mixed()
+        file: Yup.file()
+          .nullable()
           .when('fileId', {
             is: value => !value,
-            then: Yup.mixed().required('Select an infographic file to upload'),
+            then: Yup.file().required('Select an infographic file to upload'),
           })
-          .test({
-            name: 'imageType',
-            message: 'The infographic must be an image',
-            test(value?: File) {
-              if (!value) {
-                return true;
-              }
-
-              return value?.type.startsWith('image');
-            },
-          }),
+          .mimeType(['image'], 'The infographic must be an image')
+          .minSize(0, 'The infographic cannot be an empty file'),
       });
     }
 
