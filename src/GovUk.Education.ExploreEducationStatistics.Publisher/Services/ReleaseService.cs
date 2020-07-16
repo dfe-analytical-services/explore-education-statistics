@@ -57,6 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<IEnumerable<Release>> GetAmendedReleases(IEnumerable<Guid> releaseIds)
         {
             return await _contentDbContext.Releases
+                .Include(r => r.PreviousVersion)
                 .Include(r => r.Publication)
                 .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
                 .ToListAsync();
