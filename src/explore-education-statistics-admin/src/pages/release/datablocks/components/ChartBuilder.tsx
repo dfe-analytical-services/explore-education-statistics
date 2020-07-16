@@ -20,6 +20,7 @@ import {
   horizontalBarBlockDefinition,
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
+import { InfographicChartProps } from '@common/modules/charts/components/InfographicBlock';
 import {
   lineChartBlockDefinition,
   LineChartProps,
@@ -71,15 +72,20 @@ type ChartBuilderChartProps = ChartRendererProps & {
 };
 
 const filterChartProps = (props: ChartBuilderChartProps): Chart => {
-  // We don't want to persist data set labels
+  // Filter out any unnecessary props, for example,
+  // we don't want to persist data set `labels`
   // anymore in the deprecated format.
-  return omit(props, [
-    'data',
-    'meta',
-    'labels',
-    'getInfographic',
-    'file',
-  ]) as Chart;
+  const excludedProps: (
+    | keyof ChartBuilderChartProps
+    | keyof InfographicChartProps
+    | 'labels'
+  )[] = ['data', 'meta', 'labels', 'getInfographic', 'file'];
+
+  if (props.type !== 'infographic') {
+    excludedProps.push('fileId');
+  }
+
+  return omit(props, excludedProps) as Chart;
 };
 
 export interface ChartBuilderForm extends FormState {
