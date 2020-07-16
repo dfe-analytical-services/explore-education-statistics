@@ -12,6 +12,7 @@ using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseStatusTableQueryUtil;
 using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -64,6 +65,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     }));
 
             return tableResult.Result as ReleaseStatus;
+        }
+
+        public async Task<IEnumerable<ReleaseStatus>> GetWherePublishingDueTodayWithStages(
+            ReleaseStatusContentStage? content = null,
+            ReleaseStatusDataStage? data = null,
+            ReleaseStatusFilesStage? files = null,
+            ReleaseStatusPublishingStage? publishing = null,
+            ReleaseStatusOverallStage? overall = null)
+        {
+            var query = QueryPublishLessThanEndOfTodayWithStages(content, data, files, publishing, overall);
+            return await ExecuteQueryAsync(query);
         }
 
         public Task<IEnumerable<ReleaseStatus>> GetAllByOverallStage(Guid releaseId, params ReleaseStatusOverallStage[] overallStages)
@@ -125,31 +137,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateStagesAsync(Guid releaseId, Guid releaseStatusId,
-            ReleaseStatusContentStage? contentStage,
-            ReleaseStatusDataStage? dataStage, ReleaseStatusFilesStage? filesStage,
-            ReleaseStatusPublishingStage? publishingStage, ReleaseStatusLogMessage logMessage = null)
+        public async Task UpdateStagesAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusContentStage? content = null,
+            ReleaseStatusDataStage? data = null, ReleaseStatusFilesStage? files = null,
+            ReleaseStatusPublishingStage? publishing = null, ReleaseStatusOverallStage? overall = null,
+            ReleaseStatusLogMessage logMessage = null)
         {
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
-                if (contentStage.HasValue)
+                if (content.HasValue)
                 {
-                    row.State.Content = contentStage.Value;
+                    row.State.Content = content.Value;
                 }
 
-                if (dataStage.HasValue)
+                if (data.HasValue)
                 {
-                    row.State.Data = dataStage.Value;
+                    row.State.Data = data.Value;
                 }
 
-                if (filesStage.HasValue)
+                if (files.HasValue)
                 {
-                    row.State.Files = filesStage.Value;
+                    row.State.Files = files.Value;
                 }
 
-                if (publishingStage.HasValue)
+                if (publishing.HasValue)
                 {
-                    row.State.Publishing = publishingStage.Value;
+                    row.State.Publishing = publishing.Value;
+                }
+                
+                if (overall.HasValue)
+                {
+                    row.State.Overall = overall.Value;
                 }
 
                 row.AppendLogMessage(logMessage);
@@ -177,6 +194,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 row.AppendLogMessage(logMessage);
                 return row;
             });
+
+            if (stage == ReleaseStatusDataStage.Failed)
+            {
+                await CancelReleasesWithContentDependency(releaseId, releaseStatusId);
+            }
         }
 
         public async Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusFilesStage stage,
@@ -243,6 +265,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task<CloudTable> GetTableAsync()
         {
             return await _tableStorageService.GetTableAsync(PublisherReleaseStatusTableName);
+        }
+
+        /// <summary>
+        /// Cancel publishing of any other releases sharing a dependency with the content of a failing release.
+        /// Publishing any Release copies the whole staging directory.
+        /// Cancelling others is necessary to avoid publishing staged content of a Release which is now failing,
+        /// and other parts of content which were calculated expecting that Release to exist.
+        /// </summary>
+        /// <param name="failingReleaseId"></param>
+        /// <param name="failingReleaseStatusId"></param>
+        /// <returns></returns>
+        private async Task CancelReleasesWithContentDependency(Guid failingReleaseId, Guid failingReleaseStatusId)
+        {
+            if (await IsImmediate(failingReleaseId, failingReleaseStatusId))
+            {
+                return;
+            }
+            
+            var scheduled = await GetWherePublishingDueTodayWithStages(
+                publishing: ReleaseStatusPublishingStage.Scheduled);
+            var scheduledExceptFailing = scheduled
+                .Where(status => status.Id != failingReleaseStatusId);
+
+            foreach (var releaseStatus in scheduledExceptFailing)
+            {
+                await UpdateStagesAsync(releaseStatus.ReleaseId, releaseStatus.Id,
+                    publishing: ReleaseStatusPublishingStage.Cancelled, 
+                    overall: ReleaseStatusOverallStage.Failed,
+                    logMessage: new ReleaseStatusLogMessage(
+                        $"Publishing cancelled due to dependency with failed Release: {failingReleaseId}, ReleaseStatusId: {failingReleaseStatusId}"));
+            }
         }
     }
 }
