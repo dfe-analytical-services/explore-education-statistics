@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
+  FocusEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,
   ReactNode,
@@ -15,6 +16,7 @@ export interface FormFileInputProps {
   id: string;
   label: ReactNode | string;
   name: string;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onClick?: MouseEventHandler<HTMLInputElement>;
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
@@ -28,6 +30,7 @@ const FormFileInput = ({
   id,
   label,
   name,
+  onBlur,
   onChange,
   onClick,
   onKeyPress,
@@ -56,6 +59,7 @@ const FormFileInput = ({
         disabled={disabled}
         name={name}
         accept={accept}
+        onBlur={onBlur}
         onChange={onChange}
         onClick={onClick}
         onKeyPress={onKeyPress}
