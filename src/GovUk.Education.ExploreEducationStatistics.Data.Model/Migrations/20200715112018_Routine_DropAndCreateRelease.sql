@@ -1,11 +1,14 @@
-CREATE OR ALTER PROCEDURE DropAndCreateReleaseV @Release dbo.ReleaseType READONLY, @LinkedSubjects varchar(4000), @LinkedFootnotes varchar(4000)
+CREATE OR ALTER PROCEDURE DropAndCreateRelease @Release dbo.ReleaseType READONLY, @LinkedSubjects varchar(4000), @LinkedFootnotes varchar(4000)
 AS
 BEGIN
     DECLARE @LinkedSubjectsList IdListGuidType,
             @LinkedFootnotesList IdListGuidType;
-     
-    INSERT @LinkedSubjectsList VALUES (@LinkedSubjects);
-    INSERT @LinkedFootnotesList VALUES (@LinkedFootnotes);
+            
+    IF LEN(ISNULL(@LinkedSubjects, '')) > 0 
+        INSERT @LinkedSubjectsList VALUES (@LinkedSubjects);
+        
+    IF LEN(ISNULL(@LinkedFootnotes, '')) > 0    
+        INSERT @LinkedFootnotesList VALUES (@LinkedFootnotes);
     
     DELETE FROM dbo.ReleaseFootnote WHERE dbo.ReleaseFootnote.ReleaseId IN (SELECT R.Id FROM @Release R);
     DELETE FROM dbo.ReleaseSubject WHERE dbo.ReleaseSubject.ReleaseId IN (SELECT R.Id FROM @Release R);
