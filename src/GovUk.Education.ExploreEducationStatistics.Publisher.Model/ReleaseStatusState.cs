@@ -10,19 +10,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         private ReleaseStatusFilesStage _files;
         private ReleaseStatusDataStage _data;
         private ReleaseStatusPublishingStage _publishing;
-        public ReleaseStatusOverallStage ReleaseStatusOverall { get; private set; }
+        private ReleaseStatusOverallStage _overall;
 
         public ReleaseStatusState(ReleaseStatusContentStage content,
             ReleaseStatusFilesStage files,
             ReleaseStatusDataStage data,
             ReleaseStatusPublishingStage publishing,
-            ReleaseStatusOverallStage releaseStatusOverall)
+            ReleaseStatusOverallStage overall)
         {
             _content = content;
             _files = files;
             _data = data;
             _publishing = publishing;
-            ReleaseStatusOverall = releaseStatusOverall;
+            _overall = overall;
         }
 
         public ReleaseStatusState(string content, string files, string data, string publishing, string overall) : this(
@@ -94,6 +94,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
         }
 
+        public ReleaseStatusOverallStage Overall
+        {
+            get => _overall;
+            set
+            {
+                if (value == _overall)
+                {
+                    return;
+                }
+
+                _overall = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (Content == ReleaseStatusContentStage.Complete
@@ -101,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 && Files == ReleaseStatusFilesStage.Complete
                 && Publishing == ReleaseStatusPublishingStage.Complete)
             {
-                ReleaseStatusOverall = ReleaseStatusOverallStage.Complete;
+                Overall = ReleaseStatusOverallStage.Complete;
             }
 
             if (Content == ReleaseStatusContentStage.Failed
@@ -115,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 {
                     Publishing = ReleaseStatusPublishingStage.Cancelled;
                 }
-                ReleaseStatusOverall = ReleaseStatusOverallStage.Failed;
+                Overall = ReleaseStatusOverallStage.Failed;
             }
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

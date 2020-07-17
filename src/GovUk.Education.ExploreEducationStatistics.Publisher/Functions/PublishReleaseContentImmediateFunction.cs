@@ -82,22 +82,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await _releaseStatusService.UpdateStagesAsync(releaseId,
                         releaseStatusId,
                         logMessage: logMessage,
-                        publishingStage: ReleaseStatusPublishingStage.Started,
-                        contentStage: ReleaseStatusContentStage.Started);
+                        publishing: ReleaseStatusPublishingStage.Started,
+                        content: ReleaseStatusContentStage.Started);
                     break;
                 case Stage.Complete:
                     await _releaseStatusService.UpdateStagesAsync(releaseId,
                         releaseStatusId,
                         logMessage: logMessage,
-                        publishingStage: ReleaseStatusPublishingStage.Complete,
-                        contentStage: ReleaseStatusContentStage.Complete);
+                        publishing: ReleaseStatusPublishingStage.Complete,
+                        content: ReleaseStatusContentStage.Complete);
                     break;
                 case Stage.Failed:
                     await _releaseStatusService.UpdateStagesAsync(releaseId,
                         releaseStatusId,
                         logMessage: logMessage,
-                        publishingStage: ReleaseStatusPublishingStage.Failed,
-                        contentStage: ReleaseStatusContentStage.Failed);
+                        publishing: ReleaseStatusPublishingStage.Failed,
+                        content: ReleaseStatusContentStage.Failed);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stage), stage, null);
