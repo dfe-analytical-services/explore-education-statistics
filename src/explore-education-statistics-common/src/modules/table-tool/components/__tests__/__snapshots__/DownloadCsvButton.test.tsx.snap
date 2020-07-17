@@ -1,74 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DownloadCsvButton calls \`writeFile\` when button is pressed 1`] = `
-Object {
-  "SheetNames": Array [
-    "Sheet1",
-  ],
-  "Sheets": Object {
-    "Sheet1": Object {
-      "!ref": "A1:G2",
-      "A1": Object {
-        "t": "s",
-        "v": "location",
-      },
-      "A2": Object {
-        "t": "s",
-        "v": "England",
-      },
-      "B1": Object {
-        "t": "s",
-        "v": "location_code",
-      },
-      "B2": Object {
-        "t": "s",
-        "v": "england",
-      },
-      "C1": Object {
-        "t": "s",
-        "v": "geographic_level",
-      },
-      "C2": Object {
-        "t": "s",
-        "v": "country",
-      },
-      "D1": Object {
-        "t": "s",
-        "v": "time_period",
-      },
-      "D2": Object {
-        "t": "s",
-        "v": "201516",
-      },
-      "E1": Object {
-        "t": "s",
-        "v": "characteristic",
-      },
-      "E2": Object {
-        "t": "s",
-        "v": "Female",
-      },
-      "F1": Object {
-        "t": "s",
-        "v": "sess_authorised_percent",
-      },
-      "F2": Object {
-        "t": "s",
-        "v": "n/a",
-      },
-      "G1": Object {
-        "t": "s",
-        "v": "sess_authorised",
-      },
-      "G2": Object {
-        "t": "s",
-        "v": "n/a",
-      },
-    },
-  },
-}
-`;
-
 exports[`DownloadCsvButton getCsvData can contain suppressed cells 1`] = `
 Array [
   Array [
@@ -170,29 +101,6 @@ Array [
 ]
 `;
 
-exports[`DownloadCsvButton getCsvData contains n/a's if there are no results 1`] = `
-Array [
-  Array [
-    "location",
-    "location_code",
-    "geographic_level",
-    "time_period",
-    "characteristic",
-    "sess_authorised_percent",
-    "sess_authorised",
-  ],
-  Array [
-    "England",
-    "england",
-    "country",
-    "201516",
-    "Female",
-    "n/a",
-    "n/a",
-  ],
-]
-`;
-
 exports[`DownloadCsvButton getCsvData contains n/a's if there are some matching results 1`] = `
 Array [
   Array [
@@ -213,7 +121,7 @@ Array [
     "Female",
     "State-funded primary",
     "111",
-    "222",
+    "n/a",
   ],
   Array [
     "England",
@@ -223,7 +131,7 @@ Array [
     "Female",
     "State-funded secondary",
     "n/a",
-    "n/a",
+    "222",
   ],
 ]
 `;
@@ -247,6 +155,45 @@ Array [
     "Female",
     "12300000",
     "44255667.2356",
+  ],
+]
+`;
+
+exports[`DownloadCsvButton getCsvData returns only header if there are no results 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+]
+`;
+
+exports[`DownloadCsvButton getCsvData strips out rows with only n/a's 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "school_type",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "111",
+    "222",
   ],
 ]
 `;
