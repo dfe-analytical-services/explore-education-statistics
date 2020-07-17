@@ -12,6 +12,7 @@ type Props = {
   className?: string;
   disabled?: boolean;
   testId?: string;
+  variant?: 'secondary' | 'warning';
 } & LinkProps;
 
 const ButtonLink = ({
@@ -20,6 +21,7 @@ const ButtonLink = ({
   disabled = false,
   to,
   testId,
+  variant,
   ...props
 }: Props) => {
   return (
@@ -30,6 +32,8 @@ const ButtonLink = ({
         'govuk-button',
         {
           'govuk-button--disabled': disabled,
+          'govuk-button--secondary': variant === 'secondary',
+          'govuk-button--warning': variant === 'warning',
         },
         className,
       )}

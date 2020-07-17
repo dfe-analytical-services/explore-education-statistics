@@ -8,6 +8,7 @@ import {
 import { releaseCreateRoute } from '@admin/routes/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -39,34 +40,50 @@ const PublicationSummary = ({
 
   // BAU-404 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
   const showAmendmentButton = () => true;
+
   return (
     <>
       <SummaryList>
         <SummaryListItem term="Methodology" smallKey>
-          {publication.methodology && (
-            <Link to={`/methodologies/${publication.methodology.id}`}>
-              {publication.methodology.title}
-            </Link>
-          )}
-          {publication.externalMethodology &&
-            publication.externalMethodology.url && (
+          <p>
+            {publication.methodology ? (
+              <Link to={`/methodologies/${publication.methodology.id}`}>
+                {publication.methodology.title}
+              </Link>
+            ) : (
               <>
-                {publication.externalMethodology.title} (
-                <a
-                  href={publication.externalMethodology.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {publication.externalMethodology.url}
-                </a>
-                )
+                {publication.externalMethodology?.url ? (
+                  <>
+                    {publication.externalMethodology.title} (
+                    <a
+                      href={publication.externalMethodology.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {publication.externalMethodology.url}
+                    </a>
+                    )
+                  </>
+                ) : (
+                  'No methodology assigned'
+                )}
               </>
             )}
-          {!publication.methodology &&
-            (!publication.externalMethodology ||
-              !publication.externalMethodology.url) && (
-              <>No methodology assigned</>
-            )}
+          </p>
+
+          <ButtonGroup className="govuk-!-margin-bottom-2">
+            <ButtonLink
+              to={`/theme/${selectedThemeAndTopic.theme.id}/topic/${selectedThemeAndTopic.topic.id}/publication/${publication.id}/assign-methodology`}
+              variant="secondary"
+            >
+              {!publication.methodology &&
+              (!publication.externalMethodology ||
+                !publication.externalMethodology.url)
+                ? 'Add'
+                : 'Edit'}{' '}
+              methodology
+            </ButtonLink>
+          </ButtonGroup>
         </SummaryListItem>
         <SummaryListItem term="Releases" smallKey>
           <ul className="govuk-list dfe-admin">
@@ -85,32 +102,19 @@ const PublicationSummary = ({
               ))}
             {publication.releases.length < 1 && <>No releases created</>}
           </ul>
-        </SummaryListItem>
-      </SummaryList>
-      <SummaryList>
-        <SummaryListItem term="" smallKey>
-          {publication.permissions.canCreateReleases && (
-            <ButtonLink
-              to={generatePath(releaseCreateRoute.path, {
-                publicationId: publication.id,
-              })}
-              className="govuk-!-margin-right-6"
-              testId={`Create new release link for ${publication.title}`}
-            >
-              Create new release
-            </ButtonLink>
-          )}
-          <ButtonLink
-            to={`/theme/${selectedThemeAndTopic.theme.id}/topic/${selectedThemeAndTopic.topic.id}/publication/${publication.id}/assign-methodology`}
-            className="govuk-button--secondary"
-          >
-            {!publication.methodology &&
-            (!publication.externalMethodology ||
-              !publication.externalMethodology.url)
-              ? 'Add'
-              : 'Edit'}{' '}
-            methodology
-          </ButtonLink>
+
+          <ButtonGroup className="govuk-!-margin-bottom-2">
+            {publication.permissions.canCreateReleases && (
+              <ButtonLink
+                to={generatePath(releaseCreateRoute.path, {
+                  publicationId: publication.id,
+                })}
+                testId={`Create new release link for ${publication.title}`}
+              >
+                Create new release
+              </ButtonLink>
+            )}
+          </ButtonGroup>
         </SummaryListItem>
       </SummaryList>
 
