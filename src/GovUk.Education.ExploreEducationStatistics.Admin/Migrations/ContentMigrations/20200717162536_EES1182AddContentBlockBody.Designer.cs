@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200717162536_EES1182AddContentBlockBody")]
+    partial class EES1182AddContentBlockBody
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3247,23 +3249,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         });
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.HtmlBlock", b =>
-                {
-                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
-
-                    b.Property<string>("Body")
-                        .HasColumnName("Body")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("HtmlBlock");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MarkDownBlock", b =>
                 {
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
 
                     b.Property<string>("Body")
-                        .HasColumnName("Body")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("MarkDownBlock");

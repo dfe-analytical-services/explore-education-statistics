@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId, AddContentSectionRequest? request)
+            Guid releaseId, AddContentSectionRequest request)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
@@ -130,11 +130,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         var (release, sectionToRemove) = tuple;
                         
                         // detach DataBlocks before removing the ContentSection and its ContentBlocks
-                        sectionToRemove
+                        var dataBlocks = sectionToRemove
                             .Content
-                            .FindAll(contentBlock => contentBlock.Type == ContentBlockType.DataBlock.ToString())
-                            .ForEach(dataBlock =>  
-                                RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
+                            .OfType<DataBlock>()
+                            .ToList();
+                            
+                        dataBlocks.ForEach(dataBlock => 
+                            RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
                         
                         release.RemoveGenericContentSection(sectionToRemove);
                         _context.ContentSections.Remove(sectionToRemove);
@@ -158,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
         }
 
-        public Task<Either<ActionResult, List<IContentBlock>>> ReorderContentBlocksAsync(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
+        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocksAsync(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
             return 
                 CheckContentSectionExists(releaseId, contentSectionId)
@@ -179,132 +181,122 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     });
         }
 
-        public Task<Either<ActionResult, IContentBlock>> AddContentBlockAsync(Guid releaseId, Guid contentSectionId,
+        public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockAsync(Guid releaseId,
+            Guid contentSectionId,
             AddContentBlockRequest request)
         {
-            if (request.Type == ContentBlockType.DataBlock)
+            if (request.Type != ContentBlockType.HtmlBlock)
             {
-                throw new ArgumentOutOfRangeException(nameof(request), "Cannot create type DataBlock");
+                throw new ArgumentOutOfRangeException(nameof(request), "Cannot create type");
             }
-            
-            return 
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
-                    {
-                        var (_, section) = tuple;
-                        var newContentBlock = CreateContentBlockForType(request.Type);
-                        return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section, newContentBlock);
-                    });
-        }
 
-        public Task<Either<ActionResult, List<IContentBlock>>> RemoveContentBlockAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
-        {
-            return 
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
-                    {
-                        var (_, section) = tuple;
-
-                        var blockToRemove = section.Content.Find(block => block.Id == contentBlockId);
-
-                        if (blockToRemove == null)
-                        {
-                            return NotFound<List<IContentBlock>>(); 
-                        }
-                        
-                        if (!blockToRemove.ContentSectionId.HasValue)
-                        {
-                            return ValidationActionResult(ContentBlockAlreadyDetached);
-                        }
-                        
-                        if (blockToRemove.ContentSectionId != contentSectionId)
-                        {
-                            return ValidationActionResult(ContentBlockNotAttachedToThisContentSection);
-                        }
-
-                        var deleteContentBlock = blockToRemove.Type != ContentBlockType.DataBlock.ToString(); 
-                        RemoveContentBlockFromContentSection(section, blockToRemove, deleteContentBlock);
-                        
-                        _context.ContentSections.Update(section);
-                        await _context.SaveChangesAsync();
-                        return OrderedContentBlocks(section);
-                    });
-        }
-
-        public Task<Either<ActionResult, IContentBlock>> UpdateDataBlockAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
-        {
             return
                 CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
                         var (_, section) = tuple;
-
-                        var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
-
-                        if (blockToUpdate == null)
-                        {
-                            return NotFound<IContentBlock>();
-                        }
-
-                        switch (Enum.Parse<ContentBlockType>(blockToUpdate.Type))
-                        {
-                            case ContentBlockType.DataBlock:
-                                return await UpdateDataBlock((DataBlock) blockToUpdate, request);
-                            default:
-                                return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
-                        }
+                        var newContentBlock = CreateContentBlockForType(request.Type);
+                        return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section,
+                            newContentBlock);
                     });
         }
 
+        public Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlockAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId)
+                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(async tuple =>
+                {
+                    var (_, section) = tuple;
 
-        public Task<Either<ActionResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
+                    var blockToRemove = section.Content.Find(block => block.Id == contentBlockId);
+
+                    if (blockToRemove == null)
+                    {
+                        return NotFound<List<IContentBlockViewModel>>();
+                    }
+
+                    if (!blockToRemove.ContentSectionId.HasValue)
+                    {
+                        return ValidationActionResult(ContentBlockAlreadyDetached);
+                    }
+
+                    if (blockToRemove.ContentSectionId != contentSectionId)
+                    {
+                        return ValidationActionResult(ContentBlockNotAttachedToThisContentSection);
+                    }
+
+                    var deleteContentBlock = blockToRemove is DataBlock;
+                    RemoveContentBlockFromContentSection(section, blockToRemove, deleteContentBlock);
+
+                    _context.ContentSections.Update(section);
+                    await _context.SaveChangesAsync();
+                    return OrderedContentBlocks(section);
+                });
+        }
+
+        public Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlockAsync(
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
+        {
+            return CheckContentSectionExists(releaseId, contentSectionId)
+                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(async tuple =>
+                {
+                    var (_, section) = tuple;
+
+                    var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
+
+                    if (blockToUpdate == null)
+                    {
+                        return NotFound<DataBlockViewModel>();
+                    }
+
+                    if (!(blockToUpdate is DataBlock dataBlock))
+                    {
+                        return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
+                    }
+
+                    return await UpdateDataBlock(dataBlock, request);
+                });
+        }
+
+        public Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
         {
-            return 
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
+            return CheckContentSectionExists(releaseId, contentSectionId)
+                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(async tuple =>
+                {
+                    var (_, section) = tuple;
+
+                    var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
+
+                    if (blockToUpdate == null)
                     {
-                        var (_, section) = tuple;
+                        return NotFound<IContentBlockViewModel>();
+                    }
 
-                        var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
-
-                        if (blockToUpdate == null)
-                        {
-                            return NotFound<IContentBlock>();
-                        }
-
-                        switch (Enum.Parse<ContentBlockType>(blockToUpdate.Type))
-                        {
-                            case ContentBlockType.MarkDownBlock:
-                                return await UpdateMarkDownBlock((MarkDownBlock) blockToUpdate, request.Body);
-                            case ContentBlockType.HtmlBlock:
-                                return await UpdateHtmlBlock((HtmlBlock) blockToUpdate, request.Body);
-                            case ContentBlockType.DataBlock:
-                                return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
-                    });
+                    return blockToUpdate switch
+                    {
+                        MarkDownBlock markDownBlock => await UpdateMarkDownBlock(markDownBlock, request.Body),
+                        HtmlBlock htmlBlock => await UpdateHtmlBlock(htmlBlock, request.Body),
+                        DataBlock _ => ValidationActionResult(IncorrectContentBlockTypeForUpdate),
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                });
         }
 
         public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId) 
-            where T : IContentBlock
+            where T : ContentBlock
         {
-            var contentBlockTypeEnum = GetContentBlockTypeEnumValueFromType<T>();
-            
             var unattachedContentBlocks = await _context
                 .ReleaseContentBlocks
                 .Include(join => join.ContentBlock)
                 .Where(join => join.ReleaseId == releaseId)
                 .Select(join => join.ContentBlock)
-                .Where(contentBlock => contentBlock.ContentSectionId == null 
-                                       && contentBlock.Type == contentBlockTypeEnum.ToString())
+                .Where(contentBlock => contentBlock.ContentSectionId == null)
                 .OfType<T>()
                 .ToListAsync();
 
@@ -316,40 +308,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .OfType<T>()
                     .ToList();
             }
-            
+
             return unattachedContentBlocks;
         }
 
-        public Task<Either<ActionResult, IContentBlock>> AttachContentBlockAsync(Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
+        public Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,
+            AttachContentBlockRequest request)
         {
-            return 
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
-                    .OnSuccess(async tuple =>
+            return CheckContentSectionExists(releaseId, contentSectionId)
+                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(async tuple =>
+                {
+                    var (_, section) = tuple;
+
+                    var blockToAttach =
+                        _context.ContentBlocks.FirstOrDefault(block => block.Id == request.ContentBlockId);
+
+                    if (blockToAttach == null)
                     {
-                        var (_, section) = tuple;
+                        return NotFound<IContentBlockViewModel>();
+                    }
 
-                        var blockToAttach = _context
-                            .ContentBlocks
-                            .FirstOrDefault(block => block.Id == request.ContentBlockId);
+                    if (!(blockToAttach is DataBlock dataBlock))
+                    {
+                        return ValidationActionResult(IncorrectContentBlockTypeForAttach);
+                    }
 
-                        if (blockToAttach == null)
-                        {
-                            return NotFound<IContentBlock>();
-                        }
-                        
-                        if (blockToAttach.Type != ContentBlockType.DataBlock.ToString())
-                        {
-                            return ValidationActionResult(IncorrectContentBlockTypeForAttach);
-                        }
+                    if (dataBlock.ContentSectionId.HasValue)
+                    {
+                        return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
+                    }
 
-                        if (blockToAttach.ContentSectionId.HasValue)
-                        {
-                            return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
-                        }
-                        
-                        return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section, blockToAttach);
-                    });
+                    return await AddContentBlockToContentSectionAndSaveAsync(request.Order, section, dataBlock);
+                });
         }
 
         private Task<Either<ActionResult, CommentViewModel>> GetCommentAsync(Guid commentId)
@@ -443,18 +434,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 );
         }
 
-        private async Task<Either<ActionResult, IContentBlock>> AddContentBlockToContentSectionAndSaveAsync(int? order, ContentSection section,
-            IContentBlock newContentBlock)
+        private async Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockToContentSectionAndSaveAsync(
+            int? order, ContentSection section, ContentBlock newContentBlock)
         {
             if (section.Content == null)
             {
-                section.Content = new List<IContentBlock>();
-            }
-
-            // No longer supporting the creation of new MarkDownBlocks
-            if (newContentBlock.Type == ContentBlockType.MarkDownBlock.ToString())
-            {
-                newContentBlock.Type = ContentBlockType.HtmlBlock.ToString();
+                section.Content = new List<ContentBlock>();
             }
 
             var orderForNewBlock = OrderValueForNewlyAddedContentBlock(order, section);
@@ -468,14 +453,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
             _context.ContentSections.Update(section);
             await _context.SaveChangesAsync();
-            return newContentBlock;
+            return new Either<ActionResult, IContentBlockViewModel>(_mapper.Map<IContentBlockViewModel>(newContentBlock));
         }
 
         private static int OrderValueForNewlyAddedContentBlock(int? order, ContentSection section)
         {
             if (order.HasValue)
             {
-                return (int) order;
+                return order.Value;
             }
 
             if (!section.Content.IsNullOrEmpty())
@@ -488,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         private void RemoveContentBlockFromContentSection(
             ContentSection section,
-            IContentBlock blockToRemove,
+            ContentBlock blockToRemove,
             bool deleteContentBlock)
         {
             section.Content.Remove(blockToRemove);
@@ -511,25 +496,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             }
         }
 
-        private async Task<Either<ActionResult, IContentBlock>> UpdateMarkDownBlock(MarkDownBlock blockToUpdate,
+        private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateMarkDownBlock(MarkDownBlock markDownBlock,
+            string body)
+        {
+            var htmlBlock = new HtmlBlock
+            {
+                Body = body,
+                Comments = markDownBlock.Comments,
+                Order = markDownBlock.Order,
+                ContentSectionId = markDownBlock.ContentSectionId
+            };
+
+            var added = (await _context.ContentBlocks.AddAsync(htmlBlock)).Entity;
+            _context.ContentBlocks.Remove(markDownBlock);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<HtmlBlockViewModel>(added);
+        }
+
+        private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateHtmlBlock(HtmlBlock blockToUpdate,
             string body)
         {
             blockToUpdate.Body = body;
-
-            // Convert all MarkDownBlocks to HtmlBlocks
-            blockToUpdate.Type = ContentBlockType.HtmlBlock.ToString();
-
-            return await SaveContentBlock(blockToUpdate);
+            return await SaveContentBlock<HtmlBlockViewModel>(blockToUpdate);
         }
 
-        private async Task<Either<ActionResult, IContentBlock>> UpdateHtmlBlock(HtmlBlock blockToUpdate,
-            string body)
-        {
-            blockToUpdate.Body = body;
-            return await SaveContentBlock(blockToUpdate);
-        }
-
-        private async Task<Either<ActionResult, IContentBlock>> UpdateDataBlock(DataBlock blockToUpdate,
+        private async Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(DataBlock blockToUpdate,
             UpdateDataBlockRequest request)
         {
             if (blockToUpdate.Summary == null)
@@ -552,28 +543,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 request.DataSummary
             };
 
-            return await SaveContentBlock(blockToUpdate);
+            return await SaveContentBlock<DataBlockViewModel>(blockToUpdate);
         }
 
-        private async Task<IContentBlock> SaveContentBlock(IContentBlock blockToUpdate)
+        private async Task<T> SaveContentBlock<T>(ContentBlock blockToUpdate)
+            where T: IContentBlockViewModel
         {
             _context.ContentBlocks.Update(blockToUpdate);
             await _context.SaveChangesAsync();
-            return blockToUpdate;
+            return _mapper.Map<T>(blockToUpdate);
         }
 
-        private static IContentBlock CreateContentBlockForType(ContentBlockType type)
+        private static ContentBlock CreateContentBlockForType(ContentBlockType type)
         {
             var classType = GetContentBlockClassTypeFromEnumValue(type);
-            return (IContentBlock) Activator.CreateInstance(classType);
+            return (ContentBlock) Activator.CreateInstance(classType);
         }
 
-        private static List<IContentBlock> OrderedContentBlocks(ContentSection section)
+        private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)
         {
-            return section
+            return _mapper.Map<List<IContentBlockViewModel>>(section
                 .Content
                 .OrderBy(block => block.Order)
-                .ToList();
+                .ToList());
         }
 
         private List<ContentSectionViewModel> OrderedContentSections(Release release)

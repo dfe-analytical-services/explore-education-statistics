@@ -103,12 +103,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var dataBlocks = await _context
                 .ReleaseContentBlocks
-                .Where(join => join.ReleaseId == releaseId 
-                               && join.ContentBlock.Type == ContentBlockType.DataBlock.ToString())
+                .Where(join => join.ReleaseId == releaseId)
                 .Select(join => join.ContentBlock)
-                .OrderBy(dataBlock => ((DataBlock)dataBlock).Name)
+                .OfType<DataBlock>()
+                .OrderBy(dataBlock => dataBlock.Name)
                 .ToListAsync();
-            
+
             return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
         }
 

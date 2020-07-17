@@ -352,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         };
 
-        private static readonly IContentBlock Release1SummarySectionHtmlContentBlock1 = new HtmlBlock
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock1 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 1 summary 1 order 2</p>",
@@ -360,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release1SummarySection.Id
         };
 
-        private static readonly IContentBlock Release1SummarySectionHtmlContentBlock2 = new HtmlBlock
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock2 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 1 summary 2 order 0</p>",
@@ -368,7 +368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release1SummarySection.Id
         };
 
-        private static readonly IContentBlock Release1SummarySectionHtmlContentBlock3 = new HtmlBlock
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock3 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 1 summary 3 order 1</p>",
@@ -376,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release1SummarySection.Id
         };
 
-        private static readonly IContentBlock Release2SummarySectionHtmlContentBlock1 = new HtmlBlock
+        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock1 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 2 summary 1 order 2</p>",
@@ -384,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release2SummarySection.Id
         };
 
-        private static readonly IContentBlock Release2SummarySectionHtmlContentBlock2 = new HtmlBlock
+        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock2 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 2 summary 2 order 0</p>",
@@ -392,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release2SummarySection.Id
         };
 
-        private static readonly IContentBlock Release2SummarySectionHtmlContentBlock3 = new HtmlBlock
+        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock3 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 2 summary 3 order 1</p>",
@@ -400,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release2SummarySection.Id
         };
 
-        private static readonly IContentBlock Release1Section1HtmlContentBlock1 = new HtmlBlock
+        private static readonly ContentBlock Release1Section1HtmlContentBlock1 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 1 section 1 order 2</p>",
@@ -408,7 +408,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release1Section1.Id
         };
 
-        private static readonly IContentBlock Release1Section1HtmlContentBlock2 = new HtmlBlock
+        private static readonly ContentBlock Release1Section1HtmlContentBlock2 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 1 section 1 order 0</p>",
@@ -416,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release1Section1.Id
         };
 
-        private static readonly IContentBlock Release1Section1HtmlContentBlock3 = new HtmlBlock
+        private static readonly ContentBlock Release1Section1HtmlContentBlock3 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 1 section 1 order 1</p>",
@@ -424,7 +424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release1Section1.Id
         };
 
-        private static readonly IContentBlock Release2Section1HtmlContentBlock1 = new HtmlBlock
+        private static readonly ContentBlock Release2Section1HtmlContentBlock1 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 2 section 1 order 2</p>",
@@ -432,7 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release2Section1.Id
         };
 
-        private static readonly IContentBlock Release2Section1HtmlContentBlock2 = new HtmlBlock
+        private static readonly ContentBlock Release2Section1HtmlContentBlock2 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 2 section 1 order 0</p>",
@@ -440,7 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release2Section1.Id
         };
 
-        private static readonly IContentBlock Release2Section1HtmlContentBlock3 = new HtmlBlock
+        private static readonly ContentBlock Release2Section1HtmlContentBlock3 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
             Body = "<p>Release 2 section 1 order 1</p>",
@@ -448,19 +448,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             ContentSectionId = Release2Section1.Id
         };
 
-        private static readonly IContentBlock Release1KeyStatsDataBlock = new DataBlock
+        private static readonly ContentBlock Release1KeyStatsDataBlock = new DataBlock
         {
             Id = Guid.NewGuid(),
             ContentSectionId = Release1KeyStatsSection.Id
         };
 
-        private static readonly IContentBlock Release2KeyStatsDataBlock = new DataBlock
+        private static readonly ContentBlock Release2KeyStatsDataBlock = new DataBlock
         {
             Id = Guid.NewGuid(),
             ContentSectionId = Release2KeyStatsSection.Id
         };
 
-        private static readonly List<IContentBlock> ContentBlocks = new List<IContentBlock>
+        private static readonly List<ContentBlock> ContentBlocks = new List<ContentBlock>
         {
             Release1SummarySectionHtmlContentBlock1,
             Release1SummarySectionHtmlContentBlock2,

@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
         private void CreateContentBlockMap()
         {
-            CreateMap<IContentBlock, IContentBlockViewModel>()
+            CreateMap<ContentBlock, IContentBlockViewModel>()
                 .IncludeAllDerived()
                 .ForMember(dest => dest.Comments,
                     m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));

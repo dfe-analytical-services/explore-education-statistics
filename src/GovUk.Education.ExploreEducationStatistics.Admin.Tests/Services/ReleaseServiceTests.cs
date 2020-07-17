@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Heading = "Template heading index 0",
                                         Type = ContentSectionType.Generic,
                                         Order = 1,
-                                        Content = new List<IContentBlock>
+                                        Content = new List<ContentBlock>
                                         {
                                             new HtmlBlock
                                             {
