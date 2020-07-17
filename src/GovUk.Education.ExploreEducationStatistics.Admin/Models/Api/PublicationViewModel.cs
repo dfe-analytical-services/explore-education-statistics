@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
@@ -11,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public string Title { get; set; }
 
         public List<ReleaseViewModel> Releases { get; set; }
+
+        public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
         public MethodologyTitleViewModel Methodology { get; set; }
         
