@@ -2,6 +2,7 @@ import Page from '@admin/components/Page';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
+import { themeTopicRoute } from '@admin/routes/routes';
 import dashboardService from '@admin/services/dashboardService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
@@ -9,8 +10,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import PageNotFoundPage from '../errors/PageNotFoundPage';
 import PublicationAssignMethodologyPage from './topic/publication/PublicationAssignMethodologyPage';
-
-export const themeTopicPath = '/theme/:themeId/topic/:topicId';
 
 interface Props
   extends RouteComponentProps<{
@@ -48,7 +47,7 @@ const ThemeTopicWrapper = ({ match }: Props) => {
   }, [match.params, selectedThemeAndTopic, setSelectedThemeAndTopic]);
 
   const page404 = (
-    <ProtectedRoute allowAnonymousUsers component={PageNotFoundPage} />
+    <ProtectedRoute path="*" allowAnonymousUsers component={PageNotFoundPage} />
   );
 
   switch (state) {
@@ -56,12 +55,12 @@ const ThemeTopicWrapper = ({ match }: Props) => {
       return (
         <Switch>
           <Route
-            path={`${themeTopicPath}/create-publication`}
+            path={`${themeTopicRoute.path}/create-publication`}
             component={CreatePublicationPage}
             exact
           />
           <Route
-            path={`${themeTopicPath}/publication/:publicationId/assign-methodology`}
+            path={`${themeTopicRoute.path}/publication/:publicationId/assign-methodology`}
             component={PublicationAssignMethodologyPage}
             exact
           />

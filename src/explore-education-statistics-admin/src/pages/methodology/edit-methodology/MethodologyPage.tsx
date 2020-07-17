@@ -3,17 +3,34 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
-import methodologyRoutes, {
+import {
+  methodologyContentRoute,
   MethodologyRouteParams,
-  navRoutes,
-} from '@admin/routes/edit-methodology/routes';
+  MethodologyRouteProps,
+  methodologyStatusRoute,
+  methodologySummaryEditRoute,
+  methodologySummaryRoute,
+} from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { Route, RouteComponentProps, Switch } from 'react-router';
+import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+
+const methodologyRoutes: MethodologyRouteProps[] = [
+  methodologySummaryRoute,
+  methodologySummaryEditRoute,
+  methodologyContentRoute,
+  methodologyStatusRoute,
+];
+
+const navRoutes: MethodologyRouteProps[] = [
+  methodologySummaryRoute,
+  methodologyContentRoute,
+  methodologyStatusRoute,
+];
 
 const MethodologyPage = ({
   match,
@@ -28,7 +45,9 @@ const MethodologyPage = ({
 
   const currentRouteIndex =
     methodologyRoutes.findIndex(
-      route => route.generateLink(methodologyId) === location.pathname,
+      route =>
+        generatePath<MethodologyRouteParams>(route.path, { methodologyId }) ===
+        location.pathname,
     ) || 0;
 
   const previousRoute =
@@ -44,14 +63,18 @@ const MethodologyPage = ({
   const previousSection = previousRoute
     ? {
         label: previousRoute.title,
-        linkTo: previousRoute.generateLink(methodologyId),
+        linkTo: generatePath<MethodologyRouteParams>(previousRoute.path, {
+          methodologyId,
+        }),
       }
     : undefined;
 
   const nextSection = nextRoute
     ? {
         label: nextRoute.title,
-        linkTo: nextRoute.generateLink(methodologyId),
+        linkTo: generatePath<MethodologyRouteParams>(nextRoute.path, {
+          methodologyId,
+        }),
       }
     : undefined;
 
@@ -88,7 +111,9 @@ const MethodologyPage = ({
               routes={navRoutes.map(route => ({
                 path: route.path,
                 title: route.title,
-                to: route.generateLink(methodologyId),
+                to: generatePath<MethodologyRouteParams>(route.path, {
+                  methodologyId,
+                }),
               }))}
             />
 
