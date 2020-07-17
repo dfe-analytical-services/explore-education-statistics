@@ -1,5 +1,5 @@
 import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
-import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
+import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';

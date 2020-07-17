@@ -2,7 +2,7 @@ import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/components/PrintThisPage';
-import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
+import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
 import methodologyContentService from '@admin/services/methodologyContentService';
 import permissionService from '@admin/services/permissionService';
 import FormattedDate from '@common/components/FormattedDate';

@@ -1,6 +1,9 @@
 import useConfig from '@admin/hooks/useConfig';
 import ReleaseDataBlocksPageTabs from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
-import { dataBlocksRoute } from '@admin/routes/releaseRoutes';
+import {
+  releaseDataBlocksRoute,
+  ReleaseDataBlocksRouteParams,
+} from '@admin/routes/releaseRoutes';
 import dataBlocksService, {
   DeleteDataBlockPlan,
   ReleaseDataBlock,
@@ -14,20 +17,14 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import UrlContainer from '@common/components/UrlContainer';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-
-export interface ReleaseDataBlocksPageParams {
-  publicationId: string;
-  releaseId: string;
-  dataBlockId?: string;
-}
+import { generatePath, RouteComponentProps } from 'react-router';
 
 const emptyDataBlocks: ReleaseDataBlock[] = [];
 
 const ReleaseDataBlocksPageInternal = ({
   match,
   history,
-}: RouteComponentProps<ReleaseDataBlocksPageParams>) => {
+}: RouteComponentProps<ReleaseDataBlocksRouteParams>) => {
   const { publicationId, releaseId, dataBlockId } = match.params;
 
   const pageRef = useRef<HTMLDivElement>(null);
@@ -72,11 +69,14 @@ const ReleaseDataBlocksPageInternal = ({
         nextDataBlocks.push(dataBlock);
 
         history.push(
-          dataBlocksRoute.generateLink({
-            publicationId,
-            releaseId,
-            dataBlockId: dataBlock.id,
-          }),
+          generatePath<ReleaseDataBlocksRouteParams>(
+            releaseDataBlocksRoute.path,
+            {
+              publicationId,
+              releaseId,
+              dataBlockId: dataBlock.id,
+            },
+          ),
         );
       }
 
@@ -105,7 +105,12 @@ const ReleaseDataBlocksPageInternal = ({
     await dataBlocksService.deleteDataBlock(releaseId, selectedDataBlock.id);
     await fetchDataBlocks();
 
-    history.push(dataBlocksRoute.generateLink({ publicationId, releaseId }));
+    history.push(
+      generatePath<ReleaseDataBlocksRouteParams>(releaseDataBlocksRoute.path, {
+        publicationId,
+        releaseId,
+      }),
+    );
   }, [fetchDataBlocks, history, publicationId, releaseId, selectedDataBlock]);
 
   return (
@@ -130,11 +135,14 @@ const ReleaseDataBlocksPageInternal = ({
             }}
             onChange={e => {
               history.push(
-                dataBlocksRoute.generateLink({
-                  publicationId,
-                  releaseId,
-                  dataBlockId: e.target.value ? e.target.value : undefined,
-                }),
+                generatePath<ReleaseDataBlocksRouteParams>(
+                  releaseDataBlocksRoute.path,
+                  {
+                    publicationId,
+                    releaseId,
+                    dataBlockId: e.target.value ? e.target.value : undefined,
+                  },
+                ),
               );
             }}
           />
@@ -220,7 +228,7 @@ const ReleaseDataBlocksPageInternal = ({
 };
 
 const ReleaseDataBlocksPage = (
-  props: RouteComponentProps<ReleaseDataBlocksPageParams>,
+  props: RouteComponentProps<ReleaseDataBlocksRouteParams>,
 ) => {
   const {
     match: {

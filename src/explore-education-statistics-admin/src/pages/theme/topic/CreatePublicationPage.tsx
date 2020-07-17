@@ -2,7 +2,7 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import appRouteList from '@admin/routes/dashboard/routes';
+import { dashboardRoute } from '@admin/routes/routes';
 import contactService, { ContactDetails } from '@admin/services/contactService';
 import { ExternalMethodology } from '@admin/services/dashboardService';
 import methodologyService, {
@@ -86,11 +86,11 @@ const CreatePublicationPage = ({
       ...methodology,
     });
 
-    history.push(appRouteList.adminDashboard.path as string);
+    history.push(dashboardRoute.path);
   }, errorMappings);
 
   const cancelHandler = () => {
-    history.push(appRouteList.adminDashboard.path as string);
+    history.push(dashboardRoute.path);
   };
 
   const getSelectedContact = (

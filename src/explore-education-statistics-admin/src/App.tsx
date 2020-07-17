@@ -5,6 +5,7 @@ import ThemeAndTopic from '@admin/components/ThemeAndTopic';
 import { getConfig } from '@admin/config';
 import { AuthContextProvider } from '@admin/contexts/AuthContext';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
+import routes from '@admin/routes/routes';
 import {
   ApplicationInsightsContextProvider,
   useApplicationInsights,
@@ -15,7 +16,6 @@ import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import './App.scss';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
-import appRouteList from './routes/dashboard/routes';
 
 const PrototypeIndexPage = lazy(() =>
   import('@admin/prototypes/PrototypeIndexPage'),
@@ -43,7 +43,7 @@ function ApplicationInsightsTracking() {
 }
 
 function PrototypesEntry() {
-  const { value: routes = [] } = useAsyncRetry(() =>
+  const { value: prototypeRoutes = [] } = useAsyncRetry(() =>
     import('./prototypes/prototypeRoutes').then(module => module.default),
   );
 
@@ -51,7 +51,7 @@ function PrototypesEntry() {
     <Suspense fallback={<ServiceProblemsPage />}>
       <Switch>
         <Route exact path="/prototypes" component={PrototypeIndexPage} />
-        {routes?.map(route => (
+        {prototypeRoutes?.map(route => (
           <Route key={route.path} exact={route.exact ?? true} {...route} />
         ))}
       </Switch>
@@ -77,12 +77,8 @@ function App() {
                   ),
                 )}
 
-                {Object.entries(appRouteList).map(([key, appRoute]) => (
-                  <ProtectedRoute
-                    key={key}
-                    protectionAction={appRoute.protectedAction}
-                    {...appRoute}
-                  />
+                {Object.entries(routes).map(([key, route]) => (
+                  <ProtectedRoute key={key} {...route} />
                 ))}
 
                 <ProtectedRoute
@@ -94,6 +90,7 @@ function App() {
                 />
 
                 <ProtectedRoute
+                  path="*"
                   allowAnonymousUsers
                   component={PageNotFoundPage}
                 />

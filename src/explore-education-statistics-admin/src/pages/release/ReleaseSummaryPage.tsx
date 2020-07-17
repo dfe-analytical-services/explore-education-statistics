@@ -1,6 +1,9 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
-import { summaryEditRoute } from '@admin/routes/releaseRoutes';
+import {
+  ReleaseRouteParams,
+  releaseSummaryEditRoute,
+} from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseService from '@admin/services/releaseService';
 import FormattedDate from '@common/components/FormattedDate';
@@ -16,6 +19,7 @@ import {
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
 import React from 'react';
+import { generatePath } from 'react-router';
 
 const ReleaseSummaryPage = () => {
   const { publication, releaseId } = useManageReleaseContext();
@@ -71,10 +75,13 @@ const ReleaseSummaryPage = () => {
 
           <Gate condition={() => permissionService.canUpdateRelease(releaseId)}>
             <ButtonLink
-              to={summaryEditRoute.generateLink({
-                publicationId: publication.id,
-                releaseId,
-              })}
+              to={generatePath<ReleaseRouteParams>(
+                releaseSummaryEditRoute.path,
+                {
+                  publicationId: publication.id,
+                  releaseId,
+                },
+              )}
             >
               Edit release summary
             </ButtonLink>

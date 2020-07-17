@@ -1,6 +1,9 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import { summaryRoute } from '@admin/routes/edit-methodology/routes';
+import {
+  MethodologyRouteParams,
+  methodologySummaryRoute,
+} from '@admin/routes/methodologyRoutes';
 import methodologyService, {
   MethodologyStatusListItem,
 } from '@admin/services/methodologyService';
@@ -9,6 +12,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import Tag from '@common/components/Tag';
 import React, { useEffect, useState } from 'react';
+import { generatePath } from 'react-router';
 
 interface Model {
   liveMethodologies: MethodologyStatusListItem[];
@@ -40,7 +44,14 @@ const MethodologiesTable = ({ methodologies }: MethodologiesTableProps) => {
         {methodologies.map(methodology => (
           <tr className="govuk-table__row" key={methodology.id}>
             <td className="govuk-table__header">
-              <Link to={summaryRoute.generateLink(methodology.id)}>
+              <Link
+                to={generatePath<MethodologyRouteParams>(
+                  methodologySummaryRoute.path,
+                  {
+                    methodologyId: methodology.id,
+                  },
+                )}
+              >
                 {methodology.title}
               </Link>
             </td>
