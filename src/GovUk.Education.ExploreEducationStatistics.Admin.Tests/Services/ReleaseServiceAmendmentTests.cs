@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Heading = "Template heading index 0",
                             Type = ContentSectionType.Generic,
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Heading = "Template heading index 1",
                             Type = ContentSectionType.Generic,
                             Order = 2,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new MarkDownBlock
                                 {
@@ -211,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Heading = "Template heading index 2",
                             Type = ContentSectionType.Headlines,
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new MarkDownBlock
                                 {
@@ -570,12 +570,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
            });
        }
 
-       private static void AssertAmendedContentBlockCorrect(IContentBlock previousBlock, IContentBlock amendedBlock,
+       private static void AssertAmendedContentBlockCorrect(ContentBlock previousBlock, ContentBlock amendedBlock,
            ContentSection amendedSection)
        {
            Assert.NotEqual(previousBlock.Id, amendedBlock.Id);
            Assert.Equal(previousBlock.Order, amendedBlock.Order);
-           Assert.Equal(previousBlock.Type, amendedBlock.Type);
            Assert.Equal(amendedSection, amendedBlock.ContentSection);
            Assert.Equal(amendedSection.Id, amendedBlock.ContentSectionId);
            Assert.NotEmpty(previousBlock.Comments);

@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
         private void CreateContentBlockMap()
         {
-            CreateMap<IContentBlock, IContentBlockViewModel>()
+            CreateMap<ContentBlock, IContentBlockViewModel>()
                 .IncludeAllDerived();
 
             CreateDataBlockMap();

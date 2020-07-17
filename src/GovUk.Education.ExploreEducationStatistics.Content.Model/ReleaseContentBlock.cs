@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid ReleaseId { get; set; }
 
-        public IContentBlock ContentBlock { get; set; }
+        public ContentBlock ContentBlock { get; set; }
 
         public Guid ContentBlockId { get; set; }
 
