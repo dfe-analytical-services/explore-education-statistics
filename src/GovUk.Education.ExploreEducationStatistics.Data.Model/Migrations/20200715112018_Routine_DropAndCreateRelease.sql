@@ -1,15 +1,11 @@
-CREATE OR ALTER PROCEDURE DropAndCreateReleaseV2 @Release dbo.ReleaseType READONLY, @LinkedSubjects varchar(4000), @LinkedFootnotes varchar(4000)
+CREATE OR ALTER PROCEDURE DropAndCreateReleaseV @Release dbo.ReleaseType READONLY, @LinkedSubjects varchar(4000), @LinkedFootnotes varchar(4000)
 AS
 BEGIN
     DECLARE @LinkedSubjectsList IdListGuidType,
-            @LinkedFootnotesList IdListGuidType,
-            @sqlString1 NVARCHAR(2000) = N'INSERT @LinkedSubjectsList VALUES (' + @LinkedSubjects + ')',
-            @sqlString2 NVARCHAR(2000) = N'INSERT @LinkedFootnotesList VALUES (' + @LinkedFootnotes + ')'
+            @LinkedFootnotesList IdListGuidType;
      
-    EXEC sp_executesql @sqlString1, '@LinkedSubjectsList IdListGuidType READONLY', @LinkedSubjectsList = @LinkedSubjectsList;
-    EXEC sp_executesql @sqlString2, '@LinkedFootnotesList IdListGuidType READONLY', @LinkedFootnotes = @LinkedFootnotes;   
-    --INSERT @LinkedSubjectsList VALUES (@LinkedSubjects);
-    --INSERT @LinkedFootnotesList VALUES (@LinkedFootnotes);
+    INSERT @LinkedSubjectsList VALUES (@LinkedSubjects);
+    INSERT @LinkedFootnotesList VALUES (@LinkedFootnotes);
     
     DELETE FROM dbo.ReleaseFootnote WHERE dbo.ReleaseFootnote.ReleaseId IN (SELECT R.Id FROM @Release R);
     DELETE FROM dbo.ReleaseSubject WHERE dbo.ReleaseSubject.ReleaseId IN (SELECT R.Id FROM @Release R);
