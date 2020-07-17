@@ -4,7 +4,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.
     ViewSpecificPreReleaseSummaryAuthorizationHandler;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseAuthorizationHandlersTestUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
