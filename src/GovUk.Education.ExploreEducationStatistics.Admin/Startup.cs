@@ -230,6 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
+            services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();

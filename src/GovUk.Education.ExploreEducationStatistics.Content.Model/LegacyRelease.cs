@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid PublicationId { get; set; }
 
+        public Publication Publication { get; set; }
+
         public LegacyRelease CreateCopy()
         {
             return MemberwiseClone() as LegacyRelease;

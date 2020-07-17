@@ -90,10 +90,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(SecurityPolicies.CanManageAllTaxonomy);
         }
 
+        // Publication 
+
         public static Task<Either<ActionResult, Topic>> CheckCanCreatePublicationForTopic(
             this IUserService userService, Topic topic)
         {
             return userService.DoCheck(topic, SecurityPolicies.CanCreatePublicationForSpecificTopic);
+        }
+
+        public static Task<Either<ActionResult, Publication>> CheckCanUpdatePublication(
+            this IUserService userService, Publication publication)
+        {
+            return userService.DoCheck(publication, SecurityPolicies.CanUpdatePublication);
         }
         
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
@@ -208,6 +216,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Comment comment)
         {
             return userService.DoCheck(comment, SecurityPolicies.CanUpdateSpecificComment);
+        }
+
+        public static Task<Either<ActionResult, Publication>> CheckCanCreateLegacyRelease(
+            this IUserService userService, Publication publication)
+        {
+            return userService.DoCheck(publication, SecurityPolicies.CanCreateLegacyRelease);
+        }
+
+        public static Task<Either<ActionResult, LegacyRelease>> CheckCanViewLegacyRelease(
+            this IUserService userService, LegacyRelease legacyRelease)
+        {
+            return userService.DoCheck(legacyRelease, SecurityPolicies.CanViewLegacyRelease);
+        }
+        
+        public static Task<Either<ActionResult, LegacyRelease>> CheckCanUpdateLegacyRelease(
+            this IUserService userService, LegacyRelease legacyRelease)
+        {
+            return userService.DoCheck(legacyRelease, SecurityPolicies.CanUpdateLegacyRelease);
+        }
+        
+        public static Task<Either<ActionResult, LegacyRelease>> CheckCanDeleteLegacyRelease(
+            this IUserService userService, LegacyRelease legacyRelease)
+        {
+            return userService.DoCheck(legacyRelease, SecurityPolicies.CanDeleteLegacyRelease);
         }
 
         private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy) 
