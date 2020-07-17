@@ -5,10 +5,10 @@ BEGIN
             @LinkedFootnotesList IdListGuidType;
             
     IF LEN(ISNULL(@LinkedSubjects, '')) > 0 
-        INSERT @LinkedSubjectsList VALUES (@LinkedSubjects);
+        INSERT @LinkedSubjectsList SELECT value FROM STRING_SPLIT(@LinkedSubjects,',');
         
     IF LEN(ISNULL(@LinkedFootnotes, '')) > 0    
-        INSERT @LinkedFootnotesList VALUES (@LinkedFootnotes);
+        INSERT @LinkedFootnotesList SELECT value FROM STRING_SPLIT(@LinkedFootnotes,',');
     
     DELETE FROM dbo.ReleaseFootnote WHERE dbo.ReleaseFootnote.ReleaseId IN (SELECT R.Id FROM @Release R);
     DELETE FROM dbo.ReleaseSubject WHERE dbo.ReleaseSubject.ReleaseId IN (SELECT R.Id FROM @Release R);
