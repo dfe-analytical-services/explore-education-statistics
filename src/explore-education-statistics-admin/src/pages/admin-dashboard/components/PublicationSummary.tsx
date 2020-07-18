@@ -122,7 +122,7 @@ const PublicationSummary = ({
                 variant="secondary"
                 testId={`Legacy releases link for ${publication.title}`}
               >
-                See legacy releases
+                Manage legacy releases
               </ButtonLink>
             )}
           </ButtonGroup>
