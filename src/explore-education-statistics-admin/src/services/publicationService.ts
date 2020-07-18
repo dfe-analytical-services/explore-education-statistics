@@ -1,5 +1,6 @@
 import { ContactDetails } from '@admin/services/contactService';
 import { ExternalMethodology } from '@admin/services/dashboardService';
+import { LegacyRelease } from '@admin/services/legacyReleaseService';
 import { BasicMethodology } from '@admin/services/methodologyService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
@@ -10,6 +11,7 @@ export interface BasicPublicationDetails {
   contact?: ContactDetails;
   methodology?: BasicMethodology;
   externalMethodology?: ExternalMethodology;
+  legacyReleases: LegacyRelease[];
   themeId: string;
 }
 
