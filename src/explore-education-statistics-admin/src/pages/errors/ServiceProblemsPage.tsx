@@ -3,7 +3,7 @@ import React from 'react';
 
 const ServiceProblemsPage = () => {
   return (
-    <Page pageTitle="Sorry, there is a problem with the service">
+    <Page title="Sorry, there is a problem with the service">
       <p className="govuk-body">Try again later.</p>
     </Page>
   );

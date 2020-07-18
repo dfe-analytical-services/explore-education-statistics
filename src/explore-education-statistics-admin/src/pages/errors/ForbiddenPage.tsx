@@ -7,7 +7,7 @@ const ForbiddenPage = () => {
   const { user } = useAuthContext();
 
   return (
-    <Page pageTitle="Forbidden">
+    <Page title="Forbidden">
       <p className="govuk-body">
         You do not have permission to access this page.
       </p>

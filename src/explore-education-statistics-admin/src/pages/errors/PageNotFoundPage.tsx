@@ -3,7 +3,7 @@ import React from 'react';
 
 const PageNotFoundPage = () => {
   return (
-    <Page pageTitle="Page not found">
+    <Page title="Page not found">
       <p className="govuk-body">
         If you typed the web address, check it is correct.
       </p>
