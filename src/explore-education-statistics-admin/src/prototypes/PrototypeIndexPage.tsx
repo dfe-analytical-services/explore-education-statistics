@@ -5,7 +5,7 @@ import React from 'react';
 
 const PrototypeIndexPage = () => {
   return (
-    <PrototypePage pageTitle="Prototypes">
+    <PrototypePage title="Prototypes">
       <ul>
         {prototypeRoutes.map(route => {
           return (

@@ -3,7 +3,7 @@ import React from 'react';
 
 const PrototypeExamplePage = () => {
   return (
-    <PrototypePage pageTitle="Example prototype">
+    <PrototypePage title="Example prototype">
       <p>Here's an example</p>
     </PrototypePage>
   );

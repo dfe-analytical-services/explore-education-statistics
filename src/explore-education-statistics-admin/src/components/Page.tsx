@@ -1,4 +1,5 @@
 import PageFooter from '@admin/components/PageFooter';
+import PageTitle from '@admin/components/PageTitle';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Helmet } from 'react-helmet';
@@ -7,16 +8,18 @@ import PageBanner from './PageBanner';
 import PageHeader from './PageHeader';
 
 export type PageProps = {
+  caption?: string;
   children: ReactNode;
   wide?: boolean;
-  pageTitle?: string;
+  title?: string;
   pageBanner?: ReactNode;
 } & BreadcrumbsProps;
 
 const Page = ({
+  caption = '',
   children,
-  wide,
-  pageTitle,
+  wide = true,
+  title,
   pageBanner,
   ...breadcrumbProps
 }: PageProps) => {
@@ -24,8 +27,8 @@ const Page = ({
     <>
       <Helmet>
         <title>
-          {pageTitle
-            ? `${pageTitle} - Explore education statistics - GOV.UK`
+          {title
+            ? `${title} - Explore education statistics - GOV.UK`
             : 'Explore education statistics - GOV.UK'}
         </title>
       </Helmet>
@@ -46,7 +49,8 @@ const Page = ({
           id="main-content"
           role="main"
         >
-          {pageTitle && <h1 className="govuk-heading-xl">{pageTitle}</h1>}
+          {title && <PageTitle title={title} caption={caption} />}
+
           {children}
         </main>
       </div>

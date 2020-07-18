@@ -5,7 +5,7 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { releaseCreateRoute } from '@admin/routes/routes';
+import { legacyReleasesRoute, releaseCreateRoute } from '@admin/routes/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -112,6 +112,17 @@ const PublicationSummary = ({
                 testId={`Create new release link for ${publication.title}`}
               >
                 Create new release
+              </ButtonLink>
+            )}
+            {publication.permissions.canUpdatePublication && (
+              <ButtonLink
+                to={generatePath(legacyReleasesRoute.path, {
+                  publicationId: publication.id,
+                })}
+                variant="secondary"
+                testId={`Legacy releases link for ${publication.title}`}
+              >
+                See legacy releases
               </ButtonLink>
             )}
           </ButtonGroup>

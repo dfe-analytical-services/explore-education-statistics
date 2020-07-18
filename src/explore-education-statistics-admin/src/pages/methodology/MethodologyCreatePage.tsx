@@ -9,7 +9,7 @@ const MethodologyCreatePage = ({ history }: RouteComponentProps) => {
   return (
     <Page
       wide
-      pageTitle="Create new methodology"
+      title="Create new methodology"
       breadcrumbs={[
         {
           name: 'Manage methodologies',
