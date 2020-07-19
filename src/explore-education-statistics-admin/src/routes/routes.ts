@@ -32,7 +32,7 @@ export const dashboardRoute: ProtectedRouteProps = {
 };
 
 export const dashboardThemeTopicRoute: ProtectedRouteProps = {
-  path: '/dashboard/:themeId/:topicId',
+  path: '/dashboard/theme/:themeId/topic/:topicId',
   component: AdminDashboardPage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
 };
