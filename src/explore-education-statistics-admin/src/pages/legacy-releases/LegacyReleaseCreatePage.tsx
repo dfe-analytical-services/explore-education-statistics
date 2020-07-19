@@ -29,6 +29,7 @@ const LegacyReleaseCreatePage = ({
     <Page
       title="Create legacy release"
       caption={publication?.title}
+      backLink={legacyReleasesPath}
       breadcrumbs={[
         {
           name: 'Legacy releases',

@@ -1,3 +1,4 @@
+import Link from '@admin/components/Link';
 import PageFooter from '@admin/components/PageFooter';
 import PageTitle from '@admin/components/PageTitle';
 import classNames from 'classnames';
@@ -8,6 +9,8 @@ import PageBanner from './PageBanner';
 import PageHeader from './PageHeader';
 
 export type PageProps = {
+  backLink?: string;
+  backLinkText?: string;
   caption?: string;
   children: ReactNode;
   wide?: boolean;
@@ -16,6 +19,8 @@ export type PageProps = {
 } & BreadcrumbsProps;
 
 const Page = ({
+  backLink,
+  backLinkText = 'Back',
   caption = '',
   children,
   wide = true,
@@ -43,6 +48,12 @@ const Page = ({
         {pageBanner ?? <PageBanner />}
 
         <Breadcrumbs {...breadcrumbProps} />
+
+        {backLink && (
+          <Link back to={backLink}>
+            {backLinkText}
+          </Link>
+        )}
 
         <main
           className="app-main-class govuk-main-wrapper"
