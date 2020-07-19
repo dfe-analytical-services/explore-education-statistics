@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class Publication
+    public class    Publication
     {
         public Guid Id { get; set; }
 
