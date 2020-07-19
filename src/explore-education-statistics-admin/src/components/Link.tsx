@@ -7,12 +7,14 @@ import {
 } from 'react-router-dom';
 
 export type LinkProps = {
+  back?: boolean;
   children: ReactNode;
   className?: string;
   unvisited?: boolean;
 } & OmitStrict<RouterLinkProps, 'href'>;
 
 const Link = ({
+  back,
   children,
   className,
   to,
@@ -31,6 +33,7 @@ const Link = ({
         className={classNames(
           'govuk-link',
           {
+            'govuk-back-link': back,
             'govuk-link--no-visited-state': unvisited,
           },
           className,
@@ -48,6 +51,7 @@ const Link = ({
       className={classNames(
         'govuk-link',
         {
+          'govuk-back-link': back,
           'govuk-link--no-visited-state': unvisited,
         },
         className,

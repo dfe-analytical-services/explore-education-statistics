@@ -38,6 +38,7 @@ const LegacyReleaseEditPage = ({ match }: RouteComponentProps<Params>) => {
     <Page
       title="Edit legacy release"
       caption={publication?.title}
+      backLink={legacyReleasesPath}
       breadcrumbs={[
         {
           name: 'Legacy releases',

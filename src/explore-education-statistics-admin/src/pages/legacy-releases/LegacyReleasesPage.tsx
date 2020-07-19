@@ -5,7 +5,10 @@ import {
   legacyReleaseCreateRoute,
   legacyReleaseEditRoute,
 } from '@admin/routes/legacyReleaseRoutes';
-import { PublicationRouteParams } from '@admin/routes/routes';
+import {
+  dashboardThemeTopicRoute,
+  PublicationRouteParams,
+} from '@admin/routes/routes';
 import legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
@@ -44,6 +47,10 @@ const LegacyReleasesPage = () => {
       title="Legacy releases"
       caption={publication.title}
       breadcrumbs={[{ name: 'Legacy releases' }]}
+      backLink={generatePath(dashboardThemeTopicRoute.path, {
+        themeId: publication.themeId,
+        topicId: publication.topicId,
+      })}
     >
       <p>
         Legacy releases will be displayed in descending order on the

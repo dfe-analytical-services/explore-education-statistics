@@ -17,6 +17,7 @@ export interface BasicPublicationDetails {
   externalMethodology?: ExternalMethodology;
   legacyReleases: LegacyRelease[];
   themeId: string;
+  topicId: string;
 }
 
 export interface PublicationMethodologyDetails {
