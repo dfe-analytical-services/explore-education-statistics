@@ -44,4 +44,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required]
         public Guid PublicationId { get; set; }
     }
+
+    #nullable enable
+    public class PartialUpdateLegacyReleaseViewModel
+    {   
+        [Required]
+        public Guid Id { get; set; }
+
+        public string? Description { get; set; }
+
+        [Url]
+        public string? Url { get; set; }
+
+        public int? Order { get; set; }
+    }
+    #nullable disable
 }

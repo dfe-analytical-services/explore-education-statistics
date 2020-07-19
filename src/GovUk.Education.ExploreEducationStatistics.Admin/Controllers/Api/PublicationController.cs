@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,6 +51,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _publicationService
                 .UpdatePublicationMethodology(publicationId, model)
                 .HandleFailuresOr(result => Ok());
+        }
+
+        /// Partially update the publication's legacy releases.
+        /// Only legacy releases with matching ids will be updated,
+        /// and only non-null fields will be updated.
+        /// This is useful for bulk updates e.g. re-ordering.
+        [HttpPatch("api/publications/{publicationId}/legacy-releases")]
+        public async Task<ActionResult<List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
+            Guid publicationId,
+            List<PartialUpdateLegacyReleaseViewModel> legacyReleases)
+        {
+            return await _publicationService
+                .PartialUpdateLegacyReleases(publicationId, legacyReleases)
+                .HandleFailuresOrOk();
         }
         
         // POST api/topic/{topicId}/publications
