@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> RemoveDataFileReleaseLinkAsync(Guid releaseId,
+        public Task<Either<ActionResult, bool>> RemoveDataFileReleaseLinkAsync(Guid releaseId,
             string dataFileName)
         {
             return _persistenceHelper
@@ -129,15 +129,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         .OnSuccess(() => DeleteFileReference(releaseId, fileNames.dataFileName,
                                             ReleaseFileTypes.Data))
                                         .OnSuccess(() => DeleteFileReference(releaseId, fileNames.metadataFileName,
-                                            ReleaseFileTypes.Metadata))
-                                        .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
+                                            ReleaseFileTypes.Metadata)));
                     }
 
                     var metaFilename = await GetAssociatedMetaFilename(releaseId, dataFileName);
 
                     return await DeleteFileLink(releaseId, dataFileName, ReleaseFileTypes.Data)
-                        .OnSuccess(() => DeleteFileLink(releaseId, metaFilename, ReleaseFileTypes.Metadata))
-                        .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
+                        .OnSuccess(() => DeleteFileLink(releaseId, metaFilename, ReleaseFileTypes.Metadata));
                 });
         }
 
@@ -184,11 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<Models.FileInfo>>> DeleteNonDataFileAsync(Guid releaseId,
+        public async Task<Either<ActionResult, bool>> DeleteNonDataFileAsync(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
-            return await DeleteNonDataFilesAsync(releaseId, type, new List<string>(){fileName})
-                .OnSuccess(() => ListFilesAsync(releaseId, type));
+            return await DeleteNonDataFilesAsync(releaseId, type, new List<string>(){fileName});
         }
         
         public async Task<Either<ActionResult, bool>> DeleteNonDataFilesAsync(Guid releaseId, ReleaseFileTypes type, IEnumerable<string> fileNames)

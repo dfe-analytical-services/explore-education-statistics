@@ -22,11 +22,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -482,7 +480,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> RemoveDataFileReleaseLinkAsync(Guid releaseId, string fileName, string subjectTitle)
+        public async Task<Either<ActionResult, bool>> RemoveDataFileReleaseLinkAsync(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -494,9 +492,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
                     await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseId, deletePlan.SubjectId);
 
-                    return await _fileStorageService
+                    await _fileStorageService
                         .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
-                        .OnSuccessDo(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                        .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                    return true;
                 });
         }
 
