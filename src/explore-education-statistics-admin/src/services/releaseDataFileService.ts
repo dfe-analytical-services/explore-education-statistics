@@ -73,11 +73,15 @@ const releaseDataFileService = {
     data.append('metaFile', request.metadataFile);
 
     return client
-      .post<DataFileInfo>(
+      .post<DataFileInfo[]>(
         `/release/${releaseId}/data?name=${request.subjectTitle}`,
         data,
       )
-      .then(mapFile);
+      .then(response => {
+        return response
+          .filter(file => file.metaFileName.length > 0)
+          .map(mapFile)[0];
+      });
   },
   getDeleteDataFilePlan(
     releaseId: string,
