@@ -29,26 +29,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(
             Guid releaseId, Guid contentSectionId);
 
-        Task<Either<ActionResult, List<IContentBlock>>> ReorderContentBlocksAsync(
+        Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocksAsync(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder);
 
-        Task<Either<ActionResult, IContentBlock>> AddContentBlockAsync(
+        Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockAsync(
             Guid releaseId, Guid contentSectionId,
             AddContentBlockRequest request);
 
-        Task<Either<ActionResult, List<IContentBlock>>> RemoveContentBlockAsync(
+        Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId);
 
-        Task<Either<ActionResult, IContentBlock>> UpdateTextBasedContentBlockAsync(
+        Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request);
 
-        Task<Either<ActionResult, IContentBlock>> UpdateDataBlockAsync(
+        Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request);
 
         Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId)
-            where T : IContentBlock;
+            where T : ContentBlock;
 
-        Task<Either<ActionResult, IContentBlock>> AttachContentBlockAsync(
+        Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(
             Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request);
 
         Task<Either<ActionResult, List<CommentViewModel>>> GetCommentsAsync(
