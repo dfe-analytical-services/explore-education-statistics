@@ -1,18 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <AssemblyName>GovUk.Education.ExploreEducationStatistics.Content.Api</AssemblyName>
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Content.Api</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0" />
-        <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="3.0.3" />
-        <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="10.0.3" />
-        <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="10.0.3" />
+        <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.1.7" />
+        <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.7" />
         <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.5" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.5" />
         <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="2.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
     </ItemGroup>

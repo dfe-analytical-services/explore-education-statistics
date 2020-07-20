@@ -21,12 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
     [ExcludeFromCodeCoverage]
     public class Startup
     {
-        private readonly ILogger<Startup> _logger;
-
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -56,13 +53,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app,
+            IWebHostEnvironment env,
+            ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 
-                PublishAllContent();
+                PublishAllContent(logger);
             }
             else
             {
@@ -92,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
          * Add a message to the queue to publish all content.
          * This should only be used in development!
          */
-        private void PublishAllContent()
+        private void PublishAllContent(ILogger logger)
         {
             const string queueName = PublishAllContentQueue;
             try
@@ -103,12 +102,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 var message = new PublishAllContentMessage();
                 queue.AddMessage(ToCloudQueueMessage(message));
                 
-                _logger.LogInformation($"Message added to {queueName} queue");
-                _logger.LogInformation("Please ensure the Publisher function is running");
+                logger.LogInformation($"Message added to {queueName} queue");
+                logger.LogInformation("Please ensure the Publisher function is running");
             }
             catch
             {
-                _logger.LogError($"Unable add message to {queueName} queue");
+                logger.LogError($"Unable add message to {queueName} queue");
                 throw;
             }
         }
