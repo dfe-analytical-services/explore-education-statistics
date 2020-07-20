@@ -173,12 +173,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             mocks.ReleaseService
                 .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
-                .ReturnsAsync(new List<FileInfo>());
+                .ReturnsAsync(new Either<ActionResult, bool>(true));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
             var result = await controller.DeleteDataFiles(_releaseId, "datafilename","subject title");
-            AssertOkResult(result);
+            Assert.IsAssignableFrom<NoContentResult>(result);
         }
 
         [Fact]

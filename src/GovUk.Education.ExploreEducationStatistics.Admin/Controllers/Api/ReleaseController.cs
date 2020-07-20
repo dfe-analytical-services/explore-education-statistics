@@ -257,22 +257,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(Guid releaseId,
+        public async Task<ActionResult> DeleteDataFiles(Guid releaseId,
             string fileName,
             [FromQuery(Name = "name"), Required] string subjectTitle)
         {
             return await _releaseService
                 .RemoveDataFileReleaseLinkAsync(releaseId, fileName, subjectTitle)
-                .HandleFailuresOrOk();
+                .HandleFailuresOrNoContent();
         }
 
         [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteAncillaryFile(
+        public async Task<ActionResult> DeleteAncillaryFile(
             Guid releaseId, string fileName)
         {
             return await _fileStorageService
                 .DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)
-                .HandleFailuresOrOk();
+                .HandleFailuresOrNoContent();
         }
 
         [HttpDelete("release/{releaseId}/chart/{subjectName}/{fileName}")]

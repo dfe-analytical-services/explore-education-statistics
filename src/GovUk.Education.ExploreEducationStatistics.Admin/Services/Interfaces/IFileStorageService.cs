@@ -25,10 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Common.Model.FileInfo>> UploadChartFileAsync(Guid releaseId, IFormFile file);
 
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> DeleteNonDataFileAsync(Guid releaseId, ReleaseFileTypes type,
+        Task<Either<ActionResult, bool>> DeleteNonDataFileAsync(Guid releaseId, ReleaseFileTypes type,
             string fileName);
 
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> RemoveDataFileReleaseLinkAsync(Guid releaseId, string dataFileName);
+        Task<Either<ActionResult, bool>> RemoveDataFileReleaseLinkAsync(Guid releaseId, string dataFileName);
 
         Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type,
             string fileName);
