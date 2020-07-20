@@ -20,13 +20,11 @@ interface Props {
 }
 
 const ChartBuilderPreview = ({ axes, chart, definition, loading }: Props) => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const renderCount = useRef(0);
 
   const [currentChart, setCurrentChart] = useState<
     ChartRendererProps | undefined
   >(chart);
-  const [currentHeight, setCurrentHeight] = useState<number>();
 
   useDebouncedEffect(
     () => {
@@ -41,33 +39,9 @@ const ChartBuilderPreview = ({ axes, chart, definition, loading }: Props) => {
     [chart],
   );
 
-  // Explicitly set the height of container so that
-  // later changes to the chart props do not cause
-  // elements further down the page to jump up
-  // as the chart re-renders. This prevents a
-  // potentially janky user experience.
-  useDebouncedEffect(
-    () => {
-      const child = containerRef.current
-        ?.firstElementChild as HTMLElement | null;
-
-      if (child?.offsetHeight && child.offsetHeight !== currentHeight) {
-        setCurrentHeight(child.offsetHeight);
-      }
-    },
-    400,
-    [chart],
-  );
-
   return (
     <Details summary="Chart preview" open>
-      <div
-        className="govuk-width-container govuk-!-margin-bottom-6"
-        ref={containerRef}
-        style={{
-          height: currentHeight,
-        }}
-      >
+      <div className="govuk-width-container govuk-!-margin-bottom-6">
         {isChartRenderable(currentChart) ? (
           <LoadingSpinner loading={loading} text="Loading chart data">
             <ChartRenderer {...currentChart} key={renderCount.current} />

@@ -1,5 +1,9 @@
-import * as Yup from 'yup';
+import FileSchema from '@common/validation/yup/file';
+import * as yup from 'yup';
 
 import './number';
 
-export default Yup;
+export default {
+  ...yup,
+  file: () => new FileSchema(),
+};

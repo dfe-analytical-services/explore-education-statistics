@@ -124,12 +124,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var infographicChart = existing.Charts.OfType<InfographicChart>().FirstOrDefault();
                     var updatedInfographicChart = updateDataBlock.Charts.OfType<InfographicChart>().FirstOrDefault();
                     
-                    if (infographicChart != null && updatedInfographicChart == null)
+                    if (infographicChart != null && infographicChart.FileId != updatedInfographicChart?.FileId)
                     {
                         // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
                         var release = GetReleaseForDataBlock(existing.Id);
-                        await _fileStorageService.DeleteNonDataFileAsync(release.Id, ReleaseFileTypes.Chart,
-                            infographicChart.FileId);
+                        await _fileStorageService.DeleteNonDataFileAsync(
+                            release.Id, 
+                            ReleaseFileTypes.Chart,
+                            infographicChart.FileId
+                        );
                     }
 
                     _context.DataBlocks.Update(existing);

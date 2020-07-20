@@ -45,14 +45,27 @@ const ChartBuilderTabSection = ({
   );
 
   const handleChartSave = useCallback(
-    async (chart: Chart) => {
+    async (chart: Chart, file?: File) => {
+      let chartToSave = chart;
+
+      if (chart.type === 'infographic' && file) {
+        const {
+          filename,
+        } = await releaseChartFileService.uploadChartFile(releaseId, { file });
+
+        chartToSave = {
+          ...chart,
+          fileId: filename,
+        };
+      }
+
       await onDataBlockSave({
         ...dataBlock,
         query,
-        charts: [chart],
+        charts: [chartToSave],
       });
     },
-    [dataBlock, onDataBlockSave, query],
+    [dataBlock, onDataBlockSave, query, releaseId],
   );
 
   const handleChartDelete = useCallback(

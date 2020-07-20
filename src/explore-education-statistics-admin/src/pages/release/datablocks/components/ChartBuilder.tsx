@@ -20,6 +20,7 @@ import {
   horizontalBarBlockDefinition,
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
+import { InfographicChartProps } from '@common/modules/charts/components/InfographicBlock';
 import {
   lineChartBlockDefinition,
   LineChartProps,
@@ -45,6 +46,10 @@ import {
 import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
+import {
+  isServerValidationError,
+  ServerValidationErrorResponse,
+} from '@common/validation/serverValidations';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import React, {
@@ -62,16 +67,37 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-const filterChartProps = (props: ChartProps): Chart => {
-  // We don't want to persist data set labels
+type ChartBuilderChartProps = ChartRendererProps & {
+  file?: File;
+};
+
+const filterChartProps = (props: ChartBuilderChartProps): Chart => {
+  // Filter out any unnecessary props, for example,
+  // we don't want to persist data set `labels`
   // anymore in the deprecated format.
-  return omit(props, ['data', 'meta', 'labels']) as Chart;
+  const excludedProps: (
+    | keyof ChartBuilderChartProps
+    | keyof InfographicChartProps
+    | 'labels'
+  )[] = ['data', 'meta', 'labels', 'getInfographic', 'file'];
+
+  if (props.type !== 'infographic') {
+    excludedProps.push('fileId');
+  }
+
+  return omit(props, excludedProps) as Chart;
 };
 
 export interface ChartBuilderForm extends FormState {
   title: string;
   id: string;
 }
+
+type ChartBuilderForms = {
+  options: ChartBuilderForm;
+  data: ChartBuilderForm;
+  [key: string]: ChartBuilderForm;
+};
 
 export type TableQueryUpdateHandler = (
   query: Partial<ReleaseTableDataQuery>,
@@ -82,7 +108,7 @@ interface Props {
   meta: FullTableMeta;
   releaseId: string;
   initialConfiguration?: Chart;
-  onChartSave: (chart: Chart) => void;
+  onChartSave: (chart: Chart, file?: File) => Promise<void>;
   onChartDelete: (chart: Chart) => void;
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
@@ -111,11 +137,7 @@ const ChartBuilder = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
-  const forms: {
-    options: ChartBuilderForm;
-    data: ChartBuilderForm;
-    [key: string]: ChartBuilderForm;
-  } = useMemo(() => {
+  const forms: ChartBuilderForms = useMemo(() => {
     const formTitles: Dictionary<string> = {
       ...mapValues(
         (definition?.axes as Required<ChartDefinition['axes']>) ?? {},
@@ -132,6 +154,10 @@ const ChartBuilder = ({
     }));
   }, [definition, formStates]);
 
+  const [submitError, setSubmitError] = useState<
+    ServerValidationErrorResponse
+  >();
+
   const canSaveChart = useMemo(
     () => Object.values(forms).every(form => form.isValid),
     [forms],
@@ -142,7 +168,7 @@ const ChartBuilder = ({
     [forms],
   );
 
-  const chartProps = useMemo<ChartRendererProps | undefined>(() => {
+  const chartProps = useMemo<ChartBuilderChartProps | undefined>(() => {
     if (!definition) {
       return undefined;
     }
@@ -160,8 +186,10 @@ const ChartBuilder = ({
           ...baseProps,
           labels: [],
           type: 'infographic',
-          fileId: options.fileId ?? '',
-          getInfographic: getChartFile,
+          fileId: options.file ? options.file.name : options.fileId ?? '',
+          getInfographic: options.file
+            ? () => Promise.resolve(options.file as File)
+            : getChartFile,
         };
       case 'line':
         return {
@@ -201,6 +229,7 @@ const ChartBuilder = ({
     }
 
     setShouldSave(false);
+    setSubmitError(undefined);
 
     if (containerRef.current) {
       containerRef.current.scrollIntoView({
@@ -209,7 +238,13 @@ const ChartBuilder = ({
       });
     }
 
-    onChartSave(filterChartProps(chartProps));
+    onChartSave(filterChartProps(chartProps), chartProps.file).catch(error => {
+      if (isServerValidationError(error) && error.response?.data) {
+        setSubmitError(error.response.data);
+      } else {
+        throw error;
+      }
+    });
   }, [canSaveChart, chartProps, onChartSave, shouldSave]);
 
   const handleChartDelete = useCallback(async () => {
@@ -326,11 +361,11 @@ const ChartBuilder = ({
               buttons={deleteButton}
               canSaveChart={canSaveChart}
               hasSubmittedChart={hasSubmittedChart}
+              submitError={submitError}
               forms={forms}
               definition={definition}
               chartOptions={options}
               meta={meta}
-              releaseId={releaseId}
               onBoundaryLevelChange={handleBoundaryLevelChange}
               onChange={handleChartConfigurationChange}
               onFormStateChange={actions.updateFormState}
