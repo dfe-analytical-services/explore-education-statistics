@@ -168,6 +168,8 @@ def user_opens_details_dropdown(exact_details_text):
     except NoSuchElementException:
         raise_assertion_error(f'No such detail component "{exact_details_text}" found')
 
+    sl.wait_until_element_is_enabled(elem)
+
     elem.click()
     if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "false":
         raise_assertion_error(f'Details component "{exact_details_text}" not expanded!')

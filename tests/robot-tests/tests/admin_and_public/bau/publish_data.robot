@@ -40,6 +40,7 @@ Verify release summary
 Upload subject
     [Tags]  HappyPath
     user clicks link  Manage data
+    user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
     choose file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
     choose file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
@@ -165,36 +166,42 @@ Go to Table Tool page
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until page contains heading  Create your own tables online
+    user waits for page to finish loading
 
-Select publication
+Select publication in table tool
     [Tags]  HappyPath
     user opens details dropdown    Test theme
     user opens details dropdown    ${TOPIC_NAME}
     user selects radio      ${PUBLICATION_NAME}
     user clicks element    css:#publicationForm-submit
+    user waits until element is visible   xpath://h2[text()="Choose a subject"]
+    user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
-Select subject "UI test subject"
+Select subject "UI test subject" in table tool
     [Tags]  HappyPath
     user waits until page contains   UI test subject
     user selects radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
-
-Select locations
-    [Tags]   HappyPath
     user waits until element is visible  xpath://h2[text()="Choose locations"]     90
+    user checks previous table tool step contains  2    Subject    UI test subject
+
+Select locations in table tool
+    [Tags]   HappyPath
     user opens details dropdown   Local Authority
     user clicks checkbox   Barnsley
     user clicks checkbox   Birmingham
     user clicks element     css:#locationFiltersForm-submit
-
-Select time period
-    [Tags]   HappyPath
     user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user checks previous table tool step contains  3   Local Authority    Barnsley
+    user checks previous table tool step contains  3   Local Authority    Birmingham
+
+Select time period in table tool
+    [Tags]   HappyPath
     user selects start date    2014
     user selects end date      2018
     user clicks element     css:#timePeriodForm-submit
 
-Select indicators
+Select indicators in table tool
     [Tags]  HappyPath
     user waits until element is visible  xpath://h2[text()="Choose your filters"]
     user clicks indicator checkbox    Admission Numbers
