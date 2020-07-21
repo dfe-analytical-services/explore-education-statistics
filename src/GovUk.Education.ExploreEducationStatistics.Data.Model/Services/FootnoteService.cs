@@ -45,9 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .AsNoTracking();
         }
 
-        public async Task DeleteFootnotes(Guid releaseId, Guid subjectId)
+        public async Task DeleteAllFootnotesBySubject(Guid releaseId, Guid subjectId)
         {
-            var footnotesLinkedToSubject = GetFootnotes(releaseId, new List<Guid>(){subjectId});
+            var footnotesLinkedToSubject = GetFootnotes(releaseId, new List<Guid> {subjectId});
 
             foreach (var footnote in footnotesLinkedToSubject)
             {
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     .Include(footnote => footnote.Releases)
                     .Include(footnote => footnote.Subjects)
                     .Where(footnote => footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseId == releaseId))
-                    .Select(f => new Footnote()
+                    .Select(f => new Footnote
                     {
                         Id = f.Id,
                         Content = f.Content,

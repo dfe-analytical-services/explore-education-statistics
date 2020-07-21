@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         Task DeleteFootnote(Guid releaseId, Guid id);
 
-        Task DeleteFootnotes(Guid releaseId, Guid subjectId);
+        Task DeleteAllFootnotesBySubject(Guid releaseId, Guid subjectId);
         
         Task<bool> IsFootnoteExclusiveToReleaseAsync(Guid releaseId, Guid footnoteId);
 

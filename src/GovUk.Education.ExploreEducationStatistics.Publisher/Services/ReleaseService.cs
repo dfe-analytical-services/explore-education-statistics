@@ -170,26 +170,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task DeletePreviousVersionsStatisticalData(IEnumerable<Guid> releaseIds)
         {
             var releases = await GetAmendedReleases(releaseIds);
-            
-            var previousVersions = releases.Select(v => v.PreviousVersionId);
+            var previousVersions = releases.Select(r => r.PreviousVersionId).ToList();
 
-            foreach (var releaseSubject in await _statisticsDbContext.ReleaseSubject.Where(rs => previousVersions.Contains(rs.ReleaseId)).ToListAsync())
+            foreach (var previousVersion in previousVersions)
             {
-                if (!await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseSubject.ReleaseId,
-                    releaseSubject.SubjectId))
-                {
-                    throw new ArgumentException($"An error occurred  while trying to soft delete subject {releaseSubject.SubjectId} or break link with previous amendment version for releaseId {releaseSubject.ReleaseId}");
-                }
+                await _releaseSubjectService.SoftDeleteAllSubjectsOrBreakReleaseLinks(previousVersion);
             }
-            
-            // Now can remove any previous stats Release rows
-            var previousStatisticalReleases = await _statisticsDbContext.Release
-                .Where(r => previousVersions.Contains(r.Id))
+
+            // Remove Statistical Releases for each of the Content Releases
+            await RemoveStatisticalReleases(previousVersions);
+
+            await _statisticsDbContext.SaveChangesAsync();
+        }
+
+        private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)
+        {
+            var releases = await _statisticsDbContext.Release
+                .Where(r => releaseIds.Contains(r.Id))
                 .ToListAsync();
             
-            _statisticsDbContext.Release.RemoveRange(previousStatisticalReleases);
-            
-            await _statisticsDbContext.SaveChangesAsync();
+            _statisticsDbContext.Release.RemoveRange(releases);
         }
     }
 }
