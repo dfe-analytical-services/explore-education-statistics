@@ -1,14 +1,18 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import releaseRoutes, { summaryRoute } from '@admin/routes/releaseRoutes';
+import {
+  ReleaseRouteParams,
+  releaseSummaryRoute,
+} from '@admin/routes/releaseRoutes';
+import { releaseCreateRoute } from '@admin/routes/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React, { useContext, useState } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { generatePath, RouteComponentProps, withRouter } from 'react-router';
 import CancelAmendmentModal from './CancelAmendmentModal';
 import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 
@@ -87,7 +91,9 @@ const PublicationSummary = ({
         <SummaryListItem term="" smallKey>
           {publication.permissions.canCreateReleases && (
             <ButtonLink
-              to={releaseRoutes.createReleaseRoute.generateLink(publication.id)}
+              to={generatePath(releaseCreateRoute.path, {
+                publicationId: publication.id,
+              })}
               className="govuk-!-margin-right-6"
               testId={`Create new release link for ${publication.title}`}
             >
@@ -116,7 +122,7 @@ const PublicationSummary = ({
               .createReleaseAmendment(amendReleaseId)
               .then(amendment =>
                 history.push(
-                  summaryRoute.generateLink({
+                  generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                     publicationId: publication.id,
                     releaseId: amendment.id,
                   }),

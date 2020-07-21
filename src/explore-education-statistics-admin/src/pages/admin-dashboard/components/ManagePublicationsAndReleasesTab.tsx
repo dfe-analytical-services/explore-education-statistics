@@ -1,21 +1,23 @@
 import Link from '@admin/components/Link';
 import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import { generateAdminDashboardThemeTopicLink } from '@admin/routes/dashboard/routes';
-import publicationRoutes from '@admin/routes/edit-publication/routes';
-import { IdTitlePair } from '@admin/services/types/common';
+import {
+  dashboardThemeTopicRoute,
+  publicationCreateRoute,
+} from '@admin/routes/routes';
 import dashboardService, {
   AdminDashboardPublication,
 } from '@admin/services/dashboardService';
 import permissionService from '@admin/services/permissionService';
 import { Release } from '@admin/services/releaseService';
+import { IdTitlePair } from '@admin/services/types/common';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormSelect from '@common/components/form/FormSelect';
-import orderBy from 'lodash/orderBy';
-import React, { useContext, useEffect } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import orderBy from 'lodash/orderBy';
+import React, { useContext, useEffect } from 'react';
+import { generatePath, RouteComponentProps, withRouter } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
@@ -113,10 +115,10 @@ const ManagePublicationsAndReleasesTab = ({
       history.replaceState(
         {},
         '',
-        generateAdminDashboardThemeTopicLink(
-          selectedTheme.id,
-          selectedTopic.id,
-        ),
+        generatePath(dashboardThemeTopicRoute.path, {
+          themeId: selectedTheme.id,
+          topicId: selectedTopic.id,
+        }),
       );
     }
   }, [selectedTheme, selectedTopic, nonLiveReleases]);
@@ -209,10 +211,10 @@ const ManagePublicationsAndReleasesTab = ({
                 )}
               {canCreatePublication && (
                 <Link
-                  to={publicationRoutes.createPublication.generateLink(
-                    selectedTheme.id,
-                    selectedTopic.id,
-                  )}
+                  to={generatePath(publicationCreateRoute.path, {
+                    themeId: selectedTheme.id,
+                    topicId: selectedTopic.id,
+                  })}
                   className="govuk-button"
                 >
                   Create new publication

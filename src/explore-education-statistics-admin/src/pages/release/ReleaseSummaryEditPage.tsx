@@ -3,13 +3,16 @@ import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
 import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
-import { summaryRoute } from '@admin/routes/releaseRoutes';
+import {
+  ReleaseRouteParams,
+  releaseSummaryRoute,
+} from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { generatePath, RouteComponentProps } from 'react-router';
 
 const errorMappings = [
   mapFieldErrors<ReleaseSummaryFormValues>({
@@ -44,13 +47,19 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     });
 
     history.push(
-      summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
+      generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+        publicationId: publication.id,
+        releaseId,
+      }),
     );
   }, errorMappings);
 
   const handleCancel = () =>
     history.push(
-      summaryRoute.generateLink({ publicationId: publication.id, releaseId }),
+      generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+        publicationId: publication.id,
+        releaseId,
+      }),
     );
 
   return (

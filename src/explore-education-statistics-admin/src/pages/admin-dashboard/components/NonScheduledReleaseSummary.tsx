@@ -1,10 +1,14 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { getReleaseSummaryLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import { summaryRoute } from '@admin/routes/releaseRoutes';
+import {
+  ReleaseRouteParams,
+  releaseSummaryRoute,
+} from '@admin/routes/releaseRoutes';
 import { MyRelease } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import React from 'react';
+import { generatePath } from 'react-router';
 
 interface Props {
   release: MyRelease;
@@ -25,7 +29,7 @@ const NonScheduledReleaseSummary = ({
           {release.amendment ? (
             <>
               <ButtonLink
-                to={summaryRoute.generateLink({
+                to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                   publicationId: release.publicationId,
                   releaseId: release.id,
                 })}
@@ -38,7 +42,7 @@ const NonScheduledReleaseSummary = ({
                   : 'View this release amendment'}
               </ButtonLink>
               <ButtonLink
-                to={summaryRoute.generateLink({
+                to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                   publicationId: release.publicationId,
                   releaseId: release.previousVersionId,
                 })}
@@ -53,7 +57,7 @@ const NonScheduledReleaseSummary = ({
           ) : (
             <>
               <ButtonLink
-                to={summaryRoute.generateLink({
+                to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                   publicationId: release.publicationId,
                   releaseId: release.id,
                 })}

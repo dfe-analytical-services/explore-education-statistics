@@ -5,8 +5,8 @@ import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
-import appRouteList from '@admin/routes/dashboard/routes';
-import { summaryRoute } from '@admin/routes/releaseRoutes';
+import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
+import { dashboardRoute } from '@admin/routes/routes';
 import publicationService, {
   BasicPublicationDetails,
 } from '@admin/services/publicationService';
@@ -18,7 +18,7 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { generatePath, RouteComponentProps, withRouter } from 'react-router';
 
 export interface FormValues extends ReleaseSummaryFormValues {
   templateReleaseId: string;
@@ -74,15 +74,14 @@ const ReleaseCreatePage = ({
     });
 
     history.push(
-      summaryRoute.generateLink({
+      generatePath(releaseSummaryRoute.path, {
         publicationId,
         releaseId: createdRelease.id,
       }),
     );
   }, errorMappings);
 
-  const handleCancel = () =>
-    history.push(appRouteList.adminDashboard.path as string);
+  const handleCancel = () => history.push(dashboardRoute.path);
 
   return (
     <Page

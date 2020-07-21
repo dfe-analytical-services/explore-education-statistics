@@ -6,7 +6,10 @@ import DraftReleasesTab from '@admin/pages/admin-dashboard/components/DraftRelea
 import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
-import { summaryRoute } from '@admin/routes/releaseRoutes';
+import {
+  ReleaseRouteParams,
+  releaseSummaryRoute,
+} from '@admin/routes/releaseRoutes';
 import loginService from '@admin/services/loginService';
 import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -15,6 +18,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
+import { generatePath } from 'react-router';
 import ManagePublicationsAndReleasesTab from './components/ManagePublicationsAndReleasesTab';
 
 const AdminDashboardPage = () => {
@@ -124,10 +128,13 @@ const AdminDashboardPage = () => {
                   release={release}
                   actions={
                     <ButtonLink
-                      to={summaryRoute.generateLink({
-                        publicationId: release.publicationId,
-                        releaseId: release.id,
-                      })}
+                      to={generatePath<ReleaseRouteParams>(
+                        releaseSummaryRoute.path,
+                        {
+                          publicationId: release.publicationId,
+                          releaseId: release.id,
+                        },
+                      )}
                     >
                       Preview release
                     </ButtonLink>
