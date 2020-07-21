@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task DeleteByPartitionKey(string tableName, string partitionKey)
         {
-            var table = _client.GetTableReference(tableName);
+            var table = await GetTableAsync(tableName);
             await DeleteByPartitionKey(table, partitionKey);
         }
 

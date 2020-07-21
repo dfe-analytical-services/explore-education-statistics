@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 if (release.Slug != release.PreviousVersion.Slug)
                 {
                     await _fileStorageService.DeletePublicBlob(
-                        PublicReleaseDirectoryPath(release.Publication.Slug, release.PreviousVersion.Slug));
+                        PublicContentReleasePath(release.Publication.Slug, release.PreviousVersion.Slug));
                 }
             }
         }
