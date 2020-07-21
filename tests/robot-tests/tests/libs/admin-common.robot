@@ -27,6 +27,7 @@ user creates publication
 user creates publication without methodology
     [Arguments]   ${title}   ${contact}
     user waits until page contains heading    Create new publication
+    user waits until page contains element  id:createPublicationForm-publicationTitle
     user enters text into element  id:createPublicationForm-publicationTitle   ${title}
     user selects radio     Select a methodology later
     user selects from list by label  id:createPublicationForm-selectedContactId   ${contact}

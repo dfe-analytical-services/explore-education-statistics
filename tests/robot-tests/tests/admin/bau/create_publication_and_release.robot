@@ -80,6 +80,7 @@ Verify created release summary
 
 Edit release summary
     [Tags]  HappyPath
+    user waits until page contains link  Edit release summary
     user clicks link  Edit release summary
     user waits until page contains heading 2  Edit release summary
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverageStartYear
