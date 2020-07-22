@@ -179,8 +179,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
                 return new OkObjectResult("Thanks! Please check your email.");
             }
-            catch (NotifyClientException ex)
+            catch (NotifyClientException e)
             {
+                logger.LogError(e,"Caught exception sending email");
                 // Remove the subscriber from storage if we could not successfully send the email & just added it
                 if (!subscriptionPending)
                 {
@@ -189,11 +190,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 }
 
                 return new BadRequestObjectResult(
-                    $"There are problems sending the subscription verification email: {ex.Message}");
+                    $"There are problems sending the subscription verification email: {e.Message}");
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return new BadRequestObjectResult($"There are problems storing your subscription: {ex.Message}");
+                logger.LogError(e,"Caught exception storing subscription");
+                return new BadRequestObjectResult($"There are problems storing your subscription: {e.Message}");
             }
         }
 
