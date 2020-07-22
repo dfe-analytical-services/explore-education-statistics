@@ -84,6 +84,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
             return true;
         }
+        
+        public async Task FailImport(Guid releaseId, string dataFileName, string message)
+        {
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
+                new DatafileImport(releaseId.ToString(), dataFileName, 0, message, IStatus.FAILED))
+            );
+        }
 
         private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
