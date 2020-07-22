@@ -15,7 +15,7 @@ Create new publication for "UI tests topic" topic
     [Tags]  HappyPath
     environment variable should be set   RUN_IDENTIFIER
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link    Create new publication
+    user waits until page contains link     Create new publication
     user checks page does not contain button   ${PUBLICATION_NAME}
     user clicks link  Create new publication
     user creates publication without methodology  ${PUBLICATION_NAME}   Tingting Shu - (Attainment statistics team)

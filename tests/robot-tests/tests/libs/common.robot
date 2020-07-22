@@ -165,8 +165,8 @@ user waits until element contains
   wait until element contains    ${element}    ${text}     timeout=${wait}
 
 user waits until page contains link
-  [Arguments]    ${link_text}
-  page should contain link   ${link_text}
+  [Arguments]    ${link_text}   ${wait}=${timeout}
+  wait until page contains element  xpath://a[text()="${link_text}"]   timeout=${wait}
 
 user waits until page contains heading
   [Arguments]   ${text}    ${wait}=${timeout}
@@ -307,8 +307,8 @@ user selects from list by label
 
 user clears element text
   [Arguments]   ${locator}
-  press keys  ${locator}  CTRL+a
-  press keys  ${locator}  BACKSPACE
+  press keys  ${locator}  CTRL+a+BACKSPACE
+  sleep  0.1
 
 user presses keys
   [Arguments]   ${keys}
@@ -317,9 +317,9 @@ user presses keys
 
 user enters text into element
   [Arguments]   ${selector}   ${text}
-  user clicks element   ${selector}
   user clears element text  ${selector}
-  user presses keys     ${text}
+  user clicks element   ${selector}
+  user presses keys  ${text}
 
 user checks element count is x
   [Arguments]   ${locator}   ${amount}

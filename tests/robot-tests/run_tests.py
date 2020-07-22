@@ -251,16 +251,14 @@ if args.tests and "general_public" not in args.tests:
     if args.env in ['local', 'dev']:
         os.environ['RUN_IDENTIFIER'] = str(time.time()).split('.')[0]
 
-        get_themes_resp = admin_request('GET', f'{os.getenv("ADMIN_URL")}/api/me/themes')
+        get_themes_resp = get_test_themes()
         test_theme_guid = None
         for theme in get_themes_resp.json():
             if theme['title'] == 'Test theme':
                 test_theme_guid = theme['id']
                 break
         if not test_theme_guid:
-            create_theme_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme'
-            body = {'title': 'Test theme', 'summary': 'Test theme summary'}
-            create_theme_resp = admin_request('POST', create_theme_endpoint, body)
+            create_theme_resp = create_test_theme()
             test_theme_guid = create_theme_resp.json()['id']
         assert test_theme_guid is not None, 'test_theme_guid hasn\'t been set!'
 
