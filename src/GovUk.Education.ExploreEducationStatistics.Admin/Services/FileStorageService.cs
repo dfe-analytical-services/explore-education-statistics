@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.OpenApi.Extensions;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
@@ -75,10 +77,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {{DataFileKey, dataFile.FileName.ToLower()}, {UserName, userName}};
                     return await _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseId, dataFile,metadataFile, name)
                             .OnSuccess(() => _importService.CreateImportTableRow(releaseId, dataFile.FileName.ToLower()))
-                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
                             .OnSuccess(() => CreateBasicFileLink(dataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Data))
-                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo))
                             .OnSuccess(() => CreateBasicFileLink(metadataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Metadata))
+                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
+                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo))
                             // add message to queue to process these files
                             .OnSuccessDo(() => _importService.Import(dataFile.FileName.ToLower(), metadataFile.FileName.ToLower(), releaseId, dataFile))
                             .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata));
@@ -238,6 +240,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var fileReference = fileLink.ReleaseFileReference;
                             var blobPath = AdminReleasePathWithFileReference(fileReference);
+
+                            // Files should exists in storage but if not then allow user to delete
+                            if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
+                            {
+                                return new Models.FileInfo
+                                {
+                                    Extension = Path.GetExtension(fileReference.Filename),
+                                    Name = "Unknown",
+                                    Path = fileReference.Filename,
+                                    Size = "0.00 B",
+                                    MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data ? Path.ChangeExtension(fileReference.Filename, null) + ".meta.csv" : "",
+                                    Rows = 0,
+                                    UserName = "",
+                                    Created = DateTimeOffset.UtcNow,
+                                };
+                                //_importService.FailImport()
+                            }
+                            
                             var file = blobContainer.GetBlockBlobReference(blobPath);
                             await file.FetchAttributesAsync();
                             return new Models.FileInfo
