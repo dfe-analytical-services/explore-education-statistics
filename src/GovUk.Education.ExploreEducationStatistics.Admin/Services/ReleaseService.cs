@@ -490,7 +490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async deletePlan =>
                 {
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                    await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLinkAsync(releaseId, deletePlan.SubjectId);
+                    await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
 
                     await _fileStorageService
                         .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
