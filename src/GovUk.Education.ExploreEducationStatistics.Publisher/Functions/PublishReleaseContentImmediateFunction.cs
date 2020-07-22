@@ -54,10 +54,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await _contentService.UpdateContentAsync(new[] {message.ReleaseId}, context);
                 await _releaseService.SetPublishedDatesAsync(message.ReleaseId, context.Published);
                 
-//                if (!PublisherUtils.IsDevelopment())
-//                {
+                if (!PublisherUtils.IsDevelopment())
+                {
                     await _releaseService.DeletePreviousVersionsStatisticalData(new[] {message.ReleaseId});
-//                }
+                }
                 
                 await _contentService.DeletePreviousVersionsContent(new[] {message.ReleaseId});
                 await _notificationsService.NotifySubscribersAsync(new[] {message.ReleaseId});
