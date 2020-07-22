@@ -79,6 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .OnSuccess(() => _importService.CreateImportTableRow(releaseId, dataFile.FileName.ToLower()))
                             .OnSuccess(() => CreateBasicFileLink(dataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Data))
                             .OnSuccess(() => CreateBasicFileLink(metadataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Metadata))
+                            .OnSuccessDo(async () => await _context.SaveChangesAsync())
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
                             .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo))
                             // add message to queue to process these files
@@ -134,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             ReleaseFileTypes.Metadata)));
                     }
 
-                    var metaFilename = await GetAssociatedMetaFilename(releaseId, dataFileName);
+                    var metaFilename = await GetFilenameAssociatedToType(releaseId, dataFileName, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata);
 
                     return await DeleteFileLink(releaseId, dataFileName, ReleaseFileTypes.Data)
                         .OnSuccess(() => DeleteFileLink(releaseId, metaFilename, ReleaseFileTypes.Metadata));
@@ -155,8 +156,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await
                         _fileUploadsValidatorService
                             .ValidateFileForUpload(releaseId, file, type, overwrite)
-                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, file, type, info))
                             .OnSuccess(() => CreateBasicFileLink(file.FileName.ToLower(), releaseId, type))
+                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, file, type, info))
+                            .OnSuccessDo(async () => await _context.SaveChangesAsync())
                             .OnSuccess(() => ListFilesAsync(releaseId, type));
                 });
         }
@@ -173,8 +175,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var info = new Dictionary<string, string> {{NameKey, file.FileName.ToLower()}};
                     return await
                         _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, ReleaseFileTypes.Chart, true)
-                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, file, ReleaseFileTypes.Chart, info))
                             .OnSuccess(() => CreateBasicFileLink(file.FileName.ToLower(), releaseId, ReleaseFileTypes.Chart))
+                            .OnSuccessDo(async () => await _context.SaveChangesAsync())
+                            .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, file, ReleaseFileTypes.Chart, info))
                             .OnSuccess(_ =>
                             {
                                 var blob = blobContainer.GetBlobReference(AdminReleasePath(releaseId,
@@ -244,18 +247,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             // Files should exists in storage but if not then allow user to delete
                             if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
                             {
+                                // Fail the import if this was a datafile upload
+                                if (fileReference.ReleaseFileType == ReleaseFileTypes.Data ||
+                                    fileReference.ReleaseFileType == ReleaseFileTypes.Metadata)
+                                {
+                                    await _importService.FailImport(releaseId,
+                                        fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                                            ? fileReference.Filename
+                                            : await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
+                                                ReleaseFileTypes.Metadata, ReleaseFileTypes.Data), 
+                                        "Files not uploaded correctly. Please delete and retry");
+                                }
+                                
                                 return new Models.FileInfo
                                 {
                                     Extension = Path.GetExtension(fileReference.Filename),
                                     Name = "Unknown",
                                     Path = fileReference.Filename,
                                     Size = "0.00 B",
-                                    MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data ? Path.ChangeExtension(fileReference.Filename, null) + ".meta.csv" : "",
+                                    MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data ? 
+                                        await GetFilenameAssociatedToType(releaseId, fileReference.Filename, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
+                                        : "",
                                     Rows = 0,
                                     UserName = "",
                                     Created = DateTimeOffset.UtcNow,
                                 };
-                                //_importService.FailImport()
                             }
                             
                             var file = blobContainer.GetBlockBlobReference(blobPath);
@@ -351,7 +367,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
 
             await _context.ReleaseFiles.AddAsync(fileLink);
-            await _context.SaveChangesAsync();
             return true;
         }
 
@@ -487,13 +502,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return AdminReleasePath(fileReference.ReleaseId, fileReference.ReleaseFileType, fileReference.Filename);
         }
 
-        private async Task<string> GetAssociatedMetaFilename(Guid releaseId, string dataFileName)
+        private async Task<string> GetFilenameAssociatedToType(Guid releaseId, string filename, ReleaseFileTypes type, ReleaseFileTypes associatedType)
         {
-            var releaseDataFileLink = await GetReleaseFileLinkAsync(releaseId, dataFileName, ReleaseFileTypes.Data);
+            var releaseDataFileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
 
             return _context.ReleaseFileReferences
                 .First(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
-                              && rfr.ReleaseFileType == ReleaseFileTypes.Metadata
+                              && rfr.ReleaseFileType == associatedType
                               && rfr.SubjectId == releaseDataFileLink.ReleaseFileReference.SubjectId).Filename;
         }
     }
