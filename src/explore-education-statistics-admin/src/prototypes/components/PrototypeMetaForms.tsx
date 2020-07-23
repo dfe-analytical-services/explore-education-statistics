@@ -53,7 +53,8 @@ const CreateMetaForms = ({
       <form id="createMetaForm" className="govuk-!-margin-bottom-9">
         <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
           <h2 className="govuk-fieldset__heading">
-            Example publication, 2018/19
+            <span className="govuk-caption-l">Academic year 2018/19</span>
+            Example publication
           </h2>
         </legend>
         <div className="govuk-!-margin-bottom-7">
@@ -61,7 +62,7 @@ const CreateMetaForms = ({
             id="description"
             name="description"
             label="Public metadata introduction"
-            value={editing ? formExample.descriptionPlaceholder.text : ''}
+            value={formExample.descriptionPlaceholder.text}
             onChange={() => setAddNewMeta(true)}
           />
         </div>
