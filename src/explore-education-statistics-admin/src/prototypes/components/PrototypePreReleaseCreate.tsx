@@ -3,8 +3,8 @@ import FormEditor from '@admin/components/form/FormEditor';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 
 const CreatePreRelease = () => {
-  const query = new URLSearchParams(window.location.search);
-  const dialog = query.has('showDialog');
+  // const query = new URLSearchParams(window.location.search);
+  // const dialog = query.has('showDialog');
 
   const [createPreRelease, setCreatePreRelease] = useState(true);
   const [addNewPreRelease, setAddNewPreRelease] = useState(false);
@@ -66,7 +66,10 @@ const CreatePreRelease = () => {
       )}
       {addNewPreRelease && (
         <>
-          <form id="createPreRelease" className="govuk-!-margin-bottom-9">
+          <form
+            id="createPreRelease"
+            className="govuk-!-margin-bottom-9 govuk-width-container govuk-!-margin-left-0"
+          >
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
               <h2 className="govuk-fieldset__heading">
                 {editPreRelease ? 'Edit' : 'Create'} public pre-release access
@@ -107,27 +110,30 @@ const CreatePreRelease = () => {
       )}
       {previewPreRelease && (
         <>
-          <h2 className="govuk-heading-l">An example publication, 2018/19</h2>
-          <h3 className="govuk-heading-m">Pre-release access list</h3>
+          <div className="govuk-width-container govuk-!-margin-left-0">
+            <h1 className="govuk-heading-xl">
+              <span className="govuk-caption-xl">Academic year 2018/19</span>
+              An example publication
+            </h1>
+            <h2 className="govuk-heading-m">Pre-release access list</h2>
 
-          <p className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
-            Published 15 July 2020
-          </p>
+            <h3 className="govuk-heading-s">Published 23 July 2020</h3>
 
-          <div className="govuk-!-margin-bottom-9">
-            <SanitizeHtml dirtyHtml={formText || ''} />
+            <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
+              <SanitizeHtml dirtyHtml={formText || ''} />
+            </div>
+            <button
+              className="govuk-button govuk-!-margin-right-3"
+              type="submit"
+              onClick={() => {
+                setPreviewPreRelease(false);
+                setEditPreRelease(true);
+                setAddNewPreRelease(true);
+              }}
+            >
+              Edit public metadata
+            </button>
           </div>
-          <button
-            className="govuk-button govuk-!-margin-right-3"
-            type="submit"
-            onClick={() => {
-              setPreviewPreRelease(false);
-              setEditPreRelease(true);
-              setAddNewPreRelease(true);
-            }}
-          >
-            Edit public metadata
-          </button>
         </>
       )}
     </>

@@ -2,19 +2,25 @@ import React, { useState } from 'react';
 import CreateMetaForms from './PrototypeMetaForms';
 import PreviewMeta from './PrototypeMetaPreview';
 
-const CreateMeta = () => {
+interface Props {
+  publicView?: boolean;
+}
+
+const CreateMeta = (publicView: Props) => {
   const query = new URLSearchParams(window.location.search);
   const dialog = query.has('showDialog');
 
-  const [createMeta, setCreateMeta] = useState(true);
+  const switchPublicView = publicView?.publicView;
+
+  const [createMeta, setCreateMeta] = useState(!switchPublicView);
   const [addNewMeta, setAddNewMeta] = useState(false);
-  const [previewMeta, setPreviewMeta] = useState(false);
+  const [previewMeta, setPreviewMeta] = useState(switchPublicView);
   const [editMeta, setEditMeta] = useState(false);
 
   const formText = {
-    descriptionPlaceholder: {
+    descriptionSaved: {
       text: `
-        <h2>Description</h2>
+        <h2 class="govuk-heading-m">Description</h2>
         <p>
           This document describes the data included in the ‘Pupil absence in
           schools in England: 2018/19’ National Statistics release’s underlying
@@ -27,6 +33,7 @@ const CreateMeta = () => {
           data. It provides information on the data sources, their coverage and
           quality as well as explaining methodology used in producing the data.
         </p>
+        <p></p>
         <hr />
         <h2>Coverage</h2>
         <p>
@@ -57,6 +64,7 @@ const CreateMeta = () => {
           and school level absence information from 2006/07 to 2018/19 for
           schools in England.
         </p>
+        <p></p>
         <hr />
         <h2>File format and conventions</h2>
         <h3 className="govuk-heading-s">Rounding</h3>
@@ -64,6 +72,16 @@ const CreateMeta = () => {
         <h3 className="govuk-heading-s">Conventions</h3>
         <p>The following convention is used throughout the underlying data</p>
         <hr />
+      `,
+    },
+    descriptionPlaceholder: {
+      text: `
+      <h2 class="govuk-heading-m">Description</h2>
+      <p>---</p>
+      <h2 class="govuk-heading-m">Coverage</h2>
+      <p>---</p>
+      <h2 class="govuk-heading-m">File format and conventions</h2>
+      <p>---</p>
       `,
     },
     subject1: {
@@ -115,7 +133,11 @@ const CreateMeta = () => {
         <>
           <CreateMetaForms
             editing={editMeta}
-            description={formText.descriptionPlaceholder.text}
+            description={
+              editMeta
+                ? formText.descriptionSaved.text
+                : formText.descriptionPlaceholder.text
+            }
             subject1={formText.subject1.text}
             subject2={formText.subject2.text}
             subject3={formText.subject3.text}
@@ -145,20 +167,22 @@ const CreateMeta = () => {
       {previewMeta && (
         <>
           <PreviewMeta
-            description={formText.descriptionPlaceholder.text}
+            description={formText.descriptionSaved.text}
             showDialog={dialog}
           />
-          <button
-            className="govuk-button govuk-!-margin-right-3"
-            type="submit"
-            onClick={() => {
-              setPreviewMeta(false);
-              setEditMeta(true);
-              setAddNewMeta(true);
-            }}
-          >
-            Edit public metadata
-          </button>
+          {!switchPublicView && (
+            <button
+              className="govuk-button govuk-!-margin-right-3"
+              type="submit"
+              onClick={() => {
+                setPreviewMeta(false);
+                setEditMeta(true);
+                setAddNewMeta(true);
+              }}
+            >
+              Edit public metadata
+            </button>
+          )}
         </>
       )}
     </>

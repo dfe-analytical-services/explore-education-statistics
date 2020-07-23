@@ -1,5 +1,4 @@
-import PrototypePage from '@admin/prototypes/components/PrototypePage';
-import React, { useState } from 'react';
+import React from 'react';
 import { FormGroup, FormTextInput } from '@common/components/form';
 
 const PrototypeManagePreRelease = () => {

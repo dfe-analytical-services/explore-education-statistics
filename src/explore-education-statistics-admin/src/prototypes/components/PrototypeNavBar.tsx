@@ -16,7 +16,7 @@ const NavBar = () => {
           <NavLink to="/prototypes1">Release summary</NavLink>
         </li>
         <li>
-          <NavLink to="public-metadata#test-4">Manage data</NavLink>
+          <NavLink to="metadata#test-4">Manage data</NavLink>
         </li>
         <li>
           <NavLink to="/prototypes2">Manage data blocks</NavLink>
