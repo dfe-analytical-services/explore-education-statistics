@@ -9,9 +9,10 @@
       "Function.PublishReleaseContent": "Information",
       "Function.PublishReleaseData": "Information",
       "Function.PublishReleaseFiles": "Information",
-      "Function.PublishReleaseContentImmediate": "Information",
-      "Function.ValidateRelease": "Information",
-      "Function.DataFactoryPipelineStatusFunction": "Information",
+      "Function.PublishStagedReleaseContent": "Information",
+      "Function.NotifyChange": "Information",
+      "Function.DataFactoryPipelineStatus": "Information",
+      "Function.RetryStage": "Information",
       "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
     }
   }

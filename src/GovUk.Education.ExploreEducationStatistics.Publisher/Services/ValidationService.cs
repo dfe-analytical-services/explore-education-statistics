@@ -28,12 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidateAsync(
-            ValidateReleaseMessage validateReleaseMessage)
+        public async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidateAsync(Guid releaseId)
         {
-            _logger.LogTrace($"Validating release: {validateReleaseMessage.ReleaseId}");
+            _logger.LogTrace($"Validating release: {releaseId}");
 
-            var release = await GetReleaseAsync(validateReleaseMessage.ReleaseId);
+            var release = await GetReleaseAsync(releaseId);
 
             var (approvalValid, approvalMessages) = ValidateApproval(release);
             var (scheduledPublishDateValid, scheduledPublishDateMessages) = ValidateScheduledPublishDate(release);
@@ -55,8 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var releaseStatuses =
                 (await _releaseStatusService.GetAllByOverallStage(release.Id, Scheduled, Started)).ToList();
-            var scheduled = releaseStatuses.FirstOrDefault(status => status.OverallStage == Scheduled.ToString());
-            var started = releaseStatuses.FirstOrDefault(status => status.OverallStage == Started.ToString());
+            var scheduled = releaseStatuses.FirstOrDefault(status => status.State.Overall == Scheduled);
+            var started = releaseStatuses.FirstOrDefault(status => status.State.Overall == Started);
 
             // Should never happen as we mark scheduled releases as superseded prior to validation
             if (scheduled != null)
