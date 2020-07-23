@@ -4,6 +4,7 @@ import FormField, {
 import FormFileInput, {
   FormFileInputProps,
 } from '@common/components/form/FormFileInput';
+import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 
 type Props<FormValues> = FormFieldComponentProps<
@@ -14,6 +15,8 @@ type Props<FormValues> = FormFieldComponentProps<
 const FormFieldFileInput = <FormValues extends {}>(
   props: Props<FormValues>,
 ) => {
+  const [fileHasBeenSelected, toggleFileHasBeenSelected] = useToggle(false);
+
   return (
     <FormField<File | null> {...props}>
       {({ field, helpers }) => (
@@ -21,6 +24,8 @@ const FormFieldFileInput = <FormValues extends {}>(
           {...props}
           {...field}
           onChange={event => {
+            toggleFileHasBeenSelected();
+
             if (props.onChange) {
               props.onChange(event);
             }
@@ -35,6 +40,9 @@ const FormFieldFileInput = <FormValues extends {}>(
                 : null;
 
             helpers.setValue(file);
+          }}
+          onBlur={event => {
+            if (fileHasBeenSelected) field.onBlur(event);
           }}
         />
       )}
