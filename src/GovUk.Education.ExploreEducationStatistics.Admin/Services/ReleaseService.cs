@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(createRelease.PublicationId)
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
-                .OnSuccess(_ => ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId))
+                .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId))
                 .OnSuccess(async () =>
                 {
                     var release = _mapper.Map<Release>(createRelease);
@@ -280,9 +280,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
-                .OnSuccessDo(release => ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
-                .OnSuccessDo(release => CheckAllDataFilesUploaded(release, request.Status))
-                .OnSuccessDo(release => CheckMethodologyHasBeenApproved(release, request.Status))
+                .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
+                .OnSuccessDo(async release => await CheckAllDataFilesUploaded(release, request.Status))
+                .OnSuccessDo(async release => await CheckMethodologyHasBeenApproved(release, request.Status))
                 .OnSuccess(async release =>
                 {
                     if (request.Status != ReleaseStatus.Approved && release.Published.HasValue)
