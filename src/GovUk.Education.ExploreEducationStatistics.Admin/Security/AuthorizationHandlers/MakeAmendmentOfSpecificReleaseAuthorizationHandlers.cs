@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHa
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -44,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         private static bool IsLatestVersionOfRelease(ContentDbContext context, Release release)
         {
-            var releases = context.Releases.Where(r => r.PublicationId == release.PublicationId);
+            var releases = context.Releases.AsNoTracking().Where(r => r.PublicationId == release.PublicationId);
             return IsLatestVersionOfRelease(releases, release.Id);
         }
 
