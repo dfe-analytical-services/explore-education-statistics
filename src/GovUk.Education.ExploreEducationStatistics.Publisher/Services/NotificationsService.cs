@@ -2,15 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.Storage.Queue;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.QueueUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -26,10 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _storageConnectionString = config.GetValue<string>("NotificationStorage");
         }
 
-        public async Task NotifySubscribersAsync(IEnumerable<Guid> releaseIds)
+        public async Task NotifySubscribers(params Guid[] releaseIds)
         {
             var publications = GetPublications(releaseIds);
-            var queue = await QueueUtils.GetQueueReferenceAsync(_storageConnectionString, QueueName);
+            var queue = await GetQueueReferenceAsync(_storageConnectionString, QueueName);
             var messages = publications.Select(BuildPublicationNotificationMessage);
 
             foreach (var message in messages)
@@ -55,11 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 PublicationId = publication.Id,
                 Slug = publication.Slug
             };
-        }
-
-        private static CloudQueueMessage ToCloudQueueMessage(object value)
-        {
-            return new CloudQueueMessage(JsonConvert.SerializeObject(value));
         }
     }
 }

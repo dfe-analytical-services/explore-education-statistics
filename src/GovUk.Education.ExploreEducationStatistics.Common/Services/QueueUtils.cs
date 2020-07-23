@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -22,6 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var queue = client.GetQueueReference(queueName);
             await queue.CreateIfNotExistsAsync();
             return queue;
+        }
+
+        public static CloudQueueMessage ToCloudQueueMessage(object value)
+        {
+            return new CloudQueueMessage(JsonConvert.SerializeObject(value));
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -7,13 +6,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
-using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.QueueUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
@@ -97,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             try
             {
                 var storageConnectionString = Configuration.GetConnectionString("PublisherStorage");
-                var queue = QueueUtils.GetQueueReference(storageConnectionString, queueName);
+                var queue = GetQueueReference(storageConnectionString, queueName);
 
                 var message = new PublishAllContentMessage();
                 queue.AddMessage(ToCloudQueueMessage(message));
@@ -110,11 +109,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 logger.LogError($"Unable add message to {queueName} queue");
                 throw;
             }
-        }
-        
-        private static CloudQueueMessage ToCloudQueueMessage(object value)
-        {
-            return new CloudQueueMessage(JsonConvert.SerializeObject(value));
         }
     }
 }

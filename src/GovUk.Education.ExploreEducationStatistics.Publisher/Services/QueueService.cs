@@ -4,10 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.QueueUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
@@ -35,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releasesList = releases.ToList();
             _logger.LogInformation(
                 $"Queuing generate content message for releases: {string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId))}");
-            await queue.AddMessageAsync(ToCloudQueueMessage(BuildGenerateReleaseContentMessage(releasesList)));
+            await queue.AddMessageAsync(ToCloudQueueMessage(new GenerateReleaseContentMessage(releasesList)));
             foreach (var (releaseId, releaseStatusId) in releasesList)
             {
                 await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
@@ -43,14 +41,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task QueuePublishReleaseContentImmediateMessageAsync(Guid releaseId, Guid releaseStatusId)
+        public async Task QueuePublishReleaseContentMessageAsync(Guid releaseId, Guid releaseStatusId)
         {
-            var queue = await GetQueueReferenceAsync(_storageConnectionString, PublishReleaseContentImmediateQueue);
+            var queue = await GetQueueReferenceAsync(_storageConnectionString, PublishReleaseContentQueue);
             _logger.LogInformation($"Queuing publish content message for release: {releaseId}");
             await queue.AddMessageAsync(
-                ToCloudQueueMessage(BuildPublishReleaseContentImmediateMessage(releaseId, releaseStatusId)));
+                ToCloudQueueMessage(new PublishReleaseContentMessage(releaseId, releaseStatusId)));
             await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
                 ReleaseStatusContentStage.Queued);
+        }
+
+        public Task QueuePublishReleaseDataMessageAsync(Guid releaseId, Guid releaseStatusId)
+        {
+            return QueuePublishReleaseDataMessagesAsync(new[] {(releaseId, releaseStatusId)});
         }
 
         public async Task QueuePublishReleaseDataMessagesAsync(
@@ -61,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 _logger.LogInformation($"Queuing data message for release: {releaseId}");
                 await queue.AddMessageAsync(
-                    ToCloudQueueMessage(BuildPublishReleaseDataMessage(releaseId, releaseStatusId)));
+                    ToCloudQueueMessage(new PublishReleaseDataMessage(releaseId, releaseStatusId)));
                 await _releaseStatusService.UpdateDataStageAsync(releaseId, releaseStatusId,
                     ReleaseStatusDataStage.Queued);
             }
@@ -79,50 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releasesList = releases.ToList();
             _logger.LogInformation(
                 $"Queuing files message for releases: {string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId))}");
-            await queue.AddMessageAsync(ToCloudQueueMessage(BuildPublishReleaseFilesMessage(releasesList)));
+            await queue.AddMessageAsync(ToCloudQueueMessage(new PublishReleaseFilesMessage(releasesList)));
             foreach (var (releaseId, releaseStatusId) in releasesList)
             {
                 await _releaseStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId,
                     ReleaseStatusFilesStage.Queued);
             }
-        }
-
-        private static GenerateReleaseContentMessage BuildGenerateReleaseContentMessage(
-            IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
-        {
-            return new GenerateReleaseContentMessage
-            {
-                Releases = releases
-            };
-        }
-
-        private static PublishReleaseContentImmediateMessage BuildPublishReleaseContentImmediateMessage(
-            Guid releaseId, Guid releaseStatusId)
-        {
-            return new PublishReleaseContentImmediateMessage(releaseId, releaseStatusId);
-        }
-
-        private static PublishReleaseDataMessage BuildPublishReleaseDataMessage(Guid releaseId, Guid releaseStatusId)
-        {
-            return new PublishReleaseDataMessage
-            {
-                ReleaseId = releaseId,
-                ReleaseStatusId = releaseStatusId
-            };
-        }
-
-        private static PublishReleaseFilesMessage BuildPublishReleaseFilesMessage(
-            IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
-        {
-            return new PublishReleaseFilesMessage
-            {
-                Releases = releases
-            };
-        }
-
-        private static CloudQueueMessage ToCloudQueueMessage(object value)
-        {
-            return new CloudQueueMessage(JsonConvert.SerializeObject(value));
         }
     }
 }

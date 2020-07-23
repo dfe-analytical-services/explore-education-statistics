@@ -25,12 +25,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
         }
 
-        /**
-         * Azure function which updates the stage of the statistics data task depending on the result of the ADF Pipeline.
-         * This is triggered when the ADF Pipeline completes regardless of whether it was successful or not.
-         * Triggers publishing content for the Release if publishing is immediate.
-         */
-        [FunctionName("DataFactoryPipelineStatusFunction")]
+        /// <summary>
+        /// Azure function which updates the stage of the statistics data task depending on the result of the ADF Pipeline.
+        /// This is triggered when the ADF Pipeline completes regardless of whether it was successful or not.
+        /// </summary>
+        /// <remarks>
+        /// Triggers publishing content for the Release if publishing is immediate.
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <param name="logger"></param>
+        /// <param name="executionContext"></param>
+        /// <returns></returns>
+        [FunctionName("DataFactoryPipelineStatus")]
         // ReSharper disable once UnusedMember.Global
         public async Task<IActionResult> Status(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "datafactory/pipeline/status/")]
@@ -49,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 if (await _releaseStatusService.IsImmediate(response.ReleaseId, response.ReleaseStatusId))
                 {
-                    await _queueService.QueuePublishReleaseContentImmediateMessageAsync(response.ReleaseId,
+                    await _queueService.QueuePublishReleaseContentMessageAsync(response.ReleaseId,
                         response.ReleaseStatusId);
                 }
             }
