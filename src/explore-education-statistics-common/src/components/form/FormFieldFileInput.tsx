@@ -20,44 +20,42 @@ const FormFieldFileInput = <FormValues extends {}>(
 
   return (
     <FormField<File | null> {...props}>
-      {({ field, helpers }) => {
-        return (
-          <FormFileInput
-            {...props}
-            {...field}
-            onChange={event => {
-              toggleFileHasBeenSelected();
+      {({ field, helpers }) => (
+        <FormFileInput
+          {...props}
+          {...field}
+          onChange={event => {
+            toggleFileHasBeenSelected();
 
-              if (props.onChange) {
-                props.onChange(event);
-              }
+            if (props.onChange) {
+              props.onChange(event);
+            }
 
-              if (event.isDefaultPrevented()) {
-                return;
-              }
+            if (event.isDefaultPrevented()) {
+              return;
+            }
 
-              const file =
-                event.target.files && event.target.files.length > 0
-                  ? event.target.files[0]
-                  : null;
+            const file =
+              event.target.files && event.target.files.length > 0
+                ? event.target.files[0]
+                : null;
 
-              setInputValue(file);
-              helpers.setValue(file);
-            }}
-            onBlur={event => {
-              if (inputValue !== field.value) {
-                // formField value was outside of the input (e.g form reset)
-                // reset field touched state
-                helpers.setTouched(false);
-                toggleFileHasBeenSelected(false);
-              } else if (fileHasBeenSelected) {
-                // only allow field validation if a file has been previously selected
-                field.onBlur(event);
-              }
-            }}
-          />
-        );
-      }}
+            setInputValue(file);
+            helpers.setValue(file);
+          }}
+          onBlur={event => {
+            if (inputValue !== field.value) {
+              // formField value was outside of the input (e.g form reset)
+              // reset field touched state
+              helpers.setTouched(false);
+              toggleFileHasBeenSelected(false);
+            } else if (fileHasBeenSelected) {
+              // only allow field validation if a file has been previously selected
+              field.onBlur(event);
+            }
+          }}
+        />
+      )}
     </FormField>
   );
 };
