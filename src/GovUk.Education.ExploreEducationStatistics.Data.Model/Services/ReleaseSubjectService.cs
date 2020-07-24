@@ -20,21 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public async Task SoftDeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId)
         {
-            var releaseSubjects = _statisticsDbContext.ReleaseSubject
+            var subjectIds = await _statisticsDbContext.ReleaseSubject
                 .Include(rs => rs.Subject)
-                .Where(rs => rs.ReleaseId == releaseId);
-
-            var subjects = releaseSubjects.Select(rs => rs.Subject).ToList();
-
-            _statisticsDbContext.ReleaseSubject.RemoveRange(releaseSubjects);
-
-            foreach (var subject in subjects)
+                .Where(rs => rs.ReleaseId == releaseId).Select(rs => rs.SubjectId).ToListAsync();
+            
+            foreach (var id in subjectIds)
             {
-                await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subject.Id);
-                await SoftDeleteSubjectIfOrphaned(subject);
+                await SoftDeleteSubjectOrBreakReleaseLink(releaseId, id);
             }
-
-            await _statisticsDbContext.SaveChangesAsync();
         }
 
         public async Task SoftDeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId)
