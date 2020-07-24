@@ -3,17 +3,16 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.QueueUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
@@ -22,19 +21,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class PublishingService : IPublishingService
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly string _storageConnectionString;
+        private readonly IStorageQueueService _storageQueueService;
         private readonly IUserService _userService;
         private readonly ILogger _logger;
 
         public PublishingService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IStorageQueueService storageQueueService,
             IUserService userService,
-            IConfiguration config,
-            ILogger<PublishingService> logger
-        )
+            ILogger<PublishingService> logger)
         {
             _persistenceHelper = persistenceHelper;
+            _storageQueueService = storageQueueService;
             _userService = userService;
-            _storageConnectionString = config.GetValue<string>("PublisherStorage");
             _logger = logger;
         }
 
@@ -59,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReleaseNotApproved);
                     }
 
-                    var queue = await GetQueueReferenceAsync(_storageConnectionString, RetryStageQueue);
-                    await queue.AddMessageAsync(ToCloudQueueMessage(new RetryStageMessage(releaseId, stage)));
+                    await _storageQueueService.AddMessagesAsync(
+                        RetryStageQueue, new RetryStageMessage(releaseId, stage));
 
                     _logger.LogTrace($"Sent retry stage message for Release: {releaseId}");
                     return new Either<ActionResult, bool>(true);
@@ -92,8 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
                 {
-                    var queue = await GetQueueReferenceAsync(_storageConnectionString, NotifyChangeQueue);
-                    await queue.AddMessageAsync(ToCloudQueueMessage(new NotifyChangeMessage(immediate, release.Id)));
+                    await _storageQueueService.AddMessagesAsync(
+                        NotifyChangeQueue, new NotifyChangeMessage(immediate, release.Id));
 
                     _logger.LogTrace($"Sent validate message for Release: {releaseId}");
                     return true;
