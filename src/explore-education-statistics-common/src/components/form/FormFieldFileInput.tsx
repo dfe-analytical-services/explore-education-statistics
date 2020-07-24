@@ -5,7 +5,7 @@ import FormFileInput, {
   FormFileInputProps,
 } from '@common/components/form/FormFileInput';
 import useToggle from '@common/hooks/useToggle';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 type Props<FormValues> = FormFieldComponentProps<
   FormFileInputProps,
