@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IValidationService
     {
-        Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidateAsync(Guid releaseId);
+        Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidatePublishingState(Guid releaseId);
+        Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidateRelease(Guid releaseId);
     }
 }

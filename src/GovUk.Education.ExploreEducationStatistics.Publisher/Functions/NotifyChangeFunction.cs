@@ -48,25 +48,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             await MarkScheduledReleaseStatusAsSuperseded(message);
-            await ValidateReleaseAsync(message, async () =>
+            if (await ValidatePublishingState(message, logger))
             {
-                if (message.Immediate)
+                await ValidateRelease(message, async () =>
                 {
-                    var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
-                    await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId, releaseStatus.Id);
-                }
-                else
-                {
-                    await CreateReleaseStatusAsync(message, ScheduledState);
-                }
-            });
+                    if (message.Immediate)
+                    {
+                        var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
+                        await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
+                            releaseStatus.Id);
+                    }
+                    else
+                    {
+                        await CreateReleaseStatusAsync(message, ScheduledState);
+                    }
+                });
+            }
+
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task ValidateReleaseAsync(NotifyChangeMessage message, Func<Task> andThen)
+        private async Task<bool> ValidatePublishingState(NotifyChangeMessage message, ILogger logger)
         {
             var (valid, logMessages) = 
-                await _validationService.ValidateAsync(message.ReleaseId);
+                await _validationService.ValidatePublishingState(message.ReleaseId);
+
+            if (!valid)
+            {
+                foreach (var releaseStatusLogMessage in logMessages)
+                {
+                    logger.LogWarning(releaseStatusLogMessage.Message);
+                }
+            }
+            
+            return valid;
+        }
+        
+        private async Task ValidateRelease(NotifyChangeMessage message, Func<Task> andThen)
+        {
+            var (valid, logMessages) = 
+                await _validationService.ValidateRelease(message.ReleaseId);
             await (valid ? andThen.Invoke() : CreateReleaseStatusAsync(message, InvalidState, logMessages));
         }
 

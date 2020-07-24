@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidateAsync(Guid releaseId)
+        public async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidateRelease(Guid releaseId)
         {
             _logger.LogTrace($"Validating release: {releaseId}");
 
@@ -36,24 +36,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var (approvalValid, approvalMessages) = ValidateApproval(release);
             var (scheduledPublishDateValid, scheduledPublishDateMessages) = ValidateScheduledPublishDate(release);
-            var (publishingStateValid, publishingStateMessages) = await ValidatePublishingState(release);
 
             var valid = approvalValid
-                        && scheduledPublishDateValid
-                        && publishingStateValid;
+                        && scheduledPublishDateValid;
 
             var logMessages = approvalMessages
-                .Concat(scheduledPublishDateMessages)
-                .Concat(publishingStateMessages);
+                .Concat(scheduledPublishDateMessages);
 
             return Result(valid, logMessages);
         }
 
-        private async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidatePublishingState(
-            Release release)
+        public async Task<(bool Valid, IEnumerable<ReleaseStatusLogMessage> LogMessages)> ValidatePublishingState(
+            Guid releaseId)
         {
+            _logger.LogTrace($"Validating publishing state: {releaseId}");
+            
             var releaseStatuses =
-                (await _releaseStatusService.GetAllByOverallStage(release.Id, Scheduled, Started)).ToList();
+                (await _releaseStatusService.GetAllByOverallStage(releaseId, Scheduled, Started)).ToList();
             var scheduled = releaseStatuses.FirstOrDefault(status => status.State.Overall == Scheduled);
             var started = releaseStatuses.FirstOrDefault(status => status.State.Overall == Started);
 
