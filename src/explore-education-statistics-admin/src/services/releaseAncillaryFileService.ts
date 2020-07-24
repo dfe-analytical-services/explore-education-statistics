@@ -50,11 +50,13 @@ const releaseAncillaryFileService = {
     const data = new FormData();
     data.append('file', request.file);
     return client
-      .post<AncillaryFileInfo>(
+      .post<AncillaryFileInfo[]>(
         `/release/${releaseId}/ancillary?name=${request.name}`,
         data,
       )
-      .then(mapFile);
+      .then(response => {
+        return response.map(mapFile)[0];
+      });
   },
   deleteAncillaryFile(releaseId: string, fileName: string): Promise<null> {
     return client.delete<null>(`/release/${releaseId}/ancillary/${fileName}`);
