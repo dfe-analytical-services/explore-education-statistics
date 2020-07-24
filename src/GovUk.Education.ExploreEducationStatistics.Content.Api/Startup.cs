@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -12,7 +13,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.QueueUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
@@ -95,12 +95,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             const string queueName = PublishAllContentQueue;
             try
             {
-                var storageConnectionString = Configuration.GetConnectionString("PublisherStorage");
-                var queue = GetQueueReference(storageConnectionString, queueName);
+                var storageQueueService = new StorageQueueService(Configuration.GetConnectionString("PublisherStorage"));
+                storageQueueService.AddMessages(queueName, new PublishAllContentMessage());
 
-                var message = new PublishAllContentMessage();
-                queue.AddMessage(ToCloudQueueMessage(message));
-                
                 logger.LogInformation($"Message added to {queueName} queue");
                 logger.LogInformation("Please ensure the Publisher function is running");
             }
