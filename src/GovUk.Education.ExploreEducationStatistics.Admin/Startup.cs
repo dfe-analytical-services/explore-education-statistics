@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
                     provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    provider.GetService<IStorageQueueService>(),
+                    new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
                     provider.GetService<IUserService>(),
                     provider.GetRequiredService<ILogger<PublishingService>>()));
             services.AddTransient<IReleaseStatusService, ReleaseStatusService>(s => 
