@@ -269,13 +269,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static (
             Mock<IReleaseService> ReleaseService,
-            Mock<IFileStorageService> FileStorageService,
+            Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService) Mocks()
         {
             return (new Mock<IReleaseService>(),
-                    new Mock<IFileStorageService>(),
+                    new Mock<IReleaseFilesService>(),
                     new Mock<IReleaseStatusService>(),
                     MockUserManager(Users),
                     new Mock<IDataBlockService>()
@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static ReleasesController ReleasesControllerWithMocks((
             Mock<IReleaseService> ReleaseService,
-            Mock<IFileStorageService> FileStorageService,
+            Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService

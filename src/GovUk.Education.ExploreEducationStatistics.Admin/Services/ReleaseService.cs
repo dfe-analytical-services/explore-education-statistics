@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseRepository _repository;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _coreTableStorageService;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IReleaseFilesService _releaseFilesService;
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository repository,
             ISubjectService subjectService,
             ITableStorageService coreTableStorageService,
-            IFileStorageService fileStorageService,
+            IReleaseFilesService releaseFilesService,
             IImportStatusService importStatusService,
             IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _repository = repository;
             _subjectService = subjectService;
             _coreTableStorageService = coreTableStorageService;
-            _fileStorageService = fileStorageService;
+            _releaseFilesService = releaseFilesService;
             _importStatusService = importStatusService;
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
@@ -492,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
                     await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
 
-                    await _fileStorageService
+                    await _releaseFilesService
                         .DeleteDataFilesAsync(releaseId, fileName)
                         .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
                     return true;

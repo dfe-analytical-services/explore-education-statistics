@@ -25,7 +25,7 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInf
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class FileStorageService : IFileStorageService
+    public class ReleaseFilesService : IReleaseFilesService
     {
         private readonly string _storageConnectionString;
 
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         private const string NameKey = "name";
 
-        public FileStorageService(IConfiguration config, IUserService userService,
+        public ReleaseFilesService(IConfiguration config, IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper, ContentDbContext context,
             IImportService importService, IFileUploadsValidatorService fileUploadsValidatorService)
         {

@@ -204,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
 
 
-            services.AddTransient<IFileStorageService, FileStorageService>();
+            services.AddTransient<IReleaseFilesService, ReleaseFilesService>();
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<IPublishingService, PublishingService>();
             services.AddTransient<IReleaseStatusService, ReleaseStatusService>(s => 

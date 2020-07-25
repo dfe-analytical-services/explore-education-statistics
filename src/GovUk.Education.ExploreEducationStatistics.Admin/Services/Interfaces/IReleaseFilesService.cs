@@ -9,7 +9,7 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInf
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
 
-    public interface IFileStorageService
+    public interface IReleaseFilesService
     {
         Task<Common.Model.Either<ActionResult, bool>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metaFile, string name, string userName);

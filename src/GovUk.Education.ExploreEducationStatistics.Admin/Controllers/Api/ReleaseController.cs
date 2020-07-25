@@ -25,21 +25,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class ReleasesController : ControllerBase
     {   
         private readonly IReleaseService _releaseService;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IReleaseFilesService _releaseFilesService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataBlockService _dataBlockService;
 
         public ReleasesController(
             IReleaseService releaseService,
-            IFileStorageService fileStorageService,
+            IReleaseFilesService releaseFilesService,
             IReleaseStatusService releaseStatusService,
             UserManager<ApplicationUser> userManager,
             IDataBlockService dataBlockService
             )
         {
             _releaseService = releaseService;
-            _fileStorageService = fileStorageService;
+            _releaseFilesService = releaseFilesService;
             _releaseStatusService = releaseStatusService;
             _userManager = userManager;
             _dataBlockService = dataBlockService;
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("release/{releaseId}/chart/{filename}")]
         public async Task<ActionResult> GetChartFile(Guid releaseId, string filename)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Chart, filename)
                 .HandleFailures();
         }
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("release/{releaseId}/data/{filename}")]
         public async Task<ActionResult> GetDataFile(Guid releaseId, string filename)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Data, filename)
                 .HandleFailures();
         }
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("release/{releaseId}/meta/{filename}")]
         public async Task<ActionResult> GetMetaFile(Guid releaseId, string filename)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Metadata, filename)
                 .HandleFailures();
         }
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
         public async Task<ActionResult> GetAncillaryFile(Guid releaseId, string filename)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename)
                 .HandleFailures();
         }
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(Guid releaseId)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .ListFilesAsync(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
                 .HandleFailuresOrOk();
         }
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(Guid releaseId)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary)
                 .HandleFailuresOrOk();
         }
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<Common.Model.FileInfo>>> GetChartFilesAsync(Guid releaseId)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .ListChartFilesAsync(releaseId)
                 .HandleFailuresOrOk();
         }
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<bool>> AddAncillaryFileAsync(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .UploadFileAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
                 .HandleFailuresOrOk();
         }
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<Common.Model.FileInfo>> AddChartFilesAsync(Guid releaseId, IFormFile file)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .UploadChartFileAsync(releaseId, file)
                 .HandleFailuresOrOk();
         }
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return await _fileStorageService
+            return await _releaseFilesService
                 .UploadDataFilesAsync(releaseId, file, metaFile, name, user.Email)
                 .HandleFailuresOrOk();
         }
@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> DeleteAncillaryFile(
             Guid releaseId, string fileName)
         {
-            return await _fileStorageService
+            return await _releaseFilesService
                 .DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)
                 .HandleFailuresOrNoContent();
         }
