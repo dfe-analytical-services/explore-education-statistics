@@ -62,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var actionResult = await controller.AddAncillaryFileAsync(_releaseId, "File name", ancillaryFile);
-            Assert.IsAssignableFrom<bool>(actionResult);
+            var result = await controller.AddAncillaryFileAsync(_releaseId, "File name", ancillaryFile);
+            Assert.True(result.Value);
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            Assert.IsAssignableFrom<bool>(result);
+            Assert.True(result.Value);
         }
 
         [Fact(Skip="Needs principal setting")]
@@ -244,7 +244,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Method under test
             var result = await controller.GetTemplateReleaseAsync(_releaseId);
             AssertOkResult(result);
-            
         }
 
         private static IFormFile MockFile(string fileName)
