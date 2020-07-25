@@ -56,14 +56,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var ancillaryFile = MockFile("ancillaryFile.doc");
             mocks.FileStorageService
                 .Setup(service =>
-                    service.UploadFilesAsync(_releaseId, ancillaryFile, "File name", 
+                    service.UploadFileAsync(_releaseId, ancillaryFile, "File name", 
                         ReleaseFileTypes.Ancillary, false))
-                .ReturnsAsync(new List<FileInfo>());
+                .ReturnsAsync(true);
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var actionResult = await controller.AddAncillaryFilesAsync(_releaseId, "File name", ancillaryFile);
-            AssertOkResult(actionResult);
+            var actionResult = await controller.AddAncillaryFileAsync(_releaseId, "File name", ancillaryFile);
+            Assert.IsAssignableFrom<bool>(actionResult);
         }
 
         [Fact]
@@ -105,12 +105,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", "test user"))
-                .ReturnsAsync(new List<FileInfo>());
+                .ReturnsAsync(true);
 
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            AssertOkResult(result);
+            Assert.IsAssignableFrom<bool>(result);
         }
 
         [Fact(Skip="Needs principal setting")]
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             // Call the method under test
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            AssertValidationProblem(result, CannotOverwriteFile);
+            AssertValidationProblem(result.Result, CannotOverwriteFile);
         }
 
         [Fact]
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
+                .Setup(service => service.RemoveDataFilesAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(new Either<ActionResult, bool>(true));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
+                .Setup(service => service.RemoveDataFilesAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
             var controller = ReleasesControllerWithMocks(mocks);
 

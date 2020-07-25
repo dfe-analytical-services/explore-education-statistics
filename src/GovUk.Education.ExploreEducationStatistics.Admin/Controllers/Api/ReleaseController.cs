@@ -143,11 +143,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> AddAncillaryFilesAsync(Guid releaseId,
+        public async Task<ActionResult<bool>> AddAncillaryFileAsync(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
             return await _fileStorageService
-                .UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
+                .UploadFileAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
                 .HandleFailuresOrOk();
         }
 
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> AddDataFilesAsync(Guid releaseId,
+        public async Task<ActionResult<bool>> AddDataFilesAsync(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file, IFormFile metaFile)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromQuery(Name = "name"), Required] string subjectTitle)
         {
             return await _releaseService
-                .RemoveDataFileReleaseLinkAsync(releaseId, fileName, subjectTitle)
+                .RemoveDataFilesAsync(releaseId, fileName, subjectTitle)
                 .HandleFailuresOrNoContent();
         }
 

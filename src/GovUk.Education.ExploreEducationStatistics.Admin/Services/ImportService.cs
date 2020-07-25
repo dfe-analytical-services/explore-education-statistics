@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,8 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly ILogger _logger;
-        private readonly CloudTable _table;
         private readonly IGuidGenerator _guidGenerator;
+        private readonly ITableStorageService _tableStorageService;
+        
+        private const string IMPORT_TABLE_NAME = "imports";
 
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
@@ -42,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _logger = logger;
-            _table = tableStorageService.GetTableAsync("imports").Result;
+            _tableStorageService = tableStorageService;
             _guidGenerator = guidGenerator;
         }
 
-        public async void Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile)
+        public async Task Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -71,32 +73,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName)
         {
-            var result = await _table.ExecuteAsync(
-                TableOperation.Retrieve<DatafileImport>(releaseId.ToString(), dataFileName));
+            var result = await _tableStorageService.RetrieveEntity(IMPORT_TABLE_NAME,
+                new DatafileImport(releaseId.ToString(), dataFileName), new List<string>());
             
             if (result.Result != null)
             {
                 return ValidationActionResult(DatafileAlreadyUploaded);
             }
-            
-            await _table.ExecuteAsync(TableOperation.Insert(
-                new DatafileImport(releaseId.ToString(), dataFileName))
-            );
+
+            await _tableStorageService.CreateOrUpdateEntity(IMPORT_TABLE_NAME,
+                new DatafileImport(releaseId.ToString(), dataFileName));
+
             return true;
+        }
+
+        public async Task<Either<ActionResult, bool>> RemoveImportTableRowIfExists(Guid releaseId, string dataFileName)
+        {
+            return await _tableStorageService.DeleteEntityAsync(IMPORT_TABLE_NAME,
+                new DatafileImport(releaseId.ToString(), dataFileName));
         }
         
         public async Task FailImport(Guid releaseId, string dataFileName, string message)
         {
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId.ToString(), dataFileName, 0, message, IStatus.FAILED))
-            );
+            await _tableStorageService.CreateOrUpdateEntity(IMPORT_TABLE_NAME,
+                new DatafileImport(releaseId.ToString(), dataFileName, 0, message, IStatus.FAILED));
         }
 
         private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows, JsonConvert.SerializeObject(message), IStatus.QUEUED))
-            );
+            await _tableStorageService.CreateOrUpdateEntity(IMPORT_TABLE_NAME,
+                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows,
+                    JsonConvert.SerializeObject(message), IStatus.QUEUED));
         }
 
         private ImportMessage BuildMessage(string dataFileName, string metaFileName, Guid releaseId)

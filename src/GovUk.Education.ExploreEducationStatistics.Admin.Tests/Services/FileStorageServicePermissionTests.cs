@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UploadFilesAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                service.UploadFilesAsync(
+                service.UploadFileAsync(
                     _release.Id, 
                     new Mock<IFormFile>().Object, 
                     "", 
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteDataFileAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.RemoveDataFileReleaseLinkAsync(
+                    service.DeleteDataFilesAsync(
                         _release.Id, 
                         ""
                         ), 
