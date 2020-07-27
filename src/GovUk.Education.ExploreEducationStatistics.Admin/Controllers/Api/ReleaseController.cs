@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
-        public async Task<ActionResult> GetChartFile(Guid releaseId, string filename)
+        public async Task<ActionResult<FileStreamResult>> GetChartFile(Guid releaseId, string filename)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Chart, filename)
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/data/{filename}")]
-        public async Task<ActionResult> GetDataFile(Guid releaseId, string filename)
+        public async Task<ActionResult<FileStreamResult>> GetDataFile(Guid releaseId, string filename)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Data, filename)
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/meta/{filename}")]
-        public async Task<ActionResult> GetMetaFile(Guid releaseId, string filename)
+        public async Task<ActionResult<FileStreamResult>> GetMetaFile(Guid releaseId, string filename)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Metadata, filename)
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
-        public async Task<ActionResult> GetAncillaryFile(Guid releaseId, string filename)
+        public async Task<ActionResult<FileStreamResult>> GetAncillaryFile(Guid releaseId, string filename)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename)
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<bool>> AddAncillaryFileAsync(Guid releaseId,
+        public async Task<ActionResult<Common.Model.FileInfo>> AddAncillaryFileAsync(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
             return await _releaseFilesService
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<Common.Model.FileInfo>> AddChartFilesAsync(Guid releaseId, IFormFile file)
+        public async Task<ActionResult<Common.Model.FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file)
         {
             return await _releaseFilesService
                 .UploadChartFileAsync(releaseId, file)
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
-        public async Task<ActionResult> DeleteAncillaryFile(
+        public async Task<ActionResult<bool>> DeleteAncillaryFile(
             Guid releaseId, string fileName)
         {
             return await _releaseFilesService
@@ -276,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/chart/{subjectName}/{fileName}")]
-        public async Task<ActionResult> DeleteChartFile(
+        public async Task<ActionResult<bool>> DeleteChartFile(
             Guid releaseId, string subjectName, string fileName)
         {
             return await _dataBlockService.RemoveChartFile(releaseId, subjectName, fileName)

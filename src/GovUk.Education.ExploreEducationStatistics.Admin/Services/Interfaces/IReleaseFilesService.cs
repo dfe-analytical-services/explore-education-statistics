@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         
         Task<Either<ActionResult, IEnumerable<Common.Model.FileInfo>>> ListPublicFilesPreview(Guid releaseId, IEnumerable<Guid> referencedReleaseVersions);
 
-        Task<Either<ActionResult, bool>> UploadFileAsync(Guid releaseId, IFormFile file,
+        Task<Either<ActionResult, Common.Model.FileInfo>> UploadFileAsync(Guid releaseId, IFormFile file,
             string name, ReleaseFileTypes type, bool overwrite);
 
         Task<Either<ActionResult, Common.Model.FileInfo>> UploadChartFileAsync(Guid releaseId, IFormFile file);

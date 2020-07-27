@@ -51,19 +51,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
         {
-            var mocks = Mocks();
+            var testFile = new Common.Model.FileInfo
+                            {
+                                Extension = "doc",
+                                Name = "File name",
+                                Path = "file1.doc",
+                                Size = "1 Kb"
+                            };
             
+            var mocks = Mocks();
             var ancillaryFile = MockFile("ancillaryFile.doc");
             mocks.FileStorageService
                 .Setup(service =>
                     service.UploadFileAsync(_releaseId, ancillaryFile, "File name", 
                         ReleaseFileTypes.Ancillary, false))
-                .ReturnsAsync(true);
+                .ReturnsAsync(new Either<ActionResult, Common.Model.FileInfo>(testFile));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
             var result = await controller.AddAncillaryFileAsync(_releaseId, "File name", ancillaryFile);
-            Assert.True(result.Value);
+            AssertOkResult(result);
         }
 
         [Fact]

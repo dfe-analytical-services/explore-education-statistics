@@ -46,16 +46,18 @@ const releaseAncillaryFileService = {
   uploadAncillaryFile(
     releaseId: string,
     request: UploadAncillaryFileRequest,
-  ): Promise<void> {
+  ): Promise<AncillaryFile> {
     const data = new FormData();
     data.append('file', request.file);
-    return client.post<void>(
+    return client.post<AncillaryFile>(
       `/release/${releaseId}/ancillary?name=${request.name}`,
       data,
     );
   },
-  deleteAncillaryFile(releaseId: string, fileName: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/ancillary/${fileName}`);
+  deleteAncillaryFile(releaseId: string, fileName: string): Promise<boolean> {
+    return client.delete<boolean>(
+      `/release/${releaseId}/ancillary/${fileName}`,
+    );
   },
   downloadAncillaryFile(releaseId: string, fileName: string): Promise<void> {
     return client

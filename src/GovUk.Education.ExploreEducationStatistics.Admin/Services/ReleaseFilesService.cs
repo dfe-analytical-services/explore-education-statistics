@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, bool>> UploadFileAsync(Guid releaseId,
+        public Task<Either<ActionResult, FileInfo>> UploadFileAsync(Guid releaseId,
             IFormFile file, string name, ReleaseFileTypes type, bool overwrite)
         {
             return _persistenceHelper
@@ -169,7 +169,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .ValidateFileForUpload(releaseId, file, type, overwrite)
                             .OnSuccess(async () => await CreateBasicFileLink(file.FileName.ToLower(), releaseId, type))
                             .OnSuccess(async () => await _context.SaveChangesAsync())
-                            .OnSuccess(async () => await UploadFileToStorageAsync(blobContainer, releaseId, file, type, info));
+                            .OnSuccess(async () => await UploadFileToStorageAsync(blobContainer, releaseId, file, type, info))
+                            .OnSuccess(_ =>
+                            {
+                                var blob = blobContainer.GetBlobReference(AdminReleasePath(releaseId,
+                                    type, file.FileName.ToLower()));
+                                return GetFileInfo(blob);
+                            });
                 });
         }
 

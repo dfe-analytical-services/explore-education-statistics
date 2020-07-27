@@ -67,12 +67,12 @@ const releaseDataFileService = {
   uploadDataFiles(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const data = new FormData();
     data.append('file', request.dataFile);
     data.append('metaFile', request.metadataFile);
 
-    return client.post<void>(
+    return client.post<boolean>(
       `/release/${releaseId}/data?name=${request.subjectTitle}`,
       data,
     );
@@ -85,8 +85,8 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFile.filename}/delete-plan?name=${dataFile.title}`,
     );
   },
-  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
-    return client.delete<void>(
+  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<boolean> {
+    return client.delete<boolean>(
       `/release/${releaseId}/data/${dataFile.filename}?name=${dataFile.title}`,
     );
   },
