@@ -414,23 +414,31 @@ describe('TableToolWizard', () => {
       // Step 1
 
       const step1 = within(screen.getByTestId('wizardStep-1'));
-      expect(step1.getByRole('term')).toHaveTextContent('Publication');
-      expect(step1.getByRole('definition')).toHaveTextContent('Publication 1');
+      expect(
+        step1.getByText('Publication', { selector: 'dt' }),
+      ).toBeInTheDocument();
+      expect(
+        step1.getByText('Publication 1', { selector: 'dd' }),
+      ).toBeInTheDocument();
 
       // Step 2
 
       const step2 = within(screen.getByTestId('wizardStep-2'));
-      expect(step2.getByRole('term')).toHaveTextContent('Subject');
-      expect(step2.getByRole('definition')).toHaveTextContent('Subject 1');
+      expect(
+        step2.getByText('Subject', { selector: 'dt' }),
+      ).toBeInTheDocument();
+      expect(
+        step2.getByText('Subject 1', { selector: 'dd' }),
+      ).toBeInTheDocument();
 
       // Step 3
 
       const step3 = within(screen.getByTestId('wizardStep-3'));
-      expect(step3.getByRole('term')).toHaveTextContent('Local authority');
+      expect(
+        step3.getByText('Local authority', { selector: 'dt' }),
+      ).toBeInTheDocument();
 
-      const step3Locations = within(step3.getByRole('definition')).getAllByRole(
-        'listitem',
-      );
+      const step3Locations = step3.getAllByRole('listitem');
       expect(step3Locations).toHaveLength(2);
       expect(step3Locations[0]).toHaveTextContent('Barnet');
       expect(step3Locations[1]).toHaveTextContent('Barnsley');
@@ -438,16 +446,19 @@ describe('TableToolWizard', () => {
       // Step 4
 
       const step4 = within(screen.getByTestId('wizardStep-4'));
-      const step4Terms = step4.getAllByRole('term');
-      const step4Definitions = step4.getAllByRole('definition');
 
-      expect(step4Terms).toHaveLength(2);
-      expect(step4Terms[0]).toHaveTextContent('Start date');
-      expect(step4Terms[1]).toHaveTextContent('End date');
-
-      expect(step4Definitions).toHaveLength(2);
-      expect(step4Definitions[0]).toHaveTextContent('2013/14');
-      expect(step4Definitions[1]).toHaveTextContent('2014/15');
+      expect(
+        step4.getByText('Start date', { selector: 'dt' }),
+      ).toBeInTheDocument();
+      expect(
+        step4.getByText('End date', { selector: 'dt' }),
+      ).toBeInTheDocument();
+      expect(
+        step4.getByText('2013/14', { selector: 'dd' }),
+      ).toBeInTheDocument();
+      expect(
+        step4.getByText('2014/15', { selector: 'dd' }),
+      ).toBeInTheDocument();
 
       // Step 5
 
