@@ -168,12 +168,11 @@ const ReleaseContentSection = () => {
             <h2 className="govuk-heading-m">About these statistics</h2>
 
             <dl className="dfe-meta-content">
-              <dt className="govuk-caption-m">For {release.coverageTitle}:</dt>
+              <dt className="govuk-caption-m">For {release.coverageTitle}: </dt>
               <dd data-testid="release-name">
                 <strong>{release.yearTitle}</strong>
-              </dd>
-              {releaseCount > 0 && (
-                <dd>
+
+                {releaseCount > 0 && (
                   <Details summary={`See ${releaseCount} other releases`}>
                     <ul className="govuk-list">
                       {[
@@ -198,8 +197,8 @@ const ReleaseContentSection = () => {
                       ]}
                     </ul>
                   </Details>
-                </dd>
-              )}
+                )}
+              </dd>
             </dl>
             <ReleaseNotesSection release={release} />
             <RelatedInformationSection release={release} />
