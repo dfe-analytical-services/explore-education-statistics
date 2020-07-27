@@ -25,6 +25,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseRepository _repository;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _coreTableStorageService;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IReleaseFilesService _releaseFilesService;
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
@@ -61,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository repository,
             ISubjectService subjectService,
             ITableStorageService coreTableStorageService,
-            IFileStorageService fileStorageService,
+            IReleaseFilesService releaseFilesService,
             IImportStatusService importStatusService,
             IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
@@ -77,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _repository = repository;
             _subjectService = subjectService;
             _coreTableStorageService = coreTableStorageService;
-            _fileStorageService = fileStorageService;
+            _releaseFilesService = releaseFilesService;
             _importStatusService = importStatusService;
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
@@ -444,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> RemoveDataFileReleaseLinkAsync(Guid releaseId, string fileName, string subjectTitle)
+        public async Task<Either<ActionResult, bool>> RemoveDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -456,8 +457,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
                     await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
 
-                    await _fileStorageService
-                        .RemoveDataFileReleaseLinkAsync(releaseId, fileName)
+                    await _releaseFilesService
+                        .DeleteDataFilesAsync(releaseId, fileName)
                         .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
                     return true;
                 });
@@ -467,7 +468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (await _subjectService.GetAsync(deletePlan.SubjectId) == null)
             {
-                return await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
+                return await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
             }
 
             return false;
@@ -557,7 +558,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
                 
                 var query = new TableQuery<DatafileImport>().Where(filters);
-                var cloudTable = await _coreTableStorageService.GetTableAsync("imports");
+                var cloudTable = await _coreTableStorageService.GetTableAsync(DatafileImportsTableName);
                 var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
                 
                 if (results.Results.Count != 0)

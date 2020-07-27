@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await table.ExecuteAsync(TableOperation.Retrieve(entity.PartitionKey, entity.RowKey, columns));
         }
 
-        public async Task<TableResult> UpdateEntity(string tableName, ITableEntity entity)
+        public async Task<TableResult> CreateOrUpdateEntity(string tableName, ITableEntity entity)
         {
             var table = _client.GetTableReference(tableName);
             return await table.ExecuteAsync(TableOperation.InsertOrReplace(entity));

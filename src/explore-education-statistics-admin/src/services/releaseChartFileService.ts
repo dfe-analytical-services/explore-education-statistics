@@ -55,8 +55,8 @@ const releaseChartFileService = {
     releaseId: string,
     subjectName: string,
     fileName: string,
-  ): Promise<null> {
-    return client.delete<null>(
+  ): Promise<void> {
+    return client.delete<void>(
       `/release/${releaseId}/chart/${subjectName}/${fileName}`,
     );
   },

@@ -27,21 +27,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IReleaseFilesService _releaseFilesService;
         private readonly ISubjectService _subjectService;
 
         public DataBlockService(
             ContentDbContext context,
             IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IUserService userService,
-            IFileStorageService fileStorageService,
+            IReleaseFilesService releaseFilesService,
             ISubjectService subjectService)
         {
             _context = context;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
-            _fileStorageService = fileStorageService;
+            _releaseFilesService = releaseFilesService;
             _subjectService = subjectService;
         }
 
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await RemoveInfographicChartFromDataBlock(releaseId, subjectName, fileName)
                 .OnSuccessDo(() =>
-                    _fileStorageService.DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
+                    _releaseFilesService.DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
         }
         
         public async Task<DataBlockViewModel> GetAsync(Guid id)
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
                         var release = GetReleaseForDataBlock(existing.Id);
-                        await _fileStorageService.DeleteNonDataFileAsync(
+                        await _releaseFilesService.DeleteNonDataFileAsync(
                             release.Id, 
                             ReleaseFileTypes.Chart,
                             infographicChart.FileId
@@ -239,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var chartFilenames = deletePlan.DependentDataBlocks.SelectMany(block => block.InfographicFilenames);
 
-            await _fileStorageService.DeleteNonDataFilesAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart,
+            await _releaseFilesService.DeleteNonDataFilesAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart,
                 chartFilenames);
         }
 
