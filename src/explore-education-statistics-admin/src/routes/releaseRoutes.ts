@@ -2,6 +2,7 @@ import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage'
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
+import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
 import { RouteProps } from 'react-router';
 
@@ -28,7 +29,7 @@ export const releaseSummaryRoute: ReleaseRouteProps = {
 export const releaseSummaryEditRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/summary/edit',
   title: 'Release summary',
-  component: ReleaseSummaryPage,
+  component: ReleaseSummaryEditPage,
 };
 
 export const releaseDataRoute: ReleaseRouteProps = {
