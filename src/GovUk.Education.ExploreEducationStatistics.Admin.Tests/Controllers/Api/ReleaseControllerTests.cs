@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             {
                                 Extension = "doc",
                                 Name = "File name",
-                                Path = "file1.doc",
+                                Path = "ancillaryFile.doc",
                                 Size = "1 Kb"
                             };
             
