@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
-        public async Task<ActionResult<FileStreamResult>> GetChartFile(Guid releaseId, string filename)
+        public async Task<ActionResult> GetChartFile(Guid releaseId, string filename)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Chart, filename)
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/data/{filename}")]
-        public async Task<ActionResult<FileStreamResult>> GetDataFile(Guid releaseId, string filename)
+        public async Task<ActionResult> GetDataFile(Guid releaseId, string filename)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Data, filename)
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/meta/{filename}")]
-        public async Task<ActionResult<FileStreamResult>> GetMetaFile(Guid releaseId, string filename)
+        public async Task<ActionResult> GetMetaFile(Guid releaseId, string filename)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Metadata, filename)
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
-        public async Task<ActionResult<FileStreamResult>> GetAncillaryFile(Guid releaseId, string filename)
+        public async Task<ActionResult> GetAncillaryFile(Guid releaseId, string filename)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename)
