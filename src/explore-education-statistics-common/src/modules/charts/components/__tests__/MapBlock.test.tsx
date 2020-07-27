@@ -6,6 +6,7 @@ import MapBlock, {
   MapBlockProps,
 } from '@common/modules/charts/components/MapBlock';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import { within } from '@testing-library/dom';
 import { render, wait, fireEvent } from '@testing-library/react';
 import React from 'react';
 
@@ -179,17 +180,26 @@ describe('MapBlock', () => {
       },
     });
 
-    const tiles = getAllByTestId('indicatorTile');
+    const tiles = getAllByTestId('mapBlock-indicator');
 
     expect(tiles).toHaveLength(2);
-    expect(tiles[0].querySelector('dt')).toHaveTextContent(
+
+    const tile1 = within(tiles[0]);
+
+    expect(tile1.getByTestId('mapBlock-indicator-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
-    expect(tiles[0].querySelector('dd')).toHaveTextContent('3%');
+    expect(tile1.getByTestId('mapBlock-indicator-value')).toHaveTextContent(
+      '3%',
+    );
 
-    expect(tiles[1].querySelector('dt')).toHaveTextContent(
+    const tile2 = within(tiles[1]);
+
+    expect(tile2.getByTestId('mapBlock-indicator-title')).toHaveTextContent(
       'Overall absence rate (2016/17)',
     );
-    expect(tiles[1].querySelector('dd')).toHaveTextContent('4.7%');
+    expect(tile2.getByTestId('mapBlock-indicator-value')).toHaveTextContent(
+      '4.7%',
+    );
   });
 });

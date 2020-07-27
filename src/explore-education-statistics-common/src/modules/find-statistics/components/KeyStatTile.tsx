@@ -1,108 +1,31 @@
-import Details from '@common/components/Details';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import useTableQuery, {
-  TableQueryOptions,
-} from '@common/modules/find-statistics/hooks/useTableQuery';
-import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
-import { Summary } from '@common/services/types/blocks';
-import formatPretty from '@common/utils/number/formatPretty';
-import React, { FunctionComponent, ReactNode, useMemo } from 'react';
-import ReactMarkdown from 'react-markdown';
+import React, { ReactNode } from 'react';
 import styles from './KeyStatTile.module.scss';
 
-interface KeyStatTileContainerProps {
-  children: ReactNode;
-  tag?: keyof JSX.IntrinsicElements;
-}
-
-export const KeyStatTileContainer = ({
-  children,
-  tag: ElementTag = 'div',
-}: KeyStatTileContainerProps) => {
-  return <ElementTag className={styles.container}>{children}</ElementTag>;
-};
-
-export const KeyStatTileColumn: FunctionComponent = ({ children }) => {
-  return <div className={styles.column}>{children}</div>;
-};
-
-export interface KeyStatProps {
+interface Props {
   children?: ReactNode;
-  query: ReleaseTableDataQuery;
-  queryOptions?: TableQueryOptions;
-  summary?: Summary;
-  renderDataSummary?: ReactNode;
+  testId?: string;
+  title: string;
+  value: string;
 }
 
 const KeyStatTile = ({
   children,
-  query,
-  queryOptions,
-  summary,
-  renderDataSummary,
-}: KeyStatProps) => {
-  const { value: tableData, isLoading, error } = useTableQuery(
-    {
-      ...query,
-      includeGeoJson: false,
-    },
-    queryOptions,
-  );
-
-  const resultValue = useMemo<string>(() => {
-    if (tableData) {
-      const [indicator] = tableData.subjectMeta.indicators;
-
-      return formatPretty(
-        tableData.results[0].measures[indicator.value],
-        indicator.unit,
-        indicator.decimalPlaces,
-      );
-    }
-
-    return '';
-  }, [tableData]);
-
-  const indicator = tableData?.subjectMeta?.indicators[0];
-
-  if (error) {
-    return null;
-  }
-
+  testId = 'keyStatTile',
+  title,
+  value,
+}: Props) => {
   return (
-    <LoadingSpinner loading={isLoading}>
-      {tableData && resultValue && (
-        <>
-          <div className={styles.keyStat} data-testid="key-stat-tile">
-            <h3 className="govuk-heading-s" data-testid="key-stat-tile-title">
-              {indicator?.label}
-            </h3>
+    <div className={styles.tile} data-testid={testId}>
+      <h3 className="govuk-heading-s" data-testid={`${testId}-title`}>
+        {title}
+      </h3>
 
-            <p className="govuk-heading-xl" data-testid="key-stat-tile-value">
-              {resultValue}
-            </p>
+      <p className="govuk-heading-xl" data-testid={`${testId}-value`}>
+        {value}
+      </p>
 
-            {renderDataSummary ||
-              (summary?.dataSummary && (
-                <p className="govuk-body-s">{summary.dataSummary}</p>
-              ))}
-          </div>
-
-          {summary?.dataDefinition?.[0] && (
-            <Details
-              summary={summary?.dataDefinitionTitle || 'Help'}
-              className={styles.definition}
-            >
-              {summary.dataDefinition.map(data => (
-                <ReactMarkdown key={data}>{data}</ReactMarkdown>
-              ))}
-            </Details>
-          )}
-
-          {children}
-        </>
-      )}
-    </LoadingSpinner>
+      {children}
+    </div>
   );
 };
 
