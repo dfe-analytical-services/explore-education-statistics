@@ -54,10 +54,8 @@ const releaseAncillaryFileService = {
       data,
     );
   },
-  deleteAncillaryFile(releaseId: string, fileName: string): Promise<boolean> {
-    return client.delete<boolean>(
-      `/release/${releaseId}/ancillary/${fileName}`,
-    );
+  deleteAncillaryFile(releaseId: string, fileName: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/ancillary/${fileName}`);
   },
   downloadAncillaryFile(releaseId: string, fileName: string): Promise<void> {
     return client

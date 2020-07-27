@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
-        public async Task<ActionResult<bool>> DeleteAncillaryFile(
+        public async Task<ActionResult> DeleteAncillaryFile(
             Guid releaseId, string fileName)
         {
             return await _releaseFilesService
@@ -276,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/chart/{subjectName}/{fileName}")]
-        public async Task<ActionResult<bool>> DeleteChartFile(
+        public async Task<ActionResult> DeleteChartFile(
             Guid releaseId, string subjectName, string fileName)
         {
             return await _dataBlockService.RemoveChartFile(releaseId, subjectName, fileName)

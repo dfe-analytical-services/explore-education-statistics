@@ -85,8 +85,8 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFile.filename}/delete-plan?name=${dataFile.title}`,
     );
   },
-  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<boolean> {
-    return client.delete<boolean>(
+  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
+    return client.delete<void>(
       `/release/${releaseId}/data/${dataFile.filename}?name=${dataFile.title}`,
     );
   },
