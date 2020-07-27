@@ -75,22 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blobContainer;
         }
 
-        public static CloudBlobContainer GetCloudBlobContainer(string storageConnectionString, string containerName,
-            BlobContainerPermissions permissions = null)
-        {
-            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
-            blobContainer.CreateIfNotExists();
-
-            if (permissions != null)
-            {
-                blobContainer.SetPermissions(permissions);
-            }
-
-            return blobContainer;
-        }
-
         public static FileInfo GetFileInfo(CloudBlob blob)
         {
             blob.FetchAttributes();
@@ -283,6 +267,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return (int) Math.Ceiling(rows / (double) rowsPerBatch);
         }
         
+        private static CloudBlobContainer GetCloudBlobContainer(string storageConnectionString, string containerName,
+            BlobContainerPermissions permissions = null)
+        {
+            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(containerName);
+            blobContainer.CreateIfNotExists();
+
+            if (permissions != null)
+            {
+                blobContainer.SetPermissions(permissions);
+            }
+
+            return blobContainer;
+        }
+
         private static DateTime ParseDateTime(string dateTime)
         {
             return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);

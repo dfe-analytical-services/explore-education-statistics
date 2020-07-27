@@ -363,15 +363,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<ReleaseFile> GetReleaseFileLinkAsync(Guid releaseId, string filename, ReleaseFileTypes type)
         {
-            var releaseFileLinks = _context
+            var releaseFileLinks = await _context
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
                 .Where(f => f.ReleaseId == releaseId &&
-                            f.ReleaseFileReference.ReleaseFileType == type);
+                            f.ReleaseFileReference.ReleaseFileType == type)
+                .ToListAsync();
             
             // Make sure the filename predicate is case sensitive by executing in memory rather than in the db
-            return releaseFileLinks.ToList()
-                .FirstOrDefault(file => file.ReleaseFileReference.Filename == filename);
+            return releaseFileLinks.FirstOrDefault(file => file.ReleaseFileReference.Filename == filename);
         }
 
         private async Task<Either<ActionResult, bool>> DeleteFileReference(Guid releaseId, string filename,
