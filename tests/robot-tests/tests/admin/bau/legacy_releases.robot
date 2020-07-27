@@ -1,0 +1,133 @@
+*** Settings ***
+Resource    ../../libs/admin-common.robot
+
+Force Tags  Admin  Local  Dev  AltersData
+
+Suite Setup       user signs in as bau1
+Suite Teardown    user closes the browser
+
+*** Variables ***
+${TOPIC_NAME}        UI test topic %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}  UI tests - legacy releases %{RUN_IDENTIFIER}
+
+*** Keywords ***
+user creates legacy release
+    [Arguments]  ${description}  ${url}
+    user clicks link  Create legacy release
+    user waits until page contains heading 1  Create legacy release
+    user enters text into element  id:legacyReleaseForm-description  ${description}
+    user enters text into element  id:legacyReleaseForm-url  ${url}
+    user clicks button  Save legacy release
+    user waits until page contains heading 1  Legacy releases
+
+*** Test Cases ***
+Create new publication for topic
+    [Tags]  HappyPath
+    environment variable should be set   RUN_IDENTIFIER
+    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user waits until page contains link     Create new publication
+    user checks page does not contain button   ${PUBLICATION_NAME}
+    user clicks link  Create new publication
+    user creates publication without methodology  ${PUBLICATION_NAME}   Tingting Shu - (Attainment statistics team)
+
+Verify new publication
+    [Tags]  HappyPath
+    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user waits until page contains button  ${PUBLICATION_NAME}
+
+Go to legacy releases page
+    [Tags]  HappyPath
+    user opens accordion section  ${PUBLICATION_NAME}
+    user clicks element  css:[data-testid="Legacy releases link for ${PUBLICATION_NAME}"]
+    user waits until page contains heading 1  Legacy releases
+    user checks element contains  css:[data-testid="page-title-caption"]  ${PUBLICATION_NAME}
+    user checks page does not contain element  css:table
+
+Create legacy release
+    [Tags]  HappyPath
+    user clicks link  Create legacy release
+    user waits until page contains heading 1  Create legacy release
+    user enters text into element  id:legacyReleaseForm-description  Test collection
+    user enters text into element  id:legacyReleaseForm-url  http://test.com
+    user clicks button  Save legacy release
+
+Validate created legacy release
+    [Tags]  HappyPath
+    user waits until page contains heading 1  Legacy releases
+    user checks element count is x  css:tbody tr  1
+    user checks results table cell contains  1  1  1
+    user checks results table cell contains  1  2  Test collection
+    user checks results table cell contains  1  3  http://test.com
+
+Update legacy release
+    [Tags]  HappyPath
+    user clicks element  xpath://tr[1]//*[text()="Edit release"]
+    user waits until page contains heading 1  Edit legacy release
+    user enters text into element  id:legacyReleaseForm-description  Test collection 2
+    user enters text into element  id:legacyReleaseForm-url  http://test-2.com
+    user enters text into element  id:legacyReleaseForm-order  2
+    user clicks button  Save legacy release
+
+Validate updated legacy release
+    [Tags]  HappyPath
+    user waits until page contains heading 1  Legacy releases
+    user checks element count is x  css:tbody tr  1
+    user checks results table cell contains  1  1  2
+    user checks results table cell contains  1  2  Test collection 2
+    user checks results table cell contains  1  3  http://test-2.com
+
+Delete legacy release
+    [Tags]  HappyPath
+    user clicks element  xpath://tr[1]//*[text()="Delete release"]
+    user clicks button  Confirm
+    user waits until page does not contain element  css:table
+
+Create multiple legacy releases
+    [Tags]  HappyPath
+    user creates legacy release  Test collection 1  http://test-1.com
+    user creates legacy release  Test collection 2  http://test-2.com
+    user creates legacy release  Test collection 3  http://test-3.com
+
+Validate legacy release order
+    [Tags]  HappyPath
+    user checks element count is x  css:tbody tr  3
+
+    user checks results table cell contains  1  1  3
+    user checks results table cell contains  1  2  Test collection 3
+    user checks results table cell contains  1  3  http://test-3.com
+
+    user checks results table cell contains  2  1  2
+    user checks results table cell contains  2  2  Test collection 2
+    user checks results table cell contains  2  3  http://test-2.com
+
+    user checks results table cell contains  3  1  1
+    user checks results table cell contains  3  2  Test collection 1
+    user checks results table cell contains  3  3  http://test-1.com
+
+Reorder legacy releases
+    [Tags]  HappyPath
+    user clicks button  Reorder legacy releases
+    user waits until page contains button  Confirm order
+    user sets focus to element  css:tbody tr:first-child
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}
+    user clicks button  Confirm order
+
+Validate reordered legacy releases
+    [Tags]  HappyPath
+    user waits until page contains button   Reorder legacy releases
+    user checks element count is x  css:tbody tr  3
+
+    user checks results table cell contains  1  1  3
+    user checks results table cell contains  1  2  Test collection 2
+    user checks results table cell contains  1  3  http://test-2.com
+
+    user checks results table cell contains  2  1  2
+    user checks results table cell contains  2  2  Test collection 1
+    user checks results table cell contains  2  3  http://test-1.com
+
+    user checks results table cell contains  3  1  1
+    user checks results table cell contains  3  2  Test collection 3
+    user checks results table cell contains  3  3  http://test-3.com
