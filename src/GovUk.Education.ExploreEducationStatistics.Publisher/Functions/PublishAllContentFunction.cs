@@ -18,10 +18,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _contentService = contentService;
         }
 
-        /**
-         * Development / BAU Function to generate and publish the content of all Releases immediately.
-         * Depends on the download files existing.
-         */
+        /// <summary>
+        /// BAU Azure function to generate and publish the content of all Releases immediately.
+        /// </summary>
+        /// <remarks>
+        /// Depends on the download files existing.
+        /// </remarks>
+        /// <param name="message"></param>
+        /// <param name="executionContext"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         [FunctionName("PublishAllContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishAllContent(

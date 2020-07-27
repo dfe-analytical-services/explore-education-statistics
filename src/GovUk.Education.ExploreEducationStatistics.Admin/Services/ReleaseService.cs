@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // Only need to inform Publisher if changing release status to or from Approved
                     if (oldStatus == ReleaseStatus.Approved || request.Status == ReleaseStatus.Approved)
                     {
-                        await _publishingService.QueueValidateReleaseAsync(releaseId, request.PublishMethod == PublishMethod.Immediate);
+                        await _publishingService.NotifyChange(releaseId, request.PublishMethod == PublishMethod.Immediate);
                     }
                     
                     _context.Update(release);
@@ -381,42 +381,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(release => !release.Live)
                         .ToList();
                 });
-        }
-
-        public Task<Either<ActionResult, bool>> PublishReleaseAsync(Guid releaseId)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanPublishRelease)
-                .OnSuccess(async release =>
-                {
-                    if (release.Status != ReleaseStatus.Approved)
-                    {
-                        return ValidationActionResult(ReleaseNotApproved);
-                    }
-
-                    await _publishingService.QueueValidateReleaseAsync(releaseId, true);
-
-                    return new Either<ActionResult, bool>(true);
-                });
-        }
-
-        public Task<Either<ActionResult, bool>> PublishReleaseContentAsync(Guid releaseId)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => _userService.CheckCanPublishRelease(release)
-                    .OnSuccess(async release =>
-                    {
-                        if (release.Status != ReleaseStatus.Approved)
-                        {
-                            return ValidationActionResult(ReleaseNotApproved);
-                        }
-
-                        await _publishingService.QueuePublishReleaseContentImmediateMessageAsync(releaseId);
-
-                        return new Either<ActionResult, bool>(true);
-                    }));
         }
 
         public IEnumerable<Guid> GetReferencedReleaseFileVersions(Guid releaseId, params ReleaseFileTypes[] types)
