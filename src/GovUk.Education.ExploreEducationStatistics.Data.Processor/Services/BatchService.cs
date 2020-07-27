@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -24,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IFileStorageService fileStorageService,
             ILogger<IBatchService> logger)
         {
-            _table = tblStorageService.GetTableAsync("imports").Result;
+            _table = tblStorageService.GetTableAsync(DatafileImportsTableName).Result;
             _fileStorageService = fileStorageService;
             _logger = logger;
         }

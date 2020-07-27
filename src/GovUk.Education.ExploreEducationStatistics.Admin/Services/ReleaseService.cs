@@ -25,6 +25,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -503,7 +504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (await _subjectService.GetAsync(deletePlan.SubjectId) == null)
             {
-                return await _coreTableStorageService.DeleteEntityAsync("imports", deletePlan.TableStorageItem);
+                return await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
             }
 
             return false;
@@ -593,7 +594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
                 
                 var query = new TableQuery<DatafileImport>().Where(filters);
-                var cloudTable = await _coreTableStorageService.GetTableAsync("imports");
+                var cloudTable = await _coreTableStorageService.GetTableAsync(DatafileImportsTableName);
                 var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
                 
                 if (results.Results.Count != 0)

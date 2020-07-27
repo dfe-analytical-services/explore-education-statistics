@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using CloudStorageAccount = Microsoft.Azure.Storage.CloudStorageAccount;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -31,8 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IGuidGenerator _guidGenerator;
         private readonly ITableStorageService _tableStorageService;
         
-        private const string IMPORT_TABLE_NAME = "imports";
-
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
             ILogger<ImportService> logger,
@@ -73,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName)
         {
-            var result = await _tableStorageService.RetrieveEntity(IMPORT_TABLE_NAME,
+            var result = await _tableStorageService.RetrieveEntity(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName), new List<string>());
             
             if (result.Result != null)
@@ -81,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(DatafileAlreadyUploaded);
             }
 
-            await _tableStorageService.CreateOrUpdateEntity(IMPORT_TABLE_NAME,
+            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName));
 
             return true;
@@ -89,19 +88,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, bool>> RemoveImportTableRowIfExists(Guid releaseId, string dataFileName)
         {
-            return await _tableStorageService.DeleteEntityAsync(IMPORT_TABLE_NAME,
+            return await _tableStorageService.DeleteEntityAsync(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName));
         }
         
         public async Task FailImport(Guid releaseId, string dataFileName, string message)
         {
-            await _tableStorageService.CreateOrUpdateEntity(IMPORT_TABLE_NAME,
+            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName, 0, message, IStatus.FAILED));
         }
 
         private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
-            await _tableStorageService.CreateOrUpdateEntity(IMPORT_TABLE_NAME,
+            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows,
                     JsonConvert.SerializeObject(message), IStatus.QUEUED));
         }
