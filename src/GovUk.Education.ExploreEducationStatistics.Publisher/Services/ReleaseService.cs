@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        public async Task DeletePreviousVersionsStatisticalData(IEnumerable<Guid> releaseIds)
+        public async Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds)
         {
             var releases = await GetAmendedReleases(releaseIds);
             var previousVersions = releases.Select(r => r.PreviousVersionId).ToList();

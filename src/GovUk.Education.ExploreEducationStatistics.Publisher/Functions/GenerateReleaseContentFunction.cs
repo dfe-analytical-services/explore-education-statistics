@@ -25,10 +25,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
         }
 
-        /**
-         * Azure function which generates the content for a Release into a staging directory.
-         * Depends on the download files existing.
-         */
+        /// <summary>
+        /// Azure function which generates the content for a Release into a staging directory.
+        /// </summary>
+        /// <remarks>
+        /// Depends on the download files existing.
+        /// </remarks>
+        /// <param name="message"></param>
+        /// <param name="executionContext"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         [FunctionName("GenerateReleaseContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task GenerateReleaseContent(
@@ -41,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             try
             {
                 var context = new PublishContext(GetNextScheduledPublishingTime(), true);
-                await _contentService.UpdateContentAsync(message.Releases.Select(tuple => tuple.ReleaseId), context);
+                await _contentService.UpdateContent(context, message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
                 await UpdateStage(message, Complete);
             }
             catch (Exception e)

@@ -136,24 +136,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void PublishReleaseAsync()
-        {
-            AssertSecurityPoliciesChecked(service =>
-                    service.PublishReleaseAsync(_release.Id),
-                _release,
-                CanPublishSpecificRelease);
-        }
-
-        [Fact]
-        public void PublishReleaseContentAsync()
-        {
-            AssertSecurityPoliciesChecked(service =>
-                    service.PublishReleaseContentAsync(_release.Id),
-                _release,
-                CanPublishSpecificRelease);
-        }
-
-        [Fact]
         public void DeleteReleaseAsync()
         {
             AssertSecurityPoliciesChecked(service => 

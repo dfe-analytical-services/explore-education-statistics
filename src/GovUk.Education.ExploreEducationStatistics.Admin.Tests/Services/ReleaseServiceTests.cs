@@ -640,66 +640,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        [Fact]
-        public void PublishReleaseAsync()
-        {
-            var mocks = Mocks();
-
-            var release = new Release
-            {
-                Id = new Guid("33c2b77a-6a70-485d-ada3-fc99edac95dd"),
-                Status = ReleaseStatus.Approved,
-                Version = 0,
-                PreviousVersionId = new Guid("33c2b77a-6a70-485d-ada3-fc99edac95dd")
-            };
-
-            using (var context = InMemoryApplicationDbContext("PublishReleaseAsync"))
-            {
-                context.Add(release);
-                context.SaveChanges();
-            }
-
-            using (var context = InMemoryApplicationDbContext("PublishReleaseAsync"))
-            {
-                var releaseService = BuildReleaseService(context, mocks);
-                var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
-
-                mocks.PublishingService.Verify(mock => mock.QueueValidateReleaseAsync(release.Id, true), Times.Once());
-
-                Assert.True(result);
-            }
-        }
-
-        [Fact]
-        public void PublishReleaseContentAsync()
-        {
-            var mocks = Mocks();
-
-            var release = new Release
-            {
-                Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
-                Status = ReleaseStatus.Approved,
-                Version = 0,
-                PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
-            };
-
-            using (var context = InMemoryApplicationDbContext("PublishReleaseContentAsync"))
-            {
-                context.Add(release);
-                context.SaveChanges();
-            }
-
-            using (var context = InMemoryApplicationDbContext("PublishReleaseContentAsync"))
-            {
-                var releaseService = BuildReleaseService(context, mocks);
-                var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
-
-                mocks.PublishingService.Verify(mock => mock.QueueValidateReleaseAsync(release.Id, true), Times.Once());
-
-                Assert.True(result);
-            }
-        }
-
         private static ReleaseService BuildReleaseService(ContentDbContext context,
             (Mock<IUserService> userService,
                 Mock<IPublishingService> publishingService,

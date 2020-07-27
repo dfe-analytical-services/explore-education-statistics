@@ -15,6 +15,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Exceptions;
+using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
@@ -47,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         [FunctionName("PublicationNotifier")]
         // ReSharper disable once UnusedMember.Global
         public void PublicationNotifierFunc(
-            [QueueTrigger("publication-queue")] PublicationNotificationMessage publicationNotification,
+            [QueueTrigger(PublicationQueue)] PublicationNotificationMessage publicationNotification,
             ILogger logger,
             ExecutionContext context)
         {

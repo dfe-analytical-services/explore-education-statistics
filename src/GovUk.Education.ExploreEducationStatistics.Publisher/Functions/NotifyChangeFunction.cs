@@ -12,13 +12,13 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseS
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class ValidateReleaseFunction
+    public class NotifyChangeFunction
     {
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IValidationService _validationService;
 
-        public ValidateReleaseFunction(IQueueService queueService,
+        public NotifyChangeFunction(IQueueService queueService,
             IReleaseStatusService releaseStatusService,
             IValidationService validationService)
         {
@@ -26,15 +26,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
             _validationService = validationService;
         }
-
-        /**
-         * Azure function which validates that a Release is in a state to be published.
-         * Creates a ReleaseStatus entry scheduling its publication or triggers publishing files if immediate.
-         */
-        [FunctionName("ValidateRelease")]
+        
+        /// <summary>
+        /// Azure function which validates that a Release is in a state to be published.
+        /// Creates a ReleaseStatus entry scheduling its publication or triggers publishing files if immediate.
+        /// </summary>
+        /// <remarks>
+        /// Validation will fail if the Release is already in the process of being published.
+        /// A future schedule for publishing a Release that's not yet started will be cancelled.
+        /// </remarks>
+        /// <param name="message"></param>
+        /// <param name="executionContext"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        [FunctionName("NotifyChange")]
         // ReSharper disable once UnusedMember.Global
-        public async Task ValidateRelease(
-            [QueueTrigger(ValidateReleaseQueue)] ValidateReleaseMessage message,
+        public async Task NotifyChange(
+            [QueueTrigger(NotifyChangeQueue)] NotifyChangeMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -55,19 +63,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task ValidateReleaseAsync(ValidateReleaseMessage message, Func<Task> andThen)
+        private async Task ValidateReleaseAsync(NotifyChangeMessage message, Func<Task> andThen)
         {
-            var (valid, logMessages) = await _validationService.ValidateAsync(message);
+            var (valid, logMessages) = 
+                await _validationService.ValidateAsync(message.ReleaseId);
             await (valid ? andThen.Invoke() : CreateReleaseStatusAsync(message, InvalidState, logMessages));
         }
 
-        private async Task<ReleaseStatus> CreateReleaseStatusAsync(ValidateReleaseMessage message,
+        private async Task<ReleaseStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
             ReleaseStatusState state, IEnumerable<ReleaseStatusLogMessage> logMessages = null)
         {
             return await _releaseStatusService.CreateAsync(message.ReleaseId, state, message.Immediate, logMessages);
         }
 
-        private async Task MarkScheduledReleaseStatusAsSuperseded(ValidateReleaseMessage message)
+        private async Task MarkScheduledReleaseStatusAsSuperseded(NotifyChangeMessage message)
         {
             // There may be an existing scheduled ReleaseStatus entry if this release has been validated before
             // If so, mark it as superseded

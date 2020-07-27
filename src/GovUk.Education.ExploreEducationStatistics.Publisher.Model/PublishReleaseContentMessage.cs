@@ -2,21 +2,12 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class PublishReleaseContentImmediateMessage
+    public class PublishReleaseContentMessage
     {
         public Guid ReleaseId { get; set; }
-        public Guid? ReleaseStatusId { get; set; }
+        public Guid ReleaseStatusId { get; set; }
 
-        public PublishReleaseContentImmediateMessage()
-        {
-        }
-
-        public PublishReleaseContentImmediateMessage(Guid releaseId)
-        {
-            ReleaseId = releaseId;
-        }
-
-        public PublishReleaseContentImmediateMessage(Guid releaseId, Guid? releaseStatusId)
+        public PublishReleaseContentMessage(Guid releaseId, Guid releaseStatusId)
         {
             ReleaseId = releaseId;
             ReleaseStatusId = releaseStatusId;

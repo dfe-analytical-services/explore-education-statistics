@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 
@@ -7,10 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IContentService
     {
-        Task DeletePreviousVersionsContent(IEnumerable<Guid> releaseIds);
+        Task DeletePreviousVersionsContent(params Guid[] releaseIds);
 
         Task UpdateAllContentAsync();
 
-        Task UpdateContentAsync(IEnumerable<Guid> releaseIds, PublishContext context);
+        Task UpdateContent(PublishContext context, params Guid[] releaseIds);
     }
 }

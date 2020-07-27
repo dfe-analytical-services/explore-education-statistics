@@ -11,15 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class PublishingService : IPublishingService
     {
-        private readonly IFastTrackService _fastTrackService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IReleaseService _releaseService;
 
-        public PublishingService(IFastTrackService fastTrackService,
-            IFileStorageService fileStorageService,
+        public PublishingService(IFileStorageService fileStorageService,
             IReleaseService releaseService)
         {
-            _fastTrackService = fastTrackService;
             _fileStorageService = fileStorageService;
             _releaseService = releaseService;
         }

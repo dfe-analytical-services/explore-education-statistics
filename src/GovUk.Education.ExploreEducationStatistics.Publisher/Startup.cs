@@ -14,6 +14,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
@@ -45,8 +46,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         provider.GetService<IFileStorageService>(),
                         new TableStorageService(GetConfigurationValue(provider, "PublicStorage"))))
                 .AddScoped<IMethodologyService, MethodologyService>()
-                .AddScoped<INotificationsService, NotificationsService>()
-                .AddScoped<IQueueService, QueueService>()
+                .AddScoped<INotificationsService, NotificationsService>(provider =>
+                    new NotificationsService(provider.GetService<ContentDbContext>(),
+                        new StorageQueueService(GetConfigurationValue(provider, "NotificationStorage"))))
+                .AddScoped<IQueueService, QueueService>(provider => new QueueService(
+                    new StorageQueueService(GetConfigurationValue(provider, "PublisherStorage")),
+                    provider.GetService<IReleaseStatusService>(),
+                    provider.GetRequiredService<ILogger<QueueService>>()))
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectService, ReleaseSubjectService>()

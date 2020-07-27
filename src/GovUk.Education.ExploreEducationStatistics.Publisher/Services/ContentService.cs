@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
 
-        public async Task DeletePreviousVersionsContent(IEnumerable<Guid> releaseIds)
+        public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
         {
             var releases = await _releaseService.GetAmendedReleases(releaseIds);
 
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdateContentAsync(IEnumerable<Guid> releaseIds, PublishContext context)
+        public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
         {
             await UpdateTrees(releaseIds, context);
 
