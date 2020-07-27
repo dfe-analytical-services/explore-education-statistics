@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UploadFilesAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                service.UploadFilesAsync(
+                service.UploadFileAsync(
                     _release.Id, 
                     new Mock<IFormFile>().Object, 
                     "", 
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteDataFileAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.RemoveDataFileReleaseLinkAsync(
+                    service.DeleteDataFilesAsync(
                         _release.Id, 
                         ""
                         ), 
@@ -111,11 +111,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         private void AssertSecurityPoliciesChecked<T>(
-            Func<FileStorageService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
+            Func<ReleaseFilesService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
             var (configuration, userService, releaseHelper, contentDbContext, importService, fileUploadsValidatorService) = Mocks();
 
-            var service = new FileStorageService(configuration.Object,
+            var service = new ReleaseFilesService(configuration.Object,
                 userService.Object, releaseHelper.Object, contentDbContext.Object,
                 importService.Object, fileUploadsValidatorService.Object);
 

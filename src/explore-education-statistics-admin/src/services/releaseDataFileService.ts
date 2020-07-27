@@ -67,21 +67,15 @@ const releaseDataFileService = {
   uploadDataFiles(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<DataFile> {
+  ): Promise<boolean> {
     const data = new FormData();
     data.append('file', request.dataFile);
     data.append('metaFile', request.metadataFile);
 
-    return client
-      .post<DataFileInfo[]>(
-        `/release/${releaseId}/data?name=${request.subjectTitle}`,
-        data,
-      )
-      .then(response => {
-        return response
-          .filter(file => file.metaFileName.length > 0)
-          .map(mapFile)[0];
-      });
+    return client.post<boolean>(
+      `/release/${releaseId}/data?name=${request.subjectTitle}`,
+      data,
+    );
   },
   getDeleteDataFilePlan(
     releaseId: string,
@@ -91,8 +85,8 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFile.filename}/delete-plan?name=${dataFile.title}`,
     );
   },
-  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<null> {
-    return client.delete<null>(
+  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
+    return client.delete<void>(
       `/release/${releaseId}/data/${dataFile.filename}?name=${dataFile.title}`,
     );
   },

@@ -17,19 +17,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IReleaseFilesService _releaseFilesService;
 
         public AmendmentMigrationService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
-            IFileStorageService fileStorageService)
+            IReleaseFilesService releaseFilesService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
-            _fileStorageService = fileStorageService;
+            _releaseFilesService = releaseFilesService;
         }
 
         public async Task<Either<ActionResult, bool>> FixMissingSubjectId()
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Release>> UpdateSubjectId(Release release)
         {
-            var result = _fileStorageService.ListFilesAsync(release.Id, ReleaseFileTypes.Data).Result;
+            var result = _releaseFilesService.ListFilesAsync(release.Id, ReleaseFileTypes.Data).Result;
             var files = result.Right;
 
             foreach (var file in files)

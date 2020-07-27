@@ -51,19 +51,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
         {
-            var mocks = Mocks();
+            var testFile = new Common.Model.FileInfo
+                            {
+                                Extension = "doc",
+                                Name = "File name",
+                                Path = "ancillaryFile.doc",
+                                Size = "1 Kb"
+                            };
             
+            var mocks = Mocks();
             var ancillaryFile = MockFile("ancillaryFile.doc");
             mocks.FileStorageService
                 .Setup(service =>
-                    service.UploadFilesAsync(_releaseId, ancillaryFile, "File name", 
+                    service.UploadFileAsync(_releaseId, ancillaryFile, "File name", 
                         ReleaseFileTypes.Ancillary, false))
-                .ReturnsAsync(new List<FileInfo>());
+                .ReturnsAsync(new Either<ActionResult, Common.Model.FileInfo>(testFile));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var actionResult = await controller.AddAncillaryFilesAsync(_releaseId, "File name", ancillaryFile);
-            AssertOkResult(actionResult);
+            var result = await controller.AddAncillaryFileAsync(_releaseId, "File name", ancillaryFile);
+            AssertOkResult(result);
         }
 
         [Fact]
@@ -105,12 +112,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", "test user"))
-                .ReturnsAsync(new List<FileInfo>());
+                .ReturnsAsync(true);
 
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            AssertOkResult(result);
+            Assert.True(result.Value);
         }
 
         [Fact(Skip="Needs principal setting")]
@@ -129,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             // Call the method under test
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            AssertValidationProblem(result, CannotOverwriteFile);
+            AssertValidationProblem(result.Result, CannotOverwriteFile);
         }
 
         [Fact]
@@ -172,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
+                .Setup(service => service.RemoveDataFilesAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(new Either<ActionResult, bool>(true));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -187,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             
             mocks.ReleaseService
-                .Setup(service => service.RemoveDataFileReleaseLinkAsync(_releaseId, "datafilename", "subject title"))
+                .Setup(service => service.RemoveDataFilesAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -244,7 +251,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             // Method under test
             var result = await controller.GetTemplateReleaseAsync(_releaseId);
             AssertOkResult(result);
-            
         }
 
         private static IFormFile MockFile(string fileName)
@@ -270,13 +276,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static (
             Mock<IReleaseService> ReleaseService,
-            Mock<IFileStorageService> FileStorageService,
+            Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService) Mocks()
         {
             return (new Mock<IReleaseService>(),
-                    new Mock<IFileStorageService>(),
+                    new Mock<IReleaseFilesService>(),
                     new Mock<IReleaseStatusService>(),
                     MockUserManager(Users),
                     new Mock<IDataBlockService>()
@@ -285,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static ReleasesController ReleasesControllerWithMocks((
             Mock<IReleaseService> ReleaseService,
-            Mock<IFileStorageService> FileStorageService,
+            Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService
