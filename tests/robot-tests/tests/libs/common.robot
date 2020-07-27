@@ -380,5 +380,5 @@ user checks publication bullet does not contain link
 
 user waits until page contains key stat tile
   [Arguments]  ${title}   ${value}   ${wait}=${timeout}
-  user waits until page contains element   xpath://*[@data-testid="key-stat-tile-title" and text()="${title}"]/../*[@data-testid="key-stat-tile-value" and text()="${value}"]    ${wait}
+  user waits until page contains element   xpath://*[@data-testid="keyStatTile-title" and text()="${title}"]/../*[@data-testid="keyStatTile-value" and text()="${value}"]    ${wait}
 

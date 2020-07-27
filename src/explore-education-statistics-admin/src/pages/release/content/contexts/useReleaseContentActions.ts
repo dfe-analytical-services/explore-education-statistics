@@ -1,4 +1,4 @@
-import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
+import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStat';
 import { useReleaseContentDispatch } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import releaseContentService, {
