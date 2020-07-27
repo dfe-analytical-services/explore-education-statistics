@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
