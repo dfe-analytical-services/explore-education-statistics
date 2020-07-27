@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -48,47 +48,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
             await MarkScheduledReleaseStatusAsSuperseded(message);
-            if (await ValidatePublishingState(message, logger))
+            if (await _validationService.ValidatePublishingState(message.ReleaseId))
             {
-                await ValidateRelease(message, async () =>
-                {
-                    if (message.Immediate)
+                await _validationService.ValidateRelease(message.ReleaseId)
+                    .OnSuccessDo(async () =>
                     {
-                        var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
-                        await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
-                            releaseStatus.Id);
-                    }
-                    else
+                        if (message.Immediate)
+                        {
+                            var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
+                            await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
+                                releaseStatus.Id);
+                        }
+                        else
+                        {
+                            await CreateReleaseStatusAsync(message, ScheduledState);
+                        }
+                    })
+                    .OnFailureDo(async logMessages =>
                     {
-                        await CreateReleaseStatusAsync(message, ScheduledState);
-                    }
-                });
+                        await CreateReleaseStatusAsync(message, InvalidState, logMessages);
+                    });
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
-        }
-
-        private async Task<bool> ValidatePublishingState(NotifyChangeMessage message, ILogger logger)
-        {
-            var (valid, logMessages) = 
-                await _validationService.ValidatePublishingState(message.ReleaseId);
-
-            if (!valid)
-            {
-                foreach (var releaseStatusLogMessage in logMessages)
-                {
-                    logger.LogWarning(releaseStatusLogMessage.Message);
-                }
-            }
-            
-            return valid;
-        }
-        
-        private async Task ValidateRelease(NotifyChangeMessage message, Func<Task> andThen)
-        {
-            var (valid, logMessages) = 
-                await _validationService.ValidateRelease(message.ReleaseId);
-            await (valid ? andThen.Invoke() : CreateReleaseStatusAsync(message, InvalidState, logMessages));
         }
 
         private async Task<ReleaseStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
