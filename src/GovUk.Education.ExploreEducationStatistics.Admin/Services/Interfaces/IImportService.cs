@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IImportService
     {
-        void Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile);
+        Task Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile);
 
         Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName);
     }

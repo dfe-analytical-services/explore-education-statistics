@@ -46,9 +46,9 @@ public class Either<Tl, Tr> {
 
     public static class EitherTaskExtensions
     {
-        public static async Task<Either<Tl, Tr>> OnSuccessDo<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action successTask)
+        public static async Task<Either<Tl, Tr>> OnSuccessDo<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Task> successTask)
         {
-            return await task.OnSuccessDo(async _ => await Task.Run(successTask));
+            return await task.OnSuccessDo(async _ => await successTask());
         }
 
         public static async Task<Either<Tl, Tr>> OnSuccessDo<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tr, Task> successTask)
@@ -66,7 +66,7 @@ public class Either<Tl, Tr> {
 
         public static async Task<Either<Tl, Tr>> OnSuccessDo<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<Either<Tl, T>>> successTask)
         {
-            return await task.OnSuccessDo(_ => successTask());
+            return await task.OnSuccessDo(async _ => await successTask());
         }
 
         public static async Task<Either<Tl, Tr>> OnSuccessDo<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<Either<Tl, T>>> successTask)
