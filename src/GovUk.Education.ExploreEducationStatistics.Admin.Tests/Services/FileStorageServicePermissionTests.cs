@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -113,11 +114,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private void AssertSecurityPoliciesChecked<T>(
             Func<ReleaseFilesService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (configuration, userService, releaseHelper, contentDbContext, importService, fileUploadsValidatorService) = Mocks();
+            var (configuration, userService, releaseHelper,
+                contentDbContext, importService,
+                fileUploadsValidatorService, subjectService) = Mocks();
 
             var service = new ReleaseFilesService(configuration.Object,
                 userService.Object, releaseHelper.Object, contentDbContext.Object,
-                importService.Object, fileUploadsValidatorService.Object);
+                importService.Object, fileUploadsValidatorService.Object, subjectService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
@@ -128,7 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<ContentDbContext>,
             Mock<IImportService>,
-            Mock<IFileUploadsValidatorService>
+            Mock<IFileUploadsValidatorService>,
+            Mock<ISubjectService>
             ) Mocks()
         {
             var mockConf= new Mock<IConfiguration>();
@@ -140,7 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
                 new Mock<ContentDbContext>(),
                 new Mock<IImportService>(),
-                new Mock<IFileUploadsValidatorService>());
+                new Mock<IFileUploadsValidatorService>(),
+                new Mock<ISubjectService>());
         }
     }
 }

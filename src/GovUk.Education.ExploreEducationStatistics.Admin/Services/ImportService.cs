@@ -86,16 +86,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        public async Task<Either<ActionResult, bool>> RemoveImportTableRowIfExists(Guid releaseId, string dataFileName)
+        public async Task RemoveImportTableRowIfExists(Guid releaseId, string dataFileName)
         {
-            return await _tableStorageService.DeleteEntityAsync(DatafileImportsTableName,
+            await _tableStorageService.DeleteEntityAsync(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName));
         }
         
-        public async Task FailImport(Guid releaseId, string dataFileName, string message)
+        public async Task FailImport(Guid releaseId, string dataFileName, IEnumerable<ValidationError> errors)
         {
             await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
-                new DatafileImport(releaseId.ToString(), dataFileName, 0, message, IStatus.FAILED));
+                new DatafileImport(releaseId.ToString(), dataFileName, 0, "", IStatus.FAILED, JsonConvert.SerializeObject(errors)));
         }
 
         private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
@@ -126,6 +126,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 NumBatches = 1,
                 BatchNo = 1
             };
+        }
+    }
+    
+    public class ValidationError
+    {
+        public string Message { get; set; }
+
+        public ValidationError(string message)
+        {
+            Message = message;
         }
     }
 }

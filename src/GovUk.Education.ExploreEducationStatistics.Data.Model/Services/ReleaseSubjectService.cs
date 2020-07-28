@@ -32,44 +32,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public async Task SoftDeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId)
         {
-            await RemoveReleaseSubjectLink(releaseId, subjectId);
+            await RemoveReleaseSubjectLinkIfExists(releaseId, subjectId);
             await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
-            await SoftDeleteSubjectIfOrphaned(subjectId);
+            await SoftDeleteSubjectIfOrphanedAndExists(subjectId);
 
             await _statisticsDbContext.SaveChangesAsync();
         }
 
-        private async Task RemoveReleaseSubjectLink(Guid releaseId, Guid subjectId)
+        private async Task RemoveReleaseSubjectLinkIfExists(Guid releaseId, Guid subjectId)
         {
             var releaseSubject = await _statisticsDbContext
                 .ReleaseSubject
                 .FirstOrDefaultAsync(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId);
 
-            if (releaseSubject == null)
+            if (releaseSubject != null)
             {
-                throw new ArgumentException(
-                    $"ReleaseSubject not found while trying to remove it. Release: {releaseId}, Subject: {subjectId}");
+                _statisticsDbContext.ReleaseSubject.Remove(releaseSubject);
             }
-
-            _statisticsDbContext.ReleaseSubject.Remove(releaseSubject);
         }
 
-        private async Task SoftDeleteSubjectIfOrphaned(Guid id)
+        private async Task SoftDeleteSubjectIfOrphanedAndExists(Guid id)
         {
             var subject = await _statisticsDbContext.Subject
                 .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (subject == null)
+            if (subject != null)
             {
-                throw new ArgumentException($"Subject: {id} not found while trying to soft delete it", nameof(id));
+                await SoftDeleteSubjectIfOrphaned(subject);
             }
-
-            await SoftDeleteSubjectIfOrphaned(subject);
         }
 
         private async Task SoftDeleteSubjectIfOrphaned(Subject subject)
         {
-            if (await CountReleasesWithSubject(subject.Id) > 0)
+            if (await CountReleasesWithSubject(subject.Id) > 1)
             {
                 return;
             }
