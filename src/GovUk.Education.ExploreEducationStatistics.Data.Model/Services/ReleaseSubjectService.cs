@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private async Task SoftDeleteSubjectIfOrphaned(Subject subject)
         {
-            if (await CountReleasesWithSubject(subject.Id) > 0)
+            if (await CountReleasesWithSubject(subject.Id) > 1)
             {
                 return;
             }
