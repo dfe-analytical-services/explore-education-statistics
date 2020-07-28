@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.Blob;
@@ -34,12 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IImportService _importService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
+        private readonly ISubjectService _subjectService;
         
         private const string NameKey = "name";
 
         public ReleaseFilesService(IConfiguration config, IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper, ContentDbContext context,
-            IImportService importService, IFileUploadsValidatorService fileUploadsValidatorService)
+            IImportService importService, IFileUploadsValidatorService fileUploadsValidatorService,
+            ISubjectService subjectService)
         {
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _userService = userService;
@@ -47,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
             _importService = importService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
+            _subjectService = subjectService;
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId,
@@ -271,7 +275,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 return new Models.FileInfo
                                 {
                                     Extension = Path.GetExtension(fileReference.Filename),
-                                    Name = "Unknown",
+                                    Name = fileReference.ReleaseFileType == ReleaseFileTypes.Data || fileReference.ReleaseFileType == ReleaseFileTypes.Metadata ? 
+                                        await GetSubjectName(releaseId, fileReference.Filename, fileReference.ReleaseFileType) : "Unkown",
                                     Path = fileReference.Filename,
                                     Size = "0.00 B",
                                     MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data ? 
@@ -463,6 +468,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                               && rfr.ReleaseFileType == associatedType
                               && rfr.SubjectId == releaseDataFileLink.ReleaseFileReference.SubjectId);
             return associatedFileRef.Filename;
+        }
+        
+        private async Task<string> GetSubjectName(Guid releaseId, string filename, ReleaseFileTypes type)
+        {
+            // TODO Need to get back to the originating subject to get the name which is used in the delete plan
+            // Seems convoluted so flagging as future work
+            var releaseDataFileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
+
+            var associatedFileRef = await _context.ReleaseFileReferences
+                .FirstAsync(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
+                                   && rfr.ReleaseFileType == type
+                                   && rfr.Filename == filename);
+            
+            if (associatedFileRef?.SubjectId != null)
+            {
+                var subject = await _subjectService.GetAsync(associatedFileRef.SubjectId.Value);
+                return subject.Name;
+            }
+
+            return "Unknown";
         }
     }
 }
