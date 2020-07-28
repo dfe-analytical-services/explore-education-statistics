@@ -1,6 +1,6 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import PublicationAssignMethodologyPage from '@admin/pages/theme/topic/publication/PublicationAssignMethodologyPage';
-import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
+import PublicationCreatePage from '@admin/pages/theme/topic/PublicationCreatePage';
 
 export type ThemeTopicParams = {
   themeId: string;
@@ -13,7 +13,7 @@ export type ThemeTopicPublicationParams = ThemeTopicParams & {
 
 export const publicationCreateRoute: ProtectedRouteProps = {
   path: '/theme/:themeId/topic/:topicId/create-publication',
-  component: CreatePublicationPage,
+  component: PublicationCreatePage,
   protectionAction: user => user.permissions.canAccessUserAdministrationPages,
   exact: true,
 };

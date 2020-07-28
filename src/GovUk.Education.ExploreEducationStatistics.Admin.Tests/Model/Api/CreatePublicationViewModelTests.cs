@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model.Api

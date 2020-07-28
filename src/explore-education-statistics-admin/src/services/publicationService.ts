@@ -1,4 +1,4 @@
-import { ContactDetails } from '@admin/services/contactService';
+import { ContactDetails, SaveContact } from '@admin/services/contactService';
 import { ExternalMethodology } from '@admin/services/dashboardService';
 import {
   LegacyRelease,
@@ -25,11 +25,12 @@ export interface PublicationMethodologyDetails {
   externalMethodology?: ExternalMethodology;
 }
 
-export interface CreatePublicationRequest
-  extends PublicationMethodologyDetails {
+export interface CreatePublicationRequest {
+  title: string;
+  contact: SaveContact;
+  selectedMethodologyId?: string;
+  externalMethodology?: ExternalMethodology;
   topicId: string;
-  publicationTitle: string;
-  selectedContactId: string;
 }
 
 export type UpdatePublicationLegacyRelease = Partial<
@@ -37,19 +38,10 @@ export type UpdatePublicationLegacyRelease = Partial<
 >;
 
 const publicationService = {
-  createPublication({
-    topicId,
-    publicationTitle: title,
-    selectedContactId: contactId,
-    selectedMethodologyId: methodologyId,
-    externalMethodology,
-  }: CreatePublicationRequest) {
-    return client.post(`/topic/${topicId}/publications`, {
-      title,
-      contactId,
-      methodologyId,
-      externalMethodology,
-    });
+  createPublication(
+    publication: CreatePublicationRequest,
+  ): Promise<BasicPublicationDetails> {
+    return client.post('/publications', publication);
   },
 
   getPublication(publicationId: string): Promise<BasicPublicationDetails> {

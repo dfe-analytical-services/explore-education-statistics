@@ -67,9 +67,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult<PublicationViewModel>(SlugNotUnique);
                     }
 
+                    var contact = await _context.Contacts.AddAsync(new Contact
+                    {   
+                        ContactName = publication.Contact.ContactName,
+                        ContactTelNo = publication.Contact.ContactTelNo,
+                        TeamName = publication.Contact.TeamName,
+                        TeamEmail = publication.Contact.TeamEmail,
+                    });
+
                     var saved = await _context.Publications.AddAsync(new Publication
                     {
-                        ContactId = publication.ContactId,
+                        Contact = contact.Entity,
                         Title = publication.Title,
                         TopicId = publication.TopicId,
                         MethodologyId = publication.MethodologyId,

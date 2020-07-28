@@ -43,6 +43,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(Ok);
         }
 
+        // POST api/topic/{topicId}/publications
+        [HttpPost("api/publications")]
+        public async Task<ActionResult<PublicationViewModel>> CreatePublication(
+            CreatePublicationViewModel publication)
+        {
+            return await _publicationService
+                .CreatePublication(publication)
+                .HandleFailuresOr(Ok);
+        }
+
         // PUT api/publications/{publicationId}/methodology
         [HttpPut("api/publications/{publicationId}/methodology")]
         public async Task<ActionResult> UpdatePublicationMethodology(
@@ -65,18 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _publicationService
                 .PartialUpdateLegacyReleases(publicationId, legacyReleases)
                 .HandleFailuresOrOk();
-        }
-        
-        // POST api/topic/{topicId}/publications
-        [HttpPost("api/topic/{topicId}/publications")]
-        public async Task<ActionResult<PublicationViewModel>> CreatePublication(
-            CreatePublicationViewModel publication, Guid topicId)
-        {
-            publication.TopicId = topicId;
-            
-            return await _publicationService
-                .CreatePublication(publication)
-                .HandleFailuresOr(Ok);
         }
     }
 }
