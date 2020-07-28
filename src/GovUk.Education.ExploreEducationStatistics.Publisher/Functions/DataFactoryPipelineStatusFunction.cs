@@ -50,7 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             if (response.Status == "Complete")
             {
-                await UpdateStageOnSuccess(response);
+                await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
+                    Complete);
 
                 if (await _releaseStatusService.IsImmediate(response.ReleaseId, response.ReleaseStatusId))
                 {
@@ -71,40 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return response.Status != null
                 ? (ActionResult) new OkObjectResult($"status, {response.Status}")
                 : new BadRequestObjectResult("No status was passed in the request body");
-        }
-
-        private async Task UpdateStageOnSuccess(PipelineResponse response)
-        {
-            var releaseStatus = await _releaseStatusService.GetAsync(response.ReleaseId, response.ReleaseStatusId);
-            var existingState = releaseStatus.State;
-            var retriedAfterFailure = existingState.Data == Failed;
-
-            if (retriedAfterFailure)
-            {
-                // Revert to the original starting state for the Publishing stage before it was cancelled
-                var startedState = releaseStatus.Immediate
-                    ? ReleaseStatusStates.ImmediateReleaseStartedState
-                    : ReleaseStatusStates.ScheduledReleaseStartedState;
-
-                var newPublishingState = existingState.Publishing == ReleaseStatusPublishingStage.Cancelled
-                    ? startedState.Publishing
-                    : existingState.Publishing;
-
-                var newOverallState = existingState.Overall == ReleaseStatusOverallStage.Failed
-                    ? startedState.Overall
-                    : existingState.Overall;
-
-                await _releaseStatusService.UpdateStagesAsync(response.ReleaseId,
-                    response.ReleaseStatusId,
-                    data: Complete,
-                    publishing: newPublishingState,
-                    overall: newOverallState);
-            }
-            else
-            {
-                await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId,
-                    Complete);
-            }
         }
     }
 
