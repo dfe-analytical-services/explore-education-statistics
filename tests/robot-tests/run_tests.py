@@ -40,6 +40,9 @@ parser.add_argument("-i", "--interp",
                     default="pabot",
                     choices=["pabot", "robot"],
                     help="interpreter to use to run the tests")
+parser.add_argument("--processes",
+                    dest="processes",
+                    help="how many processes should be used when using the pabot interpreter")
 parser.add_argument("-e", "--env",
                     dest="env",
                     default="test",
@@ -314,6 +317,9 @@ if args.interp == "robot":
     else:
         robot_run_cli(robotArgs)
 elif args.interp == "pabot":
+    if args.processes:
+        robotArgs = ["--processes", args.processes] + robotArgs
+
     if args.profile:
         # Python profiling
         cProfile.run('pabot_run_cli(robotArgs)', 'profile-data')
