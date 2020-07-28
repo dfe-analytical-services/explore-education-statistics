@@ -12,7 +12,7 @@ import json
 import os
 import pstats
 import shutil
-import time
+import datetime
 from pathlib import Path
 
 import pyderman
@@ -252,7 +252,10 @@ if args.tests and "general_public" not in args.tests:
 
     # NOTE(mark): Tests that alter data only occur on local and dev environments
     if args.env in ['local', 'dev']:
-        os.environ['RUN_IDENTIFIER'] = str(time.time()).split('.')[0]
+        runIdentifier = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
+
+        os.environ['RUN_IDENTIFIER'] = runIdentifier
+        print(f'Starting tests with RUN_IDENTIFIER: {runIdentifier}')
 
         get_themes_resp = get_test_themes()
         test_theme_guid = None
