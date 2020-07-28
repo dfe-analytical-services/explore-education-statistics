@@ -39,7 +39,7 @@ def cookie_names_should_be_on_page():
 def user_checks_key_stat_tile_contents(tile_title, tile_value, tile_context):
     try:
         elem = sl.driver.find_element_by_xpath(
-            f'.//*[@data-testid="key-stat-tile-title" and contains(text(), "{tile_title}")]')
+            f'.//*[@data-testid="keyStatTile-title" and contains(text(), "{tile_title}")]')
     except NoSuchElementException:
         raise_assertion_error(f'Cannot find key stats tile "{tile_title}"')
 

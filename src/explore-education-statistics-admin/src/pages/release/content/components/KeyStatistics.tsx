@@ -1,13 +1,13 @@
-import EditableKeyStatTile from '@admin/components/editable/EditableKeyStatTile';
+import EditableKeyStat from '@admin/components/editable/EditableKeyStat';
 import KeyStatSelectForm from '@admin/pages/release/content/components/KeyStatSelectForm';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import {
-  KeyStatTileColumn,
-  KeyStatTileContainer,
-} from '@common/modules/find-statistics/components/KeyStatTile';
+  KeyStatColumn,
+  KeyStatContainer,
+} from '@common/modules/find-statistics/components/KeyStat';
 import { Release } from '@common/services/publicationService';
 import React, { useCallback, useState } from 'react';
 
@@ -36,12 +36,12 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           <AddKeyStatistics release={release} />
         </>
       )}
-      <KeyStatTileContainer>
+      <KeyStatContainer>
         {release.keyStatisticsSection.content
           .filter(block => block.type === 'DataBlock')
           .map(block => (
-            <KeyStatTileColumn key={block.id}>
-              <EditableKeyStatTile
+            <KeyStatColumn key={block.id}>
+              <EditableKeyStat
                 id={block.id}
                 name={block.name}
                 query={{
@@ -68,9 +68,9 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                   });
                 }}
               />
-            </KeyStatTileColumn>
+            </KeyStatColumn>
           ))}
-      </KeyStatTileContainer>
+      </KeyStatContainer>
     </>
   );
 };

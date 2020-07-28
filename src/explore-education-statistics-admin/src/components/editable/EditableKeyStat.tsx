@@ -6,10 +6,10 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import useToggle from '@common/hooks/useToggle';
-import KeyStatTile, {
+import KeyStat, {
   KeyStatProps,
-} from '@common/modules/find-statistics/components/KeyStatTile';
-import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
+} from '@common/modules/find-statistics/components/KeyStat';
+import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import { Formik } from 'formik';
 import React from 'react';
 
@@ -27,7 +27,7 @@ interface EditableKeyStatProps extends KeyStatProps {
   onSubmit: (values: KeyStatsFormValues) => void;
 }
 
-const EditableKeyStatTile = ({
+const EditableKeyStat = ({
   id,
   isEditing = false,
   name,
@@ -40,7 +40,7 @@ const EditableKeyStatTile = ({
   const [removing, toggleRemoving] = useToggle(false);
 
   if (!isEditing) {
-    return <KeyStatTile query={query} summary={summary} />;
+    return <KeyStat query={query} summary={summary} />;
   }
 
   return showForm ? (
@@ -65,7 +65,7 @@ const EditableKeyStatTile = ({
           <Form id={`key-stats-form-${id}`}>
             <h3 className="govuk-heading-s">{name}</h3>
 
-            <KeyStatTile
+            <KeyStat
               query={query}
               renderDataSummary={
                 <FormFieldTextInput<KeyStatsFormValues>
@@ -101,13 +101,13 @@ const EditableKeyStatTile = ({
                   Cancel
                 </Button>
               </ButtonGroup>
-            </KeyStatTile>
+            </KeyStat>
           </Form>
         );
       }}
     </Formik>
   ) : (
-    <KeyStatTile query={query} summary={summary}>
+    <KeyStat query={query} summary={summary}>
       <ButtonGroup className="govuk-!-margin-top-2">
         <Button onClick={toggleShowForm.on}>Edit</Button>
 
@@ -124,8 +124,8 @@ const EditableKeyStatTile = ({
           </Button>
         )}
       </ButtonGroup>
-    </KeyStatTile>
+    </KeyStat>
   );
 };
 
-export default EditableKeyStatTile;
+export default EditableKeyStat;

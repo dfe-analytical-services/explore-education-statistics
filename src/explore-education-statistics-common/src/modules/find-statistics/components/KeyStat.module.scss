@@ -1,0 +1,72 @@
+@import '../../../../src/styles/govuk-base';
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -#{govuk-spacing(1)} govuk-spacing(2);
+}
+
+.column {
+  display: flex;
+  flex: 1 0 100%;
+  flex-direction: column;
+  margin-bottom: govuk-spacing(2);
+  max-width: 100%;
+  padding: 0 govuk-spacing(1);
+
+  @include govuk-media-query($from: tablet, $until: desktop) {
+    flex: 0 1 50%;
+    max-width: 50%;
+  }
+
+  @include govuk-media-query($from: desktop) {
+    flex: 1 0 33.33%;
+    max-width: 33.33%;
+
+    // If there are four key stat tiles, have two per row
+    &:first-child:nth-last-child(4),
+    &:first-child:nth-last-child(4) ~ & {
+      flex: 0 1 50%;
+      max-width: 50%;
+    }
+  }
+}
+
+.definition {
+  background: govuk-colour('white');
+  font-size: 16px !important;
+  margin: 0;
+  padding: 0.2rem 0 0.2rem 0.5rem;
+  position: relative;
+  width: 100%;
+
+  &[open] {
+    box-shadow: 3px govuk-colour('black');
+  }
+
+  :global(.govuk-details__summary) {
+    margin-bottom: 0;
+    max-width: calc(100% - 1rem);
+    overflow: hidden;
+    padding-left: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :global(.govuk-details__text) {
+    background: govuk-colour('white');
+    border: 2px solid govuk-colour('black');
+    border-top: 0;
+    box-sizing: border-box;
+    max-height: 40vh;
+    overflow: auto;
+    position: absolute;
+    text-align: left;
+    width: 100%;
+    z-index: 2;
+  }
+}
+
+.trendText {
+  color: govuk-colour('white');
+}

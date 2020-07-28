@@ -3,7 +3,7 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import KeyStat from '@common/modules/find-statistics/components/KeyStat';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 
@@ -55,7 +55,7 @@ const KeyStatSelectForm = ({
           summary="Key statistic preview"
           open
         >
-          <KeyStatTile
+          <KeyStat
             summary={selectedDataBlock.summary}
             query={{
               ...selectedDataBlock.query,

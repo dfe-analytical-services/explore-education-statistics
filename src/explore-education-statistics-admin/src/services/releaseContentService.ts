@@ -1,4 +1,4 @@
-import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStatTile';
+import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStat';
 import {
   ContentBlockPostModel,
   ContentBlockPutModel,

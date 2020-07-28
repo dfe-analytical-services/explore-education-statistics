@@ -13,10 +13,10 @@ import getCategoryDataSetConfigurations, {
   CategoryDataSetConfiguration,
 } from '@common/modules/charts/util/getCategoryDataSetConfigurations';
 import {
-  KeyStatTileColumn,
-  KeyStatTileContainer,
-} from '@common/modules/find-statistics/components/KeyStatTile';
-import stylesIndicators from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
+  KeyStatColumn,
+  KeyStatContainer,
+} from '@common/modules/find-statistics/components/KeyStat';
+import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import {
   GeoJsonFeature,
   GeoJsonFeatureProperties,
@@ -30,6 +30,7 @@ import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, PathOptions, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
+import orderBy from 'lodash/orderBy';
 import times from 'lodash/times';
 import React, {
   useCallback,
@@ -39,7 +40,6 @@ import React, {
   useState,
 } from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import orderBy from 'lodash/orderBy';
 
 interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -505,7 +505,7 @@ export const MapBlockInternal = ({
           </h3>
 
           {selectedFeature?.properties?.dataSets && selectedDataSetKey && (
-            <KeyStatTileContainer tag="dl">
+            <KeyStatContainer>
               {Object.entries(selectedFeature?.properties.dataSets).map(
                 ([dataSetKey, dataSet]) => {
                   if (!dataSetConfigurations[dataSetKey]) {
@@ -518,28 +518,20 @@ export const MapBlockInternal = ({
                   } = dataSetConfigurations[dataSetKey];
 
                   return (
-                    <KeyStatTileColumn key={dataSetKey}>
-                      <div
-                        className={stylesIndicators.keyStat}
-                        data-testid="indicatorTile"
-                      >
-                        <dt className="govuk-heading-s">{config.label}</dt>
-
-                        <dd
-                          className="govuk-heading-xl govuk-!-margin-bottom-2"
-                          aria-label={config.label}
-                        >
-                          {formatPretty(
-                            dataSet.value,
-                            expandedDataSet.indicator.unit,
-                          )}
-                        </dd>
-                      </div>
-                    </KeyStatTileColumn>
+                    <KeyStatColumn key={dataSetKey}>
+                      <KeyStatTile
+                        testId="mapBlock-indicator"
+                        title={config.label}
+                        value={formatPretty(
+                          dataSet.value,
+                          expandedDataSet.indicator.unit,
+                        )}
+                      />
+                    </KeyStatColumn>
                   );
                 },
               )}
-            </KeyStatTileContainer>
+            </KeyStatContainer>
           )}
         </>
       )}
