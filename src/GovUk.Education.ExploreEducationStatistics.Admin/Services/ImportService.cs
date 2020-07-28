@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _guidGenerator = guidGenerator;
         }
 
-        public async void Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile)
+        public async Task Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
