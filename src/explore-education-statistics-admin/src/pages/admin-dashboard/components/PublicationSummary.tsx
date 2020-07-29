@@ -1,33 +1,40 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import { legacyReleasesRoute, releaseCreateRoute } from '@admin/routes/routes';
+import {
+  publicationAssignMethodologyRoute,
+  ThemeTopicPublicationParams,
+} from '@admin/routes/themeTopicRoutes';
 import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, { useContext, useState } from 'react';
-import { generatePath, RouteComponentProps, withRouter } from 'react-router';
+import React, { useState } from 'react';
+import { generatePath, useHistory } from 'react-router';
 import CancelAmendmentModal from './CancelAmendmentModal';
 import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 
 export interface Props {
   publication: AdminDashboardPublication;
+  themeId: string;
+  topicId: string;
   onChangePublication: () => void;
 }
 
 const PublicationSummary = ({
   publication,
+  themeId,
+  topicId,
   onChangePublication,
-  history,
-}: Props & RouteComponentProps) => {
-  const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
+}: Props) => {
+  const history = useHistory();
+
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
   const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
     string
@@ -73,8 +80,15 @@ const PublicationSummary = ({
 
           <ButtonGroup className="govuk-!-margin-bottom-2">
             <ButtonLink
-              to={`/theme/${selectedThemeAndTopic.theme.id}/topic/${selectedThemeAndTopic.topic.id}/publication/${publication.id}/assign-methodology`}
               variant="secondary"
+              to={generatePath<ThemeTopicPublicationParams>(
+                publicationAssignMethodologyRoute.path,
+                {
+                  themeId,
+                  topicId,
+                  publicationId: publication.id,
+                },
+              )}
             >
               {!publication.methodology &&
               (!publication.externalMethodology ||
@@ -169,4 +183,4 @@ const PublicationSummary = ({
   );
 };
 
-export default withRouter(PublicationSummary);
+export default PublicationSummary;

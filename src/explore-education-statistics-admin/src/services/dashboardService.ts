@@ -3,14 +3,13 @@ import { MyRelease } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 
-export interface ThemeAndTopics {
+export interface Theme {
   title: string;
   id: string;
-  topics: {
-    title: string;
-    id: string;
-  }[];
+  topics: Topic[];
 }
+
+export type Topic = IdTitlePair;
 
 export interface ExternalMethodology {
   title: string;
@@ -20,7 +19,7 @@ export interface AdminDashboardPublication {
   id: string;
   title: string;
   methodology?: IdTitlePair;
-  externalMethodology: ExternalMethodology;
+  externalMethodology?: ExternalMethodology;
   releases: MyRelease[];
   contact: ContactDetails;
   permissions: {
@@ -30,8 +29,8 @@ export interface AdminDashboardPublication {
 }
 
 const dashboardService = {
-  getMyThemesAndTopics(): Promise<ThemeAndTopics[]> {
-    return client.get<ThemeAndTopics[]>('/me/themes');
+  getMyThemesAndTopics(): Promise<Theme[]> {
+    return client.get<Theme[]>('/me/themes');
   },
   getMyPublicationsByTopic(
     topicId: string,

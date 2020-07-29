@@ -1,137 +1,102 @@
-import Link from '@admin/components/Link';
-import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
+import ButtonLink from '@admin/components/ButtonLink';
+import useQueryParams from '@admin/hooks/useQueryParams';
+import { dashboardRoute } from '@admin/routes/routes';
 import {
-  dashboardThemeTopicRoute,
   publicationCreateRoute,
-} from '@admin/routes/routes';
+  ThemeTopicParams,
+} from '@admin/routes/themeTopicRoutes';
 import dashboardService, {
-  AdminDashboardPublication,
+  Theme,
+  Topic,
 } from '@admin/services/dashboardService';
 import permissionService from '@admin/services/permissionService';
-import { Release } from '@admin/services/releaseService';
-import { IdTitlePair } from '@admin/services/types/common';
+import appendQuery from '@admin/utils/url/appendQuery';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormSelect from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import orderBy from 'lodash/orderBy';
-import React, { useContext, useEffect } from 'react';
-import { generatePath, RouteComponentProps, withRouter } from 'react-router';
+import React, { useMemo, useEffect } from 'react';
+import { generatePath, useHistory } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
-interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
-  topics: IdTitlePair[];
-}
+const ManagePublicationsAndReleasesTab = () => {
+  const { themeId, topicId } = useQueryParams<ThemeTopicParams>();
+  const history = useHistory();
 
-const findThemeById = (
-  themeId: string,
-  availableThemes: ThemeAndTopicsIdsAndTitles[],
-) =>
-  availableThemes.find(
-    theme => theme.id === themeId,
-  ) as ThemeAndTopicsIdsAndTitles;
+  const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
+    dashboardService.getMyThemesAndTopics,
+  );
 
-const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
-  theme.topics.find(topic => topic.id === topicId) as IdTitlePair;
+  const selectedTheme = useMemo<Theme | undefined>(() => {
+    if (!themes) {
+      return undefined;
+    }
 
-interface Props {
-  onChangePublication: () => void;
-  nonLiveReleases: Release[];
-}
+    return (
+      themes.find(t => t.id === themeId) ?? orderBy(themes, t => t.title)[0]
+    );
+  }, [themeId, themes]);
 
-const ManagePublicationsAndReleasesTab = ({
-  match,
-  onChangePublication,
-  nonLiveReleases,
-}: Props &
-  RouteComponentProps<{
-    themeId?: string;
-    topicId?: string;
-  }>) => {
-  const {
-    selectedThemeAndTopic: { theme: selectedTheme, topic: selectedTopic },
-    setSelectedThemeAndTopic,
-  } = useContext(ThemeAndTopicContext);
-  const { themeId, topicId } = match.params;
+  const selectedTopic = useMemo<Topic | undefined>(() => {
+    if (!themes || !selectedTheme) {
+      return undefined;
+    }
+
+    return (
+      selectedTheme.topics.find(t => t.id === topicId) ??
+      orderBy(selectedTheme.topics, t => t.title)[0]
+    );
+  }, [selectedTheme, themes, topicId]);
 
   const {
-    value: themes,
-    isLoading: loadingThemes,
-  } = useAsyncRetry(async () => {
-    return dashboardService.getMyThemesAndTopics();
-  }, []);
-
-  const {
-    value = [[], false],
+    value: myPublications,
     isLoading: loadingPublications,
-  } = useAsyncRetry(async () => {
-    if (selectedTopic.id) {
-      return Promise.all([
-        dashboardService.getMyPublicationsByTopic(selectedTopic.id),
-        permissionService.canCreatePublicationForTopic(selectedTopic.id),
-      ]);
+    retry: reloadMyPublications,
+  } = useAsyncHandledRetry(async () => {
+    if (!selectedTopic?.id) {
+      return undefined;
     }
-    return undefined;
-  }, [selectedTopic.id, nonLiveReleases]);
 
-  const [myPublications, canCreatePublication] = value as [
-    AdminDashboardPublication[],
-    boolean,
-  ];
+    return dashboardService.getMyPublicationsByTopic(selectedTopic.id);
+  }, [selectedTopic?.id]);
+
+  const { value: canCreatePublication = false } = useAsyncRetry(async () => {
+    if (!selectedTopic?.id) {
+      return false;
+    }
+
+    return permissionService.canCreatePublicationForTopic(selectedTopic.id);
+  }, [selectedTopic?.id]);
 
   useEffect(() => {
-    if (themes && themes.length && !selectedTheme.id && !selectedTopic.id) {
-      if (themeId && topicId) {
-        const theme = themes.find(t => t.id === themeId);
-        const topic = theme && theme.topics.find(t => t.id === topicId);
-        if (theme && topic) {
-          setSelectedThemeAndTopic({ theme, topic });
-          return;
-        }
-      }
-      const newSelectedTheme = themes[0];
-      const newSelectedTopic = orderBy(
-        themes[0].topics,
-        topic => topic.title,
-      )[0];
-      setSelectedThemeAndTopic({
-        theme: newSelectedTheme,
-        topic: newSelectedTopic,
-      });
+    if (!selectedTheme || !selectedTopic) {
+      return;
     }
-  }, [
-    themes,
-    selectedTheme.id,
-    selectedTopic.id,
-    themeId,
-    topicId,
-    setSelectedThemeAndTopic,
-  ]);
 
-  useEffect(() => {
-    if (selectedTheme.id && selectedTopic.id) {
-      // eslint-disable-next-line
-      history.replaceState(
-        {},
-        '',
-        generatePath(dashboardThemeTopicRoute.path, {
+    if (!themeId || !topicId) {
+      history.replace(
+        appendQuery<ThemeTopicParams>(dashboardRoute.path, {
           themeId: selectedTheme.id,
           topicId: selectedTopic.id,
         }),
       );
     }
-  }, [selectedTheme, selectedTopic, nonLiveReleases]);
+  }, [history, selectedTheme, selectedTopic, themeId, topicId]);
 
   return (
     <section>
-      <p className="govuk-body">Select publications to:</p>
-      <ul className="govuk-list--bullet">
+      <p>Select publications to:</p>
+
+      <ul>
         <li>create new releases and methodologies</li>
         <li>edit exiting releases and methodologies</li>
         <li>view and sign-off releases and methodologies</li>
       </ul>
-      <p className="govuk-bo">
+
+      <p>
         To remove publications, releases and methodologies email{' '}
         <a href="mailto:explore.statistics@education.gov.uk">
           explore.statistics@education.gov.uk
@@ -139,7 +104,7 @@ const ManagePublicationsAndReleasesTab = ({
       </p>
 
       <LoadingSpinner loading={loadingThemes}>
-        {themes && themes.length && selectedTheme && selectedTopic ? (
+        {themes && themes.length > 0 ? (
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-half">
@@ -147,17 +112,29 @@ const ManagePublicationsAndReleasesTab = ({
                   id="selectTheme"
                   label="Select theme"
                   name="selectTheme"
+                  value={selectedTheme?.id}
                   options={themes.map(theme => ({
                     label: theme.title,
                     value: theme.id,
                   }))}
-                  value={selectedTheme ? selectedTheme.id : undefined}
                   onChange={event => {
-                    const newTheme = findThemeById(event.target.value, themes);
-                    setSelectedThemeAndTopic({
-                      theme: newTheme,
-                      topic: orderBy(newTheme.topics, topic => topic.title)[0],
-                    });
+                    const newTheme = themes.find(
+                      t => t.id === event.target.value,
+                    );
+
+                    if (!newTheme) {
+                      return;
+                    }
+
+                    history.push(
+                      appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                        themeId: event.target.value,
+                        topicId: orderBy(
+                          newTheme.topics,
+                          topic => topic.title,
+                        )[0]?.id,
+                      }),
+                    );
                   }}
                 />
               </div>
@@ -166,61 +143,74 @@ const ManagePublicationsAndReleasesTab = ({
                   id="selectTopic"
                   label="Select topic"
                   name="selectTopic"
-                  options={selectedTheme.topics.map(topic => ({
-                    label: topic.title,
-                    value: topic.id,
-                  }))}
-                  value={selectedTopic ? selectedTopic.id : undefined}
+                  options={
+                    selectedTheme?.topics.map(topic => ({
+                      label: topic.title,
+                      value: topic.id,
+                    })) ?? []
+                  }
+                  value={selectedTopic?.id}
                   onChange={event => {
-                    setSelectedThemeAndTopic({
-                      theme: selectedTheme,
-                      topic: findTopicById(event.target.value, selectedTheme),
-                    });
+                    history.push(
+                      appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                        themeId,
+                        topicId: event.target.value,
+                      }),
+                    );
                   }}
                 />
               </div>
             </div>
             <hr />
-            <h2>{selectedTheme.title}</h2>
-            <h3>{selectedTopic.title}</h3>
-            <LoadingSpinner loading={loadingPublications}>
-              {myPublications && myPublications.length > 0 && (
-                <Accordion id="publications">
-                  {orderBy(myPublications, pub => pub.title.toUpperCase()).map(
-                    publication => (
-                      <AccordionSection
-                        key={publication.id}
-                        heading={publication.title}
-                        headingTag="h3"
-                      >
-                        <PublicationSummary
-                          publication={publication}
-                          onChangePublication={onChangePublication}
-                        />
-                      </AccordionSection>
-                    ),
+
+            {selectedTheme && selectedTopic && (
+              <>
+                <h2 data-testid="selectedThemeTitle">{selectedTheme.title}</h2>
+
+                <h3 data-testid="selectedTopicTitle">{selectedTopic.title}</h3>
+
+                <LoadingSpinner loading={loadingPublications}>
+                  {myPublications && myPublications.length > 0 ? (
+                    <Accordion id="publications">
+                      {orderBy(myPublications, pub =>
+                        pub.title.toUpperCase(),
+                      ).map(publication => (
+                        <AccordionSection
+                          key={publication.id}
+                          heading={publication.title}
+                          headingTag="h4"
+                        >
+                          <PublicationSummary
+                            publication={publication}
+                            themeId={selectedTheme.id}
+                            topicId={selectedTopic.id}
+                            onChangePublication={reloadMyPublications}
+                          />
+                        </AccordionSection>
+                      ))}
+                    </Accordion>
+                  ) : (
+                    <div className="govuk-inset-text">
+                      No publications available
+                    </div>
                   )}
-                </Accordion>
-              )}
-              {canCreatePublication &&
-                myPublications &&
-                myPublications.length === 0 && (
-                  <div className="govuk-inset-text">
-                    You have not yet created any publications
-                  </div>
-                )}
-              {canCreatePublication && (
-                <Link
-                  to={generatePath(publicationCreateRoute.path, {
-                    themeId: selectedTheme.id,
-                    topicId: selectedTopic.id,
-                  })}
-                  className="govuk-button"
-                >
-                  Create new publication
-                </Link>
-              )}
-            </LoadingSpinner>
+
+                  {canCreatePublication && (
+                    <ButtonLink
+                      to={generatePath<ThemeTopicParams>(
+                        publicationCreateRoute.path,
+                        {
+                          themeId: selectedTheme.id,
+                          topicId: selectedTopic.id,
+                        },
+                      )}
+                    >
+                      Create new publication
+                    </ButtonLink>
+                  )}
+                </LoadingSpinner>
+              </>
+            )}
           </>
         ) : (
           <>
@@ -243,4 +233,4 @@ const ManagePublicationsAndReleasesTab = ({
   );
 };
 
-export default withRouter(ManagePublicationsAndReleasesTab);
+export default ManagePublicationsAndReleasesTab;
