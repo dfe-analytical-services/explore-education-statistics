@@ -99,10 +99,7 @@ const AdminDashboardPage = () => {
             id="my-publications"
             title="Manage publications and releases"
           >
-            <ManagePublicationsAndReleasesTab
-              nonLiveReleases={draftReleases.concat(scheduledReleases)}
-              onChangePublication={reloadDashboard}
-            />
+            <ManagePublicationsAndReleasesTab />
           </TabsSection>
           <TabsSection
             lazy
