@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
+using Microsoft.Azure.Storage.RetryPolicies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -31,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private readonly string _privateStorageConnectionString;
         private readonly string _publicStorageConnectionString;
+        private readonly string _publisherStorageConnectionString;
 
         public FileStorageService(
             IConfiguration configuration,
@@ -38,7 +40,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             _privateStorageConnectionString = configuration.GetValue<string>("CoreStorage");
             _publicStorageConnectionString = configuration.GetValue<string>("PublicStorage");
+            _publisherStorageConnectionString = configuration.GetValue<string>("PublisherStorage");
             _logger = logger;
+        }
+
+        public async Task<(CloudBlockBlob blob, string id)> AcquireLease(string blobName)
+        {
+            var options = new BlobRequestOptions
+            {
+                RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(5), 5)
+            };
+            var blob = await UploadFromStreamAsync(_publisherStorageConnectionString, PublisherLeasesContainerName,
+                $"{blobName}.lck", MediaTypeNames.Text.Plain, string.Empty, options);
+            var leaseId = blob.AcquireLease(TimeSpan.FromSeconds(30), Guid.NewGuid().ToString());
+            return (blob, leaseId);
         }
 
         public async Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand)

@@ -78,33 +78,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await ExecuteQueryAsync(query);
         }
 
-        public Task<IEnumerable<ReleaseStatus>> GetAllByOverallStage(Guid releaseId, params ReleaseStatusOverallStage[] overallStages)
+        public async Task<IEnumerable<ReleaseStatus>> GetAllByOverallStage(Guid releaseId, params ReleaseStatusOverallStage[] overallStages)
         {
             var filter = TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
                     QueryComparisons.Equal, releaseId.ToString());
 
             if (overallStages.Any())
             {
-                var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) => 
+                var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) =>
                 {
                     var stageFilter = TableQuery.GenerateFilterCondition(
                         nameof(ReleaseStatus.OverallStage),
                         QueryComparisons.Equal,
                         stage.ToString()
                     );
-                
-                    if (acc == "")  {
+
+                    if (acc == "")
+                    {
                         return stageFilter;
                     }
 
-                    return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter); 
+                    return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter);
                 });
                 
-                filter = TableQuery.CombineFilters(filter, TableOperators.And,allStageFilters);
+                filter = TableQuery.CombineFilters(filter, TableOperators.And, allStageFilters);
             }
 
             var query = new TableQuery<ReleaseStatus>().Where(filter);
-            return _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
+            return await ExecuteQueryAsync(query);
         }
 
         public async Task<ReleaseStatus> GetLatestAsync(Guid releaseId)
@@ -113,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(TableQuery.GenerateFilterCondition(nameof(ReleaseStatus.PartitionKey),
                     QueryComparisons.Equal, releaseId.ToString()));
 
-            var result = await _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
+            var result = await ExecuteQueryAsync(query);
             return result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
         }
 
@@ -123,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return releaseStatus.Immediate;
         }
 
-        public Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
+        private Task<IEnumerable<ReleaseStatus>> ExecuteQueryAsync(TableQuery<ReleaseStatus> query)
         {
             return _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
         }
