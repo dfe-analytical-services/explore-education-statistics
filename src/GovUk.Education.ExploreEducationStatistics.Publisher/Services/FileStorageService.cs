@@ -52,11 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug, copyReleaseFilesCommand.ReleaseSlug);
 
             await DeleteBlobsAsync(publicContainer, destinationDirectoryPath);
-            
-            copyReleaseFilesCommand.AdditionalDeleteDirectoryPaths.ForEach(async directoryPath =>
-            {
-                await DeleteBlobsAsync(publicContainer, directoryPath);
-            });
 
             var referencedReleaseVersions = copyReleaseFilesCommand.ReleaseFileReferences
                 .Select(rfr => rfr.ReleaseId).Distinct();
@@ -79,6 +74,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             await ZipFiles(publicContainer, allFilesTransferred, destinationDirectoryPath, copyReleaseFilesCommand);
+        }
+        
+        public async Task DeleteDownloadFilesForPreviousVersion(Release release)
+        {
+            if (release.Slug != release.PreviousVersion.Slug)
+            {
+                var directoryPath = PublicReleaseDirectoryPath(release.Publication.Slug, release.PreviousVersion.Slug);
+                var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicFilesContainerName);
+
+                await DeleteBlobsAsync(publicContainer, directoryPath);
+            }
         }
 
         public async Task DeleteAllContentAsyncExcludingStaging()

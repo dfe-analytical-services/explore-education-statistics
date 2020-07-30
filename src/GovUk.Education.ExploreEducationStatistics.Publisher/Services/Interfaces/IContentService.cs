@@ -6,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IContentService
     {
+        Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds);
+        
         Task DeletePreviousVersionsContent(params Guid[] releaseIds);
 
         Task UpdateAllContentAsync();
