@@ -1,8 +1,8 @@
-type StorageSetterOptions = {
+export type StorageSetterOptions = {
   expiry?: Date;
 };
 
-type StorageItem<T = unknown> = {
+export type StorageItem<T = unknown> = {
   expiry?: string;
   value: T;
 };
@@ -13,22 +13,23 @@ const namespaceKey = (key: string) => `${NAMESPACE}_${key}`;
 
 const storageService = {
   get<T>(key: string): Promise<T | null> {
-    return Promise.resolve().then(() => {
-      const item = localStorage.getItem(namespaceKey(key));
+    return Promise.resolve().then(() => this.getSync(key));
+  },
+  getSync<T>(key: string): T | null {
+    const item = localStorage.getItem(namespaceKey(key));
 
-      if (!item) {
-        return null;
-      }
+    if (!item) {
+      return null;
+    }
 
-      const { value, expiry } = JSON.parse(item) as StorageItem<T>;
+    const { value, expiry } = JSON.parse(item) as StorageItem<T>;
 
-      if (expiry && new Date() >= new Date(expiry)) {
-        this.remove(key);
-        return null;
-      }
+    if (expiry && new Date() >= new Date(expiry)) {
+      this.removeSync(key);
+      return null;
+    }
 
-      return value;
-    });
+    return value;
   },
   set(
     key: string,
@@ -36,30 +37,41 @@ const storageService = {
     options: StorageSetterOptions = {},
   ): Promise<void> {
     return Promise.resolve().then(() => {
-      const { expiry } = options;
-
-      let item: StorageItem = { value };
-
-      if (expiry) {
-        // Don't bother setting in storage
-        // as it would already be expired.
-        if (expiry <= new Date()) {
-          return;
-        }
-
-        item = { value, expiry: expiry.toISOString() };
-      }
-
-      localStorage.setItem(namespaceKey(key), JSON.stringify(item));
+      this.setSync(key, value, options);
     });
   },
+  setSync(
+    key: string,
+    value: unknown,
+    options: StorageSetterOptions = {},
+  ): void {
+    const { expiry } = options;
+
+    let item: StorageItem = { value };
+
+    if (expiry) {
+      // Don't bother setting in storage
+      // as it would already be expired.
+      if (expiry <= new Date()) {
+        return;
+      }
+
+      item = { value, expiry: expiry.toISOString() };
+    }
+
+    localStorage.setItem(namespaceKey(key), JSON.stringify(item));
+  },
   remove(key: string): Promise<void> {
-    return Promise.resolve().then(() =>
-      localStorage.removeItem(namespaceKey(key)),
-    );
+    return Promise.resolve().then(() => this.removeSync(key));
+  },
+  removeSync(key: string): void {
+    localStorage.removeItem(namespaceKey(key));
   },
   clear(): Promise<void> {
-    return Promise.resolve().then(() => localStorage.clear());
+    return Promise.resolve().then(this.clearSync);
+  },
+  clearSync(): void {
+    localStorage.clear();
   },
 };
 
