@@ -7,10 +7,10 @@ import _dashboardService, {
 import _permissionService from '@admin/services/permissionService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router';
-import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/dashboardService');
 jest.mock('@admin/services/permissionService');
@@ -74,19 +74,14 @@ describe('ManagePublicationsAndReleasesTab', () => {
   ];
 
   test('renders with first theme and topic selected by default', async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(
-      async () => testThemeTopics,
-    );
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
     dashboardService.getMyPublicationsByTopic.mockImplementation(
       async topicId => {
         expect(topicId).toBe('topic-1');
         return testPublications;
       },
     );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => true,
-    );
-
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
     render(
       <MemoryRouter>
         <ManagePublicationsAndReleasesTab />
@@ -114,15 +109,11 @@ describe('ManagePublicationsAndReleasesTab', () => {
   });
 
   test('adds `themeId` and `topicId` query params from initial theme/topic', async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(
-      async () => testThemeTopics,
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
     );
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
-      async () => testPublications,
-    );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => true,
-    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     const history = createMemoryHistory();
 
@@ -138,9 +129,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
   });
 
   test('selecting new theme selects first topic automatically', async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(
-      async () => testThemeTopics,
-    );
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
     dashboardService.getMyPublicationsByTopic.mockImplementation(
       async topicId => {
         expect(topicId).toBe('topic-3');
@@ -148,9 +137,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
         return testPublications;
       },
     );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => true,
-    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     render(
       <MemoryRouter>
@@ -185,9 +172,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
   });
 
   test('selecting new theme and topic renders correctly', async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(
-      async () => testThemeTopics,
-    );
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
     dashboardService.getMyPublicationsByTopic.mockImplementation(
       async topicId => {
         expect(topicId).toBe('topic-4');
@@ -195,9 +180,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
         return testPublications;
       },
     );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => true,
-    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     render(
       <MemoryRouter>
@@ -206,10 +189,19 @@ describe('ManagePublicationsAndReleasesTab', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Select theme')).toBeInTheDocument();
+      expect(screen.getByText('Theme 2', { selector: 'option' })).toHaveValue(
+        'theme-2',
+      );
     });
 
     userEvent.selectOptions(screen.getByLabelText('Select theme'), 'theme-2');
+
+    await waitFor(() => {
+      expect(screen.getByText('Topic 4', { selector: 'option' })).toHaveValue(
+        'topic-4',
+      );
+    });
+
     userEvent.selectOptions(screen.getByLabelText('Select topic'), 'topic-4');
 
     await waitFor(() => {
@@ -233,15 +225,11 @@ describe('ManagePublicationsAndReleasesTab', () => {
   });
 
   test('selecting new theme and topic updates query params correctly', async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(
-      async () => testThemeTopics,
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
     );
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
-      async () => testPublications,
-    );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => true,
-    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     const history = createMemoryHistory();
 
@@ -252,10 +240,19 @@ describe('ManagePublicationsAndReleasesTab', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Select theme')).toBeInTheDocument();
+      expect(screen.getByText('Theme 2', { selector: 'option' })).toHaveValue(
+        'theme-2',
+      );
     });
 
     userEvent.selectOptions(screen.getByLabelText('Select theme'), 'theme-2');
+
+    await waitFor(() => {
+      expect(screen.getByText('Topic 4', { selector: 'option' })).toHaveValue(
+        'topic-4',
+      );
+    });
+
     userEvent.selectOptions(screen.getByLabelText('Select topic'), 'topic-4');
 
     await waitFor(() => {
@@ -264,13 +261,9 @@ describe('ManagePublicationsAndReleasesTab', () => {
   });
 
   test('renders correctly when no themes are available', async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(async () => []);
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
-      async () => [],
-    );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => true,
-    );
+    dashboardService.getMyThemesAndTopics.mockResolvedValue([]);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue([]);
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     render(
       <MemoryRouter>
@@ -290,15 +283,9 @@ describe('ManagePublicationsAndReleasesTab', () => {
   });
 
   test('renders correctly when no publications are available', async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(
-      async () => testThemeTopics,
-    );
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
-      async () => [],
-    );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => true,
-    );
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue([]);
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     render(
       <MemoryRouter>
@@ -312,15 +299,11 @@ describe('ManagePublicationsAndReleasesTab', () => {
   });
 
   test("renders 'Create new publication' button if authorised", async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(
-      async () => testThemeTopics,
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
     );
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
-      async () => testPublications,
-    );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => true,
-    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     render(
       <MemoryRouter>
@@ -336,15 +319,11 @@ describe('ManagePublicationsAndReleasesTab', () => {
   });
 
   test("does not render 'Create new publication' button if unauthorised", async () => {
-    dashboardService.getMyThemesAndTopics.mockImplementation(
-      async () => testThemeTopics,
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
     );
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
-      async () => testPublications,
-    );
-    permissionService.canCreatePublicationForTopic.mockImplementation(
-      async () => false,
-    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(false);
 
     render(
       <MemoryRouter>

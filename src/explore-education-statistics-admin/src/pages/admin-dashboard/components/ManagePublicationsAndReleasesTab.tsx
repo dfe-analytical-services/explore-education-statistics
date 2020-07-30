@@ -17,39 +17,36 @@ import FormSelect from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useStorageItem from '@common/hooks/useStorageItem';
 import orderBy from 'lodash/orderBy';
-import React, { useMemo, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import PublicationSummary from './PublicationSummary';
+
+interface SelectedThemeTopic {
+  themeId: string;
+  topicId: string;
+}
 
 const ManagePublicationsAndReleasesTab = () => {
   const { themeId, topicId } = useQueryParams<ThemeTopicParams>();
   const history = useHistory();
+
+  const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<
+    SelectedThemeTopic
+  >('dashboardThemeTopic', undefined);
 
   const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
     dashboardService.getMyThemesAndTopics,
   );
 
   const selectedTheme = useMemo<Theme | undefined>(() => {
-    if (!themes) {
-      return undefined;
-    }
-
-    return (
-      themes.find(t => t.id === themeId) ?? orderBy(themes, t => t.title)[0]
-    );
+    return themes?.find(t => t.id === themeId);
   }, [themeId, themes]);
 
   const selectedTopic = useMemo<Topic | undefined>(() => {
-    if (!themes || !selectedTheme) {
-      return undefined;
-    }
-
-    return (
-      selectedTheme.topics.find(t => t.id === topicId) ??
-      orderBy(selectedTheme.topics, t => t.title)[0]
-    );
-  }, [selectedTheme, themes, topicId]);
+    return selectedTheme?.topics.find(t => t.id === topicId);
+  }, [selectedTheme, topicId]);
 
   const {
     value: myPublications,
@@ -72,19 +69,57 @@ const ManagePublicationsAndReleasesTab = () => {
   }, [selectedTopic?.id]);
 
   useEffect(() => {
-    if (!selectedTheme || !selectedTopic) {
+    if (!themes || savedThemeTopic) {
       return;
     }
 
-    if (!themeId || !topicId) {
+    const theme =
+      themes.find(t => t.id === themeId) ?? orderBy(themes, t => t.title)[0];
+
+    if (!theme) {
+      return;
+    }
+
+    const topic =
+      theme.topics.find(t => t.id === topicId) ??
+      orderBy(theme.topics, t => t.title)[0];
+
+    if (!topic) {
+      return;
+    }
+
+    // Set default theme/topic in storage if it
+    // hasn't been set yet (e.g. first time
+    // visiting dashboard).
+    setSavedThemeTopic({
+      themeId: theme.id,
+      topicId: topic.id,
+    });
+  }, [savedThemeTopic, setSavedThemeTopic, themeId, themes, topicId]);
+
+  useEffect(() => {
+    if (themeId || topicId) {
+      return;
+    }
+
+    if (savedThemeTopic) {
+      // Update query params to reflect the chosen
+      // theme/topic if they haven't already been set.
       history.replace(
         appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-          themeId: selectedTheme.id,
-          topicId: selectedTopic.id,
+          themeId: savedThemeTopic.themeId,
+          topicId: savedThemeTopic.topicId,
         }),
       );
     }
-  }, [history, selectedTheme, selectedTopic, themeId, topicId]);
+  }, [
+    history,
+    savedThemeTopic,
+    selectedTheme,
+    selectedTopic,
+    themeId,
+    topicId,
+  ]);
 
   return (
     <section>
@@ -112,27 +147,38 @@ const ManagePublicationsAndReleasesTab = () => {
                   id="selectTheme"
                   label="Select theme"
                   name="selectTheme"
-                  value={selectedTheme?.id}
+                  value={themeId}
                   options={themes.map(theme => ({
                     label: theme.title,
                     value: theme.id,
                   }))}
                   onChange={event => {
-                    const newTheme = themes.find(
-                      t => t.id === event.target.value,
+                    const nextTheme = themes.find(
+                      theme => theme.id === event.target.value,
                     );
 
-                    if (!newTheme) {
+                    if (!nextTheme) {
                       return;
                     }
 
-                    history.push(
+                    const nextTopic = orderBy(
+                      nextTheme.topics,
+                      topic => topic.title,
+                    )[0];
+
+                    if (!nextTopic) {
+                      return;
+                    }
+
+                    setSavedThemeTopic({
+                      themeId: nextTheme.id,
+                      topicId: nextTopic.id,
+                    });
+
+                    history.replace(
                       appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-                        themeId: event.target.value,
-                        topicId: orderBy(
-                          newTheme.topics,
-                          topic => topic.title,
-                        )[0]?.id,
+                        themeId: nextTheme.id,
+                        topicId: nextTopic.id,
                       }),
                     );
                   }}
@@ -149,12 +195,29 @@ const ManagePublicationsAndReleasesTab = () => {
                       value: topic.id,
                     })) ?? []
                   }
-                  value={selectedTopic?.id}
+                  value={topicId}
                   onChange={event => {
-                    history.push(
+                    if (!selectedTheme) {
+                      return;
+                    }
+
+                    const nextTopic = selectedTheme.topics.find(
+                      topic => topic.id === event.target.value,
+                    );
+
+                    if (!nextTopic) {
+                      return;
+                    }
+
+                    setSavedThemeTopic({
+                      themeId: selectedTheme.id,
+                      topicId: nextTopic.id,
+                    });
+
+                    history.replace(
                       appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-                        themeId,
-                        topicId: event.target.value,
+                        themeId: selectedTheme.id,
+                        topicId: nextTopic.id,
                       }),
                     );
                   }}
