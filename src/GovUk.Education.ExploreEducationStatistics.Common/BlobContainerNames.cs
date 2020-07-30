@@ -7,5 +7,6 @@
         public const string PublicContentContainerName = "cache";
         public const string PublicPermalinkContainerName = "permalinks";
         public const string PublicPermalinkMigrationContainerName = "permalink-migrations";
+        public const string PublisherLeasesContainerName = "leases";
     }
 }
