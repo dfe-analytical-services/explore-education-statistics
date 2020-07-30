@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MetaVariables = () => {
+const PrototypeMetaVariables = () => {
   return (
     <>
       <p className="govuk-!-margin-top-0">
@@ -53,4 +53,4 @@ const MetaVariables = () => {
   );
 };
 
-export default MetaVariables;
+export default PrototypeMetaVariables;

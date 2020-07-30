@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import FormEditor from '@admin/components/form/FormEditor';
+import PageTitle from '@admin/components/PageTitle';
+import Button from '@common/components/Button';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 
-const CreatePreRelease = () => {
+const PrototypeCreatePreRelease = () => {
   // const query = new URLSearchParams(window.location.search);
   // const dialog = query.has('showDialog');
 
@@ -51,9 +53,7 @@ const CreatePreRelease = () => {
             </ul>
           </div>
 
-          <button
-            className="govuk-button"
-            type="submit"
+          <Button
             onClick={() => {
               setAddNewPreRelease(true);
               setCreatePreRelease(false);
@@ -61,7 +61,7 @@ const CreatePreRelease = () => {
             }}
           >
             Create public pre-release public access list
-          </button>
+          </Button>
         </>
       )}
       {addNewPreRelease && (
@@ -85,36 +85,34 @@ const CreatePreRelease = () => {
                 onChange={() => setAddNewPreRelease(true)}
               />
             </div>
-            <button
-              className="govuk-button govuk-!-margin-right-3"
-              type="submit"
+            <Button
+              className="govuk-!-margin-right-3"
               onClick={() => {
                 setPreviewPreRelease(true);
                 setAddNewPreRelease(false);
               }}
             >
               Save
-            </button>
-            <button
-              className="govuk-button govuk-button--secondary"
-              type="submit"
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => {
                 setAddNewPreRelease(false);
                 setCreatePreRelease(true);
               }}
             >
               Cancel
-            </button>
+            </Button>
           </form>
         </>
       )}
       {previewPreRelease && (
         <>
           <div className="govuk-width-container govuk-!-margin-left-0">
-            <h1 className="govuk-heading-xl">
-              <span className="govuk-caption-xl">Academic year 2018/19</span>
-              An example publication
-            </h1>
+            <PageTitle
+              title="An example publication"
+              caption="Academic year 2018/19"
+            />
             <h2 className="govuk-heading-m">Pre-release access list</h2>
 
             <h3 className="govuk-heading-s">Published 23 July 2020</h3>
@@ -122,9 +120,7 @@ const CreatePreRelease = () => {
             <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
               <SanitizeHtml dirtyHtml={formText || ''} />
             </div>
-            <button
-              className="govuk-button govuk-!-margin-right-3"
-              type="submit"
+            <Button
               onClick={() => {
                 setPreviewPreRelease(false);
                 setEditPreRelease(true);
@@ -132,7 +128,7 @@ const CreatePreRelease = () => {
               }}
             >
               Edit public metadata
-            </button>
+            </Button>
           </div>
         </>
       )}
@@ -140,4 +136,4 @@ const CreatePreRelease = () => {
   );
 };
 
-export default CreatePreRelease;
+export default PrototypeCreatePreRelease;

@@ -1,3 +1,4 @@
+import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React from 'react';
 import Tabs from '@common/components/Tabs';
@@ -5,17 +6,14 @@ import RelatedAside from '@common/components/RelatedAside';
 import TabsSection from '@common/components/TabsSection';
 import NavBar from './components/PrototypeNavBar';
 import CreatePreRelease from './components/PrototypePreReleaseCreate';
-import ManagePreRealease from './components/PrototypeManagePreRelease';
+import ManagePreRelease from './components/PrototypeManagePreRelease';
 
 const PrototypePreReleasePage = () => {
   return (
     <PrototypePage wide>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            <span className="govuk-caption-xl">Edit release</span>
-            An example publication
-          </h1>
+          <PageTitle title="An example publication" caption="Edit release" />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedAside>
@@ -38,7 +36,7 @@ const PrototypePreReleasePage = () => {
 
       <Tabs id="test">
         <TabsSection title="Pre-release access">
-          <ManagePreRealease />
+          <ManagePreRelease />
         </TabsSection>
         <TabsSection title="Public pre-release list">
           <CreatePreRelease />
