@@ -1,3 +1,4 @@
+import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React from 'react';
 import Tabs from '@common/components/Tabs';
@@ -6,15 +7,12 @@ import TabsSection from '@common/components/TabsSection';
 import NavBar from './components/PrototypeNavBar';
 import CreateMeta from './components/PrototypeMetaCreate';
 
-const PrototypeExamplePage = () => {
+const PrototypeMetadata = () => {
   return (
     <PrototypePage wide>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            <span className="govuk-caption-xl">Edit release</span>
-            An example publication
-          </h1>
+          <PageTitle title="An example publication" caption="Edit release" />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedAside>
@@ -52,4 +50,4 @@ const PrototypeExamplePage = () => {
   );
 };
 
-export default PrototypeExamplePage;
+export default PrototypeMetadata;

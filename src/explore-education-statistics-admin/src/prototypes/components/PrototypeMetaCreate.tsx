@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Button from '@common/components/Button';
 import CreateMetaForms from './PrototypeMetaForms';
 import PreviewMeta from './PrototypeMetaPreview';
 
@@ -6,7 +7,7 @@ interface Props {
   publicView?: boolean;
 }
 
-const CreateMeta = (publicView: Props) => {
+const PrototypeMetaCreate = (publicView: Props) => {
   const query = new URLSearchParams(window.location.search);
   const dialog = query.has('showDialog');
 
@@ -100,7 +101,7 @@ const CreateMeta = (publicView: Props) => {
 
   return (
     <>
-      {createMeta && !dialog && (
+      {createMeta && (
         <>
           <div className="govuk-inset-text">
             <h2 className="govuk-heading-m">Before you start</h2>
@@ -116,9 +117,7 @@ const CreateMeta = (publicView: Props) => {
             </ul>
           </div>
 
-          <button
-            className="govuk-button"
-            type="submit"
+          <Button
             onClick={() => {
               setAddNewMeta(true);
               setCreateMeta(false);
@@ -126,7 +125,7 @@ const CreateMeta = (publicView: Props) => {
             }}
           >
             Create public metadata
-          </button>
+          </Button>
         </>
       )}
       {addNewMeta && (
@@ -142,26 +141,15 @@ const CreateMeta = (publicView: Props) => {
             subject2={formText.subject2.text}
             subject3={formText.subject3.text}
           />
-          <button
-            className="govuk-button govuk-!-margin-right-3"
-            type="submit"
+          <Button
+            className=" govuk-!-margin-right-3"
             onClick={() => {
               setPreviewMeta(true);
               setAddNewMeta(false);
             }}
           >
-            Save
-          </button>
-          <button
-            className="govuk-button govuk-button--secondary"
-            type="submit"
-            onClick={() => {
-              setAddNewMeta(false);
-              setCreateMeta(true);
-            }}
-          >
-            Cancel
-          </button>
+            Preview
+          </Button>
         </>
       )}
       {previewMeta && (
@@ -171,9 +159,8 @@ const CreateMeta = (publicView: Props) => {
             showDialog={dialog}
           />
           {!switchPublicView && (
-            <button
-              className="govuk-button govuk-!-margin-right-3"
-              type="submit"
+            <Button
+              className="govuk-!-margin-right-3"
               onClick={() => {
                 setPreviewMeta(false);
                 setEditMeta(true);
@@ -181,7 +168,7 @@ const CreateMeta = (publicView: Props) => {
               }}
             >
               Edit public metadata
-            </button>
+            </Button>
           )}
         </>
       )}
@@ -189,4 +176,4 @@ const CreateMeta = (publicView: Props) => {
   );
 };
 
-export default CreateMeta;
+export default PrototypeMetaCreate;

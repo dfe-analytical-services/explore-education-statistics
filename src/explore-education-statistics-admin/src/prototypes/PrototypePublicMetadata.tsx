@@ -2,7 +2,7 @@ import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React from 'react';
 import CreateMeta from './components/PrototypeMetaCreate';
 
-const PrototypeExamplePage = () => {
+const PrototypePublicMetadata = () => {
   return (
     <PrototypePage
       breadcrumbs={[
@@ -16,4 +16,4 @@ const PrototypeExamplePage = () => {
   );
 };
 
-export default PrototypeExamplePage;
+export default PrototypePublicMetadata;

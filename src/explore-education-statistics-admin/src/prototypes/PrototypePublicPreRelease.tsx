@@ -1,3 +1,4 @@
+import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React from 'react';
 
@@ -10,10 +11,10 @@ const PrototypePreReleasePage = () => {
         { name: 'Pre release access list', link: '#' },
       ]}
     >
-      <h1 className="govuk-heading-xl">
-        <span className="govuk-caption-xl">Academic year 2018/19</span>
-        An example publication
-      </h1>
+      <PageTitle
+        title="An example publication"
+        caption="Academic year 2018/19"
+      />
 
       <h2 className="govuk-heading-m">Pre-release access list</h2>
 

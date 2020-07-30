@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import React from 'react';
 import styles from '@admin/components/NavBar.module.scss';
 
-const NavBar = () => {
+const PrototypeNavBar = () => {
   return (
     <nav
       className={classNames(
@@ -35,4 +35,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default PrototypeNavBar;

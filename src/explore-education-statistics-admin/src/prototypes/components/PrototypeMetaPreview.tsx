@@ -1,7 +1,9 @@
+import PageTitle from '@admin/components/PageTitle';
 import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import SanitizeHtml from '@common/components/SanitizeHtml';
+import WarningMessage from '@common/components/WarningMessage';
 import MetaVariables from './PrototypeMetaVariables';
 
 interface Props {
@@ -9,29 +11,22 @@ interface Props {
   showDialog?: boolean;
 }
 
-const CreateMetaForms = ({ description, showDialog }: Props) => {
+const PrototypeMetaPreview = ({ description, showDialog }: Props) => {
   return (
     <>
       <div>
         {showDialog && (
-          <div className="govuk-warning-text govuk-!-margin-bottom-9">
-            <span className="govuk-warning-text__icon" aria-hidden="true">
-              !
-            </span>
-            <strong className="govuk-warning-text__text">
-              <span className="govuk-warning-text__assistive">Warning</span>
-              Some data files have been added or changed since this page was
-              created. <br />
-              Please check all the details of this page and edit where
-              necessary.
-            </strong>
-          </div>
+          <WarningMessage>
+            Some data files have been added or changed since this page was
+            created. <br />
+            Please check all the details of this page and edit where necessary.
+          </WarningMessage>
         )}
 
-        <h1 className="govuk-heading-xl">
-          <span className="govuk-caption-xl">Academic year 2018/19</span>
-          An example publication
-        </h1>
+        <PageTitle
+          title="An example publiction"
+          caption="Academic year 2018/19"
+        />
         <h2 className="govuk-heading-m">Meta guidance document</h2>
 
         <h3 className="govuk-heading-s">Published 23 July 2020</h3>
@@ -165,4 +160,4 @@ const CreateMetaForms = ({ description, showDialog }: Props) => {
   );
 };
 
-export default CreateMetaForms;
+export default PrototypeMetaPreview;

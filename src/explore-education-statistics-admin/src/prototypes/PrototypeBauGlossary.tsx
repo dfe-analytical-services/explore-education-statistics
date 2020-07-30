@@ -1,11 +1,13 @@
+import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React, { useState } from 'react';
+import Button from '@common/components/Button';
 import { FormGroup, FormTextInput } from '@common/components/form';
 import FormEditor from '@admin/components/form/FormEditor';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 
-const PrototypeExamplePage = () => {
+const PrototypeBauGlossary = () => {
   const [edit, setEdit] = useState(false);
   const [newEntry, setNewEntry] = useState(false);
   const [editItem, setEditItem] = useState('');
@@ -66,10 +68,7 @@ const PrototypeExamplePage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            <span className="govuk-caption-xl">Content and data</span>
-            Manage glossary
-          </h1>
+          <PageTitle title="Manage glossary" caption="Content and data" />
         </div>
       </div>
 
@@ -104,37 +103,35 @@ const PrototypeExamplePage = () => {
             />
             <div className="govuk-!-margin-top-9 govuk-grid-row">
               <div className="govuk-grid-column-one-half">
-                <button
-                  className="govuk-button govuk-!-margin-right-3"
-                  type="submit"
+                <Button
+                  className="govuk-!-margin-right-3"
                   onClick={() => {
                     setEdit(false);
                   }}
                 >
                   Save
-                </button>
-                <button
-                  className="govuk-button govuk-button--secondary"
-                  type="submit"
+                </Button>
+
+                <Button
+                  variant="secondary"
                   onClick={() => {
                     setEdit(false);
                   }}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
               <div className="govuk-grid-column-one-half dfe-align--right">
                 {!newEntry && (
                   <>
-                    <button
-                      className="govuk-button govuk-button--warning"
-                      type="submit"
+                    <Button
+                      variant="warning"
                       onClick={() => {
                         toggleDeleteModal(true);
                       }}
                     >
                       Delete this item
-                    </button>
+                    </Button>
                     <ModalConfirm
                       mounted={showDeleteModal}
                       title="Confirm delete"
@@ -153,9 +150,8 @@ const PrototypeExamplePage = () => {
       )}
       {!edit && (
         <>
-          <button
-            className="govuk-button govuk-!-margin-right-3"
-            type="submit"
+          <Button
+            className="govuk-!-margin-right-3"
             onClick={() => {
               setEdit(true);
               setNewEntry(true);
@@ -163,8 +159,8 @@ const PrototypeExamplePage = () => {
             }}
           >
             Add new item
-          </button>
-          <table className="govuk-table">
+          </Button>
+          <table>
             <thead>
               <tr>
                 <th scope="col">Glossary item</th>
@@ -197,4 +193,4 @@ const PrototypeExamplePage = () => {
   );
 };
 
-export default PrototypeExamplePage;
+export default PrototypeBauGlossary;

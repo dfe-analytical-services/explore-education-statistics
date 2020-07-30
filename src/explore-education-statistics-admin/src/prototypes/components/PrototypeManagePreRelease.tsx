@@ -1,5 +1,10 @@
 import React from 'react';
+import Button from '@common/components/Button';
+import ButtonLink from '@common/components/ButtonLink';
 import { FormGroup, FormTextInput } from '@common/components/form';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import ButtonText from '@common/components/ButtonText';
 
 const PrototypeManagePreRelease = () => {
   return (
@@ -18,31 +23,24 @@ const PrototypeManagePreRelease = () => {
         </FormGroup>
 
         <div className="govuk-!-margin-top-3">
-          <button
-            className="govuk-button govuk-button--secondary"
-            type="submit"
-          >
-            Invite new user
-          </button>
+          <Button variant="secondary">Invite new user</Button>
         </div>
       </form>
 
-      <dl className="govuk-summary-list govuk-!-margin-bottom-9">
-        <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Pre-release access</dt>
-          <dd className="govuk-summary-list__value">Test1@example.com</dd>
-          <dd className="govuk-summary-list__actions">
-            <a href="#">Remove</a>
-          </dd>
-        </div>
-        <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Pre-release access</dt>
-          <dd className="govuk-summary-list__value">Test2@example.com</dd>
-          <dd className="govuk-summary-list__actions">
-            <a href="#">Remove</a>
-          </dd>
-        </div>
-      </dl>
+      <SummaryList>
+        <SummaryListItem
+          term="Pre-release access"
+          actions={<ButtonText>Remove</ButtonText>}
+        >
+          Test1@example.com
+        </SummaryListItem>
+        <SummaryListItem
+          term="Pre-release access"
+          actions={<ButtonText>Remove</ButtonText>}
+        >
+          Test2@example.com
+        </SummaryListItem>
+      </SummaryList>
     </>
   );
 };
