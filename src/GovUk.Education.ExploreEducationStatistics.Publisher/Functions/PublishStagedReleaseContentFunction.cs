@@ -83,6 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
                     
+                    await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);
                     await _notificationsService.NotifySubscribers(releaseIds);
                     await UpdateStage(published, Complete);

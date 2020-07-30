@@ -38,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
         }
 
-
         public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
         {
             var releases = await _releaseService.GetAmendedReleases(releaseIds);
@@ -53,6 +52,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     await _fileStorageService.DeletePublicBlob(
                         PublicContentReleasePath(release.Publication.Slug, release.PreviousVersion.Slug));
                 }
+            }
+        }
+        
+        public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)
+        {
+            var releases = await _releaseService.GetAsync(releaseIds);
+
+            foreach (var release in releases)
+            {
+                await _fileStorageService.DeleteDownloadFilesForPreviousVersion(release);
             }
         }
 

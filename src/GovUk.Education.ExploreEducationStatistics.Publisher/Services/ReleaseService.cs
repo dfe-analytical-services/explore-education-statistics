@@ -51,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _contentDbContext.Releases
                 .Where(release => ids.Contains(release.Id))
                 .Include(release => release.Publication)
+                .Include(release => release.PreviousVersion)
                 .ToListAsync();
         }
 
