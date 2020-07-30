@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
@@ -18,14 +20,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishReleaseDataFunction
     {
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IConfiguration _configuration;
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
 
-        public PublishReleaseDataFunction(IConfiguration configuration,
+        public PublishReleaseDataFunction(StatisticsDbContext statisticsDbContext, 
+            IConfiguration configuration,
             IQueueService queueService,
             IReleaseStatusService releaseStatusService)
         {
+            _statisticsDbContext = statisticsDbContext;
             _configuration = configuration;
             _queueService = queueService;
             _releaseStatusService = releaseStatusService;
@@ -50,9 +55,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
 
-            if (PublisherUtils.IsDevelopment())
+            var releaseHasSubjects = _statisticsDbContext
+                .ReleaseSubject
+                .Where(rs => rs.ReleaseId == message.ReleaseId)
+                .Any();
+            if (PublisherUtils.IsDevelopment() || !releaseHasSubjects)
             {
-                // Skip the ADF Pipeline which doesn't run locally
+                // Skip the ADF Pipeline if local or the release has no subjects
                 // If the Release is immediate then trigger publishing the content
                 // This usually happens when the ADF Pipeline is complete
                 if (await _releaseStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
