@@ -40,7 +40,6 @@ const PublicationSummary = ({
     string
   >();
   const noAmendmentInProgressFilter = (release: Release) =>
-    publication &&
     !publication.releases.some(
       r => r.amendment && r.previousVersionId === release.id,
     );
@@ -50,9 +49,9 @@ const PublicationSummary = ({
 
   return (
     <>
-      <SummaryList>
-        <SummaryListItem term="Methodology" smallKey>
-          <p>
+      <SummaryList smallKey>
+        <SummaryListItem term="Methodology">
+          <div className="govuk-!-margin-bottom-4">
             {publication.methodology ? (
               <Link to={`/methodologies/${publication.methodology.id}`}>
                 {publication.methodology.title}
@@ -76,7 +75,7 @@ const PublicationSummary = ({
                 )}
               </>
             )}
-          </p>
+          </div>
 
           <ButtonGroup className="govuk-!-margin-bottom-2">
             <ButtonLink
@@ -99,8 +98,8 @@ const PublicationSummary = ({
             </ButtonLink>
           </ButtonGroup>
         </SummaryListItem>
-        <SummaryListItem term="Releases" smallKey>
-          <ul className="govuk-list dfe-admin">
+        <SummaryListItem term="Releases">
+          <ul className="govuk-list">
             {publication.releases
               .filter(noAmendmentInProgressFilter)
               .map(release => (
