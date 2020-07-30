@@ -3,6 +3,8 @@ import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import SanitizeHtml from '@common/components/SanitizeHtml';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import MetaVariables from './PrototypeMetaVariables';
 
@@ -38,121 +40,62 @@ const PrototypeMetaPreview = ({ description, showDialog }: Props) => {
         <h2 className="govuk-heading-m govuk-!-margin-top-9">Data files</h2>
         <Accordion id="dataFiles">
           <AccordionSection heading="Absence by geography" goToTop={false}>
-            <dl className="govuk-summary-list govuk-!-margin-bottom-9">
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Filename</dt>
-                <dd className="govuk-summary-list__value">
-                  Absence_3term201819_nat_reg_la_sch
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Content</dt>
-                <dd className="govuk-summary-list__value">
-                  Absence information for all enrolments in state-funded
-                  primary, secondary and special schools including information
-                  on overall absence, persistent absence and reason for absence
-                  for pupils aged 5-15, based on all 5 half terms data from
-                  2006/07 to 2011/12 inclusive and based on 6 half term data
-                  from 2012/13 onwards
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Geographical levels</dt>
-                <dd className="govuk-summary-list__value">
-                  National; Regional; Local authority; School
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Years</dt>
-                <dd className="govuk-summary-list__value">
-                  2006/07 to 2018/19
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">
-                  Variable names and descriptions
-                </dt>
-                <dd className="govuk-summary-list__value">
-                  <MetaVariables />
-                </dd>
-              </div>
-            </dl>
+            <SummaryList className="govuk-!-margin-bottom-9">
+              <SummaryListItem term="Filename">
+                Absence_3term201819_nat_reg_la_sch
+              </SummaryListItem>
+              <SummaryListItem term="Content">
+                Absence information for all enrolments in state-funded primary,
+                secondary and special schools including information on overall
+                absence, persistent absence and reason for absence for pupils
+                aged 5-15, based on all 5 half terms data from 2006/07 to
+                2011/12 inclusive and based on 6 half term data from 2012/13
+                onwards
+              </SummaryListItem>
+              <SummaryListItem term="Geographical levels">
+                National; Regional; Local authority; School
+              </SummaryListItem>
+              <SummaryListItem term="Years">2006/07 to 2018/19</SummaryListItem>
+              <SummaryListItem term="Variable names and descriptions">
+                <MetaVariables />
+              </SummaryListItem>
+            </SummaryList>
           </AccordionSection>
           <AccordionSection
             heading="Absence by Local Authority by characteristics"
             goToTop={false}
           >
-            <dl className="govuk-summary-list govuk-!-margin-bottom-9">
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Filename</dt>
-                <dd className="govuk-summary-list__value">
-                  Absence_3term201819_la_characteristics
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Content</dt>
-                <dd className="govuk-summary-list__value">
-                  Absence information by pupil characteristics such as age,
-                  gender and ethnicity by local authority.
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Geographical levels</dt>
-                <dd className="govuk-summary-list__value">Local authority</dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Years</dt>
-                <dd className="govuk-summary-list__value">
-                  2012/13 to 2018/19
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">
-                  Variable names and descriptions
-                </dt>
-                <dd className="govuk-summary-list__value">
-                  <MetaVariables />
-                </dd>
-              </div>
-            </dl>
+            <SummaryList className="govuk-!-margin-bottom-9">
+              <SummaryListItem term="Geographical levels">
+                National; Regional; Local authority; School
+              </SummaryListItem>
+              <SummaryListItem term="Content">
+                Absence information by pupil characteristics such as age, gender
+                and ethnicity by local authority district.
+              </SummaryListItem>
+              <SummaryListItem term="Years">2006/07 to 2018/19</SummaryListItem>
+              <SummaryListItem term="Variable names and descriptions">
+                <MetaVariables />
+              </SummaryListItem>
+            </SummaryList>
           </AccordionSection>
           <AccordionSection
             heading="Absence by Local Authority District by characteristics"
             goToTop={false}
           >
-            <dl className="govuk-summary-list  govuk-!-margin-bottom-9">
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Filename</dt>
-                <dd className="govuk-summary-list__value">
-                  Absence_3term201819_lad_characteristics
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Content</dt>
-                <dd className="govuk-summary-list__value">
-                  Absence information by pupil characteristics such as age,
-                  gender and ethnicity by local authority district.
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Geographical levels</dt>
-                <dd className="govuk-summary-list__value">Local authority</dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Years</dt>
-                <dd className="govuk-summary-list__value">
-                  2012/13 to 2018/19
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">
-                  Variable names and descriptions
-                </dt>
-                <dd className="govuk-summary-list__value">
-                  <MetaVariables />
-                </dd>
-              </div>
-            </dl>
+            <SummaryList className="govuk-!-margin-bottom-9">
+              <SummaryListItem term="Geographical levels">
+                Absence_3term201819_lad_characteristics
+              </SummaryListItem>
+              <SummaryListItem term="Content">
+                Absence information by pupil characteristics such as age, gender
+                and ethnicity by local authority district.
+              </SummaryListItem>
+              <SummaryListItem term="Years">2012/13 to 2018/19</SummaryListItem>
+              <SummaryListItem term="Variable names and descriptions">
+                <MetaVariables />
+              </SummaryListItem>
+            </SummaryList>
           </AccordionSection>
         </Accordion>
       </div>
