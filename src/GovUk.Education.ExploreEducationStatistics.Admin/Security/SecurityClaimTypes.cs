@@ -15,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
          * Publication management
          */
         CreateAnyPublication,
+        UpdateAllPublications,
         
         /**
          * Release management

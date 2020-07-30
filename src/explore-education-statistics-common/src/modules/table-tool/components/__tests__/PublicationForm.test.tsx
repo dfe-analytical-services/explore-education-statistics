@@ -357,10 +357,12 @@ describe('PublicationForm', () => {
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(0);
 
-    expect(screen.getByRole('term')).toHaveTextContent('Publication');
-    expect(screen.getByRole('definition')).toHaveTextContent(
-      'National achievement rates tables',
-    );
+    expect(
+      screen.getByText('Publication', { selector: 'dt' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('National achievement rates tables', { selector: 'dd' }),
+    ).toBeInTheDocument();
   });
 
   test('renders read-only view with selected publication when step is not active', () => {
@@ -387,9 +389,13 @@ describe('PublicationForm', () => {
 
     expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(0);
 
-    expect(screen.getByRole('term')).toHaveTextContent('Publication');
-    expect(screen.getByRole('definition')).toHaveTextContent(
-      'Pupil absence in schools in England',
-    );
+    expect(
+      screen.getByText('Publication', { selector: 'dt' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Pupil absence in schools in England', {
+        selector: 'dd',
+      }),
+    ).toBeInTheDocument();
   });
 });

@@ -217,6 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<LegacyRelease> LegacyReleases { get; set; }
         public DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public DbSet<ReleaseFileReference> ReleaseFileReferences { get; set; }
         public DbSet<ContentSection> ContentSections { get; set; }

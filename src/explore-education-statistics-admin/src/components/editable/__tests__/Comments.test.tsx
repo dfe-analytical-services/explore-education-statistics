@@ -1,5 +1,7 @@
 import { AuthContext, User } from '@admin/contexts/AuthContext';
-import ManageReleaseContext from '@admin/pages/release/contexts/ManageReleaseContext';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/contexts/ManageReleaseContext';
 import { GlobalPermissions } from '@admin/services/permissionService';
 import _releaseContentCommentService from '@admin/services/releaseContentCommentService';
 import { Comment } from '@admin/services/types/content';
@@ -21,13 +23,15 @@ const releaseContentCommentService = _releaseContentCommentService as jest.Mocke
 >;
 
 describe('Comments', () => {
-  const testRelease = {
+  const testRelease: ManageRelease = {
     releaseId: 'release-1',
     onChangeReleaseStatus: noop,
     publication: {
       id: 'publication-1',
       themeId: 'theme-1',
+      topicId: 'topic-1',
       title: 'Test publication',
+      legacyReleases: [],
     },
   };
 

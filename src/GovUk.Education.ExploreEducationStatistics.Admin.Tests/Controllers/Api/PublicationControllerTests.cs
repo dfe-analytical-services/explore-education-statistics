@@ -16,18 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     {
 
         [Fact]
-        public async void Create_Publication_Returns_Ok()
+        public async void CreatePublication_Ok()
         {
             var publicationService = new Mock<IPublicationService>();
 
             publicationService
-                .Setup(s => s.CreatePublicationAsync(It.IsAny<CreatePublicationViewModel>()))
+                .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
                 .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ActionResult, PublicationViewModel>(new PublicationViewModel {TopicId = p.TopicId})));
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
             // Method under test
-            var result = await controller.CreatePublicationAsync(new CreatePublicationViewModel(), topicId);
+            var result = await controller.CreatePublication(new CreatePublicationViewModel(), topicId);
             Assert.IsAssignableFrom<OkObjectResult>(result.Result);
             Assert.IsAssignableFrom<PublicationViewModel>(((OkObjectResult) result.Result).Value);
 
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
         
         [Fact] 
-        public async void Create_Publication_Validation_Failure()
+        public async void CreatePublication_ValidationFailure()
         {
             var publicationService = new Mock<IPublicationService>();
 
@@ -45,14 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     ValidationUtils.ValidationActionResult(ValidationErrorMessages.SlugNotUnique));
             
             publicationService
-                .Setup(s => s.CreatePublicationAsync(It.IsAny<CreatePublicationViewModel>()))
+                .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
                 .Returns<CreatePublicationViewModel>(p => Task.FromResult(validationResponse));
             
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
             // Method under test
-            var result = await controller.CreatePublicationAsync(new CreatePublicationViewModel(), topicId);
+            var result = await controller.CreatePublication(new CreatePublicationViewModel(), topicId);
             var badRequestObjectResult = result.Result;
             Assert.IsAssignableFrom<BadRequestObjectResult>(badRequestObjectResult);
             var validationProblemDetails = (badRequestObjectResult as BadRequestObjectResult)?.Value;  
