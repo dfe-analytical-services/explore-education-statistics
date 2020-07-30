@@ -21,7 +21,7 @@ export interface AdminDashboardPublication {
   methodology?: IdTitlePair;
   externalMethodology?: ExternalMethodology;
   releases: MyRelease[];
-  contact: ContactDetails;
+  contact?: ContactDetails;
   permissions: {
     canCreateReleases: boolean;
     canUpdatePublication: boolean;

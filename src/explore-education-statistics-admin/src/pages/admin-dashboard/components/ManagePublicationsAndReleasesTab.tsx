@@ -245,8 +245,6 @@ const ManagePublicationsAndReleasesTab = () => {
                         >
                           <PublicationSummary
                             publication={publication}
-                            themeId={selectedTheme.id}
-                            topicId={selectedTopic.id}
                             onChangePublication={reloadMyPublications}
                           />
                         </AccordionSection>
