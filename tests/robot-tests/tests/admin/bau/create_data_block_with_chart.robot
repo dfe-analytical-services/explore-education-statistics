@@ -7,36 +7,40 @@ Force Tags  Admin  Local  Dev  AltersData
 Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
+*** Variables ***
+${TOPIC_NAME}        UI test topic %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}  UI tests - create data block %{RUN_IDENTIFIER}
+
 *** Test Cases ***
 Create Datablock test publication
     [Tags]  HappyPath
     environment variable should be set   RUN_IDENTIFIER
-    user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
-    user waits until page contains element    xpath://a[text()="Create new publication"]     60
-    user clicks element   xpath://a[text()="Create new publication"]
-    user creates publication  Datablock test %{RUN_IDENTIFIER}   Test methodology    Sean Gibson - (Special educational needs statistics team)
+    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user waits until page contains link  Create new publication     60
+    user clicks link   Create new publication
+    user creates publication without methodology  ${PUBLICATION_NAME}   Tingting Shu - (Attainment statistics team)
 
 Verify Datablock test publication is created
     [Tags]  HappyPath
-    user checks page contains accordion  Datablock test %{RUN_IDENTIFIER}
-    user opens accordion section  Datablock test %{RUN_IDENTIFIER}
-    user checks accordion section contains text  Datablock test %{RUN_IDENTIFIER}    Methodology
-    user checks accordion section contains text  Datablock test %{RUN_IDENTIFIER}    Releases
+    user checks page contains accordion  ${PUBLICATION_NAME}
+    user opens accordion section  ${PUBLICATION_NAME}
+    user checks accordion section contains text  ${PUBLICATION_NAME}    Methodology
+    user checks accordion section contains text  ${PUBLICATION_NAME}    Releases
 
 Create release
     [Tags]  HappyPath
-    user clicks element  css:[data-testid="Create new release link for Datablock test %{RUN_IDENTIFIER}"]
-    user creates release for publication  Datablock test %{RUN_IDENTIFIER}  Academic Year  2025
-    user checks summary list item "Publication title" should be "Datablock test %{RUN_IDENTIFIER}"
+    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
+    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
 
 Upload subject
     [Tags]  HappyPath
     user waits until page contains element    xpath://h2[text()="Release summary"]
-    user checks summary list item "Publication title" should be "Datablock test %{RUN_IDENTIFIER}"
+    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
     user clicks link  Manage data
-    user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
-    choose file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
-    choose file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
+    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
+    choose file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
+    choose file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
     user clicks button  Upload data files
 
     user waits until page contains heading 2  Uploaded data files
@@ -54,7 +58,7 @@ Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
     user selects radio    UI test subject
-    user clicks element   css:#publicationSubjectForm-submit
+    user clicks element   id:publicationSubjectForm-submit
     user waits until element is visible  xpath://h2[text()="Choose locations"]     90
     user checks previous table tool step contains  1    Subject     UI test subject
 
@@ -68,20 +72,20 @@ Select locations
     user opens details dropdown   Ward
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
     user waits until element is visible  xpath://h2[text()="Choose time period"]   90
 
 Select time period
     [Tags]   HappyPath
-    ${timePeriodStartList}=   get list items  css:#timePeriodForm-start
-    ${timePeriodEndList}=   get list items  css:#timePeriodForm-end
+    ${timePeriodStartList}=   get list items  id:timePeriodForm-start
+    ${timePeriodEndList}=   get list items  id:timePeriodForm-end
     ${expectedList}=   create list   Please select  2005  2007  2008  2009  2010  2011  2012  2016  2017  2018  2019  2020
     lists should be equal  ${timePeriodStartList}   ${expectedList}
     lists should be equal  ${timePeriodEndList}   ${expectedList}
 
     user selects start date    2005
     user selects end date      2020
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
     user waits until element is visible  xpath://h2[text()="Choose your filters"]
     user checks previous table tool step contains  3    Start date    2005
     user checks previous table tool step contains  3    End date      2020
@@ -93,9 +97,9 @@ Select indicators
 Create table
     [Tags]  HappyPath
     [Documentation]   EES-615
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
     user waits until results table appears     180
-    user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from 'Datablock test %{RUN_IDENTIFIER}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
+    user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table column headings
     [Tags]  HappyPath

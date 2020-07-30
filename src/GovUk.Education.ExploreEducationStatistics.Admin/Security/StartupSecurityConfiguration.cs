@@ -46,6 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // does this user have permission to view a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationRequirement()));
+                options.AddPolicy(SecurityPolicies.CanUpdatePublication.ToString(), policy =>
+                    policy.Requirements.Add(new UpdatePublicationRequirement()));
 
                 /**
                  * Release management
@@ -105,6 +107,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // does this user have permission to update a specific Comment?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificComment.ToString(), policy =>
                     policy.Requirements.Add(new UpdateSpecificCommentRequirement()));
+
+                /**
+                 * Legacy release management
+                 */
+                options.AddPolicy(SecurityPolicies.CanCreateLegacyRelease.ToString(), policy =>
+                    policy.Requirements.Add(new CreateLegacyReleaseRequirement()));
+                options.AddPolicy(SecurityPolicies.CanViewLegacyRelease.ToString(), policy =>
+                    policy.Requirements.Add(new ViewLegacyReleaseRequirement()));
+                options.AddPolicy(SecurityPolicies.CanUpdateLegacyRelease.ToString(), policy =>
+                    policy.Requirements.Add(new UpdateLegacyReleaseRequirement()));
+                options.AddPolicy(SecurityPolicies.CanDeleteLegacyRelease.ToString(), policy =>
+                    policy.Requirements.Add(new DeleteLegacyReleaseRequirement()));
 
                 /**
                  * Pre Release management
@@ -180,6 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              * Publication management
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdatePublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
 
@@ -197,6 +212,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();
+
+            /**
+             * Legacy release management
+             */
+            services.AddTransient<IAuthorizationHandler, CreateLegacyReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewLegacyReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateLegacyReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, DeleteLegacyReleaseAuthorizationHandler>();
 
             /**
              * Pre Release management

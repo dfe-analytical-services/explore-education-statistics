@@ -6,6 +6,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopicAsync(
+        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
             Guid topicId)
         {
             return await _userService
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublicationAsync(
+        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
             CreatePublicationViewModel publication)
         {
             return await _persistenceHelper
@@ -77,11 +78,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
 
                     await _context.SaveChangesAsync();
-                    return await GetViewModelAsync(saved.Entity.Id);
+                    return await GetViewModel(saved.Entity.Id);
                 });
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> GetViewModelAsync(Guid publicationId)
+        public async Task<Either<ActionResult, PublicationViewModel>> GetViewModel(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, HydratePublicationForPublicationViewModel)
@@ -89,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
 
-        public async Task<Either<ActionResult, bool>> UpdatePublicationMethodologyAsync(Guid publicationId,
+        public async Task<Either<ActionResult, bool>> UpdatePublicationMethodology(Guid publicationId,
             UpdatePublicationMethodologyViewModel methodology)
         {
             return await _persistenceHelper
@@ -117,11 +118,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
+            Guid publicationId, 
+            List<PartialUpdateLegacyReleaseViewModel> updatedLegacyReleases)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(
+                    publicationId,
+                    publication => publication.Include(p => p.LegacyReleases)
+                )
+                .OnSuccess(_userService.CheckCanUpdatePublication)
+                .OnSuccess(async publication =>
+                {
+                    publication.LegacyReleases.ForEach(legacyRelease =>
+                    {
+                        var updateLegacyRelease = updatedLegacyReleases
+                            .Find(release => release.Id == legacyRelease.Id);
+
+                        if (updateLegacyRelease == null)
+                        {
+                            return;
+                        }
+
+                        legacyRelease.Description = updateLegacyRelease.Description ?? legacyRelease.Description;
+                        legacyRelease.Url = updateLegacyRelease.Url ?? legacyRelease.Url;
+
+                        // Don't shift other orders around as its unreliable when doing 
+                        // a bulk update like this. It's easier to let the consumer 
+                        // decide what all the orders should be.
+                        legacyRelease.Order = updateLegacyRelease.Order ?? legacyRelease.Order;
+
+                        _context.Update(legacyRelease);
+                    });
+
+                    _context.Update(publication);
+                    await _context.SaveChangesAsync();
+
+                    return _mapper.Map<List<LegacyReleaseViewModel>>(
+                        publication.LegacyReleases.OrderByDescending(release => release.Order)
+                    );
+                });
+        }
+
         public static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)
         {
             return values.Include(p => p.Contact)
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.Type)
+                .Include(p => p.LegacyReleases)
                 .Include(p => p.Methodology)
                 .Include(p => p.Topic);
         }

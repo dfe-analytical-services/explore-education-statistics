@@ -25,6 +25,7 @@ export interface AdminDashboardPublication {
   contact: ContactDetails;
   permissions: {
     canCreateReleases: boolean;
+    canUpdatePublication: boolean;
   };
 }
 

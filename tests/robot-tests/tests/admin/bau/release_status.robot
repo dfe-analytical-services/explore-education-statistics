@@ -27,8 +27,6 @@ Verify new publication
 
 Create new release
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button  ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000

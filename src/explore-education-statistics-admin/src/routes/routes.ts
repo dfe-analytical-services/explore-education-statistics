@@ -1,6 +1,7 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
+import LegacyReleasesPageContainer from '@admin/pages/legacy-releases/LegacyReleasesPageContainer';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
 import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePage';
@@ -11,6 +12,10 @@ import ThemeTopicWrapper from '@admin/pages/theme/ThemeTopicWrapper';
 import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
 import administrationRoutes from '@admin/routes/administrationRoutes';
 import documentationRoutes from '@admin/routes/documentationRoutes';
+
+export type PublicationRouteParams = {
+  publicationId: string;
+};
 
 export const homeRoute: ProtectedRouteProps = {
   path: '/',
@@ -27,7 +32,7 @@ export const dashboardRoute: ProtectedRouteProps = {
 };
 
 export const dashboardThemeTopicRoute: ProtectedRouteProps = {
-  path: '/dashboard/:themeId/:topicId',
+  path: '/dashboard/theme/:themeId/topic/:topicId',
   component: AdminDashboardPage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
 };
@@ -82,6 +87,12 @@ export const releaseCreateRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+export const legacyReleasesRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/legacy-releases',
+  component: LegacyReleasesPageContainer,
+  protectionAction: user => user.permissions.canAccessUserAdministrationPages,
+};
+
 export const preReleaseRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/prerelease',
   component: PreReleasePage,
@@ -103,6 +114,7 @@ const routes = {
   methodologyRoute,
   releaseRoute,
   releaseCreateRoute,
+  legacyReleasesRoute,
   preReleaseRoute,
 };
 

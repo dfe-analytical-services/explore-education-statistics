@@ -317,6 +317,7 @@ user presses keys
 
 user enters text into element
   [Arguments]   ${selector}   ${text}
+  user waits until page contains element  ${selector}
   user clears element text  ${selector}
   user clicks element   ${selector}
   user presses keys  ${text}

@@ -15,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
          * Publication management
          */
         CanViewSpecificPublication,
+        CanUpdatePublication,
         CanCreatePublicationForSpecificTopic,
 
         /**
@@ -33,6 +34,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanDeleteSpecificRelease,
         CanViewSpecificPreReleaseSummary,
         CanUpdateSpecificComment,
+
+        /**
+         * Legacy release management
+         */
+        CanCreateLegacyRelease,
+        CanViewLegacyRelease,
+        CanUpdateLegacyRelease,
+        CanDeleteLegacyRelease,
 
         /**
          * Pre Release management

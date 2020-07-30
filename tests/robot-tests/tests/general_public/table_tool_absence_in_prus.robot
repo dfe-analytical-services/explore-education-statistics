@@ -87,10 +87,6 @@ Unselect England as a location
     user opens details dropdown     National
     user clicks checkbox            England
     user checks page contains element  xpath://*[@class="govuk-error-message" and text()="Select at least one location"]
-
-    # EES-951
-    user clicks element  //*[contains(@class,"govuk-details__summary-text") and text()="National"]
-
     user closes details dropdown    National
 
 Select locations LAs Barnet, Barnsley, Bedford
