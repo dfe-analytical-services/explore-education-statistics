@@ -75,11 +75,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blobContainer;
         }
 
-        public static FileInfo GetFileInfo(CloudBlob blob)
+        public static FileInfo GetFileInfo(Guid id, CloudBlob blob)
         {
             blob.FetchAttributes();
             return new FileInfo
             {
+                Id = id,
                 Extension = GetExtension(blob),
                 Name = GetName(blob),
                 Path = blob.Name,

@@ -49,13 +49,15 @@ const ChartBuilderTabSection = ({
       let chartToSave = chart;
 
       if (chart.type === 'infographic' && file) {
-        const {
-          filename,
-        } = await releaseChartFileService.uploadChartFile(releaseId, { file });
+        const { id } = await releaseChartFileService.uploadChartFile(
+          releaseId,
+          chart.fileId,
+          { file },
+        );
 
         chartToSave = {
           ...chart,
-          fileId: filename,
+          fileId: id,
         };
       }
 

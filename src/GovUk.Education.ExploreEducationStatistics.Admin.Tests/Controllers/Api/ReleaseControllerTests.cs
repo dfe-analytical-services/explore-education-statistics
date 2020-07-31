@@ -16,7 +16,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
         {
-            var testFile = new Common.Model.FileInfo
+            var testFile = new FileInfo
                             {
                                 Extension = "doc",
                                 Name = "File name",
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service =>
                     service.UploadFileAsync(_releaseId, ancillaryFile, "File name", 
                         ReleaseFileTypes.Ancillary, false))
-                .ReturnsAsync(new Either<ActionResult, Common.Model.FileInfo>(testFile));
+                .ReturnsAsync(new Either<ActionResult, FileInfo>(testFile));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test

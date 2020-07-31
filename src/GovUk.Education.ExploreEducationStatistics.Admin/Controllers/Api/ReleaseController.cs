@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -45,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataBlockService = dataBlockService;
         }
 
-        [HttpGet("release/{releaseId}/chart/{filename}")]
-        public async Task<ActionResult> GetChartFile(Guid releaseId, string filename)
+        [HttpGet("release/{releaseId}/chart/{id}")]
+        public async Task<ActionResult> GetChartFile(Guid releaseId, Guid id)
         {
             return await _releaseFilesService
-                .StreamFile(releaseId, ReleaseFileTypes.Chart, filename)
+                .StreamFile(releaseId, ReleaseFileTypes.Chart, id)
                 .HandleFailures();
         }
 
@@ -126,24 +125,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/chart")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<Common.Model.FileInfo>>> GetChartFilesAsync(Guid releaseId)
-        {
-            return await _releaseFilesService
-                .ListChartFilesAsync(releaseId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpPost("release/{releaseId}/ancillary")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<Common.Model.FileInfo>> AddAncillaryFileAsync(Guid releaseId,
+        public async Task<ActionResult<FileInfo>> AddAncillaryFileAsync(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
             return await _releaseFilesService
@@ -157,10 +145,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<Common.Model.FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file)
+        public async Task<ActionResult<FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file)
         {
             return await _releaseFilesService
-                .UploadChartFileAsync(releaseId, file)
+                .AddChartFileAsync(releaseId, file)
+                .HandleFailuresOrOk();
+        }
+        
+        [HttpPut("release/{releaseId}/chart/{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<FileInfo>> UpdateChartFileAsync(Guid releaseId, Guid id, IFormFile file)
+        {
+            return await _releaseFilesService
+                .UpdateChartFileAsync(releaseId, file, id)
                 .HandleFailuresOrOk();
         }
 
