@@ -59,8 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 .ReleaseSubject
                 .Where(rs => rs.ReleaseId == message.ReleaseId)
                 .Any();
+            logger.LogInformation($"releaseHasSubject: {releaseHasSubjects}");
             if (PublisherUtils.IsDevelopment() || !releaseHasSubjects)
             {
+                logger.LogInformation("Skipping ADF pipeline");
                 // Skip the ADF Pipeline if local or the release has no subjects
                 // If the Release is immediate then trigger publishing the content
                 // This usually happens when the ADF Pipeline is complete
@@ -74,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
             else
             {
+                logger.LogInformation("Running ADF pipeline");
                 try
                 {
                     var clientConfiguration = new DataFactoryClientConfiguration(_configuration);
