@@ -189,19 +189,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task UpdateDataStageAsync(Guid releaseId, Guid releaseStatusId, ReleaseStatusDataStage stage,
             ReleaseStatusLogMessage logMessage = null)
         {
-            var failureToSuccess = false;
-
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
-                // TODO EES-1070 checking Failed isn't right because the stage changes from Failed to Started when a retry begins
-                failureToSuccess = row.State.Data == ReleaseStatusDataStage.Failed
-                    && stage == ReleaseStatusDataStage.Complete;
-
                 row.State.Data = stage;
 
-                if (failureToSuccess)
+                if (stage == ReleaseStatusDataStage.Complete)
                 {
-                    var (publishing, overall) = GetStatesForReinstatingAfterSuccessfulRetry(row);
+                    // In case this was a retry, reinstate publishing if possible
+                    var (publishing, overall) = GetStatesForReinstatingAfterPossibleRetry(row);
                     row.State.Publishing = publishing;
                     row.State.Overall = overall;
                 }
@@ -215,8 +210,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await CancelReleasesWithContentDependency(releaseId, releaseStatusId);
             }
 
-            if (failureToSuccess)
+            if (stage == ReleaseStatusDataStage.Complete)
             {
+                // In case this was a retry, reinstate publishing of any other releases that were cancelled if possible
                 await ReinstateReleasesWithContentDependency(releaseId, releaseStatusId);
             }
         }
@@ -320,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         /// <summary>
         /// Reinstates publishing of any other releases sharing a dependency with the content of a Release.
-        /// Use this after a Release has failed and been successfully retried.
+        /// Use this when a Release stage may have failed previously and has now been successful.
         /// </summary>
         /// <param name="succeedingReleaseId"></param>
         /// <param name="succeedingReleaseStatusId"></param>
@@ -334,14 +330,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             var scheduled = await GetWherePublishingDueTodayWithStages(
+                content: ReleaseStatusContentStage.Complete,
+                data: ReleaseStatusDataStage.Complete,
+                files: ReleaseStatusFilesStage.Complete,
                 publishing: ReleaseStatusPublishingStage.Cancelled,
                 overall: ReleaseStatusOverallStage.Failed);
+
             var scheduledExceptSucceeding = scheduled
                 .Where(status => status.Id != succeedingReleaseStatusId);
 
             foreach (var releaseStatus in scheduledExceptSucceeding)
             {
-                var (publishing, overall) = GetStatesForReinstatingAfterSuccessfulRetry(releaseStatus);
+                var (publishing, overall) = GetStatesForReinstatingAfterPossibleRetry(releaseStatus);
 
                 await UpdateStagesAsync(releaseStatus.ReleaseId, releaseStatus.Id,
                     publishing: publishing,
@@ -352,28 +352,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         /// <summary>
-        /// Get the states for reinstating stages before they were cancelled due to a failure.
+        /// Get the states for reinstating stages after they may have been cancelled due to a failure.
         /// </summary>
         /// <remarks>
-        /// Checks that the states are still as expected and if not, leaves them untouched.
+        /// Checks that all the states are as expected and if not, leaves them untouched.
         /// </remarks>
-        /// <param name="existing"></param>
-        /// <returns>Returns the original starting states for stages before they were cancelled, unless they have since been modified.</returns>
+        /// <param name="releaseStatus"></param>
+        /// <returns>Returns the original starting states for stages before they were cancelled, if reinstating is possible.</returns>
         private static (ReleaseStatusPublishingStage Publishing, ReleaseStatusOverallStage Overall) 
-            GetStatesForReinstatingAfterSuccessfulRetry(ReleaseStatus existing)
+            GetStatesForReinstatingAfterPossibleRetry(ReleaseStatus releaseStatus)
         {
-            var startedState = existing.Immediate
+            var startingState = releaseStatus.Immediate
                 ? ReleaseStatusStates.ImmediateReleaseStartedState
                 : ReleaseStatusStates.ScheduledReleaseStartedState;
 
-            var existingState = existing.State;
-            
-            var newPublishingState = existingState.Publishing == ReleaseStatusPublishingStage.Cancelled
-                ? startedState.Publishing
-                : existingState.Publishing;
+            var existingState = releaseStatus.State;
 
-            var newOverallState = existing.State.Overall == ReleaseStatusOverallStage.Failed
-                ? startedState.Overall
+            var publishingCancelled = existingState.Publishing == ReleaseStatusPublishingStage.Cancelled;
+            var overallFailed = existingState.Overall == ReleaseStatusOverallStage.Failed;
+
+            var contentOk = existingState.Content == ReleaseStatusContentStage.Complete 
+                            || releaseStatus.Immediate && existingState.Content == startingState.Content;
+            var filesOk = existingState.Files == ReleaseStatusFilesStage.Complete;
+            var dataOk = existingState.Data == ReleaseStatusDataStage.Complete;
+
+            var reinstate = publishingCancelled
+                            && overallFailed
+                            && contentOk
+                            && filesOk
+                            && dataOk;
+
+            var newPublishingState = reinstate
+                 ? startingState.Publishing
+                 : existingState.Publishing;
+
+            var newOverallState = reinstate
+                ? startingState.Overall
                 : existingState.Overall;
 
             return (newPublishingState, newOverallState);
