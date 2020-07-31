@@ -136,24 +136,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void PublishReleaseAsync()
-        {
-            AssertSecurityPoliciesChecked(service =>
-                    service.PublishReleaseAsync(_release.Id),
-                _release,
-                CanPublishSpecificRelease);
-        }
-
-        [Fact]
-        public void PublishReleaseContentAsync()
-        {
-            AssertSecurityPoliciesChecked(service =>
-                    service.PublishReleaseContentAsync(_release.Id),
-                _release,
-                CanPublishSpecificRelease);
-        }
-
-        [Fact]
         public void DeleteReleaseAsync()
         {
             AssertSecurityPoliciesChecked(service => 
@@ -274,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteDataFilesAsync()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.RemoveDataFileReleaseLinkAsync(_release.Id, "", ""),  
+                    service.RemoveDataFilesAsync(_release.Id, "", ""),  
                 _release,
                 CanUpdateSpecificRelease);
         }
@@ -286,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IReleaseRepository> releaseRepository,
             Mock<ISubjectService> subjectService,
             Mock<ITableStorageService> tableStorageService,
-            Mock<IFileStorageService> fileStorageService,
+            Mock<IReleaseFilesService> fileStorageService,
             Mock<IImportStatusService> importStatusService,
             Mock<IFootnoteService> footnoteService,
             Mock<StatisticsDbContext> statisticsDbContext,
@@ -320,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IReleaseRepository> ReleaseRepository,
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
-            Mock<IFileStorageService> FileStorageService,
+            Mock<IReleaseFilesService> FileStorageService,
             Mock<IImportStatusService> ImportStatusService,
             Mock<IFootnoteService> FootnoteService,
             Mock<StatisticsDbContext> StatisticsDbContext,
@@ -339,7 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IReleaseRepository>(),
                 new Mock<ISubjectService>(),
                 new Mock<ITableStorageService>(),
-                new Mock<IFileStorageService>(),
+                new Mock<IReleaseFilesService>(),
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
                 new Mock<StatisticsDbContext>(),

@@ -1,6 +1,5 @@
 import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
 import ChartBuilderSaveButton from '@admin/pages/release/datablocks/components/ChartBuilderSaveButton';
-import InfographicChartForm from '@admin/pages/release/datablocks/components/InfographicChartForm';
 import {
   ChartOptions,
   FormState,
@@ -9,12 +8,18 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import Effect from '@common/components/Effect';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
+import {
+  convertServerFieldErrors,
+  mapFieldErrors,
+  ServerValidationErrorResponse,
+} from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import mapValues from 'lodash/mapValues';
@@ -22,6 +27,19 @@ import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema, Schema } from 'yup';
+
+export const errorMappings = [
+  mapFieldErrors<ChartOptions>({
+    target: 'file',
+    messages: {
+      FILE_TYPE_INVALID: 'The infographic must be an image',
+      CANNOT_OVERWRITE_FILE: 'The infographic does not have a unique filename',
+      FILE_CANNOT_BE_EMPTY: 'The infographic cannot be an empty file',
+      FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        'The infographic filename cannot contain spaces or special characters',
+    },
+  }),
+];
 
 const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
   // eslint-disable-next-line no-param-reassign
@@ -37,8 +55,8 @@ interface Props {
   definition: ChartDefinition;
   forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
-  releaseId: string;
   meta: FullTableMeta;
+  submitError?: ServerValidationErrorResponse;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
   onFormStateChange: (
@@ -59,14 +77,12 @@ const ChartConfiguration = ({
   forms,
   hasSubmittedChart,
   meta,
-  releaseId,
+  submitError,
   onBoundaryLevelChange,
   onChange,
   onFormStateChange,
   onSubmit,
 }: Props) => {
-  const { fileId } = chartOptions;
-
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
       title: Yup.string().required('Enter chart title'),
@@ -104,8 +120,26 @@ const ChartConfiguration = ({
       });
     }
 
+    if (definition.type === 'infographic') {
+      schema = schema.shape({
+        fileId: Yup.string(),
+        file: Yup.file()
+          .nullable()
+          .when('fileId', {
+            is: value => !value,
+            then: Yup.file().required('Select an infographic file to upload'),
+          })
+          .mimeType(['image'], 'The infographic must be an image')
+          .minSize(0, 'The infographic cannot be an empty file'),
+      });
+    }
+
     return schema;
-  }, [definition.capabilities.hasLegend, definition.capabilities.stackable]);
+  }, [
+    definition.capabilities.hasLegend,
+    definition.capabilities.stackable,
+    definition.type,
+  ]);
 
   const initialValues = useMemo<FormValues>(() => {
     return pick(chartOptions, Object.keys(validationSchema.fields));
@@ -132,48 +166,29 @@ const ChartConfiguration = ({
   );
 
   return (
-    <>
-      {definition.type === 'infographic' && (
-        <>
-          <InfographicChartForm
-            canSaveChart={canSaveChart}
-            releaseId={releaseId}
-            fileId={fileId}
-            subjectName={meta.subjectName}
-            onSubmit={async nextFileId => {
-              onChange({
-                ...chartOptions,
-                fileId: nextFileId,
-              });
-            }}
-            onDelete={async () => {
-              onSubmit({
-                ...chartOptions,
-                fileId: '',
-              });
-            }}
-          />
-          <hr />
-        </>
-      )}
-
-      <Formik<FormValues>
-        enableReinitialize
-        initialValues={initialValues}
-        initialTouched={
-          hasSubmittedChart
-            ? mapValues(validationSchema.fields, () => true)
-            : undefined
+    <Formik<FormValues>
+      enableReinitialize
+      initialErrors={
+        submitError
+          ? convertServerFieldErrors(submitError, errorMappings)
+          : undefined
+      }
+      initialValues={initialValues}
+      initialTouched={
+        hasSubmittedChart
+          ? mapValues(validationSchema.fields, () => true)
+          : undefined
+      }
+      validateOnMount
+      validationSchema={validationSchema}
+      onSubmit={values => {
+        if (canSaveChart) {
+          onSubmit(normalizeValues(values));
         }
-        validateOnMount
-        validationSchema={validationSchema}
-        onSubmit={values => {
-          if (canSaveChart) {
-            onSubmit(normalizeValues(values));
-          }
-        }}
-      >
-        {form => (
+      }}
+    >
+      {form => {
+        return (
           <Form id={formId}>
             <Effect
               value={{
@@ -193,7 +208,16 @@ const ChartConfiguration = ({
               onMount={onFormStateChange}
             />
 
-            <FormFieldTextArea<ChartOptions>
+            {validationSchema.fields.file && (
+              <FormFieldFileInput<FormValues>
+                id={`${formId}-file`}
+                name="file"
+                label="Upload new infographic"
+                accept="image/*"
+              />
+            )}
+
+            <FormFieldTextArea<FormValues>
               id={`${formId}-title`}
               name="title"
               label="Title"
@@ -203,7 +227,7 @@ const ChartConfiguration = ({
               onChange={replaceNewLines}
             />
 
-            <FormFieldTextArea<ChartOptions>
+            <FormFieldTextArea<FormValues>
               id={`${formId}-alt`}
               className="govuk-!-width-three-quarters"
               name="alt"
@@ -215,7 +239,7 @@ const ChartConfiguration = ({
             />
 
             {validationSchema.fields.stacked && (
-              <FormFieldCheckbox<ChartOptions>
+              <FormFieldCheckbox<FormValues>
                 id={`${formId}-stacked`}
                 name="stacked"
                 label="Stacked bars"
@@ -223,7 +247,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.legend && (
-              <FormFieldSelect<ChartOptions>
+              <FormFieldSelect<FormValues>
                 id={`${formId}-position`}
                 name="legend"
                 label="Legend position"
@@ -237,7 +261,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.height && (
-              <FormFieldNumberInput<ChartOptions>
+              <FormFieldNumberInput<FormValues>
                 id={`${formId}-height`}
                 name="height"
                 label="Height (px)"
@@ -246,7 +270,7 @@ const ChartConfiguration = ({
             )}
 
             {validationSchema.fields.width && (
-              <FormFieldNumberInput<ChartOptions>
+              <FormFieldNumberInput<FormValues>
                 id={`${formId}-width`}
                 name="width"
                 label="Width (px)"
@@ -264,7 +288,7 @@ const ChartConfiguration = ({
                 )}
                 {meta.boundaryLevels.length > 1 && (
                   <FormGroup>
-                    <FormFieldSelect<ChartOptions>
+                    <FormFieldSelect<FormValues>
                       id={`${formId}-geographicId`}
                       label="Select a version of geographical data to use"
                       name="geographicId"
@@ -299,9 +323,9 @@ const ChartConfiguration = ({
               {buttons}
             </ButtonGroup>
           </Form>
-        )}
-      </Formik>
-    </>
+        );
+      }}
+    </Formik>
   );
 };
 

@@ -6,7 +6,8 @@
   flex-direction: column;
   margin-bottom: govuk-spacing(6);
 
-  > * {
+  > button,
+  > a {
     margin-bottom: govuk-spacing(4);
     margin-right: 0;
   }
@@ -19,7 +20,8 @@
   @include govuk-media-query($from: tablet) {
     flex-direction: row;
 
-    > * {
+    > button,
+    > a {
       margin-bottom: 0;
       margin-right: govuk-spacing(2);
     }

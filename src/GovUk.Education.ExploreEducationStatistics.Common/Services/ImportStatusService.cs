@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public ImportStatusService(
             ITableStorageService tblStorageService)
         {
-            _table = tblStorageService.GetTableAsync("imports").Result;
+            _table = tblStorageService.GetTableAsync(DatafileImportsTableName).Result;
         }
         
         public async Task<ImportStatus> GetImportStatus(string releaseId, string dataFileName)

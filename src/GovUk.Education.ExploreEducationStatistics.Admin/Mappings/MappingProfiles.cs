@@ -87,6 +87,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(p => p.Releases
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(
+                    dest => dest.LegacyReleases,
+                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order))
+                )
+                .ForMember(
                     dest => dest.ThemeId,
                     m => m.MapFrom(p => p.Topic.ThemeId));
 
@@ -146,11 +150,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             .ToList(),
                         LegacyReleases = r.Publication.LegacyReleases
                             .OrderByDescending(legacyRelease => legacyRelease.Order)
-                            .Select(legacy => new LegacyReleaseViewModel
+                            .Select(legacy => new ViewModels.ManageContent.LegacyReleaseViewModel
                             {
                                 Id = legacy.Id,
                                 Description = legacy.Description,
-                                Url = legacy.Url
+                                Url = legacy.Url,
                             })
                             .ToList(),
                         ExternalMethodology = r.Publication.ExternalMethodology != null
@@ -181,6 +185,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Update, ReleaseNoteViewModel>();
 
+            CreateMap<LegacyRelease, ViewModels.LegacyReleaseViewModel>();
+
             CreateMap<Comment, CommentViewModel>()
                 .ForMember(dest => dest.CreatedBy,
                     m => m.MapFrom(comment =>
@@ -209,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
         private void CreateContentBlockMap()
         {
-            CreateMap<IContentBlock, IContentBlockViewModel>()
+            CreateMap<ContentBlock, IContentBlockViewModel>()
                 .IncludeAllDerived()
                 .ForMember(dest => dest.Comments,
                     m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));

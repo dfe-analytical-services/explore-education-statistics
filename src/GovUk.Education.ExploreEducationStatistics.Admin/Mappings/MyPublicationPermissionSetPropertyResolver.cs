@@ -24,7 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         {
             return new MyPublicationViewModel.PermissionsSet
             {
-                CanCreateReleases =  _userService
+                CanUpdatePublication = _userService
+                    .CheckCanUpdatePublication(source)
+                    .Result
+                    .OnSuccess(_ => true)
+                    .OrElse(() => false)
+                    .Right,
+                CanCreateReleases = _userService
                     .CheckCanCreateReleaseForPublication(source)
                     .Result
                     .OnSuccess(_ => true)

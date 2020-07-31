@@ -31,10 +31,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
         }
 
-        /**
-         * Azure function which publishes the statistics data for a Release by triggering an ADF Pipeline to copy it between databases.
-         * Triggers publishing content for the Release if publishing is immediate and the function is running locally where the ADF Pipeline is skipped.
-         */
+        /// <summary>
+        /// Azure function which publishes the statistics data for a Release by triggering an ADF Pipeline to copy it between databases.
+        /// </summary>
+        /// <remarks>
+        /// Triggers publishing content for the Release if publishing is immediate and the function is running locally where the ADF Pipeline is skipped.
+        /// </remarks>
+        /// <param name="message"></param>
+        /// <param name="executionContext"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         [FunctionName("PublishReleaseData")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseData(
@@ -46,12 +52,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             if (PublisherUtils.IsDevelopment())
             {
-                // Skip the ADF Pipeline which doesn't run locally
+                // Skip the ADF Pipeline if running locally
                 // If the Release is immediate then trigger publishing the content
                 // This usually happens when the ADF Pipeline is complete
                 if (await _releaseStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
                 {
-                    await _queueService.QueuePublishReleaseContentImmediateMessageAsync(message.ReleaseId,
+                    await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
                         message.ReleaseStatusId);
                 }
 

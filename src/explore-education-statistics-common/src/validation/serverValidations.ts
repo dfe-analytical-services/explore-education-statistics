@@ -1,4 +1,6 @@
 import { Dictionary } from '@common/types';
+import isAxiosError from '@common/utils/error/isAxiosError';
+import { AxiosError } from 'axios';
 import { FormikErrors } from 'formik';
 import camelCase from 'lodash/camelCase';
 import set from 'lodash/set';
@@ -116,5 +118,22 @@ export function convertServerFieldErrors<FormValues>(
       return acc;
     },
     {},
+  );
+}
+
+export function isServerValidationError(
+  error: Error,
+): error is AxiosError<ServerValidationErrorResponse> {
+  if (!isAxiosError(error) || !error.response?.data) {
+    return false;
+  }
+
+  const errorDataAsValidationError = error.response
+    .data as ServerValidationErrorResponse;
+
+  return (
+    errorDataAsValidationError.errors !== undefined &&
+    errorDataAsValidationError.status !== undefined &&
+    errorDataAsValidationError.title !== undefined
   );
 }

@@ -85,21 +85,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging()
+                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging()
+                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
-                    .EnableSensitiveDataLogging()
+                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
             );
 
             // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
@@ -204,9 +204,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
 
 
-            services.AddTransient<IFileStorageService, FileStorageService>();
+            services.AddTransient<IReleaseFilesService, ReleaseFilesService>();
             services.AddTransient<IImportService, ImportService>();
-            services.AddTransient<IPublishingService, PublishingService>();
+            services.AddTransient<IPublishingService, PublishingService>(provider =>
+                new PublishingService(
+                    provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
+                    provider.GetService<IUserService>(),
+                    provider.GetRequiredService<ILogger<PublishingService>>()));
             services.AddTransient<IReleaseStatusService, ReleaseStatusService>(s => 
                 new ReleaseStatusService(
                     s.GetService<IMapper>(),
@@ -225,6 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
+            services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();

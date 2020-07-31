@@ -3,10 +3,10 @@ import TabsSection from '@common/components/TabsSection';
 import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
-import KeyStatTile, {
-  KeyStatTileColumn,
-  KeyStatTileContainer,
-} from '@common/modules/find-statistics/components/KeyStatTile';
+import KeyStat, {
+  KeyStatColumn,
+  KeyStatContainer,
+} from '@common/modules/find-statistics/components/KeyStat';
 import { Release } from '@common/services/publicationService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
@@ -30,15 +30,15 @@ const PublicationReleaseHeadlinesSection = ({
 
   const summaryTab = (
     <TabsSection title="Summary">
-      <KeyStatTileContainer>
+      <KeyStatContainer>
         {keyStatisticsSection.content.map(block => {
           if (block.type !== 'DataBlock') {
             return null;
           }
 
           return (
-            <KeyStatTileColumn key={block.id}>
-              <KeyStatTile
+            <KeyStatColumn key={block.id}>
+              <KeyStat
                 query={{
                   releaseId: id,
                   ...block.query,
@@ -49,10 +49,10 @@ const PublicationReleaseHeadlinesSection = ({
                   expiresIn: 60 * 60 * 24,
                 }}
               />
-            </KeyStatTileColumn>
+            </KeyStatColumn>
           );
         })}
-      </KeyStatTileContainer>
+      </KeyStatContainer>
 
       {orderBy(headlinesSection.content, 'order').map(block => (
         <ContentBlockRenderer key={block.id} block={block} />

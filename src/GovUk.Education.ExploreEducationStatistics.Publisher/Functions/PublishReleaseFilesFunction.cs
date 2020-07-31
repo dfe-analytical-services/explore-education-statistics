@@ -27,11 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
         }
 
-        /**
-         * Azure function which publishes the files for a Release by copying them between storage accounts.
-         * Triggers publishing statistics data for the Release if publishing is immediate.
-         * Triggers generating staged content for the Release if publishing is not immediate.
-         */
+        /// <summary>
+        /// Azure function which publishes the files for a Release by copying them between storage accounts.
+        /// </summary>
+        /// <remarks>
+        /// Triggers publishing statistics data for the Release if publishing is immediate.
+        /// Triggers generating staged content for the Release if publishing is not immediate.
+        /// </remarks>
+        /// <param name="message"></param>
+        /// <param name="executionContext"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         [FunctionName("PublishReleaseFiles")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseFiles(

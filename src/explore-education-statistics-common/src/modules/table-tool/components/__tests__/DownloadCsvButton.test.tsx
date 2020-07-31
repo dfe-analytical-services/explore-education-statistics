@@ -7,7 +7,7 @@ import {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
-import { writeFile } from 'xlsx';
+import { WorkBook, writeFile } from 'xlsx';
 import DownloadCsvButton, { getCsvData } from '../DownloadCsvButton';
 
 jest.mock('xlsx', () => {
@@ -88,7 +88,17 @@ describe('DownloadCsvButton', () => {
     const mockedWriteFile = writeFile as jest.Mock;
 
     expect(mockedWriteFile).toHaveBeenCalledTimes(1);
-    expect(mockedWriteFile.mock.calls[0][0]).toMatchSnapshot();
+
+    const workbook = mockedWriteFile.mock.calls[0][0] as WorkBook;
+
+    expect(workbook.Sheets.Sheet1.A1.v).toBe('location');
+    expect(workbook.Sheets.Sheet1.B1.v).toBe('location_code');
+    expect(workbook.Sheets.Sheet1.C1.v).toBe('geographic_level');
+    expect(workbook.Sheets.Sheet1.D1.v).toBe('time_period');
+    expect(workbook.Sheets.Sheet1.E1.v).toBe('characteristic');
+    expect(workbook.Sheets.Sheet1.F1.v).toBe('sess_authorised_percent');
+    expect(workbook.Sheets.Sheet1.G1.v).toBe('sess_authorised');
+
     expect(mockedWriteFile.mock.calls[0][1]).toBe('pupil-absence.csv');
   });
 
@@ -247,6 +257,19 @@ describe('DownloadCsvButton', () => {
             },
             measures: {
               authAbsRate: '111',
+            },
+          },
+          {
+            filters: ['gender_female', 'school_secondary'],
+            timePeriod: '2015_AY',
+            geographicLevel: 'Country',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
               authAbsSess: '222',
             },
           },
@@ -259,28 +282,77 @@ describe('DownloadCsvButton', () => {
 
       expect(data[1]).toHaveLength(8);
       expect(data[1][6]).toBe('111');
-      expect(data[1][7]).toBe('222');
+      expect(data[1][7]).toBe('n/a');
 
       expect(data[2]).toHaveLength(8);
       expect(data[2][6]).toBe('n/a');
-      expect(data[2][7]).toBe('n/a');
+      expect(data[2][7]).toBe('222');
 
       expect(data).toMatchSnapshot();
     });
 
-    test("contains n/a's if there are no results", () => {
+    test("strips out rows with only n/a's", () => {
+      const data = getCsvData({
+        subjectMeta: {
+          ...basicSubjectMeta,
+          filters: {
+            ...basicSubjectMeta.filters,
+            'School Type': {
+              name: 'school_type',
+              options: [
+                new CategoryFilter({
+                  value: 'school_primary',
+                  label: 'State-funded primary',
+                  category: 'School Type',
+                }),
+                new CategoryFilter({
+                  value: 'school_secondary',
+                  label: 'State-funded secondary',
+                  category: 'School Type',
+                }),
+              ],
+            },
+          },
+        },
+        results: [
+          {
+            filters: ['gender_female', 'school_primary'],
+            timePeriod: '2015_AY',
+            geographicLevel: 'Country',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
+              authAbsRate: '111',
+              authAbsSess: '222',
+            },
+          },
+        ],
+      });
+
+      expect(data).toHaveLength(2);
+
+      expect(data[0]).toHaveLength(8);
+
+      expect(data[1]).toHaveLength(8);
+      expect(data[1][6]).toBe('111');
+      expect(data[1][7]).toBe('222');
+
+      expect(data).toMatchSnapshot();
+    });
+
+    test('returns only header if there are no results', () => {
       const data = getCsvData({
         subjectMeta: basicSubjectMeta,
         results: [],
       });
 
-      expect(data).toHaveLength(2);
+      expect(data).toHaveLength(1);
 
       expect(data[0]).toHaveLength(7);
-
-      expect(data[1]).toHaveLength(7);
-      expect(data[1][5]).toBe('n/a');
-      expect(data[1][6]).toBe('n/a');
 
       expect(data).toMatchSnapshot();
     });

@@ -34,44 +34,50 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
     locations,
     timePeriodRange,
     ...Object.values(filters).map(filterGroup => filterGroup.options),
-  ).map(filterCombination => {
-    const [location, timePeriod, ...filterOptions] = filterCombination as [
-      LocationFilter,
-      TimePeriodFilter,
-      ...CategoryFilter[],
-    ];
+  )
+    .map(filterCombination => {
+      const [location, timePeriod, ...filterOptions] = filterCombination as [
+        LocationFilter,
+        TimePeriodFilter,
+        ...CategoryFilter[],
+      ];
 
-    const indicatorCells = indicators.map(indicator => {
-      const matchingResult = results.find(result => {
-        const geographicLevel = camelCase(result.geographicLevel);
+      const indicatorCells = indicators.map(indicator => {
+        const matchingResult = results.find(result => {
+          const geographicLevel = camelCase(result.geographicLevel);
 
-        return (
-          filterOptions.every(filter =>
-            result.filters.includes(filter.value),
-          ) &&
-          result.location[geographicLevel] &&
-          result.location[geographicLevel].code === location.value &&
-          location.level === geographicLevel &&
-          result.timePeriod === timePeriod.value
-        );
+          return (
+            filterOptions.every(filter =>
+              result.filters.includes(filter.value),
+            ) &&
+            result.location[geographicLevel] &&
+            result.location[geographicLevel].code === location.value &&
+            location.level === geographicLevel &&
+            result.timePeriod === timePeriod.value
+          );
+        });
+
+        if (!matchingResult) {
+          return 'n/a';
+        }
+
+        return matchingResult.measures[indicator.value] ?? 'n/a';
       });
 
-      if (!matchingResult) {
-        return 'n/a';
+      if (indicatorCells.every(cell => cell === 'n/a')) {
+        return [];
       }
 
-      return matchingResult.measures[indicator.value] ?? 'n/a';
-    });
-
-    return [
-      location.label,
-      location.value,
-      location.level,
-      timePeriod.label.replace(/\//g, ''),
-      ...filterOptions.map(column => column.label),
-      ...indicatorCells,
-    ];
-  });
+      return [
+        location.label,
+        location.value,
+        location.level,
+        timePeriod.label.replace(/\//g, ''),
+        ...filterOptions.map(column => column.label),
+        ...indicatorCells,
+      ];
+    })
+    .filter(row => row.length > 0);
 
   return [columns, ...rows];
 };

@@ -217,10 +217,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<LegacyRelease> LegacyReleases { get; set; }
         public DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public DbSet<ReleaseFileReference> ReleaseFileReferences { get; set; }
         public DbSet<ContentSection> ContentSections { get; set; }
-        public DbSet<IContentBlock> ContentBlocks { get; set; }
+        public DbSet<ContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
@@ -322,7 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
             
-            modelBuilder.Entity<IContentBlock>()
+            modelBuilder.Entity<ContentBlock>()
                 .ToTable("ContentBlock")
                 .HasDiscriminator<string>("Type");
 
@@ -384,11 +385,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
-                .HasColumnName("HtmlBlock_Body");
+                .HasColumnName("Body");
 
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
-                .HasColumnName("MarkDownBlock_Body");
+                .HasColumnName("Body");
 
             modelBuilder.Entity<ReleaseContentSection>()
                 .HasKey(item => new {item.ReleaseId, item.ContentSectionId});
@@ -5706,7 +5707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "1. Overview of absence statistics",
                             Caption = "",
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5726,7 +5727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "2. National Statistics badging",
                             Caption = "",
                             Order = 2,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5746,7 +5747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "3. Methodology",
                             Caption = "",
                             Order = 3,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5766,7 +5767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "4. Data collection",
                             Caption = "",
                             Order = 4,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5786,7 +5787,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "5. Data processing",
                             Caption = "",
                             Order = 5,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5806,7 +5807,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "6. Data quality",
                             Caption = "",
                             Order = 6,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5826,7 +5827,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "7. Contacts",
                             Caption = "",
                             Order = 7,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5849,7 +5850,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex A - Calculations",
                             Caption = "",
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5869,7 +5870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex B - School attendance codes",
                             Caption = "",
                             Order = 2,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5889,7 +5890,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex C - Links to pupil absence national statistics and data",
                             Caption = "",
                             Order = 3,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5909,7 +5910,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex D - Standard breakdowns",
                             Caption = "",
                             Order = 4,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5929,7 +5930,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex E - Timeline",
                             Caption = "",
                             Order = 5,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5947,7 +5948,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex F - Absence rates over time",
                             Caption = "",
                             Order = 6,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5977,7 +5978,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "1. Overview of applications and offers statistics",
                             Caption = "",
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -5998,7 +5999,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "2. The admissions process",
                             Caption = "",
                             Order = 2,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6019,7 +6020,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "3. Methodology",
                             Caption = "",
                             Order = 3,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6040,7 +6041,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "4. Contacts",
                             Caption = "",
                             Order = 4,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6073,7 +6074,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "1. Overview of exclusion statistics",
                             Caption = "",
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6091,7 +6092,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "2. National Statistics badging",
                             Caption = "",
                             Order = 2,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6109,7 +6110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "3. Methodology",
                             Caption = "",
                             Order = 3,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6127,7 +6128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "4. Data collection",
                             Caption = "",
                             Order = 4,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6145,7 +6146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "5. Data processing",
                             Caption = "",
                             Order = 5,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6163,7 +6164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "6. Data quality",
                             Caption = "",
                             Order = 6,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6181,7 +6182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "7. Contacts",
                             Caption = "",
                             Order = 7,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6202,7 +6203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex A - Calculations",
                             Caption = "",
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6220,7 +6221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex B - Exclusion by reason codes",
                             Caption = "",
                             Order = 2,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6238,7 +6239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex C - Links to pupil exclusions statistics and data",
                             Caption = "",
                             Order = 3,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -6256,7 +6257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex D - Standard breakdowns",
                             Caption = "",
                             Order = 4,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {

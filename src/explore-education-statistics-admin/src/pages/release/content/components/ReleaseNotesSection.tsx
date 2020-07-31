@@ -2,7 +2,7 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import releaseNoteService from '@admin/services/releaseNoteService';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { Form, FormFieldset } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
@@ -16,7 +16,6 @@ import React, { useState } from 'react';
 
 interface Props {
   release: EditableRelease;
-  logEvent?: (...params: string[]) => void;
 }
 
 interface AddFormValues {
@@ -28,8 +27,6 @@ interface EditFormValues {
   reason: string;
 }
 
-const nullLogEvent = () => {};
-
 const emptyReleaseNote: ReleaseNote = {
   id: '',
   releaseId: '',
@@ -37,7 +34,7 @@ const emptyReleaseNote: ReleaseNote = {
   reason: '',
 };
 
-const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
+const ReleaseNotesSection = ({ release }: Props) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
   const [deletedReleaseNote, setDeletedReleaseNote] = useState<ReleaseNote>(
@@ -117,21 +114,19 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                   rows={3}
                 />
               </FormFieldset>
-              <Button
-                type="submit"
-                className="govuk-button govuk-!-margin-right-1"
-              >
-                Add note
-              </Button>
-              <ButtonText
-                className="govuk-button govuk-button--secondary"
-                onClick={() => {
-                  form.resetForm();
-                  setAddFormOpen(false);
-                }}
-              >
-                Cancel
-              </ButtonText>
+
+              <ButtonGroup>
+                <Button type="submit">Add note</Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    form.resetForm();
+                    setAddFormOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </ButtonGroup>
             </Form>
           );
         }}
@@ -188,21 +183,19 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                   rows={3}
                 />
               </FormFieldset>
-              <Button
-                type="submit"
-                className="govuk-button govuk-!-margin-right-1"
-              >
-                Update
-              </Button>
-              <ButtonText
-                className="govuk-button govuk-button--secondary"
-                onClick={() => {
-                  form.resetForm();
-                  setEditFormOpen(false);
-                }}
-              >
-                Cancel
-              </ButtonText>
+
+              <ButtonGroup>
+                <Button type="submit">Update</Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    form.resetForm();
+                    setEditFormOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </ButtonGroup>
             </Form>
           );
         }}
@@ -214,22 +207,12 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
     releaseNotes && (
       <>
         <dl className="dfe-meta-content">
-          <dt className="govuk-caption-m">Last updated:</dt>
+          <dt className="govuk-caption-m">Last updated: </dt>
           <dd data-testid="last-updated">
             <strong>
               <FormattedDate>{releaseNotes[0]?.on}</FormattedDate>
             </strong>
-            <Details
-              onToggle={(open: boolean) =>
-                open &&
-                logEvent(
-                  'Last Updates',
-                  'Release page last updates dropdown opened',
-                  window.location.pathname,
-                )
-              }
-              summary={`See all ${releaseNotes.length} updates`}
-            >
+            <Details summary={`See all ${releaseNotes.length} updates`}>
               {releaseNotes.map((elem, index) => (
                 <React.Fragment key={elem.id}>
                   {isEditing &&
@@ -244,20 +227,20 @@ const ReleaseNotesSection = ({ release, logEvent = nullLogEvent }: Props) => {
                       <p>{elem.reason}</p>
 
                       {isEditing && (
-                        <>
+                        <ButtonGroup>
                           <Button
-                            className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 govuk-!-margin-right-6"
+                            variant="secondary"
                             onClick={() => openEditForm(elem)}
                           >
                             Edit
                           </Button>
-                          <ButtonText
-                            className="govuk-button govuk-button--warning"
+                          <Button
+                            variant="warning"
                             onClick={() => setDeletedReleaseNote(elem)}
                           >
                             Remove
-                          </ButtonText>
-                        </>
+                          </Button>
+                        </ButtonGroup>
                       )}
                     </div>
                   )}

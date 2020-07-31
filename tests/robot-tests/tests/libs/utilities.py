@@ -9,6 +9,7 @@ import os
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
+
 def raise_assertion_error(err_msg):
     sl.capture_page_screenshot()
     raise AssertionError(err_msg)
@@ -23,6 +24,7 @@ def user_waits_for_page_to_finish_loading():
 
 
 def user_sets_focus_to_element(selector):
+    sl.wait_until_page_contains_element(selector)
     sl.set_focus_to_element(selector)
 
 
@@ -161,14 +163,17 @@ def user_checks_accordion_section_contains_text(accordion_section, details_compo
 
 def user_opens_details_dropdown(exact_details_text):
     sl.scroll_element_into_view(
-        f'xpath://*[contains(@class,"govuk-details__summary-text") and text()="{exact_details_text}"]')
+        f'xpath://details/summary//*[text()="{exact_details_text}"]')
     try:
         elem = sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{exact_details_text}"]')
+            f'//details/summary//*[text()="{exact_details_text}"]')
     except NoSuchElementException:
         raise_assertion_error(f'No such detail component "{exact_details_text}" found')
 
+    sl.wait_until_element_is_enabled(elem)
+
     elem.click()
+
     if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "false":
         raise_assertion_error(f'Details component "{exact_details_text}" not expanded!')
 
@@ -176,10 +181,12 @@ def user_opens_details_dropdown(exact_details_text):
 def user_closes_details_dropdown(exact_details_text):
     try:
         elem = sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{exact_details_text}"]')
+            f'//details/summary//*[text()="{exact_details_text}"]')
     except:
         raise_assertion_error(f'Cannot find details component "{exact_details_text}"')
+
     elem.click()
+
     if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "true":
         raise_assertion_error(f'Details component "{exact_details_text}" is still expanded!')
 

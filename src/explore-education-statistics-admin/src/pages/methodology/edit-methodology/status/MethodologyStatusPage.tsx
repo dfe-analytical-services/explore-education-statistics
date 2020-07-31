@@ -1,6 +1,6 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import { MethodologyRouteParams } from '@admin/routes/edit-methodology/routes';
+import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
 import methodologyService, {
   MethodologyStatus,
 } from '@admin/services/methodologyService';

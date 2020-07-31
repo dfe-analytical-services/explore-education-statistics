@@ -1,7 +1,13 @@
-import { GetFileResponse } from '@admin/services/types/file';
-import getFileNameFromPath from '@admin/services/utils/file/getFileNameFromPath';
+import { FileInfo } from '@admin/services/types/file';
 import client from '@admin/services/utils/service';
 import downloadFile from './utils/file/downloadFile';
+
+interface AncillaryFileInfo extends FileInfo {
+  metaFileName: string;
+  rows: number;
+  userName: string;
+  created: string;
+}
 
 export interface AncillaryFile {
   title: string;
@@ -18,34 +24,38 @@ interface UploadAncillaryFileRequest {
   file: File;
 }
 
+function mapFile(file: AncillaryFileInfo): AncillaryFile {
+  const [size, unit] = file.size.split(' ');
+
+  return {
+    title: file.name,
+    filename: file.fileName,
+    fileSize: {
+      size: parseInt(size, 10),
+      unit,
+    },
+  };
+}
+
 const releaseAncillaryFileService = {
   getAncillaryFiles(releaseId: string): Promise<AncillaryFile[]> {
     return client
-      .get<GetFileResponse[]>(`/release/${releaseId}/ancillary`)
-      .then(response =>
-        response.map(file => ({
-          title: file.name,
-          filename: getFileNameFromPath(file.path),
-          fileSize: {
-            size: parseInt(file.size.split(' ')[0], 10),
-            unit: file.size.split(' ')[1],
-          },
-        })),
-      );
+      .get<AncillaryFileInfo[]>(`/release/${releaseId}/ancillary`)
+      .then(response => response.map(mapFile));
   },
   uploadAncillaryFile(
     releaseId: string,
     request: UploadAncillaryFileRequest,
-  ): Promise<null> {
+  ): Promise<AncillaryFile> {
     const data = new FormData();
     data.append('file', request.file);
-    return client.post<null>(
+    return client.post<AncillaryFile>(
       `/release/${releaseId}/ancillary?name=${request.name}`,
       data,
     );
   },
-  deleteAncillaryFile(releaseId: string, fileName: string): Promise<null> {
-    return client.delete<null>(`/release/${releaseId}/ancillary/${fileName}`);
+  deleteAncillaryFile(releaseId: string, fileName: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/ancillary/${fileName}`);
   },
   downloadAncillaryFile(releaseId: string, fileName: string): Promise<void> {
     return client

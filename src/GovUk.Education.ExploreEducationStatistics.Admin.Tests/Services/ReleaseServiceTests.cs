@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Heading = "Template heading index 0",
                                         Type = ContentSectionType.Generic,
                                         Order = 1,
-                                        Content = new List<IContentBlock>
+                                        Content = new List<ContentBlock>
                                         {
                                             new HtmlBlock
                                             {
@@ -640,73 +640,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        [Fact]
-        public void PublishReleaseAsync()
-        {
-            var mocks = Mocks();
-
-            var release = new Release
-            {
-                Id = new Guid("33c2b77a-6a70-485d-ada3-fc99edac95dd"),
-                Status = ReleaseStatus.Approved,
-                Version = 0,
-                PreviousVersionId = new Guid("33c2b77a-6a70-485d-ada3-fc99edac95dd")
-            };
-
-            using (var context = InMemoryApplicationDbContext("PublishReleaseAsync"))
-            {
-                context.Add(release);
-                context.SaveChanges();
-            }
-
-            using (var context = InMemoryApplicationDbContext("PublishReleaseAsync"))
-            {
-                var releaseService = BuildReleaseService(context, mocks);
-                var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
-
-                mocks.PublishingService.Verify(mock => mock.QueueValidateReleaseAsync(release.Id, true), Times.Once());
-
-                Assert.True(result);
-            }
-        }
-
-        [Fact]
-        public void PublishReleaseContentAsync()
-        {
-            var mocks = Mocks();
-
-            var release = new Release
-            {
-                Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
-                Status = ReleaseStatus.Approved,
-                Version = 0,
-                PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
-            };
-
-            using (var context = InMemoryApplicationDbContext("PublishReleaseContentAsync"))
-            {
-                context.Add(release);
-                context.SaveChanges();
-            }
-
-            using (var context = InMemoryApplicationDbContext("PublishReleaseContentAsync"))
-            {
-                var releaseService = BuildReleaseService(context, mocks);
-                var result = releaseService.PublishReleaseAsync(release.Id).Result.Right;
-
-                mocks.PublishingService.Verify(mock => mock.QueueValidateReleaseAsync(release.Id, true), Times.Once());
-
-                Assert.True(result);
-            }
-        }
-
         private static ReleaseService BuildReleaseService(ContentDbContext context,
             (Mock<IUserService> userService,
                 Mock<IPublishingService> publishingService,
                 Mock<IReleaseRepository> releaseRepository,
                 Mock<ISubjectService> subjectService,
                 Mock<ITableStorageService> tableStorageService,
-                Mock<IFileStorageService> fileStorageService,
+                Mock<IReleaseFilesService> fileStorageService,
                 Mock<IImportStatusService> importStatusService,
                 Mock<IFootnoteService> footnoteService,
                 Mock<StatisticsDbContext> statisticsDbContext,
@@ -729,7 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IReleaseRepository> ReleaseRepository,
             Mock<ISubjectService> SubjectService,
             Mock<ITableStorageService> TableStorageService,
-            Mock<IFileStorageService> FileStorageService,
+            Mock<IReleaseFilesService> FileStorageService,
             Mock<IImportStatusService> ImportStatusService,
             Mock<IFootnoteService> FootnoteService,
             Mock<StatisticsDbContext> StatisticsDbContext,
@@ -748,7 +688,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IReleaseRepository>(),
                 new Mock<ISubjectService>(), 
                 new Mock<ITableStorageService>(), 
-                new Mock<IFileStorageService>(),
+                new Mock<IReleaseFilesService>(),
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
                 new Mock<StatisticsDbContext>(),

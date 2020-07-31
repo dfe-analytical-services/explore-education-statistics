@@ -1,10 +1,7 @@
-export interface GetFileResponse {
+export interface FileInfo {
   extension: string;
+  fileName: string;
   name: string;
   path: string;
   size: string;
-  metaFileName: string;
-  rows: number;
-  userName: string;
-  created: string;
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using CloudStorageAccount = Microsoft.Azure.Storage.CloudStorageAccount;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -28,9 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly ILogger _logger;
-        private readonly CloudTable _table;
         private readonly IGuidGenerator _guidGenerator;
-
+        private readonly ITableStorageService _tableStorageService;
+        
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
             ILogger<ImportService> logger,
@@ -42,11 +43,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _logger = logger;
-            _table = tableStorageService.GetTableAsync("imports").Result;
+            _tableStorageService = tableStorageService;
             _guidGenerator = guidGenerator;
         }
 
-        public async void Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile)
+        public async Task Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -71,25 +72,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName)
         {
-            var result = await _table.ExecuteAsync(
-                TableOperation.Retrieve<DatafileImport>(releaseId.ToString(), dataFileName));
+            var result = await _tableStorageService.RetrieveEntity(DatafileImportsTableName,
+                new DatafileImport(releaseId.ToString(), dataFileName), new List<string>());
             
             if (result.Result != null)
             {
                 return ValidationActionResult(DatafileAlreadyUploaded);
             }
-            
-            await _table.ExecuteAsync(TableOperation.Insert(
-                new DatafileImport(releaseId.ToString(), dataFileName))
-            );
+
+            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
+                new DatafileImport(releaseId.ToString(), dataFileName));
+
             return true;
+        }
+
+        public async Task RemoveImportTableRowIfExists(Guid releaseId, string dataFileName)
+        {
+            await _tableStorageService.DeleteEntityAsync(DatafileImportsTableName,
+                new DatafileImport(releaseId.ToString(), dataFileName));
+        }
+        
+        public async Task FailImport(Guid releaseId, string dataFileName, IEnumerable<ValidationError> errors)
+        {
+            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
+                new DatafileImport(releaseId.ToString(), dataFileName, 0, "", IStatus.FAILED, JsonConvert.SerializeObject(errors)));
         }
 
         private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows, JsonConvert.SerializeObject(message), IStatus.QUEUED))
-            );
+            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
+                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows,
+                    JsonConvert.SerializeObject(message), IStatus.QUEUED));
         }
 
         private ImportMessage BuildMessage(string dataFileName, string metaFileName, Guid releaseId)
@@ -113,6 +126,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 NumBatches = 1,
                 BatchNo = 1
             };
+        }
+    }
+    
+    public class ValidationError
+    {
+        public string Message { get; set; }
+
+        public ValidationError(string message)
+        {
+            Message = message;
         }
     }
 }

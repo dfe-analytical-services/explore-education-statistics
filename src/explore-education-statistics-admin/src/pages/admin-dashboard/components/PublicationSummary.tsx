@@ -1,28 +1,40 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
-import releaseRoutes, { summaryRoute } from '@admin/routes/releaseRoutes';
+import {
+  ReleaseRouteParams,
+  releaseSummaryRoute,
+} from '@admin/routes/releaseRoutes';
+import { legacyReleasesRoute, releaseCreateRoute } from '@admin/routes/routes';
+import {
+  publicationAssignMethodologyRoute,
+  ThemeTopicPublicationParams,
+} from '@admin/routes/themeTopicRoutes';
 import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, { useContext, useState } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
+import React, { useState } from 'react';
+import { generatePath, useHistory } from 'react-router';
 import CancelAmendmentModal from './CancelAmendmentModal';
 import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 
 export interface Props {
   publication: AdminDashboardPublication;
+  themeId: string;
+  topicId: string;
   onChangePublication: () => void;
 }
 
 const PublicationSummary = ({
   publication,
+  themeId,
+  topicId,
   onChangePublication,
-  history,
-}: Props & RouteComponentProps) => {
-  const { selectedThemeAndTopic } = useContext(ThemeAndTopicContext);
+}: Props) => {
+  const history = useHistory();
+
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
   const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
     string
@@ -35,34 +47,57 @@ const PublicationSummary = ({
 
   // BAU-404 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
   const showAmendmentButton = () => true;
+
   return (
     <>
       <SummaryList>
         <SummaryListItem term="Methodology" smallKey>
-          {publication.methodology && (
-            <Link to={`/methodologies/${publication.methodology.id}`}>
-              {publication.methodology.title}
-            </Link>
-          )}
-          {publication.externalMethodology &&
-            publication.externalMethodology.url && (
+          <p>
+            {publication.methodology ? (
+              <Link to={`/methodologies/${publication.methodology.id}`}>
+                {publication.methodology.title}
+              </Link>
+            ) : (
               <>
-                {publication.externalMethodology.title} (
-                <a
-                  href={publication.externalMethodology.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {publication.externalMethodology.url}
-                </a>
-                )
+                {publication.externalMethodology?.url ? (
+                  <>
+                    {publication.externalMethodology.title} (
+                    <a
+                      href={publication.externalMethodology.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {publication.externalMethodology.url}
+                    </a>
+                    )
+                  </>
+                ) : (
+                  'No methodology assigned'
+                )}
               </>
             )}
-          {!publication.methodology &&
-            (!publication.externalMethodology ||
-              !publication.externalMethodology.url) && (
-              <>No methodology assigned</>
-            )}
+          </p>
+
+          <ButtonGroup className="govuk-!-margin-bottom-2">
+            <ButtonLink
+              variant="secondary"
+              to={generatePath<ThemeTopicPublicationParams>(
+                publicationAssignMethodologyRoute.path,
+                {
+                  themeId,
+                  topicId,
+                  publicationId: publication.id,
+                },
+              )}
+            >
+              {!publication.methodology &&
+              (!publication.externalMethodology ||
+                !publication.externalMethodology.url)
+                ? 'Add'
+                : 'Edit'}{' '}
+              methodology
+            </ButtonLink>
+          </ButtonGroup>
         </SummaryListItem>
         <SummaryListItem term="Releases" smallKey>
           <ul className="govuk-list dfe-admin">
@@ -81,30 +116,30 @@ const PublicationSummary = ({
               ))}
             {publication.releases.length < 1 && <>No releases created</>}
           </ul>
-        </SummaryListItem>
-      </SummaryList>
-      <SummaryList>
-        <SummaryListItem term="" smallKey>
-          {publication.permissions.canCreateReleases && (
-            <ButtonLink
-              to={releaseRoutes.createReleaseRoute.generateLink(publication.id)}
-              className="govuk-!-margin-right-6"
-              testId={`Create new release link for ${publication.title}`}
-            >
-              Create new release
-            </ButtonLink>
-          )}
-          <ButtonLink
-            to={`/theme/${selectedThemeAndTopic.theme.id}/topic/${selectedThemeAndTopic.topic.id}/publication/${publication.id}/assign-methodology`}
-            className="govuk-button--secondary"
-          >
-            {!publication.methodology &&
-            (!publication.externalMethodology ||
-              !publication.externalMethodology.url)
-              ? 'Add'
-              : 'Edit'}{' '}
-            methodology
-          </ButtonLink>
+
+          <ButtonGroup className="govuk-!-margin-bottom-2">
+            {publication.permissions.canCreateReleases && (
+              <ButtonLink
+                to={generatePath(releaseCreateRoute.path, {
+                  publicationId: publication.id,
+                })}
+                testId={`Create new release link for ${publication.title}`}
+              >
+                Create new release
+              </ButtonLink>
+            )}
+            {publication.permissions.canUpdatePublication && (
+              <ButtonLink
+                to={generatePath(legacyReleasesRoute.path, {
+                  publicationId: publication.id,
+                })}
+                variant="secondary"
+                testId={`Legacy releases link for ${publication.title}`}
+              >
+                Manage legacy releases
+              </ButtonLink>
+            )}
+          </ButtonGroup>
         </SummaryListItem>
       </SummaryList>
 
@@ -116,7 +151,7 @@ const PublicationSummary = ({
               .createReleaseAmendment(amendReleaseId)
               .then(amendment =>
                 history.push(
-                  summaryRoute.generateLink({
+                  generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                     publicationId: publication.id,
                     releaseId: amendment.id,
                   }),
@@ -148,4 +183,4 @@ const PublicationSummary = ({
   );
 };
 
-export default withRouter(PublicationSummary);
+export default PublicationSummary;

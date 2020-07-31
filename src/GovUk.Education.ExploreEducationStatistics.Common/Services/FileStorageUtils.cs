@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Azure.Storage.RetryPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
@@ -60,32 +61,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
         
         public static async Task<CloudBlobContainer> GetCloudBlobContainerAsync(string storageConnectionString,
-            string containerName, BlobContainerPermissions permissions = null)
+            string containerName, BlobContainerPermissions permissions = null, BlobRequestOptions requestOptions = null)
         {
             var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
+
+            if (requestOptions != null)
+            {
+                blobClient.DefaultRequestOptions = requestOptions;
+            }
+            
             var blobContainer = blobClient.GetContainerReference(containerName);
             await blobContainer.CreateIfNotExistsAsync();
 
             if (permissions != null)
             {
                 await blobContainer.SetPermissionsAsync(permissions);
-            }
-
-            return blobContainer;
-        }
-
-        public static CloudBlobContainer GetCloudBlobContainer(string storageConnectionString, string containerName,
-            BlobContainerPermissions permissions = null)
-        {
-            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
-            blobContainer.CreateIfNotExists();
-
-            if (permissions != null)
-            {
-                blobContainer.SetPermissions(permissions);
             }
 
             return blobContainer;
@@ -170,10 +161,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
         }
         
-        public static async Task UploadFromStreamAsync(string storageConnectionString, string containerName,
-            string blobName, string contentType, string content)
+        public static async Task<CloudBlockBlob> UploadFromStreamAsync(string storageConnectionString, string containerName,
+            string blobName, string contentType, string content, BlobRequestOptions requestOptions = null)
         {
-            var blobContainer = await GetCloudBlobContainerAsync(storageConnectionString, containerName);
+            var blobContainer = await GetCloudBlobContainerAsync(storageConnectionString,
+                containerName,
+                requestOptions: requestOptions);
 
             var blob = blobContainer.GetBlockBlobReference(blobName);
             blob.Properties.ContentType = contentType;
@@ -182,6 +175,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 await blob.UploadFromStreamAsync(stream);
             }
+
+            return blob;
         }
 
         public static string GetExtension(CloudBlob blob)
@@ -283,6 +278,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return (int) Math.Ceiling(rows / (double) rowsPerBatch);
         }
         
+        private static CloudBlobContainer GetCloudBlobContainer(string storageConnectionString, string containerName,
+            BlobContainerPermissions permissions = null)
+        {
+            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(containerName);
+            blobContainer.CreateIfNotExists();
+
+            if (permissions != null)
+            {
+                blobContainer.SetPermissions(permissions);
+            }
+
+            return blobContainer;
+        }
+
         private static DateTime ParseDateTime(string dateTime)
         {
             return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);

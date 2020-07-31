@@ -7,6 +7,7 @@ using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
@@ -21,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var queueClient = storageAccount.CreateCloudQueueClient();
             var availableQueue = queueClient.GetQueueReference("imports-available");
             var pendingQueue = queueClient.GetQueueReference("imports-pending");
-            var table = tableClient.GetTableReference("imports");
+            var table = tableClient.GetTableReference(DatafileImportsTableName);
 
             availableQueue.CreateIfNotExists();
             pendingQueue.CreateIfNotExists();

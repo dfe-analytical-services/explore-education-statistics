@@ -34,7 +34,7 @@ describe('Accordion', () => {
     );
 
     expect(
-      container.querySelector('govuk-accordion__section--expanded'),
+      container.querySelector('.govuk-accordion__section--expanded'),
     ).toBeDefined();
     expect(container.querySelector('#test-sections-1-heading')).toHaveAttribute(
       'aria-expanded',

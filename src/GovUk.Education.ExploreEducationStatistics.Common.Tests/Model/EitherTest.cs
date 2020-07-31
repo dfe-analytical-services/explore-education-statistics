@@ -104,7 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model
         public async void OnSuccessDo_WithVoid()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
-                .OnSuccessDo(() => {});
+                .OnSuccessDo(async () => 
+                {
+                    await Task.Run(() => {});
+                });
 
             Assert.True(either.IsRight);
             Assert.Equal("a success", either.Right);

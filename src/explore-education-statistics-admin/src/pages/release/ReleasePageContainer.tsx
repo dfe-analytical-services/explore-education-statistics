@@ -5,7 +5,15 @@ import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import ManageReleaseContext from '@admin/pages/release/contexts/ManageReleaseContext';
 import { getReleaseStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import releaseRoutes, { viewRoutes } from '@admin/routes/releaseRoutes';
+import {
+  releaseContentRoute,
+  releaseDataBlocksRoute,
+  releaseDataRoute,
+  ReleaseRouteParams,
+  releaseStatusRoute,
+  releaseSummaryEditRoute,
+  releaseSummaryRoute,
+} from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
 } from '@admin/services/publicationService';
@@ -17,7 +25,17 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { Route, RouteComponentProps } from 'react-router';
+import { generatePath, Route, RouteComponentProps } from 'react-router';
+
+const navRoutes = [
+  releaseSummaryRoute,
+  releaseDataRoute,
+  releaseDataBlocksRoute,
+  releaseContentRoute,
+  releaseStatusRoute,
+];
+
+const routes = [...navRoutes, releaseSummaryEditRoute];
 
 interface MatchProps {
   publicationId: string;
@@ -49,30 +67,39 @@ const ReleasePageContainer = ({
   ];
 
   const currentRouteIndex =
-    viewRoutes.findIndex(
+    navRoutes.findIndex(
       route =>
-        route.generateLink({ publicationId, releaseId }) === location.pathname,
+        generatePath<ReleaseRouteParams>(route.path, {
+          publicationId,
+          releaseId,
+        }) === location.pathname,
     ) || 0;
 
   const previousRoute =
-    currentRouteIndex > 0 ? viewRoutes[currentRouteIndex - 1] : undefined;
+    currentRouteIndex > 0 ? navRoutes[currentRouteIndex - 1] : undefined;
 
   const nextRoute =
-    currentRouteIndex < viewRoutes.length - 1
-      ? viewRoutes[currentRouteIndex + 1]
+    currentRouteIndex < navRoutes.length - 1
+      ? navRoutes[currentRouteIndex + 1]
       : undefined;
 
   const previousSection = previousRoute
     ? {
         label: previousRoute.title,
-        linkTo: previousRoute.generateLink({ publicationId, releaseId }),
+        linkTo: generatePath<ReleaseRouteParams>(previousRoute.path, {
+          publicationId,
+          releaseId,
+        }),
       }
     : undefined;
 
   const nextSection = nextRoute
     ? {
         label: nextRoute.title,
-        linkTo: nextRoute.generateLink({ publicationId, releaseId }),
+        linkTo: generatePath<ReleaseRouteParams>(nextRoute.path, {
+          publicationId,
+          releaseId,
+        }),
       }
     : undefined;
 
@@ -119,10 +146,13 @@ const ReleasePageContainer = ({
           )}
 
           <NavBar
-            routes={viewRoutes.map(route => ({
+            routes={navRoutes.map(route => ({
               path: route.path,
               title: route.title,
-              to: route.generateLink({ publicationId, releaseId }),
+              to: generatePath<ReleaseRouteParams>(route.path, {
+                publicationId,
+                releaseId,
+              }),
             }))}
           />
 
@@ -133,7 +163,7 @@ const ReleasePageContainer = ({
               onChangeReleaseStatus: reloadRelease,
             }}
           >
-            {releaseRoutes.manageReleaseRoutes.map(route => (
+            {routes.map(route => (
               <Route exact key={route.path} {...route} />
             ))}
           </ManageReleaseContext.Provider>

@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Heading = "Template heading index 0",
                             Type = ContentSectionType.Generic,
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new HtmlBlock
                                 {
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Heading = "Template heading index 1",
                             Type = ContentSectionType.Generic,
                             Order = 2,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new MarkDownBlock
                                 {
@@ -211,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Heading = "Template heading index 2",
                             Type = ContentSectionType.Headlines,
                             Order = 1,
-                            Content = new List<IContentBlock>
+                            Content = new List<ContentBlock>
                             {
                                 new MarkDownBlock
                                 {
@@ -428,8 +428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, amendment.PreviousVersionId);
                 Assert.Equal(_userId, amendment.CreatedBy.Id);
                 Assert.Equal(_userId, amendment.CreatedById);
-                Assert.True(amendment.Created.CompareTo(DateTime.UtcNow.AddSeconds(-1)) > 0 
-                            && amendment.Created.CompareTo(DateTime.UtcNow) <= 0);
+                Assert.InRange(DateTime.UtcNow.Subtract(amendment.Created).Milliseconds, 0, 1500);
                 Assert.Null(amendment.InternalReleaseNote);
 
                 Assert.Equal(releaseType, amendment.Type);
@@ -570,12 +569,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
            });
        }
 
-       private static void AssertAmendedContentBlockCorrect(IContentBlock previousBlock, IContentBlock amendedBlock,
+       private static void AssertAmendedContentBlockCorrect(ContentBlock previousBlock, ContentBlock amendedBlock,
            ContentSection amendedSection)
        {
            Assert.NotEqual(previousBlock.Id, amendedBlock.Id);
            Assert.Equal(previousBlock.Order, amendedBlock.Order);
-           Assert.Equal(previousBlock.Type, amendedBlock.Type);
            Assert.Equal(amendedSection, amendedBlock.ContentSection);
            Assert.Equal(amendedSection.Id, amendedBlock.ContentSectionId);
            Assert.NotEmpty(previousBlock.Comments);
@@ -611,7 +609,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IReleaseRepository>,
             Mock<ISubjectService>,
             Mock<ITableStorageService>,
-            Mock<IFileStorageService>,
+            Mock<IReleaseFilesService>,
             Mock<IImportStatusService>,
             Mock<IFootnoteService>,
             Mock<StatisticsDbContext>,
@@ -635,7 +633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IReleaseRepository>(),
                 new Mock<ISubjectService>(), 
                 new Mock<ITableStorageService>(), 
-                new Mock<IFileStorageService>(),
+                new Mock<IReleaseFilesService>(),
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
                 new Mock<StatisticsDbContext>(),

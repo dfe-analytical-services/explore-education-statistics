@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             Content.Remove(Content.Find(join => join.ContentSection == section));
         }
         
-        public void AddContentBlock(IContentBlock contentBlock)
+        public void AddContentBlock(ContentBlock contentBlock)
         {
             if (ContentBlocks == null)
             {
@@ -275,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         private readonly Dictionary<Update, Update> _oldToNewIdUpdateMappings = new Dictionary<Update, Update>();
         private readonly Dictionary<ContentSection, ContentSection> _oldToNewIdContentSectionMappings = new Dictionary<ContentSection, ContentSection>();
-        private readonly Dictionary<IContentBlock, IContentBlock> _oldToNewIdContentBlockMappings = new Dictionary<IContentBlock, IContentBlock>();
+        private readonly Dictionary<ContentBlock, ContentBlock> _oldToNewIdContentBlockMappings = new Dictionary<ContentBlock, ContentBlock>();
         private readonly Release _target;
 
         public CreateClonedContext(Release target)
@@ -287,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Dictionary<ContentSection, ContentSection> OldToNewIdContentSectionMappings => _oldToNewIdContentSectionMappings;
 
-        public Dictionary<IContentBlock, IContentBlock> OldToNewIdContentBlockMappings => _oldToNewIdContentBlockMappings;
+        public Dictionary<ContentBlock, ContentBlock> OldToNewIdContentBlockMappings => _oldToNewIdContentBlockMappings;
 
         public Dictionary<Update, Update> OldToNewIdUpdateMappings => _oldToNewIdUpdateMappings;
     }

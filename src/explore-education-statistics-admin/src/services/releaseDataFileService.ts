@@ -1,13 +1,10 @@
 import { DeleteDataBlockPlan } from '@admin/services/dataBlockService';
+import { FileInfo } from '@admin/services/types/file';
 import client from '@admin/services/utils/service';
 import getFileNameFromPath from './utils/file/getFileNameFromPath';
 import downloadFile from './utils/file/downloadFile';
 
-interface GetFileResponse {
-  extension: string;
-  name: string;
-  path: string;
-  size: string;
+interface DataFileInfo extends FileInfo {
   metaFileName: string;
   rows: number;
   userName: string;
@@ -40,42 +37,42 @@ interface UploadDataFilesRequest {
   metadataFile: File;
 }
 
+function mapFile(file: DataFileInfo): DataFile {
+  const [size, unit] = file.size.split(' ');
+
+  return {
+    title: file.name,
+    filename: file.fileName,
+    rows: file.rows || 0,
+    fileSize: {
+      size: parseInt(size, 10),
+      unit,
+    },
+    metadataFilename: file.metaFileName,
+    canDelete: true,
+    userName: file.userName,
+    created: new Date(file.created),
+  };
+}
+
 const releaseDataFileService = {
   getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
-      .get<GetFileResponse[]>(`/release/${releaseId}/data`)
+      .get<DataFileInfo[]>(`/release/${releaseId}/data`)
       .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
-        return dataFiles.map(dataFile => {
-          const associatedMetadataFile = response.find(file =>
-            file.path.endsWith(`/${dataFile.metaFileName}`),
-          );
-          return {
-            title: dataFile.name,
-            filename: getFileNameFromPath(dataFile.path),
-            rows: dataFile.rows || 0,
-            fileSize: {
-              size: parseInt(dataFile.size.split(' ')[0], 10),
-              unit: dataFile.size.split(' ')[1],
-            },
-            metadataFilename: associatedMetadataFile
-              ? getFileNameFromPath(associatedMetadataFile.path)
-              : '',
-            canDelete: true,
-            userName: dataFile.userName,
-            created: new Date(dataFile.created),
-          };
-        });
+        return dataFiles.map(mapFile);
       });
   },
   uploadDataFiles(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<null> {
+  ): Promise<boolean> {
     const data = new FormData();
     data.append('file', request.dataFile);
     data.append('metaFile', request.metadataFile);
-    return client.post<null>(
+
+    return client.post<boolean>(
       `/release/${releaseId}/data?name=${request.subjectTitle}`,
       data,
     );
@@ -88,8 +85,8 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFile.filename}/delete-plan?name=${dataFile.title}`,
     );
   },
-  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<null> {
-    return client.delete<null>(
+  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
+    return client.delete<void>(
       `/release/${releaseId}/data/${dataFile.filename}?name=${dataFile.title}`,
     );
   },

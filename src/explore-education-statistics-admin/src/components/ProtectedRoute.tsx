@@ -5,8 +5,9 @@ import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import React from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
 
-interface ProtectedRouteProps extends RouteProps {
+export interface ProtectedRouteProps extends RouteProps {
   allowAnonymousUsers?: boolean;
+  path: string;
   protectionAction?: (user: User) => boolean;
 }
 

@@ -14,14 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             Status = IStatus.UPLOADING;
         }
         
-        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, string message, IStatus status)
+        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, string message, IStatus status, string errors = "")
         {
             PartitionKey = releaseId;
             RowKey = dataFileName;
             NumberOfRows = numberOfRows;
             Message = message;
             Status = status;
-            Errors = "";
+            Errors = errors;
         }
 
         public DatafileImport()

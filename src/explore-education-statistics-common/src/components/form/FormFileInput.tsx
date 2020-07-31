@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
+  FocusEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,
   ReactNode,
@@ -8,24 +9,28 @@ import React, {
 import ErrorMessage from '../ErrorMessage';
 
 export interface FormFileInputProps {
+  accept?: string;
   disabled?: boolean;
   error?: ReactNode | string;
   hint?: string;
   id: string;
   label: ReactNode | string;
   name: string;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onClick?: MouseEventHandler<HTMLInputElement>;
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
 }
 
 const FormFileInput = ({
+  accept,
   disabled,
   error,
   hint,
   id,
   label,
   name,
+  onBlur,
   onChange,
   onClick,
   onKeyPress,
@@ -53,6 +58,8 @@ const FormFileInput = ({
         type="file"
         disabled={disabled}
         name={name}
+        accept={accept}
+        onBlur={onBlur}
         onChange={onChange}
         onClick={onClick}
         onKeyPress={onKeyPress}

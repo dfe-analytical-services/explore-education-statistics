@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class Comment
     {
         public Guid Id { get; set; }
-        public IContentBlock ContentBlock { get; set; }
+        public ContentBlock ContentBlock { get; set; }
         public Guid ContentBlockId { get; set; }
         public string Content { get; set; }
         public DateTime Created { get; set; }

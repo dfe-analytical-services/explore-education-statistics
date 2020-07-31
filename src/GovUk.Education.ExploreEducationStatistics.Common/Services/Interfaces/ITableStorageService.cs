@@ -12,6 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         Task DeleteByPartitionKeys(string tableName, IEnumerable<string> partitionKeys);
         Task<bool> DeleteEntityAsync(string tableName, ITableEntity entity);
         Task<TableResult> RetrieveEntity(string tableName, ITableEntity entity, List<string> columns);
-        Task<TableResult> UpdateEntity(string tableName, ITableEntity entity);
+        Task<TableResult> CreateOrUpdateEntity(string tableName, ITableEntity entity);
     }
 }

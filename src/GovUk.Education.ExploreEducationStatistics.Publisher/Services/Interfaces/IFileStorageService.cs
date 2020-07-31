@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
+using Microsoft.Azure.Storage.Blob;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
@@ -12,10 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task DeleteAllContentAsyncExcludingStaging();
 
+        Task DeleteDownloadFilesForPreviousVersion(Release release);
+        
         Task DeletePublicBlobs(string directoryPath, string excludePattern = null);
         
         Task DeletePublicBlob(string blobName);
-        
+
+        Task<(CloudBlockBlob blob, string id)> AcquireLease(string blobName);
+
         IEnumerable<FileInfo> ListPublicFiles(string publication, string release);
 
         Task MoveStagedContentAsync();

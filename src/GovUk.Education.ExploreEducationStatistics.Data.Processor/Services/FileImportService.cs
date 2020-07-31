@@ -43,21 +43,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
                 var csvTable = subjectData.GetCsvTable();
                 var metaTable = subjectData.GetMetaTable();
-                
-                context.Database.BeginTransaction();
-                
-                _importerService.ImportObservations(
-                    csvTable.Columns,
-                    csvTable.Rows,
-                    releaseSubject.Subject,
-                    _importerService.GetMeta(metaTable, releaseSubject.Subject, context),
-                    message.BatchNo,
-                    message.RowsPerBatch,
-                    context
-                );
-                
-                context.Database.CommitTransaction();
-                
+
+                context.Database.CreateExecutionStrategy().Execute(() =>
+                {
+                    using var transaction = context.Database.BeginTransaction();
+
+                    _importerService.ImportObservations(
+                        csvTable.Columns,
+                        csvTable.Rows,
+                        releaseSubject.Subject,
+                        _importerService.GetMeta(metaTable, releaseSubject.Subject, context),
+                        message.BatchNo,
+                        message.RowsPerBatch,
+                        context
+                    );
+
+                    transaction.Commit();
+                });
+
                 await _batchService.CheckComplete(releaseId, message, context);
             }
             else

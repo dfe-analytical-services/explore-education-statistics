@@ -38,8 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
         }
 
-
-        public async Task DeletePreviousVersionsContent(IEnumerable<Guid> releaseIds)
+        public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
         {
             var releases = await _releaseService.GetAmendedReleases(releaseIds);
 
@@ -51,8 +50,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 if (release.Slug != release.PreviousVersion.Slug)
                 {
                     await _fileStorageService.DeletePublicBlob(
-                        PublicReleaseDirectoryPath(release.Publication.Slug, release.PreviousVersion.Slug));
+                        PublicContentReleasePath(release.Publication.Slug, release.PreviousVersion.Slug));
                 }
+            }
+        }
+        
+        public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)
+        {
+            var releases = await _releaseService.GetAsync(releaseIds);
+
+            foreach (var release in releases)
+            {
+                await _fileStorageService.DeleteDownloadFilesForPreviousVersion(release);
             }
         }
 
@@ -90,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdateContentAsync(IEnumerable<Guid> releaseIds, PublishContext context)
+        public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
         {
             await UpdateTrees(releaseIds, context);
 

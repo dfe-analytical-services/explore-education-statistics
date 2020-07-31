@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -16,105 +15,106 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
-        private readonly IReleaseStatusService _releaseStatusService;
-        private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
+        private readonly IReleaseStatusService _releaseStatusService;
 
         public PublishReleaseContentFunction(IContentService contentService,
             INotificationsService notificationsService,
-            IReleaseStatusService releaseStatusService,
-            IPublishingService publishingService,
-            IReleaseService releaseService)
+            IReleaseService releaseService,
+            IReleaseStatusService releaseStatusService)
         {
             _contentService = contentService;
             _notificationsService = notificationsService;
-            _releaseStatusService = releaseStatusService;
-            _publishingService = publishingService;
             _releaseService = releaseService;
+            _releaseStatusService = releaseStatusService;
         }
 
-        /**
-         * Azure function which publishes the content for a Release at a scheduled time by moving it from a staging directory.
-         * Sets the published time on the Release which means it's considered as 'Live'.
-         */
+        /// <summary>
+        /// Azure function which generates and publishes the content for a Release immediately.
+        /// </summary>
+        /// <remarks>
+        /// Depends on the download files existing.
+        /// Sets the published time on the Release which means it's considered as 'Live'.
+        /// </remarks>
+        /// <param name="message"></param>
+        /// <param name="executionContext"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         [FunctionName("PublishReleaseContent")]
         // ReSharper disable once UnusedMember.Global
-        public async Task PublishReleaseContent([TimerTrigger("%PublishReleaseContentCronSchedule%")]
-            TimerInfo timer,
+        public async Task PublishReleaseContent(
+            [QueueTrigger(PublishReleaseContentQueue)]
+            PublishReleaseContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
 
-            var scheduled = (await QueryScheduledReleases()).ToList();
-            if (scheduled.Any())
+            await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Started);
+            
+            var context = new PublishContext(DateTime.UtcNow, false);
+            
+            try
             {
-                var published = new List<ReleaseStatus>();
-                foreach (var releaseStatus in scheduled)
+                await _contentService.UpdateContent(context, message.ReleaseId);
+                await _releaseService.SetPublishedDatesAsync(message.ReleaseId, context.Published);
+                
+                if (!PublisherUtils.IsDevelopment())
                 {
-                    logger.LogInformation($"Moving content for release: {releaseStatus.ReleaseId}");
-                    await UpdateStage(releaseStatus, Started);
-                    try
-                    {
-                        await _publishingService.PublishStagedReleaseContentAsync(releaseStatus.ReleaseId);
-
-                        published.Add(releaseStatus);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                        await UpdateStage(releaseStatus, Failed,
-                            new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
-                    }
+                    await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
                 }
 
-                var releaseIds = published.Select(status => status.ReleaseId);
-
-                try
-                {
-                    if (!PublisherUtils.IsDevelopment())
-                    {
-                        await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
-                    }
-                    
-                    await _contentService.DeletePreviousVersionsContent(releaseIds);
-                    await _notificationsService.NotifySubscribersAsync(releaseIds);
-                    await UpdateStage(published, Complete);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                    await UpdateStage(published, Failed,
-                        new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
-                }
+                await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
+                await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
+                await _notificationsService.NotifySubscribers(message.ReleaseId);
+                await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Failed,
+                    new ReleaseStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
             }
 
-            logger.LogInformation(
-                $"{executionContext.FunctionName} completed. {timer.FormatNextOccurrences(1)}");
+            logger.LogInformation($"{executionContext.FunctionName} completed");
         }
 
-        private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
-        {
-            return await _releaseStatusService.GetWherePublishingDueTodayWithStages(
-                content: ReleaseStatusContentStage.Complete,
-                data: ReleaseStatusDataStage.Complete,
-                publishing: Scheduled);
-        }
-
-        private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, ReleaseStatusPublishingStage stage,
+        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, State state,
             ReleaseStatusLogMessage logMessage = null)
         {
-            foreach (var releaseStatus in releaseStatuses)
+            switch (state)
             {
-                await UpdateStage(releaseStatus, stage, logMessage);
+                case State.Started:
+                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                        releaseStatusId,
+                        logMessage: logMessage,
+                        publishing: ReleaseStatusPublishingStage.Started,
+                        content: ReleaseStatusContentStage.Started);
+                    break;
+                case State.Complete:
+                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                        releaseStatusId,
+                        logMessage: logMessage,
+                        publishing: ReleaseStatusPublishingStage.Complete,
+                        content: ReleaseStatusContentStage.Complete);
+                    break;
+                case State.Failed:
+                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                        releaseStatusId,
+                        logMessage: logMessage,
+                        publishing: ReleaseStatusPublishingStage.Failed,
+                        content: ReleaseStatusContentStage.Failed);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
             }
         }
 
-        private async Task UpdateStage(ReleaseStatus releaseStatus, ReleaseStatusPublishingStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        private enum State
         {
-            await _releaseStatusService.UpdatePublishingStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, stage,
-                logMessage);
+            Started,
+            Complete,
+            Failed
         }
     }
 }

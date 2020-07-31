@@ -1,8 +1,8 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import ThemeAndTopicContext from '@admin/components/ThemeAndTopicContext';
+import useThemeTopicContext from '@admin/contexts/ThemeTopicContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import appRouteList from '@admin/routes/dashboard/routes';
+import { dashboardRoute } from '@admin/routes/routes';
 import contactService, { ContactDetails } from '@admin/services/contactService';
 import { ExternalMethodology } from '@admin/services/dashboardService';
 import methodologyService, {
@@ -25,7 +25,7 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { AssignMethodologyFormValues } from './publication/AssignMethodologyForm';
 
@@ -54,7 +54,7 @@ const CreatePublicationPage = ({
 }: RouteComponentProps<{ topicId: string }>) => {
   const [model, setModel] = useState<CreatePublicationModel>();
 
-  const { topic } = useContext(ThemeAndTopicContext).selectedThemeAndTopic;
+  const { topic } = useThemeTopicContext();
 
   useEffect(() => {
     Promise.all([
@@ -86,11 +86,11 @@ const CreatePublicationPage = ({
       ...methodology,
     });
 
-    history.push(appRouteList.adminDashboard.path as string);
+    history.push(dashboardRoute.path);
   }, errorMappings);
 
   const cancelHandler = () => {
-    history.push(appRouteList.adminDashboard.path as string);
+    history.push(dashboardRoute.path);
   };
 
   const getSelectedContact = (

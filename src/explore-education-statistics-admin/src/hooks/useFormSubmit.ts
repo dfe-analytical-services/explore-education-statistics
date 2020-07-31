@@ -1,11 +1,9 @@
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
-import isAxiosError from '@common/utils/error/isAxiosError';
 import {
   convertServerFieldErrors,
-  ServerValidationErrorResponse,
   FieldMessageMapper,
+  isServerValidationError,
 } from '@common/validation/serverValidations';
-import { AxiosError } from 'axios';
 import { FormikHelpers } from 'formik';
 import { useMemo } from 'react';
 
@@ -14,22 +12,6 @@ export type UseFormSubmit<FormValues> = (
   formikActions: FormikHelpers<FormValues>,
 ) => Promise<void> | void;
 
-const isServerValidationError = (
-  error: Error,
-): error is AxiosError<ServerValidationErrorResponse> => {
-  if (!isAxiosError(error) || !error.response?.data) {
-    return false;
-  }
-
-  const errorDataAsValidationError = error.response
-    .data as ServerValidationErrorResponse;
-
-  return (
-    errorDataAsValidationError.errors !== undefined &&
-    errorDataAsValidationError.status !== undefined &&
-    errorDataAsValidationError.title !== undefined
-  );
-};
 function useFormSubmit<FormValues>(
   onSubmit: UseFormSubmit<FormValues>,
   errorMappers: FieldMessageMapper<FormValues>[] = [],

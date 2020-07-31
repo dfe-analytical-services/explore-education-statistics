@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     ContentSection = new ContentSection
                     {
                         Id = ContentSectionId,
-                        Content = new List<IContentBlock>
+                        Content = new List<ContentBlock>
                         {
                             new DataBlock
                             {
@@ -105,10 +105,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         }
 
         [Fact]
-        public void AttachContentBlockAsync()
+        public void AttachDataBlock()
         {
             AssertSecurityPoliciesChecked(service => 
-                    service.AttachContentBlockAsync(
+                    service.AttachDataBlock(
                         _release.Id,
                         ContentSectionId,
                         new AttachContentBlockRequest()),

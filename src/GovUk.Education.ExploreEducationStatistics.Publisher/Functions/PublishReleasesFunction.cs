@@ -22,10 +22,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
         }
 
-        /**
-         * Azure function which triggers tasks for all Releases that are scheduled to be published later during the day.
-         * Triggers publishing files and statistics data.
-         */
+        /// <summary>
+        /// Azure function which triggers tasks for all Releases that are scheduled to be published later during the day.
+        /// </summary>
+        /// <remarks>
+        /// Triggers publishing files and statistics data.
+        /// </remarks>
+        /// <param name="timer"></param>
+        /// <param name="executionContext"></param>
+        /// <param name="logger"></param>
         [FunctionName("PublishReleases")]
         // ReSharper disable once UnusedMember.Global
         public void PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")]

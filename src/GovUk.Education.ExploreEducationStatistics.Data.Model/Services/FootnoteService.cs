@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -46,15 +45,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .AsNoTracking();
         }
 
-        public async Task DeleteFootnotes(Guid releaseId, Guid subjectId)
+        public async Task DeleteAllFootnotesBySubject(Guid releaseId, Guid subjectId)
         {
-            var footnotesLinkedToSubject = GetFootnotes(releaseId, new List<Guid>(){subjectId});
+            var footnotesLinkedToSubject = GetFootnotes(releaseId, new List<Guid> {subjectId});
 
             foreach (var footnote in footnotesLinkedToSubject)
             {
-                var canRemoveFootnote = !IsFootnoteLinkedToAnotherSubject(footnote.Id, subjectId);
+                var canRemoveReleaseFootnote = !IsFootnoteLinkedToAnotherSubjectForThisRelease(footnote.Id, releaseId, subjectId);
+                var canRemoveFootnote = canRemoveReleaseFootnote && !IsFootnoteLinkedToAnotherSubject(footnote.Id, subjectId);
 
-                await DeleteFootnote(releaseId, footnote, canRemoveFootnote);
+                await DeleteFootnote(releaseId, footnote, canRemoveReleaseFootnote, canRemoveFootnote);
             }
         }
 
@@ -64,15 +64,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             
             foreach (var footnote in footnotes)
             {
-                await DeleteFootnote(releaseId, footnote, true);
+                await DeleteFootnote(releaseId, footnote, true, true);
             }
         }
 
-        private async Task DeleteFootnote(Guid releaseId, Footnote footnote, bool canRemoveFootnote)
+        private async Task DeleteFootnote(Guid releaseId, Footnote footnote, bool canRemoveReleaseFootnote, bool canRemoveFootnote)
         {
             // Break link with the whole release if this footnote is not related to any other subject for the release
             // Else, as the ReleaseSubject link will be broken then footnote will not be visible.
-            if (canRemoveFootnote)
+            if (canRemoveReleaseFootnote)
             {
                 await DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
             }
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     .Include(footnote => footnote.Releases)
                     .Include(footnote => footnote.Subjects)
                     .Where(footnote => footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseId == releaseId))
-                    .Select(f => new Footnote()
+                    .Select(f => new Footnote
                     {
                         Id = f.Id,
                         Content = f.Content,
@@ -178,6 +178,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     footnote.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId) ||
                     footnote.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId) ||
                     footnote.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId));
+        }
+        
+        private bool IsFootnoteLinkedToAnotherSubjectForThisRelease(Guid id, Guid releaseId, Guid subjectId)
+        {
+            var otherSubjectIds = _context.ReleaseSubject
+                .Where(rs => rs.ReleaseId == releaseId && rs.SubjectId != subjectId)
+                .ToList()
+                .Select(rs => rs.SubjectId).ToList();
+            
+            var footnote = _context.Footnote
+                .Include(f => f.Filters)
+                .Include(f => f.FilterGroups)
+                .Include(f => f.FilterItems)
+                .Include(f => f.Indicators)
+                .ThenInclude(i => i.Indicator.IndicatorGroup)
+                .Include(f => f.Subjects).Single(f => f.Id == id);
+
+            return (footnote.Subjects.Any(subject => otherSubjectIds.Contains(subject.SubjectId)) ||
+                    footnote.Filters.Any(filter => otherSubjectIds.Contains(filter.Filter.SubjectId)) ||
+                    footnote.Indicators.Any(indicator => otherSubjectIds.Contains(indicator.Indicator.IndicatorGroup.SubjectId)) ||
+                    footnote.FilterGroups.Any(filterGroup => otherSubjectIds.Contains(filterGroup.FilterGroup.Filter.SubjectId)) ||
+                    footnote.FilterItems.Any(filterItem => otherSubjectIds.Contains(filterItem.FilterItem.FilterGroup.Filter.SubjectId)));
         }
     }
 }
