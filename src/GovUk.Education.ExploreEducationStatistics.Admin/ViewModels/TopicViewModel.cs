@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public class TopicViewModel
     {
