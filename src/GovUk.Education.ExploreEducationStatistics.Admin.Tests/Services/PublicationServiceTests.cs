@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -20,104 +19,220 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class PublicationServiceTests
     {
         [Fact]
-        public async void CreatePublication_WithoutMethodology()
+        public async void CreatePublication()
         {
             var (userService, repository, _) = Mocks();
-            
-            using (var context = InMemoryApplicationDbContext("Create"))
-            {
-                context.Add(new Topic {Id = new Guid("861517a2-5055-486c-b362-f971d9791943")});
-                context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("Create"))
+            await using var context = InMemoryApplicationDbContext();
+
+            var topic = new Topic
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
-                
-                // Service method under test
-                var result = await publicationService.CreatePublication(new CreatePublicationViewModel()
+                Title = "Test topic"
+            };
+            var methodology = new Methodology
+            {
+                Title = "Test methodology",
+                Status = MethodologyStatus.Approved,
+            };
+
+            context.Add(topic);
+            context.Add(methodology);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+
+            // Service method under test
+            var result = await publicationService.CreatePublication(new SavePublicationViewModel()
+            {
+                Title = "Test publication",
+                Contact = new SaveContactViewModel
                 {
-                    Title = "Publication Title",
-                    Contact = new SaveContactViewModel 
-                    {
-                        ContactName = "John Smith",
-                        ContactTelNo = "0123456789",
-                        TeamName = "Test team",
-                        TeamEmail = "john.smith@test.com",
-                    },
-                    TopicId = new Guid("861517a2-5055-486c-b362-f971d9791943")
-                });
+                    ContactName = "John Smith",
+                    ContactTelNo = "0123456789",
+                    TeamName = "Test team",
+                    TeamEmail = "john.smith@test.com",
+                },
+                TopicId = topic.Id,
+                MethodologyId = methodology.Id
+            });
 
-                // Do an in depth check of the saved release
-                var publication = context.Publications.Single(p => p.Id == result.Right.Id);
-                
-                Assert.Equal("Publication Title", publication.Title);
-                Assert.Equal(new Guid("861517a2-5055-486c-b362-f971d9791943"), publication.TopicId);
+            var publicationViewModel = result.Right;
+            Assert.Equal("Test publication", publicationViewModel.Title);
 
-                Assert.Equal("John Smith", publication.Contact.ContactName);
-                Assert.Equal("0123456789", publication.Contact.ContactTelNo);
-                Assert.Equal("Test team", publication.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", publication.Contact.TeamEmail);
-            }
+            Assert.Equal("John Smith", publicationViewModel.Contact.ContactName);
+            Assert.Equal("0123456789", publicationViewModel.Contact.ContactTelNo);
+            Assert.Equal("Test team", publicationViewModel.Contact.TeamName);
+            Assert.Equal("john.smith@test.com", publicationViewModel.Contact.TeamEmail);
+
+            Assert.Equal(topic.Id, publicationViewModel.TopicId);
+
+            Assert.Equal(methodology.Id, publicationViewModel.Methodology.Id);
+            Assert.Equal("Test methodology", publicationViewModel.Methodology.Title);
+
+            // Do an in depth check of the saved release
+            var createdPublication = context.Publications.Single(p => p.Id == publicationViewModel.Id);
+            Assert.Equal("Test publication", createdPublication.Title);
+
+            Assert.Equal("John Smith", createdPublication.Contact.ContactName);
+            Assert.Equal("0123456789", createdPublication.Contact.ContactTelNo);
+            Assert.Equal("Test team", createdPublication.Contact.TeamName);
+            Assert.Equal("john.smith@test.com", createdPublication.Contact.TeamEmail);
+
+            Assert.Equal(topic.Id, createdPublication.TopicId);
+            Assert.Equal("Test topic", createdPublication.Topic.Title);
+
+            Assert.Equal(methodology.Id, createdPublication.Methodology.Id);
+            Assert.Equal("Test methodology", createdPublication.Methodology.Title);
         }
 
         [Fact]
-        public async void CreatePublication_WithMethodology()
+        public async void CreatePublication_FailsWithNonExistingTopic()
         {
-            var (userService, repository, _) = Mocks();
-            
-            using (var context = InMemoryApplicationDbContext("CreatePublication"))
-            {
-                context.Add(new Topic {Id = new Guid("b9ce9ddc-efdc-4853-b709-054dc7eed6e4")});
-                context.Add(new Publication // An existing publication with a methodology
+            var (userService, repository, persistenceHelper) = Mocks();
+
+            await using var context = InMemoryApplicationDbContext();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, persistenceHelper.Object);
+
+            // Service method under test
+            var result = await publicationService.CreatePublication(
+                new SavePublicationViewModel()
                 {
-                    Id = new Guid("7af5c874-a3cd-4a5a-873e-2564236a2bd1"),
-                    Methodology = new Methodology
+                    Title = "Test publication",
+                    TopicId = Guid.NewGuid(),
+                });
+
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("TOPIC_DOES_NOT_EXIST", details.Errors[""].First());
+        }
+
+        [Fact]
+        public async void CreatePublication_FailsWithNonExistingMethodology()
+        {
+            var (userService, repository, persistenceHelper) = Mocks();
+
+            await using var context = InMemoryApplicationDbContext();
+
+            var topic = new Topic
+            {
+                Title = "Test topic"
+            };
+
+            context.Add(topic);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, persistenceHelper.Object);
+
+            // Service method under test
+            var result = await publicationService.CreatePublication(
+                new SavePublicationViewModel()
+                {
+                    Title = "Test title",
+                    TopicId = topic.Id,
+                    MethodologyId = Guid.NewGuid(),
+                });
+
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("METHODOLOGY_DOES_NOT_EXIST", details.Errors[""].First());
+        }
+
+        [Fact]
+        public async void CreatePublication_FailsWithMethodologyAndExternalMethodology()
+        {
+            var (userService, repository, persistenceHelper) = Mocks();
+
+            await using var context = InMemoryApplicationDbContext();
+
+            var topic = new Topic
+            {
+                Title = "Test topic"
+            };
+            var methodology = new Methodology
+            {
+                Title = "Test methodology",
+                Status = MethodologyStatus.Approved,
+            };
+
+            context.Add(topic);
+            context.Add(methodology);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, persistenceHelper.Object);
+
+            // Service method under test
+            var result = await publicationService.CreatePublication(
+                new SavePublicationViewModel()
+                {
+                    Title = "Test title",
+                    TopicId = topic.Id,
+                    MethodologyId = methodology.Id,
+                    ExternalMethodology = new ExternalMethodology
                     {
-                        Id = new Guid("697fc9b8-4d44-45da-ae61-148dd9a31450")
+                        Title = "Test external",
+                        Url = "http://test.com"
                     }
                 });
-                context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("CreatePublication"))
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY", details.Errors[""].First());
+        }
+
+
+        [Fact]
+        public async void CreatePublication_FailsWithUnapprovedMethodology()
+        {
+            var (userService, repository, persistenceHelper) = Mocks();
+
+            await using var context = InMemoryApplicationDbContext();
+
+            var topic = new Topic
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
-                
-                // Service method under test
-                var result = await publicationService.CreatePublication(new CreatePublicationViewModel()
+                Title = "Test topic"
+            };
+            var methodology = new Methodology
+            {
+                Title = "Test methodology",
+                Status = MethodologyStatus.Draft,
+            };
+
+            context.Add(topic);
+            context.Add(methodology);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, persistenceHelper.Object);
+
+            // Service method under test
+            var result = await publicationService.CreatePublication(
+                new SavePublicationViewModel()
                 {
-                    Title = "Publication Title",
-                    Contact = new SaveContactViewModel
-                    {
-                        ContactName = "John Smith",
-                        ContactTelNo = "0123456789",
-                        TeamName = "Test team",
-                        TeamEmail = "john.smith@test.com",
-                    },
-                    TopicId = new Guid("b9ce9ddc-efdc-4853-b709-054dc7eed6e4"),
-                    MethodologyId = new Guid("697fc9b8-4d44-45da-ae61-148dd9a31450")
+                    Title = "Test title",
+                    TopicId = topic.Id,
+                    MethodologyId = methodology.Id,
                 });
 
-                // Do an in depth check of the saved release
-                var createdPublication = context.Publications.Single(p => p.Id == result.Right.Id);
-                Assert.Equal("Publication Title", createdPublication.Title);
+            Assert.True(result.IsLeft);
 
-                Assert.Equal("John Smith", createdPublication.Contact.ContactName);
-                Assert.Equal("0123456789", createdPublication.Contact.ContactTelNo);
-                Assert.Equal("Test team", createdPublication.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", createdPublication.Contact.TeamEmail);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
 
-                Assert.Equal(new Guid("b9ce9ddc-efdc-4853-b709-054dc7eed6e4"), createdPublication.TopicId);
-                Assert.Equal(new Guid("697fc9b8-4d44-45da-ae61-148dd9a31450"), createdPublication.MethodologyId);
-
-                // Check that the already existing release hasn't been altered.
-                var existingPublication =
-                    context.Publications.Single(p => p.Id == new Guid("7af5c874-a3cd-4a5a-873e-2564236a2bd1"));
-                Assert.Equal(new Guid("697fc9b8-4d44-45da-ae61-148dd9a31450"), existingPublication.MethodologyId);
-            }
+            Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
         }
 
         [Fact]
@@ -125,360 +240,571 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (userService, repository, persistenceHelper) = Mocks();
 
-            const string titleToBeDuplicated = "A title to be duplicated";
+            await using var context = InMemoryApplicationDbContext();
 
-            using (var context = InMemoryApplicationDbContext("Create"))
+            var topic = new Topic
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, persistenceHelper.Object);
-                
-                var result = await publicationService.CreatePublication(
-                    new CreatePublicationViewModel
-                    {
-                        Title = titleToBeDuplicated,
-                        Contact = new SaveContactViewModel
-                        {
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789",
-                            TeamName = "Test team",
-                            TeamEmail = "john.smith@test.com",
-                        },
-                    });
-                Assert.False(result.IsLeft); // First time should be ok
-            }
+                Title = "Test topic"
+            };
 
-            using (var context = InMemoryApplicationDbContext("Create"))
+            context.Add(topic);
+            context.Add(new Publication
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, persistenceHelper.Object);
-                
-                // Service method under test
-                var result = await publicationService.CreatePublication(
-                    new CreatePublicationViewModel()
-                    {
-                        Title = titleToBeDuplicated,
-                        Contact = new SaveContactViewModel
-                        {
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789",
-                            TeamName = "Test team",
-                            TeamEmail = "john.smith@test.com",
-                        },
-                    });
+                Title = "Test publication",
+                Slug = "test-publication"
+            });
+            await context.SaveChangesAsync();
 
-                Assert.True(result.IsLeft); // Second time should be validation failure
-                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, persistenceHelper.Object);
 
-                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
-            }
+            // Service method under test
+            var result = await publicationService.CreatePublication(
+                new SavePublicationViewModel()
+                {
+                    Title = "Test publication",
+                    TopicId = topic.Id
+                });
+
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
         }
-        
+
         [Fact]
-        public async void UpdatePublicationMethodology_WithId()
+        public async void UpdatePublication()
         {
             var (userService, repository, _) = Mocks();
-            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
-            var testMethodologyId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942");
-            
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId"))
+
+            await using var context = InMemoryApplicationDbContext();
+
+            var topic = new Topic
             {
-                context.Add(new Publication { Id = testPublicationId});
-                context.Add(new Methodology 
-                { 
-                    Id = testMethodologyId, 
-                    Published = DateTime.UtcNow.AddDays(-1), 
+                Title = "New topic"
+            };
+            var methodology = new Methodology
+            {
+                Title = "New methodology",
+                Status = MethodologyStatus.Approved,
+            };
+            var publication = new Publication
+            {
+                Title = "Old title",
+                Topic = new Topic
+                {
+                    Title = "Old topic"
+                },
+                Methodology = new Methodology
+                {
+                    Title = "Old methodology"
+                },
+                Contact = new Contact
+                {
+                    ContactName = "Old name",
+                    ContactTelNo = "0987654321",
+                    TeamName = "Old team",
+                    TeamEmail = "old.smith@test.com",
+                },
+            };
+
+            context.Add(topic);
+            context.Add(methodology);
+            context.Add(publication);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+
+            // Service method under test
+            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            {
+                Title = "New title",
+                Contact = new SaveContactViewModel
+                {
+                    ContactName = "John Smith",
+                    ContactTelNo = "0123456789",
+                    TeamName = "Test team",
+                    TeamEmail = "john.smith@test.com",
+                },
+                TopicId = topic.Id,
+                MethodologyId = methodology.Id,
+            });
+
+            Assert.Equal("New title", result.Right.Title);
+
+            Assert.Equal("John Smith", result.Right.Contact.ContactName);
+            Assert.Equal("0123456789", result.Right.Contact.ContactTelNo);
+            Assert.Equal("Test team", result.Right.Contact.TeamName);
+            Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
+
+            Assert.Equal(topic.Id, result.Right.TopicId);
+
+            Assert.Equal(methodology.Id, result.Right.Methodology.Id);
+            Assert.Equal("New methodology", result.Right.Methodology.Title);
+
+            // Do an in depth check of the saved release
+            var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+            Assert.Equal("New title", updatedPublication.Title);
+
+            Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
+            Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
+            Assert.Equal("Test team", updatedPublication.Contact.TeamName);
+            Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+
+            Assert.Equal(topic.Id, updatedPublication.TopicId);
+            Assert.Equal("New topic", updatedPublication.Topic.Title);
+
+            Assert.Equal(methodology.Id, updatedPublication.MethodologyId);
+            Assert.Equal("New methodology", updatedPublication.Methodology.Title);
+        }
+
+        [Fact]
+        public async void UpdatePublication_SavesNewContact()
+        {
+            var (userService, repository, _) = Mocks();
+
+            await using var context = InMemoryApplicationDbContext();
+
+            var publication = new Publication
+            {
+                Title = "Test title",
+                Topic = new Topic
+                {
+                    Title = "Test topic"
+                },
+                Methodology = new Methodology
+                {
+                    Title = "Test methodology",
                     Status = MethodologyStatus.Approved
-                    
-                });
+                },
+            };
 
-                context.SaveChanges();
-            }
+            context.Add(publication);
+            await context.SaveChangesAsync();
 
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId"))
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+
+            // Service method under test
+            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
-                
-                await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
+                Title = "New title",
+                Contact = new SaveContactViewModel
                 {
-                    ExternalMethodology = null,
-                    MethodologyId = testMethodologyId
-                });
+                    ContactName = "John Smith",
+                    ContactTelNo = "0123456789",
+                    TeamName = "Test team",
+                    TeamEmail = "john.smith@test.com",
+                },
+                TopicId = publication.TopicId,
+                MethodologyId = publication.MethodologyId,
+            });
 
-                var publication = context.Publications.Single(p => p.Id == testPublicationId);
-                
-                Assert.Equal(testMethodologyId, publication.MethodologyId);
-            }
+            var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+
+            Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
+            Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
+            Assert.Equal("Test team", updatedPublication.Contact.TeamName);
+            Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
         }
-        
+
         [Fact]
-        public async void UpdatePublicationMethodology_WithId_Draft()
+        public async void UpdatePublication_SavesNewContactWhenSharedWithOtherPublication()
         {
             var (userService, repository, _) = Mocks();
-            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
-            var testMethodologyId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942");
-            
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_Draft"))
-            {
-                context.Add(new Publication { Id = testPublicationId});
-                context.Add(new Methodology { Id = testMethodologyId});
 
-                context.SaveChanges();
-            }
+            await using var context = InMemoryApplicationDbContext();
 
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_Draft"))
+            var sharedContact = new Contact
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
-                
-                var result = await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
+                Id = Guid.NewGuid(),
+                ContactName = "Old name",
+                ContactTelNo = "0987654321",
+                TeamName = "Old team",
+                TeamEmail = "old.smith@test.com",
+            };
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Topic = new Topic
                 {
-                    ExternalMethodology = null,
-                    MethodologyId = testMethodologyId
-                });
+                    Title = "Test topic"
+                },
+                Methodology = new Methodology
+                {
+                    Title = "Test methodology",
+                    Status = MethodologyStatus.Approved
+                },
+                Contact = sharedContact
+            };
+            var otherPublication = new Publication
+            {
+                Title = "Other publication",
+                Contact = sharedContact
+            };
 
-                var publication = context.Publications.Single(p => p.Id == testPublicationId);
-                
-                Assert.Null(publication.MethodologyId);
-            }
+            context.AddRange(publication, otherPublication);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+
+            // Service method under test
+            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            {
+                Title = "New title",
+                Contact = new SaveContactViewModel
+                {
+                    ContactName = "John Smith",
+                    ContactTelNo = "0123456789",
+                    TeamName = "Test team",
+                    TeamEmail = "john.smith@test.com",
+                },
+                TopicId = publication.TopicId,
+                MethodologyId = publication.MethodologyId,
+            });
+
+            var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+
+            Assert.NotEqual(sharedContact.Id, updatedPublication.Contact.Id);
+            Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
+            Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
+            Assert.Equal("Test team", updatedPublication.Contact.TeamName);
+            Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
         }
-        
+
         [Fact]
-        public async void UpdatePublicationMethodology_WithId_NotExists()
+        public async void UpdatePublication_FailsWithNonExistingTopic()
         {
             var (userService, repository, _) = Mocks();
-            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
-            var testMethodologyId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942");
-            
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_NotExists"))
-            {
-                context.Add(new Publication { Id = testPublicationId});
 
-                context.SaveChanges();
-            }
+            await using var context = InMemoryApplicationDbContext();
 
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithId_NotExists"))
+            var publication = new Publication
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
-                
-                var result = await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
+                Title = "Test publication",
+                Topic = new Topic
                 {
-                    ExternalMethodology = null,
-                    MethodologyId = testMethodologyId
-                });
+                    Title = "Test topic"
+                },
+                Methodology = new Methodology
+                {
+                    Title = "Test methodology"
+                }
+            };
 
-                var publication = context.Publications.Single(p => p.Id == testPublicationId);
-                
-                Assert.Null(publication.MethodologyId);
-            }
+            context.Add(publication);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+
+            // Service method under test
+            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            {
+                Title = "Test publication",
+                TopicId = Guid.NewGuid(),
+            });
+
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("TOPIC_DOES_NOT_EXIST", details.Errors[""].First());
         }
-        
+
         [Fact]
-        public async void UpdatePublicationMethodology_WithExternal()
+        public async void UpdatePublication_FailsWithNonExistingMethodology()
         {
             var (userService, repository, _) = Mocks();
-            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
-            
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithExternal"))
-            {
-                context.Add(new Publication { Id = testPublicationId});
 
-                context.SaveChanges();
-            }
+            await using var context = InMemoryApplicationDbContext();
 
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyWithExternal"))
+            var publication = new Publication
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
-                
-                var result = await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
+                Topic = new Topic
                 {
-                    ExternalMethodology = new ExternalMethodology
-                    {
-                        Title = "title",
-                        Url = "https://example.com"
-                    },
-                    MethodologyId = null
-                });
+                    Title = "Old topic"
+                }
+            };
 
-                var publication = context.Publications.Single(p => p.Id == testPublicationId);
-                
-                Assert.Null(publication.MethodologyId);
-            }
+            context.Add(publication);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+
+            // Service method under test
+            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            {
+                Title = "Test publication",
+                TopicId = publication.TopicId,
+                MethodologyId = Guid.NewGuid(),
+            });
+
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("METHODOLOGY_DOES_NOT_EXIST", details.Errors[""].First());
         }
-        
+
         [Fact]
-        public async void UpdatePublicationMethodology_InvalidRequest()
+        public async void UpdatePublication_FailsWithMethodologyAndExternalMethodology()
         {
             var (userService, repository, _) = Mocks();
-            var testPublicationId = new Guid("861517a2-5055-486c-b362-f971d9791943");
-            
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyInvalidRequest"))
-            {
-                context.Add(new Publication { Id = testPublicationId});
 
-                context.SaveChanges();
-            }
+            await using var context = InMemoryApplicationDbContext();
 
-            using (var context = InMemoryApplicationDbContext("UpdateMethodologyInvalidRequest"))
+            var publication = new Publication
             {
-                var publicationService = new PublicationService(context, AdminMapper(),
-                    userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
-                
-                var result = await publicationService.UpdatePublicationMethodology(testPublicationId, new UpdatePublicationMethodologyViewModel
+                Topic = new Topic
                 {
-                    ExternalMethodology = null,
-                    MethodologyId = null
-                });
+                    Title = "Test topic"
+                }
+            };
 
-                var publication = context.Publications.Single(p => p.Id == testPublicationId);
-                
-                Assert.Null(publication.MethodologyId);
-                Assert.Null(publication.ExternalMethodology);
+            context.Add(publication);
+            await context.SaveChangesAsync();
 
-            }
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+
+            // Service method under test
+            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            {
+                Title = "Test publication",
+                TopicId = publication.TopicId,
+                MethodologyId = Guid.NewGuid(),
+                ExternalMethodology = new ExternalMethodology
+                {
+                    Title = "Test external",
+                    Url = "http://test.com"
+                }
+            });
+
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY", details.Errors[""].First());
+        }
+
+        [Fact]
+        public async void UpdatePublication_FailsWithUnapprovedMethodology()
+        {
+            var (userService, repository, _) = Mocks();
+
+            await using var context = InMemoryApplicationDbContext();
+
+            var methodology = new Methodology
+            {
+                Title = "Test methodology",
+                Status = MethodologyStatus.Draft,
+            };
+            var publication = new Publication
+            {
+                Topic = new Topic
+                {
+                    Title = "Test topic"
+                },
+            };
+
+            context.Add(methodology);
+            context.Add(publication);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+
+            // Service method under test
+            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            {
+                Title = "Test publication",
+                TopicId = publication.TopicId,
+                MethodologyId = methodology.Id,
+            });
+
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
+        }
+
+        [Fact]
+        public async void UpdatePublication_FailsWithNonUniqueSlug()
+        {
+            var (userService, repository, persistenceHelper) = Mocks();
+
+            await using var context = InMemoryApplicationDbContext();
+
+            var topic = new Topic
+            {
+                Title = "Topic title"
+            };
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Slug = "test-publication",
+                Topic = topic
+            };
+            var otherPublication = new Publication
+            {
+                Title = "Duplicated title",
+                Slug = "duplicated-title",
+                Topic = topic
+            };
+
+            context.Add(publication);
+            context.Add(otherPublication);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(context, AdminMapper(),
+                userService.Object, repository.Object, persistenceHelper.Object);
+
+            // Service method under test
+            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            {
+                Title = "Duplicated title",
+                TopicId = topic.Id,
+            });
+
+            Assert.True(result.IsLeft);
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
         }
 
         [Fact]
         public async void PartialUpdateLegacyReleases_OnlyMatchingEntities()
         {
             var (userService, repository, _) = Mocks();
-            var publicationId = Guid.NewGuid();
 
-            var legacyRelease1Id = Guid.NewGuid();
-            var legacyRelease2Id = Guid.NewGuid();
-            
-            using (var context = InMemoryApplicationDbContext("PartialUpdateLegacyReleases_OnlyMatchingEntities"))
+            await using var context = InMemoryApplicationDbContext();
+
+            var publication = new Publication
             {
-                context.Add(new Publication 
-                { 
-                    Id = publicationId,
-                    LegacyReleases = new List<LegacyRelease>
+                LegacyReleases = new List<LegacyRelease>
+                {
+                    new LegacyRelease
                     {
-                        new LegacyRelease 
-                        {
-                            Id = legacyRelease1Id,
-                            Description = "Test description 1",
-                            Url = "http://test1.com",
-                            Order = 1,
-                        },
-                        new LegacyRelease 
-                        {
-                            Id = legacyRelease2Id,
-                            Description = "Test description 2",
-                            Url = "http://test2.com",
-                            Order = 2,
-                        },
+                        Description = "Test description 1",
+                        Url = "http://test1.com",
+                        Order = 1,
+                    },
+                    new LegacyRelease
+                    {
+                        Description = "Test description 2",
+                        Url = "http://test2.com",
+                        Order = 2,
+                    },
+                }
+            };
+
+            context.Add(publication);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(
+                context,
+                AdminMapper(),
+                userService.Object,
+                repository.Object,
+                new PersistenceHelper<ContentDbContext>(context)
+            );
+
+            var result = await publicationService.PartialUpdateLegacyReleases(
+                publication.Id,
+                new List<PartialUpdateLegacyReleaseViewModel>
+                {
+                    new PartialUpdateLegacyReleaseViewModel
+                    {
+                        Id = publication.LegacyReleases[0].Id,
+                        Description = "Updated description 1",
+                        Url = "http://updated-test1.com",
+                        Order = 3
                     }
                 });
 
-                context.SaveChanges();
-            }
+            var legacyReleases = result.Right;
 
-            using (var context = InMemoryApplicationDbContext("PartialUpdateLegacyReleases_OnlyMatchingEntities"))
-            {
-                var publicationService = new PublicationService(
-                    context, 
-                    AdminMapper(),
-                    userService.Object, 
-                    repository.Object, 
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
-                
-                var result = await publicationService.PartialUpdateLegacyReleases(
-                    publicationId, 
-                    new List<PartialUpdateLegacyReleaseViewModel>
-                    {
-                        new PartialUpdateLegacyReleaseViewModel
-                        {
-                            Id = legacyRelease1Id,
-                            Description = "Updated description 1",
-                            Url = "http://updated-test1.com",
-                            Order = 3
-                        }
-                    });
+            Assert.Equal(2, legacyReleases.Count);
 
-                var legacyReleases = result.Right;
+            Assert.Equal(publication.LegacyReleases[0].Id, legacyReleases[0].Id);
+            Assert.Equal("Updated description 1", legacyReleases[0].Description);
+            Assert.Equal("http://updated-test1.com", legacyReleases[0].Url);
+            Assert.Equal(3, legacyReleases[0].Order);
 
-                Assert.Equal(legacyReleases.Count, 2);
-
-                Assert.Equal(legacyRelease1Id, legacyReleases[0].Id);
-                Assert.Equal("Updated description 1", legacyReleases[0].Description);
-                Assert.Equal("http://updated-test1.com", legacyReleases[0].Url);
-                Assert.Equal(3, legacyReleases[0].Order);
-
-                Assert.Equal(legacyRelease2Id, legacyReleases[1].Id);
-                Assert.Equal("Test description 2", legacyReleases[1].Description);
-                Assert.Equal("http://test2.com", legacyReleases[1].Url);
-                Assert.Equal(2, legacyReleases[1].Order);
-            }   
+            Assert.Equal(publication.LegacyReleases[1].Id, legacyReleases[1].Id);
+            Assert.Equal("Test description 2", legacyReleases[1].Description);
+            Assert.Equal("http://test2.com", legacyReleases[1].Url);
+            Assert.Equal(2, legacyReleases[1].Order);
         }
-   
+
         [Fact]
         public async void PartialUpdateLegacyReleases_OnlyNonNullFields()
         {
             var (userService, repository, _) = Mocks();
-            var publicationId = Guid.NewGuid();
 
-            var legacyRelease1Id = Guid.NewGuid();
-            
-            using (var context = InMemoryApplicationDbContext("PartialUpdateLegacyReleases_OnlyNonNullFields"))
+            await using var context = InMemoryApplicationDbContext();
+
+            var publication = new Publication
             {
-                context.Add(new Publication 
-                { 
-                    Id = publicationId,
-                    LegacyReleases = new List<LegacyRelease>
+                LegacyReleases = new List<LegacyRelease>
+                {
+                    new LegacyRelease
                     {
-                        new LegacyRelease 
-                        {
-                            Id = legacyRelease1Id,
-                            Description = "Test description 1",
-                            Url = "http://test1.com",
-                            Order = 1,
-                        },
+                        Description = "Test description 1",
+                        Url = "http://test1.com",
+                        Order = 1,
+                    },
+                }
+            };
+
+            context.Add(publication);
+            await context.SaveChangesAsync();
+
+            var publicationService = new PublicationService(
+                context,
+                AdminMapper(),
+                userService.Object,
+                repository.Object,
+                new PersistenceHelper<ContentDbContext>(context)
+            );
+
+            var result = await publicationService.PartialUpdateLegacyReleases(
+                publication.Id,
+                new List<PartialUpdateLegacyReleaseViewModel>
+                {
+                    new PartialUpdateLegacyReleaseViewModel
+                    {
+                        Id = publication.LegacyReleases[0].Id,
+                        Description = "Updated description 1",
                     }
                 });
 
-                context.SaveChanges();
-            }
+            var legacyReleases = result.Right;
 
-            using (var context = InMemoryApplicationDbContext("PartialUpdateLegacyReleases_OnlyNonNullFields"))
-            {
-                var publicationService = new PublicationService(
-                    context, 
-                    AdminMapper(),
-                    userService.Object, 
-                    repository.Object, 
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
-                
-                var result = await publicationService.PartialUpdateLegacyReleases(
-                    publicationId, 
-                    new List<PartialUpdateLegacyReleaseViewModel>
-                    {
-                        new PartialUpdateLegacyReleaseViewModel
-                        {
-                            Id = legacyRelease1Id,
-                            Description = "Updated description 1",
-                        }
-                    });
+            Assert.Single(legacyReleases);
 
-                var legacyReleases = result.Right;
-
-                Assert.Equal(legacyReleases.Count, 1);
-
-                Assert.Equal(legacyRelease1Id, legacyReleases[0].Id);
-                Assert.Equal("Updated description 1", legacyReleases[0].Description);
-                Assert.Equal("http://test1.com", legacyReleases[0].Url);
-                Assert.Equal(1, legacyReleases[0].Order);
-            }   
+            Assert.Equal(publication.LegacyReleases[0].Id, legacyReleases[0].Id);
+            Assert.Equal("Updated description 1", legacyReleases[0].Description);
+            Assert.Equal("http://test1.com", legacyReleases[0].Url);
+            Assert.Equal(1, legacyReleases[0].Order);
         }
 
         private (
-            Mock<IUserService>, 
-            Mock<IPublicationRepository>, 
+            Mock<IUserService>,
+            Mock<IPublicationRepository>,
             Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
@@ -486,8 +812,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
 
             return (
-                MockUtils.AlwaysTrueUserService(), 
-                new Mock<IPublicationRepository>(), 
+                MockUtils.AlwaysTrueUserService(),
+                new Mock<IPublicationRepository>(),
                 persistenceHelper);
         }
     }

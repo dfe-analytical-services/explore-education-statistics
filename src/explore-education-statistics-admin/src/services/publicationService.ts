@@ -25,13 +25,16 @@ export interface PublicationMethodologyDetails {
   externalMethodology?: ExternalMethodology;
 }
 
-export interface CreatePublicationRequest {
+export interface SavePublicationRequest {
   title: string;
   contact: SaveContact;
   selectedMethodologyId?: string;
   externalMethodology?: ExternalMethodology;
   topicId: string;
 }
+
+export type CreatePublicationRequest = SavePublicationRequest;
+export type UpdatePublicationRequest = SavePublicationRequest;
 
 export type UpdatePublicationLegacyRelease = Partial<
   OmitStrict<UpdateLegacyRelease, 'publicationId'>
@@ -42,6 +45,13 @@ const publicationService = {
     publication: CreatePublicationRequest,
   ): Promise<BasicPublicationDetails> {
     return client.post('/publications', publication);
+  },
+
+  updatePublication(
+    publicationId: string,
+    publication: UpdatePublicationRequest,
+  ): Promise<BasicPublicationDetails> {
+    return client.put(`/publications/${publicationId}`, publication);
   },
 
   getPublication(publicationId: string): Promise<BasicPublicationDetails> {

@@ -19,6 +19,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
+#nullable enable annotations
     public class PublicationService : IPublicationService
     {
         private readonly ContentDbContext _context;
@@ -27,8 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublicationRepository _publicationRepository;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
-        public PublicationService(ContentDbContext context, IMapper mapper, IUserService userService,
-            IPublicationRepository publicationRepository, IPersistenceHelper<ContentDbContext> persistenceHelper)
+        public PublicationService(
+            ContentDbContext context,
+            IMapper mapper,
+            IUserService userService,
+            IPublicationRepository publicationRepository,
+            IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
@@ -55,20 +60,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            CreatePublicationViewModel publication)
+            SavePublicationViewModel publication)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Topic>(publication.TopicId)
-                .OnSuccess(_userService.CheckCanCreatePublicationForTopic)
+            return await ValidateSelectedTopic(publication.TopicId)
+                .OnSuccess(_ => ValidateSelectedMethodology(
+                    publication.MethodologyId,
+                    publication.ExternalMethodology
+                ))
                 .OnSuccess(async _ =>
                 {
                     if (_context.Publications.Any(p => p.Slug == publication.Slug))
                     {
-                        return ValidationActionResult<PublicationViewModel>(SlugNotUnique);
+                        return ValidationActionResult(SlugNotUnique);
                     }
 
                     var contact = await _context.Contacts.AddAsync(new Contact
-                    {   
+                    {
                         ContactName = publication.Contact.ContactName,
                         ContactTelNo = publication.Contact.ContactTelNo,
                         TeamName = publication.Contact.TeamName,
@@ -86,8 +93,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
 
                     await _context.SaveChangesAsync();
+
                     return await GetViewModel(saved.Entity.Id);
                 });
+        }
+
+        public async Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
+            Guid publicationId,
+            SavePublicationViewModel updatedPublication)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanUpdatePublication)
+                .OnSuccessDo(_ => ValidateSelectedTopic(updatedPublication.TopicId))
+                .OnSuccessDo(_ => ValidateSelectedMethodology(
+                    updatedPublication.MethodologyId,
+                    updatedPublication.ExternalMethodology
+                ))
+                .OnSuccess(async publication =>
+                {
+                    if (_context.Publications
+                        .Any(p => p.Slug == updatedPublication.Slug && p.Id != publication.Id))
+                    {
+                        return ValidationActionResult(SlugNotUnique);
+                    }
+
+                    publication.Title = updatedPublication.Title;
+                    publication.TopicId = updatedPublication.TopicId;
+                    publication.MethodologyId = updatedPublication.MethodologyId;
+                    publication.Slug = updatedPublication.Slug;
+                    publication.ExternalMethodology = updatedPublication.ExternalMethodology;
+
+                    // Add new contact if it doesn't exist, otherwise replace existing
+                    // contact that is shared with another publication with a new
+                    // contact, as we want each publication to have its own contact.
+                    if (publication.Contact == null ||
+                        _context.Publications
+                            .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
+                    {
+                        publication.Contact = new Contact();
+                    }
+
+                    publication.Contact.ContactName = updatedPublication.Contact.ContactName;
+                    publication.Contact.ContactTelNo = updatedPublication.Contact.ContactTelNo;
+                    publication.Contact.TeamName = updatedPublication.Contact.TeamName;
+                    publication.Contact.TeamEmail = updatedPublication.Contact.TeamEmail;
+
+                    _context.Publications.Update(publication);
+
+                    await _context.SaveChangesAsync();
+
+                    return await GetViewModel(publication.Id);
+                });
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(
+            Guid? topicId)
+        {
+            var topic = await _context.Topics.FindAsync(topicId);
+
+            if (topic == null)
+            {
+                return ValidationActionResult(TopicDoesNotExist);
+            }
+
+            return await _userService.CheckCanCreatePublicationForTopic(topic)
+                .OnSuccess(_ => Unit.Instance);
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateSelectedMethodology(
+            Guid? methodologyId,
+            ExternalMethodology? externalMethodology)
+        {
+            if (methodologyId != null && externalMethodology != null)
+            {
+                return ValidationActionResult(CannotSpecifyMethodologyAndExternalMethodology);
+            }
+
+            if (methodologyId != null)
+            {
+                var methodology = await _context.Methodologies.FindAsync(methodologyId);
+
+                if (methodology == null)
+                {
+                    return ValidationActionResult(MethodologyDoesNotExist);
+                }
+
+                // TODO: this will want updating when methodology status is fully implemented
+                if (methodology.Status != MethodologyStatus.Approved)
+                {
+                    return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
+                }
+            }
+
+            return Unit.Instance;
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> GetViewModel(Guid publicationId)
@@ -98,36 +197,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
 
-        public async Task<Either<ActionResult, bool>> UpdatePublicationMethodology(Guid publicationId,
-            UpdatePublicationMethodologyViewModel methodology)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(_ => ValidateMethodologyCanBeAssigned(methodology))
-                .OnSuccess(async _ =>
-                {
-                    var publication = await _context.Publications.Include(p => p.ExternalMethodology).FirstOrDefaultAsync(p => p.Id == publicationId);
-
-                    _context.Publications.Update(publication);
-                    
-                    if (methodology.MethodologyId != null)
-                    {
-                        publication.MethodologyId = methodology.MethodologyId;
-                        publication.ExternalMethodology = null;
-                    }
-                    else
-                    {
-                        publication.ExternalMethodology = methodology.ExternalMethodology;
-                        publication.MethodologyId = null;
-                    }
-                    _context.SaveChanges();
-
-                    return true;
-                });
-        }
-
         public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
-            Guid publicationId, 
+            Guid publicationId,
             List<PartialUpdateLegacyReleaseViewModel> updatedLegacyReleases)
         {
             return await _persistenceHelper
@@ -151,8 +222,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         legacyRelease.Description = updateLegacyRelease.Description ?? legacyRelease.Description;
                         legacyRelease.Url = updateLegacyRelease.Url ?? legacyRelease.Url;
 
-                        // Don't shift other orders around as its unreliable when doing 
-                        // a bulk update like this. It's easier to let the consumer 
+                        // Don't shift other orders around as its unreliable when doing
+                        // a bulk update like this. It's easier to let the consumer
                         // decide what all the orders should be.
                         legacyRelease.Order = updateLegacyRelease.Order ?? legacyRelease.Order;
 
@@ -176,40 +247,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.LegacyReleases)
                 .Include(p => p.Methodology)
                 .Include(p => p.Topic);
-        }
-
-        private async Task<Either<ActionResult, bool>> ValidateMethodologyCanBeAssigned(
-            UpdatePublicationMethodologyViewModel model)
-        {
-            if (model.MethodologyId != null && model.ExternalMethodology == null)
-            {
-                var methodology = await _context.Methodologies.FirstOrDefaultAsync(p => p.Id == model.MethodologyId);
-
-                if (methodology == null)
-                {
-                    return ValidationActionResult(MethodologyDoesNotExist);
-                }
-
-                // TODO: this will want updating when methodology status is fully implemented
-                if (methodology.Status == MethodologyStatus.Draft)
-                {
-                    return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
-                }
-            }
-            else if (model.ExternalMethodology != null && model.MethodologyId == null)
-            {
-                // TODO: EES-1287 External methodology must be external link to the service
-            }
-            else if (model.ExternalMethodology == null && model.MethodologyId == null)
-            {
-                return ValidationActionResult(MethodologyOrExternalMethodologyLinkMustBeDefined);
-            }
-            else
-            {
-                return ValidationActionResult(CannotSpecifyMethodologyAndExternalMethodology);
-            }
-
-            return true;
         }
     }
 }

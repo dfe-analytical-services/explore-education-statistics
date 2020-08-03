@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public ContactViewModel Contact { get; set; }
     }
 
-    public class CreatePublicationViewModel
+    public class SavePublicationViewModel
     {
         [Required] public string Title { get; set; }
 

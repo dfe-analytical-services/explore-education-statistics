@@ -20,8 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var publicationService = new Mock<IPublicationService>();
 
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
-                .Returns<CreatePublicationViewModel>(p => 
+                .Setup(s => s.CreatePublication(It.IsAny<SavePublicationViewModel>()))
+                .Returns<SavePublicationViewModel>(p => 
                     Task.FromResult(new Either<ActionResult, PublicationViewModel>(
                         new PublicationViewModel 
                         {
@@ -35,16 +35,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var topicId = Guid.NewGuid();
 
             // Method under test
-            var result = await controller.CreatePublication(new CreatePublicationViewModel() 
+            var result = await controller.CreatePublication(new SavePublicationViewModel() 
             {
                 TopicId = topicId
             });
             
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            Assert.IsAssignableFrom<PublicationViewModel>(((OkObjectResult) result.Result).Value);
-
-            var viewModel = (PublicationViewModel) ((OkObjectResult) result.Result).Value;
-            Assert.Equal(topicId, viewModel.TopicId);
+            Assert.IsType<PublicationViewModel>(result.Value);
+            Assert.Equal(topicId, result.Value.TopicId);
         }
         
         [Fact] 
@@ -57,26 +54,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     ValidationUtils.ValidationActionResult(ValidationErrorMessages.SlugNotUnique));
             
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
-                .Returns<CreatePublicationViewModel>(p => Task.FromResult(validationResponse));
+                .Setup(s => s.CreatePublication(It.IsAny<SavePublicationViewModel>()))
+                .Returns<SavePublicationViewModel>(p => Task.FromResult(validationResponse));
             
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
+
             // Method under test
-            var result = await controller.CreatePublication(new CreatePublicationViewModel()
+            var result = await controller.CreatePublication(new SavePublicationViewModel()
             {
                 TopicId = topicId
             });
 
-            var badRequestObjectResult = result.Result;
-            Assert.IsAssignableFrom<BadRequestObjectResult>(badRequestObjectResult);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            var value = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
 
-            var validationProblemDetails = (badRequestObjectResult as BadRequestObjectResult)?.Value;  
-            Assert.IsAssignableFrom<ValidationProblemDetails>(validationProblemDetails);
-
-            var errors = (validationProblemDetails as ValidationProblemDetails)?.Errors;
-            Assert.Contains("SLUG_NOT_UNIQUE", errors.First().Value);
+            Assert.Contains("SLUG_NOT_UNIQUE", value.Errors.First().Value);
         }
     }
 }
