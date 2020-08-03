@@ -1,10 +1,6 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import useQueryParams from '@admin/hooks/useQueryParams';
-import { dashboardRoute } from '@admin/routes/routes';
-import {
-  publicationCreateRoute,
-  ThemeTopicParams,
-} from '@admin/routes/themeTopicRoutes';
+import { dashboardRoute, publicationCreateRoute } from '@admin/routes/routes';
 import dashboardService, {
   Theme,
   Topic,
@@ -23,18 +19,19 @@ import React, { useEffect, useMemo } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
-interface SelectedThemeTopic {
+type ThemeTopic = {
   themeId: string;
   topicId: string;
-}
+};
 
 const ManagePublicationsAndReleasesTab = () => {
-  const { themeId, topicId } = useQueryParams<ThemeTopicParams>();
+  const { themeId, topicId } = useQueryParams<ThemeTopic>();
   const history = useHistory();
 
-  const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<
-    SelectedThemeTopic
-  >('dashboardThemeTopic', undefined);
+  const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<ThemeTopic>(
+    'dashboardThemeTopic',
+    undefined,
+  );
 
   const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
     dashboardService.getMyThemesAndTopics,
@@ -106,7 +103,7 @@ const ManagePublicationsAndReleasesTab = () => {
       // Update query params to reflect the chosen
       // theme/topic if they haven't already been set.
       history.replace(
-        appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+        appendQuery<ThemeTopic>(dashboardRoute.path, {
           themeId: savedThemeTopic.themeId,
           topicId: savedThemeTopic.topicId,
         }),
@@ -176,7 +173,7 @@ const ManagePublicationsAndReleasesTab = () => {
                     });
 
                     history.replace(
-                      appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                      appendQuery<ThemeTopic>(dashboardRoute.path, {
                         themeId: nextTheme.id,
                         topicId: nextTopic.id,
                       }),
@@ -215,7 +212,7 @@ const ManagePublicationsAndReleasesTab = () => {
                     });
 
                     history.replace(
-                      appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                      appendQuery<ThemeTopic>(dashboardRoute.path, {
                         themeId: selectedTheme.id,
                         topicId: nextTopic.id,
                       }),
@@ -258,13 +255,9 @@ const ManagePublicationsAndReleasesTab = () => {
 
                   {canCreatePublication && (
                     <ButtonLink
-                      to={generatePath<ThemeTopicParams>(
-                        publicationCreateRoute.path,
-                        {
-                          themeId: selectedTheme.id,
-                          topicId: selectedTopic.id,
-                        },
-                      )}
+                      to={generatePath(publicationCreateRoute.path, {
+                        topicId: selectedTopic.id,
+                      })}
                     >
                       Create new publication
                     </ButtonLink>

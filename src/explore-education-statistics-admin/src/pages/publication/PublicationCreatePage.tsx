@@ -1,15 +1,13 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
-import useThemeTopicContext from '@admin/contexts/ThemeTopicContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { dashboardRoute } from '@admin/routes/routes';
-import { ThemeTopicParams } from '@admin/routes/themeTopicRoutes';
 import { ExternalMethodology } from '@admin/services/dashboardService';
 import methodologyService from '@admin/services/methodologyService';
 import publicationService from '@admin/services/publicationService';
+import topicService from '@admin/services/topicService';
 import { Dictionary } from '@admin/types';
-import appendQuery from '@admin/utils/url/appendQuery';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FormFieldset, FormGroup } from '@common/components/form';
@@ -25,14 +23,16 @@ import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { AssignMethodologyFormValues } from './publication/AssignMethodologyForm';
 
-interface FormValues extends AssignMethodologyFormValues {
+interface FormValues {
   title: string;
   teamName: string;
   teamEmail: string;
   contactName: string;
   contactTelNo: string;
+  methodologyChoice?: 'existing' | 'external' | 'later';
+  selectedMethodologyId?: string;
+  externalMethodology?: ExternalMethodology;
 }
 
 const errorMappings = [
@@ -42,17 +42,36 @@ const errorMappings = [
       SLUG_NOT_UNIQUE: 'Choose a unique title',
     },
   }),
+  mapFieldErrors<FormValues>({
+    target: 'methodologyChoice',
+    messages: {
+      METHODOLOGY_DOES_NOT_EXIST:
+        'There was a problem adding the selected methodology',
+      METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED:
+        'Choose a methodology that is Live or ready to be published',
+      METHODOLOGY_OR_EXTERNAL_METHODOLOGY_LINK_MUST_BE_DEFINED:
+        'Either an existing methodology or an external methodology link must be provided',
+      CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY:
+        'Either an existing methodology or an external methodology link must be provided',
+    },
+  }),
 ];
 
 const formId = 'createPublicationForm';
 
 const PublicationCreatePage = ({
   history,
+  match,
 }: RouteComponentProps<{ topicId: string }>) => {
-  const { topic, theme } = useThemeTopicContext();
+  const { topicId } = match.params;
 
   const { value: methodologies = [] } = useAsyncHandledRetry(
     methodologyService.getMethodologies,
+  );
+
+  const { value: topic } = useAsyncHandledRetry(
+    () => topicService.getTopic(topicId),
+    [topicId],
   );
 
   const handleSubmit = useFormSubmit(
@@ -64,6 +83,10 @@ const PublicationCreatePage = ({
       methodologyChoice,
       ...values
     }: FormValues) => {
+      if (!topic) {
+        return;
+      }
+
       const methodology: Dictionary<
         string | undefined | ExternalMethodology
       > = {
@@ -91,12 +114,7 @@ const PublicationCreatePage = ({
         },
       });
 
-      history.push(
-        appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-          themeId: theme.id,
-          topicId: topic.id,
-        }),
-      );
+      history.push(dashboardRoute.path);
     },
     errorMappings,
   );
@@ -112,7 +130,7 @@ const PublicationCreatePage = ({
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <PageTitle caption={topic.title} title="Create new publication" />
+          <PageTitle caption={topic?.title} title="Create new publication" />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
@@ -314,14 +332,7 @@ const PublicationCreatePage = ({
               <ButtonGroup>
                 <Button type="submit">Create publication</Button>
 
-                <Link
-                  to={appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-                    themeId: theme.id,
-                    topicId: topic.id,
-                  })}
-                >
-                  Cancel publication
-                </Link>
+                <Link to={dashboardRoute.path}>Cancel publication</Link>
               </ButtonGroup>
             </Form>
           );

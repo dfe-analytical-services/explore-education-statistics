@@ -5,10 +5,10 @@ import LegacyReleasesPageContainer from '@admin/pages/legacy-releases/LegacyRele
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
 import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePage';
+import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PreReleasePage from '@admin/pages/release/PreReleasePage';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
 import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
-import ThemeTopicPageContainer from '@admin/pages/theme/ThemeTopicPageContainer';
 import administrationRoutes from '@admin/routes/administrationRoutes';
 import documentationRoutes from '@admin/routes/documentationRoutes';
 
@@ -30,14 +30,16 @@ export const dashboardRoute: ProtectedRouteProps = {
   exact: true,
 };
 
-export const themeTopicRoute: ProtectedRouteProps = {
-  path: '/theme/:themeId/topic/:topicId',
-  component: ThemeTopicPageContainer,
-};
-
 export const contactUsRoute: ProtectedRouteProps = {
   path: '/contact-us',
   component: ContactUsPage,
+  exact: true,
+};
+
+export const publicationCreateRoute: ProtectedRouteProps = {
+  path: '/topics/:topicId/publications/create',
+  component: PublicationCreatePage,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
   exact: true,
 };
 
@@ -92,8 +94,8 @@ const routes = {
   ...documentationRoutes,
   homeRoute,
   dashboardRoute,
-  themeTopicRoute,
   contactUsRoute,
+  publicationCreateRoute,
   methodologiesIndexRoute,
   methodologyCreateRoute,
   methodologyRoute,
