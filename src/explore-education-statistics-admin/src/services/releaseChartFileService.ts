@@ -30,34 +30,23 @@ function mapFile(file: FileInfo): ChartFile {
 }
 
 const releaseChartFileService = {
-  async addChartFile(
-    releaseId: string,
-    request: UploadChartFileRequest,
-  ): Promise<ChartFile> {
-    const data = new FormData();
-    data.append('file', request.file);
-
-    const file = await client.post<FileInfo>(
-      `/release/${releaseId}/chart`,
-      data,
-    );
-
-    return mapFile(file);
-  },
-
-  async updateChartFile(
+  async uploadChartFile(
     releaseId: string,
     id: string,
     request: UploadChartFileRequest,
   ): Promise<ChartFile> {
     const data = new FormData();
     data.append('file', request.file);
+    let file;
 
-    const file = await client.put<FileInfo>(
-      `/release/${releaseId}/chart/${id}`,
-      data,
-    );
-
+    if (id !== '') {
+      file = await client.put<FileInfo>(
+        `/release/${releaseId}/chart/${id}`,
+        data,
+      );
+    } else {
+      file = await client.post<FileInfo>(`/release/${releaseId}/chart`, data);
+    }
     return mapFile(file);
   },
   async deleteChartFile(

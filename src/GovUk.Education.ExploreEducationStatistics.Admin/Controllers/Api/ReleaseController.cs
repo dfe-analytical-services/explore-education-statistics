@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file)
         {
             return await _releaseFilesService
-                .AddChartFileAsync(releaseId, file)
+                .UploadChartFileAsync(releaseId, file)
                 .HandleFailuresOrOk();
         }
         
@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<FileInfo>> UpdateChartFileAsync(Guid releaseId, Guid id, IFormFile file)
         {
             return await _releaseFilesService
-                .UpdateChartFileAsync(releaseId, file, id)
+                .UploadChartFileAsync(releaseId, file, id)
                 .HandleFailuresOrOk();
         }
 
@@ -276,11 +276,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpDelete("release/{releaseId}/chart/{subjectName}/{fileName}")]
+        [HttpDelete("release/{releaseId}/chart/{subjectName}/{id}")]
         public async Task<ActionResult> DeleteChartFile(
-            Guid releaseId, string subjectName, string fileName)
+            Guid releaseId, string subjectName, Guid id)
         {
-            return await _dataBlockService.RemoveChartFile(releaseId, subjectName, fileName)
+            return await _dataBlockService.RemoveChartFile(releaseId, subjectName, id)
                 .HandleFailuresOrNoContent();
         }
 

@@ -27,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeleteDataBlockPlan(Guid releaseId, Guid id);
 
-        DeleteDataBlockPlan GetDeleteDataBlockPlan(Guid releaseId, Subject subject);
+        Task<DeleteDataBlockPlan> GetDeleteDataBlockPlan(Guid releaseId, Subject subject);
 
-        Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName, string fileName);
+        Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName, Guid id);
     }
 }

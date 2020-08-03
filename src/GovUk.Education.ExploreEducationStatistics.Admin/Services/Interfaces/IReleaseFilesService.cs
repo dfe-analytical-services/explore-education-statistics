@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-
     public interface IReleaseFilesService
     {
         Task<Common.Model.Either<ActionResult, bool>> UploadDataFilesAsync(Guid releaseId,
@@ -19,14 +18,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, FileInfo>> UploadFileAsync(Guid releaseId, IFormFile file,
             string name, ReleaseFileTypes type, bool overwrite);
-
-        Task<Either<ActionResult, FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file);
         
-        Task<Either<ActionResult, FileInfo>> UpdateChartFileAsync(Guid releaseId, IFormFile file, Guid id);
+        Task<Either<ActionResult, FileInfo>> UploadChartFileAsync(Guid releaseId, IFormFile file, Guid? id = null);
 
         Task<Either<ActionResult, bool>> DeleteNonDataFileAsync(Guid releaseId, ReleaseFileTypes type,
             string fileName);
-
+        
+        Task<Either<ActionResult, bool>> DeleteChartFileAsync(Guid releaseId, Guid id);
+        
         Task<Either<ActionResult, bool>> DeleteDataFilesAsync(Guid releaseId, string dataFileName);
 
         Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type,
