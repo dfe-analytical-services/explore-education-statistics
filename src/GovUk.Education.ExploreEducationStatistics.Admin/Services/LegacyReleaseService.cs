@@ -84,16 +84,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     legacyRelease.Description = updateLegacyRelease.Description;
                     legacyRelease.Url = updateLegacyRelease.Url;
-                    legacyRelease.Order = updateLegacyRelease.Order;
                     legacyRelease.PublicationId = updateLegacyRelease.PublicationId;
 
                     var publication = legacyRelease.Publication;
 
-                    // Shift up the orders of existing legacy releases
-                    // to make space for updated legacy release.
-                    publication.LegacyReleases
-                        .FindAll(release => release.Order >= updateLegacyRelease.Order && release.Id != id)
-                        .ForEach(release => release.Order++);
+                    if (updateLegacyRelease.Order != legacyRelease.Order)
+                    {
+                        legacyRelease.Order = updateLegacyRelease.Order;
+
+                        // Shift up orders of existing legacy releases
+                        // to make space for updated legacy release.
+                        publication.LegacyReleases
+                            .FindAll(release => release.Order >= updateLegacyRelease.Order && release.Id != id)
+                            .ForEach(release => release.Order++);
+
+                        var currentOrder = 0;
+
+                        // Re-order again to make sure orders are
+                        // increased incrementally with no gaps.
+                        publication.LegacyReleases
+                            .OrderBy(release => release.Order)
+                            .ToList()
+                            .ForEach(release =>
+                            {
+                                currentOrder++;
+                                release.Order = currentOrder;
+                            });
+                    }
 
                     _context.Update(legacyRelease);
                     _context.Update(publication);
