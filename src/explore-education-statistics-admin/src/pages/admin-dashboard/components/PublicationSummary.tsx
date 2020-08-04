@@ -58,6 +58,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
           actions={
             permissions.canUpdatePublication && (
               <Link
+                data-testid={`Edit publication link for ${publication.title}`}
                 unvisited
                 to={generatePath<PublicationRouteParams>(
                   publicationEditRoute.path,
@@ -84,6 +85,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
           actions={
             permissions.canUpdatePublication && (
               <Link
+                data-testid={`Edit publication link for ${publication.title}`}
                 unvisited
                 to={generatePath<PublicationRouteParams>(
                   publicationEditRoute.path,
@@ -110,6 +112,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
           actions={
             permissions.canUpdatePublication && (
               <Link
+                data-testid={`Edit publication link for ${publication.title}`}
                 unvisited
                 to={generatePath<PublicationRouteParams>(
                   publicationEditRoute.path,

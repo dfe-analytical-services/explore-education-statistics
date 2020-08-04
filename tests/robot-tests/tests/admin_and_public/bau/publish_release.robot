@@ -18,7 +18,7 @@ Create new publication for "UI tests topic" topic
     user waits until page contains link    Create new publication
     user checks page does not contain button   ${PUBLICATION_NAME}
     user clicks link  Create new publication
-    user creates publication without methodology  ${PUBLICATION_NAME}   Tingting Shu - (Attainment statistics team)
+    user creates publication    ${PUBLICATION_NAME}
 
 Verify new publication
     [Tags]  HappyPath
