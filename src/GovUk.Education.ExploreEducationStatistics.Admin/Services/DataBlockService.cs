@@ -159,13 +159,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<DeleteDataBlockPlan> GetDeleteDataBlockPlan(Guid releaseId, Subject subject)
         {
             var blocks = (subject == null ? new List<DataBlock>() : GetDataBlocks(releaseId, subject.Id));
-            var dependentBlocks = await Task.WhenAll(
-                blocks.Select(async block => await CreateDependentDataBlock(block)));
-            
+            var dependentBlocks = new List<DependentDataBlock>();
+            foreach (var block in blocks)
+            {
+                dependentBlocks.Add(await CreateDependentDataBlock(block));
+            }
+
             return new DeleteDataBlockPlan()
             {
                 ReleaseId = releaseId,
-                DependentDataBlocks = dependentBlocks.ToList()
+                DependentDataBlocks = dependentBlocks
             };
         }
 

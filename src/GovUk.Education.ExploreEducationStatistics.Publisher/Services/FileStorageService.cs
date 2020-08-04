@@ -7,6 +7,7 @@ using System.Net.Mime;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
@@ -222,8 +223,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             var name = Path.GetFileName(item.Name);
-            
-            if (!releaseFileReferences.Exists(rfr => rfr.ReleaseId == releaseId && rfr.Filename == name))
+
+            if (!releaseFileReferences.Exists(rfr => rfr.ReleaseId == releaseId && 
+                                                     ((rfr.ReleaseFileType == ReleaseFileTypes.Chart && rfr.Id == new Guid(name!)) ||
+                                                      (rfr.ReleaseFileType != ReleaseFileTypes.Chart && rfr.Filename == name))))
             {
                 _logger.LogError($"No release file reference found for releaseId {releaseId} and name : {name}");
                 return false;
