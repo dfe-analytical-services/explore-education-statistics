@@ -22,6 +22,7 @@ Click fast track link for 'Pupil absence rates' data block
 Validate selected step options
     [Tags]  HappyPath
     user waits until page contains heading 1  Create your own tables online
+    user waits until page contains element    css:table
 
     user checks previous table tool step contains  1    Publication     Pupil absence in schools in England
 
@@ -40,7 +41,6 @@ Validate selected step options
 
 Validate table data
     [Tags]  HappyPath
-    user waits until page contains element  css:table
     user checks results table column heading contains  css:table  1   1   2012/13
     user checks results table column heading contains  css:table  1   2   2013/14
     user checks results table column heading contains  css:table  1   3   2014/15
