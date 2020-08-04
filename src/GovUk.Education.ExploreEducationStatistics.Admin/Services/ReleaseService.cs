@@ -439,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ReleaseId = releaseId,
                         SubjectId = subject?.Id ?? Guid.Empty,
                         TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName),
-                        DeleteDataBlockPlan = _dataBlockService.GetDeleteDataBlockPlan(releaseId, subject),
+                        DeleteDataBlockPlan = await _dataBlockService.GetDeleteDataBlockPlan(releaseId, subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
                     };
                 });

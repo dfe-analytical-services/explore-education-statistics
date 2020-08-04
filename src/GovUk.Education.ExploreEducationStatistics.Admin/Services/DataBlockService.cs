@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<DataBlock>(id)
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(block => GetDataBlock(releaseId, block.Id))
-                .OnSuccess(block => new DeleteDataBlockPlan
+                .OnSuccess(async block => new DeleteDataBlockPlan
                 {
                     ReleaseId = releaseId,
                     DependentDataBlocks = new List<DependentDataBlock>()
@@ -159,13 +159,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<DeleteDataBlockPlan> GetDeleteDataBlockPlan(Guid releaseId, Subject subject)
         {
             var blocks = (subject == null ? new List<DataBlock>() : GetDataBlocks(releaseId, subject.Id));
-
-            var dependentBlocks = blocks.Select(async block => await CreateDependentDataBlock(block)).ToList();
+            var dependentBlocks = await Task.WhenAll(
+                blocks.Select(async block => await CreateDependentDataBlock(block)));
             
             return new DeleteDataBlockPlan()
             {
                 ReleaseId = releaseId,
-                DependentDataBlocks = dependentBlocks
+                DependentDataBlocks = dependentBlocks.ToList()
             };
         }
 
@@ -240,10 +240,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
-            var chartFilenames = deletePlan.DependentDataBlocks.SelectMany(block => block.InfographicFilenames);
+            var chartFileIds = deletePlan.DependentDataBlocks.SelectMany(block => block.InfographicFileIds);
 
-            await _releaseFilesService.DeleteNonDataFilesAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart,
-                chartFilenames);
+            await _releaseFilesService.DeleteChartFilesAsync(deletePlan.ReleaseId, chartFileIds);
         }
 
         private async Task DeleteDependentDataBlocks(DeleteDataBlockPlan deletePlan)
