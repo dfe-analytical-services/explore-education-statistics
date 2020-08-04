@@ -5,6 +5,7 @@ export interface Topic {
   title: string;
   slug: string;
   description: string;
+  themeId: string;
 }
 
 const topicService = {

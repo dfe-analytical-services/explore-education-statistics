@@ -1,6 +1,10 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import useQueryParams from '@admin/hooks/useQueryParams';
-import { dashboardRoute, publicationCreateRoute } from '@admin/routes/routes';
+import {
+  dashboardRoute,
+  publicationCreateRoute,
+  ThemeTopicParams,
+} from '@admin/routes/routes';
 import dashboardService, {
   Theme,
   Topic,
@@ -19,19 +23,13 @@ import React, { useEffect, useMemo } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
-type ThemeTopic = {
-  themeId: string;
-  topicId: string;
-};
-
 const ManagePublicationsAndReleasesTab = () => {
-  const { themeId, topicId } = useQueryParams<ThemeTopic>();
+  const { themeId, topicId } = useQueryParams<ThemeTopicParams>();
   const history = useHistory();
 
-  const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<ThemeTopic>(
-    'dashboardThemeTopic',
-    undefined,
-  );
+  const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<
+    ThemeTopicParams
+  >('dashboardThemeTopic', undefined);
 
   const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
     dashboardService.getMyThemesAndTopics,
@@ -103,7 +101,7 @@ const ManagePublicationsAndReleasesTab = () => {
       // Update query params to reflect the chosen
       // theme/topic if they haven't already been set.
       history.replace(
-        appendQuery<ThemeTopic>(dashboardRoute.path, {
+        appendQuery<ThemeTopicParams>(dashboardRoute.path, {
           themeId: savedThemeTopic.themeId,
           topicId: savedThemeTopic.topicId,
         }),
@@ -173,7 +171,7 @@ const ManagePublicationsAndReleasesTab = () => {
                     });
 
                     history.replace(
-                      appendQuery<ThemeTopic>(dashboardRoute.path, {
+                      appendQuery<ThemeTopicParams>(dashboardRoute.path, {
                         themeId: nextTheme.id,
                         topicId: nextTopic.id,
                       }),
@@ -212,7 +210,7 @@ const ManagePublicationsAndReleasesTab = () => {
                     });
 
                     history.replace(
-                      appendQuery<ThemeTopic>(dashboardRoute.path, {
+                      appendQuery<ThemeTopicParams>(dashboardRoute.path, {
                         themeId: selectedTheme.id,
                         topicId: nextTopic.id,
                       }),

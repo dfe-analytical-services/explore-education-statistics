@@ -6,6 +6,7 @@ import MethodologyPage from '@admin/pages/methodology/edit-methodology/Methodolo
 import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
 import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
+import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
 import PreReleasePage from '@admin/pages/release/PreReleasePage';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
 import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
@@ -14,6 +15,11 @@ import documentationRoutes from '@admin/routes/documentationRoutes';
 
 export type PublicationRouteParams = {
   publicationId: string;
+};
+
+export type ThemeTopicParams = {
+  themeId: string;
+  topicId: string;
 };
 
 export const homeRoute: ProtectedRouteProps = {
@@ -39,6 +45,13 @@ export const contactUsRoute: ProtectedRouteProps = {
 export const publicationCreateRoute: ProtectedRouteProps = {
   path: '/topics/:topicId/publications/create',
   component: PublicationCreatePage,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
+  exact: true,
+};
+
+export const publicationEditRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/edit',
+  component: PublicationEditPage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
   exact: true,
 };
@@ -96,6 +109,7 @@ const routes = {
   dashboardRoute,
   contactUsRoute,
   publicationCreateRoute,
+  publicationEditRoute,
   methodologiesIndexRoute,
   methodologyCreateRoute,
   methodologyRoute,

@@ -4,7 +4,12 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { legacyReleasesRoute, releaseCreateRoute } from '@admin/routes/routes';
+import {
+  legacyReleasesRoute,
+  publicationEditRoute,
+  PublicationRouteParams,
+  releaseCreateRoute,
+} from '@admin/routes/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -52,7 +57,15 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
           term="Team"
           actions={
             permissions.canUpdatePublication && (
-              <Link to="/change-me" unvisited>
+              <Link
+                unvisited
+                to={generatePath<PublicationRouteParams>(
+                  publicationEditRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
+                )}
+              >
                 Change <span className="govuk-visually-hidden">team</span>
               </Link>
             )
@@ -70,7 +83,15 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
           term="Contact"
           actions={
             permissions.canUpdatePublication && (
-              <Link to="/change-me" unvisited>
+              <Link
+                unvisited
+                to={generatePath<PublicationRouteParams>(
+                  publicationEditRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
+                )}
+              >
                 Change <span className="govuk-visually-hidden">contact</span>
               </Link>
             )
@@ -88,7 +109,15 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
           term="Methodology"
           actions={
             permissions.canUpdatePublication && (
-              <Link to="/change-me" unvisited>
+              <Link
+                unvisited
+                to={generatePath<PublicationRouteParams>(
+                  publicationEditRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
+                )}
+              >
                 Change{' '}
                 <span className="govuk-visually-hidden">methodology</span>
               </Link>
