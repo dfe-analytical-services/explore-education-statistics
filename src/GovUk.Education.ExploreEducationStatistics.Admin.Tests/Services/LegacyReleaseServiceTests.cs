@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
             
-            using (var context = InMemoryApplicationDbContext("GetLegacyRelease"))
+            using (var context = InMemoryApplicationDbContext())
             {
                 context.Add(new Publication 
                 {
@@ -38,10 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("GetLegacyRelease"))
-            {
                 var legacyReleaseService = new LegacyReleaseService(
                     context,
                     AdminMapper(),
@@ -52,12 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await legacyReleaseService.GetLegacyRelease(id);
 
-                var legacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
-
-                Assert.Equal("Test description", legacyRelease.Description);
-                Assert.Equal("http://test.com", legacyRelease.Url);
-                Assert.Equal(1, legacyRelease.Order);
-                Assert.Equal(publicationId, legacyRelease.PublicationId);
+                Assert.Equal("Test description", result.Right.Description);
+                Assert.Equal("http://test.com", result.Right.Url);
+                Assert.Equal(1, result.Right.Order);
+                Assert.Equal(publicationId, result.Right.PublicationId);
             }
         }
 
@@ -66,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publicationId = Guid.NewGuid();
             
-            using (var context = InMemoryApplicationDbContext("CreateLegacyRelease"))
+            using (var context = InMemoryApplicationDbContext())
             {
                 context.Add(new Publication 
                 {
@@ -74,10 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("CreateLegacyRelease"))
-            {
                 var legacyReleaseService = new LegacyReleaseService(
                     context,
                     AdminMapper(),
@@ -94,12 +86,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publicationId
                     });
 
-                var legacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
+                Assert.Equal("Test description", result.Right.Description);
+                Assert.Equal("http://test.com", result.Right.Url);
+                Assert.Equal(1, result.Right.Order);
+                Assert.Equal(publicationId, result.Right.PublicationId);
 
-                Assert.Equal("Test description", legacyRelease.Description);
-                Assert.Equal("http://test.com", legacyRelease.Url);
-                Assert.Equal(1, legacyRelease.Order);
-                Assert.Equal(publicationId, legacyRelease.PublicationId);
+                var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
+
+                Assert.Equal("Test description", savedLegacyRelease.Description);
+                Assert.Equal("http://test.com", savedLegacyRelease.Url);
+                Assert.Equal(1, savedLegacyRelease.Order);
+                Assert.Equal(publicationId, savedLegacyRelease.PublicationId);
             }
         }
 
@@ -108,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext("CreateLegacyRelease_WithExisting"))
+            using (var context = InMemoryApplicationDbContext())
             {
                 context.Add(new Publication 
                 {
@@ -127,10 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("CreateLegacyRelease_WithExisting"))
-            {
                 var legacyReleaseService = new LegacyReleaseService(
                     context,
                     AdminMapper(),
@@ -162,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext("UpdateLegacyRelease"))
+            using (var context = InMemoryApplicationDbContext())
             {
                 context.Add(new Publication 
                 {
@@ -180,10 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("UpdateLegacyRelease"))
-            {
                 var legacyReleaseService = new LegacyReleaseService(
                     context,
                     AdminMapper(),
@@ -202,12 +193,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publicationId,
                     });
 
-                var legacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
+                Assert.Equal("Updated test description", result.Right.Description);
+                Assert.Equal("http://updated-test.com", result.Right.Url);
+                Assert.Equal(1, result.Right.Order);
+                Assert.Equal(publicationId, result.Right.PublicationId);
 
-                Assert.Equal("Updated test description", legacyRelease.Description);
-                Assert.Equal("http://updated-test.com", legacyRelease.Url);
-                Assert.Equal(1, legacyRelease.Order);
-                Assert.Equal(publicationId, legacyRelease.PublicationId);
+                var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
+
+                Assert.Equal("Updated test description", savedLegacyRelease.Description);
+                Assert.Equal("http://updated-test.com", savedLegacyRelease.Url);
+                Assert.Equal(1, savedLegacyRelease.Order);
+                Assert.Equal(publicationId, savedLegacyRelease.PublicationId);
             }
         }
 
@@ -217,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext("UpdateLegacyRelease_ReordersWithExisting"))
+            using (var context = InMemoryApplicationDbContext())
             {
                 context.Add(new Publication 
                 {
@@ -226,14 +222,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             new LegacyRelease 
                             {
-                                Id = Guid.NewGuid(),
                                 Description = "Test description 1",
                                 Url = "http://test1.com",
                                 Order = 1,
                             },
                             new LegacyRelease 
                             {
-                                Id = Guid.NewGuid(),
                                 Description = "Test description 2",
                                 Url = "http://test2.com",
                                 Order = 2,
@@ -249,10 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("UpdateLegacyRelease_ReordersWithExisting"))
-            {
                 var legacyReleaseService = new LegacyReleaseService(
                     context,
                     AdminMapper(),
@@ -285,14 +276,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(3, legacyReleases[2].Order);
             }
         }
-        
+
+        /// Test that we do not leave gaps in the order values when
+        /// updating a legacy release with an `Order` larger than 
+        /// the number of legacy releases.
+        [Fact]
+        public async void UpdateLegacyRelease_ReordersWithoutGaps()
+        {
+            var id = Guid.NewGuid();
+            var publicationId = Guid.NewGuid();
+
+            using (var context = InMemoryApplicationDbContext())
+            {
+                context.Add(new Publication 
+                {
+                    Id = publicationId,
+                    LegacyReleases = new List<LegacyRelease>
+                        {
+                            new LegacyRelease 
+                            {
+                                Id = id,
+                                Description = "Test description 1",
+                                Url = "http://test1.com",
+                                Order = 1,
+                            },
+                            new LegacyRelease 
+                            {
+                                Description = "Test description 2",
+                                Url = "http://test2.com",
+                                Order = 2,
+                            },
+                            new LegacyRelease 
+                            {
+                                Description = "Test description 3",
+                                Url = "http://test3.com",
+                                Order = 3,
+                            }
+                        }
+                });
+
+                context.SaveChanges();
+
+                var legacyReleaseService = new LegacyReleaseService(
+                    context,
+                    AdminMapper(),
+                    MockUtils.AlwaysTrueUserService().Object,
+                    new PersistenceHelper<ContentDbContext>(context)
+                );
+                
+                // Service method under test
+                var result = await legacyReleaseService.UpdateLegacyRelease(
+                    id,
+                    new UpdateLegacyReleaseViewModel()
+                    {
+                        Description = "Updated test description 1",
+                        Url = "http://updated-test1.com",
+                        Order = 5,
+                        PublicationId = publicationId,
+                    });
+
+                var legacyReleases = context.LegacyReleases
+                    .OrderBy(release => release.Order)
+                    .ToList();
+
+                Assert.Equal("Test description 2", legacyReleases[0].Description);
+                Assert.Equal(1, legacyReleases[0].Order);
+
+                Assert.Equal("Test description 3", legacyReleases[1].Description);
+                Assert.Equal(2, legacyReleases[1].Order);
+
+                Assert.Equal("Updated test description 1", legacyReleases[2].Description);
+                Assert.Equal(3, legacyReleases[2].Order);
+            }
+        }
+
         [Fact]
         public async void DeleteLegacyRelease()
         {
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext("DeleteLegacyRelease"))
+            using (var context = InMemoryApplicationDbContext())
             {
                 context.Add(new Publication 
                 {
@@ -310,10 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("DeleteLegacyRelease"))
-            {
                 var legacyReleaseService = new LegacyReleaseService(
                     context,
                     AdminMapper(),
@@ -339,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext("DeleteLegacyRelease_ReordersWithExisting"))
+            using (var context = InMemoryApplicationDbContext())
             {
                 context.Add(new Publication 
                 {
@@ -371,10 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 context.SaveChanges();
-            }
 
-            using (var context = InMemoryApplicationDbContext("DeleteLegacyRelease_ReordersWithExisting"))
-            {
                 var legacyReleaseService = new LegacyReleaseService(
                     context,
                     AdminMapper(),

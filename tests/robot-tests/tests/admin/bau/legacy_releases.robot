@@ -72,7 +72,9 @@ Validate updated legacy release
     [Tags]  HappyPath
     user waits until page contains heading 1  Legacy releases
     user checks element count is x  css:tbody tr  1
-    user checks results table cell contains  1  1  2
+    # Changing order to 2 should not actually change it to 2
+    # as there isn't another release to swap the order with.
+    user checks results table cell contains  1  1  1
     user checks results table cell contains  1  2  Test collection 2
     user checks results table cell contains  1  3  http://test-2.com
 
