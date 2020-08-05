@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.utils;
 using Microsoft.Azure.Management.DataFactory;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -18,14 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishReleaseDataFunction
     {
+        private readonly ContentDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
 
-        public PublishReleaseDataFunction(IConfiguration configuration,
+        public PublishReleaseDataFunction(ContentDbContext context,
+            IConfiguration configuration,
             IQueueService queueService,
             IReleaseStatusService releaseStatusService)
         {
+            _context = context;
             _configuration = configuration;
             _queueService = queueService;
             _releaseStatusService = releaseStatusService;
@@ -43,6 +50,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [FunctionName("PublishReleaseData")]
         // ReSharper disable once UnusedMember.Global
+
+        private bool ReleaseHasSubjects(Guid releaseId)
+        {
+            return _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Any(row => row.ReleaseId == releaseId &&
+                            row.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data);
+        }
+
         public async Task PublishReleaseData(
             [QueueTrigger(PublishReleaseDataQueue)] PublishReleaseDataMessage message,
             ExecutionContext executionContext,
@@ -50,9 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
 
-            if (PublisherUtils.IsDevelopment())
+            if (PublisherUtils.IsDevelopment() || !ReleaseHasSubjects(message.ReleaseId))
             {
-                // Skip the ADF Pipeline if running locally
+                // Skip the ADF Pipeline if running locally or release has no attached subjects
                 // If the Release is immediate then trigger publishing the content
                 // This usually happens when the ADF Pipeline is complete
                 if (await _releaseStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
