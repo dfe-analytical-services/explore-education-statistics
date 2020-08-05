@@ -43,5 +43,5 @@ Sign up for email alerts
     press keys  css:#subscriptionForm-email  mark@hiveit.co.uk
     user clicks button   Subscribe
 
-    user waits until page contains heading   Subscribed
+    user waits until page contains heading   Subscribed     90
     user checks page contains  Thank you. Check your email to confirm your subscription.

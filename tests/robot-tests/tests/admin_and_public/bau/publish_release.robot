@@ -100,7 +100,7 @@ Verify newly published release is on Find Statistics page
 Navigate to newly published release page
     [Tags]  HappyPath
     user clicks element   css:[data-testid="view-stats-ui-tests-publish-release-%{RUN_IDENTIFIER}"]
-    user waits until page contains heading  ${PUBLICATION_NAME}
+    user waits until page contains heading  ${PUBLICATION_NAME}  90
 
 Verify release URL and page caption
     [Tags]  HappyPath

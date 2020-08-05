@@ -251,10 +251,10 @@ user clicks element
   set focus to element    ${elementToClick}
   wait until element is enabled   ${elementToClick}
   click element   ${elementToClick}
-  #press keys  ${elementToClick}   ENTER
 
 user clicks link
   [Arguments]   ${text}
+  wait until page contains element   link:${text}
   scroll element into view  link:${text}
   wait until element is enabled  link:${text}
   click link  ${text}
