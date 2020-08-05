@@ -1,7 +1,7 @@
 import storageService, {
   StorageSetterOptions,
 } from '@common/services/storageService';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export type SetStorageItem<T> = (value: T) => void;
 export type RemoveStorageItem = () => void;

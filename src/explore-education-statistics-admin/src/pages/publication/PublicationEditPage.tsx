@@ -8,7 +8,6 @@ import {
 } from '@admin/routes/routes';
 import publicationService from '@admin/services/publicationService';
 import appendQuery from '@admin/utils/url/appendQuery';
-import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
