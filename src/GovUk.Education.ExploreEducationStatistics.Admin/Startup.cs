@@ -307,6 +307,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<IFileTypeService, FileTypeService>();
 
+            // Temp service for EES-960
+            services.AddTransient<IUpdateChartFilesService, UpdateChartFilesService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
