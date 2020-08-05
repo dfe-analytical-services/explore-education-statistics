@@ -5,14 +5,12 @@ import {
   legacyReleaseCreateRoute,
   legacyReleaseEditRoute,
 } from '@admin/routes/legacyReleaseRoutes';
-import {
-  dashboardThemeTopicRoute,
-  PublicationRouteParams,
-} from '@admin/routes/routes';
+import { dashboardRoute, PublicationRouteParams } from '@admin/routes/routes';
 import legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
 import publicationService from '@admin/services/publicationService';
+import appendQuery from '@admin/utils/url/appendQuery';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -47,7 +45,7 @@ const LegacyReleasesPage = () => {
       title="Legacy releases"
       caption={publication.title}
       breadcrumbs={[{ name: 'Legacy releases' }]}
-      backLink={generatePath(dashboardThemeTopicRoute.path, {
+      backLink={appendQuery(dashboardRoute.path, {
         themeId: publication.themeId,
         topicId: publication.topicId,
       })}

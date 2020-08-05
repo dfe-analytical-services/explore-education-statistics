@@ -8,8 +8,7 @@ import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePag
 import PreReleasePage from '@admin/pages/release/PreReleasePage';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
 import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
-import ThemeTopicWrapper from '@admin/pages/theme/ThemeTopicWrapper';
-import CreatePublicationPage from '@admin/pages/theme/topic/CreatePublicationPage';
+import ThemeTopicPageContainer from '@admin/pages/theme/ThemeTopicPageContainer';
 import administrationRoutes from '@admin/routes/administrationRoutes';
 import documentationRoutes from '@admin/routes/documentationRoutes';
 
@@ -31,21 +30,9 @@ export const dashboardRoute: ProtectedRouteProps = {
   exact: true,
 };
 
-export const dashboardThemeTopicRoute: ProtectedRouteProps = {
-  path: '/dashboard/theme/:themeId/topic/:topicId',
-  component: AdminDashboardPage,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-};
-
 export const themeTopicRoute: ProtectedRouteProps = {
   path: '/theme/:themeId/topic/:topicId',
-  component: ThemeTopicWrapper,
-};
-
-export const publicationCreateRoute: ProtectedRouteProps = {
-  path: '/theme/:themeId/topic/:topicId/create-publication',
-  component: CreatePublicationPage,
-  protectionAction: user => user.permissions.canAccessUserAdministrationPages,
+  component: ThemeTopicPageContainer,
 };
 
 export const contactUsRoute: ProtectedRouteProps = {
@@ -105,10 +92,8 @@ const routes = {
   ...documentationRoutes,
   homeRoute,
   dashboardRoute,
-  dashboardThemeTopicRoute,
   themeTopicRoute,
   contactUsRoute,
-  publicationCreateRoute,
   methodologiesIndexRoute,
   methodologyCreateRoute,
   methodologyRoute,

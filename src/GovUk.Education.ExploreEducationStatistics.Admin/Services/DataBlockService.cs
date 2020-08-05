@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
                         var release = GetReleaseForDataBlock(existing.Id);
                         await _releaseFilesService.DeleteNonDataFileAsync(
-                            release.Id, 
+                            release.Id,
                             ReleaseFileTypes.Chart,
                             infographicChart.FileId
                         );
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFileReferences = await _context.ReleaseFileReferences
                 .Where(rfr => fileIds.Contains(rfr.Id))
                 .ToListAsync();
-                
+
             return new DependentDataBlock
             {
                 Id = block.Id,
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var infoGraphicChart = block.Charts
                     .OfType<InfographicChart>()
                     .FirstOrDefault();
-                
+
                 if (infoGraphicChart != null && infoGraphicChart.FileId == id.ToString())
                 {
                     block.Charts.Remove(infoGraphicChart);
@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public string? ContentSectionHeading { get; set; }
         
         public List<string> InfographicFilenames { get; set; }
-        
+
         public List<Guid> InfographicFileIds { get; set; }
     }
     

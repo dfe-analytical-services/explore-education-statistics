@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
@@ -14,14 +16,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class NotifyChangeFunction
     {
+        private readonly IFileStorageService _fileStorageService;
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IValidationService _validationService;
 
-        public NotifyChangeFunction(IQueueService queueService,
+        public NotifyChangeFunction(IFileStorageService fileStorageService,
+            IQueueService queueService,
             IReleaseStatusService releaseStatusService,
             IValidationService validationService)
         {
+            _fileStorageService = fileStorageService;
             _queueService = queueService;
             _releaseStatusService = releaseStatusService;
             _validationService = validationService;
@@ -47,27 +52,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger)
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
-            await MarkScheduledReleaseStatusAsSuperseded(message);
-            if (await _validationService.ValidatePublishingState(message.ReleaseId))
+            var lease = await _fileStorageService.AcquireLease(message.ReleaseId.ToString());
+            try
             {
-                await _validationService.ValidateRelease(message.ReleaseId)
-                    .OnSuccessDo(async () =>
-                    {
-                        if (message.Immediate)
+                await MarkScheduledReleaseStatusAsSuperseded(message);
+                if (await _validationService.ValidatePublishingState(message.ReleaseId))
+                {
+                    await _validationService.ValidateRelease(message.ReleaseId)
+                        .OnSuccessDo(async () =>
                         {
-                            var releaseStatus = await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
-                            await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
-                                releaseStatus.Id);
-                        }
-                        else
+                            if (message.Immediate)
+                            {
+                                var releaseStatus =
+                                    await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
+                                await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
+                                    releaseStatus.Id);
+                            }
+                            else
+                            {
+                                await CreateReleaseStatusAsync(message, ScheduledState);
+                            }
+                        })
+                        .OnFailureDo(async logMessages =>
                         {
-                            await CreateReleaseStatusAsync(message, ScheduledState);
-                        }
-                    })
-                    .OnFailureDo(async logMessages =>
-                    {
-                        await CreateReleaseStatusAsync(message, InvalidState, logMessages);
-                    });
+                            await CreateReleaseStatusAsync(message, InvalidState, logMessages);
+                        });
+                }
+            }
+            finally
+            {
+                ReleaseLease(lease);
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
@@ -88,6 +102,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 await _releaseStatusService.UpdateStateAsync(message.ReleaseId, releaseStatus.Id, SupersededState);
             }
+        }
+        
+        private static void ReleaseLease((CloudBlockBlob blob, string id) lease)
+        {
+            lease.blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(lease.id));
         }
     }
 }

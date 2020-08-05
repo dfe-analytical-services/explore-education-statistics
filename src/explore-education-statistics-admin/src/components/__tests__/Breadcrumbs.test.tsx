@@ -6,7 +6,7 @@ import Breadcrumbs from '../Breadcrumbs';
 describe('Breadcrumbs', () => {
   test('renders correctly with just home breadcrumb', () => {
     const { container } = render(
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={['/dashboard']}>
         <Breadcrumbs breadcrumbs={[]} />
       </MemoryRouter>,
     );
@@ -15,7 +15,10 @@ describe('Breadcrumbs', () => {
 
     expect(breadcrumbs).toHaveLength(1);
     expect(breadcrumbs[0].textContent).toBe('Home');
-    expect(breadcrumbs[0].querySelector('a')).toHaveAttribute('href', '/');
+    expect(breadcrumbs[0].querySelector('a')).toHaveAttribute(
+      'href',
+      '/dashboard',
+    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -42,7 +45,10 @@ describe('Breadcrumbs', () => {
 
     expect(breadcrumbs).toHaveLength(3);
     expect(breadcrumbs[0].textContent).toBe('Home');
-    expect(breadcrumbs[0].querySelector('a')).toHaveAttribute('href', '/');
+    expect(breadcrumbs[0].querySelector('a')).toHaveAttribute(
+      'href',
+      '/dashboard',
+    );
     expect(breadcrumbs[1].textContent).toBe('Publications');
     expect(breadcrumbs[1].querySelector('a')).toHaveAttribute(
       'href',
