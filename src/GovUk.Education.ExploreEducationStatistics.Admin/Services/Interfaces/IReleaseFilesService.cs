@@ -26,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         
         Task<Either<ActionResult, bool>> DeleteChartFileAsync(Guid releaseId, Guid id);
         
+        Task<Either<ActionResult, bool>> DeleteChartFilesAsync(Guid releaseId, IEnumerable<Guid> fileIds);
+
         Task<Either<ActionResult, bool>> DeleteDataFilesAsync(Guid releaseId, string dataFileName);
 
         Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type,
@@ -33,7 +35,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         
         Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type,
             Guid id);
-
-        Task<Either<ActionResult, bool>> DeleteChartFilesAsync(Guid releaseId, IEnumerable<Guid> fileIds);
     }
 }
