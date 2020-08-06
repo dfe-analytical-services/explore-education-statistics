@@ -53,10 +53,10 @@ const releaseChartFileService = {
   async deleteChartFile(
     releaseId: string,
     subjectName: string,
-    fileName: string,
+    id: string,
   ): Promise<void> {
     return client.delete<void>(
-      `/release/${releaseId}/chart/${subjectName}/${fileName}`,
+      `/release/${releaseId}/chart/${subjectName}/${id}`,
     );
   },
 

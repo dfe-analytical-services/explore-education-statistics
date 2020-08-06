@@ -1,93 +1,151 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class UpdateChartFilesService : IUpdateChartFilesService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IUserService _userService;
-        private readonly IFileStorageService _fileStorageService;
 
+        private readonly string _storageConnectionString;
+        
         public UpdateChartFilesService(
-            ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IUserService userService,
-            IFileStorageService fileStorageService)
+            IConfiguration configuration,
+            ContentDbContext contentDbContext)
         {
+            _storageConnectionString = configuration.GetValue<string>("CoreStorage");
             _contentDbContext = contentDbContext;
-            _persistenceHelper = persistenceHelper;
-            _userService = userService;
-            _persistenceHelper = persistenceHelper;
-            _fileStorageService = fileStorageService;
         }
 
         public async Task<Either<ActionResult, bool>> UpdateChartFiles()
         {
-            var releaseIds = _contentDbContext
-                .Releases
-                .Where(r => r.Id == r.PreviousVersionId)
-                .ToList()
-                .Select(r => r.Id);
+            var refs = _contentDbContext
+                .ReleaseFileReferences
+                .Where(rfr => rfr.ReleaseFileType == ReleaseFileTypes.Chart)
+                .ToList();
 
-            foreach (var releaseId in releaseIds)
+            var result = await UpdateChartFilesAsync(refs);
+
+            if (result.IsLeft)
             {
-                var result = await FixMissingSubjectIdForRelease(releaseId);
-
-                if (result.IsLeft)
-                {
-                    return false;
-                }
+                return false;
             }
 
             return true;
         }
 
-        private Task<Either<ActionResult, Release>> FixMissingSubjectIdForRelease(Guid releaseId)
+        private async Task<Either<ActionResult, bool>> UpdateChartFilesAsync(List<ReleaseFileReference> chartReferences)
         {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanRunReleaseMigrations)
-                .OnSuccess(UpdateSubjectId);
-        }
+            var blobContainer = await GetCloudBlobContainer();
 
-        private async Task<Either<ActionResult, Release>> UpdateSubjectId(Release release)
-        {
-            var result = _fileStorageService.ListFilesAsync(release.Id, ReleaseFileTypes.Data).Result;
-            var files = result.Right;
-
-            foreach (var file in files)
+            foreach (var fileReference in chartReferences)
             {
-                var dataFileRef = _contentDbContext.ReleaseFileReferences
-                    .Where(rfr => rfr.ReleaseId == release.Id && rfr.ReleaseFileType == ReleaseFileTypes.Data)
-                    .ToList()
-                    .FirstOrDefault(rfr => rfr.Filename == file.FileName);
-
-                var metaFileRef = _contentDbContext.ReleaseFileReferences
-                    .Where(rfr => rfr.ReleaseId == release.Id && rfr.ReleaseFileType == ReleaseFileTypes.Metadata)
-                    .ToList()
-                    .FirstOrDefault(rfr => rfr.Filename == file.MetaFileName);
-
-                if (dataFileRef != null && metaFileRef != null)
+                // First check if this reference has been converted - if not then rename in storage
+                if (!Guid.TryParse(fileReference.Filename, out var guid))
                 {
-                    metaFileRef.SubjectId = dataFileRef.SubjectId;
-                    _contentDbContext.ReleaseFileReferences.Update(metaFileRef);
+                    var oldName = fileReference.Filename;
+                    var oldBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, oldName);
+
+                    // Files should exists in storage but if not then allow user to delete
+                    if (blobContainer.GetBlockBlobReference(oldBlobPath).Exists())
+                    {
+                        var newId = Guid.NewGuid();
+                        var newBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, newId.ToString());
+
+                        var oldFile = blobContainer.GetBlockBlobReference(oldBlobPath);
+                        var newFile = blobContainer.GetBlockBlobReference(newBlobPath);
+                        
+                        // Rename the blob
+                        await newFile.StartCopyAsync(oldFile);  
+                        await oldFile.DeleteAsync();
+                        
+                        // Change ref to any datablocks with charts where used
+
+                        var releaseIds = _contentDbContext.ReleaseFiles
+                            .Include(rf => rf.ReleaseFileReference)
+                            .Where(rf => rf.ReleaseFileReference.Filename == oldName && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Chart)
+                            .Select(rf => rf.ReleaseId)
+                            .Distinct()
+                            .ToList();
+
+                        await UpdateDataBlock(releaseIds, oldName, newId);
+
+                        // Change the file reference name
+                        fileReference.Filename = newId.ToString();
+                        _contentDbContext.ReleaseFileReferences.Update(fileReference);
+
+                        await _contentDbContext.SaveChangesAsync();
+                    }
                 }
             }
 
-            await _contentDbContext.SaveChangesAsync();
+            return true;
+        }
+        
+        private async Task UpdateDataBlock(List<Guid> releaseIds, string oldChartName, Guid newChartId)
+        {
+            var blocks = GetDataBlocks(releaseIds);
 
-            return release;
+            foreach (var block in blocks)
+            {
+                var infoGraphicChart = block.Charts
+                    .OfType<InfographicChart>()
+                    .FirstOrDefault();
+
+                if (infoGraphicChart != null && infoGraphicChart.FileId == oldChartName)
+                {
+                    block.Charts.Remove(infoGraphicChart);
+                    infoGraphicChart.FileId = newChartId.ToString();
+                    block.Charts.Add(infoGraphicChart);
+                    _contentDbContext.DataBlocks.Update(block);
+                }
+            }
+        }
+        
+        private List<DataBlock> GetDataBlocks(List<Guid> releaseIds)
+        {
+            return _contentDbContext
+                .ReleaseContentBlocks
+                .Include(join => join.ContentBlock)
+                .ThenInclude(block => block.ContentSection)
+                .Where(join => releaseIds.Contains(join.ReleaseId))
+                .ToList()
+                .Select(join => join.ContentBlock)
+                .OfType<DataBlock>()
+                .ToList();
+        }
+        
+        private async Task<CloudBlobContainer> GetCloudBlobContainer()
+        {
+            return await GetCloudBlobContainerAsync(_storageConnectionString, PrivateFilesContainerName);
+        }
+        
+        private static async Task<CloudBlobContainer> GetCloudBlobContainerAsync(string storageConnectionString,
+            string containerName)
+        {
+            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(containerName);
+            return blobContainer;
+        }
+        
+        private string AdminReleasePathWithFilename(Guid releaseId, string fileName)
+        {
+            return AdminReleasePath(releaseId, ReleaseFileTypes.Chart, fileName);
         }
     }
 }
