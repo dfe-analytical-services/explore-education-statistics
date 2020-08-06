@@ -63,28 +63,28 @@ def user_checks_key_stat_bullet_exists(bullet_text):
         raise_assertion_error(f'Cannot find KeyStat summary bullet "{bullet_text}"')
 
 
-def user_checks_number_of_previous_releases_is_correct(number):
-    elems = sl.driver.find_elements_by_xpath('(.//*[@data-testid="previous-release-item"])')
+def user_checks_number_of_other_releases_is_correct(number):
+    elems = sl.driver.find_elements_by_xpath('(.//*[@data-testid="other-release-item"])')
     if len(elems) != int(number):
-        raise_assertion_error(f'Found "{len(elems)}" previous releases, not "{int(number)}"')
+        raise_assertion_error(f'Found "{len(elems)}" other releases, not "{int(number)}"')
 
 
-def user_checks_previous_release_is_shown_in_position(release_name, position):
+def user_checks_other_release_is_shown_in_position(release_name, position):
     try:
         sl.driver.find_element_by_xpath(
-            f'.//*[@data-testid="previous-release-item" and a/text()="{release_name}"]')
+            f'.//*[@data-testid="other-release-item" and a/text()="{release_name}"]')
     except:
-        raise_assertion_error(f'No previous release "{release_name}" found')
+        raise_assertion_error(f'No other release "{release_name}" found')
 
     try:
         elem = sl.driver.find_element_by_xpath(
-            f'(.//a[../@data-testid="previous-release-item"])[{position}]')
+            f'(.//a[../@data-testid="other-release-item"])[{position}]')
     except:
-        raise_assertion_error(f"There are less than {position} previous releases listed!")
+        raise_assertion_error(f"There are less than {position} other releases listed!")
 
     if release_name != elem.text:
         raise_assertion_error(
-            f'Previous release "{release_name}" not in position {position}. Found "{elem.text}" instead!')
+            f'Other release "{release_name}" not in position {position}. Found "{elem.text}" instead!')
 
 
 def user_checks_number_of_updates_is_correct(number):
@@ -149,9 +149,11 @@ def user_clicks_methodology_link(topic, methodology):
 def user_checks_generated_permalink_is_valid():
     elem = sl.driver.find_element_by_css_selector('[data-testid="permalink-generated-url"]')
     url_without_basic_auth = re.sub(r'.*@', '', os.environ['PUBLIC_URL'])
-    if not elem.text.startswith(f"{url_without_basic_auth}/data-tables/permalink/"):
+    url_without_http = re.sub(r'^https?:\/\/', '', url_without_basic_auth)
+    current_url_without_http = re.sub(r'^https?:\/\/', '', elem.text)
+    if not current_url_without_http.startswith(f"{url_without_http}/data-tables/permalink/"):
         raise_assertion_error(
-            f'Generated permalink "{elem.text}" is invalid! Should match "{url_without_basic_auth}"')
+            f'Generated permalink "{current_url_without_http}" is invalid! Should start with "{url_without_http}/data-tables/permalink/"')
 
 
 def user_reorders_table_headers(drag_selector, drop_selector):

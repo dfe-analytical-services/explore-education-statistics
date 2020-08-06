@@ -28,30 +28,33 @@ Validate URL
     user checks url contains  %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Validate Published date
-    [Tags]     HappyPath    NotAgainstPreProd   Failing
+    [Tags]     HappyPath    NotAgainstPreProd    Failing
     user checks element contains  css:[data-testid="published-date"]   25 April 2018
 
-Validate Next update date, and Email alerts link
+Validate Next update date
     [Tags]     HappyPath    NotAgainstPreProd
     user checks element contains  css:[data-testid="next-update"]      22 March 2019
+
+Validate Email alerts link
+    [Tags]     HappyPath
     user checks page contains link with text and url  Sign up for email alerts    /subscriptions?slug=pupil-absence-in-schools-in-england
 
-Validate "About these statistics" -- "For school year"
+Validate "About these statistics" -- "For Academic Year:"
     [Documentation]  DFE-197 DFE-845
-    [Tags]  HappyPath   Failing
-    user checks element contains  css:[data-testid="release-name"]    2016 to 2017
+    [Tags]  HappyPath
+    user checks element contains  css:[data-testid="release-name"]    2016/17
 
-    user checks number of previous releases is correct   8
-    user opens details dropdown     See previous 8 releases
-    user checks previous release is shown in position  2016 to 2017     1
-    user checks previous release is shown in position  2015 to 2016     2
-    user checks previous release is shown in position  2014 to 2015     3
-    user checks previous release is shown in position  2013 to 2014     4
-    user checks previous release is shown in position  2012 to 2013     5
-    user checks previous release is shown in position  2011 to 2012     6
-    user checks previous release is shown in position  2010 to 2011     7
-    user checks previous release is shown in position  2009 to 2010     8
-    user closes details dropdown   See previous 8 releases
+Validate "About these statistics" -- Number of other releases
+    [Tags]  HappyPath
+    user checks number of other releases is correct   6
+    user opens details dropdown     See 6 other releases
+    user checks other release is shown in position  Academic Year 2014/15    1
+    user checks other release is shown in position  Academic Year 2013/14    2
+    user checks other release is shown in position  Academic Year 2012/13    3
+    user checks other release is shown in position  Academic Year 2011/12    4
+    user checks other release is shown in position  Academic Year 2010/11    5
+    user checks other release is shown in position  Academic Year 2009/10    6
+    user closes details dropdown   See 6 other releases
 
 Validate "About these statistics" -- "Last updated"
     [Tags]    HappyPath

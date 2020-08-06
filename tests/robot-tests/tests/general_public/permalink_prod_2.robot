@@ -28,7 +28,7 @@ Validate breadcrumbs
 
 Validate miscellaneous
     [Tags]  HappyPath
-    user checks summary list item "Created" should be "07 April 2020"
+    user checks summary list item "Created" should be "7 April 2020"
     user checks element contains   css:#dataTableCaption   Table showing 'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England' in England between 2013/14 and 2015/16
     user checks page contains element   xpath://a[text()="Print this page"]
 

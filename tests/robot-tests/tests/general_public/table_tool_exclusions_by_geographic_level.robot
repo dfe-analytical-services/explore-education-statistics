@@ -97,6 +97,7 @@ User validates permanent link works correctly
     user waits until page contains heading  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
 
 User validates permalink contains correct date
+    [Tags]  HappyPath
     ${date}=  get datetime  %d %B %Y
     user checks page contains element   xpath://*[@data-testid="created-date"]//time[text()="${date}"]
 
@@ -107,6 +108,7 @@ User validates permalink table headers
     user checks results table column heading contains  css:table  1   3   2008/09
 
 User validates permalink table rows for Bury
+    [Tags]  HappyPath
     ${row}=  user gets row with group and indicator   xpath://table  Bury   Number of fixed period exclusions
     user checks row contains heading  ${row}  Number of fixed period exclusions
     user checks row cell contains text  ${row}    1     1,539
@@ -126,6 +128,7 @@ User validates permalink table rows for Bury
     user checks row cell contains text  ${row}    3     11,217
 
 User validates permalink table rows for Sheffield
+    [Tags]  HappyPath
     ${row}=  user gets row with group and indicator   xpath://table  Sheffield   Number of fixed period exclusions
     user checks row contains heading  ${row}  Number of fixed period exclusions
     user checks row cell contains text  ${row}    1     5,351
@@ -145,6 +148,7 @@ User validates permalink table rows for Sheffield
     user checks row cell contains text  ${row}    3     30,948
 
 User validates permalink table rows for York
+    [Tags]  HappyPath
     ${row}=  user gets row with group and indicator   xpath://table  York   Number of fixed period exclusions
     user checks row contains heading  ${row}  Number of fixed period exclusions
     user checks row cell contains text  ${row}    1     1,073
@@ -162,5 +166,3 @@ User validates permalink table rows for York
     user checks row cell contains text  ${row}    1     10,179
     user checks row cell contains text  ${row}    2     9,955
     user checks row cell contains text  ${row}    3     9,870
-
-

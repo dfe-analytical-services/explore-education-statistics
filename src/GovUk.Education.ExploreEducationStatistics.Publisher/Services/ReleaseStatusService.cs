@@ -192,6 +192,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.State.Data = stage;
+
+                if (stage == ReleaseStatusDataStage.Complete)
+                {
+                    // In case this was a retry, reinstate publishing if possible
+                    var (publishing, overall) = GetStatesForReinstatingAfterPossibleRetry(row);
+                    row.State.Publishing = publishing;
+                    row.State.Overall = overall;
+                }
+
                 row.AppendLogMessage(logMessage);
                 return row;
             });
@@ -199,6 +208,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (stage == ReleaseStatusDataStage.Failed)
             {
                 await CancelReleasesWithContentDependency(releaseId, releaseStatusId);
+            }
+
+            if (stage == ReleaseStatusDataStage.Complete)
+            {
+                // In case this was a retry, reinstate publishing of any other releases that were cancelled if possible
+                await ReinstateReleasesWithContentDependency(releaseId, releaseStatusId);
             }
         }
 
@@ -269,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         /// <summary>
-        /// Cancel publishing of any other releases sharing a dependency with the content of a failing release.
+        /// Cancel publishing of any other Releases sharing a dependency with the content of a failing Release.
         /// Publishing any Release copies the whole staging directory.
         /// Cancelling others is necessary to avoid publishing staged content of a Release which is now failing,
         /// and other parts of content which were calculated expecting that Release to exist.
@@ -297,6 +312,85 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     logMessage: new ReleaseStatusLogMessage(
                         $"Publishing cancelled due to dependency with failed Release: {failingReleaseId}, ReleaseStatusId: {failingReleaseStatusId}"));
             }
+        }
+
+        /// <summary>
+        /// Reinstates publishing of any other releases sharing a dependency with the content of a Release.
+        /// Use this when a Release stage may have failed previously and has now been successful.
+        /// </summary>
+        /// <param name="succeedingReleaseId"></param>
+        /// <param name="succeedingReleaseStatusId"></param>
+        /// <returns></returns>
+        private async Task ReinstateReleasesWithContentDependency(Guid succeedingReleaseId,
+            Guid succeedingReleaseStatusId)
+        {
+            if (await IsImmediate(succeedingReleaseId, succeedingReleaseStatusId))
+            {
+                return;
+            }
+
+            var scheduled = await GetWherePublishingDueTodayWithStages(
+                content: ReleaseStatusContentStage.Complete,
+                data: ReleaseStatusDataStage.Complete,
+                files: ReleaseStatusFilesStage.Complete,
+                publishing: ReleaseStatusPublishingStage.Cancelled,
+                overall: ReleaseStatusOverallStage.Failed);
+
+            var scheduledExceptSucceeding = scheduled
+                .Where(status => status.Id != succeedingReleaseStatusId);
+
+            foreach (var releaseStatus in scheduledExceptSucceeding)
+            {
+                var (publishing, overall) = GetStatesForReinstatingAfterPossibleRetry(releaseStatus);
+
+                await UpdateStagesAsync(releaseStatus.ReleaseId, releaseStatus.Id,
+                    publishing: publishing,
+                    overall: overall,
+                    logMessage: new ReleaseStatusLogMessage(
+                        $"Publishing reinstated after Release succeeded: {succeedingReleaseId}, ReleaseStatusId: {succeedingReleaseStatusId}"));
+            }
+        }
+
+        /// <summary>
+        /// Get the states for reinstating stages after they may have been cancelled due to a failure.
+        /// </summary>
+        /// <remarks>
+        /// Checks that all the states are as expected and if not, leaves them untouched.
+        /// </remarks>
+        /// <param name="releaseStatus"></param>
+        /// <returns>Returns the original starting states for stages before they were cancelled, if reinstating is possible.</returns>
+        private static (ReleaseStatusPublishingStage Publishing, ReleaseStatusOverallStage Overall) 
+            GetStatesForReinstatingAfterPossibleRetry(ReleaseStatus releaseStatus)
+        {
+            var startingState = releaseStatus.Immediate
+                ? ReleaseStatusStates.ImmediateReleaseStartedState
+                : ReleaseStatusStates.ScheduledReleaseStartedState;
+
+            var existingState = releaseStatus.State;
+
+            var publishingCancelled = existingState.Publishing == ReleaseStatusPublishingStage.Cancelled;
+            var overallFailed = existingState.Overall == ReleaseStatusOverallStage.Failed;
+
+            var contentOk = existingState.Content == ReleaseStatusContentStage.Complete 
+                            || releaseStatus.Immediate && existingState.Content == startingState.Content;
+            var filesOk = existingState.Files == ReleaseStatusFilesStage.Complete;
+            var dataOk = existingState.Data == ReleaseStatusDataStage.Complete;
+
+            var reinstate = publishingCancelled
+                            && overallFailed
+                            && contentOk
+                            && filesOk
+                            && dataOk;
+
+            var newPublishingState = reinstate
+                 ? startingState.Publishing
+                 : existingState.Publishing;
+
+            var newOverallState = reinstate
+                ? startingState.Overall
+                : existingState.Overall;
+
+            return (newPublishingState, newOverallState);
         }
     }
 }
