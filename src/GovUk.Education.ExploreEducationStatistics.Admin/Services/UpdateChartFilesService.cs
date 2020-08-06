@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -75,10 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             // Change ref to any datablocks with charts where used
 
                             await UpdateDataBlock(fileReference, newId);
-
-                            // Change the file reference name
-                            fileReference.Filename = newId.ToString();
-                            _contentDbContext.ReleaseFileReferences.Update(fileReference);
 
                             await _contentDbContext.SaveChangesAsync();
 
