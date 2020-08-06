@@ -58,28 +58,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             foreach (var fileReference in chartReferences)
             {
-                // First check if this reference has been converted - if not then rename in storage
-                if (!Guid.TryParse(fileReference.Filename, out var guid))
+                var oldName = fileReference.Filename;
+                var oldBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, oldName);
+
+                // Files should exists first time this is run in storage
+                if (blobContainer.GetBlockBlobReference(oldBlobPath).Exists())
                 {
-                    var oldName = fileReference.Filename;
-                    var oldBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, oldName);
-
-                    // Files should exists in storage but if not then allow user to delete
-                    if (blobContainer.GetBlockBlobReference(oldBlobPath).Exists())
+                    if (await CopyBlob(fileReference, blobContainer, oldBlobPath, fileReference.Id))
                     {
-                        var newId = Guid.NewGuid();
+                        // Change ref to any datablocks with charts where used
 
-                        if (await CopyBlob(fileReference, blobContainer, oldBlobPath, newId))
-                        {
-                            // Change ref to any datablocks with charts where used
+                        await UpdateDataBlock(fileReference, fileReference.Id);
 
-                            await UpdateDataBlock(fileReference, newId);
+                        await _contentDbContext.SaveChangesAsync();
 
-                            await _contentDbContext.SaveChangesAsync();
-
-                            _logger.LogInformation(
-                                $"Update blob: {fileReference.ReleaseId}:{fileReference.Filename} successfully");
-                        }
+                        _logger.LogInformation(
+                            $"Update blob: {fileReference.ReleaseId}:{fileReference.Filename} successfully");
                     }
                 }
             }
@@ -95,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var targetBlob = blobContainer.GetBlockBlobReference(newBlobPath);
                         
             await targetBlob.StartCopyAsync(sourceBlob);
-
+            targetBlob.FetchAttributes();
             while (targetBlob.CopyState.Status == CopyStatus.Pending) {
                 await Task.Delay(1000);
                 targetBlob.FetchAttributes();
