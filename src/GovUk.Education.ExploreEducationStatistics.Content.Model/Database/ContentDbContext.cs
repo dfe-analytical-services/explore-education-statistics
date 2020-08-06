@@ -147,8 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Methodology>()
                 .Property(b => b.Status)
-                .HasConversion(new EnumToStringConverter<MethodologyStatus>())
-                .HasDefaultValue(MethodologyStatus.Draft);
+                .HasConversion(new EnumToStringConverter<MethodologyStatus>());
 
             modelBuilder.Entity<Publication>()
                 .Property(p => p.LegacyPublicationUrl)
@@ -1001,6 +1000,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Published = new DateTime(2018, 3, 22),
                     LastUpdated = new DateTime(2019, 6, 26),
                     Slug = "pupil-absence-in-schools-in-england",
+                    Status = MethodologyStatus.Draft,
                     Summary = "",
                     Content = new List<ContentSection>
                     {
