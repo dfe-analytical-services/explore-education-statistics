@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CreateTheme_Returns_Ok()
         {
-            var request = new CreateThemeRequest
+            var request = new SaveThemeViewModel
             {
                 Title = "Test theme"
             };
