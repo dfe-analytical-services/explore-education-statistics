@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpPost("charts/change-chart-filenames-to-guids")]
-        public async Task<ActionResult<bool>> FixMissingSubjectId()
+        public async Task<ActionResult<bool>> UpdateChartFilenamesToIds()
         {
             return await _updateChartFilesService
                 .UpdateChartFiles()

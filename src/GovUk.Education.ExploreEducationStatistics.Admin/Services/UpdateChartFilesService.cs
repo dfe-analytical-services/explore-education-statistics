@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -12,6 +13,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
@@ -20,15 +22,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class UpdateChartFilesService : IUpdateChartFilesService
     {
         private readonly ContentDbContext _contentDbContext;
+        private readonly ILogger _logger;
 
         private readonly string _storageConnectionString;
         
         public UpdateChartFilesService(
             IConfiguration configuration,
-            ContentDbContext contentDbContext)
+            ContentDbContext contentDbContext,
+            ILogger<UpdateChartFilesService> logger)
         {
             _storageConnectionString = configuration.GetValue<string>("CoreStorage");
             _contentDbContext = contentDbContext;
+            _logger = logger;
         }
 
         public async Task<Either<ActionResult, bool>> UpdateChartFiles()
@@ -64,40 +69,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (blobContainer.GetBlockBlobReference(oldBlobPath).Exists())
                     {
                         var newId = Guid.NewGuid();
-                        var newBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, newId.ToString());
 
-                        var oldFile = blobContainer.GetBlockBlobReference(oldBlobPath);
-                        var newFile = blobContainer.GetBlockBlobReference(newBlobPath);
-                        
-                        // Rename the blob
-                        await newFile.StartCopyAsync(oldFile);  
-                        await oldFile.DeleteAsync();
-                        
-                        // Change ref to any datablocks with charts where used
+                        if (await CopyBlob(fileReference, blobContainer, oldBlobPath, newId))
+                        {
+                            // Change ref to any datablocks with charts where used
 
-                        var releaseIds = _contentDbContext.ReleaseFiles
-                            .Include(rf => rf.ReleaseFileReference)
-                            .Where(rf => rf.ReleaseFileReference.Filename == oldName && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Chart)
-                            .Select(rf => rf.ReleaseId)
-                            .Distinct()
-                            .ToList();
+                            await UpdateDataBlock(fileReference, newId);
 
-                        await UpdateDataBlock(releaseIds, oldName, newId);
+                            // Change the file reference name
+                            fileReference.Filename = newId.ToString();
+                            _contentDbContext.ReleaseFileReferences.Update(fileReference);
 
-                        // Change the file reference name
-                        fileReference.Filename = newId.ToString();
-                        _contentDbContext.ReleaseFileReferences.Update(fileReference);
+                            await _contentDbContext.SaveChangesAsync();
 
-                        await _contentDbContext.SaveChangesAsync();
+                            _logger.LogInformation(
+                                $"Update blob: {fileReference.ReleaseId}:{fileReference.Filename} successfully");
+                        }
                     }
                 }
             }
 
             return true;
         }
-        
-        private async Task UpdateDataBlock(List<Guid> releaseIds, string oldChartName, Guid newChartId)
+
+        private async Task<bool> CopyBlob(ReleaseFileReference fileReference, CloudBlobContainer blobContainer, string oldBlobPath, Guid newId)
         {
+            var newBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, newId.ToString());
+
+            var sourceBlob = blobContainer.GetBlockBlobReference(oldBlobPath);
+            var targetBlob = blobContainer.GetBlockBlobReference(newBlobPath);
+                        
+            await targetBlob.StartCopyAsync(sourceBlob);
+
+            while (targetBlob.CopyState.Status == CopyStatus.Pending) {
+                await Task.Delay(1000);
+                targetBlob.FetchAttributes();
+            }
+
+            if (targetBlob.CopyState.Status != CopyStatus.Success) {
+                _logger.LogError($"Failed to copy blob: {fileReference.ReleaseId}:{fileReference.Filename}");
+                return false;
+            }
+
+            await sourceBlob.DeleteAsync();
+            
+            _logger.LogInformation($"Copied blob: {fileReference.ReleaseId}:{fileReference.Filename} successfully");
+
+            return true;
+        }
+        
+        private async Task UpdateDataBlock(ReleaseFileReference releaseFileReference, Guid newChartId)
+        {
+            var releaseIds = await _contentDbContext.ReleaseFiles
+                .Where(rf => rf.ReleaseFileReferenceId == releaseFileReference.Id)
+                .Select(rf => rf.ReleaseId)
+                .Distinct()
+                .ToListAsync();
+            
             var blocks = GetDataBlocks(releaseIds);
 
             foreach (var block in blocks)
@@ -106,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OfType<InfographicChart>()
                     .FirstOrDefault();
 
-                if (infoGraphicChart != null && infoGraphicChart.FileId == oldChartName)
+                if (infoGraphicChart != null && infoGraphicChart.FileId == releaseFileReference.Filename)
                 {
                     block.Charts.Remove(infoGraphicChart);
                     infoGraphicChart.FileId = newChartId.ToString();
