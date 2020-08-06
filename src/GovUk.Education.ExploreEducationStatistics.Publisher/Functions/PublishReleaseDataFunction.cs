@@ -50,6 +50,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [FunctionName("PublishReleaseData")]
         // ReSharper disable once UnusedMember.Global
+
+        private bool ReleaseHasSubjects(Guid releaseId)
+        {
+            return _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Any(row => row.ReleaseId == releaseId &&
+                            row.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data);
+        }
+
         public async Task PublishReleaseData(
             [QueueTrigger(PublishReleaseDataQueue)] PublishReleaseDataMessage message,
             ExecutionContext executionContext,
@@ -153,15 +163,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 SubscriptionId = configuration.GetValue<string>(nameof(SubscriptionId));
                 TenantId = configuration.GetValue<string>(nameof(TenantId));
             }
-        }
-
-        private bool ReleaseHasSubjects(Guid releaseId)
-        {
-            return _context
-                .ReleaseFiles
-                .Include(f => f.ReleaseFileReference)
-                .Any(row => row.ReleaseId == releaseId &&
-                            row.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data);
         }
     }
 }
