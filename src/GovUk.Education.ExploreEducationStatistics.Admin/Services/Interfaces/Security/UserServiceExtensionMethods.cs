@@ -85,6 +85,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(theme, SecurityPolicies.CanViewSpecificTheme);
         }
 
+        public static Task<Either<ActionResult, Topic>> CheckCanViewTopic(
+            this IUserService userService, Topic topic)
+        {
+            return userService.DoCheck(topic, SecurityPolicies.CanViewSpecificTopic);
+        }
+
         public static Task<Either<ActionResult, bool>> CheckCanManageAllTaxonomy(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanManageAllTaxonomy);

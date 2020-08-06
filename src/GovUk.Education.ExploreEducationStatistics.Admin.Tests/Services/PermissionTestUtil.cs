@@ -17,25 +17,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public static class PermissionTestUtil
     {
         public static async void AssertSecurityPoliciesChecked<TProtectedResource, TReturn, TService>(
-            Func<TService, Task<Either<ActionResult, TReturn>>> protectedAction, 
-            TProtectedResource resource, 
+            Func<TService, Task<Either<ActionResult, TReturn>>> protectedAction,
+            TProtectedResource resource,
             Mock<IUserService> userService,
             TService service,
             params SecurityPolicies[] policies)
         {
-            policies.ToList().ForEach(policy => 
+            policies.ToList().ForEach(policy =>
                 userService
                     .Setup(s => s.MatchesPolicy(resource, policy))
                     .ReturnsAsync(policy != policies.Last()));
-            
+
             var result = await protectedAction.Invoke(service);
 
             AssertForbidden(result);
-            
+
             policies.ToList().ForEach(policy =>
                 userService.Verify(s => s.MatchesPolicy(resource, policy)));
-            
-            userService.VerifyNoOtherCalls();
         }
 
         public static void AssertPolicyEnforcedAtClassLevel<TClass>(SecurityPolicies policy)

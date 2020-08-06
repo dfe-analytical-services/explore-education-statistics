@@ -18,7 +18,7 @@ Create Datablock test publication
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains link  Create new publication     60
     user clicks link   Create new publication
-    user creates publication without methodology  ${PUBLICATION_NAME}   Tingting Shu - (Attainment statistics team)
+    user creates publication    ${PUBLICATION_NAME}
 
 Verify Datablock test publication is created
     [Tags]  HappyPath

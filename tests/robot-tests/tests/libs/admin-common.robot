@@ -14,24 +14,16 @@ User selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until page contains heading 3  ${topic}
 
 user creates publication
-    [Arguments]   ${title}   ${methodology}   ${contact}
+    [Arguments]   ${title}
     user waits until page contains heading    Create new publication
-    user enters text into element  id:createPublicationForm-publicationTitle   ${title}
-    user selects radio     Choose an existing methodology
-    user checks element is visible    xpath://label[text()="Select methodology"]
-    user selects from list by label  id:createPublicationForm-selectedMethodologyId   ${methodology} [Approved]
-    user selects from list by label  id:createPublicationForm-selectedContactId   ${contact}
-    user clicks button   Create publication
-    user waits until page contains element   xpath://span[text()="Welcome"]
-
-user creates publication without methodology
-    [Arguments]   ${title}   ${contact}
-    user waits until page contains heading    Create new publication
-    user waits until page contains element  id:createPublicationForm-publicationTitle
-    user enters text into element  id:createPublicationForm-publicationTitle   ${title}
-    user selects radio     Select a methodology later
-    user selects from list by label  id:createPublicationForm-selectedContactId   ${contact}
-    user clicks button   Create publication
+    user waits until page contains element  id:publicationForm-title
+    user enters text into element  id:publicationForm-title   ${title}
+    user selects radio     No methodology
+    user enters text into element  id:publicationForm-teamName        Attainment statistics team
+    user enters text into element  id:publicationForm-teamEmail       Attainment.STATISTICS@education.gov.uk
+    user enters text into element  id:publicationForm-contactName     Tingting Shu
+    user enters text into element  id:publicationForm-contactTelNo    0123456789
+    user clicks button   Save publication
     user waits until page contains element   xpath://span[text()="Welcome"]
 
 User creates release for publication

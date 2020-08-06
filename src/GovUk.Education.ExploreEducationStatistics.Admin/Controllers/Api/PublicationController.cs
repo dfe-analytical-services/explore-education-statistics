@@ -23,34 +23,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _publicationService = publicationService;
         }
 
-        // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
         public async Task<ActionResult<List<MyPublicationViewModel>>> GetMyPublications(
             [FromQuery(Name = "topicId"), Required] Guid topicId)
         {
             return await _publicationService
                 .GetMyPublicationsAndReleasesByTopic(topicId)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
 
-        // GET api/publications/{publicationId}
         [HttpGet("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> GetPublicationById(
             [Required] Guid publicationId)
         {
             return await _publicationService
                 .GetViewModel(publicationId)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
 
-        // PUT api/publications/{publicationId}/methodology
-        [HttpPut("api/publications/{publicationId}/methodology")]
-        public async Task<ActionResult> UpdatePublicationMethodology(
-            UpdatePublicationMethodologyViewModel model, Guid publicationId)
+        [HttpPost("api/publications")]
+        public async Task<ActionResult<PublicationViewModel>> CreatePublication(
+            SavePublicationViewModel publication)
         {
             return await _publicationService
-                .UpdatePublicationMethodology(publicationId, model)
-                .HandleFailuresOr(result => Ok());
+                .CreatePublication(publication)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("api/publications/{publicationId}")]
+        public async Task<ActionResult<PublicationViewModel>> UpdatePublication(
+            Guid publicationId,
+            SavePublicationViewModel updatedPublication)
+        {
+            return await _publicationService
+                .UpdatePublication(publicationId, updatedPublication)
+                .HandleFailuresOrOk();
         }
 
         /// Partially update the publication's legacy releases.
@@ -65,18 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _publicationService
                 .PartialUpdateLegacyReleases(publicationId, legacyReleases)
                 .HandleFailuresOrOk();
-        }
-        
-        // POST api/topic/{topicId}/publications
-        [HttpPost("api/topic/{topicId}/publications")]
-        public async Task<ActionResult<PublicationViewModel>> CreatePublication(
-            CreatePublicationViewModel publication, Guid topicId)
-        {
-            publication.TopicId = topicId;
-            
-            return await _publicationService
-                .CreatePublication(publication)
-                .HandleFailuresOr(Ok);
         }
     }
 }

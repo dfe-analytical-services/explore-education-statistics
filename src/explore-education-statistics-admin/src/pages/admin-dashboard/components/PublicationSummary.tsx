@@ -4,11 +4,12 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { legacyReleasesRoute, releaseCreateRoute } from '@admin/routes/routes';
 import {
-  publicationAssignMethodologyRoute,
-  ThemeTopicPublicationParams,
-} from '@admin/routes/themeTopicRoutes';
+  legacyReleasesRoute,
+  publicationEditRoute,
+  PublicationRouteParams,
+  releaseCreateRoute,
+} from '@admin/routes/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -22,28 +23,29 @@ import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 
 export interface Props {
   publication: AdminDashboardPublication;
-  themeId: string;
-  topicId: string;
   onChangePublication: () => void;
 }
 
-const PublicationSummary = ({
-  publication,
-  themeId,
-  topicId,
-  onChangePublication,
-}: Props) => {
+const PublicationSummary = ({ publication, onChangePublication }: Props) => {
   const history = useHistory();
 
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
   const [cancelAmendmentReleaseId, setCancelAmendmentReleaseId] = useState<
     string
   >();
+
+  const {
+    contact,
+    externalMethodology,
+    methodology,
+    permissions,
+    releases,
+    id,
+    title,
+  } = publication;
+
   const noAmendmentInProgressFilter = (release: Release) =>
-    publication &&
-    !publication.releases.some(
-      r => r.amendment && r.previousVersionId === release.id,
-    );
+    !releases.some(r => r.amendment && r.previousVersionId === release.id);
 
   // BAU-404 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
   const showAmendmentButton = () => true;
@@ -51,90 +53,141 @@ const PublicationSummary = ({
   return (
     <>
       <SummaryList>
-        <SummaryListItem term="Methodology" smallKey>
-          <p>
-            {publication.methodology ? (
-              <Link to={`/methodologies/${publication.methodology.id}`}>
-                {publication.methodology.title}
-              </Link>
-            ) : (
-              <>
-                {publication.externalMethodology?.url ? (
-                  <>
-                    {publication.externalMethodology.title} (
-                    <a
-                      href={publication.externalMethodology.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {publication.externalMethodology.url}
-                    </a>
-                    )
-                  </>
-                ) : (
-                  'No methodology assigned'
+        <SummaryListItem
+          term="Team"
+          actions={
+            permissions.canUpdatePublication && (
+              <Link
+                data-testid={`Edit publication link for ${publication.title}`}
+                unvisited
+                to={generatePath<PublicationRouteParams>(
+                  publicationEditRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
                 )}
-              </>
-            )}
-          </p>
+              >
+                Change <span className="govuk-visually-hidden">team</span>
+              </Link>
+            )
+          }
+        >
+          <p>{contact?.teamName || 'No team name'}</p>
 
-          <ButtonGroup className="govuk-!-margin-bottom-2">
-            <ButtonLink
-              variant="secondary"
-              to={generatePath<ThemeTopicPublicationParams>(
-                publicationAssignMethodologyRoute.path,
-                {
-                  themeId,
-                  topicId,
-                  publicationId: publication.id,
-                },
-              )}
-            >
-              {!publication.methodology &&
-              (!publication.externalMethodology ||
-                !publication.externalMethodology.url)
-                ? 'Add'
-                : 'Edit'}{' '}
-              methodology
-            </ButtonLink>
-          </ButtonGroup>
+          {contact?.teamEmail && (
+            <p>
+              <a href={`mailto:${contact.teamEmail}`}>{contact.teamEmail}</a>
+            </p>
+          )}
         </SummaryListItem>
-        <SummaryListItem term="Releases" smallKey>
-          <ul className="govuk-list dfe-admin">
-            {publication.releases
-              .filter(noAmendmentInProgressFilter)
-              .map(release => (
-                <li key={release.id}>
-                  <NonScheduledReleaseSummary
-                    onClickAmendRelease={
-                      showAmendmentButton() ? setAmendReleaseId : undefined
-                    }
-                    onClickCancelAmendment={setCancelAmendmentReleaseId}
-                    release={release}
-                  />
-                </li>
-              ))}
-            {publication.releases.length < 1 && <>No releases created</>}
+        <SummaryListItem
+          term="Contact"
+          actions={
+            permissions.canUpdatePublication && (
+              <Link
+                data-testid={`Edit publication link for ${publication.title}`}
+                unvisited
+                to={generatePath<PublicationRouteParams>(
+                  publicationEditRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
+                )}
+              >
+                Change <span className="govuk-visually-hidden">contact</span>
+              </Link>
+            )
+          }
+        >
+          <p>{contact?.contactName || 'No contact name'}</p>
+
+          {contact?.contactTelNo && (
+            <p>
+              <a href={`tel:${contact.contactTelNo}`}>{contact.contactTelNo}</a>
+            </p>
+          )}
+        </SummaryListItem>
+        <SummaryListItem
+          term="Methodology"
+          actions={
+            permissions.canUpdatePublication && (
+              <Link
+                data-testid={`Edit publication link for ${publication.title}`}
+                unvisited
+                to={generatePath<PublicationRouteParams>(
+                  publicationEditRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
+                )}
+              >
+                Change{' '}
+                <span className="govuk-visually-hidden">methodology</span>
+              </Link>
+            )
+          }
+        >
+          {methodology ? (
+            <Link to={`/methodologies/${methodology.id}`}>
+              {methodology.title}
+            </Link>
+          ) : (
+            <>
+              {externalMethodology?.url ? (
+                <>
+                  {externalMethodology.title} (
+                  <a
+                    href={externalMethodology.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {externalMethodology.url}
+                  </a>
+                  )
+                </>
+              ) : (
+                'No methodology assigned'
+              )}
+            </>
+          )}
+        </SummaryListItem>
+        <SummaryListItem
+          term="Releases"
+          actions={permissions.canUpdatePublication && <></>}
+        >
+          <ul className="govuk-list">
+            {releases.filter(noAmendmentInProgressFilter).map(release => (
+              <li key={release.id}>
+                <NonScheduledReleaseSummary
+                  onClickAmendRelease={
+                    showAmendmentButton() ? setAmendReleaseId : undefined
+                  }
+                  onClickCancelAmendment={setCancelAmendmentReleaseId}
+                  release={release}
+                />
+              </li>
+            ))}
+            {releases.length < 1 && <>No releases created</>}
           </ul>
 
           <ButtonGroup className="govuk-!-margin-bottom-2">
-            {publication.permissions.canCreateReleases && (
+            {permissions.canCreateReleases && (
               <ButtonLink
                 to={generatePath(releaseCreateRoute.path, {
-                  publicationId: publication.id,
+                  publicationId: id,
                 })}
-                testId={`Create new release link for ${publication.title}`}
+                testId={`Create new release link for ${title}`}
               >
                 Create new release
               </ButtonLink>
             )}
-            {publication.permissions.canUpdatePublication && (
+            {permissions.canUpdatePublication && (
               <ButtonLink
                 to={generatePath(legacyReleasesRoute.path, {
-                  publicationId: publication.id,
+                  publicationId: id,
                 })}
                 variant="secondary"
-                testId={`Legacy releases link for ${publication.title}`}
+                testId={`Legacy releases link for ${title}`}
               >
                 Manage legacy releases
               </ButtonLink>
@@ -152,7 +205,7 @@ const PublicationSummary = ({
               .then(amendment =>
                 history.push(
                   generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-                    publicationId: publication.id,
+                    publicationId: id,
                     releaseId: amendment.id,
                   }),
                 ),

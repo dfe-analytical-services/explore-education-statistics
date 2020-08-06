@@ -1,7 +1,7 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Moq;
 using Xunit;
 

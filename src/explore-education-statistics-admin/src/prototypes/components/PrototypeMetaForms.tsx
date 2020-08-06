@@ -23,7 +23,6 @@ const PrototypeCreateMetaForms = ({
   subject2,
   subject3,
 }: Props) => {
-  const [addNewMeta, setAddNewMeta] = useState(false);
   const [valueSubject1, setValueSubject1] = useState('');
   const [valueSubject2, setValueSubject2] = useState('');
   const [valueSubject3, setValueSubject3] = useState('');
@@ -66,7 +65,7 @@ const PrototypeCreateMetaForms = ({
             name="description"
             label="Public metadata introduction"
             value={formExample.descriptionPlaceholder.text}
-            onChange={() => setAddNewMeta(true)}
+            onChange={() => {}}
           />
         </div>
         <Button className=" govuk-!-margin-right-3" onClick={() => {}}>

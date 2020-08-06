@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -61,15 +61,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Summary = request.Summary
                     });
                     await _context.SaveChangesAsync();
-                    return await GetAsync(saved.Entity.Id);
+                    return await GetTopic(saved.Entity.Id);
                 });
         }
 
-        private async Task<Either<ActionResult, TopicViewModel>> GetAsync(Guid topicId)
+        public async Task<Either<ActionResult, TopicViewModel>> GetTopic(Guid topicId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Topic>(topicId, HydrateTopicForTopicViewModel)
-                .OnSuccess(_mapper.Map<TopicViewModel>);
+                .OnSuccess(_userService.CheckCanViewTopic)
+                .OnSuccess(_mapper.Map<TopicViewModel>);   
         }
 
         private static IQueryable<Topic> HydrateTopicForTopicViewModel(IQueryable<Topic> values)
