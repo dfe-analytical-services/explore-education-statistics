@@ -92,6 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotSpecifyMethodologyAndExternalMethodology,
         MethodologyOrExternalMethodologyLinkMustBeDefined,
 
+        // Theme
+        ThemeDoesNotExist,
+
         // Topic
         TopicDoesNotExist,
 
