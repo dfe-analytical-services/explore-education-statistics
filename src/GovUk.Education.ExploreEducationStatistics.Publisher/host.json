@@ -5,6 +5,7 @@
       "default": "None",
       "Function.PublishAllContent": "Information",
       "Function.GenerateReleaseContent": "Information",
+      "Function.PublishPublication": "Information",
       "Function.PublishReleases": "Information",
       "Function.PublishReleaseContent": "Information",
       "Function.PublishReleaseData": "Information",

@@ -65,6 +65,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
+        public async Task SetPublishedDate(Guid id, DateTime published)
+        {
+            var publication = await _context.Publications.SingleOrDefaultAsync(publication => publication.Id == id);
+
+            if (publication == null)
+            {
+                throw new ArgumentException("Publication does not exist", nameof(id));
+            }
+
+            _context.Update(publication);
+            publication.Published = published;
+            await _context.SaveChangesAsync();
+        }
+
         private static ThemeTree<PublicationTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
             return new ThemeTree<PublicationTreeNode>

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class    Publication
+    public class Publication
     {
         public Guid Id { get; set; }
 
@@ -30,6 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Uri LegacyPublicationUrl { get; set; }
 
         public List<LegacyRelease> LegacyReleases { get; set; }
+
+        public DateTime? Published { get; set; }
 
         public Guid TopicId { get; set; }
 

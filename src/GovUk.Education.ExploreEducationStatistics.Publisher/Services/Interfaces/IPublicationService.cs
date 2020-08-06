@@ -11,5 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task<CachedPublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds);
         List<ThemeTree<PublicationTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds);
         IEnumerable<Publication> ListPublicationsWithPublishedReleases();
+        Task SetPublishedDate(Guid id, DateTime published);
     }
 }
