@@ -102,15 +102,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// Notify the Publisher that there has been a change to the Publication.
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="oldSlug"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> PublicationChanged(Guid id)
+        public async Task<Either<ActionResult, Unit>> PublicationChanged(Guid id, string oldSlug)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(id)
                 .OnSuccess(async release =>
                 {
                     await _storageQueueService.AddMessagesAsync(
-                        PublishPublicationQueue, new PublishPublicationMessage(id));
+                        PublishPublicationQueue, new PublishPublicationMessage(id, oldSlug));
 
                     _logger.LogTrace($"Sent message for Publication: {id}");
                     return Unit.Instance;

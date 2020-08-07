@@ -15,16 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task DeleteAllContentAsyncExcludingStaging();
 
         Task DeleteDownloadFilesForPreviousVersion(Release release);
-        
+
         Task DeletePublicBlobs(string directoryPath, string excludePattern = null);
-        
+
         Task DeletePublicBlob(string blobName);
 
         Task<(CloudBlockBlob blob, string id)> AcquireLease(string blobName);
 
         IEnumerable<FileInfo> ListPublicFiles(string publication, string release);
 
-        Task MoveStagedContentAsync();
+        Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath);
 
         Task UploadAsJson(string blobName, object value, JsonSerializerSettings settings = null);
     }

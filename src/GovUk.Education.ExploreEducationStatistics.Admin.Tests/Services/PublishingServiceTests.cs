@@ -45,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mocks.StorageQueueService.Verify(
                     mock => mock.AddMessagesAsync(RetryStageQueue,
                         It.Is<RetryStageMessage>(message =>
-                            message.ReleaseId == release.Id && message.Stage == ContentAndPublishing)), Times.Once());
+                            message.ReleaseId == release.Id 
+                            && message.Stage == ContentAndPublishing)), Times.Once());
 
                 Assert.True(result.IsRight);
             }
@@ -56,26 +57,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var mocks = Mocks();
 
-            var publication = new Publication
+            var release = new Release
             {
                 Id = Guid.NewGuid()
             };
 
             using (var context = InMemoryApplicationDbContext("ReleaseChanged"))
             {
-                context.Add(publication);
+                context.Add(release);
                 context.SaveChanges();
             }
 
             using (var context = InMemoryApplicationDbContext("ReleaseChanged"))
             {
                 var publishingService = BuildPublishingService(context, mocks);
-                var result = publishingService.ReleaseChanged(publication.Id, true).Result;
+                var result = publishingService.ReleaseChanged(release.Id, true).Result;
 
                 mocks.StorageQueueService.Verify(
-                    mock => mock.AddMessagesAsync(PublishPublicationQueue,
+                    mock => mock.AddMessagesAsync(NotifyChangeQueue,
                         It.Is<NotifyChangeMessage>(message =>
-                            message.ReleaseId == publication.Id && message.Immediate)), Times.Once());
+                            message.ReleaseId == release.Id && message.Immediate)), Times.Once());
 
                 Assert.True(result.IsRight);
             }
@@ -100,12 +101,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("PublicationChanged"))
             {
                 var publishingService = BuildPublishingService(context, mocks);
-                var result = publishingService.PublicationChanged(publication.Id).Result;
+                var result = publishingService.PublicationChanged(publication.Id, "old-slug").Result;
 
                 mocks.StorageQueueService.Verify(
                     mock => mock.AddMessagesAsync(PublishPublicationQueue,
                         It.Is<PublishPublicationMessage>(message =>
-                            message.PublicationId == publication.Id)), Times.Once());
+                            message.PublicationId == publication.Id 
+                            && message.OldSlug == "old-slug")), Times.Once());
 
                 Assert.True(result.IsRight);
             }

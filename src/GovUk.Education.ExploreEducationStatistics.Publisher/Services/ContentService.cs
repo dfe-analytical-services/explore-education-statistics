@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -127,9 +128,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdatePublication(PublishContext context, Guid publicationId)
+        public async Task UpdatePublication(PublishContext context, Guid publicationId, string oldSlug)
         {
-            await CachePublication(publicationId, context);
+            var publication = await _publicationService.Get(publicationId);
+
+            if (publication.Slug != oldSlug)
+            {
+                var pathPrefix = context.Staging ? PublicContentStagingPath() : null;
+                await _fileStorageService.MovePublicDirectory(PublicContentContainerName,
+                    PublicContentPublicationParentPath(oldSlug, pathPrefix),
+                    PublicContentPublicationParentPath(publication.Slug, pathPrefix)
+                );
+
+                await _fileStorageService.MovePublicDirectory(PublicFilesContainerName, oldSlug, publication.Slug);
+            }
+
+            await CacheDownloadTree(context);
+            await CachePublicationTree(context);
+            await CachePublication(publication.Id, context);
         }
 
         private async Task DeleteAllContent()

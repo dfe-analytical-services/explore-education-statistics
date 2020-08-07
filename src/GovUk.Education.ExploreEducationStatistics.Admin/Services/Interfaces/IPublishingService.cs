@@ -10,6 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, Unit>> RetryReleaseStage(Guid releaseId, RetryStage stage);
         Task<Either<ActionResult, Unit>> ReleaseChanged(Guid id, bool immediate = false);
-        Task<Either<ActionResult, Unit>> PublicationChanged(Guid id);
+        Task<Either<ActionResult, Unit>> PublicationChanged(Guid id, string oldSlug);
     }
 }

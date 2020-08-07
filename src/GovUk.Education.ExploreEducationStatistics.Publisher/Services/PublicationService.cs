@@ -25,6 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseService = releaseService;
         }
 
+        public async Task<Publication> Get(Guid id)
+        {
+            return await _context.Publications.FindAsync(id);
+        }
+
         public async Task<CachedPublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds)
         {
             var publication = await _context.Publications

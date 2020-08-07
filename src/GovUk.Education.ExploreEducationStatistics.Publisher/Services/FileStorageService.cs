@@ -126,12 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 publication, release);
         }
 
-        public async Task MoveStagedContentAsync()
+        public async Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath)
         {
-            var container = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
-            var sourceDirectoryPath = PublicContentStagingPath();
+            var container = await GetCloudBlobContainerAsync(_publicStorageConnectionString, containerName);
             var sourceDirectory = container.GetDirectoryReference(sourceDirectoryPath);
-            var destinationDirectory = container.GetDirectoryReference(string.Empty);
+            var destinationDirectory = container.GetDirectoryReference(destinationDirectoryPath);
 
             var options = new CopyDirectoryOptions
             {

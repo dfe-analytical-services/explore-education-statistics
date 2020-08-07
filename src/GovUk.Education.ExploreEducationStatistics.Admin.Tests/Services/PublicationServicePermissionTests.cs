@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -33,12 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetMyPublicationsAndReleasesByTopicAsync_NoAccessOfSystem()
         {
-            var (context, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
+            var userService = mocks.UserService;
+            var publicationRepository = mocks.PublicationRepository;
 
             var topicId = Guid.NewGuid();
 
-            var publicationService = new PublicationService(context.Object, mapper.Object,
-                userService.Object, publicationRepository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(mocks);
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(false);
 
@@ -64,12 +66,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetMyPublicationsAndReleasesByTopicAsync_CanViewAllReleases()
         {
-            var (context, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
+            var userService = mocks.UserService;
+            var publicationRepository = mocks.PublicationRepository;
 
             var topicId = Guid.NewGuid();
 
-            var publicationService = new PublicationService(context.Object, mapper.Object,
-                userService.Object, publicationRepository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(mocks);
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(true);
 
@@ -99,13 +102,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetMyPublicationsAndReleasesByTopicAsync_CanViewRelatedReleases()
         {
-            var (context, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
+            var userService = mocks.UserService;
+            var publicationRepository = mocks.PublicationRepository;
 
             var topicId = Guid.NewGuid();
             var userId = Guid.NewGuid();
 
-            var publicationService = new PublicationService(context.Object, mapper.Object,
-                userService.Object, publicationRepository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(mocks);
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(true);
 
@@ -137,11 +141,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void CreatePublication()
+        public async Task CreatePublication()
         {
             await using var context = DbUtils.InMemoryApplicationDbContext();
 
-            var (_, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             context.Add(_topic);
 
@@ -154,22 +158,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = _topic.Id,
                     }),
                 _topic,
-                userService,
-                new PublicationService(
-                    context,
-                    mapper.Object,
-                    userService.Object,
-                    publicationRepository.Object,
-                    persistenceHelper.Object),
+                mocks.UserService,
+                BuildPublicationService(mocks),
                 SecurityPolicies.CanCreatePublicationForSpecificTopic);
         }
 
         [Fact]
-        public async void UpdatePublication_CanUpdatePublication()
+        public async Task UpdatePublication_CanUpdatePublication()
         {
             await using var context = DbUtils.InMemoryApplicationDbContext();
 
-            var (_, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             context.Add(_topic);
             context.Add(_publication);
@@ -191,22 +190,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }),
                 _publication,
-                userService,
-                new PublicationService(
-                    context,
-                    mapper.Object,
-                    userService.Object,
-                    publicationRepository.Object,
-                    persistenceHelper.Object),
+                mocks.UserService,
+                BuildPublicationService(mocks),
                 SecurityPolicies.CanUpdatePublication);
         }
 
         [Fact]
-        public async void UpdatePublication_CanCreatePublicationForSpecificTopic()
+        public async Task UpdatePublication_CanCreatePublicationForSpecificTopic()
         {
             await using var context = DbUtils.InMemoryApplicationDbContext();
 
-            var (_, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             context.Add(_topic);
             context.Add(_publication);
@@ -228,40 +222,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }),
                 _topic,
-                userService,
-                new PublicationService(
-                    context,
-                    mapper.Object,
-                    userService.Object,
-                    publicationRepository.Object,
-                    persistenceHelper.Object),
+                mocks.UserService,
+                BuildPublicationService(mocks),
                 SecurityPolicies.CanCreatePublicationForSpecificTopic);
         }
 
         [Fact]
-        public async void GetViewModel()
+        public void GetViewModel()
         {
-            var (context, mapper, userService, publicationRepository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service => await service.GetViewModel(_publication.Id),
                 _publication,
-                userService,
-                new PublicationService(
-                    context.Object,
-                    mapper.Object,
-                    userService.Object,
-                    publicationRepository.Object,
-                    persistenceHelper.Object),
+                mocks.UserService,
+                BuildPublicationService(mocks),
                 SecurityPolicies.CanViewSpecificPublication);
         }
 
-        private (
-            Mock<ContentDbContext>,
+        private static PublicationService BuildPublicationService((Mock<ContentDbContext>,
             Mock<IMapper>,
-            Mock<IUserService>,
-            Mock<IPublicationRepository>,
-            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
+            Mock<IUserService> userService,
+            Mock<IPublicationRepository> publicationRepository,
+            Mock<IPublishingService> publishingService,
+            Mock<IPersistenceHelper<ContentDbContext>>) mocks)
+        {
+            var (context, mapper, userService, publicationRepository, publishingService, persistenceHelper) = mocks;
+
+            return new PublicationService(
+                context.Object,
+                mapper.Object,
+                userService.Object,
+                publicationRepository.Object,
+                publishingService.Object,
+                persistenceHelper.Object);
+        }
+
+        private (
+            Mock<ContentDbContext> ContentDbContext,
+            Mock<IMapper> Mapper,
+            Mock<IUserService> UserService,
+            Mock<IPublicationRepository> PublicationRepository,
+            Mock<IPublishingService> PublishingService,
+            Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, _topic.Id, _topic);
@@ -272,6 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IMapper>(),
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
+                new Mock<IPublishingService>(),
                 persistenceHelper);
         }
     }

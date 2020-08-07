@@ -121,6 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(SlugNotUnique);
                     }
 
+                    var oldSlug = publication.Slug;
+                    
                     publication.Title = updatedPublication.Title;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.MethodologyId = updatedPublication.MethodologyId;
@@ -148,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (publication.Published.HasValue)
                     {
-                        await _publishingService.PublicationChanged(publication.Id);
+                        await _publishingService.PublicationChanged(publication.Id, oldSlug);
                     }
 
                     return await GetViewModel(publication.Id);

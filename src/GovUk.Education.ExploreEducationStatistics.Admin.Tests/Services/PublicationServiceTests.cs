@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -39,8 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(methodology);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.CreatePublication(new SavePublicationViewModel()
@@ -89,12 +88,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication_FailsWithNonExistingTopic()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.CreatePublication(
@@ -115,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication_FailsWithNonExistingMethodology()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -127,8 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(topic);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.CreatePublication(
@@ -150,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication_FailsWithMethodologyAndExternalMethodology()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -168,12 +165,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(methodology);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.CreatePublication(
-                new SavePublicationViewModel()
+                new SavePublicationViewModel
                 {
                     Title = "Test title",
                     TopicId = topic.Id,
@@ -197,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication_FailsWithUnapprovedMethodology()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -215,8 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(methodology);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.CreatePublication(
@@ -238,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication_FailsWithNonUniqueSlug()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -255,8 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             });
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.CreatePublication(
@@ -277,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -315,8 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(publication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
@@ -364,7 +357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication_SavesNewContact()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -385,8 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(publication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
@@ -414,7 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication_SavesNewContactWhenSharedWithOtherPublication()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -446,11 +438,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Contact = sharedContact
             };
 
-            context.AddRange(publication, otherPublication);
+            await context.AddRangeAsync(publication, otherPublication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
@@ -479,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication_FailsWithNonExistingTopic()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -499,8 +490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(publication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
@@ -520,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication_FailsWithNonExistingMethodology()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -535,8 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(publication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
@@ -557,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication_FailsWithMethodologyAndExternalMethodology()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -572,8 +561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(publication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
@@ -599,7 +587,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication_FailsWithUnapprovedMethodology()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -620,8 +608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(publication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, new PersistenceHelper<ContentDbContext>(context));
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
@@ -642,7 +629,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication_FailsWithNonUniqueSlug()
         {
-            var (userService, repository, persistenceHelper) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -667,8 +654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(otherPublication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(context, AdminMapper(),
-                userService.Object, repository.Object, persistenceHelper.Object);
+            var publicationService = BuildPublicationService(context, mocks);
 
             // Service method under test
             var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
@@ -688,7 +674,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void PartialUpdateLegacyReleases_OnlyMatchingEntities()
         {
-            var (userService, repository, _) = Mocks();
+            var mocks = Mocks();
 
             await using var context = InMemoryApplicationDbContext();
 
@@ -714,13 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(publication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(
-                context,
-                AdminMapper(),
-                userService.Object,
-                repository.Object,
-                new PersistenceHelper<ContentDbContext>(context)
-            );
+            var publicationService = BuildPublicationService(context, mocks);
 
             var result = await publicationService.PartialUpdateLegacyReleases(
                 publication.Id,
@@ -753,8 +733,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void PartialUpdateLegacyReleases_OnlyNonNullFields()
         {
-            var (userService, repository, _) = Mocks();
-
+            var mocks = Mocks();
+            
             await using var context = InMemoryApplicationDbContext();
 
             var publication = new Publication
@@ -773,13 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             context.Add(publication);
             await context.SaveChangesAsync();
 
-            var publicationService = new PublicationService(
-                context,
-                AdminMapper(),
-                userService.Object,
-                repository.Object,
-                new PersistenceHelper<ContentDbContext>(context)
-            );
+            var publicationService = BuildPublicationService(context, mocks);
 
             var result = await publicationService.PartialUpdateLegacyReleases(
                 publication.Id,
@@ -802,19 +776,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(1, legacyReleases[0].Order);
         }
 
-        private (
-            Mock<IUserService>,
-            Mock<IPublicationRepository>,
-            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
+        private static PublicationService BuildPublicationService(ContentDbContext context,
+            (Mock<IUserService> userService,
+                Mock<IPublicationRepository> publicationRepository,
+                Mock<IPublishingService> publishingService) mocks)
         {
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall<ContentDbContext, Topic>(persistenceHelper);
-            MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
+            var (userService, publicationRepository, publishingService) = mocks;
 
+            return new PublicationService(
+                context,
+                AdminMapper(),
+                userService.Object,
+                publicationRepository.Object,
+                publishingService.Object,
+                new PersistenceHelper<ContentDbContext>(context));
+        }
+
+        private static (Mock<IUserService> UserService,
+            Mock<IPublicationRepository> PublicationRepository,
+            Mock<IPublishingService> PublishingService) Mocks()
+        {
             return (
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
-                persistenceHelper);
+                new Mock<IPublishingService>());
         }
     }
 }
