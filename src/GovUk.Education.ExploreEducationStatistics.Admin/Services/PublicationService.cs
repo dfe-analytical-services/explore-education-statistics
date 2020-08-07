@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
+        private readonly IPublishingService _publishingService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
         public PublicationService(
@@ -33,12 +34,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMapper mapper,
             IUserService userService,
             IPublicationRepository publicationRepository,
+            IPublishingService publishingService,
             IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
             _userService = userService;
             _publicationRepository = publicationRepository;
+            _publishingService = publishingService;
             _persistenceHelper = persistenceHelper;
         }
 
@@ -142,6 +145,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Publications.Update(publication);
 
                     await _context.SaveChangesAsync();
+
+                    if (publication.Published.HasValue)
+                    {
+                        await _publishingService.PublicationChanged(publication.Id);
+                    }
 
                     return await GetViewModel(publication.Id);
                 });

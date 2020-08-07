@@ -31,23 +31,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
             };
 
-            using (var context = InMemoryApplicationDbContext("RetryContentAndPublishing"))
+            using (var context = InMemoryApplicationDbContext("RetryReleaseStage"))
             {
                 context.Add(release);
                 context.SaveChanges();
             }
 
-            using (var context = InMemoryApplicationDbContext("RetryContentAndPublishing"))
+            using (var context = InMemoryApplicationDbContext("RetryReleaseStage"))
             {
                 var publishingService = BuildPublishingService(context, mocks);
-                var result = publishingService.RetryStage(release.Id, ContentAndPublishing).Result.Right;
+                var result = publishingService.RetryReleaseStage(release.Id, ContentAndPublishing).Result;
 
                 mocks.StorageQueueService.Verify(
                     mock => mock.AddMessagesAsync(RetryStageQueue,
                         It.Is<RetryStageMessage>(message =>
                             message.ReleaseId == release.Id && message.Stage == ContentAndPublishing)), Times.Once());
 
-                Assert.True(result);
+                Assert.True(result.IsRight);
+            }
+        }
+
+        [Fact]
+        public void ReleaseChanged()
+        {
+            var mocks = Mocks();
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+
+            using (var context = InMemoryApplicationDbContext("ReleaseChanged"))
+            {
+                context.Add(publication);
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("ReleaseChanged"))
+            {
+                var publishingService = BuildPublishingService(context, mocks);
+                var result = publishingService.ReleaseChanged(publication.Id, true).Result;
+
+                mocks.StorageQueueService.Verify(
+                    mock => mock.AddMessagesAsync(PublishPublicationQueue,
+                        It.Is<NotifyChangeMessage>(message =>
+                            message.ReleaseId == publication.Id && message.Immediate)), Times.Once());
+
+                Assert.True(result.IsRight);
+            }
+        }
+
+        [Fact]
+        public void PublicationChanged()
+        {
+            var mocks = Mocks();
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+
+            using (var context = InMemoryApplicationDbContext("PublicationChanged"))
+            {
+                context.Add(publication);
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("PublicationChanged"))
+            {
+                var publishingService = BuildPublishingService(context, mocks);
+                var result = publishingService.PublicationChanged(publication.Id).Result;
+
+                mocks.StorageQueueService.Verify(
+                    mock => mock.AddMessagesAsync(PublishPublicationQueue,
+                        It.Is<PublishPublicationMessage>(message =>
+                            message.PublicationId == publication.Id)), Times.Once());
+
+                Assert.True(result.IsRight);
             }
         }
 

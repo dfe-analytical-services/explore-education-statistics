@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         [FunctionName("PublishPublication")]
         // ReSharper disable once UnusedMember.Global
-        public void PublishPublication(
+        public async Task PublishPublication(
             [QueueTrigger(PublishPublicationQueue)]
             PublishPublicationMessage message,
             ExecutionContext executionContext,
@@ -33,8 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var context = new PublishContext(DateTime.UtcNow, false);
 
-            _contentService.UpdatePublication(context, message.PublicationId);
-            _publicationService.SetPublishedDate(message.PublicationId, context.Published);
+            await _contentService.UpdatePublication(context, message.PublicationId);
+            await _publicationService.SetPublishedDate(message.PublicationId, context.Published);
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
@@ -26,10 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
         /// <param name="releaseId"></param>
         /// <returns></returns>
         [HttpPut("bau/release/{releaseId}/publish/content")]
-        public async Task<ActionResult<bool>> RetryContentAndPublishing(Guid releaseId)
+        public async Task<ActionResult<Unit>> RetryContentAndPublishing(Guid releaseId)
         {
             return await _publishingService
-                .RetryStage(releaseId, ContentAndPublishing)
+                .RetryReleaseStage(releaseId, ContentAndPublishing)
                 .HandleFailuresOrOk();
         }
 
@@ -43,10 +44,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
         /// <param name="releaseId"></param>
         /// <returns></returns>
         [HttpPut("bau/release/{releaseId}/publish/data")]
-        public async Task<ActionResult<bool>> RetryStatisticsData(Guid releaseId)
+        public async Task<ActionResult<Unit>> RetryStatisticsData(Guid releaseId)
         {
             return await _publishingService
-                .RetryStage(releaseId, StatisticsData)
+                .RetryReleaseStage(releaseId, StatisticsData)
                 .HandleFailuresOrOk();
         }
     }

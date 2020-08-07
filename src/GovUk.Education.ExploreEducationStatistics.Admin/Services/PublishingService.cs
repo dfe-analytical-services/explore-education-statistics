@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// <param name="releaseId"></param>
         /// <param name="stage"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, bool>> RetryStage(Guid releaseId, RetryStage stage)
+        public async Task<Either<ActionResult, Unit>> RetryReleaseStage(Guid releaseId, RetryStage stage)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         RetryStageQueue, new RetryStageMessage(releaseId, stage));
 
                     _logger.LogTrace($"Sent retry stage message for Release: {releaseId}");
-                    return new Either<ActionResult, bool>(true);
+                    return new Either<ActionResult, Unit>(Unit.Instance);
                 });
         }
 
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// <param name="releaseId"></param>
         /// <param name="immediate">If true, runs all of the stages of the publishing workflow except that they are combined to act immediately.</param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, bool>> NotifyChange(Guid releaseId, bool immediate = false)
+        public async Task<Either<ActionResult, Unit>> ReleaseChanged(Guid releaseId, bool immediate = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -93,8 +93,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _storageQueueService.AddMessagesAsync(
                         NotifyChangeQueue, new NotifyChangeMessage(immediate, release.Id));
 
-                    _logger.LogTrace($"Sent validate message for Release: {releaseId}");
-                    return true;
+                    _logger.LogTrace($"Sent message for Release: {releaseId}");
+                    return Unit.Instance;
+                });
+        }
+
+        /// <summary>
+        /// Notify the Publisher that there has been a change to the Publication.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Either<ActionResult, Unit>> PublicationChanged(Guid id)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(id)
+                .OnSuccess(async release =>
+                {
+                    await _storageQueueService.AddMessagesAsync(
+                        PublishPublicationQueue, new PublishPublicationMessage(id));
+
+                    _logger.LogTrace($"Sent message for Publication: {id}");
+                    return Unit.Instance;
                 });
         }
     }
