@@ -1,0 +1,158 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using static System.Globalization.CultureInfo;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
+
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
+{
+    public class ReleaseViewModel
+    {
+        public Guid Id { get; set; }
+
+        public string Title { get; set; }
+
+        public Guid PublicationId { get; set; }
+
+        public string PublicationTitle { get; set; }
+
+        public string ReleaseName { get; set; }
+
+        public string YearTitle { get; set; }
+
+        public Guid? TypeId { get; set; }
+
+        public PartialDate NextReleaseDate { get; set; }
+
+        [JsonConverter(typeof(DateTimeToDateJsonConverter))]
+        public DateTime? PublishScheduled { get; set; }
+
+        public DateTime? Published { get; set; }
+
+        public bool Live => Published != null;
+
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
+        public TimeIdentifier? TimePeriodCoverage { get; set; }
+
+        public bool LatestRelease { get; set; }
+
+        public ReleaseType Type { get; set; }
+
+        public Contact Contact { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatus Status { get; set; }
+
+        public string InternalReleaseNote { get; set; }
+
+        public bool Amendment { get; set; }
+
+        public Guid PreviousVersionId { get; set; }
+    }
+
+    public class CreateReleaseViewModel
+    {
+        public Guid PublicationId { get; set; }
+
+        [Required] public Guid? TypeId { get; set; }
+
+        [Required]
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
+        public TimeIdentifier TimePeriodCoverage { get; set; }
+
+        [DateTimeFormatValidator("yyyy-MM-dd")]
+        public string PublishScheduled { get; set; }
+
+        public DateTime? PublishScheduledDate
+        {
+            get
+            {
+                if (PublishScheduled == null)
+                {
+                    return null;
+                }
+
+                DateTime.TryParseExact(
+                    PublishScheduled,
+                    "yyyy-MM-dd",
+                    InvariantCulture,
+                    DateTimeStyles.None,
+                    out var dateTime
+                );
+                return dateTime.AsStartOfDayUtc();
+            }
+        }
+
+        [PartialDateValidator] public PartialDate NextReleaseDate { get; set; }
+
+        [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; set; }
+
+        public string Slug => SlugFromTitle(Title);
+
+        private string Title => Format(Year, TimePeriodCoverage);
+
+        private int Year => int.Parse(ReleaseName);
+
+        public Guid? TemplateReleaseId { get; set; }
+    }
+
+    public class UpdateReleaseViewModel
+    {
+        [Required] public Guid PublicationId { get; set; }
+
+        [Required] public Guid TypeId { get; set; }
+
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
+        [Required]
+        public TimeIdentifier TimePeriodCoverage { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatus Status { get; set; }
+
+        public string InternalReleaseNote { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PublishMethod? PublishMethod { get; set; }
+
+        [DateTimeFormatValidator("yyyy-MM-dd")]
+        public string PublishScheduled { get; set; }
+
+        public DateTime? PublishScheduledDate
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(PublishScheduled))
+                {
+                    return null;
+                }
+
+                DateTime.TryParseExact(
+                    PublishScheduled,
+                    "yyyy-MM-dd",
+                    InvariantCulture,
+                    DateTimeStyles.None,
+                    out var dateTime
+                );
+                return dateTime.AsStartOfDayUtc();
+            }
+        }
+
+        [PartialDateValidator] public PartialDate NextReleaseDate { get; set; }
+
+        [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; set; }
+
+        public string Slug => SlugFromTitle(Title);
+
+        private string Title => Format(Year, TimePeriodCoverage);
+
+        private int Year => int.Parse(ReleaseName);
+    }
+}

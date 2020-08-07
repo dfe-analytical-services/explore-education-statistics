@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -75,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UpdateRelease()
         {
             AssertSecurityPoliciesChecked(
-                service => service.UpdateRelease(_release.Id, new UpdateReleaseRequest()), 
+                service => service.UpdateRelease(_release.Id, new UpdateReleaseViewModel()), 
                 _release, 
                 CanUpdateSpecificRelease);
         }
@@ -84,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UpdateRelease_Draft()
         {
             AssertSecurityPoliciesChecked(service => 
-                service.UpdateRelease(_release.Id, new UpdateReleaseRequest() {
+                service.UpdateRelease(_release.Id, new UpdateReleaseViewModel() {
                     Status = ReleaseStatus.Draft
                 }),  
                 _release,
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UpdateRelease_SubmitForHigherLevelReview()
         {
             AssertSecurityPoliciesChecked(service => 
-                service.UpdateRelease(_release.Id, new UpdateReleaseRequest() {
+                service.UpdateRelease(_release.Id, new UpdateReleaseViewModel() {
                     Status = ReleaseStatus.HigherLevelReview
                 }),  
                 _release,
@@ -108,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UpdateRelease_Approve()
         {
             AssertSecurityPoliciesChecked(service => 
-                service.UpdateRelease(_release.Id, new UpdateReleaseRequest() {
+                service.UpdateRelease(_release.Id, new UpdateReleaseViewModel() {
                     Status = ReleaseStatus.Approved
                 }),  
                 _release,
