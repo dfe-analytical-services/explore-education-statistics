@@ -8,6 +8,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public class CamelCaseTests
         {
             [Fact]
+            public void NullStringCanAppendTrailingSlash()
+            {
+                string input = null;
+                Assert.Null(input.AppendTrailingSlash());
+            }
+
+            [Fact]
+            public void EmptyStringCanAppendTrailingSlash()
+            {
+                Assert.Equal("/", string.Empty.AppendTrailingSlash());
+            }
+
+            [Fact]
+            public void AppendTrailingSlash()
+            {
+                Assert.Equal("foo/", "foo".AppendTrailingSlash());
+            }
+            
+            [Fact]
             public void NullStringCanBeCamelCased()
             {
                 string input = null;
