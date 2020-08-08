@@ -136,8 +136,8 @@ const ManagePublicationsAndReleasesTab = () => {
       <LoadingSpinner loading={loadingThemes}>
         {themes && themes.length > 0 ? (
           <>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-one-half">
+            <div className="dfe-flex dfe-flex-wrap">
+              <div className="govuk-!-margin-right-4">
                 <FormSelect
                   id="selectTheme"
                   label="Select theme"
@@ -179,7 +179,7 @@ const ManagePublicationsAndReleasesTab = () => {
                   }}
                 />
               </div>
-              <div className="govuk-grid-column-one-half">
+              <div>
                 <FormSelect
                   id="selectTopic"
                   label="Select topic"
@@ -219,6 +219,7 @@ const ManagePublicationsAndReleasesTab = () => {
                 />
               </div>
             </div>
+
             <hr />
 
             {selectedTheme && selectedTopic && (
