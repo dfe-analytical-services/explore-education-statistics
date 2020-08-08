@@ -2,10 +2,10 @@ import authService from '@admin/components/api-authorization/AuthorizeService';
 import permissionService, {
   GlobalPermissions,
 } from '@admin/services/permissionService';
+import logger from '@common/services/logger';
 import React, {
   createContext,
   ReactNode,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -15,17 +15,25 @@ import React, {
 export interface User {
   id: string;
   name: string;
-  permissions: GlobalPermissions;
   validToken?: boolean;
+  permissions: GlobalPermissions;
 }
 
-export interface Authentication {
+const defaultPermissions: GlobalPermissions = {
+  canAccessSystem: false,
+  canAccessPrereleasePages: false,
+  canAccessAnalystPages: false,
+  canAccessUserAdministrationPages: false,
+  canAccessMethodologyAdministrationPages: false,
+};
+
+export interface AuthContextState {
   user?: User;
 }
 
-export const AuthContext = createContext<Authentication>({
-  user: undefined,
-});
+export const AuthContext = createContext<AuthContextState | undefined>(
+  undefined,
+);
 
 interface Props {
   children: ReactNode;
@@ -37,80 +45,71 @@ interface State {
 }
 
 export const AuthContextProvider = ({ children }: Props) => {
-  const [authState, setAuthState] = useState<State>({
-    ready: false,
-    user: undefined,
-  });
-
-  const populateAuthenticationState = useCallback(async () => {
-    const authenticated = await authService.isAuthenticated();
-
-    if (authenticated) {
-      try {
-        const userProfile = await authService.getUser();
-        const { profile } = userProfile;
-        const userId = profile.sub;
-        const validToken = new Date() < new Date(userProfile.expires_at * 1000);
-
-        const permissions = validToken
-          ? await permissionService.getGlobalPermissions()
-          : {
-              canAccessSystem: false,
-              canAccessPrereleasePages: false,
-              canAccessAnalystPages: false,
-              canAccessUserAdministrationPages: false,
-              canAccessMethodologyAdministrationPages: false,
-            };
-
-        const user: User = {
-          id: userId,
-          name: profile.given_name,
-          permissions,
-          validToken: new Date() < new Date(userProfile.expires_at * 1000),
-        };
-
-        setAuthState({
-          ready: true,
-          user,
-        });
-      } catch (_) {
-        setAuthState({
-          ready: false,
-          user: undefined,
-        });
-      }
-    } else {
-      setAuthState({
-        ready: true,
-        user: undefined,
-      });
-    }
-  }, []);
+  const [state, setState] = useState<State>({ ready: false });
 
   useEffect(() => {
-    const subscriptionId = authService.subscribe(async () => {
-      await populateAuthenticationState();
+    const populateAuthenticationState = async () => {
+      const authenticated = await authService.isAuthenticated();
+
+      if (authenticated) {
+        try {
+          const userProfile = await authService.getUser();
+          const { profile } = userProfile;
+          const userId = profile.sub;
+
+          const validToken =
+            new Date() < new Date(userProfile.expires_at * 1000);
+
+          const permissions = validToken
+            ? await permissionService.getGlobalPermissions()
+            : defaultPermissions;
+
+          setState({
+            ready: true,
+            user: {
+              id: userId,
+              name: profile.given_name,
+              validToken,
+              permissions,
+            },
+          });
+        } catch (err) {
+          logger.error(err);
+
+          setState({ ready: false });
+        }
+      } else {
+        setState({ ready: true });
+      }
+    };
+
+    let subscriptionId: number;
+
+    populateAuthenticationState().then(() => {
+      subscriptionId = authService.subscribe(async () => {
+        await populateAuthenticationState();
+      });
     });
 
-    populateAuthenticationState();
-
     return () => {
-      authService.unsubscribe(subscriptionId);
+      if (typeof subscriptionId !== 'undefined') {
+        authService.unsubscribe(subscriptionId);
+      }
     };
-  }, [populateAuthenticationState]);
+  }, []);
 
-  const loginContext: Authentication = useMemo(
-    () => ({
-      user: authState.user,
-    }),
-    [authState.user],
-  );
+  const contextState: AuthContextState = useMemo(() => {
+    return {
+      user: state.user,
+    };
+  }, [state.user]);
 
-  return authState.ready ? (
-    <AuthContext.Provider value={loginContext}>{children}</AuthContext.Provider>
+  return state.ready ? (
+    <AuthContext.Provider value={contextState}>{children}</AuthContext.Provider>
   ) : null;
 };
 
-export function useAuthContext() {
-  return useContext(AuthContext);
+export function useAuthContext(): AuthContextState {
+  const context = useContext(AuthContext);
+  return context ?? {};
 }
