@@ -21,10 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var topic = new Topic
             {
                 Title = "Test topic"
@@ -35,62 +31,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = MethodologyStatus.Approved,
             };
 
-            context.Add(topic);
-            context.Add(methodology);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.CreatePublication(new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "Test publication",
-                Contact = new SaveContactViewModel
-                {
-                    ContactName = "John Smith",
-                    ContactTelNo = "0123456789",
-                    TeamName = "Test team",
-                    TeamEmail = "john.smith@test.com",
-                },
-                TopicId = topic.Id,
-                MethodologyId = methodology.Id
-            });
+                context.Add(topic);
+                context.Add(methodology);
+                await context.SaveChangesAsync();
+            }
 
-            var publicationViewModel = result.Right;
-            Assert.Equal("Test publication", publicationViewModel.Title);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            Assert.Equal("John Smith", publicationViewModel.Contact.ContactName);
-            Assert.Equal("0123456789", publicationViewModel.Contact.ContactTelNo);
-            Assert.Equal("Test team", publicationViewModel.Contact.TeamName);
-            Assert.Equal("john.smith@test.com", publicationViewModel.Contact.TeamEmail);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            Assert.Equal(topic.Id, publicationViewModel.TopicId);
+                // Service method under test
+                var result = await publicationService.CreatePublication(
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Test publication",
+                        Contact = new SaveContactViewModel
+                        {
+                            ContactName = "John Smith",
+                            ContactTelNo = "0123456789",
+                            TeamName = "Test team",
+                            TeamEmail = "john.smith@test.com",
+                        },
+                        TopicId = topic.Id,
+                        MethodologyId = methodology.Id
+                    }
+                );
 
-            Assert.Equal(methodology.Id, publicationViewModel.Methodology.Id);
-            Assert.Equal("Test methodology", publicationViewModel.Methodology.Title);
+                var publicationViewModel = result.Right;
+                Assert.Equal("Test publication", publicationViewModel.Title);
 
-            // Do an in depth check of the saved release
-            var createdPublication = context.Publications.Single(p => p.Id == publicationViewModel.Id);
-            Assert.Equal("Test publication", createdPublication.Title);
+                Assert.Equal("John Smith", publicationViewModel.Contact.ContactName);
+                Assert.Equal("0123456789", publicationViewModel.Contact.ContactTelNo);
+                Assert.Equal("Test team", publicationViewModel.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", publicationViewModel.Contact.TeamEmail);
 
-            Assert.Equal("John Smith", createdPublication.Contact.ContactName);
-            Assert.Equal("0123456789", createdPublication.Contact.ContactTelNo);
-            Assert.Equal("Test team", createdPublication.Contact.TeamName);
-            Assert.Equal("john.smith@test.com", createdPublication.Contact.TeamEmail);
+                Assert.Equal(topic.Id, publicationViewModel.TopicId);
 
-            Assert.Equal(topic.Id, createdPublication.TopicId);
-            Assert.Equal("Test topic", createdPublication.Topic.Title);
+                Assert.Equal(methodology.Id, publicationViewModel.Methodology.Id);
+                Assert.Equal("Test methodology", publicationViewModel.Methodology.Title);
 
-            Assert.Equal(methodology.Id, createdPublication.Methodology.Id);
-            Assert.Equal("Test methodology", createdPublication.Methodology.Title);
+                // Do an in depth check of the saved release
+                var createdPublication = context.Publications.Single(p => p.Id == publicationViewModel.Id);
+                Assert.Equal("Test publication", createdPublication.Title);
+
+                Assert.Equal("John Smith", createdPublication.Contact.ContactName);
+                Assert.Equal("0123456789", createdPublication.Contact.ContactTelNo);
+                Assert.Equal("Test team", createdPublication.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", createdPublication.Contact.TeamEmail);
+
+                Assert.Equal(topic.Id, createdPublication.TopicId);
+                Assert.Equal("Test topic", createdPublication.Topic.Title);
+
+                Assert.Equal(methodology.Id, createdPublication.Methodology.Id);
+                Assert.Equal("Test methodology", createdPublication.Methodology.Title);
+            }
         }
 
         [Fact]
         public async void CreatePublication_FailsWithNonExistingTopic()
         {
-            var mocks = Mocks();
-
             await using var context = InMemoryApplicationDbContext();
+
+            var mocks = Mocks();
 
             var publicationService = BuildPublicationService(context, mocks);
 
@@ -113,44 +121,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CreatePublication_FailsWithNonExistingMethodology()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var topic = new Topic
             {
                 Title = "Test topic"
             };
 
-            context.Add(topic);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(topic);
+                await context.SaveChangesAsync();
+            }
 
-            // Service method under test
-            var result = await publicationService.CreatePublication(
-                new SavePublicationViewModel()
-                {
-                    Title = "Test title",
-                    TopicId = topic.Id,
-                    MethodologyId = Guid.NewGuid(),
-                });
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            Assert.True(result.IsLeft);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                // Service method under test
+                var result = await publicationService.CreatePublication(
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Test title",
+                        TopicId = topic.Id,
+                        MethodologyId = Guid.NewGuid(),
+                    }
+                );
 
-            Assert.Equal("METHODOLOGY_DOES_NOT_EXIST", details.Errors[""].First());
+                Assert.True(result.IsLeft);
+
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+                Assert.Equal("METHODOLOGY_DOES_NOT_EXIST", details.Errors[""].First());
+            }
         }
 
         [Fact]
         public async void CreatePublication_FailsWithMethodologyAndExternalMethodology()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var topic = new Topic
             {
                 Title = "Test topic"
@@ -161,42 +172,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = MethodologyStatus.Approved,
             };
 
-            context.Add(topic);
-            context.Add(methodology);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(topic);
+                context.Add(methodology);
+                await context.SaveChangesAsync();
+            }
 
-            // Service method under test
-            var result = await publicationService.CreatePublication(
-                new SavePublicationViewModel
-                {
-                    Title = "Test title",
-                    TopicId = topic.Id,
-                    MethodologyId = methodology.Id,
-                    ExternalMethodology = new ExternalMethodology
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
+
+                var publicationService = BuildPublicationService(context, mocks);
+
+                // Service method under test
+                var result = await publicationService.CreatePublication(
+                    new SavePublicationViewModel()
                     {
-                        Title = "Test external",
-                        Url = "http://test.com"
+                        Title = "Test title",
+                        TopicId = topic.Id,
+                        MethodologyId = methodology.Id,
+                        ExternalMethodology = new ExternalMethodology
+                        {
+                            Title = "Test external",
+                            Url = "http://test.com"
+                        }
                     }
-                });
+                );
 
-            Assert.True(result.IsLeft);
+                Assert.True(result.IsLeft);
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
 
-            Assert.Equal("CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY", details.Errors[""].First());
+                Assert.Equal("CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY", details.Errors[""].First());
+            }
         }
 
 
         [Fact]
         public async void CreatePublication_FailsWithUnapprovedMethodology()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var topic = new Topic
             {
                 Title = "Test topic"
@@ -207,74 +225,92 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = MethodologyStatus.Draft,
             };
 
-            context.Add(topic);
-            context.Add(methodology);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(topic);
+                context.Add(methodology);
+                await context.SaveChangesAsync();
+            }
 
-            // Service method under test
-            var result = await publicationService.CreatePublication(
-                new SavePublicationViewModel()
-                {
-                    Title = "Test title",
-                    TopicId = topic.Id,
-                    MethodologyId = methodology.Id,
-                });
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            Assert.True(result.IsLeft);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                // Service method under test
+                var result = await publicationService.CreatePublication(
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Test title",
+                        TopicId = topic.Id,
+                        MethodologyId = methodology.Id,
+                    }
+                );
 
-            Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
+                Assert.True(result.IsLeft);
+
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+                Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
+            }
         }
 
         [Fact]
         public async void CreatePublication_FailsWithNonUniqueSlug()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var topic = new Topic
             {
                 Title = "Test topic"
             };
 
-            context.Add(topic);
-            context.Add(new Publication
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "Test publication",
-                Slug = "test-publication"
-            });
-            await context.SaveChangesAsync();
+                context.Add(topic);
+                context.Add(
+                    new Publication
+                    {
+                        Title = "Test publication",
+                        Slug = "test-publication"
+                    }
+                );
 
-            var publicationService = BuildPublicationService(context, mocks);
+                await context.SaveChangesAsync();
+            }
 
-            // Service method under test
-            var result = await publicationService.CreatePublication(
-                new SavePublicationViewModel()
-                {
-                    Title = "Test publication",
-                    TopicId = topic.Id
-                });
 
-            Assert.True(result.IsLeft);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+                // Service method under test
+                var result = await publicationService.CreatePublication(
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Test publication",
+                        TopicId = topic.Id
+                    }
+                );
+
+                Assert.True(result.IsLeft);
+
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+            }
         }
 
         [Fact]
         public async void UpdatePublication()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var topic = new Topic
             {
                 Title = "New topic"
@@ -304,63 +340,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            context.Add(topic);
-            context.Add(methodology);
-            context.Add(publication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "New title",
-                Contact = new SaveContactViewModel
-                {
-                    ContactName = "John Smith",
-                    ContactTelNo = "0123456789",
-                    TeamName = "Test team",
-                    TeamEmail = "john.smith@test.com",
-                },
-                TopicId = topic.Id,
-                MethodologyId = methodology.Id,
-            });
+                context.Add(topic);
+                context.Add(methodology);
+                context.Add(publication);
 
-            Assert.Equal("New title", result.Right.Title);
+                await context.SaveChangesAsync();
+            }
 
-            Assert.Equal("John Smith", result.Right.Contact.ContactName);
-            Assert.Equal("0123456789", result.Right.Contact.ContactTelNo);
-            Assert.Equal("Test team", result.Right.Contact.TeamName);
-            Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            Assert.Equal(topic.Id, result.Right.TopicId);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            Assert.Equal(methodology.Id, result.Right.Methodology.Id);
-            Assert.Equal("New methodology", result.Right.Methodology.Title);
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "New title",
+                        Contact = new SaveContactViewModel
+                        {
+                            ContactName = "John Smith",
+                            ContactTelNo = "0123456789",
+                            TeamName = "Test team",
+                            TeamEmail = "john.smith@test.com",
+                        },
+                        TopicId = topic.Id,
+                        MethodologyId = methodology.Id,
+                    }
+                );
 
-            // Do an in depth check of the saved release
-            var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
-            Assert.Equal("New title", updatedPublication.Title);
+                Assert.Equal("New title", result.Right.Title);
 
-            Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
-            Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
-            Assert.Equal("Test team", updatedPublication.Contact.TeamName);
-            Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+                Assert.Equal("John Smith", result.Right.Contact.ContactName);
+                Assert.Equal("0123456789", result.Right.Contact.ContactTelNo);
+                Assert.Equal("Test team", result.Right.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
 
-            Assert.Equal(topic.Id, updatedPublication.TopicId);
-            Assert.Equal("New topic", updatedPublication.Topic.Title);
+                Assert.Equal(topic.Id, result.Right.TopicId);
 
-            Assert.Equal(methodology.Id, updatedPublication.MethodologyId);
-            Assert.Equal("New methodology", updatedPublication.Methodology.Title);
+                Assert.Equal(methodology.Id, result.Right.Methodology.Id);
+                Assert.Equal("New methodology", result.Right.Methodology.Title);
+
+                // Do an in depth check of the saved release
+                var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+                Assert.Equal("New title", updatedPublication.Title);
+
+                Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
+                Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
+                Assert.Equal("Test team", updatedPublication.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+
+                Assert.Equal(topic.Id, updatedPublication.TopicId);
+                Assert.Equal("New topic", updatedPublication.Topic.Title);
+
+                Assert.Equal(methodology.Id, updatedPublication.MethodologyId);
+                Assert.Equal("New methodology", updatedPublication.Methodology.Title);
+            }
         }
 
         [Fact]
         public async void UpdatePublication_SavesNewContact()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var publication = new Publication
             {
                 Title = "Test title",
@@ -375,41 +421,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            context.Add(publication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "New title",
-                Contact = new SaveContactViewModel
-                {
-                    ContactName = "John Smith",
-                    ContactTelNo = "0123456789",
-                    TeamName = "Test team",
-                    TeamEmail = "john.smith@test.com",
-                },
-                TopicId = publication.TopicId,
-                MethodologyId = publication.MethodologyId,
-            });
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
 
-            var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
-            Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
-            Assert.Equal("Test team", updatedPublication.Contact.TeamName);
-            Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+                var publicationService = BuildPublicationService(context, mocks);
+
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "New title",
+                        Contact = new SaveContactViewModel
+                        {
+                            ContactName = "John Smith",
+                            ContactTelNo = "0123456789",
+                            TeamName = "Test team",
+                            TeamEmail = "john.smith@test.com",
+                        },
+                        TopicId = publication.TopicId,
+                        MethodologyId = publication.MethodologyId,
+                    }
+                );
+
+                var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+
+                Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
+                Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
+                Assert.Equal("Test team", updatedPublication.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+            }
         }
 
         [Fact]
         public async void UpdatePublication_SavesNewContactWhenSharedWithOtherPublication()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var sharedContact = new Contact
             {
                 Id = Guid.NewGuid(),
@@ -438,42 +493,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Contact = sharedContact
             };
 
-            await context.AddRangeAsync(publication, otherPublication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "New title",
-                Contact = new SaveContactViewModel
-                {
-                    ContactName = "John Smith",
-                    ContactTelNo = "0123456789",
-                    TeamName = "Test team",
-                    TeamEmail = "john.smith@test.com",
-                },
-                TopicId = publication.TopicId,
-                MethodologyId = publication.MethodologyId,
-            });
+                await context.AddRangeAsync(publication, otherPublication);
+                await context.SaveChangesAsync();
+            }
 
-            var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            Assert.NotEqual(sharedContact.Id, updatedPublication.Contact.Id);
-            Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
-            Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
-            Assert.Equal("Test team", updatedPublication.Contact.TeamName);
-            Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+                var publicationService = BuildPublicationService(context, mocks);
+
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "New title",
+                        Contact = new SaveContactViewModel
+                        {
+                            ContactName = "John Smith",
+                            ContactTelNo = "0123456789",
+                            TeamName = "Test team",
+                            TeamEmail = "john.smith@test.com",
+                        },
+                        TopicId = publication.TopicId,
+                        MethodologyId = publication.MethodologyId,
+                    }
+                );
+
+                var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+
+                Assert.NotEqual(sharedContact.Id, updatedPublication.Contact.Id);
+                Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
+                Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
+                Assert.Equal("Test team", updatedPublication.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+            }
         }
 
         [Fact]
         public async void UpdatePublication_FailsWithNonExistingTopic()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var publication = new Publication
             {
                 Title = "Test publication",
@@ -487,33 +551,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            context.Add(publication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "Test publication",
-                TopicId = Guid.NewGuid(),
-            });
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
 
-            Assert.True(result.IsLeft);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            Assert.Equal("TOPIC_DOES_NOT_EXIST", details.Errors[""].First());
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Test publication",
+                        TopicId = Guid.NewGuid(),
+                    }
+                );
+
+                Assert.True(result.IsLeft);
+
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+                Assert.Equal("TOPIC_DOES_NOT_EXIST", details.Errors[""].First());
+            }
         }
 
         [Fact]
         public async void UpdatePublication_FailsWithNonExistingMethodology()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var publication = new Publication
             {
                 Topic = new Topic
@@ -522,34 +595,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            context.Add(publication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "Test publication",
-                TopicId = publication.TopicId,
-                MethodologyId = Guid.NewGuid(),
-            });
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
 
-            Assert.True(result.IsLeft);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            Assert.Equal("METHODOLOGY_DOES_NOT_EXIST", details.Errors[""].First());
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Test publication",
+                        TopicId = publication.TopicId,
+                        MethodologyId = Guid.NewGuid(),
+                    }
+                );
+
+                Assert.True(result.IsLeft);
+
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+                Assert.Equal("METHODOLOGY_DOES_NOT_EXIST", details.Errors[""].First());
+            }
         }
 
         [Fact]
         public async void UpdatePublication_FailsWithMethodologyAndExternalMethodology()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var publication = new Publication
             {
                 Topic = new Topic
@@ -558,39 +640,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            context.Add(publication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "Test publication",
-                TopicId = publication.TopicId,
-                MethodologyId = Guid.NewGuid(),
-                ExternalMethodology = new ExternalMethodology
-                {
-                    Title = "Test external",
-                    Url = "http://test.com"
-                }
-            });
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
 
-            Assert.True(result.IsLeft);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            Assert.Equal("CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY", details.Errors[""].First());
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Test publication",
+                        TopicId = publication.TopicId,
+                        MethodologyId = Guid.NewGuid(),
+                        ExternalMethodology = new ExternalMethodology
+                        {
+                            Title = "Test external",
+                            Url = "http://test.com"
+                        }
+                    }
+                );
+
+                Assert.True(result.IsLeft);
+
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+                Assert.Equal("CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY", details.Errors[""].First());
+            }
         }
 
         [Fact]
         public async void UpdatePublication_FailsWithUnapprovedMethodology()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var methodology = new Methodology
             {
                 Title = "Test methodology",
@@ -604,35 +695,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            context.Add(methodology);
-            context.Add(publication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "Test publication",
-                TopicId = publication.TopicId,
-                MethodologyId = methodology.Id,
-            });
+                context.Add(methodology);
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
 
-            Assert.True(result.IsLeft);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Test publication",
+                        TopicId = publication.TopicId,
+                        MethodologyId = methodology.Id,
+                    }
+                );
+
+                Assert.True(result.IsLeft);
+
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+                Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
+            }
         }
 
         [Fact]
         public async void UpdatePublication_FailsWithNonUniqueSlug()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var topic = new Topic
             {
                 Title = "Topic title"
@@ -650,34 +750,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Topic = topic
             };
 
-            context.Add(publication);
-            context.Add(otherPublication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
-
-            // Service method under test
-            var result = await publicationService.UpdatePublication(publication.Id, new SavePublicationViewModel()
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Title = "Duplicated title",
-                TopicId = topic.Id,
-            });
+                context.Add(publication);
+                context.Add(otherPublication);
+                await context.SaveChangesAsync();
+            }
 
-            Assert.True(result.IsLeft);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+                var publicationService = BuildPublicationService(context, mocks);
 
-            Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "Duplicated title",
+                        TopicId = topic.Id,
+                    }
+                );
+
+                Assert.True(result.IsLeft);
+
+                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+            }
         }
 
         [Fact]
         public async void PartialUpdateLegacyReleases_OnlyMatchingEntities()
         {
-            var mocks = Mocks();
-
-            await using var context = InMemoryApplicationDbContext();
-
             var publication = new Publication
             {
                 LegacyReleases = new List<LegacyRelease>
@@ -697,45 +806,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            context.Add(publication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
 
-            var result = await publicationService.PartialUpdateLegacyReleases(
-                publication.Id,
-                new List<PartialUpdateLegacyReleaseViewModel>
-                {
-                    new PartialUpdateLegacyReleaseViewModel
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
+
+                var publicationService = BuildPublicationService(context, mocks);
+
+                var result = await publicationService.PartialUpdateLegacyReleases(
+                    publication.Id,
+                    new List<PartialUpdateLegacyReleaseViewModel>
                     {
-                        Id = publication.LegacyReleases[0].Id,
-                        Description = "Updated description 1",
-                        Url = "http://updated-test1.com",
-                        Order = 3
+                        new PartialUpdateLegacyReleaseViewModel
+                        {
+                            Id = publication.LegacyReleases[0].Id,
+                            Description = "Updated description 1",
+                            Url = "http://updated-test1.com",
+                            Order = 3
+                        }
                     }
-                });
+                );
 
-            var legacyReleases = result.Right;
+                var legacyReleases = result.Right;
 
-            Assert.Equal(2, legacyReleases.Count);
+                Assert.Equal(2, legacyReleases.Count);
 
-            Assert.Equal(publication.LegacyReleases[0].Id, legacyReleases[0].Id);
-            Assert.Equal("Updated description 1", legacyReleases[0].Description);
-            Assert.Equal("http://updated-test1.com", legacyReleases[0].Url);
-            Assert.Equal(3, legacyReleases[0].Order);
+                Assert.Equal(publication.LegacyReleases[0].Id, legacyReleases[0].Id);
+                Assert.Equal("Updated description 1", legacyReleases[0].Description);
+                Assert.Equal("http://updated-test1.com", legacyReleases[0].Url);
+                Assert.Equal(3, legacyReleases[0].Order);
 
-            Assert.Equal(publication.LegacyReleases[1].Id, legacyReleases[1].Id);
-            Assert.Equal("Test description 2", legacyReleases[1].Description);
-            Assert.Equal("http://test2.com", legacyReleases[1].Url);
-            Assert.Equal(2, legacyReleases[1].Order);
+                Assert.Equal(publication.LegacyReleases[1].Id, legacyReleases[1].Id);
+                Assert.Equal("Test description 2", legacyReleases[1].Description);
+                Assert.Equal("http://test2.com", legacyReleases[1].Url);
+                Assert.Equal(2, legacyReleases[1].Order);
+            }
         }
 
         [Fact]
         public async void PartialUpdateLegacyReleases_OnlyNonNullFields()
         {
-            var mocks = Mocks();
-            
-            await using var context = InMemoryApplicationDbContext();
 
             var publication = new Publication
             {
@@ -750,30 +867,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            context.Add(publication);
-            await context.SaveChangesAsync();
+            var contextId = Guid.NewGuid().ToString();
 
-            var publicationService = BuildPublicationService(context, mocks);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
 
-            var result = await publicationService.PartialUpdateLegacyReleases(
-                publication.Id,
-                new List<PartialUpdateLegacyReleaseViewModel>
-                {
-                    new PartialUpdateLegacyReleaseViewModel
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
+
+                var publicationService = BuildPublicationService(context, mocks);
+
+                var result = await publicationService.PartialUpdateLegacyReleases(
+                    publication.Id,
+                    new List<PartialUpdateLegacyReleaseViewModel>
                     {
-                        Id = publication.LegacyReleases[0].Id,
-                        Description = "Updated description 1",
+                        new PartialUpdateLegacyReleaseViewModel
+                        {
+                            Id = publication.LegacyReleases[0].Id,
+                            Description = "Updated description 1",
+                        }
                     }
-                });
+                );
 
-            var legacyReleases = result.Right;
+                var legacyReleases = result.Right;
 
-            Assert.Single(legacyReleases);
+                Assert.Single(legacyReleases);
 
-            Assert.Equal(publication.LegacyReleases[0].Id, legacyReleases[0].Id);
-            Assert.Equal("Updated description 1", legacyReleases[0].Description);
-            Assert.Equal("http://test1.com", legacyReleases[0].Url);
-            Assert.Equal(1, legacyReleases[0].Order);
+                Assert.Equal(publication.LegacyReleases[0].Id, legacyReleases[0].Id);
+                Assert.Equal("Updated description 1", legacyReleases[0].Description);
+                Assert.Equal("http://test1.com", legacyReleases[0].Url);
+                Assert.Equal(1, legacyReleases[0].Order);
+            }
         }
 
         private static PublicationService BuildPublicationService(ContentDbContext context,
