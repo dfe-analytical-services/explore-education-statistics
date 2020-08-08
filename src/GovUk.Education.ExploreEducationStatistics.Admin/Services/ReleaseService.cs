@@ -29,6 +29,7 @@ using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Servic
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -279,7 +280,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
+                .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
+                .OnSuccessDo(async release => await ValidateSelectedPublication(release, request.PublicationId))
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
                 .OnSuccessDo(async release => await CheckAllDataFilesUploaded(release, request.Status))
                 .OnSuccessDo(async release => await CheckMethodologyHasBeenApproved(release, request.Status))
@@ -328,6 +330,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return await GetReleaseForIdAsync(releaseId);
                 });
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateSelectedPublication(Release release, Guid publicationId)
+        {
+            if (release.PublicationId == publicationId)
+            {
+                return Unit.Instance;
+            }
+
+            return await _persistenceHelper.CheckEntityExists<Publication>(publicationId)
+                .OnFailureFailWith(() => ValidationActionResult(PublicationDoesNotExist))
+                .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
+                .OnSuccess(_ => Unit.Instance);
         }
 
         public async Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId)

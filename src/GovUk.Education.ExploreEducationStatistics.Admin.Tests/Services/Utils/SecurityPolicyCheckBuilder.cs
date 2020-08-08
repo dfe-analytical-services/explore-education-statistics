@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -22,6 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils
             return this;
         }
 
+        public SecurityPolicyCheckBuilder ExpectCheckToFail(SecurityPolicies policy)
+        {
+            return ExpectCheck(policy, false);
+        }
+
         public SecurityPolicyCheckBuilder ExpectResourceCheck(
             object resource,
             SecurityPolicies policy,
@@ -32,6 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils
                 .ReturnsAsync(checkResult);
 
             return this;
+        }
+
+        public SecurityPolicyCheckBuilder ExpectResourceCheckToFail(object resource, SecurityPolicies policy)
+        {
+            return ExpectResourceCheck(resource, policy, false);
         }
 
         public Mock<IUserService> GetUserServiceMock()

@@ -469,6 +469,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async void UpdateRelease_FailsNonExistingPublication()
+        {
+            var releaseType = new ReleaseType
+            {
+                Title = "Ad Hoc"
+            };
+
+            var releaseId = Guid.NewGuid();
+            var release = new Release
+            {
+                Id = releaseId,
+                Type = releaseType,
+                Publication = new Publication
+                {
+                    Title = "Old publication"
+                },
+                ReleaseName = "2030",
+                Slug = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0,
+                PreviousVersionId = releaseId
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(releaseType);
+                context.Add(release);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
+
+                var result = await releaseService
+                    .UpdateRelease(
+                        releaseId,
+                        new UpdateReleaseViewModel
+                        {
+                            PublicationId = Guid.NewGuid(),
+                            PublishScheduled = "2051-06-30",
+                            TypeId = releaseType.Id,
+                            ReleaseName = "2035",
+                            TimePeriodCoverage = TimeIdentifier.CalendarYear
+                        }
+                    );
+
+                Assert.True(result.IsLeft);
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+                Assert.Equal("PUBLICATION_DOES_NOT_EXIST", details.Errors[""].First());
+            }
+        }
+
+        [Fact]
         public async void UpdateRelease_Amendment_NoUniqueSlugFailure()
         {
             var releaseType = new ReleaseType
@@ -504,7 +562,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 1,
                 PreviousVersionId = initialRelease.Id
             };
-
 
             var contextId = Guid.NewGuid().ToString();
 
