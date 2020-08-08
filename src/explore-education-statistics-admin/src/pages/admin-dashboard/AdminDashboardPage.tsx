@@ -1,6 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import PageTitle from '@admin/components/PageTitle';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import DraftReleasesTab from '@admin/pages/admin-dashboard/components/DraftReleasesTab';
 import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
@@ -45,22 +46,26 @@ const AdminDashboardPage = () => {
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <span className="govuk-caption-xl">Welcome</span>
-          <h1 className="govuk-heading-xl">
-            {user ? user.name : ''}{' '}
-            <span className="govuk-body-s">
-              Not you?{' '}
-              <li className="govuk-header__navigation-item">
-                <Link className="govuk-link" to={loginService.getSignOutLink()}>
-                  Sign out
-                </Link>
-              </li>
-            </span>
-          </h1>
+          <PageTitle
+            caption={`Welcome ${user?.name}`}
+            title="Dashboard"
+            className="govuk-!-margin-bottom-4"
+          />
+
+          <p className="govuk-body-s">
+            {user && (
+              <>
+                Logged in as <strong>{user?.name}</strong>. Not you?{' '}
+              </>
+            )}
+            <Link className="govuk-link" to={loginService.getSignOutLink()}>
+              Sign out
+            </Link>
+          </p>
 
           <p>This is your administration dashboard - here you can:</p>
 
-          <ul className="govuk-bullet--list govuk-!-margin-bottom-9">
+          <ul className="govuk-!-margin-bottom-6">
             <li>
               <Link to="/dashboard">manage publications and releases</Link>
             </li>

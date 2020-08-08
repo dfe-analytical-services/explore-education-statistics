@@ -1,24 +1,30 @@
+import classNames from 'classnames';
 import React from 'react';
 import { Helmet } from 'react-helmet';
 
 interface Props {
   caption?: string;
+  className?: string;
   title: string;
 }
 
-const PageTitle = ({ caption, title }: Props) => {
+const PageTitle = ({ caption, className, title }: Props) => {
   return (
     <>
       <Helmet>
         <title>{`${title} - Explore education statistics - GOV.UK`}</title>
       </Helmet>
 
-      <h1 className="govuk-heading-xl" data-testid={`page-title ${title}`}>
-        {caption && (
-          <span className="govuk-caption-xl" data-testid="page-title-caption">
-            {caption}
-          </span>
-        )}
+      {caption && (
+        <span className="govuk-caption-xl" data-testid="page-title-caption">
+          {caption}
+        </span>
+      )}
+
+      <h1
+        className={classNames('govuk-heading-xl', className)}
+        data-testid={`page-title ${title}`}
+      >
         {title}
       </h1>
     </>
