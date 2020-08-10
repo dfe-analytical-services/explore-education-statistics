@@ -8,7 +8,6 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { parseISO } from 'date-fns';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -34,11 +33,6 @@ const MethodologySummaryPage = ({
               </SummaryListItem>
               <SummaryListItem term="Status">
                 <Tag>{currentMethodology.status}</Tag>
-              </SummaryListItem>
-              <SummaryListItem term="Scheduled release">
-                <FormattedDate>
-                  {parseISO(currentMethodology.publishScheduled)}
-                </FormattedDate>
               </SummaryListItem>
               <SummaryListItem term="Published on">
                 {currentMethodology.published ? (

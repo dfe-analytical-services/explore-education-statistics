@@ -22,14 +22,12 @@ describe('PublicationForm', () => {
       title: 'Methodology 1',
       slug: 'methodology-1',
       status: 'Approved',
-      publishScheduled: '',
     },
     {
       id: 'methodology-2',
       title: 'Methodology 2',
       slug: 'methodology-2',
       status: 'Approved',
-      publishScheduled: '',
     },
   ];
 

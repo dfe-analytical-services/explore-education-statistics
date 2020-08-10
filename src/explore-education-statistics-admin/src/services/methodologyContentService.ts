@@ -17,7 +17,6 @@ export interface MethodologyContent {
   slug: string;
   status: MethodologyStatus;
   published?: string;
-  publishScheduled: string;
   content: ContentSection<EditableContentBlock>[];
   annexes: ContentSection<EditableContentBlock>[];
 }

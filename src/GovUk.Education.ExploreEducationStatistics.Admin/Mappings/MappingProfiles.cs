@@ -70,11 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseStatus, ReleaseStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
-            CreateMap<Methodology, MethodologySummaryViewModel>().ForMember(model => model.PublishScheduled,
-                m => m.MapFrom(model =>
-                    model.PublishScheduled.HasValue
-                        ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
-                        : (DateTime?) null));
+            CreateMap<Methodology, MethodologySummaryViewModel>();
 
             CreateMap<Methodology, MethodologyTitleViewModel>();
             CreateMap<Methodology, MethodologyPublicationsViewModel>();

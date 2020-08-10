@@ -4,7 +4,6 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Form from '@common/components/form/Form';
-import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import SummaryList from '@common/components/SummaryList';
@@ -18,7 +17,6 @@ import React from 'react';
 export interface MethodologySummaryFormValues {
   title: string;
   contactId: string;
-  publishScheduled: Date;
 }
 
 const errorMappings = [
@@ -78,9 +76,6 @@ const MethodologySummaryForm = ({
         contactId: isContactEnabled
           ? Yup.string().required('Choose a methodology contact')
           : Yup.string(),
-        publishScheduled: Yup.date().required(
-          'Enter a valid scheduled publish date',
-        ),
       })}
       onSubmit={handleSubmit}
     >
@@ -91,13 +86,6 @@ const MethodologySummaryForm = ({
               id={`${id}-title`}
               label="Enter methodology title"
               name="title"
-            />
-
-            <FormFieldDateInput<MethodologySummaryFormValues>
-              id={`${id}-publishScheduled`}
-              name="publishScheduled"
-              legend="Schedule publish date"
-              legendSize="s"
             />
 
             {isContactEnabled && (
