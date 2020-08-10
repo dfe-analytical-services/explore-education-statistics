@@ -109,7 +109,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         )
                         .OrElse(GetUserThemes)
                 )
-                .OnSuccess(list => list.Select(_mapper.Map<ThemeViewModel>).ToList());
+                .OnSuccess(
+                    list =>
+                        list.Select(_mapper.Map<ThemeViewModel>)
+                            .OrderBy(theme => theme.Title)
+                            .ToList()
+                );
         }
 
         private async Task<List<Theme>> GetUserThemes()
