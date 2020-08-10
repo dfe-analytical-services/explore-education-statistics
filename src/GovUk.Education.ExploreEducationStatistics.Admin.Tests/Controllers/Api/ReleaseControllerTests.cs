@@ -142,16 +142,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetDataFilesAsync_Returns_A_List_Of_Files()
         {
-            IEnumerable<FileInfo> testFiles = new[]
+            IEnumerable<DataFileInfo> testFiles = new[]
             {
-                new FileInfo
+                new DataFileInfo
                 {
                     Extension = "csv",
                     Name = "Release a file 1",
                     Path = "file1.csv",
                     Size = "1 Kb"
                 },
-                new FileInfo
+                new DataFileInfo
                 {
                     Extension = "csv",
                     Name = "Release a file 2",
@@ -162,8 +162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var mocks = Mocks();
             
-            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata))
-                .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
+            mocks.FileStorageService.Setup(s => s.ListDataFilesAsync(_releaseId))
+                .ReturnsAsync(new Either<ActionResult, IEnumerable<DataFileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test

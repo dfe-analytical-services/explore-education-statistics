@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var chartReferences = await _contentDbContext
                 .ReleaseFileReferences
+                .AsNoTracking()
                 .Include(rfr => rfr.Release)
                 .Where(rfr => rfr.ReleaseFileType == ReleaseFileTypes.Chart)
                 .ToListAsync();
@@ -52,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             foreach (var fileReference in chartReferences)
             {
-                await _userService.CheckCanRunReleaseMigrations(fileReference.Release).OnSuccess(async _ =>
+                await _userService.CheckCanRunReleaseMigrations(fileReference.Release).OnSuccessDo(async _ =>
                 {
                     var oldName = fileReference.Filename;
                     var oldBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, oldName);
@@ -64,7 +65,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             // Change ref to any datablocks with charts where used
 
-                            await UpdateDataBlock(fileReference, fileReference.Id);
+                            var releaseIds = await _contentDbContext.ReleaseFiles
+                                .AsNoTracking()
+                                .Where(rf => rf.ReleaseFileReferenceId == fileReference.Id)
+                                .Select(rf => rf.ReleaseId)
+                                .Distinct()
+                                .ToListAsync();
+                            
+                            await UpdateDataBlocks(releaseIds, fileReference.Filename, fileReference.Id);
 
                             await _contentDbContext.SaveChangesAsync();
 
@@ -104,27 +112,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
         
-        private async Task UpdateDataBlock(ReleaseFileReference releaseFileReference, Guid newChartId)
+        private async Task UpdateDataBlocks(List<Guid> releaseIds, string oldName, Guid id)
         {
-            var releaseIds = await _contentDbContext.ReleaseFiles
-                .Where(rf => rf.ReleaseFileReferenceId == releaseFileReference.Id)
-                .Select(rf => rf.ReleaseId)
-                .Distinct()
-                .ToListAsync();
-            
             var blocks = GetDataBlocks(releaseIds);
-
+            
             foreach (var block in blocks)
             {
                 var infoGraphicChart = block.Charts
                     .OfType<InfographicChart>()
                     .FirstOrDefault();
 
-                if (infoGraphicChart != null && infoGraphicChart.FileId == releaseFileReference.Filename)
+                if (infoGraphicChart != null && infoGraphicChart.FileId == oldName)
                 {
                     block.Charts.Remove(infoGraphicChart);
-                    infoGraphicChart.FileId = newChartId.ToString();
+                    infoGraphicChart.FileId = id.ToString();
                     block.Charts.Add(infoGraphicChart);
+                    _contentDbContext.ContentBlocks.Update(block);
                 }
             }
         }
