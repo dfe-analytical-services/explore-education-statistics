@@ -191,8 +191,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ContentSectionHeading = GetContentSectionHeading(block),
                 InfographicFilesInfo = releaseFileReferences.Select(rfr => new InfographicFileInfo
                 {
-                    Filename = rfr.Filename,
-                    Id = rfr.Id
+                    Id = rfr.Id,
+                    Filename = rfr.Filename
                 }).ToList()
             };
         }

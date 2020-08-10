@@ -60,8 +60,8 @@ const releaseChartFileService = {
     );
   },
 
-  getChartFile(releaseId: string, fileName: string): Promise<Blob> {
-    return client.get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
+  getChartFile(releaseId: string, id: string): Promise<Blob> {
+    return client.get<Blob>(`/release/${releaseId}/chart/${id}`, {
       responseType: 'blob',
     });
   },

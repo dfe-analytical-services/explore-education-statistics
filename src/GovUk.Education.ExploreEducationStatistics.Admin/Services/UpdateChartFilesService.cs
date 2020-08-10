@@ -122,8 +122,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (infoGraphicChart != null && infoGraphicChart.FileId == releaseFileReference.Filename)
                 {
+                    block.Charts.Remove(infoGraphicChart);
                     infoGraphicChart.FileId = newChartId.ToString();
-                    _contentDbContext.DataBlocks.Update(block);
+                    block.Charts.Add(infoGraphicChart);
                 }
             }
         }
