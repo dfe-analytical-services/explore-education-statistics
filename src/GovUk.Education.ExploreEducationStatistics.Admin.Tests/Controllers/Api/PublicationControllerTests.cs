@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -14,25 +14,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
     public class PublicationControllerTests
     {
-
         [Fact]
         public async void CreatePublication_Ok()
         {
             var publicationService = new Mock<IPublicationService>();
 
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
-                .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ActionResult, PublicationViewModel>(new PublicationViewModel {TopicId = p.TopicId})));
+                .Setup(s => s.CreatePublication(It.IsAny<SavePublicationViewModel>()))
+                .Returns<SavePublicationViewModel>(p => 
+                    Task.FromResult(new Either<ActionResult, PublicationViewModel>(
+                        new PublicationViewModel 
+                        {
+                            TopicId = p.TopicId
+                        })
+                    )
+                );
+
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
-            // Method under test
-            var result = await controller.CreatePublication(new CreatePublicationViewModel(), topicId);
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            Assert.IsAssignableFrom<PublicationViewModel>(((OkObjectResult) result.Result).Value);
 
-            var viewModel = (PublicationViewModel) ((OkObjectResult) result.Result).Value;
-            Assert.Equal(topicId, viewModel.TopicId);
+            // Method under test
+            var result = await controller.CreatePublication(new SavePublicationViewModel() 
+            {
+                TopicId = topicId
+            });
+            
+            Assert.IsType<PublicationViewModel>(result.Value);
+            Assert.Equal(topicId, result.Value.TopicId);
         }
         
         [Fact] 
@@ -45,20 +54,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     ValidationUtils.ValidationActionResult(ValidationErrorMessages.SlugNotUnique));
             
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
-                .Returns<CreatePublicationViewModel>(p => Task.FromResult(validationResponse));
+                .Setup(s => s.CreatePublication(It.IsAny<SavePublicationViewModel>()))
+                .Returns<SavePublicationViewModel>(p => Task.FromResult(validationResponse));
             
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
+
             // Method under test
-            var result = await controller.CreatePublication(new CreatePublicationViewModel(), topicId);
-            var badRequestObjectResult = result.Result;
-            Assert.IsAssignableFrom<BadRequestObjectResult>(badRequestObjectResult);
-            var validationProblemDetails = (badRequestObjectResult as BadRequestObjectResult)?.Value;  
-            Assert.IsAssignableFrom<ValidationProblemDetails>(validationProblemDetails);
-            var errors = (validationProblemDetails as ValidationProblemDetails)?.Errors;
-            Assert.Contains("SLUG_NOT_UNIQUE", errors.First().Value);
+            var result = await controller.CreatePublication(new SavePublicationViewModel()
+            {
+                TopicId = topicId
+            });
+
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            var value = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
+
+            Assert.Contains("SLUG_NOT_UNIQUE", value.Errors.First().Value);
         }
     }
 }

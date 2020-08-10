@@ -115,8 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var statisticsRelease = await _statisticsDbContext.Release
                 .SingleOrDefaultAsync(r => r.Id == id);
 
-            var methodology = contentRelease.Publication.Methodology;
-
             if (contentRelease == null)
             {
                 throw new ArgumentException("Content Release does not exist", nameof(id));
@@ -139,10 +137,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             contentRelease.Published ??= published;
             contentRelease.DataLastPublished = DateTime.UtcNow;
 
-            // TODO EES-913 Remove this when methodologies are published independently 
+            // Update the Publication date if it's the first time it's published
+            contentRelease.Publication.Published ??= published;
+            
+            // Update the Methodology date if it's the first time it's published
+            var methodology = contentRelease.Publication.Methodology;
             if (methodology != null)
             {
-                _contentDbContext.Methodologies.Update(methodology);
                 methodology.Published ??= published;
             }
 

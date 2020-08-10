@@ -8,6 +8,13 @@ export interface ContactDetails {
   teamName?: string;
 }
 
+export interface SaveContact {
+  contactName: string;
+  contactTelNo: string;
+  teamEmail: string;
+  teamName?: string;
+}
+
 const contactService = {
   getContacts(): Promise<ContactDetails[]> {
     return client.get<ContactDetails[]>('/contacts');

@@ -13,12 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
 
         Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            CreatePublicationViewModel publication);
+            SavePublicationViewModel publication);
+
+        Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
+            Guid publicationId,
+            SavePublicationViewModel updatedPublication);
 
         Task<Either<ActionResult, PublicationViewModel>> GetViewModel(Guid publicationId);
         
-        Task<Either<ActionResult, bool>> UpdatePublicationMethodology(Guid publicationId, UpdatePublicationMethodologyViewModel methodology);
-
         Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId, 
             List<PartialUpdateLegacyReleaseViewModel> updatedLegacyReleases);

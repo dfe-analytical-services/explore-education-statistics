@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // Only need to inform Publisher if changing release status to or from Approved
                     if (oldStatus == ReleaseStatus.Approved || request.Status == ReleaseStatus.Approved)
                     {
-                        await _publishingService.NotifyChange(releaseId, request.PublishMethod == PublishMethod.Immediate);
+                        await _publishingService.ReleaseChanged(releaseId, request.PublishMethod == PublishMethod.Immediate);
                     }
                     
                     _context.Update(release);

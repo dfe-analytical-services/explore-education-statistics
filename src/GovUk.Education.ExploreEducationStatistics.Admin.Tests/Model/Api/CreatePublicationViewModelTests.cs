@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model.Api
@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model.Api
         [Fact]
         public void ManualSlugOverride()
         {
-            Assert.Equal("slug", new CreatePublicationViewModel {Title = "title", Slug = "slug"}.Slug);
+            Assert.Equal("slug", new SavePublicationViewModel {Title = "title", Slug = "slug"}.Slug);
         }
     }
 }

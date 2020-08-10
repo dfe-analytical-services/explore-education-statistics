@@ -5,6 +5,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class StringExtensions
     {
+        public static string AppendTrailingSlash(this string input)
+        {
+            if (input == null)
+            {
+                return null;
+            }
+
+            return input.EndsWith("/") ? input : input + "/";
+        }
+        
         public static string CamelCase(this string input)
         {
             if (string.IsNullOrEmpty(input))

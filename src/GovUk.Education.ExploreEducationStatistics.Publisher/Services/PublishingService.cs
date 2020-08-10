@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -20,7 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishStagedReleaseContentAsync(Guid releaseId)
         {
-            await _fileStorageService.MoveStagedContentAsync();
+            await _fileStorageService.MovePublicDirectory(PublicContentContainerName, PublicContentStagingPath(),
+                string.Empty);
             await _releaseService.SetPublishedDatesAsync(releaseId, DateTime.UtcNow);
         }
 

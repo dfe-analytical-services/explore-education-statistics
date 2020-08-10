@@ -7,42 +7,46 @@ Force Tags  Admin  Local  Dev  AltersData
 Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
+*** Variables ***
+${TOPIC_NAME}        UI test topic %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}  UI tests - manage content %{RUN_IDENTIFIER}
+
 *** Test Cases ***
 Create Manage content test publication
     [Tags]  HappyPath
     environment variable should be set   RUN_IDENTIFIER
-    user selects theme "Test theme" and topic "UI test topic %{RUN_IDENTIFIER}" from the admin dashboard
+    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains element    xpath://a[text()="Create new publication"]     60
     user clicks link  Create new publication
-    user creates publication  Manage content test %{RUN_IDENTIFIER}   Test methodology    Sean Gibson - (Special educational needs statistics team)
+    user creates publication    ${PUBLICATION_NAME}
 
 Verify Manage content test publication is created
     [Tags]  HappyPath
-    user checks page contains accordion  Manage content test %{RUN_IDENTIFIER}
-    user opens accordion section  Manage content test %{RUN_IDENTIFIER}
-    user checks accordion section contains text  Manage content test %{RUN_IDENTIFIER}    Methodology
-    user checks accordion section contains text  Manage content test %{RUN_IDENTIFIER}    Releases
+    user checks page contains accordion  ${PUBLICATION_NAME}
+    user opens accordion section  ${PUBLICATION_NAME}
+    user checks accordion section contains text  ${PUBLICATION_NAME}    Methodology
+    user checks accordion section contains text  ${PUBLICATION_NAME}    Releases
 
 Create release
     [Tags]  HappyPath
-    user clicks element  css:[data-testid="Create new release link for Manage content test %{RUN_IDENTIFIER}"]
-    user creates release for publication  Manage content test %{RUN_IDENTIFIER}  Academic Year  2025
-    user checks summary list item "Publication title" should be "Manage content test %{RUN_IDENTIFIER}"
+    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
+    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
 
 Navigate to Manage content tab
     [Tags]  HappyPath
     user waits until page contains element   xpath://a[text()="Manage content"]
     user clicks element  xpath://a[text()="Manage content"]
-    user waits until page contains heading  Manage content test %{RUN_IDENTIFIER}
+    user waits until page contains heading  ${PUBLICATION_NAME}
 
 Add summary content to release
     [Tags]  HappyPath   Failing
     user clicks element  xpath://button[text()="Add a summary text block"]
     user waits until page contains element  xpath://p[text()="This section is empty"]
     user clicks element   xpath://button[text()="Edit block"]
-    user presses keys  Test intro text for Manage content test %{RUN_IDENTIFIER}
+    user presses keys  Test intro text for ${PUBLICATION_NAME}
     user clicks element   xpath://button[text()="Save"]
-    user waits until page contains element  xpath://p[text()="Test intro text for Manage content test %{RUN_IDENTIFIER}"]
+    user waits until page contains element  xpath://p[text()="Test intro text for ${PUBLICATION_NAME}"]
 
 # TODO: Add comment to summary content
 
@@ -76,10 +80,10 @@ Add key statistics summary content to release
     user clicks element   xpath://button[text()="Add a headlines text block"]
     user waits until page contains element  xpath://p[text()="This section is empty"]
     user clicks element   xpath://section[@id="releaseHeadlines-headlines"]//button[text()="Edit block"]
-    user presses keys   Test key statistics summary text for Manage content test %{RUN_IDENTIFIER}
+    user presses keys   Test key statistics summary text for ${PUBLICATION_NAME}
     user clicks element  xpath://button[text()="Save"]
 
-    user waits until page contains   Test key statistics summary text for Manage content test %{RUN_IDENTIFIER}
+    user waits until page contains   Test key statistics summary text for ${PUBLICATION_NAME}
 
 Add accordion sections to release
     [Tags]  HappyPath

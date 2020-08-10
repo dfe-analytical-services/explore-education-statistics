@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -7,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -70,12 +70,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
          */
         public async Task UpdateAllContentAsync()
         {
-            // Content is not staged when performing a full refresh and there are no additional releases included
-            var includedReleaseIds = Enumerable.Empty<Guid>();
             var context = new PublishContext(DateTime.UtcNow, false);
 
             await DeleteAllContent();
-            await UpdateTrees(includedReleaseIds, context);
+            await CacheTrees(context);
 
             var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();
             var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
@@ -84,24 +82,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             foreach (var publication in publications)
             {
                 var releases = publication.Releases.Where(release => release.Live);
-                await UpdatePublication(publication, includedReleaseIds, context);
-                await UpdateLatestRelease(publication, includedReleaseIds, context);
+                await CachePublication(publication.Id, context);
+                await CacheLatestRelease(publication, context);
                 foreach (var release in releases)
                 {
-                    await UpdateFastTracks(release, context);
-                    await UpdateRelease(release, context);
+                    await CacheFastTracks(release, context);
+                    await CacheRelease(release, context);
                 }
             }
 
             foreach (var methodologyId in methodologyIds)
             {
-                await UpdateMethodology(methodologyId, context);
+                await CacheMethodology(methodologyId, context);
             }
         }
 
         public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
         {
-            await UpdateTrees(releaseIds, context);
+            await CacheTrees(context, releaseIds);
 
             var releases = await _releaseService.GetAsync(releaseIds);
             var publications = releases.Select(release => release.Publication).ToList();
@@ -110,19 +108,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                await UpdatePublication(publication, releaseIds, context);
-                await UpdateLatestRelease(publication, releaseIds, context);
+                // Only include the Publication if it's not already published
+                if (!publication.Published.HasValue)
+                {
+                    await CachePublication(publication.Id, context, releaseIds);
+                }
+
+                await CacheLatestRelease(publication, context, releaseIds);
                 foreach (var release in releases)
                 {
-                    await UpdateFastTracks(release, context);
-                    await UpdateRelease(release, context);
+                    await CacheFastTracks(release, context);
+                    await CacheRelease(release, context);
                 }
             }
 
             foreach (var methodologyId in methodologyIds)
             {
-                await UpdateMethodology(methodologyId, context);
+                await CacheMethodology(methodologyId, context);
             }
+        }
+
+        public async Task UpdatePublication(PublishContext context, Guid publicationId, string oldSlug)
+        {
+            var publication = await _publicationService.Get(publicationId);
+
+            if (publication.Slug != oldSlug)
+            {
+                var pathPrefix = context.Staging ? PublicContentStagingPath() : null;
+                await _fileStorageService.MovePublicDirectory(PublicContentContainerName,
+                    PublicContentPublicationParentPath(oldSlug, pathPrefix),
+                    PublicContentPublicationParentPath(publication.Slug, pathPrefix)
+                );
+
+                await _fileStorageService.MovePublicDirectory(PublicFilesContainerName, oldSlug, publication.Slug);
+            }
+
+            await CacheDownloadTree(context);
+            await CachePublicationTree(context);
+            await CachePublication(publication.Id, context);
         }
 
         private async Task DeleteAllContent()
@@ -131,60 +154,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _fileStorageService.DeleteAllContentAsyncExcludingStaging();
         }
         
-        private async Task UpdateDownloadTreeAsync(IEnumerable<Guid> includedReleaseIds, PublishContext context)
+        private async Task CacheDownloadTree(PublishContext context, params Guid[] includedReleaseIds)
         {
             // This assumes the files have been copied first
             var tree = _downloadService.GetTree(includedReleaseIds);
             await Upload(PublicContentDownloadTreePath, context, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateFastTracks(Release release, PublishContext context)
+        private async Task CacheFastTracks(Release release, PublishContext context)
         {
             await _fastTrackService.CreateAllByRelease(release.Id, context);
         }
         
-        private async Task UpdateMethodologyTree(IEnumerable<Guid> includedReleaseIds, PublishContext context)
+        private async Task CacheMethodologyTree(PublishContext context, params Guid[] includedReleaseIds)
         {
             var tree = _methodologyService.GetTree(includedReleaseIds);
             await Upload(PublicContentMethodologyTreePath, context, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdatePublicationTree(IEnumerable<Guid> includedReleaseIds, PublishContext context)
+        private async Task CachePublicationTree(PublishContext context, params Guid[] includedReleaseIds)
         {
             var tree = _publicationService.GetTree(includedReleaseIds);
             await Upload(PublicContentPublicationsTreePath, context, tree, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateLatestRelease(Publication publication, IEnumerable<Guid> includedReleaseIds,
-            PublishContext context)
+        private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)
         {
             var viewModel = _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
             await Upload(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateMethodology(Guid methodologyId, PublishContext context)
+        private async Task CacheMethodology(Guid methodologyId, PublishContext context)
         {
             var viewModel = await _methodologyService.GetViewModelAsync(methodologyId, context);
             await Upload(prefix => PublicContentMethodologyPath(viewModel.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdatePublication(Publication publication, IEnumerable<Guid> includedReleaseIds, PublishContext context)
+        private async Task CachePublication(Guid publicationId, PublishContext context, params Guid[] includedReleaseIds)
         {
-            var viewModel = await _publicationService.GetViewModelAsync(publication.Id, includedReleaseIds);
-            await Upload(prefix => PublicContentPublicationPath(publication.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
+            var viewModel = await _publicationService.GetViewModelAsync(publicationId, includedReleaseIds);
+            await Upload(prefix => PublicContentPublicationPath(viewModel.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateRelease(Release release, PublishContext context)
+        private async Task CacheRelease(Release release, PublishContext context)
         {
             var viewModel = _releaseService.GetReleaseViewModel(release.Id, context);
             await Upload(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
-        private async Task UpdateTrees(IEnumerable<Guid> includedReleaseIds, PublishContext context)
+        private async Task CacheTrees(PublishContext context, params Guid[] includedReleaseIds)
         {
-            await UpdateDownloadTreeAsync(includedReleaseIds, context);
-            await UpdateMethodologyTree(includedReleaseIds, context);
-            await UpdatePublicationTree(includedReleaseIds, context);
+            await CacheDownloadTree(context, includedReleaseIds);
+            await CacheMethodologyTree(context, includedReleaseIds);
+            await CachePublicationTree(context, includedReleaseIds);
         }
 
         private static JsonSerializerSettings GetJsonSerializerSettings(NamingStrategy namingStrategy)

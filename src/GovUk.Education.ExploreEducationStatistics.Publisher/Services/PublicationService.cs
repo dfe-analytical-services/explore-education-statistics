@@ -25,6 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseService = releaseService;
         }
 
+        public async Task<Publication> Get(Guid id)
+        {
+            return await _context.Publications.FindAsync(id);
+        }
+
         public async Task<CachedPublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds)
         {
             var publication = await _context.Publications
@@ -63,6 +68,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(publication =>
                     publication.Releases.Any(release => IsReleasePublished(release, Enumerable.Empty<Guid>())))
                 .ToList();
+        }
+
+        public async Task SetPublishedDate(Guid id, DateTime published)
+        {
+            var publication = await _context.Publications.SingleOrDefaultAsync(p => p.Id == id);
+
+            if (publication == null)
+            {
+                throw new ArgumentException("Publication does not exist", nameof(id));
+            }
+
+            _context.Update(publication);
+            publication.Published = published;
+            await _context.SaveChangesAsync();
         }
 
         private static ThemeTree<PublicationTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)

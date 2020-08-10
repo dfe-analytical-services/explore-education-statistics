@@ -83,12 +83,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public List<LinkViewModel> RelatedInformation { get; set; }
 
-        private DateTime? dataLastPublished;
+        private DateTime? _dataLastPublished;
         
         public DateTime? DataLastPublished
         {
-            get => dataLastPublished;
-            set => dataLastPublished = value ?? DateTime.UtcNow;
+            get => _dataLastPublished;
+            set => _dataLastPublished = value ?? DateTime.UtcNow;
         }
     }
 }
