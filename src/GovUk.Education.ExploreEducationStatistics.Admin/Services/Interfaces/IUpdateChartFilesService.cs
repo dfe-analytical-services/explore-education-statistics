@@ -6,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUpdateChartFilesService
     {
-        Task<Either<ActionResult, bool>> UpdateChartFiles();
+        Task<Either<ActionResult, Unit>> UpdateChartFiles();
     }
 }

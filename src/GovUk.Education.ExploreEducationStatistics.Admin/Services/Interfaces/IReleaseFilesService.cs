@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IFormFile dataFile, IFormFile metaFile, string name, string userName);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId, params ReleaseFileTypes[] types);
-
+        
+        Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListDataFilesAsync(Guid releaseId);
+        
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId, IEnumerable<Guid> referencedReleaseVersions);
 
         Task<Either<ActionResult, FileInfo>> UploadFileAsync(Guid releaseId, IFormFile file,

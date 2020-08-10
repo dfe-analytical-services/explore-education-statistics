@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class UpdateChartFilesService : IUpdateChartFilesService
     {
         private readonly ContentDbContext _contentDbContext;
+        private readonly  IUserService _userService;
         private readonly ILogger _logger;
 
         private readonly string _storageConnectionString;
@@ -28,57 +31,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public UpdateChartFilesService(
             IConfiguration configuration,
             ContentDbContext contentDbContext,
+            IUserService userService,
             ILogger<UpdateChartFilesService> logger)
         {
+            _userService = userService;
             _storageConnectionString = configuration.GetValue<string>("CoreStorage");
             _contentDbContext = contentDbContext;
             _logger = logger;
         }
 
-        public async Task<Either<ActionResult, bool>> UpdateChartFiles()
+        public async Task<Either<ActionResult, Unit>> UpdateChartFiles()
         {
-            var refs = _contentDbContext
+            var chartReferences = await _contentDbContext
                 .ReleaseFileReferences
+                .Include(rfr => rfr.Release)
                 .Where(rfr => rfr.ReleaseFileType == ReleaseFileTypes.Chart)
-                .ToList();
+                .ToListAsync();
 
-            var result = await UpdateChartFilesAsync(refs);
-
-            if (result.IsLeft)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private async Task<Either<ActionResult, bool>> UpdateChartFilesAsync(List<ReleaseFileReference> chartReferences)
-        {
             var blobContainer = await GetCloudBlobContainer();
 
             foreach (var fileReference in chartReferences)
             {
-                var oldName = fileReference.Filename;
-                var oldBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, oldName);
-
-                // Files should exists first time this is run in storage
-                if (blobContainer.GetBlockBlobReference(oldBlobPath).Exists())
+                await _userService.CheckCanRunReleaseMigrations(fileReference.Release).OnSuccess(async _ =>
                 {
-                    if (await CopyBlob(fileReference, blobContainer, oldBlobPath, fileReference.Id))
+                    var oldName = fileReference.Filename;
+                    var oldBlobPath = AdminReleasePathWithFilename(fileReference.ReleaseId, oldName);
+
+                    // Files should exists first time this is run in storage
+                    if (blobContainer.GetBlockBlobReference(oldBlobPath).Exists())
                     {
-                        // Change ref to any datablocks with charts where used
+                        if (await CopyBlob(fileReference, blobContainer, oldBlobPath, fileReference.Id))
+                        {
+                            // Change ref to any datablocks with charts where used
 
-                        await UpdateDataBlock(fileReference, fileReference.Id);
+                            await UpdateDataBlock(fileReference, fileReference.Id);
 
-                        await _contentDbContext.SaveChangesAsync();
+                            await _contentDbContext.SaveChangesAsync();
 
-                        _logger.LogInformation(
-                            $"Update blob: {fileReference.ReleaseId}:{fileReference.Filename} successfully");
+                            _logger.LogInformation(
+                                $"Update blob: {fileReference.ReleaseId}:{fileReference.Filename} successfully");
+                        }
                     }
-                }
+                });
             }
 
-            return true;
+            return Unit.Instance;
         }
 
         private async Task<bool> CopyBlob(ReleaseFileReference fileReference, CloudBlobContainer blobContainer, string oldBlobPath, Guid newId)
@@ -125,9 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (infoGraphicChart != null && infoGraphicChart.FileId == releaseFileReference.Filename)
                 {
-                    block.Charts.Remove(infoGraphicChart);
                     infoGraphicChart.FileId = newChartId.ToString();
-                    block.Charts.Add(infoGraphicChart);
                     _contentDbContext.DataBlocks.Update(block);
                 }
             }
@@ -137,11 +132,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _contentDbContext
                 .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
+                .Include(rcb => rcb.ContentBlock)
                 .ThenInclude(block => block.ContentSection)
-                .Where(join => releaseIds.Contains(join.ReleaseId))
+                .Where(rcb => releaseIds.Contains(rcb.ReleaseId))
                 .ToList()
-                .Select(join => join.ContentBlock)
+                .Select(rcb => rcb.ContentBlock)
                 .OfType<DataBlock>()
                 .ToList();
         }

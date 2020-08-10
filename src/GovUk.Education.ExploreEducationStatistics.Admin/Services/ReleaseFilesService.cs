@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -242,11 +243,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var blobContainer = await GetCloudBlobContainer();
 
-                    var files = await _context
-                        .ReleaseFiles
-                        .Include(f => f.ReleaseFileReference)
-                        .Where(f => f.ReleaseId == releaseId && types.Contains(f.ReleaseFileReference.ReleaseFileType))
-                        .ToListAsync();
+                    var files = await GetReleaseFiles(releaseId, types);
+                    
+                    var filesWithMetadata = files
+                        .Select(async fileLink =>
+                        {
+                            var fileReference = fileLink.ReleaseFileReference;
+                            var blobPath = AdminReleasePathWithFileReference(fileReference);
+
+                            // Files should exists in storage but if not then allow user to delete
+                            if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
+                            {
+                                return new FileInfo
+                                {
+                                    Id = fileReference.Id,
+                                    Extension = Path.GetExtension(fileReference.Filename),
+                                    Name = "Unkown",
+                                    Path = fileReference.Filename,
+                                    Size = "0.00 B"
+                                };
+                            }
+
+                            var file = blobContainer.GetBlockBlobReference(blobPath);
+                            await file.FetchAttributesAsync();
+                            return new FileInfo
+                            {
+                                Id = fileReference.Id,
+                                Extension = GetExtension(file),
+                                Name = GetName(file),
+                                Path = file.Name,
+                                Size = GetSize(file)
+                            };
+                        });
+
+                    return (await Task.WhenAll(filesWithMetadata))
+                        .OrderBy(file => file.Name)
+                        .AsEnumerable();
+                });
+        }
+
+        public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListDataFilesAsync(Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async _ =>
+                {
+                    var blobContainer = await GetCloudBlobContainer();
+                    var files = await GetReleaseFiles(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata);
 
                     var filesWithMetadata = files
                         .Select(async fileLink =>
@@ -258,10 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
                             {
                                 // Fail the import if this was a datafile upload
-                                if (fileReference.ReleaseFileType == ReleaseFileTypes.Data ||
-                                    fileReference.ReleaseFileType == ReleaseFileTypes.Metadata)
-                                {
-                                    await _importService.FailImport(releaseId,
+                                await _importService.FailImport(releaseId,
                                         fileReference.ReleaseFileType == ReleaseFileTypes.Data
                                             ? fileReference.Filename
                                             : await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
@@ -270,14 +311,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 {
                                                     new ValidationError("Files not uploaded correctly. Please delete and retry")
                                                 }.AsEnumerable());
-                                }
 
-                                return new FileInfo
+                                return new DataFileInfo
                                 {
                                     Id = fileReference.Id,
                                     Extension = Path.GetExtension(fileReference.Filename),
-                                    Name = fileReference.ReleaseFileType == ReleaseFileTypes.Data || fileReference.ReleaseFileType == ReleaseFileTypes.Metadata ?
-                                        await GetSubjectName(releaseId, fileReference.Filename, fileReference.ReleaseFileType) : "Unkown",
+                                    Name = await GetSubjectName(releaseId, fileReference.Filename, fileReference.ReleaseFileType),
                                     Path = fileReference.Filename,
                                     Size = "0.00 B",
                                     MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data ?
@@ -291,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             var file = blobContainer.GetBlockBlobReference(blobPath);
                             await file.FetchAttributesAsync();
-                            return new FileInfo
+                            return new DataFileInfo
                             {
                                 Id = fileReference.Id,
                                 Extension = GetExtension(file),
@@ -398,6 +437,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context.ReleaseFiles.Remove(fileLink);
         }
 
+        private async Task<List<ReleaseFile>> GetReleaseFiles(Guid releaseId, params ReleaseFileTypes[] types)
+        {
+            return await _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .Where(f => f.ReleaseId == releaseId && types.Contains(f.ReleaseFileReference.ReleaseFileType))
+                .ToListAsync();
+        }
+        
         private async Task<ReleaseFile> GetReleaseFileLinkAsync(Guid releaseId, string filename, ReleaseFileTypes type)
         {
             var releaseFileLinks = await _context

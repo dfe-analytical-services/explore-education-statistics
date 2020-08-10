@@ -107,10 +107,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(Guid releaseId)
+        public async Task<ActionResult<IEnumerable<DataFileInfo>>> GetDataFilesAsync(Guid releaseId)
         {
             return await _releaseFilesService
-                .ListFilesAsync(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
+                .ListDataFilesAsync(releaseId)
                 .HandleFailuresOrOk();
         }
 

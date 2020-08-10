@@ -39,7 +39,7 @@ const releaseChartFileService = {
     data.append('file', request.file);
     let file;
 
-    if (id !== '') {
+    if (id) {
       file = await client.put<FileInfo>(
         `/release/${releaseId}/chart/${id}`,
         data,

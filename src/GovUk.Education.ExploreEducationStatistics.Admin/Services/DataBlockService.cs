@@ -189,8 +189,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Id = block.Id,
                 Name = block.Name,
                 ContentSectionHeading = GetContentSectionHeading(block),
-                InfographicFilenames = releaseFileReferences.Select(rfr => rfr.Filename).ToList(),
-                InfographicFileIds = releaseFileReferences.Select(rfr => rfr.Id).ToList()
+                InfographicFilesInfo = releaseFileReferences.Select(rfr => new InfographicFileInfo
+                {
+                    Filename = rfr.Filename,
+                    Id = rfr.Id
+                }).ToList()
             };
         }
 
@@ -243,7 +246,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
-            var chartFileIds = deletePlan.DependentDataBlocks.SelectMany(block => block.InfographicFileIds);
+            var chartFileIds = deletePlan.DependentDataBlocks.SelectMany(
+                block => block.InfographicFilesInfo.Select((f => f.Id)));
 
             await _releaseFilesService.DeleteChartFilesAsync(deletePlan.ReleaseId, chartFileIds);
         }
@@ -311,21 +315,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         [JsonIgnore]
         public Guid Id { get; set; }
-
         public string Name { get; set; }
-
         public string? ContentSectionHeading { get; set; }
+        public List<InfographicFileInfo> InfographicFilesInfo { get; set; }
+    }
 
-        public List<string> InfographicFilenames { get; set; }
-
-        public List<Guid> InfographicFileIds { get; set; }
+    public class InfographicFileInfo
+    {
+        public Guid Id { get; set; }
+        public string Filename { get; set; }
     }
     
     public class DeleteDataBlockPlan
     {
         [JsonIgnore]
         public Guid ReleaseId { get; set; }
-        
         public List<DependentDataBlock> DependentDataBlocks { get; set; }
     }
 }
