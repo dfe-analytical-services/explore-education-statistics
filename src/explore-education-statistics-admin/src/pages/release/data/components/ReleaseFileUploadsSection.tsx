@@ -6,6 +6,7 @@ import releaseAncillaryFileService, {
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
@@ -163,20 +164,15 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                   />
                 </FormFieldset>
 
-                <Button
-                  type="submit"
-                  id="upload-file-button"
-                  className="govuk-button govuk-!-margin-right-6"
-                >
-                  Upload file
-                </Button>
+                <ButtonGroup>
+                  <Button type="submit" id="upload-file-button">
+                    Upload file
+                  </Button>
 
-                <ButtonText
-                  className="govuk-button govuk-button--secondary"
-                  onClick={() => resetPage(form)}
-                >
-                  Cancel
-                </ButtonText>
+                  <ButtonText onClick={() => resetPage(form)}>
+                    Cancel
+                  </ButtonText>
+                </ButtonGroup>
               </>
             )}
 

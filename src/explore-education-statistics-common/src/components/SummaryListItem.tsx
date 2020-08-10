@@ -11,7 +11,7 @@ const SummaryListItem = ({ actions, children, term }: Props) => {
     <div className="govuk-summary-list__row">
       <dt className="govuk-summary-list__key">{term}</dt>
 
-      <dd className="govuk-summary-list__value">{children}</dd>
+      {children && <dd className="govuk-summary-list__value">{children}</dd>}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
     </div>
   );

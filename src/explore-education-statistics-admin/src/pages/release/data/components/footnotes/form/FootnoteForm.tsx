@@ -20,6 +20,7 @@ import { Formik } from 'formik';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
 import React from 'react';
+import ButtonGroup from '@common/components/ButtonGroup';
 
 const footnoteFormValidation = (footnote: BaseFootnote) => {
   const errors: { [key: string]: string } = {};
@@ -245,18 +246,13 @@ const FootnoteForm = ({
                     name="content"
                     label="Footnote"
                   />
-                  <Button
-                    type="submit"
-                    className="govuk-button govuk-!-margin-right-6"
-                  >
-                    {`${!footnote ? 'Create' : 'Update'} footnote`}
-                  </Button>
-                  <ButtonText
-                    className="govuk-button govuk-button--secondary"
-                    onClick={onCancel}
-                  >
-                    Cancel
-                  </ButtonText>
+
+                  <ButtonGroup>
+                    <Button type="submit">
+                      {`${!footnote ? 'Create' : 'Update'} footnote`}
+                    </Button>
+                    <ButtonText onClick={onCancel}>Cancel</ButtonText>
+                  </ButtonGroup>
                 </FormFieldset>
               </Form>
             </div>
@@ -268,12 +264,7 @@ const FootnoteForm = ({
 
   const renderNewForm = () => {
     return state !== 'create' ? (
-      <Button
-        type="button"
-        id="add-footnote-button"
-        className="govuk-button"
-        onClick={onOpen}
-      >
+      <Button type="button" id="add-footnote-button" onClick={onOpen}>
         Add {!isFirst && `another `}footnote
       </Button>
     ) : (

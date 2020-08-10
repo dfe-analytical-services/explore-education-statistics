@@ -10,6 +10,7 @@ import releaseMetaFileService from '@admin/services/releaseMetaFileService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
@@ -259,19 +260,14 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   />
                 </FormFieldset>
 
-                <Button
-                  type="submit"
-                  id="upload-data-files-button"
-                  className="govuk-button govuk-!-margin-right-6"
-                >
-                  Upload data files
-                </Button>
-                <ButtonText
-                  className="govuk-button govuk-button--secondary"
-                  onClick={() => resetPage(form)}
-                >
-                  Cancel
-                </ButtonText>
+                <ButtonGroup>
+                  <Button type="submit" id="upload-data-files-button">
+                    Upload data files
+                  </Button>
+                  <ButtonText onClick={() => resetPage(form)}>
+                    Cancel
+                  </ButtonText>
+                </ButtonGroup>
               </>
             )}
 
