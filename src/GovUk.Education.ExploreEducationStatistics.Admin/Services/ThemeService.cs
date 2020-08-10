@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -23,19 +24,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        private readonly IThemeRepository _repository;
 
         public ThemeService(
             ContentDbContext context,
             IMapper mapper,
             IUserService userService,
-            IThemeRepository repository,
             IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
             _userService = userService;
-            _repository = repository;
             _persistenceHelper = persistenceHelper;
         }
 
@@ -97,19 +95,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ThemeViewModel>);
         }
 
-        public async Task<Either<ActionResult, List<Theme>>> GetMyThemes()
+        public async Task<Either<ActionResult, List<ThemeViewModel>>> GetThemes()
         {
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(
-                    _ =>
+                    async _ => await _userService
+                        .CheckCanViewAllTopics()
+                        .OnSuccess(
+                            async () => await _context.Themes
+                                .Include(theme => theme.Topics)
+                                .ToListAsync()
+                        )
+                        .OrElse(GetUserThemes)
+                )
+                .OnSuccess(list => list.Select(_mapper.Map<ThemeViewModel>).ToList());
+        }
+
+        private async Task<List<Theme>> GetUserThemes()
+        {
+            var userId = _userService.GetUserId();
+
+            var topics = await _context
+                .UserReleaseRoles
+                .Include(r => r.Release)
+                .ThenInclude(release => release.Publication)
+                .ThenInclude(publication => publication.Topic)
+                .ThenInclude(topic => topic.Theme)
+                .Where(r => r.UserId == userId && r.Role != ReleaseRole.PrereleaseViewer)
+                .Select(r => r.Release.Publication.Topic)
+                .Distinct()
+                .ToListAsync();
+
+            return topics
+                .GroupBy(topic => topic.Theme)
+                .Select(
+                    group =>
                     {
-                        return _userService
-                            .CheckCanViewAllTopics()
-                            .OnSuccess(() => _repository.GetAllThemesAsync())
-                            .OrElse(() => _repository.GetThemesRelatedToUserAsync(_userService.GetUserId()));
+                        group.Key.Topics = group.ToList();
+                        return group.Key;
                     }
-                );
+                )
+                .ToList();
         }
     }
 }

@@ -3,14 +3,6 @@ import { MyRelease } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 
-export interface Theme {
-  title: string;
-  id: string;
-  topics: Topic[];
-}
-
-export type Topic = IdTitlePair;
-
 export interface ExternalMethodology {
   title: string;
   url: string;
@@ -29,9 +21,6 @@ export interface AdminDashboardPublication {
 }
 
 const dashboardService = {
-  getMyThemesAndTopics(): Promise<Theme[]> {
-    return client.get<Theme[]>('/me/themes');
-  },
   getMyPublicationsByTopic(
     topicId: string,
   ): Promise<AdminDashboardPublication[]> {

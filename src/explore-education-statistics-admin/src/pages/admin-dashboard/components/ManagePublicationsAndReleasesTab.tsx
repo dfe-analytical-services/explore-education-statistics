@@ -5,11 +5,9 @@ import {
   publicationCreateRoute,
   ThemeTopicParams,
 } from '@admin/routes/routes';
-import dashboardService, {
-  Theme,
-  Topic,
-} from '@admin/services/dashboardService';
+import dashboardService from '@admin/services/dashboardService';
 import permissionService from '@admin/services/permissionService';
+import themeService, { Theme, Topic } from '@admin/services/themeService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -32,7 +30,7 @@ const ManagePublicationsAndReleasesTab = () => {
   >('dashboardThemeTopic', undefined);
 
   const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
-    dashboardService.getMyThemesAndTopics,
+    themeService.getThemes,
   );
 
   const selectedTheme = useMemo<Theme | undefined>(() => {

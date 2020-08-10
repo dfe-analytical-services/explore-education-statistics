@@ -1,13 +1,11 @@
 using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -207,7 +205,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context,
                 AdminMapper(),
                 MockUtils.AlwaysTrueUserService().Object,
-                new Mock<IThemeRepository>().Object,
                 new PersistenceHelper<ContentDbContext>(context)
             );
         }

@@ -16,6 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id);
 
-        Task<Either<ActionResult, List<Theme>>> GetMyThemes();
+        Task<Either<ActionResult, List<ThemeViewModel>>> GetThemes();
     }
 }

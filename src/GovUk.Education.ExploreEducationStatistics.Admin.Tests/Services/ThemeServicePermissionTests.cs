@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -24,62 +22,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public async void GetMyThemes_CanViewAllTopics()
+        public async void GetThemes_CanViewAllTopics()
         {
-            var repository = new Mock<IThemeRepository>();
-
-            var themeList = new List<Theme>
-            {
-                new Theme
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
-
-            repository
-                .Setup(s => s.GetAllThemesAsync())
-                .ReturnsAsync(themeList);
-
             PolicyCheckBuilder()
                 .ExpectCheck(SecurityPolicies.CanAccessSystem)
                 .ExpectCheck(SecurityPolicies.CanViewAllTopics)
                 .AssertSuccess(
                     async userService =>
                     {
-                        var service = SetupThemeService(
-                            userService: userService.Object,
-                            themeRepository: repository.Object
-                        );
+                        var service = SetupThemeService(userService: userService.Object);
 
-                        var result = await service.GetMyThemes();
-                        Assert.Equal(themeList, result.Right);
-
-                        return result;
+                        return await service.GetThemes();
                     }
                 );
-
-            repository.Verify(s => s.GetAllThemesAsync());
-            repository.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public void GetMyThemes_CanViewLinkedTopics()
+        public void GetThemes_CanViewLinkedTopics()
         {
-            var repository = new Mock<IThemeRepository>();
-
             var userId = Guid.NewGuid();
-
-            var themeList = new List<Theme>
-            {
-                new Theme
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
-
-            repository
-                .Setup(s => s.GetThemesRelatedToUserAsync(userId))
-                .ReturnsAsync(themeList);
 
             PolicyCheckBuilder()
                 .ExpectCheck(SecurityPolicies.CanAccessSystem)
@@ -91,42 +52,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             .Setup(s => s.GetUserId())
                             .Returns(userId);
 
-                        var service = SetupThemeService(
-                            userService: userService.Object,
-                            themeRepository: repository.Object
-                        );
+                        var service = SetupThemeService(userService: userService.Object);
 
-                        var result = await service.GetMyThemes();
-                        Assert.Equal(themeList, result.Right);
-
-                        return result;
+                        return await service.GetThemes();
                     }
                 );
-
-            repository.Verify(s => s.GetThemesRelatedToUserAsync(userId));
-            repository.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void GetMyThemes_NoAccessToSystem()
         {
-            var repository = new Mock<IThemeRepository>();
-
             PolicyCheckBuilder()
                 .ExpectCheck(SecurityPolicies.CanAccessSystem, false)
                 .AssertForbidden(
                     async userService =>
                     {
-                        var service = SetupThemeService(
-                            userService: userService.Object,
-                            themeRepository: repository.Object
-                        );
+                        var service = SetupThemeService(userService: userService.Object);
 
-                        return await service.GetMyThemes();
+                        return await service.GetThemes();
                     }
                 );
-
-            repository.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -192,14 +137,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext context = null,
             IMapper mapper = null,
             IUserService userService = null,
-            IThemeRepository themeRepository = null,
             PersistenceHelper<ContentDbContext> persistenceHelper = null)
         {
             return new ThemeService(
                 context ?? new Mock<ContentDbContext>().Object,
                 mapper ?? AdminMapper(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                themeRepository ?? new Mock<IThemeRepository>().Object,
                 persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object
             );
         }

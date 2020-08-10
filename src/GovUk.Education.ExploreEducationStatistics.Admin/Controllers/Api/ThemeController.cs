@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _themeService = themeService;
         }
 
-        [HttpPost("theme")]
+        [HttpPost("themes")]
         public async Task<ActionResult<ThemeViewModel>> CreateTheme(SaveThemeViewModel theme)
         {
             return await _themeService
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("theme/{themeId}")]
+        [HttpPut("themes/{themeId}")]
         public async Task<ActionResult<ThemeViewModel>> UpdateTheme(
             [Required] Guid themeId,
             SaveThemeViewModel theme)
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
 
-        [HttpGet("theme/{themeId}")]
+        [HttpGet("themes/{themeId}")]
         public async Task<ActionResult<ThemeViewModel>> GetTheme([Required] Guid themeId)
         {
             return await _themeService
@@ -51,11 +51,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("me/themes")]
-        public async Task<ActionResult<List<Theme>>> GetMyThemes()
+        [HttpGet("themes")]
+        public async Task<ActionResult<List<ThemeViewModel>>> GetThemes()
         {
             return await _themeService
-                .GetMyThemes()
+                .GetThemes()
                 .HandleFailuresOrOk();
         }
     }

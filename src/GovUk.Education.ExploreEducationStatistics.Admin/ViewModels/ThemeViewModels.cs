@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -10,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Slug { get; set; }
         public string Title { get; set; }
         public string Summary { get; set; }
+        public List<TopicViewModel> Topics { get; set; }
     }
 
     public class SaveThemeViewModel

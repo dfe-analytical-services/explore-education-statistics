@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
@@ -19,8 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid ThemeId { get; set; }
 
         public string Summary { get; set; }
-
-        public List<MyPublicationViewModel> Publications { get; set; }
     }
 
     public class SaveTopicViewModel

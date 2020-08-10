@@ -35,16 +35,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task GetMyThemes_Returns_Ok()
+        public async Task GetThemes_Returns_Ok()
         {
-            var themes = new List<Theme>
+            var themes = new List<ThemeViewModel>
             {
-                new Theme
+                new ThemeViewModel
                 {
                     Title = "Theme A",
-                    Topics = new List<Topic>
+                    Topics = new List<TopicViewModel>
                     {
-                        new Topic
+                        new TopicViewModel
                         {
                             Title = "Topic A"
                         }
@@ -53,11 +53,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             };
 
             var themeService = new Mock<IThemeService>();
-            themeService.Setup(s => s.GetMyThemes()).ReturnsAsync(themes);
+            themeService.Setup(s => s.GetThemes()).ReturnsAsync(themes);
 
             var controller = new ThemeController(themeService.Object);
 
-            var result = await controller.GetMyThemes();
+            var result = await controller.GetThemes();
             Assert.Equal(themes, result.Value);
         }
     }
