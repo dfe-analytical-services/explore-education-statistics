@@ -36,12 +36,26 @@ const ManagePublicationsAndReleasesTab = () => {
   );
 
   const selectedTheme = useMemo<Theme | undefined>(() => {
-    return themes?.find(t => t.id === themeId);
-  }, [themeId, themes]);
+    const selectedThemeId = themeId || savedThemeTopic?.themeId;
+
+    return (
+      themes?.find(t => t.id === selectedThemeId) ??
+      orderBy(themes, t => t.title)[0]
+    );
+  }, [savedThemeTopic, themeId, themes]);
 
   const selectedTopic = useMemo<Topic | undefined>(() => {
-    return selectedTheme?.topics.find(t => t.id === topicId);
-  }, [selectedTheme, topicId]);
+    if (!selectedTheme) {
+      return undefined;
+    }
+
+    const selectedTopicId = topicId || savedThemeTopic?.topicId;
+
+    return (
+      selectedTheme.topics.find(t => t.id === selectedTopicId) ??
+      orderBy(selectedTheme.topics, t => t.title)[0]
+    );
+  }, [savedThemeTopic, selectedTheme, topicId]);
 
   const {
     value: myPublications,
@@ -64,46 +78,33 @@ const ManagePublicationsAndReleasesTab = () => {
   }, [selectedTopic?.id]);
 
   useEffect(() => {
-    if (!themes || savedThemeTopic) {
-      return;
-    }
-
-    const theme =
-      themes.find(t => t.id === themeId) ?? orderBy(themes, t => t.title)[0];
-
-    if (!theme) {
-      return;
-    }
-
-    const topic =
-      theme.topics.find(t => t.id === topicId) ??
-      orderBy(theme.topics, t => t.title)[0];
-
-    if (!topic) {
+    if (savedThemeTopic) {
       return;
     }
 
     // Set default theme/topic in storage if it
     // hasn't been set yet (e.g. first time
     // visiting dashboard).
-    setSavedThemeTopic({
-      themeId: theme.id,
-      topicId: topic.id,
-    });
-  }, [savedThemeTopic, setSavedThemeTopic, themeId, themes, topicId]);
+    if (selectedTheme && selectedTopic) {
+      setSavedThemeTopic({
+        themeId: selectedTheme.id,
+        topicId: selectedTopic.id,
+      });
+    }
+  }, [savedThemeTopic, selectedTheme, selectedTopic, setSavedThemeTopic]);
 
   useEffect(() => {
-    if (themeId || topicId) {
+    if (!selectedTheme || !selectedTopic) {
       return;
     }
 
-    if (savedThemeTopic) {
-      // Update query params to reflect the chosen
-      // theme/topic if they haven't already been set.
+    // Update query params to reflect the chosen
+    // theme/topic if they haven't already been set.
+    if (selectedTheme?.id !== themeId || selectedTopic?.id !== topicId) {
       history.replace(
         appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-          themeId: savedThemeTopic.themeId,
-          topicId: savedThemeTopic.topicId,
+          themeId: selectedTheme?.id,
+          topicId: selectedTopic?.id,
         }),
       );
     }

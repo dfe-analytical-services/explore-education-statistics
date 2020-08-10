@@ -5,6 +5,7 @@ import _dashboardService, {
   Theme,
 } from '@admin/services/dashboardService';
 import _permissionService from '@admin/services/permissionService';
+import _storageService from '@common/services/storageService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,6 +15,7 @@ import { MemoryRouter, Router } from 'react-router';
 
 jest.mock('@admin/services/dashboardService');
 jest.mock('@admin/services/permissionService');
+jest.mock('@common/services/storageService');
 
 const dashboardService = _dashboardService as jest.Mocked<
   typeof _dashboardService
@@ -21,6 +23,7 @@ const dashboardService = _dashboardService as jest.Mocked<
 const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
 >;
+const storageService = _storageService as jest.Mocked<typeof _storageService>;
 
 describe('ManagePublicationsAndReleasesTab', () => {
   const testThemeTopics: Theme[] = [
@@ -75,13 +78,11 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('renders with first theme and topic selected by default', async () => {
     dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
-      async topicId => {
-        expect(topicId).toBe('topic-1');
-        return testPublications;
-      },
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
     render(
       <MemoryRouter>
         <ManagePublicationsAndReleasesTab />
@@ -98,13 +99,6 @@ describe('ManagePublicationsAndReleasesTab', () => {
       expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
         'Topic 1',
       );
-
-      expect(
-        screen.getByRole('button', { name: 'Publication 1' }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'Publication 2' }),
-      ).toBeInTheDocument();
     });
   });
 
@@ -125,6 +119,268 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
     await waitFor(() => {
       expect(history.location.search).toBe('?themeId=theme-1&topicId=topic-1');
+    });
+  });
+
+  test('renders with saved theme and topic', async () => {
+    storageService.getSync.mockReturnValue({
+      themeId: 'theme-2',
+      topicId: 'topic-4',
+    });
+
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter>
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select theme')).toHaveValue('theme-2');
+      expect(screen.getByLabelText('Select topic')).toHaveValue('topic-4');
+
+      expect(screen.getByTestId('selectedThemeTitle')).toHaveTextContent(
+        'Theme 2',
+      );
+      expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
+        'Topic 4',
+      );
+    });
+  });
+
+  test('renders with first theme/topic if saved theme and topic are invalid', async () => {
+    storageService.getSync.mockReturnValue({
+      themeId: 'not a theme',
+      topicId: 'not a topic',
+    });
+
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter>
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select theme')).toHaveValue('theme-1');
+      expect(screen.getByLabelText('Select topic')).toHaveValue('topic-1');
+
+      expect(screen.getByTestId('selectedThemeTitle')).toHaveTextContent(
+        'Theme 1',
+      );
+      expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
+        'Topic 1',
+      );
+    });
+  });
+
+  test('adds `themeId` and `topicId` query params from saved theme and topic', async () => {
+    storageService.getSync.mockReturnValue({
+      themeId: 'theme-2',
+      topicId: 'topic-4',
+    });
+
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    const history = createMemoryHistory();
+
+    render(
+      <Router history={history}>
+        <ManagePublicationsAndReleasesTab />
+      </Router>,
+    );
+
+    await waitFor(() => {
+      expect(history.location.search).toBe('?themeId=theme-2&topicId=topic-4');
+    });
+  });
+
+  test('renders theme/topic selected from query params instead of saved theme/topic', async () => {
+    storageService.getSync.mockReturnValue({
+      themeId: 'theme-1',
+      topicId: 'topic-2',
+    });
+
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter
+        initialEntries={[{ search: '?themeId=theme-2&topicId=topic-4' }]}
+      >
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select theme')).toHaveValue('theme-2');
+      expect(screen.getByLabelText('Select topic')).toHaveValue('topic-4');
+
+      expect(screen.getByTestId('selectedThemeTitle')).toHaveTextContent(
+        'Theme 2',
+      );
+      expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
+        'Topic 4',
+      );
+    });
+  });
+
+  test('renders with first theme selected if `themeId` query param does not match any theme', async () => {
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter initialEntries={[{ search: '?themeId=not-a-theme' }]}>
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select theme')).toHaveValue('theme-1');
+      expect(screen.getByLabelText('Select topic')).toHaveValue('topic-1');
+
+      expect(screen.getByTestId('selectedThemeTitle')).toHaveTextContent(
+        'Theme 1',
+      );
+      expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
+        'Topic 1',
+      );
+    });
+  });
+
+  test('renders with saved theme selected if `topicId` query param is missing', async () => {
+    storageService.getSync.mockReturnValue({
+      themeId: 'theme-2',
+      topicId: 'topic-3',
+    });
+
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter initialEntries={[{ search: '?topicId=topic-4' }]}>
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select theme')).toHaveValue('theme-2');
+      expect(screen.getByLabelText('Select topic')).toHaveValue('topic-4');
+
+      expect(screen.getByTestId('selectedThemeTitle')).toHaveTextContent(
+        'Theme 2',
+      );
+      expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
+        'Topic 4',
+      );
+    });
+  });
+
+  test('renders with first topic selected if `topicId` query param is missing', async () => {
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter initialEntries={[{ search: '?themeId=theme-2' }]}>
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select theme')).toHaveValue('theme-2');
+      expect(screen.getByLabelText('Select topic')).toHaveValue('topic-3');
+
+      expect(screen.getByTestId('selectedThemeTitle')).toHaveTextContent(
+        'Theme 2',
+      );
+      expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
+        'Topic 3',
+      );
+    });
+  });
+
+  test('renders with first topic selected if `topicId` query param does not match any topic', async () => {
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter
+        initialEntries={[{ search: '?themeId=theme-2&topicId=not-a-topic' }]}
+      >
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select theme')).toHaveValue('theme-2');
+      expect(screen.getByLabelText('Select topic')).toHaveValue('topic-3');
+
+      expect(screen.getByTestId('selectedThemeTitle')).toHaveTextContent(
+        'Theme 2',
+      );
+      expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
+        'Topic 3',
+      );
+    });
+  });
+
+  test('renders with saved topic selected if `topicId` query param is missing', async () => {
+    storageService.getSync.mockReturnValue({
+      themeId: 'theme-2',
+      topicId: 'topic-4',
+    });
+
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+      testPublications,
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter initialEntries={[{ search: '?themeId=theme-2' }]}>
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select theme')).toHaveValue('theme-2');
+      expect(screen.getByLabelText('Select topic')).toHaveValue('topic-4');
+
+      expect(screen.getByTestId('selectedThemeTitle')).toHaveTextContent(
+        'Theme 2',
+      );
+      expect(screen.getByTestId('selectedTopicTitle')).toHaveTextContent(
+        'Topic 4',
+      );
     });
   });
 
@@ -278,6 +534,32 @@ describe('ManagePublicationsAndReleasesTab', () => {
         screen.getByText(
           /do not currently have permission to edit any releases/,
         ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('renders correctly with list of publications', async () => {
+    dashboardService.getMyThemesAndTopics.mockResolvedValue(testThemeTopics);
+    dashboardService.getMyPublicationsByTopic.mockImplementation(
+      async topicId => {
+        expect(topicId).toBe('topic-1');
+        return testPublications;
+      },
+    );
+    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+
+    render(
+      <MemoryRouter>
+        <ManagePublicationsAndReleasesTab />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Publication 1' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Publication 2' }),
       ).toBeInTheDocument();
     });
   });
