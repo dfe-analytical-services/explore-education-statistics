@@ -23,14 +23,12 @@ set to local storage
   [Arguments]    ${key}   ${value}
   execute javascript  localStorage.setItem('${key}', '${value}');
 
-user signs in
-
 user signs in as bau1
   user opens the browser
 
   environment variable should be set   ADMIN_URL
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading     Sign in
+  user waits until page contains heading 1    Sign in
 
   environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
   set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
@@ -49,7 +47,7 @@ user signs in as analyst1
 
   environment variable should be set   ADMIN_URL
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading     Sign in
+  user waits until page contains heading 1     Sign in
 
   environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
   set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}
@@ -57,7 +55,7 @@ user signs in as analyst1
   set cookie from json   %{IDENTITY_COOKIE_ANALYST}
 
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading   Dashboard
+  user waits until page contains heading 1  Dashboard
   user waits until page contains title caption  Welcome Analyst1
   user waits until page contains element   css:#selectTheme   180
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
@@ -170,10 +168,6 @@ user waits until page contains link
   [Arguments]    ${link_text}   ${wait}=${timeout}
   wait until page contains element  xpath://a[text()="${link_text}"]   timeout=${wait}
 
-user waits until page contains heading
-  [Arguments]   ${text}    ${wait}=${timeout}
-  wait until page contains element   xpath://h1[contains(.,"${text}")]   timeout=${wait}
-
 user waits until page contains accordion section
   [Arguments]   ${section_title}     ${wait}=${timeout}
   user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
@@ -279,20 +273,24 @@ user checks page contains tag
   user checks page contains element  xpath://span[contains(@class, "govuk-tag")][text()="${text}"]
 
 user waits until page contains heading 1
-  [Arguments]   ${text}
-  user waits until page contains element  xpath://h1[text()="${text}"]
+  [Arguments]   ${text}  ${wait}=${timeout}
+  user waits until page contains element  xpath://h1[text()="${text}"]  ${wait}
 
 user waits until page contains heading 2
-  [Arguments]   ${text}
-  user waits until page contains element  xpath://h2[text()="${text}"]
+  [Arguments]   ${text}  ${wait}=${timeout}
+  user waits until page contains element  xpath://h2[text()="${text}"]  ${wait}
 
 user waits until page contains heading 3
-  [Arguments]   ${text}
-  user waits until page contains element  xpath://h3[text()="${text}"]
+  [Arguments]   ${text}  ${wait}=${timeout}
+  user waits until page contains element  xpath://h3[text()="${text}"]  ${wait}
+
+user waits until page contains title
+  [Arguments]   ${text}  ${wait}=${timeout}
+  user waits until page contains element   xpath://h1[@data-testid="page-title" and text()="${text}"]   ${wait}
 
 user waits until page contains title caption
-  [Arguments]  ${text}
-  user waits until page contains element  xpath://*[@data-testid="page-title-caption" and text()="${text}"]
+  [Arguments]  ${text}  ${wait}=${timeout}
+  user waits until page contains element  xpath://span[@data-testid="page-title-caption" and text()="${text}"]  ${wait}
 
 user selects newly opened window
   select window   NEW

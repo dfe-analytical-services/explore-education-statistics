@@ -11,7 +11,7 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until page contains heading  Create your own tables online
+    user waits until page contains heading 1  Create your own tables online
     user waits for page to finish loading
 
 Select "Pupil absence" publication

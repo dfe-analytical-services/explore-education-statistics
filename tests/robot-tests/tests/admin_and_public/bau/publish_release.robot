@@ -82,7 +82,7 @@ User goes to public Find Statistics page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until page contains heading  Find statistics and data
+    user waits until page contains heading 1  Find statistics and data
     user waits for page to finish loading
 
 Verify newly published release is on Find Statistics page
@@ -100,7 +100,7 @@ Verify newly published release is on Find Statistics page
 Navigate to newly published release page
     [Tags]  HappyPath
     user clicks element   css:[data-testid="view-stats-ui-tests-publish-release-%{RUN_IDENTIFIER}"]
-    user waits until page contains heading  ${PUBLICATION_NAME}  90
+    user waits until page contains heading 1  ${PUBLICATION_NAME}  90
 
 Verify release URL and page caption
     [Tags]  HappyPath

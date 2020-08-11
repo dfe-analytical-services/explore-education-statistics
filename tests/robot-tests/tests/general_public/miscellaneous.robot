@@ -52,7 +52,7 @@ Validate homepage
 Validate Cookies page
     [Tags]  HappyPath
     user clicks link   Cookies
-    user waits until page contains heading   Cookies on Explore education statistics
+    user waits until page contains heading 1   Cookies on Explore education statistics
     user checks url contains   %{PUBLIC_URL}/cookies
 
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
@@ -73,7 +73,7 @@ Enable google analytics
     user reloads page
 
     user checks page does not contain  Your cookie settings were saved
-    user waits until page contains heading   Cookies on Explore education statistics
+    user waits until page contains heading 1   Cookies on Explore education statistics
 
     sleep  1   # NOTE(mark): Without the wait, the click doesn't select the radio despite the DOM being loaded
     user clicks element   css:#googleAnalytics-on
@@ -86,7 +86,7 @@ Enable google analytics
 Validate Cookies Details page
     [Tags]  HappyPath
     user clicks link   Find out more about cookies on Explore education statistics
-    user waits until page contains heading   Details about cookies
+    user waits until page contains heading 1   Details about cookies
     user checks url contains   %{PUBLIC_URL}/cookies/details
 
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     3
@@ -99,7 +99,7 @@ Validate Cookies Details page
 Validate Privacy notice page
     [Tags]  HappyPath
     user clicks link   Privacy notice
-    user waits until page contains heading  Privacy notice
+    user waits until page contains heading 1  Privacy notice
     user waits until page contains  The Explore education statistics service is operated by the Department for Education
 
     user checks url contains  %{PUBLIC_URL}/privacy-notice
@@ -126,7 +126,7 @@ Validate Contact page
 Validate Accessibility statement page
     [Tags]  HappyPath
     user clicks link  Accessibility statement
-    user waits until page contains heading  Accessibility statement for Explore education statistics
+    user waits until page contains heading 1  Accessibility statement for Explore education statistics
     user waits until page contains heading 2  What we’re doing to improve accessibility
 
     user checks url contains  %{PUBLIC_URL}/accessibility-statement
@@ -138,7 +138,7 @@ Validate Accessibility statement page
 Validate Help and support page
     [Tags]  HappyPath
     user clicks link    Help and support
-    user waits until page contains heading  Help and support
+    user waits until page contains heading 1  Help and support
 
     user checks url contains    %{PUBLIC_URL}/help-support
 

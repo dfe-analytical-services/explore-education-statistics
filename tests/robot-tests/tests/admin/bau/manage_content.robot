@@ -37,7 +37,7 @@ Navigate to Manage content tab
     [Tags]  HappyPath
     user waits until page contains element   xpath://a[text()="Manage content"]
     user clicks element  xpath://a[text()="Manage content"]
-    user waits until page contains heading  ${PUBLICATION_NAME}
+    user waits until page contains heading 1  ${PUBLICATION_NAME}
 
 Add summary content to release
     [Tags]  HappyPath   Failing

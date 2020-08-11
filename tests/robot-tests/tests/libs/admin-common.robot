@@ -15,7 +15,7 @@ User selects theme "${theme}" and topic "${topic}" from the admin dashboard
 
 user creates publication
     [Arguments]   ${title}
-    user waits until page contains heading    Create new publication
+    user waits until page contains heading 1  Create new publication
     user waits until page contains element  id:publicationForm-title
     user enters text into element  id:publicationForm-title   ${title}
     user selects radio     No methodology
@@ -28,7 +28,7 @@ user creates publication
 
 User creates release for publication
     [Arguments]  ${publication}  ${time_period_coverage}  ${start_year}
-    user waits until page contains heading   Create new release
+    user waits until page contains heading 1  Create new release
     user waits until page contains element   xpath://h1/span[text()="${publication}"]
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
