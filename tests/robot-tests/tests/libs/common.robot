@@ -270,7 +270,7 @@ user checks page does not contain button
 
 user checks page contains tag
   [Arguments]   ${text}
-  user checks page contains element  xpath://span[contains(@class, "govuk-tag")][text()="${text}"]
+  user checks page contains element  xpath://*[contains(@class, "govuk-tag")][text()="${text}"]
 
 user waits until page contains heading 1
   [Arguments]   ${text}  ${wait}=${timeout}

@@ -9,8 +9,15 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${TOPIC_NAME}        UI test topic %{RUN_IDENTIFIER}
 ${PUBLICATION_NAME}  UI tests - create publication %{RUN_IDENTIFIER}
+${METHODOLOGY_NAME}  Test methodology
 
 *** Test Cases ***
+Create approved 'Test methodology'
+    [Tags]  HappyPath
+    user clicks link  manage methodologies
+    user creates approved methodology  ${METHODOLOGY_NAME}
+    user clicks link  Home
+
 Go to Create publication page for "UI tests topic" topic
     [Tags]  HappyPath
     environment variable should be set   RUN_IDENTIFIER
@@ -72,8 +79,8 @@ Update publication
     [Tags]  HappyPath
     user enters text into element  id:publicationForm-title  ${PUBLICATION_NAME}
     user selects radio  Choose an existing methodology
-    user waits until page contains element  xpath://option[text()="Test methodology [Approved]"]
-    user selects from list by label  id:publicationForm-methodologyId   Test methodology [Approved]
+    user waits until page contains element  xpath://option[text()="${METHODOLOGY_NAME} [Approved]"]
+    user selects from list by label  id:publicationForm-methodologyId   ${METHODOLOGY_NAME} [Approved]
     user enters text into element  id:publicationForm-teamName      Special educational needs statistics team
     user enters text into element  id:publicationForm-teamEmail     sen.statistics@education.gov.uk
     user enters text into element  id:publicationForm-contactName   Sean Gibson

@@ -87,13 +87,13 @@ const MethodologyStatusPage = ({
 
   return (
     <>
-      <h2>Methodology status</h2>
-
       <LoadingSpinner loading={isLoading}>
         {model ? (
           <>
             {!showForm ? (
               <>
+                <h2>Methodology status</h2>
+
                 <div className="govuk-!-margin-bottom-6">
                   The current methodology status is:{' '}
                   <StatusBlock text={statusMap[model.summary.status]} />
@@ -104,7 +104,7 @@ const MethodologyStatusPage = ({
                     className="govuk-!-margin-top-2"
                     onClick={toggleForm.on}
                   >
-                    Update status
+                    Edit status
                   </Button>
                 )}
               </>
@@ -128,6 +128,8 @@ const MethodologyStatusPage = ({
                 {form => {
                   return (
                     <Form id={formId}>
+                      <h2>Edit methodology status</h2>
+
                       <FormFieldRadioGroup<FormValues, MethodologyStatus>
                         legend="Status"
                         hint="Once approved, the status cannot be reverted."
