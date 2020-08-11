@@ -49,8 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     var model = new Methodology
                     {
                         Title = request.Title,
-                        Slug = slug,
-                        PublishScheduled = request.PublishScheduledDate
+                        Slug = slug
                     };
 
                     var saved = await _context.Methodologies.AddAsync(model);
@@ -104,7 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     _context.Methodologies.Update(methodology);
                     methodology.InternalReleaseNote = request.InternalReleaseNote ?? methodology.InternalReleaseNote;
-                    methodology.PublishScheduled = request.PublishScheduledDate;
                     methodology.Status = request.Status;
                     methodology.Title = request.Title;
                     methodology.Slug = slug;

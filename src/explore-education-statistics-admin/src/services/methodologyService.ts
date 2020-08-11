@@ -14,7 +14,6 @@ export interface MethodologyStatusListItem {
 
 interface SaveMethodologySummary {
   title: string;
-  publishScheduled: string;
   contactId: string;
 }
 
@@ -31,7 +30,6 @@ export interface BasicMethodology {
   // TODO: EES-899 methodology should have a contact attached
   contact?: ContactDetails;
   published?: string;
-  publishScheduled: string;
 }
 
 const methodologyService = {

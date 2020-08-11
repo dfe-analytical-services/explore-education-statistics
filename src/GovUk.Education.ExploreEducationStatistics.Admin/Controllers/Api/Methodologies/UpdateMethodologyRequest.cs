@@ -1,12 +1,7 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using static System.Globalization.CultureInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies
 {
@@ -15,19 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         public string InternalReleaseNote { get; set; }
 
         [Required] public string Title { get; set; }
-
-        [DateTimeFormatValidator("yyyy-MM-dd")]
-        public string PublishScheduled { get; set; }
-
-        public DateTime? PublishScheduledDate
-        {
-            get
-            {
-                DateTime.TryParseExact(PublishScheduled, "yyyy-MM-dd", InvariantCulture,DateTimeStyles.None,
-                    out var dateTime);
-                return dateTime.AsStartOfDayUtc();
-            }
-        }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyStatus Status { get; set; }
