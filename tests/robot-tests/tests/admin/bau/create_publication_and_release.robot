@@ -18,8 +18,8 @@ Go to Create publication page for "UI tests topic" topic
     user waits until page contains link    Create new publication
     user checks page does not contain button  ${PUBLICATION_NAME}
     user clicks link  Create new publication
+    user waits until page contains title caption  ${TOPIC_NAME}
     user waits until page contains heading 1    Create new publication
-    user waits until page contains element  xpath://h1/span[text()="${TOPIC_NAME}"]
 
 Selects no methodology
     [Tags]  HappyPath
@@ -65,8 +65,8 @@ Verify that new publication has been created
 Go to edit publication
     [Tags]  HappyPath
     user clicks element  css:[data-testid="Edit publication link for ${PUBLICATION_NAME} (created)"]
+    user waits until page contains title caption  ${PUBLICATION_NAME} (created)
     user waits until page contains heading 1    Edit publication
-    user waits until page contains element  xpath://h1/span[text()="${PUBLICATION_NAME} (created)"]
 
 Update publication
     [Tags]  HappyPath
@@ -103,7 +103,7 @@ Create new release
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2025
     user clicks element   css:input[data-testid="National Statistics"]
     user clicks button   Create new release
-    user waits until page contains element  xpath://h1/span[text()="Edit release"]
+    user waits until page contains title caption  Edit release
     user waits until page contains heading 1  ${PUBLICATION_NAME}
 
 Verify created release summary

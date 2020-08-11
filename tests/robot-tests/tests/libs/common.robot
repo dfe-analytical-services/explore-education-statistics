@@ -47,7 +47,7 @@ user signs in as analyst1
 
   environment variable should be set   ADMIN_URL
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading 1     Sign in
+  user waits until page contains heading 1    Sign in
 
   environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
   set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}

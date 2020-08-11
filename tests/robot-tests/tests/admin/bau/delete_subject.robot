@@ -46,7 +46,7 @@ User fills in form
 Click Create new release button
     [Tags]   HappyPath
     user clicks button   Create new release
-    user waits until page contains element  xpath://h1/span[text()="Edit release"]
+    user waits until page contains title caption  Edit release
     user waits until page contains heading 1  ${PUBLICATION_NAME}
 
 Verify Release summary

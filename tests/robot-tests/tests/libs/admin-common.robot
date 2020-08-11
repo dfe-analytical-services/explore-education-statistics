@@ -28,8 +28,8 @@ user creates publication
 
 User creates release for publication
     [Arguments]  ${publication}  ${time_period_coverage}  ${start_year}
+    user waits until page contains title caption  ${publication}
     user waits until page contains heading 1  Create new release
-    user waits until page contains element   xpath://h1/span[text()="${publication}"]
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
