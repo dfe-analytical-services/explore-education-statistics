@@ -248,6 +248,8 @@ def user_clicks_indicator_checkbox(indicator_label):
         f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]')
     sl.driver.find_element_by_xpath(
         f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]').click()
+    sl.checkbox_should_be_selected(
+        f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]/../input')
 
 
 def user_clicks_subheaded_indicator_checkbox(subheading_label, indicator_label):
