@@ -121,11 +121,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     await CacheRelease(release, context);
                 }
             }
-            
-            // TODO only include the Methodology if it's not already published
+
             foreach (var methodologyId in methodologyIds)
             {
-                await CacheMethodology(methodologyId, context);
+                var methodology = await _methodologyService.Get(methodologyId);
+                if (!methodology.Live)
+                {
+                    await CacheMethodology(methodology.Id, context);
+                }
             }
         }
 
@@ -133,6 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             await CacheMethodologyTree(context);
             await CacheMethodology(methodologyId, context);
+            await _methodologyService.SetPublishedDate(methodologyId, context.Published);
         }
 
         public async Task UpdatePublication(PublishContext context, Guid publicationId, string oldSlug)
@@ -150,9 +154,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await _fileStorageService.MovePublicDirectory(PublicFilesContainerName, oldSlug, publication.Slug);
             }
 
-            await CacheDownloadTree(context);
-            await CachePublicationTree(context);
+            await CacheTrees(context);
             await CachePublication(publication.Id, context);
+            await _publicationService.SetPublishedDate(publication.Id, context.Published);
+
+            if (publication.MethodologyId.HasValue)
+            {
+                var methodology = await _methodologyService.Get(publication.MethodologyId.Value);
+                if (!methodology.Live)
+                {
+                    await CacheMethodology(methodology.Id, context);
+                    await _methodologyService.SetPublishedDate(methodology.Id, context.Published);
+                }
+            }
         }
 
         private async Task DeleteAllContent()

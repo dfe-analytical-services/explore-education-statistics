@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     await _context.SaveChangesAsync();
 
-                    if (methodology.Status == MethodologyStatus.Approved && methodology.Published.HasValue)
+                    if (methodology.Status == MethodologyStatus.Approved && methodology.Live)
                     {
                         await _publishingService.MethodologyChanged(methodology.Id);
                     }

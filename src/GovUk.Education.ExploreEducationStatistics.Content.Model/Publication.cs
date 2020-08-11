@@ -41,6 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Contact Contact { get; set; }
 
+        public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
+
         public Release LatestRelease()
         {
             return Releases?.Where(r => r.Live && IsLatestVersionOfRelease(r.Publication, r.Id))

@@ -13,13 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishPublicationFunction
     {
         private readonly IContentService _contentService;
-        private readonly IPublicationService _publicationService;
 
-        public PublishPublicationFunction(IContentService contentService,
-            IPublicationService publicationService)
+        public PublishPublicationFunction(IContentService contentService)
         {
             _contentService = contentService;
-            _publicationService = publicationService;
         }
 
         [FunctionName("PublishPublication")]
@@ -35,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var context = new PublishContext(DateTime.UtcNow, false);
 
             await _contentService.UpdatePublication(context, message.PublicationId, message.OldSlug);
-            await _publicationService.SetPublishedDate(message.PublicationId, context.Published);
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }

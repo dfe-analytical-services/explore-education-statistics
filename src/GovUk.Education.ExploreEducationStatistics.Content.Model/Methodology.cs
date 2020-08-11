@@ -36,5 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<Publication> Publications { get; set; }
 
         public string InternalReleaseNote { get; set; }
+
+        public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
     }
 }

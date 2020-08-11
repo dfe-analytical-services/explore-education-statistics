@@ -13,13 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishMethodologyFunction
     {
         private readonly IContentService _contentService;
-        private readonly IMethodologyService _methodologyService;
 
-        public PublishMethodologyFunction(IContentService contentService,
-            IMethodologyService methodologyService)
+        public PublishMethodologyFunction(IContentService contentService)
         {
             _contentService = contentService;
-            _methodologyService = methodologyService;
         }
 
         [FunctionName("PublishMethodology")]
@@ -35,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var context = new PublishContext(DateTime.UtcNow, false);
 
             await _contentService.UpdateMethodology(context, message.MethodologyId);
-            await _methodologyService.SetPublishedDate(message.MethodologyId, context.Published);
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }

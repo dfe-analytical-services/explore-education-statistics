@@ -24,10 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
+        public async Task<Methodology> Get(Guid id)
+        {
+            return await _context.Methodologies.FindAsync(id);
+        }
+
         public async Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context)
         {
-            var methodology = await _context.Methodologies
-                .SingleOrDefaultAsync(m => m.Id == id);
+            var methodology = await Get(id);
 
             var methodologyViewModel =  _mapper.Map<MethodologyViewModel>(methodology);
 
@@ -55,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task SetPublishedDate(Guid id, DateTime published)
         {
-            var methodology = await _context.Methodologies.FindAsync(id);
+            var methodology = await Get(id);
 
             if (methodology == null)
             {
