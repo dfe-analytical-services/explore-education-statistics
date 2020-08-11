@@ -223,13 +223,13 @@ def capture_large_screenshot():
 def user_checks_previous_table_tool_step_contains(step, key, value):
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]')
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]', timeout=30)
     except:
         raise_assertion_error(f'Previous step wasn\'t found!')
 
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]')
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]', timeout=30)
     except:
         raise_assertion_error(
             f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
