@@ -276,11 +276,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpDelete("release/{releaseId}/chart/{subjectName}/{id}")]
+        [HttpDelete("release/{releaseId}/chart/{id}")]
         public async Task<ActionResult> DeleteChartFile(
             Guid releaseId, string subjectName, Guid id)
         {
-            return await _dataBlockService.RemoveChartFile(releaseId, subjectName, id)
+            return await _dataBlockService.RemoveChartFile(releaseId, id)
                 .HandleFailuresOrNoContent();
         }
 

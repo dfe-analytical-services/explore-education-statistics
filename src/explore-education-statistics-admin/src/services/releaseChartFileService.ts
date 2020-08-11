@@ -50,14 +50,8 @@ const releaseChartFileService = {
     return mapFile(file);
   },
 
-  async deleteChartFile(
-    releaseId: string,
-    subjectName: string,
-    id: string,
-  ): Promise<void> {
-    return client.delete<void>(
-      `/release/${releaseId}/chart/${subjectName}/${id}`,
-    );
+  async deleteChartFile(releaseId: string, id: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/chart/${id}`);
   },
 
   getChartFile(releaseId: string, id: string): Promise<Blob> {

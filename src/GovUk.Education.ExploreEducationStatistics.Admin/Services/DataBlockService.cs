@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -28,21 +27,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IReleaseFilesService _releaseFilesService;
-        private readonly ISubjectService _subjectService;
 
         public DataBlockService(
             ContentDbContext context,
             IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper, 
             IUserService userService,
-            IReleaseFilesService releaseFilesService,
-            ISubjectService subjectService)
+            IReleaseFilesService releaseFilesService)
         {
             _context = context;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _releaseFilesService = releaseFilesService;
-            _subjectService = subjectService;
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> CreateAsync(Guid releaseId, CreateDataBlockViewModel createDataBlock)
@@ -85,9 +81,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName, Guid id)
+        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, Guid id)
         {
-            return await RemoveInfographicChartFromDataBlock(releaseId, subjectName, id)
+            return await RemoveInfographicChartFromDataBlock(releaseId, id)
                 .OnSuccess(async () => await _releaseFilesService.DeleteChartFileAsync(releaseId, id));
         }
 
@@ -217,14 +213,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
-        private async Task<Either<ActionResult, bool>> RemoveInfographicChartFromDataBlock(Guid releaseId,
-            string subjectName, Guid id)
+        private async Task<Either<ActionResult, bool>> RemoveInfographicChartFromDataBlock(Guid releaseId, Guid id)
         {
-            // TODO EES-960 - Using Subject here doesn't find datablocks in the same Release but for a different Subject
-            // that include the same infographic file.
-            // They are left untouched but the file is eventually removed causing an error.
-            var subject = await _subjectService.GetAsync(releaseId, subjectName);
-            var blocks = GetDataBlocks(releaseId, subject.Id);
+            var blocks = GetDataBlocks(releaseId);
 
             foreach (var block in blocks)
             {
@@ -266,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _context.SaveChangesAsync();
         }
 
-        private List<DataBlock> GetDataBlocks(Guid releaseId, Guid subjectId)
+        private List<DataBlock> GetDataBlocks(Guid releaseId, Guid? subjectId = null)
         {
             return _context
                 .ReleaseContentBlocks
@@ -276,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList()
                 .Select(join => join.ContentBlock)
                 .OfType<DataBlock>()
-                .Where(block => block.Query.SubjectId == subjectId)
+                .Where(block => subjectId == null || block.Query.SubjectId == subjectId)
                 .ToList();
         }
 
