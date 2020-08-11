@@ -7,7 +7,8 @@ import {
 } from '@admin/routes/routes';
 import dashboardService from '@admin/services/dashboardService';
 import permissionService from '@admin/services/permissionService';
-import themeService, { Theme, Topic } from '@admin/services/themeService';
+import themeService, { Theme } from '@admin/services/themeService';
+import { Topic } from '@admin/services/topicService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';

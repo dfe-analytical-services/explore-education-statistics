@@ -72,6 +72,11 @@ const AdminDashboardPage = () => {
             <li>
               <Link to="/methodologies">manage methodologies</Link>
             </li>
+            {user?.permissions.canManageAllTaxonomy && (
+              <li>
+                <Link to="/themes">manage themes and topics</Link>
+              </li>
+            )}
           </ul>
         </div>
 

@@ -8,6 +8,7 @@ export interface GlobalPermissions {
   canAccessAnalystPages: boolean;
   canAccessUserAdministrationPages: boolean;
   canAccessMethodologyAdministrationPages: boolean;
+  canManageAllTaxonomy: boolean;
 }
 
 export interface ReleaseStatusPermissions {

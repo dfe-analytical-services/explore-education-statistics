@@ -25,6 +25,7 @@ const defaultPermissions: GlobalPermissions = {
   canAccessAnalystPages: false,
   canAccessUserAdministrationPages: false,
   canAccessMethodologyAdministrationPages: false,
+  canManageAllTaxonomy: false,
 };
 
 export interface AuthContextState {
