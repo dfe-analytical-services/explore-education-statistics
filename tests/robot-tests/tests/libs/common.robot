@@ -38,7 +38,8 @@ user signs in as bau1
   set cookie from json   %{IDENTITY_COOKIE_BAU}
 
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading   Bau1
+  user waits until page contains heading 1   Dashboard
+  user waits until page contains title caption  Welcome Bau1
   user waits until page contains element   css:#selectTheme   180
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
@@ -56,7 +57,8 @@ user signs in as analyst1
   set cookie from json   %{IDENTITY_COOKIE_ANALYST}
 
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading   Analyst1
+  user waits until page contains heading   Dashboard
+  user waits until page contains title caption  Welcome Analyst1
   user waits until page contains element   css:#selectTheme   180
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
@@ -287,6 +289,10 @@ user waits until page contains heading 2
 user waits until page contains heading 3
   [Arguments]   ${text}
   user waits until page contains element  xpath://h3[text()="${text}"]
+
+user waits until page contains title caption
+  [Arguments]  ${text}
+  user waits until page contains element  xpath://*[@data-testid="page-title-caption" and text()="${text}"]
 
 user selects newly opened window
   select window   NEW

@@ -227,14 +227,14 @@ if args.tests and "general_public" not in args.tests:
     def get_test_themes():
         assert os.getenv('ADMIN_URL') is not None
 
-        get_themes_endpoint = f'{os.getenv("ADMIN_URL")}/api/me/themes'
+        get_themes_endpoint = f'{os.getenv("ADMIN_URL")}/api/themes'
         return admin_request('GET', get_themes_endpoint)
 
 
     def create_test_theme():
         assert os.getenv('ADMIN_URL') is not None
 
-        create_theme_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme'
+        create_theme_endpoint = f'{os.getenv("ADMIN_URL")}/api/themes'
         body = {'title': 'Test theme', 'summary': 'Test theme summary'}
         return admin_request('POST', create_theme_endpoint, body)
 
@@ -244,8 +244,8 @@ if args.tests and "general_public" not in args.tests:
         assert os.getenv('ADMIN_URL') is not None
         assert os.getenv('RUN_IDENTIFIER') is not None
 
-        create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/{theme_id}/topics'
-        body = {'title': f'UI test topic {os.getenv("RUN_IDENTIFIER")}'}
+        create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/topics'
+        body = {'title': f'UI test topic {os.getenv("RUN_IDENTIFIER")}', 'themeId': theme_id}
         return admin_request('POST', create_topic_endpoint, body)
 
     setup_authentication()

@@ -47,7 +47,7 @@ Enter new publication title
 User redirects to the dashboard after saving publication
     [Tags]  HappyPath
     user clicks button   Save publication
-    user waits until page contains element   xpath://span[text()="Welcome"]
+    user waits until page contains heading 1  Dashboard
 
 Verify that new publication has been created
     [Tags]  HappyPath
@@ -82,7 +82,7 @@ Update publication
 
 Verify publication has been updated
     [Tags]  HappyPath
-    user waits until page contains element   xpath://span[text()="Welcome"]
+    user waits until page contains heading 1  Dashboard
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains button   ${PUBLICATION_NAME}
     user checks page contains accordion   ${PUBLICATION_NAME}

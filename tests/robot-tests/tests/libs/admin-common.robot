@@ -24,7 +24,7 @@ user creates publication
     user enters text into element  id:publicationForm-contactName     Tingting Shu
     user enters text into element  id:publicationForm-contactTelNo    0123456789
     user clicks button   Save publication
-    user waits until page contains element   xpath://span[text()="Welcome"]
+    user waits until page contains heading 1  Dashboard
 
 User creates release for publication
     [Arguments]  ${publication}  ${time_period_coverage}  ${start_year}
