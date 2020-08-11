@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
@@ -26,11 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = DbUtils.InMemoryApplicationDbContext())
             {
-                var viewModel = (await new MethodologyService(
+                var viewModel = (await BuildMethodologyService(
                         context,
-                        AdminMapper(),
-                        MockUtils.AlwaysTrueUserService().Object,
-                        new PersistenceHelper<ContentDbContext>(context))
+                        Mocks())
                     .CreateMethodologyAsync(request)).Right;
 
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -50,20 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = DbUtils.InMemoryApplicationDbContext("CreateSlugNotUnique"))
             {
-                var createResult = await new MethodologyService(
+                var createResult = await BuildMethodologyService(
                         context,
-                        AdminMapper(),
-                        MockUtils.AlwaysTrueUserService().Object,
-                        new PersistenceHelper<ContentDbContext>(context))
+                        Mocks())
                     .CreateMethodologyAsync(request);
 
                 Assert.True(createResult.IsRight);
 
-                var repeatedCreateResult = await new MethodologyService(
+                var repeatedCreateResult = await BuildMethodologyService(
                         context,
-                        AdminMapper(),
-                        MockUtils.AlwaysTrueUserService().Object,
-                        new PersistenceHelper<ContentDbContext>(context))
+                        Mocks())
                     .CreateMethodologyAsync(request);
 
                 Assert.True(repeatedCreateResult.IsLeft);
@@ -72,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public void ListAsync()
+        public async Task ListAsync()
         {
             var methodology1 = new Methodology
             {
@@ -100,12 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             using (var context = DbUtils.InMemoryApplicationDbContext("List"))
             {
                 // Method under test
-                var methodologies = new MethodologyService(
+                var methodologies = (await BuildMethodologyService(
                         context,
-                        AdminMapper(),
-                        MockUtils.AlwaysTrueUserService().Object,
-                        new PersistenceHelper<ContentDbContext>(context))
-                    .ListAsync().Result.Right;
+                        Mocks())
+                    .ListAsync()).Right;
 
                 Assert.Contains(methodologies,
                     m => m.Id == methodology1.Id
@@ -140,11 +135,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = DbUtils.InMemoryApplicationDbContext("GetSummary"))
             {
-                var viewModel = (await new MethodologyService(
+                var viewModel = (await BuildMethodologyService(
                         context,
-                        AdminMapper(),
-                        MockUtils.AlwaysTrueUserService().Object,
-                        new PersistenceHelper<ContentDbContext>(context))
+                        Mocks())
                     .GetSummaryAsync(methodology.Id)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
@@ -183,11 +176,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
             {
-                var viewModel = (await new MethodologyService(
-                        context,
-                        AdminMapper(),
-                        MockUtils.AlwaysTrueUserService().Object,
-                        new PersistenceHelper<ContentDbContext>(context))
+                var viewModel = (await BuildMethodologyService(context,
+                        Mocks())
                     .UpdateMethodologyAsync(methodology.Id, request)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
@@ -241,16 +231,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = DbUtils.InMemoryApplicationDbContext("UpdateSlugNotUnique"))
             {
-                var result = await new MethodologyService(
+                var result = await BuildMethodologyService(
                         context,
-                        AdminMapper(),
-                        MockUtils.AlwaysTrueUserService().Object,
-                        new PersistenceHelper<ContentDbContext>(context))
+                        Mocks())
                     .UpdateMethodologyAsync(methodology1.Id, request);
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, SlugNotUnique);
             }
+        }
+        
+        private static MethodologyService BuildMethodologyService(ContentDbContext context,
+            (Mock<IPublishingService> publishingService,
+                Mock<IUserService> userService) mocks)
+        {
+            var (publishingService, userService) = mocks;
+
+            return new MethodologyService(
+                context,
+                AdminMapper(),
+                publishingService.Object,
+                userService.Object,
+                new PersistenceHelper<ContentDbContext>(context));
+        }
+
+        private static (Mock<IPublishingService> PublishingService,
+            Mock<IUserService> UserService) Mocks()
+        {
+            return (new Mock<IPublishingService>(),
+                MockUtils.AlwaysTrueUserService());
         }
     }
 }

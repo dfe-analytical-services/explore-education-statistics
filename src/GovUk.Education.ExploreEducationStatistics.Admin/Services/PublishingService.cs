@@ -99,6 +99,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         /// <summary>
+        /// Notify the Publisher that there has been a change to the Methodology.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Either<ActionResult, Unit>> MethodologyChanged(Guid id)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(id)
+                .OnSuccess(async release =>
+                {
+                    await _storageQueueService.AddMessagesAsync(PublishMethodologyQueue,
+                        new PublishMethodologyMessage(id));
+
+                    _logger.LogTrace($"Sent message for Methodology: {id}");
+                    return Unit.Instance;
+                });
+        }
+
+        /// <summary>
         /// Notify the Publisher that there has been a change to the Publication.
         /// </summary>
         /// <param name="id"></param>

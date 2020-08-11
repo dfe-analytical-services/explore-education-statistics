@@ -53,6 +53,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
+        public async Task SetPublishedDate(Guid id, DateTime published)
+        {
+            var methodology = await _context.Methodologies.FindAsync(id);
+
+            if (methodology == null)
+            {
+                throw new ArgumentException("Methodology does not exist", nameof(id));
+            }
+
+            _context.Update(methodology);
+            methodology.Published = published;
+            await _context.SaveChangesAsync();
+        }
+
         private static ThemeTree<MethodologyTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
         {
             return new ThemeTree<MethodologyTreeNode>

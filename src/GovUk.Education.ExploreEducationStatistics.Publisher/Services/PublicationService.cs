@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task SetPublishedDate(Guid id, DateTime published)
         {
-            var publication = await _context.Publications.SingleOrDefaultAsync(p => p.Id == id);
+            var publication = await _context.Publications.FindAsync(id);
 
             if (publication == null)
             {

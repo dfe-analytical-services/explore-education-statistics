@@ -121,11 +121,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     await CacheRelease(release, context);
                 }
             }
-
+            
+            // TODO only include the Methodology if it's not already published
             foreach (var methodologyId in methodologyIds)
             {
                 await CacheMethodology(methodologyId, context);
             }
+        }
+
+        public async Task UpdateMethodology(PublishContext context, Guid methodologyId)
+        {
+            await CacheMethodologyTree(context);
+            await CacheMethodology(methodologyId, context);
         }
 
         public async Task UpdatePublication(PublishContext context, Guid publicationId, string oldSlug)

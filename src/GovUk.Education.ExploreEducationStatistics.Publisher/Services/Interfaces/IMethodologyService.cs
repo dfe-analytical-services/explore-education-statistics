@@ -10,5 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context);
         List<ThemeTree<MethodologyTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds);
+        Task SetPublishedDate(Guid id, DateTime published);
     }
 }
