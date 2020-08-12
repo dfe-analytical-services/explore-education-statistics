@@ -34,6 +34,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Mocks())
                     .CreateMethodologyAsync(request)).Right;
 
+                var model = await context.Methodologies.FindAsync(viewModel.Id);
+
+                Assert.False(model.Live);
+                Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
+                Assert.False(model.LastUpdated.HasValue);
+
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Draft, viewModel.Status);
@@ -87,16 +93,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             using (var context = DbUtils.InMemoryApplicationDbContext("List"))
             {
-                context.AddRange(new List<Methodology>
+                await context.AddRangeAsync(new List<Methodology>
                 {
                     methodology1, methodology2
                 });
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
 
             using (var context = DbUtils.InMemoryApplicationDbContext("List"))
             {
-                // Method under test
                 var methodologies = (await BuildMethodologyService(
                         context,
                         Mocks())
@@ -154,6 +159,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodology = new Methodology
             {
                 Id = Guid.NewGuid(),
+                Slug = "pupil-absence-statistics-methodology",
+                Status = Draft,
+                Title = "Pupil absence statistics: methodology"
+            };
+
+            var request = new UpdateMethodologyRequest
+            {
+                InternalReleaseNote = null,
+                Status = Draft,
+                Title = "Pupil absence statistics (updated): methodology"
+            };
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
+            {
+                context.Add(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
+            {
+                var viewModel = (await BuildMethodologyService(context,
+                        Mocks())
+                    .UpdateMethodologyAsync(methodology.Id, request)).Right;
+
+                var model = await context.Methodologies.FindAsync(methodology.Id);
+
+                Assert.False(model.Live);
+                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
+                Assert.True(model.LastUpdated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.LastUpdated.Value).Milliseconds, 0, 1500);
+
+                Assert.Equal(methodology.Id, viewModel.Id);
+                Assert.Null(viewModel.InternalReleaseNote);
+                Assert.Null(viewModel.Published);
+                Assert.Equal(request.Status, viewModel.Status);
+                Assert.Equal(request.Title, viewModel.Title);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateAsync_AlreadyPublished()
+        {
+            var methodology = new Methodology
+            {
+                Id = Guid.NewGuid(),
                 InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 Slug = "pupil-absence-statistics-methodology",
@@ -180,6 +230,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Mocks())
                     .UpdateMethodologyAsync(methodology.Id, request)).Right;
 
+                var model = await context.Methodologies.FindAsync(methodology.Id);
+                
+                Assert.True(model.Live);
+                // Slug remains unchanged
+                Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
+                Assert.True(model.LastUpdated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.LastUpdated.Value).Milliseconds, 0, 1500);
+                
                 Assert.Equal(methodology.Id, viewModel.Id);
                 // TODO EES-331 is this correct?
                 // Original release note is not cleared if the update is not altering it
@@ -189,18 +247,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(request.Title, viewModel.Title);
             }
         }
-
+        
         [Fact]
         public async Task UpdateAsync_SlugNotUnique()
         {
             var methodology1 = new Methodology
             {
                 Id = Guid.NewGuid(),
-                InternalReleaseNote = "Test approval",
-                Published = new DateTime(2020, 5, 25),
                 Slug = "pupil-absence-statistics-methodology",
                 Status = Draft,
-                Title = "Pupil absence statistics: methodology"
+                Title = "Methodology title"
             };
 
             var methodology2 = new Methodology
