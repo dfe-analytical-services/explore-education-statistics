@@ -144,7 +144,7 @@ Delete UI test subject
     user clicks button   Delete files
 
     user waits until page contains heading   Confirm deletion of selected data files
-    user checks page contains element  xpath://p[text()="4 footnotes will be removed or updated."]
+    user waits until page contains    4 footnotes will be removed or updated.
 
     user clicks button  Confirm
     user waits until page does not contain accordion section   UI test subject
