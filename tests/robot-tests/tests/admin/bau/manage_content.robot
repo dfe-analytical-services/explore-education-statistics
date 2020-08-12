@@ -31,7 +31,7 @@ Create release
     [Tags]  HappyPath
     user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Navigate to Manage content tab
     [Tags]  HappyPath

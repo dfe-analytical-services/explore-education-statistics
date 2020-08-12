@@ -62,12 +62,12 @@ Verify that new publication has been created
     user waits until page contains button   ${PUBLICATION_NAME} (created)
     user checks page contains accordion   ${PUBLICATION_NAME} (created)
     user opens accordion section  ${PUBLICATION_NAME} (created)
-    user checks summary list item "Team" should be "Post-16 statistics team"
-    user checks summary list item "Team" should be "post16.statistics@education.gov.uk"
-    user checks summary list item "Contact" should be "Suzanne Wallace"
-    user checks summary list item "Contact" should be "0123456789"
-    user checks summary list item "Methodology" should be "No methodology assigned"
-    user checks summary list item "Releases" should be "No releases created"
+    user checks testid element contains  Team name for ${PUBLICATION_NAME} (created)  Post-16 statistics team
+    user checks testid element contains  Team email for ${PUBLICATION_NAME} (created)  post16.statistics@education.gov.uk
+    user checks testid element contains  Contact name for ${PUBLICATION_NAME} (created)  Suzanne Wallace
+    user checks testid element contains  Contact phone number for ${PUBLICATION_NAME} (created)  0123456789
+    user checks testid element contains  Methodology for ${PUBLICATION_NAME} (created)  No methodology assigned
+    user checks testid element contains  Releases for ${PUBLICATION_NAME} (created)  No releases created
 
 Go to edit publication
     [Tags]  HappyPath
@@ -94,12 +94,12 @@ Verify publication has been updated
     user waits until page contains button   ${PUBLICATION_NAME}
     user checks page contains accordion   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
-    user checks summary list item "Team" should be "Special educational needs statistics team"
-    user checks summary list item "Team" should be "sen.statistics@education.gov.uk"
-    user checks summary list item "Contact" should be "Sean Gibson"
-    user checks summary list item "Contact" should be "0987654321"
-    user checks summary list item "Methodology" should be "Test methodology"
-    user checks summary list item "Releases" should be "No releases created"
+    user checks testid element contains  Team name for ${PUBLICATION_NAME}  Special educational needs statistics team
+    user checks testid element contains  Team email for ${PUBLICATION_NAME}  sen.statistics@education.gov.uk
+    user checks testid element contains  Contact name for ${PUBLICATION_NAME}  Sean Gibson
+    user checks testid element contains  Contact phone number for ${PUBLICATION_NAME}  0987654321
+    user checks testid element contains  Methodology for ${PUBLICATION_NAME}  Test methodology
+    user checks testid element contains  Releases for ${PUBLICATION_NAME}  No releases created
 
 Create new release
     [Tags]   HappyPath
@@ -117,13 +117,13 @@ Verify created release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
     user waits until page contains heading 2  Release summary
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
-    user checks summary list item "Time period" should be "Spring Term"
-    user checks summary list item "Release period" should be "2025/26"
-    user checks summary list item "Lead statistician" should be "Sean Gibson"
-    user checks summary list item "Scheduled release" should be "Not scheduled"
-    user checks summary list item "Next release expected" should be "Not set"
-    user checks summary list item "Release type" should be "National Statistics"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
+    user checks summary list contains  Time period  Spring Term
+    user checks summary list contains  Release period  2025/26
+    user checks summary list contains  Lead statistician  Sean Gibson
+    user checks summary list contains  Scheduled release  Not scheduled
+    user checks summary list contains  Next release expected  Not set
+    user checks summary list contains  Release type  National Statistics
 
 Edit release summary
     [Tags]  HappyPath
@@ -140,10 +140,10 @@ Verify updated release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
     user waits until page contains heading 2  Release summary
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
-    user checks summary list item "Time period" should be "Summer Term"
-    user checks summary list item "Release period" should be "2026/27"
-    user checks summary list item "Lead statistician" should be "Sean Gibson"
-    user checks summary list item "Scheduled release" should be "Not scheduled"
-    user checks summary list item "Next release expected" should be "Not set"
-    user checks summary list item "Release type" should be "Official Statistics"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
+    user checks summary list contains  Time period  Summer Term
+    user checks summary list contains  Release period  2026/27
+    user checks summary list contains  Lead statistician  Sean Gibson
+    user checks summary list contains  Scheduled release  Not scheduled
+    user checks summary list contains  Next release expected  Not set
+    user checks summary list contains  Release type  Official Statistics

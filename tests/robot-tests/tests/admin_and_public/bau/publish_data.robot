@@ -35,7 +35,7 @@ Verify release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
     user waits until page contains heading 2  Release summary
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Upload subject
     [Tags]  HappyPath
@@ -138,8 +138,8 @@ Wait for release process status to be Complete
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
     user waits until page contains heading 2  Release status
-    user checks summary list item "Current status" should be "Approved"
-    user checks summary list item "Scheduled release" should be "${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}"
+    user checks summary list contains  Current status  Approved
+    user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user waits for release process status to be  Complete    900
     user checks page does not contain button  Edit release status
 

@@ -72,11 +72,18 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
             )
           }
         >
-          <p>{contact?.teamName || 'No team name'}</p>
+          <p data-testid={`Team name for ${publication.title}`}>
+            {contact?.teamName || 'No team name'}
+          </p>
 
           {contact?.teamEmail && (
             <p>
-              <a href={`mailto:${contact.teamEmail}`}>{contact.teamEmail}</a>
+              <a
+                href={`mailto:${contact.teamEmail}`}
+                data-testid={`Team email for ${publication.title}`}
+              >
+                {contact.teamEmail}
+              </a>
             </p>
           )}
         </SummaryListItem>
@@ -99,16 +106,24 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
             )
           }
         >
-          <p>{contact?.contactName || 'No contact name'}</p>
+          <p data-testid={`Contact name for ${publication.title}`}>
+            {contact?.contactName || 'No contact name'}
+          </p>
 
           {contact?.contactTelNo && (
             <p>
-              <a href={`tel:${contact.contactTelNo}`}>{contact.contactTelNo}</a>
+              <a
+                href={`tel:${contact.contactTelNo}`}
+                data-testid={`Contact phone number for ${publication.title}`}
+              >
+                {contact.contactTelNo}
+              </a>
             </p>
           )}
         </SummaryListItem>
         <SummaryListItem
           term="Methodology"
+          testId={`Methodology for ${publication.title}`}
           actions={
             permissions.canUpdatePublication && (
               <Link
@@ -153,22 +168,26 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
         </SummaryListItem>
         <SummaryListItem
           term="Releases"
+          testId={`Releases for ${publication.title}`}
           actions={permissions.canUpdatePublication && <></>}
         >
-          <ul className="govuk-list">
-            {releases.filter(noAmendmentInProgressFilter).map(release => (
-              <li key={release.id}>
-                <NonScheduledReleaseSummary
-                  onClickAmendRelease={
-                    showAmendmentButton() ? setAmendReleaseId : undefined
-                  }
-                  onClickCancelAmendment={setCancelAmendmentReleaseId}
-                  release={release}
-                />
-              </li>
-            ))}
-            {releases.length < 1 && <>No releases created</>}
-          </ul>
+          {releases.length > 0 ? (
+            <ul className="govuk-list">
+              {releases.filter(noAmendmentInProgressFilter).map(release => (
+                <li key={release.id}>
+                  <NonScheduledReleaseSummary
+                    onClickAmendRelease={
+                      showAmendmentButton() ? setAmendReleaseId : undefined
+                    }
+                    onClickCancelAmendment={setCancelAmendmentReleaseId}
+                    release={release}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No releases created</p>
+          )}
 
           <ButtonGroup className="govuk-!-margin-bottom-2">
             {permissions.canCreateReleases && (

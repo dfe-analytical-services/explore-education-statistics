@@ -35,7 +35,7 @@ Verify release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
     user waits until page contains heading 2  Release summary
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Go to "Release status" tab
     [Tags]  HappyPath
@@ -68,9 +68,9 @@ Approve release
 Verify release is scheduled
     [Tags]  HappyPath
     user waits until page contains heading 2  Release status
-    user checks summary list item "Current status" should be "Approved"
-    user checks summary list item "Scheduled release" should be "${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}"
-    user checks summary list item "Next release expected" should be "December 3001"
+    user checks summary list contains  Current status  Approved
+    user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains  Next release expected  December 3001
 
 Wait for release process status to be Complete
     [Tags]  HappyPath

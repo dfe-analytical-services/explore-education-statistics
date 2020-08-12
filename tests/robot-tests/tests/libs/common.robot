@@ -143,6 +143,10 @@ user checks element contains
   wait until element contains  ${element}    ${text}
   element should contain    ${element}    ${text}
 
+user checks testid element contains
+    [Arguments]  ${id}  ${text}
+    user checks element contains  css:[data-testid="${id}"]   ${text}
+
 user checks element does not contain
   [Arguments]   ${element}    ${text}
   element should not contain    ${element}    ${text}
@@ -264,8 +268,9 @@ user checks element attribute value should be
 user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
-user checks summary list item "${dtText}" should be "${ddText}"
-  user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
+user checks summary list contains
+    [Arguments]  ${term}    ${description}
+    user waits until element is visible  xpath://dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}

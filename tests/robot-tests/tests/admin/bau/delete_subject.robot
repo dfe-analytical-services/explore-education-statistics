@@ -24,11 +24,11 @@ Go to Create publication page for "UI tests topic" topic
 Verify that new publication has been created
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains element   xpath://button[text()="${PUBLICATION_NAME}"]
+    user waits until page contains button   ${PUBLICATION_NAME}
     user checks page contains accordion   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
-    user checks summary list item "Methodology" should be "No methodology assigned"
-    user checks summary list item "Releases" should be "No releases created"
+    user checks testid element contains  Methodology for ${PUBLICATION_NAME}  No methodology assigned
+    user checks testid element contains  Releases for ${PUBLICATION_NAME}  No releases created
 
 Create new release
     [Tags]   HappyPath
@@ -53,13 +53,13 @@ Verify Release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
     user waits until page contains heading 2    Release summary
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
-    user checks summary list item "Time period" should be "Tax Year"
-    user checks summary list item "Release period" should be "2020-21"
-    user checks summary list item "Lead statistician" should be "Tingting Shu"
-    user checks summary list item "Scheduled release" should be "Not scheduled"
-    user checks summary list item "Next release expected" should be "Not set"
-    user checks summary list item "Release type" should be "Ad Hoc"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
+    user checks summary list contains  Time period  Tax Year
+    user checks summary list contains  Release period  2020-21
+    user checks summary list contains  Lead statistician  Tingting Shu
+    user checks summary list contains  Scheduled release  Not scheduled
+    user checks summary list contains  Next release expected  Not set
+    user checks summary list contains  Release type  Ad Hoc
 
 Upload subject
     [Tags]  HappyPath
