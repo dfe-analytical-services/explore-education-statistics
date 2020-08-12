@@ -101,13 +101,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("PublicationChanged"))
             {
                 var publishingService = BuildPublishingService(context, mocks);
-                var result = publishingService.PublicationChanged(publication.Id, "old-slug").Result;
+                var result = publishingService.PublicationChanged(publication.Id).Result;
 
                 mocks.StorageQueueService.Verify(
                     mock => mock.AddMessagesAsync(PublishPublicationQueue,
                         It.Is<PublishPublicationMessage>(message =>
-                            message.PublicationId == publication.Id 
-                            && message.OldSlug == "old-slug")), Times.Once());
+                            message.PublicationId == publication.Id)), Times.Once());
 
                 Assert.True(result.IsRight);
             }

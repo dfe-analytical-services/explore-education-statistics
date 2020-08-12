@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.InternalReleaseNote = request.InternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.Status = request.Status;
                     methodology.Title = request.Title;
-                    methodology.LastUpdated = DateTime.UtcNow;
+                    methodology.Updated = DateTime.UtcNow;
 
                     _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();

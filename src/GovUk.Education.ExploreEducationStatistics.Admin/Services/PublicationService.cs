@@ -115,19 +115,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ))
                 .OnSuccess(async publication =>
                 {
-                    if (_context.Publications
-                        .Any(p => p.Slug == updatedPublication.Slug && p.Id != publication.Id))
+                    if (publication.Live)
                     {
-                        return ValidationActionResult(SlugNotUnique);
+                        // Leave slug
+                        return publication;
                     }
 
-                    var oldSlug = publication.Slug;
-                    
+                    return (await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug)).Map(_ =>
+                    {
+                        publication.Slug = updatedPublication.Slug;
+                        return publication;
+                    });
+                })
+                .OnSuccess(async publication =>
+                {
                     publication.Title = updatedPublication.Title;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.MethodologyId = updatedPublication.MethodologyId;
-                    publication.Slug = updatedPublication.Slug;
                     publication.ExternalMethodology = updatedPublication.ExternalMethodology;
+                    publication.Updated = DateTime.UtcNow;
 
                     // Add new contact if it doesn't exist, otherwise replace existing
                     // contact that is shared with another publication with a new
@@ -145,12 +151,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.Contact.TeamEmail = updatedPublication.Contact.TeamEmail;
 
                     _context.Publications.Update(publication);
-
                     await _context.SaveChangesAsync();
 
                     if (publication.Live)
                     {
-                        await _publishingService.PublicationChanged(publication.Id, oldSlug);
+                        await _publishingService.PublicationChanged(publication.Id);
                     }
 
                     return await GetViewModel(publication.Id);
@@ -247,6 +252,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         publication.LegacyReleases.OrderByDescending(release => release.Order)
                     );
                 });
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidatePublicationSlugUniqueForUpdate(Guid id, string slug)
+        {
+            if (await _context.Publications.AnyAsync(publication => publication.Slug == slug && publication.Id != id))
+            {
+                return ValidationActionResult(SlugNotUnique);
+            }
+
+            return Unit.Instance;
         }
 
         public static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)

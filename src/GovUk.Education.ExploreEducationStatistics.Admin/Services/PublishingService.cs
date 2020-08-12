@@ -123,14 +123,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// <param name="id"></param>
         /// <param name="oldSlug"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> PublicationChanged(Guid id, string oldSlug)
+        public async Task<Either<ActionResult, Unit>> PublicationChanged(Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(id)
                 .OnSuccess(async release =>
                 {
                     await _storageQueueService.AddMessagesAsync(
-                        PublishPublicationQueue, new PublishPublicationMessage(id, oldSlug));
+                        PublishPublicationQueue, new PublishPublicationMessage(id));
 
                     _logger.LogTrace($"Sent message for Publication: {id}");
                     return Unit.Instance;

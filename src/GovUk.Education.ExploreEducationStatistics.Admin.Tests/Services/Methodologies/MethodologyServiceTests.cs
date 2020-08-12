@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.False(model.Live);
                 Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
-                Assert.False(model.LastUpdated.HasValue);
+                Assert.False(model.Updated.HasValue);
 
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
@@ -187,8 +187,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.False(model.Live);
                 Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
-                Assert.True(model.LastUpdated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(model.LastUpdated.Value).Milliseconds, 0, 1500);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -235,8 +235,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(model.Live);
                 // Slug remains unchanged
                 Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
-                Assert.True(model.LastUpdated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(model.LastUpdated.Value).Milliseconds, 0, 1500);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
                 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 // TODO EES-331 is this correct?
