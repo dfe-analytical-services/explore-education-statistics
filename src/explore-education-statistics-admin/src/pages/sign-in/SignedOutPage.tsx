@@ -14,7 +14,7 @@ const SignedOutPage = () => {
         href={loginService.getSignInLink()}
         className="govuk-button govuk-button--start"
       >
-        Sign-in
+        Sign in
         <svg
           className="govuk-button__start-icon"
           xmlns="http://www.w3.org/2000/svg"
