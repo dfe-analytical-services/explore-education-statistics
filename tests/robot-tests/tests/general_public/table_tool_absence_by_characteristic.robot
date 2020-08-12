@@ -50,9 +50,12 @@ Select Start date and End date
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks subheaded indicator checkbox   Absence fields        Authorised absence rate
-    user clicks subheaded indicator checkbox   Absence fields        Overall absence rate
-    user clicks subheaded indicator checkbox   Absence fields        Unauthorised absence rate
+    user clicks subheaded indicator checkbox                Absence fields    Authorised absence rate
+    user checks subheaded indicator checkbox is selected    Absence fields    Authorised absence rate
+    user clicks subheaded indicator checkbox                Absence fields    Overall absence rate
+    user checks subheaded indicator checkbox is selected    Absence fields    Overall absence rate
+    user clicks subheaded indicator checkbox                Absence fields    Unauthorised absence rate
+    user checks subheaded indicator checkbox is selected    Absence fields    Unauthorised absence rate
 
 Select Characteristics
     [Tags]   HappyPath
@@ -129,6 +132,7 @@ Validate Gender female Unauthorised absence rate row
 Reorder Gender to be column group
     [Tags]  HappyPath
     user opens details dropdown     Re-order table headers
+    user scrolls to element     xpath://button[text()="Re-order table"]   # Column group needs to be inside the viewport
     user sets focus to element  xpath://legend[text()="Row group 1"]/../../..
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN

@@ -254,7 +254,7 @@ def user_clicks_indicator_checkbox(indicator_label):
 def user_clicks_subheaded_indicator_checkbox(subheading_label, indicator_label):
     sl.page_should_contain_checkbox(f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input')
     sl.driver.find_element_by_xpath(
-        f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]').click()
+        f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input').click()
 
 
 def user_checks_indicator_checkbox_is_selected(indicator_label):
