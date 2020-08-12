@@ -3,6 +3,44 @@ Resource    ./common.robot
 Library     admin-utilities.py
 
 *** Keywords ***
+user signs in as bau1
+  user opens the browser
+
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading 1    Sign in
+
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
+  environment variable should be set   IDENTITY_COOKIE_BAU
+  set cookie from json   %{IDENTITY_COOKIE_BAU}
+
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading 1   Dashboard
+  user waits until page contains title caption  Welcome Bau1
+  user waits until page contains element   css:#selectTheme   180
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
+
+user signs in as analyst1
+  user opens the browser
+
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading 1    Sign in
+
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}
+  environment variable should be set   IDENTITY_COOKIE_ANALYST
+  set cookie from json   %{IDENTITY_COOKIE_ANALYST}
+
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading 1  Dashboard
+  user waits until page contains title caption  Welcome Analyst1
+  user waits until page contains element   css:#selectTheme   180
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
+
 User selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user clicks element   id:my-publications-tab
     user waits until page contains element   id:selectTheme
