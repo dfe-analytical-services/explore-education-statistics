@@ -43,8 +43,10 @@ const ThemesPage = () => {
               <SummaryList noBorder>
                 <SummaryListItem
                   term="Summary"
+                  testId={`Summary for ${theme.title}`}
                   actions={
                     <Link
+                      data-testid={`Edit link for ${theme.title}`}
                       unvisited
                       to={generatePath<ThemeParams>(themeEditRoute.path, {
                         themeId: theme.id,
@@ -58,36 +60,40 @@ const ThemesPage = () => {
                 </SummaryListItem>
               </SummaryList>
 
-              <h3>Topics</h3>
+              <section data-testid={`Topics for ${theme.title}`}>
+                <h3>Topics</h3>
 
-              {theme.topics.length > 0 ? (
-                <SummaryList>
-                  {theme.topics.map(topic => (
-                    <SummaryListItem
-                      key={topic.id}
-                      term={topic.title}
-                      actions={
-                        <Link
-                          unvisited
-                          to={generatePath<ThemeTopicParams>(
-                            topicEditRoute.path,
-                            {
-                              themeId: theme.id,
-                              topicId: topic.id,
-                            },
-                          )}
-                        >
-                          Edit topic
-                        </Link>
-                      }
-                    />
-                  ))}
-                </SummaryList>
-              ) : (
-                <p>No topics for this theme.</p>
-              )}
+                {theme.topics.length > 0 ? (
+                  <SummaryList>
+                    {theme.topics.map(topic => (
+                      <SummaryListItem
+                        key={topic.id}
+                        term={topic.title}
+                        actions={
+                          <Link
+                            data-testid={`Edit ${topic.title} topic link for ${theme.title}`}
+                            unvisited
+                            to={generatePath<ThemeTopicParams>(
+                              topicEditRoute.path,
+                              {
+                                themeId: theme.id,
+                                topicId: topic.id,
+                              },
+                            )}
+                          >
+                            Edit topic
+                          </Link>
+                        }
+                      />
+                    ))}
+                  </SummaryList>
+                ) : (
+                  <p>No topics for this theme</p>
+                )}
+              </section>
 
               <ButtonLink
+                data-testid={`Create topic link for ${theme.title}`}
                 to={generatePath<ThemeParams>(topicCreateRoute.path, {
                   themeId: theme.id,
                 })}

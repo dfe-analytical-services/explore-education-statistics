@@ -191,6 +191,11 @@ user checks element should not contain
   [Arguments]   ${element}  ${text}
   element should not contain  ${element}    ${text}
 
+user checks input field contains
+    [Arguments]  ${element}  ${text}
+    page should contain textfield  ${element}
+    textfield value should be  ${element}  ${text}
+
 user checks page contains
   [Arguments]   ${text}
   page should contain   ${text}
@@ -208,16 +213,21 @@ user checks page does not contain element
   page should not contain element  ${element}
 
 user clicks element
-  [Arguments]     ${elementToClick}
-  wait until page contains element  ${elementToClick}
-  set focus to element    ${elementToClick}
-  wait until element is enabled   ${elementToClick}
-  click element   ${elementToClick}
+    [Arguments]     ${element}
+    wait until page contains element  ${element}
+    user scrolls to element  ${element}
+    set focus to element    ${element}
+    wait until element is enabled   ${element}
+    click element   ${element}
+
+user clicks testid element
+    [Arguments]  ${id}
+    user clicks element  css:[data-testid="${id}"]
 
 user clicks link
   [Arguments]   ${text}
-  wait until page contains element   link:${text}
-  scroll element into view  link:${text}
+  wait until element is visible   link:${text}
+  user scrolls to element  link:${text}
   wait until element is enabled  link:${text}
   click link  ${text}
 

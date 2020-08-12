@@ -200,7 +200,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
                     to={generatePath(releaseCreateRoute.path, {
                       publicationId: id,
                     })}
-                    testId={`Create new release link for ${title}`}
+                    data-testid={`Create new release link for ${title}`}
                   >
                     Create new release
                   </ButtonLink>
@@ -211,7 +211,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
                       publicationId: id,
                     })}
                     variant="secondary"
-                    testId={`Legacy releases link for ${title}`}
+                    data-testid={`Legacy releases link for ${title}`}
                   >
                     Manage legacy releases
                   </ButtonLink>

@@ -3,6 +3,7 @@ import Page from '@admin/components/Page';
 import ThemeForm from '@admin/pages/themes/components/ThemeForm';
 import { ThemeParams, themesRoute } from '@admin/routes/routes';
 import themeService from '@admin/services/themeService';
+import appendQuery from '@admin/utils/url/appendQuery';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -22,8 +23,13 @@ const ThemeCreatePage = ({ history }: RouteComponentProps<ThemeParams>) => {
           </Link>
         }
         onSubmit={async values => {
-          await themeService.createTheme(values);
-          history.push(themesRoute.path);
+          const theme = await themeService.createTheme(values);
+
+          history.push(
+            appendQuery<ThemeParams>(themesRoute.path, {
+              themeId: theme.id,
+            }),
+          );
         }}
       />
     </Page>

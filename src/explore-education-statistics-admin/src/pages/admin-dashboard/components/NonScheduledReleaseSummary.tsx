@@ -33,7 +33,7 @@ const NonScheduledReleaseSummary = ({
                   publicationId: release.publicationId,
                   releaseId: release.id,
                 })}
-                testId={`Edit release amendment link for ${
+                data-testid={`Edit release amendment link for ${
                   release.publicationTitle
                 }, ${getReleaseSummaryLabel(release)}`}
               >
@@ -47,7 +47,7 @@ const NonScheduledReleaseSummary = ({
                   releaseId: release.previousVersionId,
                 })}
                 className="govuk-button--secondary govuk-!-margin-left-4"
-                testId={`View original release link for ${
+                data-testid={`View original release link for ${
                   release.publicationTitle
                 }, ${getReleaseSummaryLabel(release)}`}
               >
@@ -61,7 +61,7 @@ const NonScheduledReleaseSummary = ({
                   publicationId: release.publicationId,
                   releaseId: release.id,
                 })}
-                testId={`Edit release link for ${
+                data-testid={`Edit release link for ${
                   release.publicationTitle
                 }, ${getReleaseSummaryLabel(release)}`}
               >
