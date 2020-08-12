@@ -35,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             new SaveTopicViewModel
                             {
                                 Title = "Test title",
-                                Summary = "Test summary"
                             }
                         );
                     }
@@ -57,7 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             new SaveTopicViewModel
                             {
                                 Title = "Test title",
-                                Summary = "Test summary"
                             }
                         );
                     }

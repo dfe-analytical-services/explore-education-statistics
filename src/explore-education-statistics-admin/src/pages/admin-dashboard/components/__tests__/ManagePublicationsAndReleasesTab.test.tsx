@@ -32,17 +32,41 @@ describe('ManagePublicationsAndReleasesTab', () => {
     {
       id: 'theme-1',
       title: 'Theme 1',
+      slug: 'theme-1',
+      summary: '',
       topics: [
-        { id: 'topic-1', title: 'Topic 1' },
-        { id: 'topic-2', title: 'Topic 2' },
+        {
+          id: 'topic-1',
+          title: 'Topic 1',
+          slug: 'topic-1',
+          themeId: 'theme-1',
+        },
+        {
+          id: 'topic-2',
+          title: 'Topic 2',
+          slug: 'topic-2',
+          themeId: 'theme-1',
+        },
       ],
     },
     {
       id: 'theme-2',
       title: 'Theme 2',
+      slug: 'theme-2',
+      summary: '',
       topics: [
-        { id: 'topic-3', title: 'Topic 3' },
-        { id: 'topic-4', title: 'Topic 4' },
+        {
+          id: 'topic-3',
+          title: 'Topic 3',
+          slug: 'topic-3',
+          themeId: 'theme-1',
+        },
+        {
+          id: 'topic-4',
+          title: 'Topic 4',
+          slug: 'topic-4',
+          themeId: 'theme-1',
+        },
       ],
     },
   ];

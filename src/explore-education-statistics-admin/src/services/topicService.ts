@@ -4,7 +4,6 @@ export interface Topic {
   id: string;
   title: string;
   slug: string;
-  description: string;
   themeId: string;
 }
 

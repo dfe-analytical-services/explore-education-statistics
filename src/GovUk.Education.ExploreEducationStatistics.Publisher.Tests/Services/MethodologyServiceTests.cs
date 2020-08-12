@@ -30,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Title = "Topic A",
             ThemeId = Theme.Id,
             Slug = "topic-a",
-            Summary = "The first topic"
         };
 
         private static readonly Methodology MethodologyA = new Methodology

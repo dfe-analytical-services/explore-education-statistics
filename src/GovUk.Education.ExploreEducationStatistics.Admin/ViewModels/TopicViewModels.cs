@@ -12,21 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Slug { get; set; }
 
-        public string Description { get; set; }
-
         public Guid ThemeId { get; set; }
-
-        public string Summary { get; set; }
     }
 
     public class SaveTopicViewModel
     {
         [Required]
         public string Title { get; set; }
-
-        public string Description { get; set; }
-
-        public string Summary { get; set; }
 
         [Required]
         public Guid ThemeId { get; set; }

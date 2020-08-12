@@ -59,8 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 Title = createdTopic.Title,
                                 Slug = createdTopic.Slug,
-                                Summary = createdTopic.Summary,
-                                Description = createdTopic.Description,
                                 ThemeId = createdTopic.ThemeId,
                             }
                         );
@@ -93,8 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         topic.Title = updatedTopic.Title;
                         topic.Slug = updatedTopic.Slug;
-                        topic.Summary = updatedTopic.Summary;
-                        topic.Description = updatedTopic.Description;
                         topic.ThemeId = updatedTopic.ThemeId;
 
                         _context.Topics.Update(topic);

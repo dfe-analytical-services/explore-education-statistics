@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
@@ -41,8 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new SaveTopicViewModel
                     {
                         Title = "Test topic",
-                        Summary = "Test summary",
-                        Description = "Test description",
                         ThemeId = theme.Id
                     }
                 );
@@ -50,16 +47,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
                 Assert.Equal("Test topic", result.Right.Title);
                 Assert.Equal("test-topic", result.Right.Slug);
-                Assert.Equal("Test description", result.Right.Description);
-                Assert.Equal("Test summary", result.Right.Summary);
                 Assert.Equal(theme.Id, result.Right.ThemeId);
 
                 var savedTopic = await context.Topics.FindAsync(result.Right.Id);
 
                 Assert.Equal("Test topic", savedTopic.Title);
                 Assert.Equal("test-topic", savedTopic.Slug);
-                Assert.Equal("Test description", savedTopic.Description);
-                Assert.Equal("Test summary", savedTopic.Summary);
                 Assert.Equal(theme.Id, savedTopic.ThemeId);
             }
         }
@@ -75,8 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new SaveTopicViewModel
                 {
                     Title = "Test topic",
-                    Summary = "Test summary",
-                    Description = "Test description",
                     ThemeId = Guid.NewGuid()
                 }
             );
@@ -121,8 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new SaveTopicViewModel
                     {
                         Title = "Test topic",
-                        Summary = "Test summary",
-                        Description = "Test description",
                         ThemeId = theme.Id
                     }
                 );
@@ -147,8 +136,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Old title",
                 Slug = "old-title",
-                Description = "Old description",
-                Summary = "Old summary",
                 Theme = new Theme
                 {
                     Title = "Old theme"
@@ -174,8 +161,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new SaveTopicViewModel
                     {
                         Title = "New title",
-                        Summary = "New summary",
-                        Description = "New description",
                         ThemeId = theme.Id
                     }
                 );
@@ -184,16 +169,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(topic.Id, result.Right.Id);
                 Assert.Equal("New title", result.Right.Title);
                 Assert.Equal("new-title", result.Right.Slug);
-                Assert.Equal("New description", result.Right.Description);
-                Assert.Equal("New summary", result.Right.Summary);
                 Assert.Equal(theme.Id, result.Right.ThemeId);
 
                 var savedTopic = await context.Topics.FindAsync(result.Right.Id);
 
                 Assert.Equal("New title", savedTopic.Title);
                 Assert.Equal("new-title", savedTopic.Slug);
-                Assert.Equal("New description", savedTopic.Description);
-                Assert.Equal("New summary", savedTopic.Summary);
                 Assert.Equal(theme.Id, savedTopic.ThemeId);
             }
         }
@@ -205,8 +186,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Old title",
                 Slug = "old-title",
-                Description = "Old description",
-                Summary = "Old summary",
                 Theme = new Theme
                 {
                     Title = "Old theme"
@@ -230,8 +209,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new SaveTopicViewModel
                     {
                         Title = "Test topic",
-                        Summary = "Test summary",
-                        Description = "Test description",
                         ThemeId = Guid.NewGuid()
                     }
                 );
@@ -284,8 +261,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new SaveTopicViewModel
                     {
                         Title = "Other topic",
-                        Summary = "Test summary",
-                        Description = "Test description",
                         ThemeId = topic.ThemeId
                     }
                 );
@@ -305,8 +280,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test topic",
                 Slug = "test-topic",
-                Description = "Test description",
-                Summary = "Test summary",
                 Theme = new Theme
                 {
                     Title = "Test theme"
@@ -331,8 +304,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(topic.Id, result.Right.Id);
                 Assert.Equal("Test topic", result.Right.Title);
-                Assert.Equal("Test description", result.Right.Description);
-                Assert.Equal("Test summary", result.Right.Summary);
                 Assert.Equal(topic.ThemeId, result.Right.ThemeId);
             }
         }

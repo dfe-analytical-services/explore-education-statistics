@@ -39,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Title = "Topic A",
             ThemeId = Theme.Id,
             Slug = "topic-a",
-            Summary = "The first topic"
         };
 
         private static readonly Publication PublicationA = new Publication
@@ -84,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PreviousVersionId = new Guid("36725e6b-8682-480b-a04a-0564253b7160"),
             SoftDeleted = false
         };
-        
+
         private static readonly Release PublicationARelease1V1 = new Release
         {
             Id = new Guid("de6dc6ad-dc75-435c-9cf5-1ed4fe49c0cc"),
@@ -106,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PreviousVersionId = new Guid("36725e6b-8682-480b-a04a-0564253b7160"),
             SoftDeleted = false
         };
-        
+
         private static readonly Release PublicationARelease1V2Deleted = new Release
         {
             Id = new Guid("6ac10729-e83f-4ed4-abc6-8d0efa62ccd2"),
@@ -179,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Published = new DateTime(2019, 1, 01),
                 Status = Approved,
                 Version = 0,
-                PreviousVersionId = new Guid("b647f4cd-4aba-47d9-ab8d-82ece32dca86") 
+                PreviousVersionId = new Guid("b647f4cd-4aba-47d9-ab8d-82ece32dca86")
             },
             new Release
             {
@@ -190,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Published = null,
                 Status = Draft,
                 Version = 0,
-                PreviousVersionId = new Guid("21109205-6362-4746-bc37-0e6db2838173") 
+                PreviousVersionId = new Guid("21109205-6362-4746-bc37-0e6db2838173")
             }
         };
 
