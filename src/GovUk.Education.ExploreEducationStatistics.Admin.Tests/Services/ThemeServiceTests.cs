@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -196,6 +197,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test theme", result.Right.Title);
                 Assert.Equal("test-theme", result.Right.Slug);
                 Assert.Equal("Test summary", result.Right.Summary);
+            }
+        }
+
+        [Fact]
+        public async void GetThemes()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Summary = "Test summary",
+                Topics = new List<Topic>
+                {
+                    new Topic
+                    {
+                        Slug = "topic-b",
+                        Title = "Topic B"
+                    },
+                    new Topic
+                    {
+                        Slug = "topic-c",
+                        Title = "Topic C"
+                    },
+                    new Topic
+                    {
+                        Slug = "topic-a",
+                        Title = "Topic A"
+                    },
+                }
+            };
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(theme);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupThemeService(context);
+
+                var themes = await service.GetThemes();
+
+                Assert.Single(themes.Right);
+
+                var themeViewModel = themes.Right[0];
+
+                Assert.Equal(theme.Id, themeViewModel.Id);
+                Assert.Equal("Theme A", themeViewModel.Title);
+                Assert.Equal("Test summary", themeViewModel.Summary);
+
+                Assert.Equal(3, themeViewModel.Topics.Count);
+
+                // Orders topics alphabetically
+                Assert.Equal(theme.Topics[2].Id, themeViewModel.Topics[0].Id);
+                Assert.Equal("Topic A", themeViewModel.Topics[0].Title);
+
+                Assert.Equal(theme.Topics[0].Id, themeViewModel.Topics[1].Id);
+                Assert.Equal("Topic B", themeViewModel.Topics[1].Title);
+
+                Assert.Equal(theme.Topics[1].Id, themeViewModel.Topics[2].Id);
+                Assert.Equal("Topic C", themeViewModel.Topics[2].Title);
             }
         }
 
