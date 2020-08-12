@@ -145,8 +145,8 @@ user scrolls to element
   scroll element into view  ${element}
 
 user waits until page contains
-  [Arguments]    ${pageText}
-  wait until page contains   ${pageText}
+  [Arguments]    ${pageText}   ${wait}=${timeout}
+  wait until page contains   ${pageText}     timeout=${wait}
 
 user waits until page contains element
   [Arguments]    ${element}        ${wait}=${timeout}

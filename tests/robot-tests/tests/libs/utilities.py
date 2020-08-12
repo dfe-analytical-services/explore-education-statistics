@@ -203,7 +203,8 @@ def user_checks_radio_is_checked(radio_label):
 
 
 def user_clicks_checkbox(checkbox_label):
-    sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]').click()
+    sl.page_should_contain_checkbox(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]/../input')
+    sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]/../input').click()
 
 
 def capture_large_screenshot():
@@ -220,16 +221,16 @@ def capture_large_screenshot():
     sl.set_window_size(page_width, original_height)
 
 
-def user_checks_previous_table_tool_step_contains(step, key, value):
+def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]')
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]', timeout=timeout)
     except:
         raise_assertion_error(f'Previous step wasn\'t found!')
 
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]')
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]', timeout=timeout)
     except:
         raise_assertion_error(
             f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
@@ -244,13 +245,14 @@ def user_selects_end_date(end_date):
 
 
 def user_clicks_indicator_checkbox(indicator_label):
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]')
+    sl.page_should_contain_checkbox(
+        f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]/../input')
     sl.driver.find_element_by_xpath(
-        f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]').click()
+        f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]/../input').click()
 
 
 def user_clicks_subheaded_indicator_checkbox(subheading_label, indicator_label):
+    sl.page_should_contain_checkbox(f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input')
     sl.driver.find_element_by_xpath(
         f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]').click()
 
@@ -405,19 +407,9 @@ def user_checks_selected_list_label(list_locator, label):
             f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_Locator}"')
 
 
-def user_checks_details_dropdown_contains_publication(details_heading, publication_name):
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]')
-    except:
-        raise_assertion_error(f'Cannot find details component "{details_heading}"')
-
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
-    except:
-        raise_assertion_error(
-            f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
+def user_waits_until_details_dropdown_contains_publication(details_heading, publication_name, timeout=3):
+    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]', timeout=timeout)
+    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]/../..//*[text()="{publication_name}"]')
 
 
 def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
