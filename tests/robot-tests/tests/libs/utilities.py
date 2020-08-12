@@ -203,7 +203,8 @@ def user_checks_radio_is_checked(radio_label):
 
 
 def user_clicks_checkbox(checkbox_label):
-    sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]').click()
+    sl.page_should_contain_checkbox(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]/../input')
+    sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]/../input').click()
 
 
 def capture_large_screenshot():
@@ -244,15 +245,14 @@ def user_selects_end_date(end_date):
 
 
 def user_clicks_indicator_checkbox(indicator_label):
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]')
-    sl.driver.find_element_by_xpath(
-        f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]').click()
-    sl.checkbox_should_be_selected(
+    sl.page_should_contain_checkbox(
         f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]/../input')
+    sl.driver.find_element_by_xpath(
+        f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]/../input').click()
 
 
 def user_clicks_subheaded_indicator_checkbox(subheading_label, indicator_label):
+    sl.page_should_contain_checkbox(f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input')
     sl.driver.find_element_by_xpath(
         f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]').click()
 
@@ -408,8 +408,8 @@ def user_checks_selected_list_label(list_locator, label):
 
 
 def user_waits_until_details_dropdown_contains_publication(details_heading, publication_name, timeout=3):
-    sl.wait_until_page_contains_element(f'xpath://*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]', timeout=timeout)
-    sl.wait_until_page_contains_element(f'xpath://*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
+    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]', timeout=timeout)
+    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]/../..//*[text()="{publication_name}"]')
 
 
 def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
