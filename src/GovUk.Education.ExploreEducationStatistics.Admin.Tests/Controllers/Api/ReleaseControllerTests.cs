@@ -16,7 +16,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
@@ -33,16 +33,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private readonly Guid _releaseId = Guid.NewGuid();
         private readonly Guid _publicationId = Guid.NewGuid();
-        
+
         [Fact]
         public async void Create_Release_Returns_Ok()
         {
             var mocks = Mocks();
-            
+
             mocks.ReleaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
                 .ReturnsAsync(new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel()));
             var controller = ReleasesControllerWithMocks(mocks);
-            
+
             // Call the method under test
             var result = await controller.CreateReleaseAsync(new CreateReleaseViewModel(), _publicationId);
             AssertOkResult(result);
@@ -51,21 +51,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
         {
-            var testFile = new Common.Model.FileInfo
+            var testFile = new FileInfo
                             {
                                 Extension = "doc",
                                 Name = "File name",
                                 Path = "ancillaryFile.doc",
                                 Size = "1 Kb"
                             };
-            
+
             var mocks = Mocks();
             var ancillaryFile = MockFile("ancillaryFile.doc");
             mocks.FileStorageService
                 .Setup(service =>
-                    service.UploadFileAsync(_releaseId, ancillaryFile, "File name", 
+                    service.UploadFileAsync(_releaseId, ancillaryFile, "File name",
                         ReleaseFileTypes.Ancillary, false))
-                .ReturnsAsync(new Either<ActionResult, Common.Model.FileInfo>(testFile));
+                .ReturnsAsync(new Either<ActionResult, FileInfo>(testFile));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
@@ -142,16 +142,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetDataFilesAsync_Returns_A_List_Of_Files()
         {
-            IEnumerable<FileInfo> testFiles = new[]
+            IEnumerable<DataFileInfo> testFiles = new[]
             {
-                new FileInfo
+                new DataFileInfo
                 {
                     Extension = "csv",
                     Name = "Release a file 1",
                     Path = "file1.csv",
                     Size = "1 Kb"
                 },
-                new FileInfo
+                new DataFileInfo
                 {
                     Extension = "csv",
                     Name = "Release a file 2",
@@ -162,8 +162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var mocks = Mocks();
             
-            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata))
-                .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
+            mocks.FileStorageService.Setup(s => s.ListDataFilesAsync(_releaseId))
+                .ReturnsAsync(new Either<ActionResult, IEnumerable<DataFileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test

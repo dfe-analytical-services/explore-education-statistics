@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IAmendmentMigrationService
+    public interface IUpdateChartFilesService
     {
-        Task<Either<ActionResult, bool>> FixMissingSubjectId();
+        Task<Either<ActionResult, Unit>> UpdateChartFiles();
     }
 }
