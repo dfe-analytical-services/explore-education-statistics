@@ -220,16 +220,16 @@ def capture_large_screenshot():
     sl.set_window_size(page_width, original_height)
 
 
-def user_checks_previous_table_tool_step_contains(step, key, value):
+def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]', timeout=30)
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]', timeout=timeout)
     except:
         raise_assertion_error(f'Previous step wasn\'t found!')
 
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]', timeout=30)
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]', timeout=timeout)
     except:
         raise_assertion_error(
             f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
@@ -407,19 +407,9 @@ def user_checks_selected_list_label(list_locator, label):
             f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_Locator}"')
 
 
-def user_checks_details_dropdown_contains_publication(details_heading, publication_name):
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]')
-    except:
-        raise_assertion_error(f'Cannot find details component "{details_heading}"')
-
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
-    except:
-        raise_assertion_error(
-            f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
+def user_waits_until_details_dropdown_contains_publication(details_heading, publication_name, timeout=3):
+    sl.wait_until_page_contains_element(f'xpath://*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]', timeout=timeout)
+    sl.wait_until_page_contains_element(f'xpath://*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
 
 
 def user_checks_details_dropdown_contains_download_link(details_heading, download_link):

@@ -157,7 +157,7 @@ Verify newly published release is on Find Statistics page
     user checks accordion section contains text   Test theme   ${TOPIC_NAME}
 
     user opens details dropdown  ${TOPIC_NAME}
-    user checks details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}
+    user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
     user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables online
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
