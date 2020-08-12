@@ -190,16 +190,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var footnote = _context.Footnote
                 .Include(f => f.Filters)
                 .Include(f => f.FilterGroups)
+                .ThenInclude(f => f.FilterGroup.Filter)
                 .Include(f => f.FilterItems)
+                .ThenInclude(itemFootnote => itemFootnote.FilterItem.FilterGroup.Filter)
                 .Include(f => f.Indicators)
                 .ThenInclude(i => i.Indicator.IndicatorGroup)
-                .Include(f => f.Subjects).Single(f => f.Id == id);
+                .Include(f => f.Subjects)
+                .Single(f => f.Id == id);
 
-            return (footnote.Subjects.Any(subject => otherSubjectIds.Contains(subject.SubjectId)) ||
+            return footnote.Subjects.Any(subject => otherSubjectIds.Contains(subject.SubjectId)) ||
                     footnote.Filters.Any(filter => otherSubjectIds.Contains(filter.Filter.SubjectId)) ||
                     footnote.Indicators.Any(indicator => otherSubjectIds.Contains(indicator.Indicator.IndicatorGroup.SubjectId)) ||
                     footnote.FilterGroups.Any(filterGroup => otherSubjectIds.Contains(filterGroup.FilterGroup.Filter.SubjectId)) ||
-                    footnote.FilterItems.Any(filterItem => otherSubjectIds.Contains(filterItem.FilterItem.FilterGroup.Filter.SubjectId)));
+                    footnote.FilterItems.Any(filterItem => otherSubjectIds.Contains(filterItem.FilterItem.FilterGroup.Filter.SubjectId));
         }
     }
 }

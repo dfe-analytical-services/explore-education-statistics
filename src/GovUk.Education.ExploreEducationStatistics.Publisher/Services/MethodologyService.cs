@@ -24,10 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
+        public async Task<Methodology> Get(Guid id)
+        {
+            return await _context.Methodologies.FindAsync(id);
+        }
+
         public async Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context)
         {
-            var methodology = await _context.Methodologies
-                .SingleOrDefaultAsync(m => m.Id == id);
+            var methodology = await Get(id);
 
             var methodologyViewModel =  _mapper.Map<MethodologyViewModel>(methodology);
 
@@ -51,6 +55,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Select(theme => BuildThemeTree(theme, includedReleaseIds))
                 .OrderBy(theme => theme.Title)
                 .ToList();
+        }
+
+        public async Task SetPublishedDate(Guid id, DateTime published)
+        {
+            var methodology = await Get(id);
+
+            if (methodology == null)
+            {
+                throw new ArgumentException("Methodology does not exist", nameof(id));
+            }
+
+            _context.Update(methodology);
+            methodology.Published = published;
+            await _context.SaveChangesAsync();
         }
 
         private static ThemeTree<MethodologyTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)

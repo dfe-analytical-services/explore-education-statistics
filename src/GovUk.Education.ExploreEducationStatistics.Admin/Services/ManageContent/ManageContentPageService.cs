@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         releaseId, _releaseService.GetReferencedReleaseFileVersions(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Ancillary))
                 .OnSuccess(publicFiles =>
                 {
-                    var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                    var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
                     releaseViewModel.DownloadFiles = publicFiles;
 
                     return new ManageContentPageViewModel

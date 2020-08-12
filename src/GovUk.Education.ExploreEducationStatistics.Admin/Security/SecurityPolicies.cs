@@ -59,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
          */
         CanViewAllTopics,
         CanViewSpecificTheme,
+        CanViewSpecificTopic,
 
         /**
          * Methodology management

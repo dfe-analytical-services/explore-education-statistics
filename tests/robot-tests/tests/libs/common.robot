@@ -30,7 +30,7 @@ user signs in as bau1
 
   environment variable should be set   ADMIN_URL
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading     Sign-in
+  user waits until page contains heading     Sign in
 
   environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
   set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
@@ -48,7 +48,7 @@ user signs in as analyst1
 
   environment variable should be set   ADMIN_URL
   user goes to url  %{ADMIN_URL}
-  user waits until page contains heading     Sign-in
+  user waits until page contains heading     Sign in
 
   environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
   set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}
@@ -251,10 +251,10 @@ user clicks element
   set focus to element    ${elementToClick}
   wait until element is enabled   ${elementToClick}
   click element   ${elementToClick}
-  #press keys  ${elementToClick}   ENTER
 
 user clicks link
   [Arguments]   ${text}
+  wait until page contains element   link:${text}
   scroll element into view  link:${text}
   wait until element is enabled  link:${text}
   click link  ${text}

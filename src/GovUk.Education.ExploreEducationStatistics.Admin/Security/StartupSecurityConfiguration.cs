@@ -153,6 +153,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanViewSpecificTheme.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificThemeRequirement()));
 
+                // does this user have permission to view a specific Topic?
+                options.AddPolicy(SecurityPolicies.CanViewSpecificTopic.ToString(), policy =>
+                    policy.Requirements.Add(new ViewSpecificTopicRequirement()));
+
+
                 /**
                  * Methodology management
                  */
@@ -235,6 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              * Topic / Theme management
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificThemeAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewSpecificTopicAuthorizationHandler>();
 
             /**
              * Methodology management

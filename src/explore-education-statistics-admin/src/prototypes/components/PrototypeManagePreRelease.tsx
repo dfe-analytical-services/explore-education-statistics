@@ -1,10 +1,9 @@
-import React from 'react';
 import Button from '@common/components/Button';
-import ButtonLink from '@common/components/ButtonLink';
+import ButtonText from '@common/components/ButtonText';
 import { FormGroup, FormTextInput } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import ButtonText from '@common/components/ButtonText';
+import React from 'react';
 
 const PrototypeManagePreRelease = () => {
   return (

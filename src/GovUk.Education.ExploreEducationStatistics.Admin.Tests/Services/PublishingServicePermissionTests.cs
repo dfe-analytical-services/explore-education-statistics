@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publishingService = BuildPublishingService(mocks);
 
             AssertSecurityPoliciesChecked(service =>
-                    service.RetryStage(_release.Id, ContentAndPublishing),
+                    service.RetryReleaseStage(_release.Id, ContentAndPublishing),
                 _release,
                 mocks.UserService,
                 publishingService,

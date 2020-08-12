@@ -1,4 +1,4 @@
-import { ContactDetails } from '@admin/services/contactService';
+import { ContactDetails, SaveContact } from '@admin/services/contactService';
 import { ExternalMethodology } from '@admin/services/dashboardService';
 import {
   LegacyRelease,
@@ -25,31 +25,33 @@ export interface PublicationMethodologyDetails {
   externalMethodology?: ExternalMethodology;
 }
 
-export interface CreatePublicationRequest
-  extends PublicationMethodologyDetails {
+export interface SavePublicationRequest {
+  title: string;
+  contact: SaveContact;
+  selectedMethodologyId?: string;
+  externalMethodology?: ExternalMethodology;
   topicId: string;
-  publicationTitle: string;
-  selectedContactId: string;
 }
+
+export type CreatePublicationRequest = SavePublicationRequest;
+export type UpdatePublicationRequest = SavePublicationRequest;
 
 export type UpdatePublicationLegacyRelease = Partial<
   OmitStrict<UpdateLegacyRelease, 'publicationId'>
 >;
 
 const publicationService = {
-  createPublication({
-    topicId,
-    publicationTitle: title,
-    selectedContactId: contactId,
-    selectedMethodologyId: methodologyId,
-    externalMethodology,
-  }: CreatePublicationRequest) {
-    return client.post(`/topic/${topicId}/publications`, {
-      title,
-      contactId,
-      methodologyId,
-      externalMethodology,
-    });
+  createPublication(
+    publication: CreatePublicationRequest,
+  ): Promise<BasicPublicationDetails> {
+    return client.post('/publications', publication);
+  },
+
+  updatePublication(
+    publicationId: string,
+    publication: UpdatePublicationRequest,
+  ): Promise<BasicPublicationDetails> {
+    return client.put(`/publications/${publicationId}`, publication);
   },
 
   getPublication(publicationId: string): Promise<BasicPublicationDetails> {

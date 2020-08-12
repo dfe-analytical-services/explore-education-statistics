@@ -8,6 +8,10 @@ body {
   @extend %govuk-body-m;
 }
 
+p {
+  @extend %govuk-body-m;
+}
+
 a {
   @extend %govuk-link;
 }

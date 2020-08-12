@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.DateTimeExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 // ReSharper disable StringLiteralTypo
@@ -140,15 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
             modelBuilder.Entity<Methodology>()
-                .Property(methodology => methodology.PublishScheduled)
-                .HasConversion(
-                    v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
-
-            modelBuilder.Entity<Methodology>()
                 .Property(b => b.Status)
-                .HasConversion(new EnumToStringConverter<MethodologyStatus>())
-                .HasDefaultValue(MethodologyStatus.Draft);
+                .HasConversion(new EnumToStringConverter<MethodologyStatus>());
 
             modelBuilder.Entity<Publication>()
                 .Property(p => p.LegacyPublicationUrl)
@@ -997,10 +989,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = absenceMethodologyId,
                     Title = "Pupil absence statistics: methodology",
-                    PublishScheduled = new DateTime(2018, 3, 22).AsStartOfDayUtc(),
                     Published = new DateTime(2018, 3, 22),
                     LastUpdated = new DateTime(2019, 6, 26),
                     Slug = "pupil-absence-in-schools-in-england",
+                    Status = MethodologyStatus.Draft,
                     Summary = "",
                     Content = new List<ContentSection>
                     {

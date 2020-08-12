@@ -126,12 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 publication, release);
         }
 
-        public async Task MoveStagedContentAsync()
+        public async Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath)
         {
-            var container = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
-            var sourceDirectoryPath = PublicContentStagingPath();
+            var container = await GetCloudBlobContainerAsync(_publicStorageConnectionString, containerName);
             var sourceDirectory = container.GetDirectoryReference(sourceDirectoryPath);
-            var destinationDirectory = container.GetDirectoryReference(string.Empty);
+            var destinationDirectory = container.GetDirectoryReference(destinationDirectoryPath);
 
             var options = new CopyDirectoryOptions
             {
@@ -240,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             
             if (!releaseFileReferences.Exists(rfr => rfr.ReleaseId == releaseId && rfr.Filename == name))
             {
-                _logger.LogError($"No release file reference found for releaseId {releaseId} and name : {name}");
+                _logger.LogError($"No release file reference found for releaseId {releaseId} and name: {name}");
                 return false;
             }
 
@@ -268,6 +267,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task DeleteBlobsAsync(CloudBlobContainer container, string directoryPath,
             string excludePattern = null)
         {
+            directoryPath = directoryPath.AppendTrailingSlash();
+            _logger.LogInformation($"Deleting blobs from {container.Name} directory {directoryPath}");
+
             var token = new BlobContinuationToken();
             do
             {

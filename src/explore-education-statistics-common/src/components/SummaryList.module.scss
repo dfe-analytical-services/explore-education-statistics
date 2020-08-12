@@ -1,0 +1,12 @@
+.compact {
+  :global(.govuk-summary-list__key),
+  :global(.govuk-summary-list__value) {
+    padding: 0;
+  }
+}
+
+.smallKey {
+  :global(.govuk-summary-list__key) {
+    width: 15%;
+  }
+}

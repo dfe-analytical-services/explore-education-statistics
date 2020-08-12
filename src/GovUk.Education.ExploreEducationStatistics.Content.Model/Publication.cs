@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class    Publication
+    public class Publication
     {
         public Guid Id { get; set; }
 
@@ -31,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<LegacyRelease> LegacyReleases { get; set; }
 
+        public DateTime? Published { get; set; }
+
         public Guid TopicId { get; set; }
 
         public Topic Topic { get; set; }
@@ -38,6 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid? ContactId { get; set; }
 
         public Contact Contact { get; set; }
+
+        public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
 
         public Release LatestRelease()
         {
