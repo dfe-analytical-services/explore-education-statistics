@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    if (publication.Published.HasValue)
+                    if (publication.Live)
                     {
                         await _publishingService.PublicationChanged(publication.Id, oldSlug);
                     }

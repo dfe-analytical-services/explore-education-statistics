@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -22,18 +23,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 {
     public class MethodologyService : IMethodologyService
     {
-        private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IPublishingService _publishingService;
+        private readonly IUserService _userService;
 
         public MethodologyService(ContentDbContext context,
             IMapper mapper,
+            IPublishingService publishingService,
             IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
+            _publishingService = publishingService;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
         }
@@ -108,6 +112,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodology.Slug = slug;
 
                     await _context.SaveChangesAsync();
+
+                    if (methodology.Status == MethodologyStatus.Approved && methodology.Live)
+                    {
+                        await _publishingService.MethodologyChanged(methodology.Id);
+                    }
+
                     return await GetSummaryAsync(id);
                 });
         }

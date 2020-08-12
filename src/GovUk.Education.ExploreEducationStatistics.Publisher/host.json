@@ -2,19 +2,13 @@
   "version": "2.0",
   "logging": {
     "logLevel": {
-      "default": "None",
-      "Function.PublishAllContent": "Information",
-      "Function.GenerateReleaseContent": "Information",
-      "Function.PublishPublication": "Information",
-      "Function.PublishReleases": "Information",
-      "Function.PublishReleaseContent": "Information",
-      "Function.PublishReleaseData": "Information",
-      "Function.PublishReleaseFiles": "Information",
-      "Function.PublishStagedReleaseContent": "Information",
-      "Function.NotifyChange": "Information",
-      "Function.DataFactoryPipelineStatus": "Information",
-      "Function.RetryStage": "Information",
-      "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
+      "default": "Information",
+      "Microsoft": "Warning"
+    }
+  },
+  "extensions": {
+    "queues": {
+      "maxPollingInterval": "00:00:02"
     }
   }
 }

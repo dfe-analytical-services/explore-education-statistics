@@ -10,20 +10,20 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Publishe
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class PublishPublicationFunction
+    public class PublishMethodologyFunction
     {
         private readonly IContentService _contentService;
 
-        public PublishPublicationFunction(IContentService contentService)
+        public PublishMethodologyFunction(IContentService contentService)
         {
             _contentService = contentService;
         }
 
-        [FunctionName("PublishPublication")]
+        [FunctionName("PublishMethodology")]
         // ReSharper disable once UnusedMember.Global
-        public async Task PublishPublication(
-            [QueueTrigger(PublishPublicationQueue)]
-            PublishPublicationMessage message,
+        public async Task PublishMethodology(
+            [QueueTrigger(PublishMethodologyQueue)]
+            PublishMethodologyMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var context = new PublishContext(DateTime.UtcNow, false);
 
-            await _contentService.UpdatePublication(context, message.PublicationId, message.OldSlug);
+            await _contentService.UpdateMethodology(context, message.MethodologyId);
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }

@@ -12,5 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             PublicationId = publicationId;
             OldSlug = oldSlug;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(PublicationId)}: {PublicationId}, {nameof(OldSlug)}: {OldSlug}";
+        }
     }
 }
