@@ -42,13 +42,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new SavePublicationViewModel()
+                    new SavePublicationViewModel
                     {
                         Title = "Test publication",
                         Contact = new SaveContactViewModel
@@ -77,7 +75,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test methodology", publicationViewModel.Methodology.Title);
 
                 // Do an in depth check of the saved release
-                var createdPublication = context.Publications.Single(p => p.Id == publicationViewModel.Id);
+                var createdPublication = await context.Publications.FindAsync(publicationViewModel.Id);
+                Assert.False(createdPublication.Live);
+                Assert.Equal("test-publication", createdPublication.Slug);
+                Assert.False(createdPublication.Updated.HasValue);
                 Assert.Equal("Test publication", createdPublication.Title);
 
                 Assert.Equal("John Smith", createdPublication.Contact.ContactName);
@@ -98,16 +99,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             await using var context = InMemoryApplicationDbContext();
 
-            var mocks = Mocks();
-
-            var publicationService = BuildPublicationService(context, mocks);
+            var publicationService = BuildPublicationService(context, Mocks());
 
             // Service method under test
             var result = await publicationService.CreatePublication(
-                new SavePublicationViewModel()
+                new SavePublicationViewModel
                 {
                     Title = "Test publication",
-                    TopicId = Guid.NewGuid(),
+                    TopicId = Guid.NewGuid()
                 });
 
             Assert.True(result.IsLeft);
@@ -136,9 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -183,9 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -236,9 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -286,9 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
@@ -353,9 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -388,7 +377,112 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New methodology", result.Right.Methodology.Title);
 
                 // Do an in depth check of the saved release
-                var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                Assert.False(updatedPublication.Live);
+                Assert.True(updatedPublication.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
+                Assert.Equal("new-title", updatedPublication.Slug);
+                Assert.Equal("New title", updatedPublication.Title);
+
+                Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
+                Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
+                Assert.Equal("Test team", updatedPublication.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+
+                Assert.Equal(topic.Id, updatedPublication.TopicId);
+                Assert.Equal("New topic", updatedPublication.Topic.Title);
+
+                Assert.Equal(methodology.Id, updatedPublication.MethodologyId);
+                Assert.Equal("New methodology", updatedPublication.Methodology.Title);
+            }
+        }
+        
+        [Fact]
+        public async void UpdatePublication_AlreadyPublished()
+        {
+            var topic = new Topic
+            {
+                Title = "New topic"
+            };
+            var methodology = new Methodology
+            {
+                Title = "New methodology",
+                Status = MethodologyStatus.Approved,
+            };
+            var publication = new Publication
+            {
+                Slug = "old-title",
+                Title = "Old title",
+                Topic = new Topic
+                {
+                    Title = "Old topic"
+                },
+                Methodology = new Methodology
+                {
+                    Title = "Old methodology"
+                },
+                Contact = new Contact
+                {
+                    ContactName = "Old name",
+                    ContactTelNo = "0987654321",
+                    TeamName = "Old team",
+                    TeamEmail = "old.smith@test.com",
+                },
+                Published = new DateTime(2020, 8, 12),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(topic);
+                context.Add(methodology);
+                context.Add(publication);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context, Mocks());
+
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new SavePublicationViewModel()
+                    {
+                        Title = "New title",
+                        Contact = new SaveContactViewModel
+                        {
+                            ContactName = "John Smith",
+                            ContactTelNo = "0123456789",
+                            TeamName = "Test team",
+                            TeamEmail = "john.smith@test.com",
+                        },
+                        TopicId = topic.Id,
+                        MethodologyId = methodology.Id,
+                    }
+                );
+
+                Assert.Equal("New title", result.Right.Title);
+
+                Assert.Equal("John Smith", result.Right.Contact.ContactName);
+                Assert.Equal("0123456789", result.Right.Contact.ContactTelNo);
+                Assert.Equal("Test team", result.Right.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
+
+                Assert.Equal(topic.Id, result.Right.TopicId);
+
+                Assert.Equal(methodology.Id, result.Right.Methodology.Id);
+                Assert.Equal("New methodology", result.Right.Methodology.Title);
+
+                // Do an in depth check of the saved release
+                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                Assert.True(updatedPublication.Live);
+                Assert.True(updatedPublication.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
+                // Slug remains unchanged
+                Assert.Equal("old-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
 
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
@@ -431,9 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -453,7 +545,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
 
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
                 Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
@@ -503,9 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -524,8 +614,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         MethodologyId = publication.MethodologyId,
                     }
                 );
-
-                var updatedPublication = context.Publications.Single(p => p.Id == result.Right.Id);
+                
+                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
 
                 Assert.NotEqual(sharedContact.Id, updatedPublication.Contact.Id);
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
@@ -561,9 +651,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -605,9 +693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -650,9 +736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -706,9 +790,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
 
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -761,9 +844,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -816,9 +897,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 var result = await publicationService.PartialUpdateLegacyReleases(
                     publication.Id,
@@ -853,7 +932,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void PartialUpdateLegacyReleases_OnlyNonNullFields()
         {
-
             var publication = new Publication
             {
                 LegacyReleases = new List<LegacyRelease>
@@ -877,9 +955,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var mocks = Mocks();
-
-                var publicationService = BuildPublicationService(context, mocks);
+                var publicationService = BuildPublicationService(context, Mocks());
 
                 var result = await publicationService.PartialUpdateLegacyReleases(
                     publication.Id,

@@ -16,6 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task UpdateMethodology(PublishContext context, Guid methodologyId);
 
-        Task UpdatePublication(PublishContext context, Guid publicationId, string oldSlug);
+        Task UpdatePublication(PublishContext context, Guid publicationId);
     }
 }

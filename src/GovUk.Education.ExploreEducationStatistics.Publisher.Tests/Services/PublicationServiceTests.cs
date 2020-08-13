@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "methodology-slug",
             Summary = "methodology summary",
             Published = new DateTime(2020, 2, 10),
-            LastUpdated = new DateTime(2020, 2, 11)
+            Updated = new DateTime(2020, 2, 11)
         };
 
         private static readonly Publication PublicationA = new Publication

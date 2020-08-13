@@ -989,7 +989,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = absenceMethodologyId,
                     Title = "Pupil absence statistics: methodology",
                     Published = new DateTime(2018, 3, 22),
-                    LastUpdated = new DateTime(2019, 6, 26),
+                    Updated = new DateTime(2019, 6, 26),
                     Slug = "pupil-absence-in-schools-in-england",
                     Status = MethodologyStatus.Draft,
                     Summary = "",
