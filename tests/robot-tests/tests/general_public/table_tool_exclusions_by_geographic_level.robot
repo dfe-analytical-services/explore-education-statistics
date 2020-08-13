@@ -11,7 +11,7 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until page contains heading  Create your own tables online
+    user waits until page contains heading 1  Create your own tables online
     user waits for page to finish loading
 
 Select Exclusions publication
@@ -97,7 +97,7 @@ User validates permanent link works correctly
     [Tags]   HappyPath
     user clicks link   View permanent link
     select window    NEW
-    user waits until page contains heading  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
+    user waits until page contains heading 1  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
 
 User validates permalink contains correct date
     [Tags]  HappyPath

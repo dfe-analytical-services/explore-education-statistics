@@ -5,11 +5,10 @@ import {
   publicationCreateRoute,
   ThemeTopicParams,
 } from '@admin/routes/routes';
-import dashboardService, {
-  Theme,
-  Topic,
-} from '@admin/services/dashboardService';
+import dashboardService from '@admin/services/dashboardService';
 import permissionService from '@admin/services/permissionService';
+import themeService, { Theme } from '@admin/services/themeService';
+import { Topic } from '@admin/services/topicService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -32,16 +31,30 @@ const ManagePublicationsAndReleasesTab = () => {
   >('dashboardThemeTopic', undefined);
 
   const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
-    dashboardService.getMyThemesAndTopics,
+    themeService.getThemes,
   );
 
   const selectedTheme = useMemo<Theme | undefined>(() => {
-    return themes?.find(t => t.id === themeId);
-  }, [themeId, themes]);
+    const selectedThemeId = themeId || savedThemeTopic?.themeId;
+
+    return (
+      themes?.find(t => t.id === selectedThemeId) ??
+      orderBy(themes, t => t.title)[0]
+    );
+  }, [savedThemeTopic, themeId, themes]);
 
   const selectedTopic = useMemo<Topic | undefined>(() => {
-    return selectedTheme?.topics.find(t => t.id === topicId);
-  }, [selectedTheme, topicId]);
+    if (!selectedTheme) {
+      return undefined;
+    }
+
+    const selectedTopicId = topicId || savedThemeTopic?.topicId;
+
+    return (
+      selectedTheme.topics.find(t => t.id === selectedTopicId) ??
+      orderBy(selectedTheme.topics, t => t.title)[0]
+    );
+  }, [savedThemeTopic, selectedTheme, topicId]);
 
   const {
     value: myPublications,
@@ -64,46 +77,33 @@ const ManagePublicationsAndReleasesTab = () => {
   }, [selectedTopic?.id]);
 
   useEffect(() => {
-    if (!themes || savedThemeTopic) {
-      return;
-    }
-
-    const theme =
-      themes.find(t => t.id === themeId) ?? orderBy(themes, t => t.title)[0];
-
-    if (!theme) {
-      return;
-    }
-
-    const topic =
-      theme.topics.find(t => t.id === topicId) ??
-      orderBy(theme.topics, t => t.title)[0];
-
-    if (!topic) {
+    if (savedThemeTopic) {
       return;
     }
 
     // Set default theme/topic in storage if it
     // hasn't been set yet (e.g. first time
     // visiting dashboard).
-    setSavedThemeTopic({
-      themeId: theme.id,
-      topicId: topic.id,
-    });
-  }, [savedThemeTopic, setSavedThemeTopic, themeId, themes, topicId]);
+    if (selectedTheme && selectedTopic) {
+      setSavedThemeTopic({
+        themeId: selectedTheme.id,
+        topicId: selectedTopic.id,
+      });
+    }
+  }, [savedThemeTopic, selectedTheme, selectedTopic, setSavedThemeTopic]);
 
   useEffect(() => {
-    if (themeId || topicId) {
+    if (!selectedTheme || !selectedTopic) {
       return;
     }
 
-    if (savedThemeTopic) {
-      // Update query params to reflect the chosen
-      // theme/topic if they haven't already been set.
+    // Update query params to reflect the chosen
+    // theme/topic if they haven't already been set.
+    if (selectedTheme?.id !== themeId || selectedTopic?.id !== topicId) {
       history.replace(
         appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-          themeId: savedThemeTopic.themeId,
-          topicId: savedThemeTopic.topicId,
+          themeId: selectedTheme?.id,
+          topicId: selectedTopic?.id,
         }),
       );
     }
@@ -136,8 +136,8 @@ const ManagePublicationsAndReleasesTab = () => {
       <LoadingSpinner loading={loadingThemes}>
         {themes && themes.length > 0 ? (
           <>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-one-half">
+            <div className="dfe-flex dfe-flex-wrap">
+              <div className="govuk-!-margin-right-4">
                 <FormSelect
                   id="selectTheme"
                   label="Select theme"
@@ -179,7 +179,7 @@ const ManagePublicationsAndReleasesTab = () => {
                   }}
                 />
               </div>
-              <div className="govuk-grid-column-one-half">
+              <div>
                 <FormSelect
                   id="selectTopic"
                   label="Select topic"
@@ -219,6 +219,7 @@ const ManagePublicationsAndReleasesTab = () => {
                 />
               </div>
             </div>
+
             <hr />
 
             {selectedTheme && selectedTopic && (

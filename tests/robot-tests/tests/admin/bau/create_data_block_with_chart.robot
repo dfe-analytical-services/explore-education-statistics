@@ -31,12 +31,12 @@ Create release
     [Tags]  HappyPath
     user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Upload subject
     [Tags]  HappyPath
     user waits until page contains element    xpath://h2[text()="Release summary"]
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
     user clicks link  Manage data
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
     choose file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv

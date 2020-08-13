@@ -43,14 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             AbsenceByCharacteristic
         }
-        
+
         private static readonly Dictionary<SubjectName, Guid> SubjectIds = new Dictionary<SubjectName, Guid>
         {
             {
                 SubjectName.AbsenceByCharacteristic, new Guid("803fbf56-600f-490f-8409-6413a891720d")
             }
         };
-        
+
         private static readonly Dictionary<Guid, Dictionary<FilterItemName, Guid>> SubjectFilterItemIds =
             new Dictionary<Guid, Dictionary<FilterItemName, Guid>>
             {
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
-            
+
             modelBuilder.Entity<Methodology>()
                 .Property(b => b.Annexes)
                 .HasConversion(
@@ -164,12 +164,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .HasIndex(r => new {r.PreviousVersionId, r.Version});
-            
+
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
-            
+
             modelBuilder.Entity<Release>()
                 .HasQueryFilter(r => !r.SoftDeleted);
 
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(r => r.Release)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
-            
+
             modelBuilder.Entity<ReleaseFileReference>()
                 .Property(b => b.ReleaseFileType)
                 .HasConversion(new EnumToStringConverter<ReleaseFileTypes>());
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(r => r.PreviousVersion)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
-            
+
             modelBuilder.Entity<ContentBlock>()
                 .ToTable("ContentBlock")
                 .HasDiscriminator<string>("Type");
@@ -211,8 +211,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
-                
-            modelBuilder.Entity<Release>()                
+
+            modelBuilder.Entity<Release>()
                 .Property(release => release.Status)
                 .HasConversion(new EnumToStringConverter<ReleaseStatus>());
 
@@ -322,7 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
                     Title = "Pupils and schools",
-                    Summary = "", 
+                    Summary = "",
                     Slug = "pupils-and-schools"
                 }
             );
@@ -332,7 +332,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
                     Title = "Pupil absence",
-                    Summary = "",
                     ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
                     Slug = "pupil-absence"
                 }
@@ -358,7 +357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
                     Slug = "pupil-absence-in-schools-in-england",
-                    DataSource = "", 
+                    DataSource = "",
                     ContactId = dataAnalystContactId
                 }
             );
@@ -394,28 +393,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Order = 1, Heading = "Pupil absence rates", Caption = "",
                     Type = ContentSectionType.Generic
                 },
-                
+
                 new ContentSection
                 {
                     Id = pupilAbsenceSummaryContentSectionId,
                     Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.ReleaseSummary
                 },
-                
+
                 new ContentSection
                 {
                     Id = pupilAbsenceKeyStatisticsSectionId,
                     Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.KeyStatistics
                 },
-                
+
                 new ContentSection
                 {
                     Id = pupilAbsenceKeyStatisticsSecondarySectionId,
                     Order = 1, Heading = "", Caption = "",
                     Type = ContentSectionType.KeyStatisticsSecondary
                 },
-                
+
                 new ContentSection
                 {
                     Id = pupilAbsenceKeyStatisticsHeadlineSectionId,
@@ -430,25 +429,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     ContentSectionId = pupilAbsenceRatesContentSectionId,
                     ReleaseId = absenceReleaseId
                 },
-                
+
                 new ReleaseContentSection
                 {
                     ContentSectionId = pupilAbsenceSummaryContentSectionId,
                     ReleaseId = absenceReleaseId,
                 },
-                
+
                 new ReleaseContentSection
                 {
                     ContentSectionId = pupilAbsenceKeyStatisticsSectionId,
                     ReleaseId = absenceReleaseId,
                 },
-                
+
                 new ReleaseContentSection
                 {
                     ContentSectionId = pupilAbsenceKeyStatisticsSecondarySectionId,
                     ReleaseId = absenceReleaseId,
                 },
-                
+
                 new ReleaseContentSection
                 {
                     ContentSectionId = pupilAbsenceKeyStatisticsHeadlineSectionId,
@@ -1095,7 +1094,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         Email = "prerelease2@example.com"
                     }
                 );
-            
+
             modelBuilder.Entity<UserReleaseRole>()
                 .HasData(
                     new UserReleaseRole

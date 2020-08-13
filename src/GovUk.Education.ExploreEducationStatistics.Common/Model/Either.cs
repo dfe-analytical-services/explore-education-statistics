@@ -159,6 +159,11 @@ public class Either<Tl, Tr> {
             return firstResult.Left;
         }
 
+        public static async Task<Either<Tl, Tr>> OnFailureFailWith<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tl> failureTask)
+        {
+            return await task.OnFailureFailWith(async _ => await Task.FromResult(failureTask()));
+        }
+
         /**
          * If the previous Either failed, provide the errors to the given action and then return a new set of errors
          * provided by the action.

@@ -605,13 +605,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Summary")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ThemeId")
@@ -632,7 +626,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         {
                             Id = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
                             Slug = "pupil-absence",
-                            Summary = "",
                             ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
                             Title = "Pupil absence"
                         });

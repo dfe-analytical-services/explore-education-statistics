@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { Authentication, useAuthContext } from '@admin/contexts/AuthContext';
+import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import loginService from '@admin/services/loginService';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
@@ -63,12 +63,12 @@ const PageHeader = ({ wide }: Props) => {
             </a>
           </div>
           <div className="govuk-header__content">
-            <a
-              href={user && user.permissions.canAccessAnalystPages ? '/' : '#'}
+            <Link
+              to="/"
               className="govuk-header__link govuk-header__link--service-name"
             >
               Explore education statistics
-            </a>
+            </Link>
 
             <button
               type="button"
@@ -84,7 +84,7 @@ const PageHeader = ({ wide }: Props) => {
                 className="govuk-header__navigation "
                 aria-label="Top Level Navigation"
               >
-                {user && user.validToken ? (
+                {user?.validToken ? (
                   <LoggedInLinks user={user} />
                 ) : (
                   <NotLoggedInLinks />
@@ -98,9 +98,13 @@ const PageHeader = ({ wide }: Props) => {
   );
 };
 
-const LoggedInLinks = ({ user }: Authentication) => (
+interface LoggedInLinksProps {
+  user: User;
+}
+
+const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
   <>
-    {user && user.permissions.canAccessAnalystPages && (
+    {user.permissions.canAccessAnalystPages && (
       <li className="govuk-header__navigation-item">
         <a className="govuk-header__link" href="/documentation">
           Administrators' guide
@@ -108,15 +112,14 @@ const LoggedInLinks = ({ user }: Authentication) => (
       </li>
     )}
 
-    {user &&
-      (user.permissions.canAccessUserAdministrationPages ||
-        user.permissions.canAccessMethodologyAdministrationPages) && (
-        <li className="govuk-header__navigation-item">
-          <a className="govuk-header__link" href="/administration">
-            Platform administration
-          </a>
-        </li>
-      )}
+    {(user.permissions.canAccessUserAdministrationPages ||
+      user.permissions.canAccessMethodologyAdministrationPages) && (
+      <li className="govuk-header__navigation-item">
+        <a className="govuk-header__link" href="/administration">
+          Platform administration
+        </a>
+      </li>
+    )}
     <li className="govuk-header__navigation-item">
       <Link className="govuk-header__link" to={loginService.getSignOutLink()}>
         Sign out

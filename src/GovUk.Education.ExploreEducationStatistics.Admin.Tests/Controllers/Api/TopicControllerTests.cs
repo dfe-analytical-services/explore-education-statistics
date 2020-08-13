@@ -12,24 +12,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void CreateTopic_Returns_Ok()
         {
-            var themeId = Guid.NewGuid();
-            
-            var request = new CreateTopicRequest
+            var request = new SaveTopicViewModel
             {
-                Title = "Test topic"
+                Title = "Test topic",
+                ThemeId =  Guid.NewGuid()
             };
-            
+
             var viewModel = new TopicViewModel
             {
                 Id = Guid.NewGuid()
             };
 
             var topicService = new Mock<ITopicService>();
-            topicService.Setup(s => s.CreateTopic(themeId, request)).ReturnsAsync(viewModel);
+            topicService.Setup(s => s.CreateTopic(request)).ReturnsAsync(viewModel);
 
             var controller = new TopicController(topicService.Object);
 
-            var result = await controller.CreateTopic(request, themeId);
+            var result = await controller.CreateTopic(request);
             Assert.Equal(viewModel, result.Value);
         }
     }

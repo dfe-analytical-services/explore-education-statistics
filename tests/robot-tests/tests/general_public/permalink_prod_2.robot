@@ -11,12 +11,12 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until page contains heading  Create your own tables online
+    user waits until page contains heading 1  Create your own tables online
 
 Go to permalink
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables/permalink/edfe9f83-d1f0-40fc-8dce-9467a250c61b
-    user waits until page contains heading   'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
+    user waits until page contains heading 1   'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
 
 Validate breadcrumbs
     [Tags]  HappyPath
@@ -28,7 +28,7 @@ Validate breadcrumbs
 
 Validate miscellaneous
     [Tags]  HappyPath
-    user checks summary list item "Created" should be "7 April 2020"
+    user checks summary list contains  Created  7 April 2020
     user checks element contains   css:#dataTableCaption   Table showing 'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England' in England between 2013/14 and 2015/16
     user checks page contains element   xpath://a[text()="Print this page"]
 
@@ -72,4 +72,4 @@ Use Create tables button
     user waits until page contains heading 2  Create your own tables online
     user clicks link    Create tables
 
-    user waits until page contains heading  Create your own tables online
+    user waits until page contains heading 1  Create your own tables online

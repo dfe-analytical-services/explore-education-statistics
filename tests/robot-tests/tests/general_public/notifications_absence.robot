@@ -27,8 +27,8 @@ Go to Notify me page for Absence publication
     [Tags]  HappyPath  Local
     user clicks link  Sign up for email alerts
 
-    user waits until page contains element  xpath://h1/span[text()="Notify me"]     180
-    user waits until page contains element  xpath://h1[text()="Pupil absence in schools in England"]
+    user waits until page contains title caption  Notify me     180
+    user waits until page contains heading 1  Pupil absence in schools in England
 
     user checks element count is x      css:[data-testid="breadcrumbs--list"] li     4
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
@@ -43,5 +43,5 @@ Sign up for email alerts
     press keys  css:#subscriptionForm-email  mark@hiveit.co.uk
     user clicks button   Subscribe
 
-    user waits until page contains heading   Subscribed     90
+    user waits until page contains heading 1   Subscribed     90
     user checks page contains  Thank you. Check your email to confirm your subscription.

@@ -3,6 +3,44 @@ Resource    ./common.robot
 Library     admin-utilities.py
 
 *** Keywords ***
+user signs in as bau1
+  user opens the browser
+
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading 1    Sign in
+
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
+  environment variable should be set   IDENTITY_COOKIE_BAU
+  set cookie from json   %{IDENTITY_COOKIE_BAU}
+
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading 1   Dashboard
+  user waits until page contains title caption  Welcome Bau1
+  user waits until page contains element   css:#selectTheme   180
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
+
+user signs in as analyst1
+  user opens the browser
+
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading 1    Sign in
+
+  environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
+  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}
+  environment variable should be set   IDENTITY_COOKIE_ANALYST
+  set cookie from json   %{IDENTITY_COOKIE_ANALYST}
+
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading 1  Dashboard
+  user waits until page contains title caption  Welcome Analyst1
+  user waits until page contains element   css:#selectTheme   180
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
+
 User selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user clicks element   id:my-publications-tab
     user waits until page contains element   id:selectTheme
@@ -15,7 +53,7 @@ User selects theme "${theme}" and topic "${topic}" from the admin dashboard
 
 user creates publication
     [Arguments]   ${title}
-    user waits until page contains heading    Create new publication
+    user waits until page contains heading 1  Create new publication
     user waits until page contains element  id:publicationForm-title
     user enters text into element  id:publicationForm-title   ${title}
     user selects radio     No methodology
@@ -24,12 +62,12 @@ user creates publication
     user enters text into element  id:publicationForm-contactName     Tingting Shu
     user enters text into element  id:publicationForm-contactTelNo    0123456789
     user clicks button   Save publication
-    user waits until page contains element   xpath://span[text()="Welcome"]
+    user waits until page contains heading 1  Dashboard
 
 User creates release for publication
     [Arguments]  ${publication}  ${time_period_coverage}  ${start_year}
-    user waits until page contains heading   Create new release
-    user waits until page contains element   xpath://h1/span[text()="${publication}"]
+    user waits until page contains title caption  ${publication}
+    user waits until page contains heading 1  Create new release
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
@@ -37,6 +75,48 @@ User creates release for publication
     user clicks button  Create new release
     user waits until page contains element  xpath://span[text()="Edit release"]
     user waits until page contains heading 2  Release summary
+
+user creates approved methodology
+    [Arguments]  ${title}
+    user waits until page contains heading 1  Manage methodologies
+    user waits until page contains element  id:approved-methodologies-tab
+    user clicks element  id:approved-methodologies-tab
+    ${is_approved}=  run keyword and return status  user checks page contains element  xpath://section[@id="approved-methodologies"]//a[text()="${title}"]
+    user clicks element  id:draft-methodologies-tab
+    ${is_draft}=  run keyword and return status  user checks page contains element  xpath://section[@id="draft-methodologies"]//a[text()="${title}"]
+    run keyword if  ${is_approved} == False and ${is_draft} == False  run keywords
+    ...  user creates methodology  ${title}
+    ...  AND    user approves methodology  ${title}
+    run keyword if  ${is_draft} == True   run keywords
+    ...  user clicks element    id:draft-methodologies-tab
+    ...  AND    user clicks link  ${title}
+    ...  AND    user approves methodology  ${title}
+
+user creates methodology
+    [Arguments]  ${title}
+    user waits until page contains heading 1  Manage methodologies
+    user waits until page contains element  id:live-methodologies-tab
+    user clicks element  id:live-methodologies-tab
+    user clicks link  Create new methodology
+    user waits until page contains heading 1  Create new methodology
+    user enters text into element  id:createMethodologyForm-title   ${title}
+    user clicks button  Create methodology
+    user waits until page contains title caption  Edit methodology
+    user waits until page contains heading 1  ${title}
+
+user approves methodology
+    [Arguments]  ${title}
+    user waits until page contains title caption  Edit methodology
+    user waits until page contains heading 1  ${title}
+    user clicks link  Release status
+    user clicks button  Edit status
+    user waits until page contains heading 2  Edit methodology status
+    user selects radio  Approved for publication
+    user enters text into element  id:methodologyStatusForm-internalReleaseNote  Test release note
+    user clicks button  Update status
+
+    user waits until page contains heading 2  Methodology status
+    user checks page contains tag  Approved
 
 user opens editable accordion
     [Arguments]   ${accordion_section_title}

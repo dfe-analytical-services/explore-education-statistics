@@ -1,6 +1,7 @@
 import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import signInService from '@admin/services/loginService';
+import appendQuery from '@admin/utils/url/appendQuery';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import React from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
@@ -10,8 +11,6 @@ export interface ProtectedRouteProps extends RouteProps {
   path: string;
   protectionAction?: (user: User) => boolean;
 }
-
-const basicAccessCheck = (user: User) => user.permissions.canAccessSystem;
 
 /**
  * Creates a <Route> that firstly checks the user's authentication
@@ -29,26 +28,25 @@ const ProtectedRoute = ({
 
   const { handleManualErrors } = useErrorControl();
 
-  let accessDenied = false;
+  let hasAccess = allowAnonymousUsers;
 
   if (user) {
-    const accessCheck = protectionAction || basicAccessCheck;
-    accessDenied = !accessCheck(user);
-  } else {
-    accessDenied = !allowAnonymousUsers;
+    hasAccess = protectionAction
+      ? protectionAction(user)
+      : user.permissions.canAccessSystem;
   }
 
-  if (!allowAnonymousUsers && (!user || user.validToken === false)) {
+  if (!allowAnonymousUsers && !user?.validToken) {
     return (
       <Redirect
-        to={`${signInService.getSignInLink()}?${
-          QueryParameterNames.ReturnUrl
-        }=${encodeURI(window.location.href)}`}
+        to={appendQuery(signInService.getSignInLink(), {
+          [QueryParameterNames.ReturnUrl]: encodeURI(window.location.href),
+        })}
       />
     );
   }
 
-  if (accessDenied) {
+  if (!hasAccess) {
     handleManualErrors.forbidden();
     return null;
   }

@@ -89,10 +89,10 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
 
     try:
         wait_until_page_contains_xpath(driver,
-                                       '//span[text()="Welcome"]')  # Should be Admin dashboard for user
+                                       '//h1[text()="Dashboard"]')  # Should be Admin dashboard for user
     except:
         raise AssertionError(
-            f'Couldn\'t find \'//span[text()="Welcome"]\' on page. Incorrect user details used? Found page source: \n{driver.page_source}')
+            f'Couldn\'t find \'//h1[text()="Dashboard"]\' on page. Incorrect user details used? Found page source: \n{driver.page_source}')
 
     local_storage_json = driver.execute_script(
         f"return window.localStorage.getItem('GovUk.Education.ExploreEducationStatistics.Adminuser:{url}:GovUk.Education.ExploreEducationStatistics.Admin')")

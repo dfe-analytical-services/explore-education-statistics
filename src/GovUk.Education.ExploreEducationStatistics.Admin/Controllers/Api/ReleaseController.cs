@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("releases/{releaseId}")]
-        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(UpdateReleaseRequest request,
+        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(UpdateReleaseViewModel request,
             Guid releaseId)
         {
             return await _releaseService

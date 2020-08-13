@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -28,7 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
 
-        public TopicService(ContentDbContext context,
+        public TopicService(
+            ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
             IUserService userService)
@@ -39,30 +39,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, TopicViewModel>> CreateTopic(Guid themeId,
-            CreateTopicRequest request)
+        public async Task<Either<ActionResult, TopicViewModel>> CreateTopic(SaveTopicViewModel createdTopic)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Theme>(themeId)
-                .OnSuccess(_userService.CheckCanManageAllTaxonomy)
-                .OnSuccess(async _ =>
-                {
-                    if (_context.Topics.Any(topic => topic.Slug == request.Slug))
+            return await _userService.CheckCanManageAllTaxonomy()
+                .OnSuccessDo(() => ValidateSelectedTheme(createdTopic.ThemeId))
+                .OnSuccess(
+                    async _ =>
                     {
-                        return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
-                    }
+                        if (_context.Topics.Any(
+                            topic => topic.Slug == createdTopic.Slug
+                                     && topic.ThemeId == createdTopic.ThemeId
+                        ))
+                        {
+                            return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
+                        }
 
-                    var saved = await _context.Topics.AddAsync(new Topic
+                        var saved = await _context.Topics.AddAsync(
+                            new Topic
+                            {
+                                Title = createdTopic.Title,
+                                Slug = createdTopic.Slug,
+                                ThemeId = createdTopic.ThemeId,
+                            }
+                        );
+
+                        await _context.SaveChangesAsync();
+
+                        return await GetTopic(saved.Entity.Id);
+                    }
+                );
+        }
+
+        public async Task<Either<ActionResult, TopicViewModel>> UpdateTopic(
+            Guid topicId,
+            SaveTopicViewModel updatedTopic)
+        {
+            return await _userService.CheckCanManageAllTaxonomy()
+                .OnSuccess(() => _persistenceHelper.CheckEntityExists<Topic>(topicId))
+                .OnSuccessDo(() => ValidateSelectedTheme(updatedTopic.ThemeId))
+                .OnSuccess(
+                    async topic =>
                     {
-                        Title = request.Title,
-                        Slug = request.Slug,
-                        Description = request.Description,
-                        ThemeId = themeId,
-                        Summary = request.Summary
-                    });
-                    await _context.SaveChangesAsync();
-                    return await GetTopic(saved.Entity.Id);
-                });
+                        if (_context.Topics.Any(
+                            t => t.Slug == updatedTopic.Slug
+                                 && t.Id != topicId
+                                 && t.ThemeId == updatedTopic.ThemeId
+                        ))
+                        {
+                            return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
+                        }
+
+                        topic.Title = updatedTopic.Title;
+                        topic.Slug = updatedTopic.Slug;
+                        topic.ThemeId = updatedTopic.ThemeId;
+
+                        _context.Topics.Update(topic);
+                        await _context.SaveChangesAsync();
+
+                        return await GetTopic(topic.Id);
+                    }
+                );
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateSelectedTheme(Guid themeId)
+        {
+            var theme = await _context.Themes.FindAsync(themeId);
+
+            if (theme == null)
+            {
+                return ValidationActionResult(ValidationErrorMessages.ThemeDoesNotExist);
+            }
+
+            return Unit.Instance;
         }
 
         public async Task<Either<ActionResult, TopicViewModel>> GetTopic(Guid topicId)
@@ -70,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Topic>(topicId, HydrateTopicForTopicViewModel)
                 .OnSuccess(_userService.CheckCanViewTopic)
-                .OnSuccess(_mapper.Map<TopicViewModel>);   
+                .OnSuccess(_mapper.Map<TopicViewModel>);
         }
 
         private static IQueryable<Topic> HydrateTopicForTopicViewModel(IQueryable<Topic> values)

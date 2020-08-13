@@ -211,13 +211,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mocks.ReleaseService
                 .Setup(s => s.UpdateRelease(
                     It.Is<Guid>(id => id.Equals(_releaseId)), 
-                    It.IsAny<UpdateReleaseRequest>())
+                    It.IsAny<UpdateReleaseViewModel>())
                 )
                 .ReturnsAsync(new ReleaseViewModel {Id = _releaseId});
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.UpdateRelease(new UpdateReleaseRequest(), _releaseId);
+            var result = await controller.UpdateRelease(new UpdateReleaseViewModel(), _releaseId);
             var unboxed = AssertOkResult(result);
             Assert.Equal(_releaseId, unboxed.Id);
         }

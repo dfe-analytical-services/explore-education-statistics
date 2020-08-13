@@ -16,11 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                 foreach (var memberName in result.MemberNames)
                 {
                     errors.AddModelError(memberName, result.ErrorMessage);
-                }    
+                }
             }
             else
             {
-                // This appears to be the default MVC way of reporting generalised validation errors not associated  
+                // This appears to be the default MVC way of reporting generalised validation errors not associated
                 // with a single property.
                 errors.AddModelError(string.Empty, result.ErrorMessage);
             }
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         {
             return new ValidationResult(message.ToString().ScreamingSnakeCase());
         }
-        
+
         // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
         // rename this to "ValidationResult"
         public static ActionResult ValidationActionResult(ValidationErrorMessages message)
@@ -56,51 +56,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
     public enum ValidationErrorMessages
     {
-        CannotOverwriteFile,
+        // Slug
         SlugNotUnique,
+
+        // Partial date
         PartialDateNotValid,
-        CannotUseGenericFunctionToDeleteDataFile,
-        CannotUseGenericFunctionToAddDataFile,
-        UnableToFindMetadataFileToDelete,
-        FileNotFound,
-        FileCannotBeEmpty,
-        DataFileCannotBeEmpty,
-        MetadataFileCannotBeEmpty,
-        CannotOverwriteDataFile,
-        CannotOverwriteMetadataFile,
-        DataAndMetadataFilesCannotHaveTheSameName,
-        DataFileMustBeCsvFile,
-        MetaFileMustBeCsvFile,
-        FileTypeInvalid,
-        SubjectTitleMustBeUnique,
+
+        // Content blocks
         ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
         ContentBlockAlreadyDetached,
         ContentBlockNotAttachedToThisContentSection,
+
+        // User
         UserAlreadyExists,
         UserDoesNotExist,
         UserAlreadyHasReleaseRole,
+
+        // Role
         RoleDoesNotExist,
+
+        // Invite
         UnableToCancelInvite,
         InvalidEmailAddress,
-        ApprovedReleaseMustHavePublishScheduledDate,
-        PublishedReleaseCannotBeUnapproved,
+
+        // Publication
         PublicationDoesNotExist,
         PublicationHasMethodologyAssigned,
-        MethodologyDoesNotExist, 
+
+        // Methodology
+        MethodologyDoesNotExist,
         MethodologyMustBeApprovedOrPublished,
-        TopicDoesNotExist,
         CannotSpecifyMethodologyAndExternalMethodology,
         MethodologyOrExternalMethodologyLinkMustBeDefined,
+
+        // Theme
+        ThemeDoesNotExist,
+
+        // Topic
+        TopicDoesNotExist,
+
+        // File
+        CannotOverwriteFile,
+        FileNotFound,
+        FileCannotBeEmpty,
+        FileTypeInvalid,
+        FilenameCannotContainSpacesOrSpecialCharacters,
+
+        // Data file
+        SubjectTitleMustBeUnique,
+        CannotUseGenericFunctionToDeleteDataFile,
+        CannotUseGenericFunctionToAddDataFile,
+        CannotOverwriteDataFile,
+        DataAndMetadataFilesCannotHaveTheSameName,
+        DataFileCannotBeEmpty,
+        DataFileMustBeCsvFile,
+        DatafileAlreadyUploaded,
+        DataFilenameCannotContainSpacesOrSpecialCharacters,
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
-        DatafileAlreadyUploaded,
         AllDatafilesUploadedMustBeComplete,
-        ReleaseNotApproved,
-        DataFilenameCannotContainSpacesOrSpecialCharacters,
+
+        // Meta file
+        CannotOverwriteMetadataFile,
+        MetadataFileCannotBeEmpty,
+        MetaFileMustBeCsvFile,
+        UnableToFindMetadataFileToDelete,
         MetaFilenameCannotContainSpacesOrSpecialCharacters,
-        FilenameCannotContainSpacesOrSpecialCharacters
+
+        // Release
+        ReleaseNotApproved,
+        ApprovedReleaseMustHavePublishScheduledDate,
+        PublishedReleaseCannotBeUnapproved,
+
     }
 }

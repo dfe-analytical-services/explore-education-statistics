@@ -50,13 +50,13 @@ Validate Analyst1 can see Absence release summary
     user clicks element  css:[data-testid="Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)"]
     user waits until page contains heading 1  Pupil absence in schools in England
     user waits until page contains heading 2  Release summary
-    user checks summary list item "Publication title" should be "Pupil absence in schools in England"
-    user checks summary list item "Time period" should be "Academic Year"
-    user checks summary list item "Release period" should be "2016/17"
-    user checks summary list item "Lead statistician" should be "Sean Gibson"
-    user checks summary list item "Scheduled release" should be "25 April 2018"
-    user checks summary list item "Next release expected" should be "22 March 2019"
-    user checks summary list item "Release type" should be "Official Statistics"
+    user checks summary list contains  Publication title  Pupil absence in schools in England
+    user checks summary list contains  Time period  Academic Year
+    user checks summary list contains  Release period  2016/17
+    user checks summary list contains  Lead statistician  Sean Gibson
+    user checks summary list contains  Scheduled release  25 April 2018
+    user checks summary list contains  Next release expected  22 March 2019
+    user checks summary list contains  Release type  Official Statistics
 
 Validate Analyst1 cannot see 'Upload data files' button
     [Tags]  HappyPath   NotAgainstDev
@@ -109,5 +109,5 @@ Validate Analyst1 cannot Approve the 'Pupil absence in schools in England' relea
     [Tags]  HappyPath   NotAgainstDev
     user clicks element  link:Release status
     user waits until page contains heading 2  Release status
-    user checks summary list item "Current status" should be "Approved"
+    user checks summary list contains  Current status  Approved
     user checks page does not contain  xpath://button[text()="Edit release status"]
