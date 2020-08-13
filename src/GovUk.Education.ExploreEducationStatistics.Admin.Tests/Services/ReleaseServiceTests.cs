@@ -885,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Ad Hoc"
             };
 
-            var publishScheduled = new DateTime(2020, 6, 29, 0, 0, 0).AsStartOfDayUtc();
+            var publishScheduled = new DateTime(2020, 6, 29, 0, 0, 0).AsStartOfDayUtcForTimeZone();
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             const string releaseName = "2035";
             const TimeIdentifier timePeriodCoverage = TimeIdentifier.January;

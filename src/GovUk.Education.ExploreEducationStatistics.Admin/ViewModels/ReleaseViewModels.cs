@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
                     DateTimeStyles.None,
                     out var dateTime
                 );
-                return dateTime.AsStartOfDayUtc();
+                return dateTime.AsStartOfDayUtcForTimeZone();
             }
         }
 
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
                     DateTimeStyles.None,
                     out var dateTime
                 );
-                return dateTime.AsStartOfDayUtc();
+                return dateTime.AsStartOfDayUtcForTimeZone();
             }
         }
 
