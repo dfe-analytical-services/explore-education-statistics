@@ -3,7 +3,7 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 {
     public class EitherTest
     {
@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model
             Assert.Equal("a failure", either.Left);
             Assert.Throws<ArgumentException>(() => either.Right);
         }
-        
+
         [Fact]
         public void Right()
         {
@@ -78,6 +78,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model
         }
 
         [Fact]
+        public async void OnSuccess_WithVoidTask()
+        {
+            var either = await Task.FromResult(new Either<int, string>("a success"))
+                .OnSuccess(
+                    async str =>
+                    {
+                        await Task.FromResult(true);
+                    });
+
+            Assert.True(either.IsRight);
+            Assert.Equal(Unit.Instance, either.Right);
+            Assert.Throws<ArgumentException>(() => either.Left);
+        }
+
+        [Fact]
         public async void OnSuccess_WithRightTask()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
@@ -104,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model
         public async void OnSuccessDo_WithVoid()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
-                .OnSuccessDo(async () => 
+                .OnSuccessDo(async () =>
                 {
                     await Task.Run(() => {});
                 });
@@ -136,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model
             Assert.Equal(exception, either.Left);
             Assert.Throws<ArgumentException>(() => either.Right);
         }
-        
+
         [Fact]
         public async void OnFailureDo_WithTask()
         {
