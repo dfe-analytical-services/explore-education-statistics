@@ -332,17 +332,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateSelectedPublication(Release release, Guid publicationId)
+        private async Task<Either<ActionResult, Publication>> ValidateSelectedPublication(Release release, Guid publicationId)
         {
             if (release.PublicationId == publicationId)
             {
-                return Unit.Instance;
+                return release.Publication;
             }
 
             return await _persistenceHelper.CheckEntityExists<Publication>(publicationId)
                 .OnFailureFailWith(() => ValidationActionResult(PublicationDoesNotExist))
-                .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
-                .OnSuccess(_ => Unit.Instance);
+                .OnSuccess(_userService.CheckCanCreateReleaseForPublication);
         }
 
         public async Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId)
