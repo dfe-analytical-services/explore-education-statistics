@@ -12,13 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
     {
         public StatisticsDbContext()
         {
-            
+
         }
-        
+
         public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
         {
         }
-        
+
         public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout) : base(options)
         {
             if (timeout.HasValue)
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
         public DbSet<Theme> Theme { get; set; }
         public DbSet<Topic> Topic { get; set; }
-        
+
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; }
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -141,43 +141,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(r => r.TimeIdentifier)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
-            
+
             modelBuilder.Entity<Release>()
                 .HasIndex(data => data.PreviousVersionId);
         }
-        
+
         private static void ConfigureReleaseSubject(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReleaseSubject>()
                 .HasKey(item => new {item.ReleaseId, item.SubjectId});
-            
+
             modelBuilder.Entity<ReleaseSubject>()
                 .HasOne(r => r.Release)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
-            
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<ReleaseSubject>()
                 .HasOne(r => r.Subject)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
-        
+
         private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReleaseFootnote>()
                 .HasKey(item => new {item.ReleaseId, item.FootnoteId});
-            
+
             modelBuilder.Entity<ReleaseFootnote>()
                 .HasOne(rf => rf.Release)
                 .WithMany(release => release.Footnotes)
                 .HasForeignKey(releaseFootnote => releaseFootnote.ReleaseId)
-                .OnDelete(DeleteBehavior.NoAction);
-            
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<ReleaseFootnote>()
                 .HasOne(rf => rf.Footnote)
                 .WithMany(footnote => footnote.Releases)
                 .HasForeignKey(releaseFootnote => releaseFootnote.FootnoteId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void ConfigureMeasures(ModelBuilder modelBuilder)
@@ -252,58 +252,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Filter>()
                 .HasIndex(filter => filter.Name);
         }
-        
+
         private static void ConfigureFilterFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FilterFootnote>()
                 .HasKey(item => new {item.FilterId, item.FootnoteId});
-            
+
             modelBuilder.Entity<FilterFootnote>()
                 .HasOne(filterFootnote => filterFootnote.Filter)
                 .WithMany(filter => filter.Footnotes)
                 .HasForeignKey(filterFootnote => filterFootnote.FilterId);
-            
+
             modelBuilder.Entity<FilterFootnote>()
                 .HasOne(filterFootnote => filterFootnote.Footnote)
                 .WithMany(footnote => footnote.Filters)
                 .HasForeignKey(filterFootnote => filterFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-        
+
         private static void ConfigureFilterGroupFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FilterGroupFootnote>()
                 .HasKey(item => new {item.FilterGroupId, item.FootnoteId});
-            
+
             modelBuilder.Entity<FilterGroupFootnote>()
                 .HasOne(filterGroupFootnote => filterGroupFootnote.FilterGroup)
                 .WithMany(filterGroup => filterGroup.Footnotes)
                 .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FilterGroupId);
-            
+
             modelBuilder.Entity<FilterGroupFootnote>()
                 .HasOne(filterGroupFootnote => filterGroupFootnote.Footnote)
                 .WithMany(footnote => footnote.FilterGroups)
                 .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-        
+
         private static void ConfigureFilterItemFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FilterItemFootnote>()
                 .HasKey(item => new {item.FilterItemId, item.FootnoteId});
-            
+
             modelBuilder.Entity<FilterItemFootnote>()
                 .HasOne(filterItemFootnote => filterItemFootnote.FilterItem)
                 .WithMany(filterItem => filterItem.Footnotes)
                 .HasForeignKey(filterItemFootnote => filterItemFootnote.FilterItemId);
-            
+
             modelBuilder.Entity<FilterItemFootnote>()
                 .HasOne(filterItemFootnote => filterItemFootnote.Footnote)
                 .WithMany(footnote => footnote.FilterItems)
                 .HasForeignKey(filterItemFootnote => filterItemFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-        
+
         private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<IndicatorFootnote>()
@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasForeignKey(indicatorFootnote => indicatorFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-        
+
         private static void ConfigureInstitution(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
@@ -407,20 +407,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .OwnsOne(level => level.Ward,
                     builder => builder.HasIndex(ward => ward.Code));
         }
-        
+
         private static void ConfigurePlanningArea(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.PlanningArea,
                     builder => builder.HasIndex(planningArea => planningArea.Code));
         }
-        
+
         private static void ConfigureSubject(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Subject>()
                 .HasQueryFilter(r => !r.SoftDeleted);
         }
-        
+
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeoJson>().HasNoKey().ToView("geojson");
