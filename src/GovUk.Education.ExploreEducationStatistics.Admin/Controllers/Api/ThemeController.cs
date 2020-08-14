@@ -58,5 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .GetThemes()
                 .HandleFailuresOrOk();
         }
+
+        [HttpDelete("themes/{themeId}")]
+        public async Task<ActionResult> DeleteTheme([Required] Guid themeId)
+        {
+            return await _themeService
+                .DeleteTheme(themeId)
+                .HandleFailuresOrNoContent();
+        }
     }
 }

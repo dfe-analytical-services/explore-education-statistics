@@ -2,14 +2,21 @@ using System;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Documents.Linq;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
+using Topic = GovUk.Education.ExploreEducationStatistics.Content.Model.Topic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -308,17 +315,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async void DeleteTopic()
+        {
+            var topicId = Guid.NewGuid();
+
+            var topic = new Topic
+            {
+                Id = topicId,
+                Title = "UI test topic"
+            };
+
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Topic = new Data.Model.Topic
+                    {
+                        Id = topicId,
+                        Title = "UI test topic"
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
+            await using (var statisticsContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                contentContext.Add(topic);
+                statisticsContext.Add(release);
+
+                await contentContext.SaveChangesAsync();
+                await statisticsContext.SaveChangesAsync();
+            }
+
+            await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
+            await using (var statisticsContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = SetupTopicService(contentContext, statisticsContext: statisticsContext);
+
+                var result = await service.DeleteTopic(topic.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(0, contentContext.Topics.Count());
+                Assert.Equal(0, statisticsContext.Release.Count());
+                Assert.Equal(0, statisticsContext.Topic.Count());
+            }
+        }
+
         private TopicService SetupTopicService(
-            ContentDbContext context,
+            ContentDbContext contentContext,
+            StatisticsDbContext statisticsContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IMapper mapper = null,
-            IUserService userService = null)
+            IUserService userService = null,
+            IReleaseSubjectService releaseSubjectService = null,
+            IReleaseFilesService releaseFilesService = null)
         {
             return new TopicService(
-                context,
-                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
+                contentContext,
+                statisticsContext ?? new Mock<StatisticsDbContext>().Object,
+                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),
                 mapper ?? AdminMapper(),
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
+                releaseFilesService ?? new Mock<IReleaseFilesService>().Object
             );
         }
     }

@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -263,13 +267,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static ThemeService SetupThemeService(ContentDbContext context)
+        [Fact]
+        public async void DeleteTheme()
+        {
+            var theme = new Theme
+            {
+                Title = "UI test theme",
+                Topics = new List<Topic>()
+                {
+                    new Topic
+                    {
+                        Title = "UI test topic 1"
+                    },
+                    new Topic
+                    {
+                        Title = "UI test topic 2"
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(theme);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var topicService = new Mock<ITopicService>();
+
+                topicService.Setup(s => s.DeleteTopic(theme.Topics[0].Id));
+                topicService.Setup(s => s.DeleteTopic(theme.Topics[0].Id));
+
+                var service = SetupThemeService(context, topicService: topicService.Object);
+                var result = await service.DeleteTheme(theme.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(0, context.Themes.Count());
+
+                topicService.VerifyAll();
+            }
+        }
+
+        private static ThemeService SetupThemeService(
+            ContentDbContext context,
+            IMapper mapper = null,
+            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
+            IUserService userService = null,
+            ITopicService topicService = null)
         {
             return new ThemeService(
                 context,
-                AdminMapper(),
-                MockUtils.AlwaysTrueUserService().Object,
-                new PersistenceHelper<ContentDbContext>(context)
+                mapper ?? AdminMapper(),
+                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                topicService ?? new Mock<ITopicService>().Object
             );
         }
     }

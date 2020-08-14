@@ -11,6 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -22,21 +24,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
      */
     public class TopicService : ITopicService
     {
-        private readonly ContentDbContext _context;
+        private readonly ContentDbContext _contentContext;
+        private readonly StatisticsDbContext _statisticsContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
+        private readonly IReleaseSubjectService _releaseSubjectService;
+        private readonly IReleaseFilesService _releaseFilesService;
 
         public TopicService(
-            ContentDbContext context,
+            ContentDbContext contentContext,
+            StatisticsDbContext statisticsContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
-            IUserService userService)
+            IUserService userService,
+            IReleaseSubjectService releaseSubjectService,
+            IReleaseFilesService releaseFilesService)
         {
-            _context = context;
+            _contentContext = contentContext;
+            _statisticsContext = statisticsContext;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _userService = userService;
+            _releaseSubjectService = releaseSubjectService;
+            _releaseFilesService = releaseFilesService;
         }
 
         public async Task<Either<ActionResult, TopicViewModel>> CreateTopic(SaveTopicViewModel createdTopic)
@@ -46,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(
                     async _ =>
                     {
-                        if (_context.Topics.Any(
+                        if (_contentContext.Topics.Any(
                             topic => topic.Slug == createdTopic.Slug
                                      && topic.ThemeId == createdTopic.ThemeId
                         ))
@@ -54,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                         }
 
-                        var saved = await _context.Topics.AddAsync(
+                        var saved = await _contentContext.Topics.AddAsync(
                             new Topic
                             {
                                 Title = createdTopic.Title,
@@ -63,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             }
                         );
 
-                        await _context.SaveChangesAsync();
+                        await _contentContext.SaveChangesAsync();
 
                         return await GetTopic(saved.Entity.Id);
                     }
@@ -80,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(
                     async topic =>
                     {
-                        if (_context.Topics.Any(
+                        if (_contentContext.Topics.Any(
                             t => t.Slug == updatedTopic.Slug
                                  && t.Id != topicId
                                  && t.ThemeId == updatedTopic.ThemeId
@@ -93,8 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         topic.Slug = updatedTopic.Slug;
                         topic.ThemeId = updatedTopic.ThemeId;
 
-                        _context.Topics.Update(topic);
-                        await _context.SaveChangesAsync();
+                        _contentContext.Topics.Update(topic);
+                        await _contentContext.SaveChangesAsync();
 
                         return await GetTopic(topic.Id);
                     }
@@ -103,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTheme(Guid themeId)
         {
-            var theme = await _context.Themes.FindAsync(themeId);
+            var theme = await _contentContext.Themes.FindAsync(themeId);
 
             if (theme == null)
             {
@@ -119,6 +130,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Topic>(topicId, HydrateTopicForTopicViewModel)
                 .OnSuccess(_userService.CheckCanViewTopic)
                 .OnSuccess(_mapper.Map<TopicViewModel>);
+        }
+
+        public async Task<Either<ActionResult, Unit>> DeleteTopic(Guid topicId)
+        {
+            return await _userService.CheckCanManageAllTaxonomy()
+                .OnSuccess(
+                    () => _persistenceHelper.CheckEntityExists<Topic>(
+                        topicId,
+                        q => q.Include(t => t.Publications)
+                            .ThenInclude(p => p.Releases)
+                    )
+                )
+                .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
+                .OnSuccess(
+                    async topic =>
+                    {
+                        // For now we only want to delete test topics as we
+                        // don't really have a mechanism to clean things up
+                        // properly across the entire application.
+                        // TODO: EES-1295 ability to completely delete releases
+                        if (!topic.Title.StartsWith("UI test topic"))
+                        {
+                            return;
+                        }
+
+                        foreach (var release in topic.Publications.SelectMany(publication => publication.Releases))
+                        {
+                            await _releaseFilesService.DeleteAllFiles(release.Id);
+                            await _releaseSubjectService.DeleteAllSubjectsOrBreakReleaseLinks(release.Id);
+                        }
+
+                        _statisticsContext.Release.RemoveRange(
+                            _statisticsContext.Release.Where(r => r.Publication.TopicId == topic.Id)
+                        );
+
+                        _statisticsContext.Topic.RemoveRange(
+                            _statisticsContext.Topic.Where(t => t.Id == topic.Id)
+                        );
+
+                        await _statisticsContext.SaveChangesAsync();
+
+                        _contentContext.Topics.RemoveRange(
+                            _contentContext.Topics.Where(t => t.Id == topic.Id)
+                        );
+
+                        await _contentContext.SaveChangesAsync();
+                    }
+                );
         }
 
         private static IQueryable<Topic> HydrateTopicForTopicViewModel(IQueryable<Topic> values)

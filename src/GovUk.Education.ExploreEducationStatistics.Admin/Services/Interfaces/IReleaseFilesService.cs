@@ -14,9 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IFormFile dataFile, IFormFile metaFile, string name, string userName);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId, params ReleaseFileTypes[] types);
-        
+
         Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListDataFilesAsync(Guid releaseId);
-        
+
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId, IEnumerable<Guid> referencedReleaseVersions);
 
         Task<Either<ActionResult, FileInfo>> UploadFileAsync(Guid releaseId, IFormFile file,
@@ -32,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, bool>> DeleteChartFilesAsync(Guid releaseId, IEnumerable<Guid> fileIds);
 
         Task<Either<ActionResult, bool>> DeleteDataFilesAsync(Guid releaseId, string dataFileName);
+
+        Task<Either<ActionResult, Unit>> DeleteAllFiles(Guid releaseId);
 
         Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type,
             string fileName);

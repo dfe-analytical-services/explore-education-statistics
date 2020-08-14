@@ -2,6 +2,7 @@ using System;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -191,7 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
-
         [Fact]
         public void GetTheme()
         {
@@ -207,17 +207,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
+        [Fact]
+        public void DeleteTheme()
+        {
+            PolicyCheckBuilder()
+                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = SetupThemeService(userService: userService.Object);
+
+                        return await service.DeleteTheme(_theme.Id);
+                    }
+                );
+        }
+
         private ThemeService SetupThemeService(
             ContentDbContext context = null,
             IMapper mapper = null,
+            PersistenceHelper<ContentDbContext> persistenceHelper = null,
             IUserService userService = null,
-            PersistenceHelper<ContentDbContext> persistenceHelper = null)
+            ITopicService topicService = null)
         {
             return new ThemeService(
                 context ?? new Mock<ContentDbContext>().Object,
                 mapper ?? AdminMapper(),
+                persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object
+                topicService ?? new Mock<ITopicService>().Object
             );
         }
     }
