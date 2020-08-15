@@ -96,3 +96,10 @@ Verify updated topic
     user waits until page contains heading 1  Manage themes and topics
     user waits until page contains accordion section  ${THEME_NAME}
     user checks topic is in correct position  ${THEME_NAME}  1  ${TOPIC_NAME}
+
+Delete test theme
+    [Tags]  HappyPath
+    user clicks testid element  Edit link for ${THEME_NAME}
+    ${theme_id}=  get theme id from url
+    delete theme  ${theme_id}
+    user closes the browser
