@@ -7,9 +7,9 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${TOPIC_NAME}        UI test topic %{RUN_IDENTIFIER}
+${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - create publication %{RUN_IDENTIFIER}
-${METHODOLOGY_NAME}  Test methodology
+${METHODOLOGY_NAME}  UI test methodology
 
 *** Test Cases ***
 Create approved 'Test methodology'
@@ -20,7 +20,6 @@ Create approved 'Test methodology'
 
 Go to Create publication page for "UI tests topic" topic
     [Tags]  HappyPath
-    environment variable should be set   RUN_IDENTIFIER
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains link    Create new publication
     user checks page does not contain button  ${PUBLICATION_NAME}
@@ -98,7 +97,7 @@ Verify publication has been updated
     user checks testid element contains  Team email for ${PUBLICATION_NAME}  sen.statistics@education.gov.uk
     user checks testid element contains  Contact name for ${PUBLICATION_NAME}  Sean Gibson
     user checks testid element contains  Contact phone number for ${PUBLICATION_NAME}  0987654321
-    user checks testid element contains  Methodology for ${PUBLICATION_NAME}  Test methodology
+    user checks testid element contains  Methodology for ${PUBLICATION_NAME}  ${METHODOLOGY_NAME}
     user checks testid element contains  Releases for ${PUBLICATION_NAME}  No releases created
 
 Create new release

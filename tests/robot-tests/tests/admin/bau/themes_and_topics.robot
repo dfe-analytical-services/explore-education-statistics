@@ -7,10 +7,10 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${THEME_NAME}           UI test suite theme %{RUN_IDENTIFIER}
-${THEME_NAME_CREATED}   UI test suite created theme %{RUN_IDENTIFIER}
-${TOPIC_NAME}           UI test suite topic %{RUN_IDENTIFIER}
-${TOPIC_NAME_CREATED}   UI test suite created topic %{RUN_IDENTIFIER}
+${THEME_NAME}           UI test theme - suite %{RUN_IDENTIFIER}
+${THEME_NAME_CREATED}   UI test theme - suite created %{RUN_IDENTIFIER}
+${TOPIC_NAME}           UI test topic - suite %{RUN_IDENTIFIER}
+${TOPIC_NAME_CREATED}   UI test topic - suite created %{RUN_IDENTIFIER}
 
 *** Keywords ***
 user checks topic is in correct position
@@ -20,7 +20,6 @@ user checks topic is in correct position
 *** Test Cases ***
 Go to 'Manage themes and topics'
     [Tags]  HappyPath
-    environment variable should be set   RUN_IDENTIFIER
     user clicks link  manage themes and topics
     user waits until page contains heading 1  Manage themes and topics
 
