@@ -49,11 +49,20 @@ Select Start date and End date
     user checks previous table tool step contains  4    Start date    2012/13
     user checks previous table tool step contains  4    End date      2015/16
 
-Select Indicators
+Select Indicators - Authorised absence rate
     [Tags]  HappyPath
     user selects subheaded indicator checkbox                Absence fields    Authorised absence rate
+    user checks subheaded indicator checkbox is selected     Absence fields    Authorised absence rate
+
+Select Indicators - Overall absence rate
+    [Tags]  HappyPath
     user selects subheaded indicator checkbox                Absence fields    Overall absence rate
+    user checks subheaded indicator checkbox is selected     Absence fields    Overall absence rate
+
+Select Indicators - Unauthorised absence rate
+    [Tags]  HappyPath
     user selects subheaded indicator checkbox                Absence fields    Unauthorised absence rate
+    user checks subheaded indicator checkbox is selected     Absence fields    Unauthorised absence rate
 
 Select Characteristics
     [Tags]   HappyPath
