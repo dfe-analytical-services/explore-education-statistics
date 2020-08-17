@@ -7,7 +7,7 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${TOPIC_NAME}        UI test topic %{RUN_IDENTIFIER}
+${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - legacy releases %{RUN_IDENTIFIER}
 
 *** Keywords ***

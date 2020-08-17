@@ -20,21 +20,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public async Task SoftDeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId)
         {
-            var subjectIds = await _statisticsDbContext.ReleaseSubject
-                .Include(rs => rs.Subject)
-                .Where(rs => rs.ReleaseId == releaseId).Select(rs => rs.SubjectId).ToListAsync();
-            
-            foreach (var id in subjectIds)
-            {
-                await SoftDeleteSubjectOrBreakReleaseLink(releaseId, id);
-            }
+            await DeleteAllSubjectsOrBreakReleaseLinks(releaseId, true);
         }
 
         public async Task SoftDeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId)
         {
+            await DeleteSubjectOrBreakReleaseLink(releaseId, subjectId, true);
+        }
+
+        public async Task DeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId, bool isSoftDelete = false)
+        {
+            var subjectIds = await _statisticsDbContext.ReleaseSubject
+                .Include(rs => rs.Subject)
+                .Where(rs => rs.ReleaseId == releaseId).Select(rs => rs.SubjectId).ToListAsync();
+
+            foreach (var id in subjectIds)
+            {
+                await DeleteSubjectOrBreakReleaseLink(releaseId, id, isSoftDelete);
+            }
+        }
+
+        public async Task DeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId, bool isSoftDelete = false)
+        {
             await RemoveReleaseSubjectLinkIfExists(releaseId, subjectId);
             await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
-            await SoftDeleteSubjectIfOrphanedAndExists(subjectId);
+            await DeleteSubjectIfOrphanedAndExists(subjectId, isSoftDelete);
 
             await _statisticsDbContext.SaveChangesAsync();
         }
@@ -51,32 +61,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private async Task SoftDeleteSubjectIfOrphanedAndExists(Guid id)
+        private async Task DeleteSubjectIfOrphanedAndExists(Guid subjectId, bool isSoftDelete)
         {
             var subject = await _statisticsDbContext.Subject
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == subjectId);
 
-            if (subject != null)
+            if (CanDeleteSubject(subject))
             {
-                await SoftDeleteSubjectIfOrphaned(subject);
+                if (isSoftDelete)
+                {
+                    subject.SoftDeleted = true;
+                    _statisticsDbContext.Subject.Update(subject);
+                }
+                else
+                {
+                    _statisticsDbContext.Subject.Remove(subject);
+                }
             }
         }
 
-        private async Task SoftDeleteSubjectIfOrphaned(Subject subject)
+        private bool CanDeleteSubject(Subject subject)
         {
-            if (await CountReleasesWithSubject(subject.Id) > 1)
-            {
-                return;
-            }
-
-            subject.SoftDeleted = true;
-            _statisticsDbContext.Subject.Update(subject);
-        }
-
-        private async Task<int> CountReleasesWithSubject(Guid subjectId)
-        {
-            return await _statisticsDbContext.ReleaseSubject
-                .CountAsync(rs => rs.SubjectId == subjectId);
+            return subject != null
+                   && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
         }
     }
 }

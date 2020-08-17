@@ -13,6 +13,42 @@ def raise_assertion_error(err_msg):
     raise AssertionError(err_msg)
 
 
+def admin_request(method, endpoint, body=None):
+    assert method and endpoint
+    assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
+    assert os.getenv('ADMIN_URL') is not None
+
+    # To prevent InsecureRequestWarning
+    requests.packages.urllib3.disable_warnings()
+
+    jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_BAU'))['access_token']
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {jwt_token}',
+    }
+    return requests.request(
+        method,
+        url=f'{os.getenv("ADMIN_URL")}{endpoint}',
+        headers=headers,
+        json=body,
+        verify=False
+    )
+
+
+def delete_theme(theme_id: str):
+    assert theme_id
+
+    resp = admin_request('DELETE', f'/api/themes/{theme_id}')
+    assert resp.status_code == 204, \
+        f'Could not delete theme! Responded with {resp.status_code} and {resp.text}'
+
+
+def get_theme_id_from_url():
+    url = sl.get_location()
+    assert '/themes/' in url, 'URL does not contain /themes'
+    return url.lstrip(os.getenv('ADMIN_URL')).split('/')[1]
+
+
 def get_release_guid_from_release_status_page_url(url):
     assert url.endswith('/status')
     url_components = url.split('/')
@@ -20,15 +56,9 @@ def get_release_guid_from_release_status_page_url(url):
 
 
 def user_triggers_release_on_demand(release_id):
-    release_on_demand_endpoint = f'{os.getenv("ADMIN_URL")}/api/bau/release/{release_id}/publish'
-    jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {jwt_token}',
-    }
-
-    resp = requests.put(release_on_demand_endpoint, headers=headers, verify=False)
-    assert resp.status_code == 200, f'Release on demand request failed! Returned response code {resp.status_code}'
+    resp = admin_request('PUT', f'/api/bau/release/{release_id}/publish')
+    assert resp.status_code == 200, \
+        f'Release on demand request failed! Responded with {resp.status_code} and {resp.text}'
 
 
 def data_csv_number_contains_xpath(num, xpath):
@@ -54,14 +84,17 @@ def data_file_number_contains_xpath(num, xpath):
 
 
 def user_changes_accordion_section_title(num, new_title):
-    sl.wait_until_page_contains_element(f'xpath://*[@data-testid="EditableAccordionSection"][{num}]')
+    sl.wait_until_page_contains_element(
+        f'xpath://*[@data-testid="EditableAccordionSection"][{num}]')
     try:
-        elem = sl.driver.find_element_by_xpath(f'//*[@data-testid="EditableAccordionSection"][{num}]')
+        elem = sl.driver.find_element_by_xpath(
+            f'//*[@data-testid="EditableAccordionSection"][{num}]')
     except:
         raise_assertion_error(f'Cannot find accordion section number "{num}"')
 
     try:
-        elem.find_element_by_xpath('.//h2[contains(@class, "govuk-accordion__section-heading")]/button').click()
+        elem.find_element_by_xpath(
+            './/h2[contains(@class, "govuk-accordion__section-heading")]/button').click()
     except:
         raise_assertion_error(f'Cannot open accordion section number "{num}"')
 
@@ -108,7 +141,8 @@ def user_adds_text_block_to_editable_accordion_section(section_elem, timeout=30)
         elem = section_elem.find_element_by_xpath('.//button[text()="Add text block"]')
     except Exception as e:
         raise_assertion_error(
-            f'Failed to get "Add text block" button element for accordion section element\nException: ', e)
+            f'Failed to get "Add text block" button element for accordion section element\nException: ',
+            e)
 
     max_time = time.time() + timeout
     while (not elem.is_enabled()) and (time.time() < max_time):
@@ -120,7 +154,9 @@ def user_adds_text_block_to_editable_accordion_section(section_elem, timeout=30)
     try:
         elem.click()
     except Exception as e:
-        raise_assertion_error(f'Failed to click "Add text block" button for accordion section element\nException: ', e)
+        raise_assertion_error(
+            f'Failed to click "Add text block" button for accordion section element\nException: {e}',
+            e)
 
     max_time = time.time() + timeout
     while time.time() < max_time:
@@ -140,14 +176,16 @@ def user_checks_accordion_section_contains_X_blocks(section_elem, num_blocks):
     except:
         raise_assertion_error(f'Failed to find any content blocks in accordion section')
 
-    assert len(elems) == int(num_blocks), f'Found {len(elems)} content blocks. Should have found {num_blocks}'
+    assert len(elems) == int(
+        num_blocks), f'Found {len(elems)} content blocks. Should have found {num_blocks}'
 
 
 def user_adds_content_to_accordion_section_text_block(section_elem, block_num, content):
     try:
         section_elem.find_element_by_xpath(f'(.//button[text()="Edit block"])[{block_num}]').click()
     except:
-        raise_assertion_error(f'Failed to find "Edit block" button for content block number {block_num}')
+        raise_assertion_error(
+            f'Failed to find "Edit block" button for content block number {block_num}')
 
     sl.press_keys(None, content)
 
@@ -165,12 +203,14 @@ def user_checks_accordion_section_text_block_contains_text(section_elem, block_n
             f'.//*[@data-testid="EditableSectionBlock"][{block_num}]//*[text()="{content}"]'
         )
     except:
-        raise_assertion_error(f'Failed to find text "{content}" in content block number {block_num}')
+        raise_assertion_error(
+            f'Failed to find text "{content}" in content block number {block_num}')
 
 
 def user_deletes_editable_accordion_section_content_block(section_elem, block_num):
     try:
-        section_elem.find_element_by_xpath(f'(.//button[text()="Remove block"])[{block_num}]').click()
+        section_elem.find_element_by_xpath(
+            f'(.//button[text()="Remove block"])[{block_num}]').click()
     except:
         raise_assertion_error(f'Failed to find Delete button for content block number {block_num}')
 

@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<ReleaseFileReference>()
                 .HasOne(r => r.Release)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReleaseFileReference>()
                 .Property(b => b.ReleaseFileType)

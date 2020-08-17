@@ -8,13 +8,12 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${TOPIC_NAME}        UI test topic %{RUN_IDENTIFIER}
+${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - create data block %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Create Datablock test publication
     [Tags]  HappyPath
-    environment variable should be set   RUN_IDENTIFIER
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains link  Create new publication     60
     user clicks link   Create new publication

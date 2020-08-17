@@ -2,11 +2,14 @@ using System;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -77,17 +80,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
+        [Fact]
+        public void DeleteTopic()
+        {
+            PolicyCheckBuilder()
+                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = SetupTopicService(userService: userService.Object);
+
+                        return await service.DeleteTopic(_topic.Id);
+                    }
+                );
+        }
+
         private TopicService SetupTopicService(
-            ContentDbContext context = null,
+            ContentDbContext contentContext = null,
+            StatisticsDbContext statisticsContext = null,
+            PersistenceHelper<ContentDbContext> persistenceHelper = null,
             IMapper mapper = null,
             IUserService userService = null,
-            PersistenceHelper<ContentDbContext> persistenceHelper = null)
+            IReleaseSubjectService releaseSubjectService = null,
+            IReleaseFilesService releaseFilesService = null)
         {
             return new TopicService(
-                context ?? new Mock<ContentDbContext>().Object,
+                contentContext ?? new Mock<ContentDbContext>().Object,
+                statisticsContext ?? new Mock<StatisticsDbContext>().Object,
                 persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Topic>(_topic.Id, _topic).Object,
                 mapper ?? AdminMapper(),
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
+                releaseFilesService ?? new Mock<IReleaseFilesService>().Object
             );
         }
     }

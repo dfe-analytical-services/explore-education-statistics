@@ -24,17 +24,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
+        private readonly ITopicService _topicService;
 
         public ThemeService(
             ContentDbContext context,
             IMapper mapper,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            ITopicService topicService)
         {
             _context = context;
             _mapper = mapper;
-            _userService = userService;
             _persistenceHelper = persistenceHelper;
+            _userService = userService;
+            _topicService = topicService;
         }
 
         public async Task<Either<ActionResult, ThemeViewModel>> CreateTheme(SaveThemeViewModel createdTheme)
@@ -114,6 +117,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         list.Select(_mapper.Map<ThemeViewModel>)
                             .OrderBy(theme => theme.Title)
                             .ToList()
+                );
+        }
+
+        public async Task<Either<ActionResult, Unit>> DeleteTheme(Guid themeId)
+        {
+            return await _userService.CheckCanManageAllTaxonomy()
+                .OnSuccess(
+                    () => _persistenceHelper.CheckEntityExists<Theme>(
+                        themeId,
+                        q => q.Include(t => t.Topics)
+                    )
+                )
+                .OnSuccess(
+                    async theme =>
+                    {
+                        // For now we only want to delete test themes as we
+                        // don't really have a mechanism to clean things up
+                        // properly across the entire application.
+                        // TODO: EES-1295 ability to completely delete releases
+                        if (!theme.Title.StartsWith("UI test theme"))
+                        {
+                            return;
+                        }
+
+                        var topicIds = theme.Topics.Select(topic => topic.Id).ToList();
+
+                        foreach (var topicId in topicIds)
+                        {
+                            await _topicService.DeleteTopic(topicId);
+                        }
+
+                        _context.Themes.Remove(theme);
+                        await _context.SaveChangesAsync();
+                    }
                 );
         }
 

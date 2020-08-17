@@ -164,10 +164,6 @@ For this reason, you **MUST** ensure that if a test suite changes test data, tha
 ### Test data
 After a group discussion, it was decided that tests will, as far as is possible, create their own test data. This means that any tests you write that alter data, you will need to create that data from scratch.
 
-After an environment's data has been reset and reseeded, you will need to create some test data in the content database for the UI tests to work:
-* Themes - "Test theme" with the Id `449d720f-9a87-4895-91fe-70972d1bdc04`
-* Methodologies - "Test methodology" with the Id `b4886b45-53c2-4d6f-e6bc-08d77d76f342`, and Status `Approved`
-
 ### IDE
 
 If searching for an IDE to add/edit these tests, consider using IntelliJ with the following plugins:

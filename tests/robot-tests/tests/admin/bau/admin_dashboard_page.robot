@@ -6,6 +6,9 @@ Force Tags  Admin  Local  Dev
 Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
+*** Variables ***
+${TOPIC_NAME}       %{TEST_TOPIC_NAME}
+
 *** Test Cases ***
 Heading is present on tab
     [Tags]  HappyPath
@@ -27,6 +30,5 @@ Verify correct data is shown when theme and topic is shown
     # EES-892 - Selecting theme or topic refreshes the page, so must wait
     user waits until page contains element   css:#selectTopic
 
-    environment variable should be set   RUN_IDENTIFIER
-    user selects from list by label  css:#selectTopic  UI test topic %{RUN_IDENTIFIER}
-    user waits until page contains element   xpath://h2[text()="Test theme"]/../h3[text()="UI test topic %{RUN_IDENTIFIER}"]
+    user selects from list by label  css:#selectTopic  ${TOPIC_NAME}
+    user waits until page contains element   xpath://h2[text()="Test theme"]/../h3[text()="${TOPIC_NAME}"]

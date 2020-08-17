@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IImportService _importService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly ISubjectService _subjectService;
-        
+
         private const string NameKey = "name";
 
         public ReleaseFilesService(IConfiguration config, IUserService userService,
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var blobContainer = await GetCloudBlobContainer();
 
                     var files = await GetReleaseFiles(releaseId, types);
-                    
+
                     var filesWithMetadata = files
                         .Select(async fileLink =>
                         {
@@ -350,6 +350,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, Unit>> DeleteAllFiles(Guid releaseId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(
+                    async release =>
+                    {
+                        // Exclude metadata as they'll be deleted alongside the data file
+                        var files = (await GetAllReleaseFiles(release.Id))
+                            .Where(file => file.ReleaseFileReference.ReleaseFileType != ReleaseFileTypes.Metadata)
+                            .Select(file => file.ReleaseFileReference);
+
+                        foreach (var file in files)
+                        {
+                            switch (file.ReleaseFileType)
+                            {
+                                case ReleaseFileTypes.Chart:
+                                    await DeleteChartFileAsync(release.Id, file.Id);
+                                    break;
+                                case ReleaseFileTypes.Data:
+                                    await DeleteDataFilesAsync(release.Id, file.Filename);
+                                    break;
+                                default:
+                                    await DeleteNonDataFileAsync(
+                                        release.Id,
+                                        file.ReleaseFileType,
+                                        file.Filename
+                                    );
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
+
         public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
@@ -437,6 +473,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context.ReleaseFiles.Remove(fileLink);
         }
 
+        private async Task<List<ReleaseFile>> GetAllReleaseFiles(Guid releaseId)
+        {
+            return await _context
+                .ReleaseFiles
+                .Include(f => f.ReleaseFileReference)
+                .AsNoTracking()
+                .Where(f => f.ReleaseId == releaseId)
+                .ToListAsync();
+        }
+
         private async Task<List<ReleaseFile>> GetReleaseFiles(Guid releaseId, params ReleaseFileTypes[] types)
         {
             return await _context
@@ -445,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(f => f.ReleaseId == releaseId && types.Contains(f.ReleaseFileReference.ReleaseFileType))
                 .ToListAsync();
         }
-        
+
         private async Task<ReleaseFile> GetReleaseFileLinkAsync(Guid releaseId, string filename, ReleaseFileTypes type)
         {
             var releaseFileLinks = await _context
@@ -588,7 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                               && rfr.SubjectId == releaseDataFileLink.ReleaseFileReference.SubjectId);
             return associatedFileRef.Filename;
         }
-        
+
         private async Task<string> GetSubjectName(Guid releaseId, string filename, ReleaseFileTypes type)
         {
             // TODO Need to get back to the originating subject to get the name which is used in the delete plan
@@ -599,7 +645,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstAsync(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
                                    && rfr.ReleaseFileType == type
                                    && rfr.Filename == filename);
-            
+
             if (associatedFileRef?.SubjectId != null)
             {
                 var subject = await _subjectService.GetAsync(associatedFileRef.SubjectId.Value);

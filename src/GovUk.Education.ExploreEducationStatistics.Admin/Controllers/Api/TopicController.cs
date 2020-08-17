@@ -46,5 +46,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .GetTopic(topicId)
                 .HandleFailuresOrOk();
         }
+
+        [HttpDelete("topics/{topicId}")]
+        public async Task<ActionResult> DeleteTopic(Guid topicId)
+        {
+            return await _topicService
+                .DeleteTopic(topicId)
+                .HandleFailuresOrNoContent();
+        }
     }
 }
