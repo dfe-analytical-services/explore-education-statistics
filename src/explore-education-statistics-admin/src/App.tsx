@@ -1,3 +1,6 @@
+// Load app styles first to ensure correct style ordering
+import './App.scss';
+
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
@@ -13,7 +16,6 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React, { lazy, Suspense, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
-import './App.scss';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 
 const PrototypeIndexPage = lazy(() =>
