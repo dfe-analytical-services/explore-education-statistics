@@ -55,6 +55,7 @@ Edit theme
     [Tags]  HappyPath
     user clicks testid element  Edit link for ${THEME_NAME_CREATED}
     user waits until page contains heading 1  Edit theme
+    user waits until page contains element   id:themeForm-title
     user checks input field contains  id:themeForm-title   ${THEME_NAME_CREATED}
     user checks input field contains  id:themeForm-summary   Created summary
     user enters text into element  id:themeForm-title   ${THEME_NAME}
@@ -87,6 +88,7 @@ Edit topic
     user clicks testid element  Edit ${TOPIC_NAME_CREATED} topic link for ${THEME_NAME}
     user waits until page contains title caption  ${THEME_NAME}
     user waits until page contains heading 1  Edit topic
+    user waits until page contains element   id:topicForm-title
     user checks input field contains  id:topicForm-title   ${TOPIC_NAME_CREATED}
     user enters text into element  id:topicForm-title   ${TOPIC_NAME}
     user clicks button  Save topic
