@@ -236,39 +236,37 @@ def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
             f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
 
 
-def user_selects_start_date(start_date):
-    sl.select_from_list_by_label('css:#timePeriodForm-start', start_date)
-
-
-def user_selects_end_date(end_date):
-    sl.select_from_list_by_label('css:#timePeriodForm-end', end_date)
-
-
 def user_clicks_indicator_checkbox(indicator_label):
-    sl.page_should_contain_checkbox(
-        f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]/../input')
-    sl.driver.find_element_by_xpath(
-        f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]/../input').click()
+    checkbox_selector = f'//*[@id="filtersForm-indicators"]//label[text()="{indicator_label}"]/../input'
+    sl.wait_until_page_contains_element(f'xpath:{checkbox_selector}')
+    sl.page_should_contain_checkbox(f'xpath:{checkbox_selector}')
+    sl.scroll_element_into_view(f'xpath:{checkbox_selector}')
+    sl.wait_until_element_is_enabled(f'xpath:{checkbox_selector}')
+    try:
+        elem = sl.driver.find_element_by_xpath(checkbox_selector)
+    except:
+        raise_assertion_error(f'Couldn\'t find checkbox with selector "{checkbox_selector}"')
+    try:
+        elem.click()
+    except:
+        raise_assertion_error(f'Failed to click indicator checkbox!')
 
 
 def user_selects_subheaded_indicator_checkbox(subheading_label, indicator_label):
     checkbox_selector = f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input'
-    sl.page_should_contain_checkbox(checkbox_selector)
-    sl.scroll_element_into_view(checkbox_selector)
-    sl.checkbox_should_not_be_selected(checkbox_selector)
-    sl.wait_until_element_is_enabled(checkbox_selector)
-    sl.driver.find_element_by_xpath(checkbox_selector).click()
-
-
-def user_checks_indicator_checkbox_is_selected(indicator_label):
-    sl.checkbox_should_be_selected(
-        f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "{indicator_label}")]/../input')
-
-
-def user_checks_subheaded_indicator_checkbox_is_selected(subheading_label, indicator_label):
-    checkbox_selector = f'xpath://*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input'
-    sl.wait_until_element_is_enabled(checkbox_selector)
-    sl.checkbox_should_be_selected(checkbox_selector)
+    sl.wait_until_page_contains_element(f'xpath:{checkbox_selector}')
+    sl.page_should_contain_checkbox(f'xpath:{checkbox_selector}')
+    sl.scroll_element_into_view(f'xpath:{checkbox_selector}')
+    sl.checkbox_should_not_be_selected(f'xpath:{checkbox_selector}')
+    sl.wait_until_element_is_enabled(f'xpath:{checkbox_selector}')
+    try:
+        elem = sl.driver.find_element_by_xpath(checkbox_selector)
+    except:
+        raise_assertion_error(f'Couldn\'t find checkbox with selector "{checkbox_selector}"')
+    try:
+        elem.click()
+    except:
+        raise_assertion_error(f'Failed to click subheaded indicator checkbox!')
 
 
 def user_clicks_category_checkbox(subheading_label, category_label):

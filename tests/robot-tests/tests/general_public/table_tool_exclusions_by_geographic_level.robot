@@ -20,14 +20,14 @@ Select Exclusions publication
     user opens details dropdown    Exclusions
     user selects radio      Permanent and fixed-period exclusions in England
     user clicks element    css:#publicationForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose a subject"]
+    user waits until page contains heading 2  Choose a subject
     user checks previous table tool step contains  1   Publication   Permanent and fixed-period exclusions in England
 
 Select subject "Exclusions by geographic level"
     [Tags]  HappyPath
     user selects radio   Exclusions by geographic level
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose locations"]
+    user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject     Exclusions by geographic level
 
 Select Locations LA, Bury, Sheffield, York
@@ -38,7 +38,7 @@ Select Locations LA, Bury, Sheffield, York
     user clicks checkbox    York
     user clicks element     css:#locationFiltersForm-submit
     # Extra timeout until EES-315/316
-    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user waits until page contains heading 2  Choose time period
     user checks previous table tool step contains  3    Local Authority    Bury
     user checks previous table tool step contains  3    Local Authority    Sheffield
     user checks previous table tool step contains  3    Local Authority    York
@@ -48,16 +48,25 @@ Select Start date and End date
     user selects start date     2006/07
     user selects end date       2008/09
     user clicks element     css:#timePeriodForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains heading 2  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2006/07
     user checks previous table tool step contains  4    End date      2008/09
 
-Select Indicators
+Select Indicator - Number of pupils
     [Tags]  HappyPath
     user clicks indicator checkbox  Number of pupils
+    user checks indicator checkbox is selected  Number of pupils
+
+Select Indicator - Number of permanent exclusions
+    [Tags]  HappyPath
     user clicks indicator checkbox  Number of permanent exclusions
+    user checks indicator checkbox is selected  Number of permanent exclusions
+
+Select Indicator - Number of fixed period exclusions
+    [Tags]  HappyPath
     user clicks indicator checkbox  Number of fixed period exclusions
+    user checks indicator checkbox is selected  Number of fixed period exclusions
 
 Select Characteristics
     [Tags]   HappyPath

@@ -59,7 +59,7 @@ Select subject "UI test subject"
     user waits until page contains   UI test subject
     user selects radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose locations"]     90
+    user waits until page contains heading 2   Choose locations
     user checks previous table tool step contains  1    Subject     UI test subject
 
 Select locations
@@ -73,7 +73,7 @@ Select locations
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
     user clicks element     id:locationFiltersForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user waits until page contains heading 2  Choose time period
 
 Select time period
     [Tags]   HappyPath
@@ -86,7 +86,7 @@ Select time period
     user selects start date    2005
     user selects end date      2020
     user clicks element     id:timePeriodForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains heading 2  Choose your filters
     user checks previous table tool step contains  3    Start date    2005
     user checks previous table tool step contains  3    End date      2020
 

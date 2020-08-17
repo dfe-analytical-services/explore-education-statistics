@@ -254,7 +254,7 @@ user waits until page contains heading 1
 
 user waits until page contains heading 2
   [Arguments]   ${text}  ${wait}=${timeout}
-  user waits until page contains element  xpath://h2[text()="${text}"]  ${wait}
+  wait until element is visible  xpath://h2[text()="${text}"]   timeout=${wait}
 
 user waits until page contains heading 3
   [Arguments]   ${text}  ${wait}=${timeout}
@@ -364,3 +364,20 @@ user waits until page contains key stat tile
   [Arguments]  ${title}   ${value}   ${wait}=${timeout}
   user waits until page contains element   xpath://*[@data-testid="keyStatTile-title" and text()="${title}"]/../*[@data-testid="keyStatTile-value" and text()="${value}"]    ${wait}
 
+user selects start date
+  [Arguments]  ${start_date}
+  select from list by label   css:#timePeriodForm-start   ${start_date}
+
+user selects end date
+  [Arguments]  ${end_date}
+  select from list by label   css:#timePeriodForm-end   ${end_date}
+
+user checks indicator checkbox is selected
+  [Arguments]  ${indicator_label}
+  wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "${indicator_label}")]/../input
+  checkbox should be selected     xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "${indicator_label}")]/../input
+
+user checks subheaded indicator checkbox is selected
+  [Arguments]  ${subheading_label}  ${indicator_label}
+  wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+  checkbox should be selected     xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input

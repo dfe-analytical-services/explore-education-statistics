@@ -20,14 +20,14 @@ Select "Pupil absence" publication
     user opens details dropdown    Pupil absence
     user selects radio      Pupil absence in schools in England
     user clicks element    css:#publicationForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose a subject"]
+    user waits until page contains heading 2  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence by characteristic"
     [Tags]  HappyPath
     user selects radio   Absence by characteristic
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose locations"]
+    user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject     Absence by characteristic
 
 Select Location Country, England
@@ -36,7 +36,7 @@ Select Location Country, England
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
     # Extra timeout until EES-315/316
-    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user waits until page contains heading 2  Choose time period
     user checks previous table tool step contains  3    National    England
 
 Select Start date and End date
@@ -44,7 +44,7 @@ Select Start date and End date
     user selects start date     2012/13
     user selects end date       2015/16
     user clicks element     css:#timePeriodForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains heading 2  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2012/13
     user checks previous table tool step contains  4    End date      2015/16
