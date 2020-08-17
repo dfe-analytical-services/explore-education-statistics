@@ -42,6 +42,7 @@ user signs in as analyst1
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
 User selects theme "${theme}" and topic "${topic}" from the admin dashboard
+    user waits until page contains element  id:my-publications-tab
     user clicks element   id:my-publications-tab
     user waits until page contains element   id:selectTheme
     user checks element contains  id:my-publications-tab  Manage publications and releases
