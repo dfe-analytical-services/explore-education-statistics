@@ -45,17 +45,15 @@ Select Start date and End date
     user selects end date       2015/16
     user clicks element     css:#timePeriodForm-submit
     user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2012/13
     user checks previous table tool step contains  4    End date      2015/16
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks subheaded indicator checkbox                Absence fields    Authorised absence rate
-    user checks subheaded indicator checkbox is selected    Absence fields    Authorised absence rate
-    user clicks subheaded indicator checkbox                Absence fields    Overall absence rate
-    user checks subheaded indicator checkbox is selected    Absence fields    Overall absence rate
-    user clicks subheaded indicator checkbox                Absence fields    Unauthorised absence rate
-    user checks subheaded indicator checkbox is selected    Absence fields    Unauthorised absence rate
+    user selects subheaded indicator checkbox                Absence fields    Authorised absence rate
+    user selects subheaded indicator checkbox                Absence fields    Overall absence rate
+    user selects subheaded indicator checkbox                Absence fields    Unauthorised absence rate
 
 Select Characteristics
     [Tags]   HappyPath

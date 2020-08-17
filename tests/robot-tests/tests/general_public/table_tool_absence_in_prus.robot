@@ -20,14 +20,14 @@ Select "Pupil absence" publication
     user opens details dropdown    Pupil absence
     user selects radio      Pupil absence in schools in England
     user clicks element    css:#publicationForm-submit
-    user waits until page contains    Choose a subject
+    user waits until element is visible  xpath://h2[text()="Choose a subject"]
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence in prus"
     [Tags]  HappyPath
     user selects radio   Absence in prus
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until page contains    Choose locations
+    user waits until element is visible  xpath://h2[text()="Choose locations"]
     user checks previous table tool step contains  2    Subject     Absence in prus
 
 Select Location Country, England
@@ -35,7 +35,7 @@ Select Location Country, England
     user opens details dropdown     National
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
-    user waits until page contains  Choose time period
+    user waits until element is visible  xpath://h2[text()="Choose time period"]
     user checks previous table tool step contains  3   National     England
 
 Select Start date and End date
@@ -43,13 +43,14 @@ Select Start date and End date
     user selects start date     2013/14
     user selects end date       2016/17
     user clicks element     css:#timePeriodForm-submit
-    user waits until page contains   Choose your filters
+    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2013/14
     user checks previous table tool step contains  4    End date      2016/17
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks subheaded indicator checkbox   Absence fields        Number of schools
+    user selects subheaded indicator checkbox   Absence fields        Number of schools
 
 Create table
     [Tags]  HappyPath
@@ -97,24 +98,34 @@ Select locations LAs Barnet, Barnsley, Bedford
     user clicks checkbox            Bedford
 
     user clicks element   css:#locationFiltersForm-submit
-    user waits until page contains  Choose time period
+    user waits until element is visible  xpath://h2[text()="Choose time period"]
     user checks previous table tool step contains  3    Local Authority    Barnet
     user checks previous table tool step contains  3    Local Authority    Barnsley
     user checks previous table tool step contains  3    Local Authority    Bedford
 
-Select start and end date again
+Select new start and end date
     [Tags]   HappyPath
     user selects start date     2014/15
     user selects end date       2015/16
     user clicks element     css:#timePeriodForm-submit
-    user waits until page contains   Choose your filters
+    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2014/15
     user checks previous table tool step contains  4    End date      2015/16
 
-Select indicators again
+Select indicator Number of pupil enrolments
     [Tags]   HappyPath
-    user clicks subheaded indicator checkbox  Absence fields   Number of pupil enrolments
-    user clicks subheaded indicator checkbox  Absence fields   Number of sessions possible
+    user selects subheaded indicator checkbox  Absence fields   Number of pupil enrolments
+    user checks subheaded indicator checkbox is selected  Absence fields  Number of pupil enrolments
+
+Select indicator Number of sessions available
+    [Tags]   HappyPath
+    user selects subheaded indicator checkbox  Absence fields   Number of sessions possible
+    user checks subheaded indicator checkbox is selected  Absence fields  Number of sessions possible
+
+Verify indicator Number of schools is still selected
+    [Tags]   HappyPath
+    user checks subheaded indicator checkbox is selected  Absence fields  Number of schools
 
 Create table again
     [Tags]   HappyPath

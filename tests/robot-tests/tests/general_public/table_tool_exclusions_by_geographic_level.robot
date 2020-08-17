@@ -49,6 +49,7 @@ Select Start date and End date
     user selects end date       2008/09
     user clicks element     css:#timePeriodForm-submit
     user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2006/07
     user checks previous table tool step contains  4    End date      2008/09
 
