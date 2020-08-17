@@ -78,8 +78,8 @@ Select locations
 Select time period
     [Tags]   HappyPath
     user waits until page contains heading 2  Choose time period
-    user selects start date    2005
-    user selects end date      2020
+    user selects from list by label  id:timePeriodForm-start  2005
+    user selects from list by label  id:timePeriodForm-end  2020
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators
@@ -196,8 +196,8 @@ Select locations in table tool
 
 Select time period in table tool
     [Tags]   HappyPath
-    user selects start date    2014
-    user selects end date      2018
+    user selects from list by label  id:timePeriodForm-start  2014
+    user selects from list by label  id:timePeriodForm-end    2018
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators in table tool

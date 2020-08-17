@@ -41,8 +41,8 @@ Select Location Country, England
 
 Select Start date and End date
     [Tags]  HappyPath
-    user selects start date     2012/13
-    user selects end date       2015/16
+    user selects from list by label  id:timePeriodForm-start   2012/13
+    user selects from list by label  id:timePeriodForm-end   2015/16
     user clicks element     css:#timePeriodForm-submit
     user waits until page contains heading 2  Choose your filters
     user waits until page contains element   id:filtersForm-indicators

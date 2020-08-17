@@ -364,14 +364,6 @@ user waits until page contains key stat tile
   [Arguments]  ${title}   ${value}   ${wait}=${timeout}
   user waits until page contains element   xpath://*[@data-testid="keyStatTile-title" and text()="${title}"]/../*[@data-testid="keyStatTile-value" and text()="${value}"]    ${wait}
 
-user selects start date
-  [Arguments]  ${start_date}
-  select from list by label   css:#timePeriodForm-start   ${start_date}
-
-user selects end date
-  [Arguments]  ${end_date}
-  select from list by label   css:#timePeriodForm-end   ${end_date}
-
 user clicks indicator checkbox
     [Arguments]  ${indicator_label}
     wait until page contains element  xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input

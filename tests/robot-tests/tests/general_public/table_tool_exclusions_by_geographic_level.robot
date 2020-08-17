@@ -45,8 +45,8 @@ Select Locations LA, Bury, Sheffield, York
 
 Select Start date and End date
     [Tags]  HappyPath
-    user selects start date     2006/07
-    user selects end date       2008/09
+    user selects from list by label  id:timePeriodForm-start   2006/07
+    user selects from list by label  id:timePeriodForm-end     2008/09
     user clicks element     css:#timePeriodForm-submit
     user waits until page contains heading 2  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
