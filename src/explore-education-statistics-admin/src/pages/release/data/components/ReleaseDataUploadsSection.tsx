@@ -426,14 +426,14 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                                 {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
                               </p>
                             )}
-                            {block.infographicFilenames.length > 0 && (
+                            {block.infographicFilesInfo.length > 0 && (
                               <p>
                                 The following infographic files will also be
                                 removed:
                                 <ul>
-                                  {block.infographicFilenames.map(filename => (
-                                    <li key={filename}>
-                                      <p>{filename}</p>
+                                  {block.infographicFilesInfo.map(finfo => (
+                                    <li key={finfo.filename}>
+                                      <p>{finfo.filename}</p>
                                     </li>
                                   ))}
                                 </ul>
