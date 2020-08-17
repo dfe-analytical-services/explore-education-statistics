@@ -26,7 +26,6 @@ User navigates to absence methodology page
 Validate Published date, Last updated date
     [Tags]  HappyPath
     user checks element contains   css:[data-testid="published-date"]   22 March 2018
-    user checks element contains   css:[data-testid="last-updated"]     26 June 2019
 
 Validate accordion sections order
     [Tags]  HappyPath
