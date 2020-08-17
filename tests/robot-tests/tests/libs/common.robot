@@ -250,15 +250,15 @@ user checks page contains tag
 
 user waits until page contains heading 1
   [Arguments]   ${text}  ${wait}=${timeout}
-  user waits until page contains element  xpath://h1[text()="${text}"]  ${wait}
+  user waits until element is visible  xpath://h1[text()="${text}"]  ${wait}
 
 user waits until page contains heading 2
   [Arguments]   ${text}  ${wait}=${timeout}
-  wait until element is visible  xpath://h2[text()="${text}"]   timeout=${wait}
+  user waits until element is visible  xpath://h2[text()="${text}"]  ${wait}
 
 user waits until page contains heading 3
   [Arguments]   ${text}  ${wait}=${timeout}
-  user waits until page contains element  xpath://h3[text()="${text}"]  ${wait}
+  user waits until element is visible  xpath://h3[text()="${text}"]  ${wait}
 
 user waits until page contains title
   [Arguments]   ${text}  ${wait}=${timeout}
