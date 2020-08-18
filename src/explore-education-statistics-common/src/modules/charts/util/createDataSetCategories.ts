@@ -19,7 +19,6 @@ import parseNumber from '@common/utils/number/parseNumber';
 import camelCase from 'lodash/camelCase';
 import difference from 'lodash/difference';
 import groupBy from 'lodash/groupBy';
-import isEqual from 'lodash/isEqual';
 import orderBy from 'lodash/orderBy';
 
 /**
@@ -222,44 +221,8 @@ function createKeyedDataSets(
 ): DataSetCategory['dataSets'] {
   return dataSets.reduce<DataSetCategory['dataSets']>(
     (acc, [childDataSet, value]) => {
-      const { dataSet, parent } = childDataSet;
-
-      let expandedParent: DataSet = {
-        ...parent,
-      };
-
-      // This part is a little confusing as it's not
-      // particularly clear why we're doing this.
-      //
-      // We're basically trying to figure out if a
-      // data set should use it's parent (or original)
-      // data set's key or not.
-      //
-      // The parent data set may not include the location
-      // or time period, so we have to fill these in
-      // using the current category's filter.
-      // Failing to fill this in, we just fallback to
-      // using the expanded data set with all of its
-      // details filled out.
-      if (filter instanceof LocationFilter) {
-        expandedParent.location = {
-          value: filter.value,
-          level: filter.level,
-        };
-      } else if (filter instanceof TimePeriodFilter) {
-        expandedParent.timePeriod = filter.value;
-      } else {
-        expandedParent = {
-          ...dataSet,
-        };
-      }
-
-      // If we're using the parent key, we don't bother
-      // excluding the groupBy as we want to create a
-      // unique data point in the chart.
-      const key = isEqual(expandedParent, parent)
-        ? generateDataSetKey(parent)
-        : generateDataSetKey(dataSet, filter);
+      const { dataSet } = childDataSet;
+      const key = generateDataSetKey(dataSet, filter);
 
       acc[key] = {
         dataSet,

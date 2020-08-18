@@ -163,14 +163,6 @@ user checks element is not visible
   [Arguments]   ${element}
   element should not be visible   ${element}
 
-user checks checkbox is selected
-  [Arguments]    ${checkbox}
-  checkbox should be selected   ${checkbox}
-
-user checks checkbox is not selected
-  [Arguments]    ${checkbox}
-  checkbox should not be selected   ${checkbox}
-
 user waits until element is enabled
   [Arguments]   ${element}
   wait until element is enabled   ${element}
@@ -216,7 +208,6 @@ user clicks element
     [Arguments]     ${element}
     wait until page contains element  ${element}
     user scrolls to element  ${element}
-    set focus to element    ${element}
     wait until element is enabled   ${element}
     click element   ${element}
 
@@ -250,15 +241,15 @@ user checks page contains tag
 
 user waits until page contains heading 1
   [Arguments]   ${text}  ${wait}=${timeout}
-  user waits until page contains element  xpath://h1[text()="${text}"]  ${wait}
+  user waits until element is visible  xpath://h1[text()="${text}"]  ${wait}
 
 user waits until page contains heading 2
   [Arguments]   ${text}  ${wait}=${timeout}
-  wait until element is visible  xpath://h2[text()="${text}"]   timeout=${wait}
+  user waits until element is visible  xpath://h2[text()="${text}"]  ${wait}
 
 user waits until page contains heading 3
   [Arguments]   ${text}  ${wait}=${timeout}
-  user waits until page contains element  xpath://h3[text()="${text}"]  ${wait}
+  user waits until element is visible  xpath://h3[text()="${text}"]  ${wait}
 
 user waits until page contains title
   [Arguments]   ${text}  ${wait}=${timeout}
@@ -364,37 +355,60 @@ user waits until page contains key stat tile
   [Arguments]  ${title}   ${value}   ${wait}=${timeout}
   user waits until page contains element   xpath://*[@data-testid="keyStatTile-title" and text()="${title}"]/../*[@data-testid="keyStatTile-value" and text()="${value}"]    ${wait}
 
-user selects start date
-  [Arguments]  ${start_date}
-  select from list by label   css:#timePeriodForm-start   ${start_date}
+user clicks radio
+    [Arguments]  ${label}
+    user clicks element  xpath://label[text()="${label}"]/../input[@type="radio"]
 
-user selects end date
-  [Arguments]  ${end_date}
-  select from list by label   css:#timePeriodForm-end   ${end_date}
+user checks radio is checked
+    [Arguments]  ${label}
+    user checks page contains element  xpath://label[text()="${label}"]/../input[@type="radio" and @checked]
+
+user clicks checkbox
+    [Arguments]  ${label}
+    user clicks element  xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+
+user checks checkbox is checked
+    [Arguments]    ${label}
+    user checks checkbox input is checked  xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+
+user checks checkbox is not checked
+    [Arguments]    ${label}
+    user checks checkbox input is not checked  xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+
+user checks checkbox input is checked
+    [Arguments]    ${selector}
+    user waits until page contains element  ${selector}
+    checkbox should be selected   ${selector}
+
+user checks checkbox input is not checked
+    [Arguments]    ${selector}
+    user waits until page contains element  ${selector}
+    checkbox should not be selected   ${selector}
 
 user clicks indicator checkbox
     [Arguments]  ${indicator_label}
-    wait until page contains element  xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
-    page should contain checkbox  xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
-    user scrolls to element   xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
-    wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
-    user clicks element     xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
+    user clicks element  xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]
 
-user selects subheaded indicator checkbox
+user checks indicator checkbox is checked
+    [Arguments]  ${indicator_label}
+    user checks checkbox input is checked  xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "${indicator_label}")]/../input[@type="checkbox"]
+
+user clicks subheaded indicator checkbox
     [Arguments]  ${subheading_label}   ${indicator_label}
-    wait until page contains element  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
-    page should contain checkbox   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
-    user scrolls to element  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
-    checkbox should not be selected   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
-    wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
-    user clicks element   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+    user clicks element  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input[@type="checkbox"]
 
-user checks indicator checkbox is selected
-  [Arguments]  ${indicator_label}
-  wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "${indicator_label}")]/../input
-  checkbox should be selected     xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "${indicator_label}")]/../input
+user checks subheaded indicator checkbox is checked
+    [Arguments]  ${subheading_label}  ${indicator_label}
+    user checks checkbox input is checked  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input[@type="checkbox"]
 
-user checks subheaded indicator checkbox is selected
-  [Arguments]  ${subheading_label}  ${indicator_label}
-  wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
-  checkbox should be selected     xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+user clicks category checkbox
+    [Arguments]  ${subheading_label}  ${category_label}
+    user clicks element  xpath://legend[text()="${subheading_label}"]/..//label[text()="${category_label}"]/../input[@type="checkbox"]
+
+user checks category checkbox is checked
+    [Arguments]  ${subheading_label}  ${category_label}
+    user checks checkbox input is checked  xpath://legend[text()="${subheading_label}"]/..//label[text()="${category_label}"]/../input[@type="checkbox"]
+
+user clicks select all for category
+    [Arguments]  ${category_label}
+    user clicks element  xpath://legend[text()="{category_label}"]/..//button[contains(text(), "Select")]

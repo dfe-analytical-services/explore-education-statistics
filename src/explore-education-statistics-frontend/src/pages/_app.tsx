@@ -1,5 +1,6 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
+import '../styles/_all.scss';
 
 import {
   ApplicationInsightsContextProvider,
@@ -15,7 +16,6 @@ import NextApp, { AppContext, AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
 import React, { useEffect } from 'react';
-import '../styles/_all.scss';
 
 loadEnv();
 

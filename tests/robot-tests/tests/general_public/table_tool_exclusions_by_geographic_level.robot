@@ -18,14 +18,14 @@ Select Exclusions publication
     [Tags]  HappyPath
     user opens details dropdown    Pupils and schools
     user opens details dropdown    Exclusions
-    user selects radio      Permanent and fixed-period exclusions in England
+    user clicks radio      Permanent and fixed-period exclusions in England
     user clicks element    css:#publicationForm-submit
     user waits until page contains heading 2  Choose a subject
     user checks previous table tool step contains  1   Publication   Permanent and fixed-period exclusions in England
 
 Select subject "Exclusions by geographic level"
     [Tags]  HappyPath
-    user selects radio   Exclusions by geographic level
+    user clicks radio   Exclusions by geographic level
     user clicks element   css:#publicationSubjectForm-submit
     user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject     Exclusions by geographic level
@@ -45,8 +45,8 @@ Select Locations LA, Bury, Sheffield, York
 
 Select Start date and End date
     [Tags]  HappyPath
-    user selects start date     2006/07
-    user selects end date       2008/09
+    user selects from list by label  id:timePeriodForm-start   2006/07
+    user selects from list by label  id:timePeriodForm-end     2008/09
     user clicks element     css:#timePeriodForm-submit
     user waits until page contains heading 2  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
@@ -56,17 +56,17 @@ Select Start date and End date
 Select Indicator - Number of pupils
     [Tags]  HappyPath
     user clicks indicator checkbox  Number of pupils
-    user checks indicator checkbox is selected  Number of pupils
+    user checks indicator checkbox is checked  Number of pupils
 
 Select Indicator - Number of permanent exclusions
     [Tags]  HappyPath
     user clicks indicator checkbox  Number of permanent exclusions
-    user checks indicator checkbox is selected  Number of permanent exclusions
+    user checks indicator checkbox is checked  Number of permanent exclusions
 
 Select Indicator - Number of fixed period exclusions
     [Tags]  HappyPath
     user clicks indicator checkbox  Number of fixed period exclusions
-    user checks indicator checkbox is selected  Number of fixed period exclusions
+    user checks indicator checkbox is checked  Number of fixed period exclusions
 
 Select Characteristics
     [Tags]   HappyPath
@@ -99,7 +99,7 @@ Validate Bury Number of fixed period exclusions row
 
 User generates a permanent link
     [Tags]   HappyPath
-    user clicks element    xpath://*[text()="Generate permanent link"]
+    user clicks button    Generate permanent link
     user waits until page contains element   xpath://a[text()="View permanent link"]   60
     user checks generated permalink is valid
 

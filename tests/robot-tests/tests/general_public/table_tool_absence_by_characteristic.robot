@@ -18,14 +18,14 @@ Select "Pupil absence" publication
     [Tags]  HappyPath
     user opens details dropdown    Pupils and schools
     user opens details dropdown    Pupil absence
-    user selects radio      Pupil absence in schools in England
+    user clicks radio      Pupil absence in schools in England
     user clicks element    css:#publicationForm-submit
     user waits until page contains heading 2  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence by characteristic"
     [Tags]  HappyPath
-    user selects radio   Absence by characteristic
+    user clicks radio   Absence by characteristic
     user clicks element   css:#publicationSubjectForm-submit
     user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject     Absence by characteristic
@@ -41,8 +41,8 @@ Select Location Country, England
 
 Select Start date and End date
     [Tags]  HappyPath
-    user selects start date     2012/13
-    user selects end date       2015/16
+    user selects from list by label  id:timePeriodForm-start   2012/13
+    user selects from list by label  id:timePeriodForm-end   2015/16
     user clicks element     css:#timePeriodForm-submit
     user waits until page contains heading 2  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
@@ -51,18 +51,18 @@ Select Start date and End date
 
 Select Indicators - Authorised absence rate
     [Tags]  HappyPath
-    user selects subheaded indicator checkbox                Absence fields    Authorised absence rate
-    user checks subheaded indicator checkbox is selected     Absence fields    Authorised absence rate
+    user clicks subheaded indicator checkbox                Absence fields    Authorised absence rate
+    user checks subheaded indicator checkbox is checked     Absence fields    Authorised absence rate
 
 Select Indicators - Overall absence rate
     [Tags]  HappyPath
-    user selects subheaded indicator checkbox                Absence fields    Overall absence rate
-    user checks subheaded indicator checkbox is selected     Absence fields    Overall absence rate
+    user clicks subheaded indicator checkbox                Absence fields    Overall absence rate
+    user checks subheaded indicator checkbox is checked     Absence fields    Overall absence rate
 
 Select Indicators - Unauthorised absence rate
     [Tags]  HappyPath
-    user selects subheaded indicator checkbox                Absence fields    Unauthorised absence rate
-    user checks subheaded indicator checkbox is selected     Absence fields    Unauthorised absence rate
+    user clicks subheaded indicator checkbox                Absence fields    Unauthorised absence rate
+    user checks subheaded indicator checkbox is checked     Absence fields    Unauthorised absence rate
 
 Select Characteristics
     [Tags]   HappyPath

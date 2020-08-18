@@ -192,22 +192,6 @@ def user_closes_details_dropdown(exact_details_text):
         raise_assertion_error(f'Details component "{exact_details_text}" is still expanded!')
 
 
-def user_selects_radio(radio_label):
-    sl.driver.find_element_by_xpath(f'//label[text()="{radio_label}"]').click()
-
-
-def user_checks_radio_is_checked(radio_label):
-    try:
-        sl.driver.find_element_by_css_selector(f'input[data-testid="{radio_label}"][checked]')
-    except NoSuchElementException:
-        raise_assertion_error('Unable to find checked radio!')
-
-
-def user_clicks_checkbox(checkbox_label):
-    sl.page_should_contain_checkbox(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]/../input')
-    sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]/../input').click()
-
-
 def capture_large_screenshot():
     currentWindow = sl.get_window_size()
     page_height = sl.driver.execute_script(
@@ -235,21 +219,6 @@ def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
     except:
         raise_assertion_error(
             f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
-
-
-def user_clicks_category_checkbox(subheading_label, category_label):
-    sl.driver.find_element_by_xpath(
-        f'//legend[text()="{subheading_label}"]/..//label[text()="{category_label}"]').click()
-
-
-def user_checks_category_checkbox_is_selected(subheading_label, category_label):
-    sl.checkbox_should_be_selected(
-        f'xpath://legend[text()="{subheading_label}"]/..//label[text()="{category_label}"]/../input')
-
-
-def user_clicks_select_all_for_category(category_label):
-    sl.driver.find_element_by_xpath(
-        f'//legend[text()="{category_label}"]/..//button[contains(text(),"Select")]').click()
 
 
 def user_checks_results_table_column_heading_contains(table_selector, row, column, expected,

@@ -56,7 +56,7 @@ Navigate to Manage data blocks tab
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
-    user selects radio    UI test subject
+    user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
     user waits until page contains heading 2   Choose locations
     user checks previous table tool step contains  1    Subject     UI test subject
@@ -82,8 +82,8 @@ Select time period
     lists should be equal  ${timePeriodStartList}   ${expectedList}
     lists should be equal  ${timePeriodEndList}   ${expectedList}
 
-    user selects start date    2005
-    user selects end date      2020
+    user selects from list by label  id:timePeriodForm-start  2005
+    user selects from list by label  id:timePeriodForm-end  2020
     user clicks element     id:timePeriodForm-submit
     user waits until page contains heading 2  Choose your filters
     user checks previous table tool step contains  3    Start date    2005

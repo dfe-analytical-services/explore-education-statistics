@@ -40,7 +40,7 @@ User fills in form
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  Tax Year
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2020
 
-    user clicks element   css:[data-testid="Ad Hoc"]
+    user clicks radio  Ad Hoc
 
 Click Create new release button
     [Tags]   HappyPath

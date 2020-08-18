@@ -59,7 +59,7 @@ Navigate to Manage data blocks tab
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
-    user selects radio    UI test subject
+    user clicks radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
 
 Select locations
@@ -78,8 +78,8 @@ Select locations
 Select time period
     [Tags]   HappyPath
     user waits until page contains heading 2  Choose time period
-    user selects start date    2005
-    user selects end date      2020
+    user selects from list by label  id:timePeriodForm-start  2005
+    user selects from list by label  id:timePeriodForm-end  2020
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators
@@ -171,7 +171,7 @@ Select publication in table tool
     [Tags]  HappyPath
     user opens details dropdown    Test theme
     user opens details dropdown    ${TOPIC_NAME}
-    user selects radio      ${PUBLICATION_NAME}
+    user clicks radio      ${PUBLICATION_NAME}
     user clicks element    css:#publicationForm-submit
     user waits until page contains heading 2   Choose a subject
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
@@ -179,7 +179,7 @@ Select publication in table tool
 Select subject "UI test subject" in table tool
     [Tags]  HappyPath
     user waits until page contains   UI test subject
-    user selects radio    UI test subject
+    user clicks radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
     user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject    UI test subject
@@ -196,8 +196,8 @@ Select locations in table tool
 
 Select time period in table tool
     [Tags]   HappyPath
-    user selects start date    2014
-    user selects end date      2018
+    user selects from list by label  id:timePeriodForm-start  2014
+    user selects from list by label  id:timePeriodForm-end    2018
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators in table tool

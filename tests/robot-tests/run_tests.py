@@ -212,9 +212,8 @@ def create_test_topic():
 
 
 def delete_test_topic():
-    assert os.getenv('TEST_TOPIC_ID') is not None
-
-    return admin_request('DELETE', f'/api/topics/{os.getenv("TEST_TOPIC_ID")}')
+    if os.getenv('TEST_TOPIC_ID') is not None:
+        admin_request('DELETE', f'/api/topics/{os.getenv("TEST_TOPIC_ID")}')
 
 
 # Auth not required with general_public tests

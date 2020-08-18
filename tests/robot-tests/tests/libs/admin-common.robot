@@ -57,7 +57,7 @@ user creates publication
     user waits until page contains heading 1  Create new publication
     user waits until page contains element  id:publicationForm-title
     user enters text into element  id:publicationForm-title   ${title}
-    user selects radio     No methodology
+    user clicks radio     No methodology
     user enters text into element  id:publicationForm-teamName        Attainment statistics team
     user enters text into element  id:publicationForm-teamEmail       Attainment.STATISTICS@education.gov.uk
     user enters text into element  id:publicationForm-contactName     Tingting Shu
@@ -72,7 +72,7 @@ User creates release for publication
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
-    user selects radio   National Statistics
+    user clicks radio   National Statistics
     user clicks button  Create new release
     user waits until page contains element  xpath://span[text()="Edit release"]
     user waits until page contains heading 2  Release summary
@@ -112,7 +112,7 @@ user approves methodology
     user clicks link  Release status
     user clicks button  Edit status
     user waits until page contains heading 2  Edit methodology status
-    user selects radio  Approved for publication
+    user clicks radio  Approved for publication
     user enters text into element  id:methodologyStatusForm-internalReleaseNote  Test release note
     user clicks button  Update status
 
