@@ -148,7 +148,8 @@ function generateGeometryAndLegend(
   return { geometry, legend };
 }
 
-export interface MapBlockInternalProps extends ChartProps {
+export interface MapBlockProps extends ChartProps {
+  id: string;
   position?: { lat: number; lng: number };
   maxBounds?: LatLngBounds;
   geographicId?: string;
@@ -158,13 +159,14 @@ export interface MapBlockInternalProps extends ChartProps {
 }
 
 export const MapBlockInternal = ({
+  id,
   data,
   meta,
   position = { lat: 53.00986, lng: -3.2524038 },
   width,
   height,
   axes,
-}: MapBlockInternalProps) => {
+}: MapBlockProps) => {
   const mapRef = useRef<Map>(null);
   const container = useRef<HTMLDivElement>(null);
   const geometryRef = useRef<GeoJSON>(null);
@@ -308,6 +310,7 @@ export const MapBlockInternal = ({
 
         if (element) {
           element.classList.remove(styles.selected);
+          element.removeAttribute('data-testid');
         }
       }
 
@@ -325,6 +328,7 @@ export const MapBlockInternal = ({
 
       if (element) {
         element.classList.add(styles.selected);
+        element.setAttribute('data-testid', 'mapBlock-selectedFeature');
       }
 
       if (mapRef.current) {
@@ -383,47 +387,41 @@ export const MapBlockInternal = ({
   return (
     <>
       <form className="govuk-!-margin-bottom-2">
-        <FormFieldset
-          id="data-and-location"
-          legend="Select data and location to view indicators"
-          legendHidden
-        >
-          <div className="govuk-grid-row">
-            <FormGroup className="govuk-grid-column-two-thirds">
-              <FormSelect
-                name="selectedIndicator"
-                id="selectedIndicator"
-                className="govuk-!-width-full"
-                label="1. Select data to view"
-                value={selectedDataSetKey}
-                onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
-                options={dataSetOptions}
-                order={FormSelect.unordered}
-              />
-            </FormGroup>
+        <div className="govuk-grid-row">
+          <FormGroup className="govuk-grid-column-two-thirds">
+            <FormSelect
+              name="selectedDataSet"
+              id={`${id}-selectedDataSet`}
+              className="govuk-!-width-full"
+              label="1. Select data to view"
+              value={selectedDataSetKey}
+              onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
+              options={dataSetOptions}
+              order={FormSelect.unordered}
+            />
+          </FormGroup>
 
-            <FormGroup className="govuk-grid-column-one-third">
-              <FormSelect
-                name="selectedLocation"
-                id="selectedLocation"
-                label="2. Select a location"
-                value={selectedFeature?.id?.toString()}
-                placeholder="Select location"
-                options={locationOptions}
-                order={FormSelect.unordered}
-                onChange={e => {
-                  const feature = geometry?.features.find(
-                    feat => feat.id === e.currentTarget.value,
-                  );
+          <FormGroup className="govuk-grid-column-one-third">
+            <FormSelect
+              name="selectedLocation"
+              id={`${id}-selectedLocation`}
+              label="2. Select a location"
+              value={selectedFeature?.id?.toString()}
+              placeholder="Select location"
+              options={locationOptions}
+              order={FormSelect.unordered}
+              onChange={e => {
+                const feature = geometry?.features.find(
+                  feat => feat.id === e.currentTarget.value,
+                );
 
-                  if (feature) {
-                    updateSelectedFeature(feature);
-                  }
-                }}
-              />
-            </FormGroup>
-          </div>
-        </FormFieldset>
+                if (feature) {
+                  updateSelectedFeature(feature);
+                }
+              }}
+            />
+          </FormGroup>
+        </div>
       </form>
 
       <div className="govuk-grid-row govuk-!-margin-bottom-4" ref={container}>
@@ -481,11 +479,11 @@ export const MapBlockInternal = ({
                 <li
                   key={`${min}-${max}-${colour}`}
                   className={styles.legend}
-                  data-testid="mapLegendItem"
+                  data-testid="mapBlock-legend-item"
                 >
                   <span
                     className={styles.legendIcon}
-                    data-testid="mapLegendItem-colour"
+                    data-testid="mapBlock-legend-colour"
                     style={{
                       backgroundColor: colour,
                     }}

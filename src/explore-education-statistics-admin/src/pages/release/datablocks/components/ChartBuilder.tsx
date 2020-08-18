@@ -25,8 +25,10 @@ import {
   lineChartBlockDefinition,
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
-import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
+import {
+  mapBlockDefinition,
+  MapBlockProps,
+} from '@common/modules/charts/components/MapBlock';
 import {
   verticalBarBlockDefinition,
   VerticalBarProps,
@@ -208,7 +210,7 @@ const ChartBuilder = ({
         };
       case 'map':
         return {
-          ...(baseProps as MapBlockInternalProps),
+          ...(baseProps as MapBlockProps),
           type: 'map',
         };
       default:
@@ -376,7 +378,7 @@ const ChartBuilder = ({
           {definition.data.length > 0 && (
             <TabsSection
               title="Data sets"
-              headingTitle="Choose data to add to the chart"
+              headingTitle="Add data sets to the chart"
               id={forms.data.id}
             >
               <ChartDataSelector

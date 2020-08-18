@@ -1,4 +1,4 @@
-import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
+import { MapBlockProps as MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import dynamic from 'next/dynamic';
 import React, { memo } from 'react';

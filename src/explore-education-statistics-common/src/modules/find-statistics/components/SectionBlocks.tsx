@@ -16,14 +16,7 @@ const SectionBlocks = ({ content, ...props }: SectionBlocksProps) => {
     <>
       {content.map(block => {
         if (block.type === 'DataBlock') {
-          return (
-            <DataBlockTabs
-              {...props}
-              key={block.id}
-              id={`sectionBlocks-dataBlock-${block.id}`}
-              dataBlock={block}
-            />
-          );
+          return <DataBlockTabs {...props} key={block.id} dataBlock={block} />;
         }
 
         return <ContentBlockRenderer key={block.id} block={block} />;
