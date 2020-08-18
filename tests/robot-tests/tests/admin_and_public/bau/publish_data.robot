@@ -64,7 +64,7 @@ Select subject "UI test subject"
 
 Select locations
     [Tags]   HappyPath
-    user waits until element is visible  xpath://h2[text()="Choose locations"]     90
+    user waits until page contains heading 2  Choose locations
     user opens details dropdown   Opportunity Area
     user clicks checkbox   Bolton 001 (E02000984)
     user clicks checkbox   Bolton 001 (E05000364)
@@ -77,14 +77,14 @@ Select locations
 
 Select time period
     [Tags]   HappyPath
-    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user waits until page contains heading 2  Choose time period
     user selects start date    2005
     user selects end date      2020
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators
     [Tags]  HappyPath
-    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains heading 2  Choose your filters
     user clicks indicator checkbox    Admission Numbers
 
 Create table
@@ -173,7 +173,7 @@ Select publication in table tool
     user opens details dropdown    ${TOPIC_NAME}
     user selects radio      ${PUBLICATION_NAME}
     user clicks element    css:#publicationForm-submit
-    user waits until element is visible   xpath://h2[text()="Choose a subject"]
+    user waits until page contains heading 2   Choose a subject
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
 Select subject "UI test subject" in table tool
@@ -181,7 +181,7 @@ Select subject "UI test subject" in table tool
     user waits until page contains   UI test subject
     user selects radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose locations"]     90
+    user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject    UI test subject
 
 Select locations in table tool
@@ -190,7 +190,7 @@ Select locations in table tool
     user clicks checkbox   Barnsley
     user clicks checkbox   Birmingham
     user clicks element     css:#locationFiltersForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user waits until page contains heading 2  Choose time period
     user checks previous table tool step contains  3   Local Authority    Barnsley
     user checks previous table tool step contains  3   Local Authority    Birmingham
 
@@ -202,7 +202,7 @@ Select time period in table tool
 
 Select indicators in table tool
     [Tags]  HappyPath
-    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains heading 2  Choose your filters
     user clicks indicator checkbox    Admission Numbers
     user clicks element   css:#filtersForm-submit
 
