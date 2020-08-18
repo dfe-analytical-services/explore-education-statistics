@@ -171,6 +171,7 @@ def user_opens_details_dropdown(exact_details_text):
         raise_assertion_error(f'No such detail component "{exact_details_text}" found')
 
     sl.wait_until_element_is_enabled(elem)
+    sl.wait_until_element_is_visible(elem)
 
     sl.click_element(elem)
 
@@ -234,39 +235,6 @@ def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
     except:
         raise_assertion_error(
             f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
-
-
-def user_clicks_indicator_checkbox(indicator_label):
-    checkbox_selector = f'//*[@id="filtersForm-indicators"]//label[text()="{indicator_label}"]/../input'
-    sl.wait_until_page_contains_element(f'xpath:{checkbox_selector}')
-    sl.page_should_contain_checkbox(f'xpath:{checkbox_selector}')
-    sl.scroll_element_into_view(f'xpath:{checkbox_selector}')
-    sl.wait_until_element_is_enabled(f'xpath:{checkbox_selector}')
-    try:
-        elem = sl.driver.find_element_by_xpath(checkbox_selector)
-    except:
-        raise_assertion_error(f'Couldn\'t find checkbox with selector "{checkbox_selector}"')
-    try:
-        elem.click()
-    except:
-        raise_assertion_error(f'Failed to click indicator checkbox!')
-
-
-def user_selects_subheaded_indicator_checkbox(subheading_label, indicator_label):
-    checkbox_selector = f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input'
-    sl.wait_until_page_contains_element(f'xpath:{checkbox_selector}')
-    sl.page_should_contain_checkbox(f'xpath:{checkbox_selector}')
-    sl.scroll_element_into_view(f'xpath:{checkbox_selector}')
-    sl.checkbox_should_not_be_selected(f'xpath:{checkbox_selector}')
-    sl.wait_until_element_is_enabled(f'xpath:{checkbox_selector}')
-    try:
-        elem = sl.driver.find_element_by_xpath(checkbox_selector)
-    except:
-        raise_assertion_error(f'Couldn\'t find checkbox with selector "{checkbox_selector}"')
-    try:
-        elem.click()
-    except:
-        raise_assertion_error(f'Failed to click subheaded indicator checkbox!')
 
 
 def user_clicks_category_checkbox(subheading_label, category_label):

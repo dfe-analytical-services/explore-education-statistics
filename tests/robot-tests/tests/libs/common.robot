@@ -372,6 +372,23 @@ user selects end date
   [Arguments]  ${end_date}
   select from list by label   css:#timePeriodForm-end   ${end_date}
 
+user clicks indicator checkbox
+    [Arguments]  ${indicator_label}
+    wait until page contains element  xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
+    page should contain checkbox  xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
+    user scrolls to element   xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
+    wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
+    user clicks element     xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]/../input
+
+user selects subheaded indicator checkbox
+    [Arguments]  ${subheading_label}   ${indicator_label}
+    wait until page contains element  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+    page should contain checkbox   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+    user scrolls to element  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+    checkbox should not be selected   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+    wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+    user clicks element   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+
 user checks indicator checkbox is selected
   [Arguments]  ${indicator_label}
   wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "${indicator_label}")]/../input
