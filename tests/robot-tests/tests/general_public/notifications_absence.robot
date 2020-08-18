@@ -38,10 +38,11 @@ Go to Notify me page for Absence publication
 
 Sign up for email alerts
     [Tags]  HappyPath   NotAgainstPreProd
-    [Documentation]   EES-716
+    [Documentation]   EES-716  EES-1265
     user clicks element  css:#subscriptionForm-email
     press keys  css:#subscriptionForm-email  mark@hiveit.co.uk
     user clicks button   Subscribe
 
-    user waits until page contains heading 1   Subscribed     90
+    # EES-1265 
+    user waits until page contains heading 1   Subscribed     180
     user checks page contains  Thank you. Check your email to confirm your subscription.
