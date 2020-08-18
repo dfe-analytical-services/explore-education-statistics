@@ -504,7 +504,7 @@ export const MapBlockInternal = ({
 
       {selectedDataSetConfiguration && selectedFeature && (
         <>
-          <h3 className="govuk-heading-m govuk-!-margin-left-1 govuk-!-margin-bottom-0">
+          <h3 className="govuk-heading-m">
             {selectedFeature?.properties.name}
           </h3>
 
