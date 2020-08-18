@@ -119,10 +119,6 @@ user approves methodology
     user waits until page contains heading 2  Methodology status
     user checks page contains tag  Approved
 
-user opens editable accordion
-    [Arguments]   ${accordion_section_title}
-    user clicks element  //span[text()="${accordion_section_title}"]
-
 user checks draft releases tab contains publication
     [Arguments]    ${publication_name}
     user checks page contains element   xpath://*[@id="draft-releases"]//h3[text()="${publication_name}"]
@@ -156,6 +152,18 @@ user clicks footnote checkbox
     user clicks element     xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
 
 user checks footnote checkbox is selected
-  [Arguments]  ${label}
-  wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
-  checkbox should be selected     xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
+    [Arguments]  ${label}
+    wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
+    checkbox should be selected     xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
+
+user adds data block to editable accordion section
+    [Arguments]   ${accordion_name}   ${block_name}
+    user opens accordion section  ${accordion_name}
+    ${accordion_section}=  user gets accordion content element  ${accordion_name}
+    ${add_block_button}=   get child element  ${accordion_section}  xpath:.//button[text()="Add data block"]
+    user clicks element   ${add_block_button}
+    ${block_list}=  get child element  ${accordion_section}  css:select[name="selectedDataBlock"]
+    user selects from list by label  ${block_list}  Dates data block name
+    user waits until parent contains element  ${accordion_section}   css:table
+    ${embed_button}=   get child element   ${accordion_section}   xpath:.//button[text()="Embed"]
+    user clicks element  ${embed_button}

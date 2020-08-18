@@ -190,6 +190,8 @@ def user_verifies_accordion_is_open(section_text):
 
 
 def user_verifies_accordion_is_closed(section_text):
+    sl.wait_until_page_contains_element(
+        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
     try:
         sl.driver \
             .find_element_by_xpath(
@@ -206,91 +208,67 @@ def user_verifies_accordion_is_closed(section_text):
             f'Accordion section "{section_text}" should have attribute aria-expanded="false"')
 
 
-def user_opens_accordion_section(exact_section_text):
+def user_opens_accordion_section(section_text):
     sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]')
+        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
 
-    try:
-        elem = sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="false"]')
-    except NoSuchElementException:
-        BuiltIn().log_to_console(f'WARNING: Accordion section "{exact_section_text}" already open!')
-        return
-
+    elem = user_gets_accordion_button_element(section_text)
+    if elem.get_attribute('aria-expanded') == "true":
+        raise_assertion_error(f'Accordion section "{section_text}" already open!')
     sl.set_focus_to_element(elem)
     sl.wait_until_element_is_enabled(elem)
-
-    try:
-        elem.click()
-    except:
-        raise_assertion_error(f'Cannot click accordion section header {exact_section_text}')
-
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="true"]')
-
-
-def user_closes_accordion_section(exact_section_text):
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]') \
-            .click()
-    except NoSuchElementException:
-        raise_assertion_error(f'Cannot find accordion with header {exact_section_text}')
-
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="false"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'Accordion "{exact_section_text}" not collapsed!')
-
-
-def user_checks_accordion_section_contains_text(accordion_section, details_component):
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{accordion_section}"]')
-    except:
-        raise_assertion_error(f'Cannot find accordion section "{accordion_section}"')
-
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{accordion_section}"]/../../..//*[text()="{details_component}"]')
-    except:
-        raise_assertion_error(
-            f'Details component "{details_component}" not found in accordion section "{accordion_section}"')
-
-
-def user_opens_details_dropdown(exact_details_text):
-    sl.scroll_element_into_view(
-        f'xpath://details/summary//*[text()="{exact_details_text}"]')
-    try:
-        elem = sl.driver.find_element_by_xpath(
-            f'//details/summary//*[text()="{exact_details_text}"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'No such detail component "{exact_details_text}" found')
-
-    sl.wait_until_element_is_enabled(elem)
-    sl.wait_until_element_is_visible(elem)
-
     sl.click_element(elem)
+    if elem.get_attribute('aria-expanded') == "false":
+        raise_assertion_error(f'Accordion section "{section_text}" should be open!')
 
-    if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "false":
-        raise_assertion_error(f'Details component "{exact_details_text}" not expanded!')
+
+def user_closes_accordion_section(section_text):
+    elem = user_gets_accordion_button_element(section_text)
+    if elem.get_attribute('aria-expanded') == "false":
+        raise_assertion_error(f'Accordion section "{section_text}" already closed!')
+    sl.click_element(elem)
+    if elem.get_attribute('aria-expanded') == "true":
+        raise_assertion_error(f'Accordion section "{section_text}" should be open!')
 
 
-def user_closes_details_dropdown(exact_details_text):
-    try:
-        elem = sl.driver.find_element_by_xpath(
-            f'//details/summary//*[text()="{exact_details_text}"]')
-    except:
-        raise_assertion_error(f'Cannot find details component "{exact_details_text}"')
+def user_checks_accordion_section_contains_text(accordion_section_text, text):
+    elem = user_gets_accordion_content_element(accordion_section_text)
+    user_waits_until_parent_contains_element(elem, f'xpath://*[text()="{text}"]')
 
-    elem.click()
 
+def user_gets_accordion_button_element(accordion_text):
+    sl.wait_until_page_contains_element(f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
+    return sl.get_webelement(f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
+
+
+def user_gets_accordion_section_element(accordion_text):
+    accordion_button = user_gets_accordion_button_element(accordion_text)
+    heading_id = accordion_button.get_attribute("id")
+    accordion_id = heading_id[:-len('-heading')]
+    return sl.get_webelement(f'css:#{accordion_id}')
+
+
+def user_gets_accordion_content_element(accordion_text):
+    accordion_button = user_gets_accordion_button_element(accordion_text)
+    heading_id = accordion_button.get_attribute("id")
+    return sl.get_webelement(f'xpath://*[@aria-labelledby="{heading_id}"]')
+
+
+def user_gets_child_details_element(parent, details_text):
+    user_waits_until_parent_contains_element(parent, f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
+    return get_child_element(parent, f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
+
+
+def user_verifies_details_is_open(details_elem):
+    if details_elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "false":
+        raise_assertion_error(f'Details component "{details_text}" not expanded!')
+
+
+def user_closes_details_dropdown(details_text):
+    elem = sl.get_webelement(f'xpath://details/summary/*[text()="{details_text}"]')
+    sl.click_element(elem)
     if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "true":
-        raise_assertion_error(f'Details component "{exact_details_text}" is still expanded!')
+        raise_assertion_error(f'Details component "{details_text}" is still expanded!')
 
 
 def capture_large_screenshot():
@@ -332,14 +310,13 @@ def user_checks_table_column_heading_contains(table_selector, row, column, expec
         timeout=timeout)
 
 
-def user_gets_row_with_heading(heading):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
-    return elem
+def user_gets_table_row_with_heading(table_selector, heading: str):
+    return get_child_element(table_selector, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
 
 
 def user_gets_row_number_with_heading(table_locator: str, heading: str):
-    elem = get_child_element(table_locator, f'xpath://table/tbody/tr/th[text()="{heading}"]/..')
-    rows = get_child_elements(table_locator, 'css:table tbody tr')
+    elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
+    rows = get_child_elements(table_locator, 'css:tbody tr')
 
     return rows.index(elem) + 1
 
@@ -347,7 +324,7 @@ def user_gets_row_number_with_heading(table_locator: str, heading: str):
 def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
     table_elem = sl.get_webelement(table_selector)
     elems = table_elem.find_elements_by_xpath(
-        f'.//tbody/tr/th[text()="{group}"]/../self::tr | //table/tbody/tr/th[text()="{group}"]/../following-sibling::tr')
+        f'.//tbody/tr/th[text()="{group}"]/../self::tr | .//tbody/tr/th[text()="{group}"]/../following-sibling::tr')
     for elem in elems:
         try:
             elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
