@@ -291,46 +291,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var blobContainer = await GetCloudBlobContainer();
                     var files = await GetReleaseFiles(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata);
+                    var fileList = new List<DataFileInfo>();
+                    
+                    foreach (var fileLink in files)
+                    {
+                        var fileReference = fileLink.ReleaseFileReference;
+                        var blobPath = AdminReleasePathWithFileReference(fileReference);
 
-                    var filesWithMetadata = files
-                        .Select(async fileLink =>
+                        // Files should exists in storage but if not then allow user to delete
+                        if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
                         {
-                            var fileReference = fileLink.ReleaseFileReference;
-                            var blobPath = AdminReleasePathWithFileReference(fileReference);
+                            // Fail the import if this was a datafile upload
+                            await _importService.FailImport(releaseId,
+                                    fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                                        ? fileReference.Filename
+                                        : await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
+                                            ReleaseFileTypes.Metadata, ReleaseFileTypes.Data),
+                                    new List<ValidationError>
+                                            {
+                                                new ValidationError("Files not uploaded correctly. Please delete and retry")
+                                            }.AsEnumerable());
 
-                            // Files should exists in storage but if not then allow user to delete
-                            if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
+                            fileList.Add(new DataFileInfo
                             {
-                                // Fail the import if this was a datafile upload
-                                await _importService.FailImport(releaseId,
-                                        fileReference.ReleaseFileType == ReleaseFileTypes.Data
-                                            ? fileReference.Filename
-                                            : await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
-                                                ReleaseFileTypes.Metadata, ReleaseFileTypes.Data),
-                                        new List<ValidationError>
-                                                {
-                                                    new ValidationError("Files not uploaded correctly. Please delete and retry")
-                                                }.AsEnumerable());
-
-                                return new DataFileInfo
-                                {
-                                    Id = fileReference.Id,
-                                    Extension = Path.GetExtension(fileReference.Filename),
-                                    Name = await GetSubjectName(releaseId, fileReference.Filename, fileReference.ReleaseFileType),
-                                    Path = fileReference.Filename,
-                                    Size = "0.00 B",
-                                    MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data ?
-                                        await GetFilenameAssociatedToType(releaseId, fileReference.Filename, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
-                                        : "",
-                                    Rows = 0,
-                                    UserName = "",
-                                    Created = DateTimeOffset.UtcNow,
-                                };
-                            }
-
+                                Id = fileReference.Id,
+                                Extension = Path.GetExtension(fileReference.Filename),
+                                Name = await GetSubjectName(releaseId, fileReference.Filename,
+                                    fileReference.ReleaseFileType),
+                                Path = fileReference.Filename,
+                                Size = "0.00 B",
+                                MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                                    ? await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
+                                        ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
+                                    : "",
+                                Rows = 0,
+                                UserName = "",
+                                Created = DateTimeOffset.UtcNow,
+                            });
+                        }
+                        else
+                        {
                             var file = blobContainer.GetBlockBlobReference(blobPath);
                             await file.FetchAttributesAsync();
-                            return new DataFileInfo
+                            fileList.Add(new DataFileInfo
                             {
                                 Id = fileReference.Id,
                                 Extension = GetExtension(file),
@@ -341,10 +344,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 Rows = GetNumberOfRows(file),
                                 UserName = GetUserName(file),
                                 Created = file.Properties.Created
-                            };
-                        });
-
-                    return (await Task.WhenAll(filesWithMetadata))
+                            });
+                        }
+                    }
+                    
+                    return fileList
                         .OrderBy(file => file.Name)
                         .AsEnumerable();
                 });
