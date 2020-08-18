@@ -353,21 +353,27 @@ export const MapBlockInternal = ({
 
       featureLayer.bindTooltip(() => {
         if (feature.properties) {
-          const content = [
-            `<strong>${feature.properties.name}</strong>`,
-            ...Object.entries(feature.properties.dataSets).map(
-              ([dataSetKey, dataSet]) => {
-                const dataSetConfig = dataSetConfigurations[dataSetKey];
+          const items = Object.entries(feature.properties.dataSets).map(
+            ([dataSetKey, dataSet]) => {
+              const dataSetConfig = dataSetConfigurations[dataSetKey];
 
-                return `${dataSetConfig.config.label} : ${formatPretty(
+              return (
+                `<li>` +
+                `${dataSetConfig.config.label}: ${formatPretty(
                   dataSet.value,
                   dataSetConfig.dataSet.indicator.unit,
-                )}`;
-              },
-            ),
-          ];
+                )}` +
+                `</li>`
+              );
+            },
+          );
 
-          return content.join('<br />');
+          return (
+            `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
+            `<ul class="${
+              styles.tooltipList
+            }" data-testid="chartTooltip-items">${items.join('')}</ul>`
+          );
         }
 
         return '';
