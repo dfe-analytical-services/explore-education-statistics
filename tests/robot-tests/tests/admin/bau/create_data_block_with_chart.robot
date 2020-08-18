@@ -56,7 +56,7 @@ Navigate to Manage data blocks tab
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
-    user selects radio    UI test subject
+    user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
     user waits until page contains heading 2   Choose locations
     user checks previous table tool step contains  1    Subject     UI test subject

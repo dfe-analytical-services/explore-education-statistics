@@ -18,14 +18,14 @@ Select "Pupil absence" publication
     [Tags]  HappyPath
     user opens details dropdown    Pupils and schools
     user opens details dropdown    Pupil absence
-    user selects radio      Pupil absence in schools in England
+    user clicks radio      Pupil absence in schools in England
     user clicks element    css:#publicationForm-submit
     user waits until page contains heading 2  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence in prus"
     [Tags]  HappyPath
-    user selects radio   Absence in prus
+    user clicks radio   Absence in prus
     user clicks element   css:#publicationSubjectForm-submit
     user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject     Absence in prus
@@ -50,7 +50,8 @@ Select Start date and End date
 
 Select Indicators
     [Tags]  HappyPath
-    user selects subheaded indicator checkbox   Absence fields        Number of schools
+    user clicks subheaded indicator checkbox   Absence fields        Number of schools
+    user checks subheaded indicator checkbox is checked   Absence fields        Number of schools
 
 Create table
     [Tags]  HappyPath
@@ -115,17 +116,17 @@ Select new start and end date
 
 Select indicator Number of pupil enrolments
     [Tags]   HappyPath
-    user selects subheaded indicator checkbox  Absence fields   Number of pupil enrolments
-    user checks subheaded indicator checkbox is selected  Absence fields  Number of pupil enrolments
+    user clicks subheaded indicator checkbox  Absence fields   Number of pupil enrolments
+    user checks subheaded indicator checkbox is checked  Absence fields  Number of pupil enrolments
 
 Select indicator Number of sessions available
     [Tags]   HappyPath
-    user selects subheaded indicator checkbox  Absence fields   Number of sessions possible
-    user checks subheaded indicator checkbox is selected  Absence fields  Number of sessions possible
+    user clicks subheaded indicator checkbox  Absence fields   Number of sessions possible
+    user checks subheaded indicator checkbox is checked  Absence fields  Number of sessions possible
 
 Verify indicator Number of schools is still selected
     [Tags]   HappyPath
-    user checks subheaded indicator checkbox is selected  Absence fields  Number of schools
+    user checks subheaded indicator checkbox is checked  Absence fields  Number of schools
 
 Create table again
     [Tags]   HappyPath

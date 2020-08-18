@@ -45,7 +45,7 @@ Go to "Release status" tab
 Submit release for Higher Review
     [Tags]  HappyPath
     user clicks button  Edit release status
-    user clicks element   css:input[data-testid="Ready for higher review"]
+    user clicks radio  Ready for higher review
     user enters text into element  id:releaseStatusForm-internalReleaseNote     Submitted for Higher Review
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3001
@@ -63,10 +63,10 @@ Approve release
     user clicks button  Edit release status
     user waits until page contains heading 2  Edit release status
 
-    user clicks element   css:input[data-testid="Approved for publication"]
+    user clicks radio   Approved for publication
     user enters text into element   id:releaseStatusForm-internalReleaseNote    Approved for release
 
-    user clicks element  css:input[data-testid="On a specific date"]
+    user clicks radio  On a specific date
     user enters text into element  id:releaseStatusForm-publishScheduled-day    1
     user enters text into element  id:releaseStatusForm-publishScheduled-month  12
     user enters text into element  id:releaseStatusForm-publishScheduled-year   3000
@@ -87,7 +87,7 @@ Verify release status is Approved
 Move release status back to Draft
     [Tags]  HappyPath
     user clicks button  Edit release status
-    user clicks element   css:input[data-testid="In draft"]
+    user clicks radio  In draft
 
     user enters text into element   id:releaseStatusForm-internalReleaseNote    Moved back to draft
 

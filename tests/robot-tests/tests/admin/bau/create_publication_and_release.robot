@@ -30,7 +30,7 @@ Go to Create publication page for "UI tests topic" topic
 Selects no methodology
     [Tags]  HappyPath
     user waits until page contains element   xpath://label[text()="No methodology"]
-    user selects radio  No methodology
+    user clicks radio  No methodology
 
 Enters contact details
     [Tags]  HappyPath
@@ -77,7 +77,7 @@ Go to edit publication
 Update publication
     [Tags]  HappyPath
     user enters text into element  id:publicationForm-title  ${PUBLICATION_NAME}
-    user selects radio  Choose an existing methodology
+    user clicks radio  Choose an existing methodology
     user waits until page contains element  xpath://option[text()="${METHODOLOGY_NAME} [Approved]"]
     user selects from list by label  id:publicationForm-methodologyId   ${METHODOLOGY_NAME} [Approved]
     user enters text into element  id:publicationForm-teamName      Special educational needs statistics team
@@ -107,7 +107,7 @@ Create new release
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverageStartYear
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  Spring Term
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2025
-    user clicks element   css:input[data-testid="National Statistics"]
+    user clicks radio  National Statistics
     user clicks button   Create new release
     user waits until page contains title caption  Edit release
     user waits until page contains heading 1  ${PUBLICATION_NAME}
@@ -132,7 +132,7 @@ Edit release summary
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverageStartYear
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  Summer Term
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2026
-    user clicks element   css:input[data-testid="Official Statistics"]
+    user clicks radio  Official Statistics
     user clicks button   Update release summary
 
 Verify updated release summary
