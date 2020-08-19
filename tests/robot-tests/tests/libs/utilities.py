@@ -11,7 +11,7 @@ sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
 
 def raise_assertion_error(err_msg):
-    sl.capture_page_screenshot()
+    sl.failure_occurred()
     raise AssertionError(err_msg)
 
 
