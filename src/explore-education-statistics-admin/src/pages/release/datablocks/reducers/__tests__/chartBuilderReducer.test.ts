@@ -145,41 +145,6 @@ describe('chartBuilderReducer', () => {
       });
     });
 
-    test('overrides `options` if definition has constants', () => {
-      const initialStateWithOptions: ChartBuilderState = {
-        ...initialState,
-        options: {
-          height: 400,
-          title: 'Some title',
-          alt: 'Some alt',
-          legend: 'bottom',
-        },
-      };
-
-      const testChartDefinitionWithConstants = {
-        ...testChartDefinition,
-        options: {
-          defaults: testChartDefinition.options.defaults,
-          constants: {
-            height: 600,
-            legend: 'top',
-          },
-        },
-      };
-
-      const nextState = produce(chartBuilderReducer)(initialStateWithOptions, {
-        type: 'UPDATE_CHART_DEFINITION',
-        payload: testChartDefinitionWithConstants,
-      } as ChartBuilderActions);
-
-      expect(nextState.options).toEqual<ChartOptions>({
-        height: 600,
-        title: 'Some title',
-        alt: 'Some alt',
-        legend: 'top',
-      });
-    });
-
     test('sets `axes` with defaults', () => {
       const nextState = produce(chartBuilderReducer)(initialState, {
         type: 'UPDATE_CHART_DEFINITION',
@@ -253,45 +218,6 @@ describe('chartBuilderReducer', () => {
       expect(nextState.axes.minor).toMatchObject<Partial<AxisConfiguration>>({
         sortBy: 'something else',
         visible: false,
-      });
-    });
-
-    test('overrides `axes` options if definition has constants', () => {
-      const testChartDefinitionWithConstants: ChartDefinition = {
-        ...testChartDefinition,
-        axes: {
-          ...testChartDefinition.axes,
-          major: {
-            ...testChartDefinition.axes.major,
-            constants: {
-              visible: true,
-              sortBy: 'overriding value',
-            },
-          } as ChartDefinition['axes']['major'],
-        },
-      };
-
-      const initialStateWithAxes: ChartBuilderState = {
-        ...initialState,
-        axes: {
-          major: {
-            type: 'major',
-            dataSets: [],
-            referenceLines: [],
-            visible: false,
-            sortBy: 'override me',
-          },
-        },
-      };
-
-      const nextState = produce(chartBuilderReducer)(initialStateWithAxes, {
-        type: 'UPDATE_CHART_DEFINITION',
-        payload: testChartDefinitionWithConstants,
-      } as ChartBuilderActions);
-
-      expect(nextState.axes.major).toMatchObject<Partial<AxisConfiguration>>({
-        sortBy: 'overriding value',
-        visible: true,
       });
     });
 
@@ -384,42 +310,6 @@ describe('chartBuilderReducer', () => {
         label: {
           text: 'Some label',
         },
-      });
-    });
-
-    test('does not override chart definition constants', () => {
-      const initialStateWithConstants: ChartBuilderState = {
-        ...initialState,
-        definition: {
-          ...testChartDefinition,
-          axes: {
-            ...testChartDefinition.axes,
-            major: {
-              ...testChartDefinition.axes.major,
-              constants: {
-                groupBy: 'filters',
-                visible: true,
-              },
-            },
-          },
-        } as ChartDefinition,
-      };
-
-      const nextState = produce(chartBuilderReducer)(
-        initialStateWithConstants,
-        {
-          type: 'UPDATE_CHART_AXIS',
-          payload: {
-            type: 'major',
-            groupBy: 'indicators',
-            visible: false,
-          },
-        } as ChartBuilderActions,
-      );
-
-      expect(nextState.axes.major).toMatchObject<Partial<AxisConfiguration>>({
-        groupBy: 'filters',
-        visible: true,
       });
     });
 
@@ -538,43 +428,6 @@ describe('chartBuilderReducer', () => {
         legend: 'top',
         title: '',
         alt: '',
-      });
-    });
-
-    test('overrides `options` with chart definition constants', () => {
-      const initialStateWithConstants: ChartBuilderState = {
-        ...initialState,
-        definition: {
-          ...testChartDefinition,
-          options: {
-            ...testChartDefinition.options,
-            constants: {
-              height: 400,
-              title: 'overrides title',
-              alt: 'overrides alt',
-              legend: 'bottom',
-            },
-          },
-        } as ChartDefinition,
-      };
-
-      const nextState = produce(chartBuilderReducer)(
-        initialStateWithConstants,
-        {
-          type: 'UPDATE_CHART_OPTIONS',
-          payload: {
-            height: 500,
-            legend: 'top',
-            title: 'override me',
-          },
-        } as ChartBuilderActions,
-      );
-
-      expect(nextState.options).toEqual<ChartOptions>({
-        height: 400,
-        title: 'overrides title',
-        alt: 'overrides alt',
-        legend: 'bottom',
       });
     });
   });

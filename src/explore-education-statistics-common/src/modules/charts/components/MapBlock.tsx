@@ -62,7 +62,7 @@ export const mapBlockDefinition: ChartDefinition = {
       capabilities: {
         canRotateLabel: false,
       },
-      constants: {
+      defaults: {
         groupBy: 'locations',
       },
     },
