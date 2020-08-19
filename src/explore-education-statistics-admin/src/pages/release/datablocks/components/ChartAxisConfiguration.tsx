@@ -48,6 +48,7 @@ interface Props {
   defaultDataType?: AxisGroupBy;
   forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
+  isSaving?: boolean;
   id: string;
   type: AxisType;
   configuration: AxisConfiguration;
@@ -66,6 +67,7 @@ const ChartAxisConfiguration = ({
   definition,
   forms,
   hasSubmittedChart,
+  isSaving,
   id,
   data,
   meta,
@@ -639,6 +641,7 @@ const ChartAxisConfiguration = ({
 
           <ButtonGroup>
             <ChartBuilderSaveButton
+              disabled={isSaving}
               formId={id}
               forms={forms}
               showSubmitError={

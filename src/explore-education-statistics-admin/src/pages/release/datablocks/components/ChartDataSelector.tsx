@@ -38,6 +38,7 @@ interface Props {
   dataSets?: DataSetConfiguration[];
   definition: ChartDefinition;
   forms: Dictionary<ChartBuilderForm>;
+  isSaving?: boolean;
   meta: FullTableMeta;
   onDataAdded?: (data: DataSetConfiguration) => void;
   onDataRemoved?: (data: DataSetConfiguration, index: number) => void;
@@ -55,6 +56,7 @@ const formId = 'chartDataSelectorForm';
 const ChartDataSelector = ({
   buttons,
   canSaveChart,
+  isSaving,
   forms,
   meta,
   dataSets = [],
@@ -309,6 +311,7 @@ const ChartDataSelector = ({
 
               <ButtonGroup>
                 <ChartBuilderSaveButton
+                  disabled={isSaving}
                   formId={formId}
                   forms={forms}
                   showSubmitError={submitCount > 0 && !canSaveChart}

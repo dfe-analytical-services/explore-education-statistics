@@ -5,6 +5,7 @@ import { Dictionary } from '@common/types';
 import React, { MouseEventHandler } from 'react';
 
 interface Props {
+  disabled?: boolean;
   formId: string;
   forms: Dictionary<ChartBuilderForm>;
   showSubmitError: boolean;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const ChartBuilderSaveButton = ({
+  disabled,
   formId,
   forms,
   showSubmitError,
@@ -56,7 +58,12 @@ const ChartBuilderSaveButton = ({
         }}
       />
 
-      <Button type="submit" id={`${formId}-submit`} onClick={onClick}>
+      <Button
+        type="submit"
+        id={`${formId}-submit`}
+        disabled={disabled}
+        onClick={onClick}
+      >
         Save chart options
       </Button>
     </>
