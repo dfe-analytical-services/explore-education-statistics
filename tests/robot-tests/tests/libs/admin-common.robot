@@ -41,8 +41,8 @@ user signs in as analyst1
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
-User selects theme "${theme}" and topic "${topic}" from the admin dashboard
-    user waits until page contains element  id:my-publications-tab
+user selects theme "${theme}" and topic "${topic}" from the admin dashboard
+    user waits until page contains element  id:my-publications-tab   60
     user clicks element   id:my-publications-tab
     user waits until page contains element   id:selectTheme
     user checks element contains  id:my-publications-tab  Manage publications and releases
@@ -65,7 +65,7 @@ user creates publication
     user clicks button   Save publication
     user waits until page contains heading 1  Dashboard
 
-User creates release for publication
+user creates release for publication
     [Arguments]  ${publication}  ${time_period_coverage}  ${start_year}
     user waits until page contains title caption  ${publication}
     user waits until page contains heading 1  Create new release
