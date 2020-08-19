@@ -163,10 +163,10 @@ const routes = {
   methodologiesIndexRoute,
   methodologyCreateRoute,
   methodologyRoute,
+  preReleaseRoute,
   releaseRoute,
   releaseCreateRoute,
   legacyReleasesRoute,
-  preReleaseRoute,
 };
 
 export default routes;
