@@ -56,7 +56,7 @@ const DataBlockSelectForm = ({
     <div className="dfe-align--left">
       <FormSelect
         className="govuk-!-margin-right-1"
-        id="id"
+        id="datablock_select"
         name="datablock_select"
         label={label}
         value={selectedDataBlockId}

@@ -398,3 +398,20 @@ user checks subheaded indicator checkbox is selected
   [Arguments]  ${subheading_label}  ${indicator_label}
   wait until element is enabled   xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
   checkbox should be selected     xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input
+
+user clicks category filters checkbox
+  [Arguments]  ${filter_label}
+    wait until page contains element  xpath://*[@id="filtersForm-filters"]//label[text()="${filter_label}"]/../input
+    page should contain checkbox  xpath://*[@id="filtersForm-filters"]//label[text()="${filter_label}"]/../input
+    user scrolls to element   xpath://*[@id="filtersForm-filters"]//label[text()="${filter_label}"]/../input
+    wait until element is enabled   xpath://*[@id="filtersForm-filters"]//label[text()="${filter_label}"]/../input
+    user clicks element     xpath://*[@id="filtersForm-filters"]//label[text()="${filter_label}"]/../input
+
+user checks category filters checkbox is selected
+  [Arguments]  ${filter_label}
+  wait until element is enabled   xpath://*[@id="filtersForm-filters"]//label[contains(text(), "${filter_label}")]/../input
+  checkbox should be selected     xpath://*[@id="filtersForm-filters"]//label[contains(text(), "${filter_label}")]/../input
+
+user opens category filters details section
+  [Arguments]  ${text}
+  user clicks element  xpath://*[@id="filtersForm-filters"]//summary[@class="govuk-details__summary"]//span[text()="${text}"]

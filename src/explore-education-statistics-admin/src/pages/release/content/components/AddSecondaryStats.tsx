@@ -36,7 +36,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
             setIsFormOpen(true);
           }}
         >
-          {updating ? 'Change' : 'Add'} Secondary Stats
+          {`${updating ? 'Change' : 'Add'} secondary stats`}
         </Button>
         {updating && (
           <Button
