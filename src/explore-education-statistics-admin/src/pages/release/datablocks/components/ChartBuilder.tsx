@@ -188,7 +188,7 @@ const ChartBuilder = ({
           ...baseProps,
           labels: [],
           type: 'infographic',
-          fileId: options.fileId ?? '',
+          fileId: options.file ? options.file.name : options.fileId ?? '',
           getInfographic: options.file
             ? () => Promise.resolve(options.file as File)
             : getChartFile,

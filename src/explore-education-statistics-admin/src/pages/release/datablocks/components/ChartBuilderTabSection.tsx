@@ -51,7 +51,6 @@ const ChartBuilderTabSection = ({
       if (chart.type === 'infographic' && file) {
         const { id } = await releaseChartFileService.uploadChartFile(
           releaseId,
-          chart.fileId,
           { file },
         );
 

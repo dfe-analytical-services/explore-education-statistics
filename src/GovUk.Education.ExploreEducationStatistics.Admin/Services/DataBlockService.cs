@@ -127,9 +127,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
                     }
 
-                    _context.DataBlocks.Update(existing);
                     _mapper.Map(updateDataBlock, existing);
+
+                    _context.DataBlocks.Update(existing);
                     await _context.SaveChangesAsync();
+
                     return await GetAsync(id);
                 });
         }
