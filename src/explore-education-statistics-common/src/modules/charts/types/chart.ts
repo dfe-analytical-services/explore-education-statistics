@@ -107,7 +107,6 @@ export interface ChartDefinition {
   capabilities: ChartCapabilities;
   options: {
     defaults?: Partial<ChartDefinitionOptions>;
-    constants?: Partial<ChartDefinitionOptions>;
   };
   data: {
     type: string;
@@ -131,7 +130,6 @@ export interface ChartDefinitionAxis {
   hide?: boolean;
   capabilities: ChartDefinitionAxisCapabilities;
   defaults?: NestedPartial<AxisConfiguration>;
-  constants?: NestedPartial<AxisConfiguration>;
 }
 
 export const chartDefinitions: ChartDefinition[] = [
