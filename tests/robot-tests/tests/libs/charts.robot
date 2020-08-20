@@ -26,6 +26,14 @@ user waits until element does not contain map chart
     [Arguments]  ${locator}
     user waits until parent does not contain element  ${locator}  css:.leaflet-pane
 
+user waits until element contains infographic chart
+    [Arguments]  ${locator}
+    user waits until parent contains element  ${locator}  css:img
+
+user waits until element does not contain infographic chart
+    [Arguments]  ${locator}
+    user waits until parent contains element  ${locator}  css:img
+
 user checks chart title contains
     [Arguments]  ${locator}  ${text}
     user waits until parent contains element  ${locator}  xpath://figcaption[text()="${text}"]
