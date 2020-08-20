@@ -119,7 +119,7 @@ Navigate to Manage data blocks tab
 Select subject "${SUBJECT_NAME}"
     [Tags]  HappyPath
     user waits until page contains   ${SUBJECT_NAME}
-    user selects radio    ${SUBJECT_NAME}
+    user clicks radio    ${SUBJECT_NAME}
     user clicks element   css:#publicationSubjectForm-submit
 
 Select locations
@@ -132,8 +132,8 @@ Select locations
 Select time period
     [Tags]   HappyPath
     user waits until page contains heading 2  Choose time period
-    user selects start date    2020 Week 13
-    user selects end date      2021 Week 24
+    user selects from list by label  id:timePeriodForm-start    2020 Week 13
+    user selects from list by label  id:timePeriodForm-end      2021 Week 24
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators
@@ -178,8 +178,8 @@ Add data block to release
     [tags]  HappyPath
     user clicks link  Manage content
     user clicks button  Add secondary stats
-    user waits until page contains element  id:selectedDataBlock
-    user selects from list by label  id:selectedDataBlock  ${FOOTNOTE_DATABLOCK_NAME}
+    user waits until page contains element  secondaryStats-dataBlockSelectForm-selectedDataBlock
+    user selects from list by label  secondaryStats-dataBlockSelectForm-selectedDataBlock  ${FOOTNOTE_DATABLOCK_NAME}
     user clicks button  Embed
     user waits until page contains link  Table
     user clicks link  Table
@@ -299,13 +299,13 @@ Choose publication
     user waits until page contains   Choose a publication
     user opens details section  Test theme
     user opens details section  ${TOPIC_NAME}
-    user selects radio  ${PUBLICATION_NAME}
+    user clicks radio  ${PUBLICATION_NAME}
     user clicks button  Next step
 
 Choose subject
     [Tags]  HappyPath
     user waits until page contains   ${SUBJECT_NAME}
-    user selects radio  ${SUBJECT_NAME}
+    user clicks radio  ${SUBJECT_NAME}
     user clicks button  Next step
 
 Select locations
@@ -318,8 +318,8 @@ Select locations
 Select time period
     [Tags]   HappyPath
     user waits until page contains heading 2  Choose time period
-    user selects start date    2020 Week 13
-    user selects end date      2021 Week 24
+    user selects from list by label  id:timePeriodForm-start    2020 Week 13
+    user selects from list by label  id:timePeriodForm-end      2021 Week 24
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators
