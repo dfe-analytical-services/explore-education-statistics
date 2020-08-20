@@ -427,5 +427,3 @@ user checks category checkbox is checked
 user clicks select all for category
     [Arguments]  ${category_label}
     user clicks element  xpath://legend[text()="{category_label}"]/..//button[contains(text(), "Select")]
-
-  
