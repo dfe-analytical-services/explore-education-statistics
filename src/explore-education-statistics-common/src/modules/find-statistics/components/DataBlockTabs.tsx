@@ -65,7 +65,11 @@ const DataBlockTabs = ({
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <Tabs id={id} onToggle={onToggle}>
+      <Tabs
+        id={id}
+        testId={`Data block - ${dataBlock.name}`}
+        onToggle={onToggle}
+      >
         {firstTabs}
 
         {dataBlock.charts?.length && (

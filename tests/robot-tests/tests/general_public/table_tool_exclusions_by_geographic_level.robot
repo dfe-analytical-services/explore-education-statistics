@@ -85,9 +85,9 @@ User waits for table to appear
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   2006/07
-    user checks results table column heading contains  css:table  1   2   2007/08
-    user checks results table column heading contains  css:table  1   3   2008/09
+    user checks table column heading contains  css:table  1   1   2006/07
+    user checks table column heading contains  css:table  1   2   2007/08
+    user checks table column heading contains  css:table  1   3   2008/09
 
 Validate Bury Number of fixed period exclusions row
     [Tags]  HappyPath
@@ -116,9 +116,9 @@ User validates permalink contains correct date
 
 User validates permalink table headers
     [Tags]   HappyPath
-    user checks results table column heading contains  css:table  1   1   2006/07
-    user checks results table column heading contains  css:table  1   2   2007/08
-    user checks results table column heading contains  css:table  1   3   2008/09
+    user checks table column heading contains  css:table  1   1   2006/07
+    user checks table column heading contains  css:table  1   2   2007/08
+    user checks table column heading contains  css:table  1   3   2008/09
 
 User validates permalink table rows for Bury
     [Tags]  HappyPath

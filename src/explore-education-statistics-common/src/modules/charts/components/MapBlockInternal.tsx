@@ -522,9 +522,9 @@ export const MapBlockInternal = ({
                   } = dataSetConfigurations[dataSetKey];
 
                   return (
-                    <KeyStatColumn key={dataSetKey}>
+                    <KeyStatColumn key={dataSetKey} testId="mapBlock-indicator">
                       <KeyStatTile
-                        testId="mapBlock-indicator"
+                        testId="mapBlock-indicatorTile"
                         title={config.label}
                         value={formatPretty(
                           dataSet.value,

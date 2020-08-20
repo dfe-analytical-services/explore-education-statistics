@@ -181,25 +181,25 @@ describe('MapBlock', () => {
       },
     });
 
-    const tiles = getAllByTestId('mapBlock-indicator');
+    const tiles = getAllByTestId('mapBlock-indicatorTile');
 
     expect(tiles).toHaveLength(2);
 
     const tile1 = within(tiles[0]);
 
-    expect(tile1.getByTestId('mapBlock-indicator-title')).toHaveTextContent(
+    expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
-    expect(tile1.getByTestId('mapBlock-indicator-value')).toHaveTextContent(
+    expect(tile1.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
       '3%',
     );
 
     const tile2 = within(tiles[1]);
 
-    expect(tile2.getByTestId('mapBlock-indicator-title')).toHaveTextContent(
+    expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Overall absence rate (2016/17)',
     );
-    expect(tile2.getByTestId('mapBlock-indicator-value')).toHaveTextContent(
+    expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
       '4.7%',
     );
   });

@@ -1,18 +1,119 @@
 import json
 import time
+import re
 from datetime import datetime
 from logging import warn
+
+from SeleniumLibrary.utils import is_noney
 from robot.libraries.BuiltIn import BuiltIn
+from SeleniumLibrary import ElementFinder
+from SeleniumLibrary.errors import ElementNotFound
+from SeleniumLibrary.keywords.waiting import WaitingKeywords
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 import os
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
+element_finder = ElementFinder(sl)
+waiting = WaitingKeywords(sl)
 
 
 def raise_assertion_error(err_msg):
     sl.failure_occurred()
     raise AssertionError(err_msg)
+
+
+def user_waits_until_parent_contains_element(parent_locator: str, child_locator: str,
+                                             timeout: int = None, error: str = None,
+                                             limit: int = None):
+    try:
+        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error,
+                                            limit=limit)
+
+        def parent_contains_matching_element() -> bool:
+            parent_el = sl.find_element(parent_locator)
+            return element_finder.find(child_locator, required=False, parent=parent_el) is not None
+
+        if is_noney(limit):
+            return waiting._wait_until(
+                parent_contains_matching_element,
+                "Element '%s' did not appear in <TIMEOUT>." % child_locator,
+                timeout, error
+            )
+
+        limit = int(limit)
+
+        def parent_contains_matching_elements() -> bool:
+            parent_el = sl.find_element(parent_locator)
+            return len(sl.find_elements(child_locator, parent=parent_el)) == limit
+
+        waiting._wait_until(
+            parent_contains_matching_elements,
+            'Parent "%s" did not contain "%s" %s element(s) within <TIMEOUT>.' % (
+                parent_locator, limit, child_locator),
+            timeout, error
+        )
+    except Exception as err:
+        raise_assertion_error(err)
+
+
+def user_waits_until_parent_does_not_contain_element(parent_locator: str, child_locator: str,
+                                                     timeout: int = None, error: str = None,
+                                                     limit: int = None):
+    try:
+        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error,
+                                            limit=limit)
+
+        def parent_does_not_contain_matching_element() -> bool:
+            parent_el = sl.find_element(parent_locator)
+            return element_finder.find(child_locator, required=False, parent=parent_el) is None
+
+        if is_noney(limit):
+            return waiting._wait_until(
+                parent_does_not_contain_matching_element,
+                "Element '%s' did not disappear in <TIMEOUT>." % child_locator,
+                timeout, error
+            )
+
+        limit = int(limit)
+
+        def parent_does_not_contain_matching_elements() -> bool:
+            parent_el = sl.find_element(parent_locator)
+            return len(sl.find_elements(child_locator, parent=parent_el)) != limit
+
+        waiting._wait_until(
+            parent_does_not_contain_matching_elements,
+            'Parent "%s" should not have contained "%s" %s element(s) within <TIMEOUT>.' % (
+                parent_locator, limit, child_locator),
+            timeout, error
+        )
+    except Exception as err:
+        raise_assertion_error(err)
+
+
+def get_child_element(parent_locator: str, child_locator: str):
+    parent_el = None
+
+    try:
+        parent_el = sl.find_element(parent_locator)
+    except Exception as err:
+        raise_assertion_error(err)
+
+    try:
+        return sl.find_element(child_locator, parent=parent_el)
+    except ElementNotFound:
+        raise_assertion_error(
+            f"Could not find child '{child_locator}' within parent '{parent_locator}'")
+    except Exception as err:
+        raise_assertion_error(err)
+
+
+def get_child_elements(parent_locator: str, child_locator: str):
+    try:
+        parent_el = sl.find_element(parent_locator)
+        return sl.find_elements(child_locator, parent=parent_el)
+    except Exception as err:
+        raise_assertion_error(err)
 
 
 def user_waits_for_page_to_finish_loading():
@@ -209,33 +310,26 @@ def capture_large_screenshot():
 def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]', timeout=timeout)
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]',
+            timeout=timeout)
     except:
         raise_assertion_error(f'Previous step wasn\'t found!')
 
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]', timeout=timeout)
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]',
+            timeout=timeout)
     except:
         raise_assertion_error(
             f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
 
 
-def user_checks_results_table_column_heading_contains(table_selector, row, column, expected,
-                                                      timeout=30):
-    table_elem = sl.get_webelement(table_selector)
-
-    max_time = time.time() + timeout
-    while time.time() < max_time:
-        try:
-            table_elem.find_element_by_xpath(
-                f'.//thead/tr[{row}]/th[{column}][text()="{expected}"]')
-            return
-        except:
-            time.sleep(0.5)
-
-        raise_assertion_error(
-            f'"{expected}" not found in th tag in results table thead row {row}, column {column}.')
+def user_checks_table_column_heading_contains(table_selector, row, column, expected,
+                                              timeout=30):
+    user_waits_until_parent_contains_element(
+        table_selector,
+        f'xpath://thead/tr[{row}]/th[{column}][text()="{expected}"]',
+        timeout=timeout)
 
 
 def user_gets_row_with_heading(heading):
@@ -243,9 +337,9 @@ def user_gets_row_with_heading(heading):
     return elem
 
 
-def user_gets_row_number_with_heading(heading):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
-    rows = sl.driver.find_elements_by_xpath('//table/tbody/tr')
+def user_gets_row_number_with_heading(table_locator: str, heading: str):
+    elem = get_child_element(table_locator, f'xpath://table/tbody/tr/th[text()="{heading}"]/..')
+    rows = get_child_elements(table_locator, 'css:table tbody tr')
 
     return rows.index(elem) + 1
 
@@ -288,9 +382,11 @@ def user_checks_results_table_row_heading_contains(row, column, expected):
             f'"{expected}" not found in th tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
 
-def user_checks_results_table_heading_in_offset_row_contains(row, offset, column, expected):
+def user_checks_table_heading_in_offset_row_contains(table_locator: str, row: int,
+                                                     offset: int, column: int,
+                                                     expected: str):
     offset_row = int(row) + int(offset)
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{offset_row}]/th[{column}]')
+    elem = get_child_element(table_locator, f'xpath://tbody/tr[{offset_row}]/th[{column}]')
 
     if expected not in elem.text:
         raise_assertion_error(
@@ -304,9 +400,10 @@ def user_checks_results_table_cell_contains(row, column, expected):
             f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
 
-def user_checks_results_table_cell_in_offset_row_contains(row, offset, column, expected):
+def user_checks_table_cell_in_offset_row_contains(table_locator: str, row: int, offset: int,
+                                                  column: int, expected: str):
     offset_row = int(row) + int(offset)
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{offset_row}]/td[{column}]')
+    elem = get_child_element(table_locator, f'xpath://tbody/tr[{offset_row}]/td[{column}]')
 
     if expected not in elem.text:
         raise_assertion_error(
@@ -343,12 +440,15 @@ def user_checks_selected_list_label(list_locator, label):
     selected_label = sl.get_selected_list_label(list_locator)
     if selected_label != label:
         raise_assertion_error(
-            f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_Locator}"')
+            f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_locator}"')
 
 
-def user_waits_until_details_dropdown_contains_publication(details_heading, publication_name, timeout=3):
-    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]', timeout=timeout)
-    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]/../..//*[text()="{publication_name}"]')
+def user_waits_until_details_dropdown_contains_publication(details_heading, publication_name,
+                                                           timeout=3):
+    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]',
+                                        timeout=timeout)
+    sl.wait_until_page_contains_element(
+        f'xpath://details/summary[.="{details_heading}"]/../..//*[text()="{publication_name}"]')
 
 
 def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
@@ -363,5 +463,3 @@ def user_checks_details_dropdown_contains_download_link(details_heading, downloa
             f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
     except:
         raise_assertion_error(f'Cannot find link "{download_link}" in "{details_heading}"')
-
-

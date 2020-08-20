@@ -118,8 +118,8 @@ const ReleaseDataBlocksPageInternal = ({
       {dataBlockOptions.length > 0 && (
         <>
           <FormSelect
-            id="selectDataBlock"
-            name="selectDataBlock"
+            id="selectedDataBlock"
+            name="selectedDataBlock"
             label="Select an existing data block to edit or create a new one"
             disabled={isLoading}
             order={[]}
