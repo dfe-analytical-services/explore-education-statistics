@@ -11,27 +11,13 @@ ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - footnotes %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}      UI test subject
 
-${DATA_FILE_NAME}  footnotes_dates
+${DATA_FILE_NAME}  dates
 
 ${FOOTNOTE_TEXT_1}  test footnote text (will be deleted)
 ${FOOTNOTE_TEXT_2}  A test footnote
 ${FOOTNOTE_TEXT_3}  A edited test footnote!
 
 ${FOOTNOTE_DATABLOCK_NAME}  test data block (footnotes)
-
-*** Keywords ***
-user clicks footnote checkbox
-    [Arguments]  ${label}
-    wait until page contains element  xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    page should contain checkbox  xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    user scrolls to element   xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    user clicks element     xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-
-user checks footnote checkbox is selected
-  [Arguments]  ${label}
-  wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
-  checkbox should be selected     xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
 
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
@@ -64,8 +50,8 @@ Upload subject
     user clicks link  Manage data
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    choose file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}${DATA_FILE_NAME}.csv
-    choose file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}${DATA_FILE_NAME}.meta.csv
+    user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}${DATA_FILE_NAME}.csv
+    user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}${DATA_FILE_NAME}.meta.csv
     user clicks button  Upload data files
 
     user waits until page contains heading 2  Uploaded data files
