@@ -77,10 +77,10 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   2012/13
-    user checks results table column heading contains  css:table  1   2   2013/14
-    user checks results table column heading contains  css:table  1   3   2014/15
-    user checks results table column heading contains  css:table  1   4   2015/16
+    user checks table column heading contains  css:table  1   1   2012/13
+    user checks table column heading contains  css:table  1   2   2013/14
+    user checks table column heading contains  css:table  1   3   2014/15
+    user checks table column heading contains  css:table  1   4   2015/16
 
 Validate Gender male Authorised absence rate row
     [Tags]  HappyPath
@@ -186,16 +186,16 @@ Click Re-order table button
 
 Validate results table column headings after reordering
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   Gender female
-    user checks results table column heading contains  css:table  1   2   Gender male
-    user checks results table column heading contains  css:table  2   1   2013/14
-    user checks results table column heading contains  css:table  2   2   2014/15
-    user checks results table column heading contains  css:table  2   3   2015/16
-    user checks results table column heading contains  css:table  2   4   2012/13
-    user checks results table column heading contains  css:table  2   5   2013/14
-    user checks results table column heading contains  css:table  2   6   2014/15
-    user checks results table column heading contains  css:table  2   7   2015/16
-    user checks results table column heading contains  css:table  2   8   2012/13
+    user checks table column heading contains  css:table  1   1   Gender female
+    user checks table column heading contains  css:table  1   2   Gender male
+    user checks table column heading contains  css:table  2   1   2013/14
+    user checks table column heading contains  css:table  2   2   2014/15
+    user checks table column heading contains  css:table  2   3   2015/16
+    user checks table column heading contains  css:table  2   4   2012/13
+    user checks table column heading contains  css:table  2   5   2013/14
+    user checks table column heading contains  css:table  2   6   2014/15
+    user checks table column heading contains  css:table  2   7   2015/16
+    user checks table column heading contains  css:table  2   8   2012/13
 
 Validate results table row headings after reordering
     [Tags]  HappyPath
@@ -249,16 +249,16 @@ User validates permanent link works correctly
 
 User validates permalink table
     [Tags]   HappyPath
-    user checks results table column heading contains  css:table  1   1   Gender female
-    user checks results table column heading contains  css:table  1   2   Gender male
-    user checks results table column heading contains  css:table  2   1   2013/14
-    user checks results table column heading contains  css:table  2   2   2014/15
-    user checks results table column heading contains  css:table  2   3   2015/16
-    user checks results table column heading contains  css:table  2   4   2012/13
-    user checks results table column heading contains  css:table  2   5   2013/14
-    user checks results table column heading contains  css:table  2   6   2014/15
-    user checks results table column heading contains  css:table  2   7   2015/16
-    user checks results table column heading contains  css:table  2   8   2012/13
+    user checks table column heading contains  css:table  1   1   Gender female
+    user checks table column heading contains  css:table  1   2   Gender male
+    user checks table column heading contains  css:table  2   1   2013/14
+    user checks table column heading contains  css:table  2   2   2014/15
+    user checks table column heading contains  css:table  2   3   2015/16
+    user checks table column heading contains  css:table  2   4   2012/13
+    user checks table column heading contains  css:table  2   5   2013/14
+    user checks table column heading contains  css:table  2   6   2014/15
+    user checks table column heading contains  css:table  2   7   2015/16
+    user checks table column heading contains  css:table  2   8   2012/13
 
     user checks results table row heading contains  1    1      Overall absence rate
     user checks results table row heading contains  2    1      Unauthorised absence rate

@@ -9,7 +9,7 @@ import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
 import MapBlock from '@common/modules/charts/components/MapBlock';
-import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
+import { MapBlockProps } from '@common/modules/charts/components/MapBlockInternal';
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
@@ -29,13 +29,21 @@ export type ChartRendererProps = {
     } & HorizontalBarProps)
   | ({
       type: 'map';
-    } & MapBlockInternalProps)
+    } & Omit<MapBlockProps, 'id'>)
   | ({
       type: 'infographic';
     } & InfographicChartProps)
 );
 
-function ChartRenderer({ source, ...props }: ChartRendererProps) {
+export interface ChartRendererInternalProps {
+  id: string;
+}
+
+function ChartRenderer({
+  source,
+  id,
+  ...props
+}: ChartRendererProps & ChartRendererInternalProps) {
   const { data, meta, title } = props;
 
   const chart = useMemo(() => {
@@ -47,17 +55,17 @@ function ChartRenderer({ source, ...props }: ChartRendererProps) {
       case 'horizontalbar':
         return <HorizontalBarBlock {...props} />;
       case 'map':
-        return <MapBlock {...props} />;
+        return <MapBlock {...props} id={`${id}-map`} />;
       case 'infographic':
         return <InfographicBlock {...props} />;
       default:
         return <p>Unable to render invalid chart type</p>;
     }
-  }, [props]);
+  }, [id, props]);
 
   if (data && meta && data.length > 0) {
     return (
-      <figure className="govuk-!-margin-0">
+      <figure className="govuk-!-margin-0" id={id}>
         {title && <figcaption className="govuk-heading-s">{title}</figcaption>}
 
         {chart}

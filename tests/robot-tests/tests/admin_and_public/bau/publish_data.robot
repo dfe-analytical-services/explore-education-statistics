@@ -206,32 +206,29 @@ Select indicators in table tool
     user clicks indicator checkbox    Admission Numbers
     user clicks element   css:#filtersForm-submit
 
-Validate table column headings
+Validate table
     [Tags]  HappyPath
+    ${table}=  set variable  css:table
     user waits until results table appears  180
-    user checks results table column heading contains  css:table  1  1  2014
-    user checks results table column heading contains  css:table  1  2  2015
-    user checks results table column heading contains  css:table  1  3  2016
-    user checks results table column heading contains  css:table  1  4  2017
-    user checks results table column heading contains  css:table  1  5  2018
+    user checks table column heading contains   ${table}  1  1  2014
+    user checks table column heading contains   ${table}  1  2  2015
+    user checks table column heading contains   ${table}  1  3  2016
+    user checks table column heading contains   ${table}  1  4  2017
+    user checks table column heading contains   ${table}  1  5  2018
 
-Validate table rows for Barnsley
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading  Barnsley
-    user checks results table cell in offset row contains  ${row}  0  1  9,854
-    user checks results table cell in offset row contains  ${row}  0  2  1,134
-    user checks results table cell in offset row contains  ${row}  0  3  7,419
-    user checks results table cell in offset row contains  ${row}  0  4  5,032
-    user checks results table cell in offset row contains  ${row}  0  5  8,123
+    ${row}=  user gets row number with heading  ${table}  Barnsley
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  9,854
+    user checks table cell in offset row contains  ${table}  ${row}  0  2  1,134
+    user checks table cell in offset row contains  ${table}  ${row}  0  3  7,419
+    user checks table cell in offset row contains  ${table}  ${row}  0  4  5,032
+    user checks table cell in offset row contains  ${table}  ${row}  0  5  8,123
 
-Validate table rows for Birmingham
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Birmingham
-    user checks results table cell in offset row contains  ${row}  0  1  3,708
-    user checks results table cell in offset row contains  ${row}  0  2  9,303
-    user checks results table cell in offset row contains  ${row}  0  3  8,856
-    user checks results table cell in offset row contains  ${row}  0  4  8,530
-    user checks results table cell in offset row contains  ${row}  0  5  3,962
+    ${row}=  user gets row number with heading   ${table}  Birmingham
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  3,708
+    user checks table cell in offset row contains  ${table}  ${row}  0  2  9,303
+    user checks table cell in offset row contains  ${table}  ${row}  0  3  8,856
+    user checks table cell in offset row contains  ${table}  ${row}  0  4  8,530
+    user checks table cell in offset row contains  ${table}  ${row}  0  5  3,962
 
 Select table highlight from subjects step
     [Tags]  HappyPath
@@ -246,70 +243,62 @@ Select table highlight from subjects step
 
 Validate table column headings for table highlight
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1  1  Admission Numbers
+    user checks table column heading contains  css:table  1  1  Admission Numbers
 
 Validate table rows for Bolton 001 (E02000984)
     [Tags]  HappyPath
-    ${row}=  user gets row number with heading  Bolton 001 (E02000984)
-    user checks results table heading in offset row contains  ${row}  0  2  2019
+    ${table}=  set variable  css:table
 
-    user checks results table cell in offset row contains  ${row}  0  1  8,533
+    ${row}=  user gets row number with heading  ${table}  Bolton 001 (E02000984)
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2019
 
-Validate table rows for Bolton 001 (E05000364)
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Bolton 001 (E05000364)
-    user checks results table heading in offset row contains  ${row}  0  2  2009
-    user checks results table heading in offset row contains  ${row}  1  1  2010
-    user checks results table heading in offset row contains  ${row}  2  1  2017
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,533
 
-    user checks results table cell in offset row contains  ${row}  0  1  5,815
-    user checks results table cell in offset row contains  ${row}  1  1  5,595
-    user checks results table cell in offset row contains  ${row}  2  1  6,373
+    ${row}=  user gets row number with heading   ${table}  Bolton 001 (E05000364)
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2009
+    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${table}  ${row}  2  1  2017
 
-Validate table rows for Bolton 004 (E02000987)
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Bolton 004 (E02000987)
-    user checks results table heading in offset row contains  ${row}  0  2  2020
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  5,815
+    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,595
+    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,373
 
-    user checks results table cell in offset row contains  ${row}  0  1  6,031
+    ${row}=  user gets row number with heading   ${table}  Bolton 004 (E02000987)
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2020
 
-Validate table rows for Bolton 004 (E05010450)
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Bolton 004 (E05010450)
-    user checks results table heading in offset row contains  ${row}  0  2  2005
-    user checks results table heading in offset row contains  ${row}  1  1  2017
-    user checks results table heading in offset row contains  ${row}  2  1  2018
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  6,031
 
-    user checks results table cell in offset row contains  ${row}  0  1  8,557
-    user checks results table cell in offset row contains  ${row}  1  1  3,481
-    user checks results table cell in offset row contains  ${row}  2  1  8,630
+    ${row}=  user gets row number with heading   ${table}  Bolton 004 (E05010450)
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${table}  ${row}  1  1  2017
+    user checks table heading in offset row contains  ${table}  ${row}  2  1  2018
 
-Validate table rows for Nailsea Youngwood
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Nailsea Youngwood
-    user checks results table heading in offset row contains  ${row}  0  2  2005
-    user checks results table heading in offset row contains  ${row}  1  1  2010
-    user checks results table heading in offset row contains  ${row}  2  1  2011
-    user checks results table heading in offset row contains  ${row}  3  1  2012
-    user checks results table heading in offset row contains  ${row}  4  1  2016
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,557
+    user checks table cell in offset row contains  ${table}  ${row}  1  1  3,481
+    user checks table cell in offset row contains  ${table}  ${row}  2  1  8,630
 
-    user checks results table cell in offset row contains  ${row}  0  1  3,612
-    user checks results table cell in offset row contains  ${row}  1  1  9,304
-    user checks results table cell in offset row contains  ${row}  2  1  9,603
-    user checks results table cell in offset row contains  ${row}  3  1  8,150
-    user checks results table cell in offset row contains  ${row}  4  1  4,198
+    ${row}=  user gets row number with heading   ${table}  Nailsea Youngwood
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${table}  ${row}  2  1  2011
+    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${table}  ${row}  4  1  2016
 
-Validate table rows for Syon
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Syon
-    user checks results table heading in offset row contains  ${row}  0  2  2007
-    user checks results table heading in offset row contains  ${row}  1  1  2008
-    user checks results table heading in offset row contains  ${row}  2  1  2010
-    user checks results table heading in offset row contains  ${row}  3  1  2012
-    user checks results table heading in offset row contains  ${row}  4  1  2017
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  3,612
+    user checks table cell in offset row contains  ${table}  ${row}  1  1  9,304
+    user checks table cell in offset row contains  ${table}  ${row}  2  1  9,603
+    user checks table cell in offset row contains  ${table}  ${row}  3  1  8,150
+    user checks table cell in offset row contains  ${table}  ${row}  4  1  4,198
 
-    user checks results table cell in offset row contains  ${row}  0  1  9,914
-    user checks results table cell in offset row contains  ${row}  1  1  5,505
-    user checks results table cell in offset row contains  ${row}  2  1  6,060
-    user checks results table cell in offset row contains  ${row}  3  1  1,109
-    user checks results table cell in offset row contains  ${row}  4  1  1,959
+    ${row}=  user gets row number with heading   ${table}  Syon
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2007
+    user checks table heading in offset row contains  ${table}  ${row}  1  1  2008
+    user checks table heading in offset row contains  ${table}  ${row}  2  1  2010
+    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${table}  ${row}  4  1  2017
+
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  9,914
+    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,505
+    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,060
+    user checks table cell in offset row contains  ${table}  ${row}  3  1  1,109
+    user checks table cell in offset row contains  ${table}  ${row}  4  1  1,959

@@ -111,11 +111,11 @@ Validate Key Statistics data block -- Data tables tab
    user clicks element   css:#releaseHeadlines-dataBlock-tables-tab
    user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
 
-   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   1   2012/13
-   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   2   2013/14
-   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   3   2014/15
-   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   4   2015/16
-   user checks results table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   5   2016/17
+   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   1   2012/13
+   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   2   2013/14
+   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   3   2014/15
+   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   4   2015/16
+   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   5   2016/17
 
    ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Authorised absence rate
    user checks row contains heading  ${row}   Authorised absence rate
@@ -167,7 +167,7 @@ Validate Regional and local authority (LA) breakdown table
     user opens accordion section  Regional and local authority (LA) breakdown
     user checks element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
 
-    user checks results table column heading contains  css:#content_9_datablock-tables table   1   1   2016/17
+    user checks table column heading contains  css:#content_9_datablock-tables table   1   1   2016/17
 
     ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table   Vale of White Horse   Authorised absence rate
     user checks row contains heading  ${row}   Authorised absence rate

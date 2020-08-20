@@ -36,10 +36,6 @@ const InfographicBlock = ({
     return <p className="govuk-inset-text">Could not load infographic</p>;
   }
 
-  if (!fileId) {
-    return null;
-  }
-
   return (
     <LoadingSpinner loading={isLoading}>
       {file && (

@@ -23,8 +23,17 @@ export const KeyStatContainer = ({
   return <ElementTag className={styles.container}>{children}</ElementTag>;
 };
 
-export const KeyStatColumn: FC = ({ children }) => {
-  return <div className={styles.column}>{children}</div>;
+interface KeyStatColumnProps {
+  children: ReactNode;
+  testId?: string;
+}
+
+export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
+  return (
+    <div className={styles.column} data-testid={testId}>
+      {children}
+    </div>
+  );
 };
 
 export interface KeyStatProps {

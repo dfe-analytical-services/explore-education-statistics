@@ -25,10 +25,12 @@ const CustomTooltip = ({
 
   return (
     <div className={styles.tooltip}>
-      <p className="govuk-!-font-weight-bold">{tooltipLabel}</p>
+      <p className="govuk-!-font-weight-bold" data-testid="chartTooltip-label">
+        {tooltipLabel}
+      </p>
 
       {payload && (
-        <ul className={styles.itemList}>
+        <ul className={styles.itemList} data-testid="chartTooltip-items">
           {orderBy(payload, item => Number(item.value), ['desc']).map(
             (item, index) => {
               return (
@@ -41,8 +43,8 @@ const CustomTooltip = ({
                     />
                   </div>
 
-                  <div>
-                    {`${item.name} : `}
+                  <div data-testid="chartTooltip-item-text">
+                    {`${item.name}: `}
 
                     <strong>
                       {formatPretty(item.value.toString(), item.unit)}

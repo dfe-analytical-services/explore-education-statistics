@@ -55,6 +55,7 @@ interface Props {
   definition: ChartDefinition;
   forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
+  isSaving?: boolean;
   meta: FullTableMeta;
   submitError?: ServerValidationErrorResponse;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
@@ -76,6 +77,7 @@ const ChartConfiguration = ({
   definition,
   forms,
   hasSubmittedChart,
+  isSaving,
   meta,
   submitError,
   onBoundaryLevelChange,
@@ -313,6 +315,7 @@ const ChartConfiguration = ({
 
             <ButtonGroup>
               <ChartBuilderSaveButton
+                disabled={isSaving}
                 formId={formId}
                 forms={forms}
                 showSubmitError={

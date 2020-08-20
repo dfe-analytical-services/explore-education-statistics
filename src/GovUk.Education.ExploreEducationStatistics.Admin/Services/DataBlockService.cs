@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public DataBlockService(
             ContentDbContext context,
-            IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IReleaseFilesService releaseFilesService)
         {
@@ -49,12 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
-                    
+
                     var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 
                     release.AddContentBlock(added);
                     _context.Releases.Update(release);
-            
+
                     await _context.SaveChangesAsync();
 
                     return await GetAsync(added.Id);
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return true;
                 }));
         }
-        
+
         public async Task<Either<ActionResult, bool>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan)
         {
             await DeleteDependentDataBlocks(deletePlan);
@@ -120,18 +120,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (infographicChart != null && infographicChart.FileId != updatedInfographicChart?.FileId)
                     {
-                        // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
                         var release = GetReleaseForDataBlock(existing.Id);
-                        await _releaseFilesService.DeleteNonDataFileAsync(
+                        await _releaseFilesService.DeleteChartFileAsync(
                             release.Id,
-                            ReleaseFileTypes.Chart,
-                            infographicChart.FileId
+                            new Guid(infographicChart.FileId)
                         );
                     }
 
-                    _context.DataBlocks.Update(existing);
                     _mapper.Map(updateDataBlock, existing);
+
+                    _context.DataBlocks.Update(existing);
                     await _context.SaveChangesAsync();
+
                     return await GetAsync(id);
                 });
         }
@@ -316,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Guid Id { get; set; }
         public string Filename { get; set; }
     }
-    
+
     public class DeleteDataBlockPlan
     {
         [JsonIgnore]

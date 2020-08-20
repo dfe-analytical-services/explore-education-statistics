@@ -106,6 +106,10 @@ user scrolls to element
   [Arguments]  ${element}
   scroll element into view  ${element}
 
+user mouses over element
+    [Arguments]  ${element}
+    mouse over  ${element}
+
 user waits until page contains
   [Arguments]    ${pageText}    ${wait}=${timeout}
   wait until page contains   ${pageText}    timeout=${wait}
@@ -224,6 +228,7 @@ user clicks link
 
 user clicks button
   [Arguments]   ${text}
+  user waits until element is visible  xpath://button[text()="${text}"]
   user waits until element is enabled  xpath://button[text()="${text}"]
   click button  ${text}
 
@@ -234,6 +239,10 @@ user waits until page contains button
 user checks page does not contain button
   [Arguments]  ${text}
   user checks page does not contain element  xpath://button[text()="${text}"]
+
+user waits until button is enabled
+  [Arguments]   ${text}
+  user waits until element is enabled  xpath://button[text()="${text}"]
 
 user checks page contains tag
   [Arguments]   ${text}
@@ -275,7 +284,13 @@ user checks summary list contains
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}
+  user waits until element is visible  ${locator}
   select from list by label   ${locator}   ${label}
+
+user chooses file
+    [Arguments]  ${locator}  ${file_path}
+    user waits until element is visible  ${locator}
+    choose file  ${locator}  ${file_path}
 
 user clears element text
   [Arguments]   ${locator}
