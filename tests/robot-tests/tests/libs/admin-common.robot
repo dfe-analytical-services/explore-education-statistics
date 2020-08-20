@@ -146,3 +146,16 @@ user waits until scheduled releases tab contains publication
 user checks scheduled releases tab publication has release
     [Arguments]   ${publication_name}   ${release_text}
     user checks page contains element   xpath://*[@id="scheduled-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]
+
+user clicks footnote checkbox
+    [Arguments]  ${label}
+    wait until page contains element  xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
+    page should contain checkbox  xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
+    user scrolls to element   xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
+    wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
+    user clicks element     xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
+
+user checks footnote checkbox is selected
+  [Arguments]  ${label}
+  wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
+  checkbox should be selected     xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
