@@ -25,11 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper; 
-        private readonly IUserService _userService; 
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IUserService _userService;
 
         public ContentService(ContentDbContext context,
-            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper, IUserService userService)
         {
             _context = context;
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(
-            Guid releaseId, 
+            Guid releaseId,
             Dictionary<Guid, int> newSectionOrder)
         {
             return _persistenceHelper
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             .ToList()
                             .Find(section => section.Id == sectionId).Order = newOrder;
                     });
-                    
+
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
                     return OrderedContentSections(release);
@@ -78,9 +78,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    var orderForNewSection = request?.Order ?? 
+                    var orderForNewSection = request?.Order ??
                                              release.GenericContent.Max(contentSection => contentSection.Order) + 1;
-                    
+
                     release.GenericContent
                         .ToList()
                         .FindAll(contentSection => contentSection.Order >= orderForNewSection)
@@ -91,9 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         Heading = "New section",
                         Order = orderForNewSection
                     };
-                    
+
                     release.AddGenericContentSection(newContentSection);
-                    
+
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
                     return _mapper.Map<ContentSectionViewModel>(newContentSection);
@@ -103,13 +103,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
             Guid releaseId, Guid contentSectionId, string newHeading)
         {
-            return 
+            return
                 CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
                         var (_, sectionToUpdate) = tuple;
-                        
+
                         sectionToUpdate.Heading = newHeading;
 
                         _context.ContentSections.Update(sectionToUpdate);
@@ -117,37 +117,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return _mapper.Map<ContentSectionViewModel>(sectionToUpdate);
                     });
         }
-        
+
         public  Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
             Guid releaseId,
             Guid contentSectionId)
         {
-            return 
+            return
                 CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
                     {
                         var (release, sectionToRemove) = tuple;
-                        
+
                         // detach DataBlocks before removing the ContentSection and its ContentBlocks
                         var dataBlocks = sectionToRemove
                             .Content
                             .OfType<DataBlock>()
                             .ToList();
-                            
-                        dataBlocks.ForEach(dataBlock => 
+
+                        dataBlocks.ForEach(dataBlock =>
                             RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
-                        
+
                         release.RemoveGenericContentSection(sectionToRemove);
                         _context.ContentSections.Remove(sectionToRemove);
 
                         var removedSectionOrder = sectionToRemove.Order;
-                        
+
                         release.GenericContent
                             .ToList()
                             .FindAll(contentSection => contentSection.Order > removedSectionOrder)
                             .ForEach(contentSection => contentSection.Order--);
-                        
+
                         _context.Releases.Update(release);
                         await _context.SaveChangesAsync();
                         return OrderedContentSections(release);
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocksAsync(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
-            return 
+            return
                 CheckContentSectionExists(releaseId, contentSectionId)
                     .OnSuccess(CheckCanUpdateRelease)
                     .OnSuccess(async tuple =>
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             var (blockId, newOrder) = kvp;
                             section.Content.Find(block => block.Id == blockId).Order = newOrder;
                         });
-                        
+
                         _context.ContentSections.Update(section);
                         await _context.SaveChangesAsync();
                         return OrderedContentBlocks(section);
@@ -228,7 +228,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationActionResult(ContentBlockNotAttachedToThisContentSection);
                     }
 
-                    var deleteContentBlock = blockToRemove is DataBlock;
+                    // This is rubbish. Data blocks and content blocks are only the
+                    // same type in name as they actually do very different things.
+                    // Ideally we need to separate out data blocks from the content block model.
+                    // TODO: EES-1306 Refactor data blocks out of content block model
+                    var deleteContentBlock = !(blockToRemove is DataBlock);
+
                     RemoveContentBlockFromContentSection(section, blockToRemove, deleteContentBlock);
 
                     _context.ContentSections.Update(section);
@@ -288,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
 
-        public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId) 
+        public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocksAsync<T>(Guid releaseId)
             where T : ContentBlock
         {
             var unattachedContentBlocks = await _context
@@ -345,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         private Task<Either<ActionResult, CommentViewModel>> GetCommentAsync(Guid commentId)
         {
-            return _persistenceHelper.CheckEntityExists<Comment>(commentId, queryable => 
+            return _persistenceHelper.CheckEntityExists<Comment>(commentId, queryable =>
                     queryable.Include(comment => comment.CreatedBy))
                 .OnSuccess(comment => _mapper.Map<CommentViewModel>(comment));
         }
@@ -397,7 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         Created = DateTime.UtcNow,
                         CreatedById = _userService.GetUserId()
                     };
-                    
+
                     await _context.Comment.AddAsync(comment);
                     await _context.SaveChangesAsync();
                     return await GetCommentAsync(comment.Id);
@@ -527,12 +532,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             {
                 blockToUpdate.Summary = new DataBlockSummary();
             }
-            
+
             blockToUpdate.Summary.DataDefinitionTitle = new List<string>
             {
                 request.DataDefinitionTitle
             };
-            
+
             blockToUpdate.Summary.DataDefinition = new List<string>
             {
                 request.DataDefinition

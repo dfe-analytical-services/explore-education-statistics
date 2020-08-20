@@ -566,6 +566,7 @@ Configure basic infographic chart
 Validate basic infographic chart preview
     [Tags]  HappyPath
     user checks chart title contains  id:chartBuilderPreview  Test chart title
+    user waits until element contains infographic chart  id:chartBuilderPreview
     user checks infographic chart contains alt  id:chartBuilderPreview  Test chart alt
 
 Save and validate infographic chart embeds correctly
@@ -580,3 +581,24 @@ Save and validate infographic chart embeds correctly
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user checks chart title contains  ${datablock}  Test chart title
     user checks infographic chart contains alt  ${datablock}  Test chart alt
+
+Delete embedded data block
+    [Tags]  HappyPath
+    user clicks button  Remove block
+    user clicks button  Confirm
+
+Delete chart from data block
+    [Tags]  HappyPath
+    user clicks link  Manage data blocks
+    user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
+    user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user clicks link  Chart
+    user clicks button  Delete chart
+    user clicks button  Confirm
+    user waits until element does not contain infographic chart  id:chartBuilderPreview
+
+Delete data block
+    [Tags]  HappyPath
+    user clicks button  Delete this data block
+    user clicks button  Confirm
+    user waits until page contains heading 2  Create new data block
