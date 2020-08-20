@@ -1,7 +1,7 @@
 import json
 import time
 import re
-from datetime import datetime
+import datetime
 from logging import warn
 
 from SeleniumLibrary.utils import is_noney
@@ -136,8 +136,8 @@ def set_cookie_from_json(cookie_json):
     sl.driver.add_cookie(cookie_dict)
 
 
-def get_datetime(strf):
-    now = datetime.now()
+def get_datetime(strf, days=0):
+    now = datetime.datetime.now() + datetime.timedelta(days=days)
     return now.strftime(strf).lstrip('0')
 
 
@@ -463,3 +463,10 @@ def user_checks_details_dropdown_contains_download_link(details_heading, downloa
             f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
     except:
         raise_assertion_error(f'Cannot find link "{download_link}" in "{details_heading}"')
+
+
+def remove_substring_from_right_of_string(string, substring):
+    if string.endswith(substring):
+        return string[:-len(substring)]
+    else:
+        raise_assertion_error(f'String "{string}" doesn\'t end with substring "{substring}"')
