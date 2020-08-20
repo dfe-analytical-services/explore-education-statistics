@@ -143,11 +143,11 @@ Select indicators
 
 Select category filters
     [Tags]  HappyPath
-    user opens category filters details section  Date
-    user clicks category filters checkbox    01/04/2020
-    user checks category filters checkbox is selected  01/04/2020
-    user clicks category filters checkbox    01/04/2021
-    user checks category filters checkbox is selected  01/04/2021
+    user opens details dropdown  Date
+    user clicks category checkbox    Date  01/04/2020
+    user checks category checkbox is checked  Date  01/04/2020
+    user clicks category checkbox    Date  01/04/2021
+    user checks category checkbox is checked  Date  01/04/2021
 
 Create table
     [Tags]  HappyPath
@@ -178,8 +178,8 @@ Add data block to release
     [tags]  HappyPath
     user clicks link  Manage content
     user clicks button  Add secondary stats
-    user waits until page contains element  css:#datablock_select
-    user selects from list by label  css:#datablock_select  ${FOOTNOTE_DATABLOCK_NAME}
+    user waits until page contains element  id:selectedDataBlock
+    user selects from list by label  id:selectedDataBlock  ${FOOTNOTE_DATABLOCK_NAME}
     user clicks button  Embed
     user waits until page contains link  Table
     user clicks link  Table
@@ -329,11 +329,11 @@ Select indicators
 
 Select category filters
     [Tags]  HappyPath
-    user opens category filters details section  Date
-    user clicks category filters checkbox    01/04/2020
-    user checks category filters checkbox is selected  01/04/2020
-    user clicks category filters checkbox    01/04/2021
-    user checks category filters checkbox is selected  01/04/2021
+    user opens details dropdown  Date
+    user clicks category checkbox    Date  01/04/2020
+    user checks category checkbox is checked  Date  01/04/2020
+    user clicks category checkbox    Date  01/04/2021
+    user checks category checkbox is checked  Date  01/04/2021
 
 Create table
     [Tags]  HappyPath
