@@ -4,7 +4,6 @@ import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import KeyStat, {
-  KeyStatColumn,
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
 import { Release } from '@common/services/publicationService';
@@ -37,19 +36,18 @@ const PublicationReleaseHeadlinesSection = ({
           }
 
           return (
-            <KeyStatColumn key={block.id}>
-              <KeyStat
-                query={{
-                  releaseId: id,
-                  ...block.query,
-                }}
-                summary={block.summary}
-                queryOptions={{
-                  dataLastPublished,
-                  expiresIn: 60 * 60 * 24,
-                }}
-              />
-            </KeyStatColumn>
+            <KeyStat
+              key={block.id}
+              query={{
+                releaseId: id,
+                ...block.query,
+              }}
+              summary={block.summary}
+              queryOptions={{
+                dataLastPublished,
+                expiresIn: 60 * 60 * 24,
+              }}
+            />
           );
         })}
       </KeyStatContainer>

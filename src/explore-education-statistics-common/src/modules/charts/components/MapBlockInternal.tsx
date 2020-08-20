@@ -1,4 +1,4 @@
-import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
+import { FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import useCallbackRef from '@common/hooks/useCallbackRef';
 import useIntersectionObserver from '@common/hooks/useIntersectionObserver';

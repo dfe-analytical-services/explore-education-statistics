@@ -5,11 +5,15 @@ import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import useToggle from '@common/hooks/useToggle';
 import KeyStat, {
+  KeyStatColumn,
   KeyStatProps,
 } from '@common/modules/find-statistics/components/KeyStat';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
+import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
 import { Formik } from 'formik';
 import React from 'react';
 
@@ -33,98 +37,114 @@ const EditableKeyStat = ({
   name,
   query,
   summary,
+  testId = 'editableKeyStat',
   onRemove,
   onSubmit,
 }: EditableKeyStatProps) => {
   const [showForm, toggleShowForm] = useToggle(false);
   const [removing, toggleRemoving] = useToggle(false);
 
-  if (!isEditing) {
-    return <KeyStat query={query} summary={summary} />;
+  const { value: keyStat, isLoading, error } = useKeyStatQuery({
+    ...query,
+    includeGeoJson: false,
+  });
+
+  if (error) {
+    return null;
   }
 
-  return showForm ? (
-    <Formik<KeyStatsFormValues>
-      initialValues={{
-        dataSummary: summary?.dataSummary?.[0] ?? '',
-        dataDefinitionTitle: summary?.dataDefinitionTitle?.[0] ?? 'Help',
-        dataDefinition: summary?.dataDefinition?.[0]
-          ? toHtml(summary?.dataDefinition?.[0])
-          : '',
-      }}
-      onSubmit={values => {
-        onSubmit({
-          ...values,
-          dataDefinition: toMarkdown(values.dataDefinition),
-        });
-        toggleShowForm.off();
-      }}
-    >
-      {form => {
-        return (
-          <Form id={`key-stats-form-${id}`}>
-            <h3 className="govuk-heading-s">{name}</h3>
+  return (
+    <KeyStatColumn testId={testId}>
+      <LoadingSpinner loading={isLoading}>
+        {keyStat && (
+          <>
+            {showForm ? (
+              <Formik<KeyStatsFormValues>
+                initialValues={{
+                  dataSummary: summary?.dataSummary?.[0] ?? '',
+                  dataDefinitionTitle:
+                    summary?.dataDefinitionTitle?.[0] ?? 'Help',
+                  dataDefinition: summary?.dataDefinition?.[0]
+                    ? toHtml(summary?.dataDefinition?.[0])
+                    : '',
+                }}
+                onSubmit={values => {
+                  onSubmit({
+                    ...values,
+                    dataDefinition: toMarkdown(values.dataDefinition),
+                  });
+                  toggleShowForm.off();
+                }}
+              >
+                {form => (
+                  <Form id={`key-stats-form-${id}`}>
+                    <h3 className="govuk-heading-s">{name}</h3>
 
-            <KeyStat
-              query={query}
-              renderDataSummary={
-                <FormFieldTextInput<KeyStatsFormValues>
-                  id={`key-stat-dataSummary-${id}`}
-                  name="dataSummary"
-                  label={<span className={styles.trendText}>Trend</span>}
-                />
-              }
-            >
-              <FormFieldTextInput<KeyStatsFormValues>
-                formGroupClass="govuk-!-margin-top-2"
-                id={`key-stat-dataDefinitionTitle-${id}`}
-                name="dataDefinitionTitle"
-                label="Guidance title"
-              />
+                    <KeyStatTile title={keyStat.title} value={keyStat.value}>
+                      <FormFieldTextInput<KeyStatsFormValues>
+                        id={`key-stat-dataSummary-${id}`}
+                        name="dataSummary"
+                        label={<span className={styles.trendText}>Trend</span>}
+                      />
+                    </KeyStatTile>
 
-              <FormFieldEditor<KeyStatsFormValues>
-                name="dataDefinition"
-                toolbarConfig={toolbarConfigs.reduced}
-                id={`key-stat-dataDefinition-${id}`}
-                label="Guidance text"
-              />
+                    <FormFieldTextInput<KeyStatsFormValues>
+                      formGroupClass="govuk-!-margin-top-2"
+                      id={`key-stat-dataDefinitionTitle-${id}`}
+                      name="dataDefinitionTitle"
+                      label="Guidance title"
+                    />
 
-              <ButtonGroup>
-                <Button
-                  disabled={!form.isValid}
-                  type="submit"
-                  className="govuk-!-margin-right-2"
-                >
-                  Save
-                </Button>
-                <Button variant="secondary" onClick={toggleShowForm.off}>
-                  Cancel
-                </Button>
-              </ButtonGroup>
-            </KeyStat>
-          </Form>
-        );
-      }}
-    </Formik>
-  ) : (
-    <KeyStat query={query} summary={summary}>
-      <ButtonGroup className="govuk-!-margin-top-2">
-        <Button onClick={toggleShowForm.on}>Edit</Button>
+                    <FormFieldEditor<KeyStatsFormValues>
+                      name="dataDefinition"
+                      toolbarConfig={toolbarConfigs.reduced}
+                      id={`key-stat-dataDefinition-${id}`}
+                      label="Guidance text"
+                    />
 
-        {onRemove && (
-          <Button
-            disabled={removing}
-            variant="secondary"
-            onClick={() => {
-              toggleRemoving.on();
-              onRemove();
-            }}
-          >
-            Remove
-          </Button>
+                    <ButtonGroup>
+                      <Button
+                        disabled={!form.isValid}
+                        type="submit"
+                        className="govuk-!-margin-right-2"
+                      >
+                        Save
+                      </Button>
+                      <Button variant="secondary" onClick={toggleShowForm.off}>
+                        Cancel
+                      </Button>
+                    </ButtonGroup>
+                  </Form>
+                )}
+              </Formik>
+            ) : (
+              <>
+                <KeyStatTile title={keyStat.title} value={keyStat.value} />
+
+                {isEditing && (
+                  <ButtonGroup className="govuk-!-margin-top-2">
+                    <Button onClick={toggleShowForm.on}>Edit</Button>
+
+                    {onRemove && (
+                      <Button
+                        disabled={removing}
+                        variant="secondary"
+                        onClick={() => {
+                          toggleRemoving.on();
+                          onRemove();
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </ButtonGroup>
+                )}
+              </>
+            )}
+          </>
         )}
-      </ButtonGroup>
-    </KeyStat>
+      </LoadingSpinner>
+    </KeyStatColumn>
   );
 };
 
