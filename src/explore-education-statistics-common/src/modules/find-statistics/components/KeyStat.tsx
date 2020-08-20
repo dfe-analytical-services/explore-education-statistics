@@ -69,7 +69,9 @@ const KeyStat = ({
               testId={testId}
             >
               {summary?.dataSummary && (
-                <p className="govuk-body-s">{summary.dataSummary}</p>
+                <p className="govuk-body-s" data-testid={`${testId}-summary`}>
+                  {summary.dataSummary}
+                </p>
               )}
             </KeyStatTile>
 

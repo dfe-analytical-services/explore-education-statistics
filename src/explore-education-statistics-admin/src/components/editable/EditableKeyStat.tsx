@@ -7,7 +7,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useToggle from '@common/hooks/useToggle';
-import KeyStat, {
+import {
   KeyStatColumn,
   KeyStatProps,
 } from '@common/modules/find-statistics/components/KeyStat';

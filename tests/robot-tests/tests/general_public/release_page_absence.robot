@@ -87,37 +87,33 @@ Validate absence_in_prus.csv file can be downloaded
 
     user closes details dropdown     Download data files
 
-Validate Key Statistics data block -- Summary tab
+Validate headlines -- Summary tab key stats
     [Documentation]  DFE-915   EES-806   EES-1508
     [Tags]  HappyPath
-    user waits until page contains element   xpath://h3[text()="Overall absence rate"]    90
-    user waits until page contains element   xpath://h3[text()="Authorised absence rate"]    90
-    user waits until page contains element   xpath://h3[text()="Unauthorised absence rate"]    90
+    user checks key stat contents   1  Overall absence rate         4.7%   Up from 4.6% in 2015/16
+    user checks key stat contents   2  Authorised absence rate      3.4%   Similar to previous years
+    user checks key stat contents   3  Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
 
-    user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
-    user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
-    user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
-
-Validate Key Statistics headline content block
+Validate headlines -- Summary tab content
     [Documentation]    EES-718
     [Tags]  HappyPath  NotAgainstPreProd
-    user checks key stat bullet exists   pupils missed on average 8.2 school days
-    user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
-    user checks key stat bullet exists   unauthorised absence rise due to higher rates of unauthorised holidays
-    user checks key stat bullet exists   10% of pupils persistently absent during 2016/17
+    user checks headline summary contains   pupils missed on average 8.2 school days
+    user checks headline summary contains   overall and unauthorised absence rates up on 2015/16
+    user checks headline summary contains   unauthorised absence rise due to higher rates of unauthorised holidays
+    user checks headline summary contains   10% of pupils persistently absent during 2016/17
 
 Validate Key Statistics data block -- Data tables tab
    [Tags]  HappyPath
-   user clicks element   css:#releaseHeadlines-dataBlock-tables-tab
+   user clicks element   css:#releaseHeadlines-tables-tab
    user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
 
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   1   2012/13
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   2   2013/14
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   3   2014/15
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   4   2015/16
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   5   2016/17
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   1   2012/13
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   2   2013/14
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   3   2014/15
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   4   2015/16
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   5   2016/17
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Authorised absence rate
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Authorised absence rate
    user checks row contains heading  ${row}   Authorised absence rate
    user checks row cell contains text  ${row}   1    4.2
    user checks row cell contains text  ${row}   2    3.5
@@ -125,7 +121,7 @@ Validate Key Statistics data block -- Data tables tab
    user checks row cell contains text  ${row}   4    3.4
    user checks row cell contains text  ${row}   5    3.4
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Unauthorised absence rate
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Unauthorised absence rate
    user checks row contains heading  ${row}   Unauthorised absence rate
    user checks row cell contains text  ${row}   1    1.1
    user checks row cell contains text  ${row}   2    1.1
@@ -133,7 +129,7 @@ Validate Key Statistics data block -- Data tables tab
    user checks row cell contains text  ${row}   4    1.1
    user checks row cell contains text  ${row}   5    1.3
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Overall absence rate
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Overall absence rate
    user checks row contains heading  ${row}   Overall absence rate
    user checks row cell contains text  ${row}   1    5.3
    user checks row cell contains text  ${row}   2    4.5
@@ -143,7 +139,7 @@ Validate Key Statistics data block -- Data tables tab
 
 Validate Key Statistics data block -- Charts tab
    [Tags]  HappyPath
-   user clicks element   css:#releaseHeadlines-dataBlock-charts-tab
+   user clicks element   css:#releaseHeadlines-charts-tab
    user waits until element is visible  css:.recharts-responsive-container
    # TODO: Possible to verify chart?
 

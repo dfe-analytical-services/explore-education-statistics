@@ -28,7 +28,7 @@ const PublicationReleaseHeadlinesSection = ({
   const getChartFile = useGetChartFile(publication.slug, slug);
 
   const summaryTab = (
-    <TabsSection title="Summary">
+    <TabsSection title="Summary" id="releaseHeadlines-summary">
       <KeyStatContainer>
         {keyStatisticsSection.content.map(block => {
           if (block.type !== 'DataBlock') {
@@ -59,13 +59,13 @@ const PublicationReleaseHeadlinesSection = ({
   );
 
   if (!keyStatisticsSecondarySection.content.length) {
-    return <Tabs id="releaseHeadlines-dataBlock">{summaryTab}</Tabs>;
+    return <Tabs id="releaseHeadlines">{summaryTab}</Tabs>;
   }
 
   return (
     <DataBlockTabs
+      id="releaseHeadlines"
       releaseId={id}
-      id="releaseHeadlines-dataBlock"
       getInfographic={getChartFile}
       dataBlock={keyStatisticsSecondarySection.content[0]}
       firstTabs={summaryTab}
