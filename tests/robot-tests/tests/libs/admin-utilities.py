@@ -120,29 +120,12 @@ def user_changes_accordion_section_title(num, new_title):
         raise_assertion_error(f'Cannot close accordion section number "{num}"')
 
 
-def user_gets_editable_accordion_section_element(section_title):
-    try:
-        elem = sl.driver.find_element_by_xpath(
-            f'//*[@data-testid="EditableAccordionSection"][.//button = "{section_title}"]')
-    except:
-        raise_assertion_error(f'Cannot find accordion section titled "{section_title}"')
-    return elem
-
-
-def user_opens_editable_accordion_section(section_elem):
-    try:
-        section_elem.click()
-    except:
-        raise_assertion_error('Cannot click accordion section element')
-
-
 def user_adds_text_block_to_editable_accordion_section(section_elem, timeout=30):
     try:
         elem = section_elem.find_element_by_xpath('.//button[text()="Add text block"]')
     except Exception as e:
         raise_assertion_error(
-            f'Failed to get "Add text block" button element for accordion section element\nException: ',
-            e)
+            f'Failed to get "Add text block" button element for accordion section element\nException: {e}')
 
     max_time = time.time() + timeout
     while (not elem.is_enabled()) and (time.time() < max_time):
@@ -155,8 +138,7 @@ def user_adds_text_block_to_editable_accordion_section(section_elem, timeout=30)
         elem.click()
     except Exception as e:
         raise_assertion_error(
-            f'Failed to click "Add text block" button for accordion section element\nException: {e}',
-            e)
+            f'Failed to click "Add text block" button for accordion section element\nException: {e}')
 
     max_time = time.time() + timeout
     while time.time() < max_time:

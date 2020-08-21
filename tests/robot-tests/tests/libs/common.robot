@@ -279,8 +279,8 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list contains
-    [Arguments]  ${term}    ${description}
-    user waits until element is visible  xpath://dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
+    [Arguments]  ${term}    ${description}   ${wait}=${timeout}
+    user waits until element is visible  xpath://dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]    ${wait}
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}
@@ -305,6 +305,7 @@ user presses keys
 user enters text into element
   [Arguments]   ${selector}   ${text}
   user waits until page contains element  ${selector}
+  user waits until element is visible   ${selector}
   user clears element text  ${selector}
   user clicks element   ${selector}
   user presses keys  ${text}
@@ -324,11 +325,16 @@ user checks page contains link with text and url
 
 user checks page contains details section
   [Arguments]  ${text}
-  user checks page contains element  css:[data-testid="Expand Details Section ${text}"]
+  user checks page contains element  xpath://details/summary//*[text()="${text}"]
 
-user opens details section
+user opens details dropdown
   [Arguments]  ${text}
-  user clicks element    css:[data-testid="Expand Details Section ${text}"]
+  ${elem}=  get webelement  xpath://details/summary//*[text()="${text}"]
+  scroll element into view   ${elem}
+  wait until element is visible   ${elem}
+  wait until element is enabled   ${elem}
+  click element   ${elem}
+  wait until page contains element    xpath://details/summary//*[text()="${text}"]/../../*[@aria-expanded]
 
 user waits until results table appears
   # Extra timeout until EES-234

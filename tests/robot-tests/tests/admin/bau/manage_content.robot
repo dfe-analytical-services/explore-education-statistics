@@ -102,10 +102,11 @@ Add accordion sections to release
 
 Add content block to Test section one
     [Tags]  HappyPath
-    ${section_one}=  user gets editable accordion section element  Test section one
+    user opens accordion section   Test section one
+    ${section_one}=  user gets accordion content element  Test section one
+
     set global variable   ${section_one}   ${section_one}
 
-    user opens editable accordion section   ${section_one}
     user adds text block to editable accordion section   ${section_one}
 
 Add text to newly created content blocks
