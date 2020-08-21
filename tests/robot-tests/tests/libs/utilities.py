@@ -200,11 +200,6 @@ def user_closes_accordion_section(section_text):
         raise_assertion_error(f'Accordion section "{section_text}" should be open!')
 
 
-def user_checks_accordion_section_contains_text(accordion_section_text, text):
-    elem = user_gets_accordion_content_element(accordion_section_text)
-    user_waits_until_parent_contains_element(elem, f'xpath://*[text()="{text}"]')
-
-
 def user_gets_accordion_button_element(accordion_text):
     sl.wait_until_page_contains_element(
         f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')

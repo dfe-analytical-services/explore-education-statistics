@@ -35,15 +35,15 @@ Open "Pupils and schools" accordion section
 Validate "Pupils and schools" section
     [Tags]  HappyPath
     [Documentation]  EES-1577
-    user checks accordion section contains text  Pupils and schools    Admission appeals
-    user checks accordion section contains text  Pupils and schools    Exclusions
-    user checks accordion section contains text  Pupils and schools    Parental responsibility measures
-    user checks accordion section contains text  Pupils and schools    Pupil absence
-    user checks accordion section contains text  Pupils and schools    Pupil projections
-    user checks accordion section contains text  Pupils and schools    School and pupil numbers
-    user checks accordion section contains text  Pupils and schools    School applications
-    user checks accordion section contains text  Pupils and schools    School capacity
-    user checks accordion section contains text  Pupils and schools    Special educational needs (SEN)
+    user waits until accordion section contains text  Pupils and schools    Admission appeals
+    user waits until accordion section contains text  Pupils and schools    Exclusions
+    user waits until accordion section contains text  Pupils and schools    Parental responsibility measures
+    user waits until accordion section contains text  Pupils and schools    Pupil absence
+    user waits until accordion section contains text  Pupils and schools    Pupil projections
+    user waits until accordion section contains text  Pupils and schools    School and pupil numbers
+    user waits until accordion section contains text  Pupils and schools    School applications
+    user waits until accordion section contains text  Pupils and schools    School capacity
+    user waits until accordion section contains text  Pupils and schools    Special educational needs (SEN)
 
 Validate "Pupil absence" details component
     [Tags]  HappyPath

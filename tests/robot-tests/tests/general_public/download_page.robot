@@ -23,7 +23,7 @@ Validate Pupils and schools contains Pupil absence files
     user waits for page to finish loading
     user opens accordion section   Pupils and schools
 
-    user checks accordion section contains text  Pupils and schools   Pupil absence
+    user waits until accordion section contains text  Pupils and schools   Pupil absence
 
 Validate Pupil absence data downloads are available
     [Documentation]  EES-562
@@ -69,7 +69,7 @@ Download All files ZIP
 
 Validate Pupil and schools contains Exclusions files
     [Tags]  HappyPath   NotAgainstLocal
-    user checks accordion section contains text  Pupils and schools   Exclusions
+    user waits until accordion section contains text  Pupils and schools   Exclusions
 
 Validate Exclusions data downloads are available
     [Documentation]  EES-562

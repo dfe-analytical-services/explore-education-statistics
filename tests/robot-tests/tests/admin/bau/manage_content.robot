@@ -23,8 +23,8 @@ Verify Manage content test publication is created
     [Tags]  HappyPath
     user waits until page contains accordion section  ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
-    user checks accordion section contains text  ${PUBLICATION_NAME}    Methodology
-    user checks accordion section contains text  ${PUBLICATION_NAME}    Releases
+    user waits until accordion section contains text  ${PUBLICATION_NAME}    Methodology
+    user waits until accordion section contains text  ${PUBLICATION_NAME}    Releases
 
 Create release
     [Tags]  HappyPath

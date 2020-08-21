@@ -163,6 +163,11 @@ user checks there are x accordion sections
     # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
     page should contain element    xpath:.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")]       limit=${num}
 
+user waits until accordion section contains text
+    [Arguments]  ${section_text}   ${text}
+    ${section}=  user gets accordion content element  ${section_text}
+    user waits until parent contains element   ${section}   xpath://*[text()="${text}"]
+
 user checks element contains
     [Arguments]   ${element}    ${text}
     wait until element contains  ${element}    ${text}
