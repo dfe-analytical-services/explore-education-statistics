@@ -39,7 +39,7 @@ User fills in form
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  Tax Year
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2020
-    user clicks element   css:[data-testid="Ad Hoc"]
+    user clicks radio  Ad Hoc
 
 Click Create new release button
     [Tags]   HappyPath
@@ -72,22 +72,25 @@ Upload subject
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
     user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
 
+Navigate to Footnotes tab
+    [Tags]  HappyPath
+    user clicks link  Footnotes
+    user waits until page contains heading 2  Footnotes
+
 Create subject footnote for new subject
     [Tags]  HappyPath
-    user clicks element  id:footnotes-tab
-    user waits until page contains heading 2  Footnotes
     user waits until page contains element   id:add-footnote-button
     user clicks element   id:add-footnote-button
     user waits until page contains element   xpath://fieldset[@datatest-id="footnote-subject UI test subject"]
-    user clicks element  xpath://fieldset[@datatest-id="footnote-subject UI test subject"]//label[text()="Select all indicators and filters for this subject"]/../input
+    user clicks checkbox  Select all indicators and filters for this subject
     user clicks element   id:create-footnote-form-content
     user presses keys  UI tests subject footnote
     user clicks button   Create footnote
 
 Create indicator footnote for new subject
     [Tags]  HappyPath
-    user waits until page contains element   id:add-footnote-button
-    user clicks element   id:add-footnote-button
+    user waits until page contains element  css:#add-footnote-button
+    user clicks element  css:#add-footnote-button
     user waits until page contains element   xpath://fieldset[@datatest-id="footnote-subject UI test subject"]
     user opens details dropdown  Indicators
     user clicks checkbox  Admission Numbers
@@ -97,8 +100,8 @@ Create indicator footnote for new subject
 
 Create Random Filter Total footnote for new subject
     [Tags]  HappyPath
-    user waits until page contains element   id:add-footnote-button
-    user clicks element   id:add-footnote-button
+    user waits until page contains element  css:#add-footnote-button
+    user clicks element  css:#add-footnote-button
     user waits until page contains element   xpath://fieldset[@datatest-id="footnote-subject UI test subject"]
     user opens details dropdown   Random Filter
     user clicks checkbox   Total
@@ -108,8 +111,8 @@ Create Random Filter Total footnote for new subject
 
 Create Random Filter Select all footnote for new subject
     [Tags]  HappyPath
-    user waits until page contains element   id:add-footnote-button
-    user clicks element   id:add-footnote-button
+    user waits until page contains element  css:#add-footnote-button
+    user clicks element  css:#add-footnote-button
     user waits until page contains element   xpath://fieldset[@datatest-id="footnote-subject UI test subject"]
     user opens details dropdown   Random Filter
     user clicks checkbox   Select all
@@ -125,7 +128,7 @@ Navigate to Manage data blocks tab
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
-    user selects radio    UI test subject
+    user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
     user waits until page contains heading 2   Choose locations
     user checks previous table tool step contains  1    Subject     UI test subject
@@ -144,8 +147,8 @@ Select time period
     [Tags]   HappyPath
     ${timePeriodStartList}=   get list items  id:timePeriodForm-start
     ${timePeriodEndList}=   get list items  id:timePeriodForm-end
-    user selects start date    2019
-    user selects end date      2019
+    user selects from list by label  id:timePeriodForm-start  2019
+    user selects from list by label  id:timePeriodForm-end  2019
     user clicks element     id:timePeriodForm-submit
     user waits until page contains heading 2  Choose your filters
 
@@ -159,14 +162,15 @@ Create table
     user clicks element   id:filtersForm-submit
     user waits until results table appears     180
     user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 for 2019"]
-    user enters text into element  id:dataBlockDetailsForm-name  datablock-name
-    user enters text into element  id:dataBlockDetailsForm-source  datablock-source
+    user enters text into element  id:dataBlockDetailsForm-name         UI test table name
+    user enters text into element  id:dataBlockDetailsForm-heading      UI test table title
+    user enters text into element  id:dataBlockDetailsForm-source       UI test source
     user clicks button   Save data block
-    user waits until page contains element  id:manageDataBlocks-chart-tab
+    user waits until page contains    Delete this data block
 
 Navigate to Create chart tab
     [Tags]  HappyPath
-    user clicks element  xpath://li/a[text()="Chart"]
+    user clicks link  Chart
     user clicks button  Choose an infographic as alternative
     choose file   id:chartConfigurationForm-file       ${CURDIR}${/}files${/}dfe-logo.jpg
     user enters text into element  id:chartConfigurationForm-title  Sample title
@@ -177,11 +181,11 @@ Navigate to Create chart tab
 Navigate back to Manage data tab
     [Tags]  HappyPath
     user clicks link  Manage data
-    user waits until page contains element  id:data-upload-tab
+    user waits until page contains link  Data uploads
 
 Delete UI test subject
     [Tags]  HappyPath
-    user clicks element  id:data-upload-tab
+    user clicks link  Data uploads
     user waits until page contains element  xpath://legend[text()="Add new data to release"]
     user waits until page contains accordion section  UI test subject
     user opens accordion section   UI test subject
@@ -189,8 +193,9 @@ Delete UI test subject
     user waits until page contains heading 1   Confirm deletion of selected data files
     user checks page contains   4 footnotes will be removed or updated.
     user checks page contains   The following data blocks will also be deleted:
-    user checks page contains   datablock-name
+    user checks page contains   UI test table name
     user checks page contains   The following infographic files will also be removed:
     user checks page contains   dfe-logo.jpg
     user clicks button  Confirm
     user waits until page does not contain accordion section   UI test subject
+    user checks page contains element  xpath://legend[text()="Add new data to release"]
