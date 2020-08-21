@@ -150,10 +150,22 @@ user waits until page does not contain accordion section
     [Arguments]   ${section_title}     ${wait}=${timeout}
     user waits until page does not contain element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
 
+user verifies accordion is open
+    [Arguments]  ${section_text}
+    user waits until page contains element   xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="true"]
+
+user verifies accordion is closed
+    [Arguments]  ${section_text}
+    user waits until page contains element   xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="false"]
+
+user checks there are x accordion sections
+    [Arguments]  ${num}
+    # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
+    page should contain element    xpath:.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")]       limit=${num}
+
 user checks element contains
     [Arguments]   ${element}    ${text}
     wait until element contains  ${element}    ${text}
-    element should contain    ${element}    ${text}
 
 user waits until page contains testid
     [Arguments]  ${id}   ${wait}=${timeout}

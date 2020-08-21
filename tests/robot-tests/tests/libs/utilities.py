@@ -170,60 +170,17 @@ def user_should_be_at_top_of_page():
 
 
 def user_checks_accordion_is_in_position(header_starts_with, position):
-    try:
+    elem = sl.get_webelement(
         # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
-        elem = sl.driver.find_element_by_xpath(
-            f'(.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")])[{position}]')
-    except:
-        raise_assertion_error(f"There are less than {position} accordion sections!")
-
+        f'(.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")])[{position}]')
     if not elem.text.strip().startswith(header_starts_with):
         raise_assertion_error(
             f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
 
 
-def user_checks_there_are_x_accordion_sections(num):
-    sl.page_should_contain_element(
-        'xpath:.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")]',
-        limit=num)
-
-
-def user_verifies_accordion_is_open(section_text):
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="true"]')
-    except NoSuchElementException:
-        raise_assertion_error(
-            f'Accordion section "{section_text}" should have attribute aria-expanded="true"')
-
-
-def user_verifies_accordion_is_closed(section_text):
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'Cannot find accordion with header {section_text}')
-
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="false"]')
-    except NoSuchElementException:
-        raise_assertion_error(
-            f'Accordion section "{section_text}" should have attribute aria-expanded="false"')
-
-
 def user_opens_accordion_section(section_text):
     sl.wait_until_page_contains_element(
         f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-
     elem = user_gets_accordion_button_element(section_text)
     if elem.get_attribute('aria-expanded') == "true":
         raise_assertion_error(f'Accordion section "{section_text}" already open!')
