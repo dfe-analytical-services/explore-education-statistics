@@ -272,23 +272,23 @@ Validate basic line chart preview
     user checks chart y axis ticks  id:chartBuilderPreview  0     2500  5000  7500  10000
     user checks chart x axis ticks  id:chartBuilderPreview  2005  2010  2011  2012  2016
 
-    user mouses over line chart point  id:chartBuilderPreview  1
+    user mouses over line chart point  id:chartBuilderPreview  1  1
     user checks chart tooltip label contains  id:chartBuilderPreview  2005
     user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 3,612
 
-    user mouses over line chart point  id:chartBuilderPreview  2
+    user mouses over line chart point  id:chartBuilderPreview  1  2
     user checks chart tooltip label contains  id:chartBuilderPreview  2010
     user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 9,304
 
-    user mouses over line chart point  id:chartBuilderPreview  3
+    user mouses over line chart point  id:chartBuilderPreview  1  3
     user checks chart tooltip label contains  id:chartBuilderPreview  2011
     user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 9,603
 
-    user mouses over line chart point  id:chartBuilderPreview  4
+    user mouses over line chart point  id:chartBuilderPreview  1  4
     user checks chart tooltip label contains  id:chartBuilderPreview  2012
     user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 8,150
 
-    user mouses over line chart point  id:chartBuilderPreview  5
+    user mouses over line chart point  id:chartBuilderPreview  1  5
     user checks chart tooltip label contains  id:chartBuilderPreview  2016
     user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 4,198
 
@@ -311,23 +311,23 @@ Save and validate line chart embeds correctly
     user checks chart y axis ticks  ${datablock}  0     2500  5000  7500  10000
     user checks chart x axis ticks  ${datablock}  2005  2010  2011  2012  2016
 
-    user mouses over line chart point  ${datablock}  1
+    user mouses over line chart point  ${datablock}  1  1
     user checks chart tooltip label contains  ${datablock}  2005
     user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 3,612
 
-    user mouses over line chart point  ${datablock}  2
+    user mouses over line chart point  ${datablock}  1  2
     user checks chart tooltip label contains  ${datablock}  2010
     user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 9,304
 
-    user mouses over line chart point  ${datablock}  3
+    user mouses over line chart point  ${datablock}  1  3
     user checks chart tooltip label contains  ${datablock}  2011
     user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 9,603
 
-    user mouses over line chart point  ${datablock}  4
+    user mouses over line chart point  ${datablock}  1  4
     user checks chart tooltip label contains  ${datablock}  2012
     user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 8,150
 
-    user mouses over line chart point  ${datablock}  5
+    user mouses over line chart point  ${datablock}  1  5
     user checks chart tooltip label contains  ${datablock}  2016
     user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 4,198
 
