@@ -1,9 +1,8 @@
 import styles from '@admin/pages/release/datablocks/components/ChartAxisConfiguration.module.scss';
 import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
-import ChartBuilderSaveButton from '@admin/pages/release/datablocks/components/ChartBuilderSaveButton';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
 import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
-import ButtonGroup from '@common/components/ButtonGroup';
 import Effect from '@common/components/Effect';
 import {
   Form,
@@ -639,18 +638,16 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          <ButtonGroup>
-            <ChartBuilderSaveButton
-              disabled={isSaving}
-              formId={id}
-              forms={forms}
-              showSubmitError={
-                form.isValid && form.submitCount > 0 && !canSaveChart
-              }
-            />
-
+          <ChartBuilderSaveActions
+            disabled={isSaving}
+            formId={id}
+            forms={forms}
+            showSubmitError={
+              form.isValid && form.submitCount > 0 && !canSaveChart
+            }
+          >
             {buttons}
-          </ButtonGroup>
+          </ChartBuilderSaveActions>
         </Form>
       )}
     </Formik>

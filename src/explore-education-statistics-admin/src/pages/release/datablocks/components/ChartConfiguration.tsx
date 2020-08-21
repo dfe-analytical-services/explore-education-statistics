@@ -1,10 +1,9 @@
 import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
-import ChartBuilderSaveButton from '@admin/pages/release/datablocks/components/ChartBuilderSaveButton';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
 import {
   ChartOptions,
   FormState,
 } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
-import ButtonGroup from '@common/components/ButtonGroup';
 import Effect from '@common/components/Effect';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
@@ -313,18 +312,16 @@ const ChartConfiguration = ({
               </>
             )}
 
-            <ButtonGroup>
-              <ChartBuilderSaveButton
-                disabled={isSaving}
-                formId={formId}
-                forms={forms}
-                showSubmitError={
-                  form.isValid && form.submitCount > 0 && !canSaveChart
-                }
-              />
-
+            <ChartBuilderSaveActions
+              disabled={isSaving}
+              formId={formId}
+              forms={forms}
+              showSubmitError={
+                form.isValid && form.submitCount > 0 && !canSaveChart
+              }
+            >
               {buttons}
-            </ButtonGroup>
+            </ChartBuilderSaveActions>
           </Form>
         );
       }}

@@ -1,10 +1,12 @@
 import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import ErrorSummary from '@common/components/ErrorSummary';
 import { Dictionary } from '@common/types';
-import React, { MouseEventHandler } from 'react';
+import React, { MouseEventHandler, ReactNode } from 'react';
 
 interface Props {
+  children?: ReactNode;
   disabled?: boolean;
   formId: string;
   forms: Dictionary<ChartBuilderForm>;
@@ -12,7 +14,8 @@ interface Props {
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
-const ChartBuilderSaveButton = ({
+const ChartBuilderSaveActions = ({
+  children,
   disabled,
   formId,
   forms,
@@ -58,16 +61,20 @@ const ChartBuilderSaveButton = ({
         }}
       />
 
-      <Button
-        type="submit"
-        id={`${formId}-submit`}
-        disabled={disabled}
-        onClick={onClick}
-      >
-        Save chart options
-      </Button>
+      <ButtonGroup>
+        <Button
+          type="submit"
+          id={`${formId}-submit`}
+          disabled={disabled}
+          onClick={onClick}
+        >
+          Save chart options
+        </Button>
+
+        {children}
+      </ButtonGroup>
     </>
   );
 };
 
-export default ChartBuilderSaveButton;
+export default ChartBuilderSaveActions;
