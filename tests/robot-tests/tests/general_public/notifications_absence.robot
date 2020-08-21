@@ -30,11 +30,11 @@ Go to Notify me page for Absence publication
     user waits until page contains title caption  Notify me     180
     user waits until page contains heading 1  Pupil absence in schools in England
 
-    user checks element count is x      css:[data-testid="breadcrumbs--list"] li     4
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Find statistics and data
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(3)   Pupil absence in schools in England
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(4)   Notify me
+    user checks breadcrumb count should be  4
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Find statistics and data
+    user checks nth breadcrumb contains  3   Pupil absence in schools in England
+    user checks nth breadcrumb contains  4   Notify me
 
 Sign up for email alerts
     [Tags]  HappyPath   NotAgainstPreProd

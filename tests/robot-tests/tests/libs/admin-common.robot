@@ -19,8 +19,10 @@ user signs in as bau1
   user waits until page contains heading 1   Dashboard
   user waits until page contains title caption  Welcome Bau1
   user waits until page contains element   css:#selectTheme   180
-  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
-  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
+
+  user checks breadcrumb count should be  2
+  user checks nth breadcrumb contains  1   Home
+  user checks nth breadcrumb contains  2   Administrator dashboard
 
 user signs in as analyst1
   user opens the browser
@@ -38,8 +40,10 @@ user signs in as analyst1
   user waits until page contains heading 1  Dashboard
   user waits until page contains title caption  Welcome Analyst1
   user waits until page contains element   css:#selectTheme   180
-  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
-  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
+
+  user checks breadcrumb count should be  2
+  user checks nth breadcrumb contains  1   Home
+  user checks nth breadcrumb contains  2   Administrator dashboard
 
 user selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until page contains element  id:my-publications-tab   60
