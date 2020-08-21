@@ -102,13 +102,13 @@ Navigate to Manage data blocks tab
     user clicks link    Manage data blocks
     user waits until page contains heading 2   Choose a subject
 
-Select subject "${SUBJECT_NAME}"
+Select subject "${SUBJECT_NAME}" (data block)
     [Tags]  HappyPath
     user waits until page contains   ${SUBJECT_NAME}
     user clicks radio    ${SUBJECT_NAME}
     user clicks element   css:#publicationSubjectForm-submit
 
-Select locations
+Select locations (data block)
     [Tags]   HappyPath
     user waits until page contains heading 2  Choose locations
     user opens details dropdown   National
@@ -122,12 +122,12 @@ Select time period
     user selects from list by label  id:timePeriodForm-end      2021 Week 24
     user clicks element     css:#timePeriodForm-submit
 
-Select indicators
+Select indicators (data block)
     [Tags]  HappyPath
     user waits until page contains heading 2  Choose your filters
     user clicks button  Select all 2 subgroup options
 
-Select category filters
+Select category filters (data block)
     [Tags]  HappyPath
     user opens details dropdown  Date
     user clicks category checkbox    Date  01/04/2020
@@ -135,12 +135,12 @@ Select category filters
     user clicks category checkbox    Date  01/04/2021
     user checks category checkbox is checked  Date  01/04/2021
 
-Create table
+Create table (data block)
     [Tags]  HappyPath
     user clicks element   css:#filtersForm-submit
     user waits until results table appears     180
 
-Check footnotes in table preview
+Check footnotes in table preview (data block)
     user checks page contains  ${FOOTNOTE_TEXT_1}
     user checks page contains  ${FOOTNOTE_TEXT_2}
 
@@ -291,32 +291,32 @@ Choose publication
     user clicks radio  ${PUBLICATION_NAME}
     user clicks button  Next step
 
-Choose subject
+Choose subject (table tool)
     [Tags]  HappyPath
     user waits until page contains   ${SUBJECT_NAME}
     user clicks radio  ${SUBJECT_NAME}
     user clicks button  Next step
 
-Select locations
+Select locations (table tool)
     [Tags]   HappyPath
     user waits until page contains heading 2  Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
     user clicks element     css:#locationFiltersForm-submit
 
-Select time period
+Select time period (table tool)
     [Tags]   HappyPath
     user waits until page contains heading 2  Choose time period
     user selects from list by label  id:timePeriodForm-start    2020 Week 13
     user selects from list by label  id:timePeriodForm-end      2021 Week 24
     user clicks element     css:#timePeriodForm-submit
 
-Select indicators
+Select indicators (table tool)
     [Tags]  HappyPath
     user waits until page contains heading 2  Choose your filters
     user clicks button  Select all 2 subgroup options
 
-Select category filters
+Select category filters (table tool)
     [Tags]  HappyPath
     user opens details dropdown  Date
     user clicks category checkbox    Date  01/04/2020
@@ -324,12 +324,12 @@ Select category filters
     user clicks category checkbox    Date  01/04/2021
     user checks category checkbox is checked  Date  01/04/2021
 
-Create table
+Create table (table tool)
     [Tags]  HappyPath
     user clicks element   css:#filtersForm-submit
     user waits until results table appears     180
 
-Check footnotes in table preview
+Check footnotes in table preview (table tool)
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
