@@ -89,7 +89,7 @@ Create another footnote
     user clicks button  Create footnote
 
 Confirm created footnotes
-    [tags]  HappyPath
+    [Tags]  HappyPath
     user waits until page contains  ${FOOTNOTE_TEXT_1}
     user waits until page contains  ${FOOTNOTE_TEXT_2}
 
@@ -152,7 +152,7 @@ Save data block
     user waits until page contains element  xpath://h2[text()="${FOOTNOTE_DATABLOCK_NAME}"]
 
 Go back and delete a footnote
-    [tags]  HappyPath
+    [Tags]  HappyPath
     user clicks link  Manage data
     user clicks link  Footnotes
     user clicks button  Delete
@@ -161,7 +161,7 @@ Go back and delete a footnote
     user checks page contains  ${FOOTNOTE_TEXT_2}
 
 Add data block to release
-    [tags]  HappyPath
+    [Tags]  HappyPath
     user clicks link  Manage content
     user clicks button  Add secondary stats
     user waits until page contains element  secondaryStats-dataBlockSelectForm-selectedDataBlock
@@ -173,7 +173,7 @@ Add data block to release
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
 Edit footnote
-    [tags]  HappyPath
+    [Tags]  HappyPath
     user clicks link  Manage data
     user waits until page contains link  Footnotes
     user clicks link  Footnotes
@@ -185,16 +185,19 @@ Edit footnote
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
 
 Check footnote was updated
-    [tags]  HappyPath
+    [Tags]  HappyPath
     user clicks link  Manage content
+    user waits until page contains element  css:#releaseHeadlines
+    user scrolls to element  css:#releaseHeadlines
     user waits until page contains link  Table  180
     user clicks link  Table
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
+
 Check footnote in Preview content mode
-    [tags]  HappyPath
+    [Tags]  HappyPath
     user clicks element   css:#pageMode-preview
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
