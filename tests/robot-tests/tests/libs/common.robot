@@ -152,11 +152,11 @@ user waits until page does not contain accordion section
 
 user verifies accordion is open
     [Arguments]  ${section_text}
-    user waits until page contains element   xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="true"]
+    user waits until page contains element   xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="true"]
 
 user verifies accordion is closed
     [Arguments]  ${section_text}
-    user waits until page contains element   xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="false"]
+    user waits until page contains element   xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="false"]
 
 user checks there are x accordion sections
     [Arguments]  ${num}

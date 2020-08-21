@@ -344,7 +344,7 @@ try:
         else:
             pabot_run_cli(robotArgs)
 finally:
-    if args.disable_teardown is not True:
+    if not args.disable_teardown:
         print("Tearing down tests...", flush=True)
         delete_test_topic()
 

@@ -172,7 +172,7 @@ def user_should_be_at_top_of_page():
 def user_checks_accordion_is_in_position(header_starts_with, position):
     elem = sl.get_webelement(
         # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
-        f'(.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")])[{position}]')
+        f'xpath:(.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")])[{position}]')
     if not elem.text.strip().startswith(header_starts_with):
         raise_assertion_error(
             f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
