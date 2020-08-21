@@ -20,11 +20,11 @@ Go to permalink
 
 Validate breadcrumbs
     [Tags]  HappyPath
-    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     4
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Data tables
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(3)   Permanent link
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(4)   'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
+    user checks breadcrumb count should be  4
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Data tables
+    user checks nth breadcrumb contains  3   Permanent link
+    user checks nth breadcrumb contains  4   'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
 
 Validate miscellaneous
     [Tags]  HappyPath
@@ -34,9 +34,9 @@ Validate miscellaneous
 
 Validate table
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   2013/14
-    user checks results table column heading contains  css:table  1   2   2014/15
-    user checks results table column heading contains  css:table  1   3   2015/16
+    user checks table column heading contains  css:table  1   1   2013/14
+    user checks table column heading contains  css:table  1   2   2014/15
+    user checks table column heading contains  css:table  1   3   2015/16
 
     ${row}=  user gets row with group and indicator   xpath://table  England   Number of fixed period exclusions
     user checks row contains heading  ${row}  Number of fixed period exclusions

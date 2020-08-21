@@ -427,3 +427,11 @@ user checks category checkbox is checked
 user clicks select all for category
     [Arguments]  ${category_label}
     user clicks element  xpath://legend[text()="{category_label}"]/..//button[contains(text(), "Select")]
+
+user checks breadcrumb count should be
+    [Arguments]  ${count}
+    page should contain element  css:[data-testid="breadcrumbs--list"] li   limit=${count}
+
+user checks nth breadcrumb contains
+    [Arguments]   ${num}   ${text}
+    user checks element should contain   css:[data-testid="breadcrumbs--list"] li:nth-child(${num})   ${text}

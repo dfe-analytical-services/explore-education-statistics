@@ -84,9 +84,9 @@ Navigate to Prerelease page
 Validate Prerelease page is displayed
     [Tags]  HappyPath
     user waits until page contains heading 1  Pre Release access is not yet available
-    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Pre Release access
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre Release access
 
 Validate Prerelease page displays correct message
     [Tags]  HappyPath   NotAgainstLocal
