@@ -23,8 +23,7 @@ Go to Create publication page for "UI tests topic" topic
 Verify that new publication has been created
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button   ${PUBLICATION_NAME}
-    user checks page contains accordion   ${PUBLICATION_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     user checks testid element contains  Methodology for ${PUBLICATION_NAME}  No methodology assigned
     user checks testid element contains  Releases for ${PUBLICATION_NAME}  No releases created

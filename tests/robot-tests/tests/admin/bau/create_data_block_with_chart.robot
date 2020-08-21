@@ -24,7 +24,7 @@ Create test publication
 
 Verify test publication is created
     [Tags]  HappyPath
-    user checks page contains accordion  ${PUBLICATION_NAME}
+    user waits until page contains accordion section  ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     user checks accordion section contains text  ${PUBLICATION_NAME}    Methodology
     user checks accordion section contains text  ${PUBLICATION_NAME}    Releases

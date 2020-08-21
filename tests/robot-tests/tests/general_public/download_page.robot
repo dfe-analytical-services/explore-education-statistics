@@ -19,7 +19,7 @@ Navigate to /download-data page
 Validate Pupils and schools contains Pupil absence files
     [Documentation]  EES-562
     [Tags]  HappyPath   NotAgainstLocal
-    user checks page contains accordion   Pupils and schools
+    user waits until page contains accordion section   Pupils and schools
     user waits for page to finish loading
     user opens accordion section   Pupils and schools
 

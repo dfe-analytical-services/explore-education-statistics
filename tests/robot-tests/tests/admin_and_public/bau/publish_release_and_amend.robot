@@ -85,7 +85,7 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user checks page contains accordion   Test theme
+    user waits until page contains accordion section   Test theme
     user opens accordion section  Test theme
     user checks accordion section contains text   Test theme   ${TOPIC_NAME}
 
@@ -263,7 +263,7 @@ Go back to public find-statistics page
 
 Verify amendment is on Find Statistics page again
     [Tags]  HappyPath
-    user checks page contains accordion   Test theme
+    user waits until page contains accordion section   Test theme
     user opens accordion section  Test theme
     user checks accordion section contains text   Test theme   ${TOPIC_NAME}
 

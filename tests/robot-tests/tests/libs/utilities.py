@@ -169,15 +169,6 @@ def user_should_be_at_top_of_page():
             f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
 
-def user_checks_page_contains_accordion(accordion_heading):
-    try:
-        sl.wait_until_page_contains_element(
-            f'xpath://*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
-        # sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
-    except:
-        raise_assertion_error(f"Accordion with heading '{accordion_heading}' not found!'")
-
-
 def user_checks_accordion_is_in_position(header_starts_with, position):
     try:
         # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...

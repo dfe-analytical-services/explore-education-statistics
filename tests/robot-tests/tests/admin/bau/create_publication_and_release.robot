@@ -58,8 +58,7 @@ User redirects to the dashboard after saving publication
 Verify that new publication has been created
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button   ${PUBLICATION_NAME} (created)
-    user checks page contains accordion   ${PUBLICATION_NAME} (created)
+    user waits until page contains accordion section   ${PUBLICATION_NAME} (created)
     user opens accordion section  ${PUBLICATION_NAME} (created)
     user checks testid element contains  Team name for ${PUBLICATION_NAME} (created)  Post-16 statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME} (created)  post16.statistics@education.gov.uk
@@ -90,8 +89,7 @@ Verify publication has been updated
     [Tags]  HappyPath
     user waits until page contains heading 1  Dashboard
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button   ${PUBLICATION_NAME}
-    user checks page contains accordion   ${PUBLICATION_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     user checks testid element contains  Team name for ${PUBLICATION_NAME}  Special educational needs statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME}  sen.statistics@education.gov.uk

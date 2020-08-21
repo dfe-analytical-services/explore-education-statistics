@@ -18,15 +18,15 @@ Navigate to Find Statistics page
 
 Validate accordion sections exist
     [Tags]  HappyPath
-    user checks page contains accordion  Children, early years and social care
-    user checks page contains accordion  Destination of pupils and students
-    user checks page contains accordion  Finance and funding
-    user checks page contains accordion  Further education
-    user checks page contains accordion  Higher education
-    user checks page contains accordion  Pupils and schools
-    user checks page contains accordion  School and college outcomes and performance
-    user checks page contains accordion  Teachers and school workforce
-    user checks page contains accordion  UK education and training statistics
+    user waits until page contains accordion section  Children, early years and social care
+    user waits until page contains accordion section  Destination of pupils and students
+    user waits until page contains accordion section  Finance and funding
+    user waits until page contains accordion section  Further education
+    user waits until page contains accordion section  Higher education
+    user waits until page contains accordion section  Pupils and schools
+    user waits until page contains accordion section  School and college outcomes and performance
+    user waits until page contains accordion section  Teachers and school workforce
+    user waits until page contains accordion section  UK education and training statistics
 
 Open "Pupils and schools" accordion section
     [Tags]  HappyPath
