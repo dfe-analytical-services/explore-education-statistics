@@ -59,3 +59,4 @@ Delete file
     user waits until page contains heading 1   Confirm deletion of file
     user clicks button  Confirm
     user waits until page does not contain accordion section   dfe logo
+    user checks page contains  File uploads
