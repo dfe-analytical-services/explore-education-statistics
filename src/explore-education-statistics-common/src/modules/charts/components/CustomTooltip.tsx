@@ -24,7 +24,7 @@ const CustomTooltip = ({
   }, [dataSetCategories, label]);
 
   return (
-    <div className={styles.tooltip}>
+    <div className={styles.tooltip} data-testid="chartTooltip">
       <p className="govuk-!-font-weight-bold" data-testid="chartTooltip-label">
         {tooltipLabel}
       </p>

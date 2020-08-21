@@ -350,7 +350,7 @@ const ChartBuilder = ({
         Delete chart
       </Button>
     ),
-    [toggleDeleteModal.on],
+    [isDeleting, toggleDeleteModal.on],
   );
 
   return (

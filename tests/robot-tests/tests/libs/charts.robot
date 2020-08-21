@@ -34,6 +34,14 @@ user waits until element does not contain infographic chart
     [Arguments]  ${locator}
     user waits until parent contains element  ${locator}  css:img
 
+user waits until element contains chart tooltip
+    [Arguments]  ${locator}
+    user waits until parent contains element  ${locator}  css:[data-testid="chartTooltip"]
+
+user waits until element does not contain chart tooltip
+    [Arguments]  ${locator}
+    user waits until parent does not contain element  ${locator}  css:[data-testid="chartTooltip"]
+
 user checks chart title contains
     [Arguments]  ${locator}  ${text}
     user waits until parent contains element  ${locator}  xpath://figcaption[text()="${text}"]
@@ -72,9 +80,9 @@ user checks chart x axis ticks
     END
 
 user mouses over line chart point
-    [Arguments]  ${locator}  ${number}
-    user waits until parent contains element  ${locator}  css:.recharts-line-dots .recharts-symbols:nth-of-type(${number})
-    ${element}=  get child element  ${locator}  css:.recharts-line-dots .recharts-symbols:nth-of-type(${number})
+    [Arguments]  ${locator}  ${line}  ${number}
+    user waits until parent contains element  ${locator}  css:.recharts-line-dots:nth-of-type(${line}) .recharts-symbols:nth-of-type(${number})
+    ${element}=  get child element  ${locator}  css:.recharts-line-dots:nth-of-type(${line}) .recharts-symbols:nth-of-type(${number})
     user waits until element is visible  ${element}
     user mouses over element  ${element}
 

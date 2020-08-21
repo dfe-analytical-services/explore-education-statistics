@@ -36,33 +36,6 @@ def cookie_names_should_be_on_page():
             raise_assertion_error(f"Page should contain text \"{cookie['name']}\"!")
 
 
-def user_checks_key_stat_tile_contents(tile_title, tile_value, tile_context):
-    try:
-        elem = sl.driver.find_element_by_xpath(
-            f'.//*[@data-testid="keyStatTile-title" and contains(text(), "{tile_title}")]')
-    except NoSuchElementException:
-        raise_assertion_error(f'Cannot find key stats tile "{tile_title}"')
-
-    try:
-        elem.find_element_by_xpath(f'../p[text()="{tile_value}"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'Cannot find key stat tile "{tile_title}" with value "{tile_value}"')
-
-    try:
-        elem.find_element_by_xpath(f'../p[text()="{tile_context}"]')
-    except NoSuchElementException:
-        raise_assertion_error(
-            f'Cannot find key stat tile "{tile_title}" with context "{tile_context}"')
-
-
-def user_checks_key_stat_bullet_exists(bullet_text):
-    elem = sl.driver.find_element_by_xpath('.//*[@id="releaseHeadlines-dataBlock-1"]')
-    try:
-        elem.find_element_by_xpath(f'.//li[text()="{bullet_text}"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'Cannot find KeyStat summary bullet "{bullet_text}"')
-
-
 def user_checks_number_of_other_releases_is_correct(number):
     elems = sl.driver.find_elements_by_xpath('(.//*[@data-testid="other-release-item"])')
     if len(elems) != int(number):

@@ -14,6 +14,7 @@ interface Props {
   collapseAfter?: number;
   isCollapsed?: boolean;
   listStyle?: 'none' | 'number' | 'bullet';
+  testId?: string;
 }
 
 const CollapsibleList = ({
@@ -21,6 +22,7 @@ const CollapsibleList = ({
   collapseAfter = 5,
   isCollapsed = true,
   listStyle = 'none',
+  testId,
 }: Props) => {
   const [collapsed, toggleCollapsed] = useToggle(isCollapsed);
 
@@ -49,9 +51,13 @@ const CollapsibleList = ({
   return (
     <>
       {listStyle === 'number' ? (
-        <ol className={listClasses}>{listItems}</ol>
+        <ol className={listClasses} data-testid={testId}>
+          {listItems}
+        </ol>
       ) : (
-        <ul className={listClasses}>{listItems}</ul>
+        <ul className={listClasses} data-testid={testId}>
+          {listItems}
+        </ul>
       )}
 
       {collapsedCount > 0 && (

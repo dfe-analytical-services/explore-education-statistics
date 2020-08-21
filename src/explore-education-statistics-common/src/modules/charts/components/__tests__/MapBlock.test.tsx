@@ -181,11 +181,11 @@ describe('MapBlock', () => {
       },
     });
 
-    const tiles = getAllByTestId('mapBlock-indicatorTile');
+    const indicators = getAllByTestId('mapBlock-indicator');
 
-    expect(tiles).toHaveLength(2);
+    expect(indicators).toHaveLength(2);
 
-    const tile1 = within(tiles[0]);
+    const tile1 = within(indicators[0]);
 
     expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
@@ -194,7 +194,7 @@ describe('MapBlock', () => {
       '3%',
     );
 
-    const tile2 = within(tiles[1]);
+    const tile2 = within(indicators[1]);
 
     expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Overall absence rate (2016/17)',

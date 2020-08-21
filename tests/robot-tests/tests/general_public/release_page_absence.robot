@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../libs/public-common.robot
+Resource    ../libs/charts.robot
 
 Force Tags  GeneralPublic  Local  Dev  Test  Preprod
 
@@ -87,37 +88,79 @@ Validate absence_in_prus.csv file can be downloaded
 
     user closes details dropdown     Download data files
 
-Validate Key Statistics data block -- Summary tab
+Validate headlines -- Summary tab key stats
     [Documentation]  DFE-915   EES-806   EES-1508
     [Tags]  HappyPath
-    user waits until page contains element   xpath://h3[text()="Overall absence rate"]    90
-    user waits until page contains element   xpath://h3[text()="Authorised absence rate"]    90
-    user waits until page contains element   xpath://h3[text()="Unauthorised absence rate"]    90
+    user checks key stat contents   1  Overall absence rate         4.7%   Up from 4.6% in 2015/16
+    user checks key stat contents   2  Authorised absence rate      3.4%   Similar to previous years
+    user checks key stat contents   3  Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
 
-    user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
-    user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
-    user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
-
-Validate Key Statistics headline content block
+Validate headlines -- Summary tab content
     [Documentation]    EES-718
     [Tags]  HappyPath  NotAgainstPreProd
-    user checks key stat bullet exists   pupils missed on average 8.2 school days
-    user checks key stat bullet exists   overall and unauthorised absence rates up on 2015/16
-    user checks key stat bullet exists   unauthorised absence rise due to higher rates of unauthorised holidays
-    user checks key stat bullet exists   10% of pupils persistently absent during 2016/17
+    user checks headline summary contains   pupils missed on average 8.2 school days
+    user checks headline summary contains   overall and unauthorised absence rates up on 2015/16
+    user checks headline summary contains   unauthorised absence rise due to higher rates of unauthorised holidays
+    user checks headline summary contains   10% of pupils persistently absent during 2016/17
+
+Validate Key Statistics data block -- Charts tab
+    [Tags]  HappyPath
+    user clicks element   id:releaseHeadlines-charts-tab
+    ${headline_chart}=  set variable  css:#releaseHeadlines-chart
+    user waits until element contains line chart  ${headline_chart}
+    user checks chart legend item contains  ${headline_chart}  1  Unauthorised absence rate (England)
+    user checks chart legend item contains  ${headline_chart}  2  Authorised absence rate (England)
+    user checks chart legend item contains  ${headline_chart}  3  Overall absence rate (England)
+
+    user checks chart x axis ticks  ${headline_chart}  2012/13  2013/14  2014/15  2015/16  2016/17
+    user checks chart y axis ticks  ${headline_chart}  0  2  4  6
+
+    user mouses over line chart point  ${headline_chart}  1  1
+    user checks chart tooltip label contains  ${headline_chart}  2012/13
+    user checks chart tooltip item contains  ${headline_chart}  1  Overall absence rate (England): 5.3%
+    user checks chart tooltip item contains  ${headline_chart}  2  Authorised absence rate (England): 4.2%
+    user checks chart tooltip item contains  ${headline_chart}  3  Unauthorised absence rate (England): 1.1%
+
+    user mouses over line chart point  ${headline_chart}  1  2
+    user checks chart tooltip label contains  ${headline_chart}  2013/14
+    user checks chart tooltip item contains  ${headline_chart}  1  Overall absence rate (England): 4.5%
+    user checks chart tooltip item contains  ${headline_chart}  2  Authorised absence rate (England): 3.5%
+    user checks chart tooltip item contains  ${headline_chart}  3  Unauthorised absence rate (England): 1.1%
+
+    user mouses over line chart point  ${headline_chart}  1  3
+    user checks chart tooltip label contains  ${headline_chart}  2014/15
+    user checks chart tooltip item contains  ${headline_chart}  1  Overall absence rate (England): 4.6%
+    user checks chart tooltip item contains  ${headline_chart}  2  Authorised absence rate (England): 3.5%
+    user checks chart tooltip item contains  ${headline_chart}  3  Unauthorised absence rate (England): 1.1%
+
+    user mouses over line chart point  ${headline_chart}  1  4
+    user checks chart tooltip label contains  ${headline_chart}  2015/16
+    user checks chart tooltip item contains  ${headline_chart}  1  Overall absence rate (England): 4.6%
+    user checks chart tooltip item contains  ${headline_chart}  2  Authorised absence rate (England): 3.4%
+    user checks chart tooltip item contains  ${headline_chart}  3  Unauthorised absence rate (England): 1.1%
+
+    user mouses over line chart point  ${headline_chart}  1  5
+    user checks chart tooltip label contains  ${headline_chart}  2016/17
+    user checks chart tooltip item contains  ${headline_chart}  1  Overall absence rate (England): 4.7%
+    user checks chart tooltip item contains  ${headline_chart}  2  Authorised absence rate (England): 3.4%
+    user checks chart tooltip item contains  ${headline_chart}  3  Unauthorised absence rate (England): 1.3%
+
+    user checks element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(1)  Absence rates are the number of absence sessions expressed
+    user checks element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(2)  There may be discrepancies between totals and the sum of constituent parts
+    user checks element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(3)  x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
 
 Validate Key Statistics data block -- Data tables tab
    [Tags]  HappyPath
-   user clicks element   css:#releaseHeadlines-dataBlock-tables-tab
+   user clicks element   css:#releaseHeadlines-tables-tab
    user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
 
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   1   2012/13
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   2   2013/14
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   3   2014/15
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   4   2015/16
-   user checks table column heading contains  css:#releaseHeadlines-dataBlock-tables table  1   5   2016/17
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   1   2012/13
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   2   2013/14
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   3   2014/15
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   4   2015/16
+   user checks table column heading contains  css:#releaseHeadlines-tables table  1   5   2016/17
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Authorised absence rate
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Authorised absence rate
    user checks row contains heading  ${row}   Authorised absence rate
    user checks row cell contains text  ${row}   1    4.2
    user checks row cell contains text  ${row}   2    3.5
@@ -125,7 +168,7 @@ Validate Key Statistics data block -- Data tables tab
    user checks row cell contains text  ${row}   4    3.4
    user checks row cell contains text  ${row}   5    3.4
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Unauthorised absence rate
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Unauthorised absence rate
    user checks row contains heading  ${row}   Unauthorised absence rate
    user checks row cell contains text  ${row}   1    1.1
    user checks row cell contains text  ${row}   2    1.1
@@ -133,19 +176,13 @@ Validate Key Statistics data block -- Data tables tab
    user checks row cell contains text  ${row}   4    1.1
    user checks row cell contains text  ${row}   5    1.3
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-dataBlock-tables table   England   Overall absence rate
+   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Overall absence rate
    user checks row contains heading  ${row}   Overall absence rate
    user checks row cell contains text  ${row}   1    5.3
    user checks row cell contains text  ${row}   2    4.5
    user checks row cell contains text  ${row}   3    4.6
    user checks row cell contains text  ${row}   4    4.6
    user checks row cell contains text  ${row}   5    4.7
-
-Validate Key Statistics data block -- Charts tab
-   [Tags]  HappyPath
-   user clicks element   css:#releaseHeadlines-dataBlock-charts-tab
-   user waits until element is visible  css:.recharts-responsive-container
-   # TODO: Possible to verify chart?
 
 Validate accordion sections order
     [Tags]  HappyPath
@@ -199,7 +236,53 @@ Validate Regional and local authority (LA) breakdown table
     user checks row contains heading  ${row}   Unauthorised absence rate
     user checks row cell contains text  ${row}   1    1.7%
 
-    #TODO: More
+Validate Regional and local authority (LA) breakdown chart
+    [Tags]  HappyPath
+    user opens accordion section  Regional and local authority (LA) breakdown
+
+    ${datablock}=  set variable  css:[data-testid="Data block - Generic data block - LA"]
+    user waits until element contains map chart  ${datablock}
+
+    user selects from list by label  ${datablock} select[name="selectedLocation"]  Vale of White Horse
+    user waits until element does not contain chart tooltip  ${datablock}
+
+    user mouses over selected map feature  ${datablock}
+    user checks chart tooltip label contains  ${datablock}  Vale of White Horse
+    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate (2016/17): 0.9%
+    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate (2016/17): 4.3%
+    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate (2016/17): 3.4%
+
+    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate (2016/17)  0.9%
+    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate (2016/17)  4.3%
+    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate (2016/17)  3.4%
+
+    user mouses over element  ${datablock} select[name="selectedLocation"]
+    user selects from list by label  ${datablock} select[name="selectedLocation"]  Harlow
+    user waits until element does not contain chart tooltip  ${datablock}
+
+    user mouses over selected map feature  ${datablock}
+    user checks chart tooltip label contains  ${datablock}  Harlow
+    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate (2016/17): 1.1%
+    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate (2016/17): 4.2%
+    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate (2016/17): 3.1%
+
+    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate (2016/17)  1.1%
+    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate (2016/17)  4.2%
+    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate (2016/17)  3.1%
+
+    user mouses over element  ${datablock} select[name="selectedLocation"]
+    user selects from list by label  ${datablock} select[name="selectedLocation"]  Newham
+    user waits until element does not contain chart tooltip  ${datablock}
+
+    user mouses over selected map feature  ${datablock}
+    user checks chart tooltip label contains  ${datablock}  Newham
+    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate (2016/17): 1.7%
+    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate (2016/17): 4.4%
+    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate (2016/17): 2.7%
+
+    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate (2016/17)  1.7%
+    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate (2016/17)  4.4%
+    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate (2016/17)  2.7%
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898
