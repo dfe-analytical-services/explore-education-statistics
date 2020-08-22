@@ -160,14 +160,65 @@ user checks footnote checkbox is selected
     wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
     checkbox should be selected     xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
 
+user opens nth editable accordion section
+    [Arguments]  ${section_num}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
+    ${section}=  get child element  ${parent}  xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
+    ${header_button}=  get child element  ${section}  css:h2 > button[aria-expanded]
+    ${is_expanded}=  get element attribute  ${header_button}  aria-expanded
+    run keyword if  '${is_expanded}' != 'true'  user clicks element  ${header_button}
+    user checks element attribute value should be  ${header_button}  aria-expanded  true
+
+user changes accordion section title
+    [Arguments]  ${section_num}  ${title}  ${parent}=id:releaseContentAccordion
+    user opens nth editable accordion section  ${section_num}  ${parent}
+    ${section}=  get child element  ${parent}  xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
+    user clicks button  Edit section title  ${section}
+    user waits until parent contains element  ${section}  css:input[name="heading"]
+    ${input}=  get child element  ${section}  css:input[name="heading"]
+    user enters text into element  ${input}  ${title}
+    user clicks button  Save section title  ${section}
+    user waits until parent contains element  ${section}  xpath:.//h2/button[@aria-expanded and text()="${title}"]
+
+user checks accordion section contains x blocks
+    [Arguments]  ${section_name}  ${num_blocks}
+    ${section}=  user gets accordion content element  ${section_name}
+    ${blocks}=  get child elements  ${section}  css:[data-testid="editableSectionBlock"]
+    length should be  ${blocks}  ${num_blocks}
+
+user adds text block to editable accordion section
+    [Arguments]  ${section_name}
+    ${section}=  user gets accordion content element  ${section_name}
+    user clicks button  Add text block  ${section}
+    user waits until element contains  ${section}  This section is empty
+
 user adds data block to editable accordion section
-    [Arguments]   ${accordion_name}   ${block_name}
-    user opens accordion section  ${accordion_name}
-    ${accordion_section}=  user gets accordion content element  ${accordion_name}
-    ${add_block_button}=   get child element  ${accordion_section}  xpath:.//button[text()="Add data block"]
-    user clicks element   ${add_block_button}
-    ${block_list}=  get child element  ${accordion_section}  css:select[name="selectedDataBlock"]
+    [Arguments]   ${section_name}   ${block_name}
+    ${section}=  user gets accordion content element  ${section_name}
+    user clicks button  Add data block   ${section}
+    ${block_list}=  get child element  ${section}  css:select[name="selectedDataBlock"]
     user selects from list by label  ${block_list}  Dates data block name
-    user waits until parent contains element  ${accordion_section}   css:table
-    ${embed_button}=   get child element   ${accordion_section}   xpath:.//button[text()="Embed"]
-    user clicks element  ${embed_button}
+    user waits until parent contains element  ${section}   css:table
+    user clicks button  Embed  ${section}
+
+user adds content to accordion section text block
+    [Arguments]  ${section_name}  ${block_num}  ${content}
+    ${section}=  user gets accordion content element  ${section_name}
+    ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
+    user clicks button  Edit block  ${block}
+    user presses keys  ${content}
+    user clicks button  Save  ${block}
+    user waits until element contains  ${block}  ${content}
+
+user checks accordion section text block contains
+    [Arguments]  ${section_name}  ${block_num}  ${content}
+    ${section}=  user gets accordion content element  ${section_name}
+    ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
+    user checks element contains  ${block}  ${content}
+
+user deletes editable accordion section content block
+    [Arguments]  ${section_name}  ${block_num}
+    ${section}=  user gets accordion content element  ${section_name}
+    ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
+    user clicks button  Remove block  ${block}
+    user clicks button  Confirm

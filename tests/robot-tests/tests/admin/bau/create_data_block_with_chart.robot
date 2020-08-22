@@ -176,7 +176,6 @@ Embed data block into release content
     user waits until page contains heading 2  ${PUBLICATION_NAME}
     user clicks button  Add new section
     user changes accordion section title  1   ${CONTENT_SECTION_NAME}
-    user opens accordion section  ${CONTENT_SECTION_NAME}
     user clicks button   Add data block
     user selects from list by label  css:select[name="selectedDataBlock"]  ${DATABLOCK_NAME}
     user waits until element is visible  css:table

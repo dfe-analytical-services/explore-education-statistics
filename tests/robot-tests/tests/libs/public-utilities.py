@@ -60,25 +60,6 @@ def user_checks_other_release_is_shown_in_position(release_name, position):
             f'Other release "{release_name}" not in position {position}. Found "{elem.text}" instead!')
 
 
-def user_checks_number_of_updates_is_correct(number):
-    elems = sl.driver.find_elements_by_xpath('(.//*[@data-testid="last-updated-element"])')
-    if len(elems) != int(number):
-        raise_assertion_error(f'Found "{len(elems)}" updates, not "{int(number)}"')
-
-
-def user_checks_update_exists(date, text_starts_with):
-    try:
-        elem = sl.driver.find_element_by_xpath(
-            f'.//*[@data-testid="last-updated-element" and time/text()="{date}"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'No update with date "{date}" found')
-
-    try:
-        elem.find_element_by_xpath(f'./p[starts-with(text(), "{text_starts_with}")]')
-    except NoSuchElementException:
-        raise_assertion_error(f'No update on "{date}" found starting with text "{text_starts_with}"')
-
-
 # Methodology
 def user_checks_page_contains_methodology_link(topic, methodology, link_url):
     try:

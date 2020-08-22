@@ -115,8 +115,8 @@ user waits until page contains
   wait until page contains   ${pageText}    timeout=${wait}
 
 user waits until page contains element
-  [Arguments]    ${element}        ${wait}=${timeout}
-  wait until page contains element  ${element}   timeout=${wait}
+  [Arguments]    ${element}  ${wait}=${timeout}  ${limit}=None
+  wait until page contains element  ${element}  timeout=${wait}  limit=${limit}
 
 user waits until page does not contain
   [Arguments]    ${pageText}
@@ -227,10 +227,10 @@ user clicks link
   click link  ${text}
 
 user clicks button
-  [Arguments]   ${text}
-  user waits until element is visible  xpath://button[text()="${text}"]
-  user waits until element is enabled  xpath://button[text()="${text}"]
-  click button  ${text}
+  [Arguments]   ${text}  ${parent}=css:body
+  user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
+  ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
+  user clicks element  ${button}
 
 user waits until page contains button
   [Arguments]  ${text}
@@ -323,18 +323,13 @@ user checks page contains link with text and url
   [Arguments]  ${text}  ${href}
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
-user checks page contains details section
-  [Arguments]  ${text}
-  user checks page contains element  xpath://details/summary//*[text()="${text}"]
-
 user opens details dropdown
-  [Arguments]  ${text}
-  ${elem}=  get webelement  xpath://details/summary//*[text()="${text}"]
-  scroll element into view   ${elem}
-  wait until element is visible   ${elem}
-  wait until element is enabled   ${elem}
-  click element   ${elem}
-  wait until page contains element    xpath://details/summary//*[text()="${text}"]/../../*[@aria-expanded]
+  [Arguments]  ${text}  ${parent}=css:body
+  user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+  ${elem}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+  user waits until element is visible  ${elem}
+  user clicks element  ${elem}
+  user waits until parent contains element  ${parent}  xpath:.//details/summary[@aria-expanded="true" and contains(., "${text}")]
 
 user waits until results table appears
   # Extra timeout until EES-234

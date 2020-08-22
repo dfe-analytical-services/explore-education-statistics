@@ -85,7 +85,7 @@ Create another footnote
     user checks footnote checkbox is selected  Proportion of settings open
     user clicks footnote checkbox  01/04/2021
     user checks footnote checkbox is selected  01/04/2021
-    user enters text into element  css:#create-footnote-form-content  ${FOOTNOTE_TEXT_2}    
+    user enters text into element  css:#create-footnote-form-content  ${FOOTNOTE_TEXT_2}
     user clicks button  Create footnote
 
 Confirm created footnotes
@@ -203,7 +203,7 @@ Check footnote in Preview content mode
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
-# Stolen from publish_release.robot 
+# Stolen from publish_release.robot
 Go to "Release status" tab
     [Tags]  HappyPath
     user clicks link   Release status
@@ -271,8 +271,8 @@ Navigate to newly published release page
 
 Check footnote on data block
     [Tags]  HappyPath
-    user waits until page contains element  css:#releaseHeadlines-dataBlock-tables-tab
-    user clicks element  css:#releaseHeadlines-dataBlock-tables-tab
+    user waits until page contains element  css:#releaseHeadlines-tables-tab
+    user clicks element  css:#releaseHeadlines-tables-tab
     user scrolls to element  xpath://h3[.="Footnotes"]
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
@@ -286,8 +286,8 @@ Navigate to table tool
 Choose publication
     [Tags]  HappyPath
     user waits until page contains   Choose a publication
-    user opens details section  Test theme
-    user opens details section  ${TOPIC_NAME}
+    user opens details dropdown  Test theme
+    user opens details dropdown  ${TOPIC_NAME}
     user clicks radio  ${PUBLICATION_NAME}
     user clicks button  Next step
 

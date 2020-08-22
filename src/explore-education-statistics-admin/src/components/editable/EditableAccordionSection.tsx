@@ -66,11 +66,11 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
     toggleEditingHeading,
   ]);
 
-  const header = useMemo(() => {
+  const header: ReactNode = useMemo(() => {
     if (isEditingHeading) {
       return (
         <FormTextInput
-          id="heading"
+          id={`${id}-editHeading`}
           name="heading"
           label="Edit Heading"
           value={newHeading}
@@ -110,6 +110,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
   }, [
     heading,
     headingTag,
+    id,
     isEditingHeading,
     isReordering,
     newHeading,
@@ -132,7 +133,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
             [styles.dragContainer]: isReordering,
             [styles.isDragging]: snapshot.isDragging,
           })}
-          data-testid="EditableAccordionSection"
+          data-testid="editableAccordionSection"
         >
           <AccordionSection
             {...props}

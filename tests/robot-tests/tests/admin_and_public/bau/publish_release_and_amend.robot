@@ -224,10 +224,8 @@ Add data block to first accordion section
 
 Add test text to second accordion section
     [Tags]  HappyPath
-    ${text_section}=  user gets accordion section element  Test text
-    user clicks element   ${text_section}
-    user adds text block to editable accordion section   ${text_section}
-    user adds content to accordion section text block  ${text_section}   1    Some test text!
+    user adds text block to editable accordion section   Test text
+    user adds content to accordion section text block  Test text   1    Some test text!
 
 Go to "Release status" tab again
     [Tags]  HappyPath

@@ -221,29 +221,33 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
               {data.updates && data.updates.length > 0 && (
                 <>
                   <dt className="govuk-caption-m">Last updated: </dt>
-                  <dd data-testid="last-updated">
+                  <dd id="releaseLastUpdated">
                     <strong>
                       <FormattedDate>{data.updates[0].on}</FormattedDate>
                     </strong>
                     <Details
-                      onToggle={(open: boolean) =>
-                        open &&
-                        logEvent(
-                          'Last Updates',
-                          'Release page last updates dropdown opened',
-                          window.location.pathname,
-                        )
-                      }
+                      id="releaseNotes"
+                      onToggle={open => {
+                        if (open) {
+                          logEvent(
+                            'Last Updates',
+                            'Release page last updates dropdown opened',
+                            window.location.pathname,
+                          );
+                        }
+                      }}
                       summary={`See all ${data.updates.length} updates`}
                     >
-                      {data.updates.map(elem => (
-                        <div data-testid="last-updated-element" key={elem.id}>
-                          <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                            {elem.on}
-                          </FormattedDate>
-                          <p>{elem.reason}</p>
-                        </div>
-                      ))}
+                      <ol className="govuk-list">
+                        {data.updates.map(note => (
+                          <li key={note.id}>
+                            <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                              {note.on}
+                            </FormattedDate>
+                            <p>{note.reason}</p>
+                          </li>
+                        ))}
+                      </ol>
                     </Details>
                   </dd>
                 </>

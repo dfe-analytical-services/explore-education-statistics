@@ -27,6 +27,7 @@ export interface AccordionSectionProps {
   headingTag?: 'h2' | 'h3' | 'h4';
   id?: string;
   open?: boolean;
+  testId?: string;
   onToggle?: ToggleHandler;
 }
 
@@ -61,10 +62,10 @@ const AccordionSection = ({
     <div
       className={classNames(classes.section, styles.section, className, {
         [classes.expanded]: open,
-        [styles.sectionExpanded]: open,
       })}
-      role="presentation"
+      data-testid="accordionSection"
       id={id}
+      role="presentation"
     >
       <div className="govuk-accordion__section-header">
         {header ??
@@ -74,22 +75,20 @@ const AccordionSection = ({
               className: classes.sectionHeading,
             },
             isMounted ? (
-              <>
-                <button
-                  aria-expanded={open}
-                  className={classes.sectionButton}
-                  id={headingId}
-                  type="button"
-                  onClick={() => {
-                    if (onToggle) {
-                      onToggle(!open, id);
-                    }
-                  }}
-                >
-                  {heading}
-                  <span aria-hidden className="govuk-accordion__icon" />
-                </button>
-              </>
+              <button
+                aria-expanded={open}
+                className={classes.sectionButton}
+                id={headingId}
+                type="button"
+                onClick={() => {
+                  if (onToggle) {
+                    onToggle(!open, id);
+                  }
+                }}
+              >
+                {heading}
+                <span aria-hidden className="govuk-accordion__icon" />
+              </button>
             ) : (
               <span id={headingId} className={classes.sectionButton}>
                 {heading}
@@ -104,10 +103,10 @@ const AccordionSection = ({
         )}
       </div>
       <div
+        aria-labelledby={headingId}
         className={classNames(classes.sectionContent, styles.sectionContent, {
           [styles.sectionContentExpanded]: open,
         })}
-        aria-labelledby={headingId}
         id={contentId}
       >
         {typeof children === 'function'

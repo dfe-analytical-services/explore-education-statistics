@@ -59,12 +59,12 @@ Validate "About these statistics" -- Number of other releases
 
 Validate "About these statistics" -- "Last updated"
     [Tags]    HappyPath
-    user checks element contains  css:[data-testid="last-updated"]     19 April 2018
+    user checks element contains  id:releaseLastUpdated     19 April 2018
 
-    user checks number of updates is correct    2
+    user checks number of release updates     2
     user opens details dropdown   See all 2 updates
-    user checks update exists   19 April 2018   Underlying data file updated to include absence
-    user checks update exists   22 March 2018   First published.
+    user checks release update   1  19 April 2018   Underlying data file updated to include absence
+    user checks release update   2  22 March 2018   First published.
     user closes details dropdown   See all 2 updates
 
 Validate "Related guidance"
