@@ -4,46 +4,41 @@ Library     admin-utilities.py
 
 *** Keywords ***
 user signs in as bau1
-  user opens the browser
+    [Arguments]  ${open_browser}=True
+    run keyword if  ${open_browser}  user opens the browser
+    environment variable should be set   ADMIN_URL
+    user goes to url  %{ADMIN_URL}
+    user waits until page contains heading 1    Sign in
+    user signs in as  ADMIN
 
-  environment variable should be set   ADMIN_URL
-  user goes to url  %{ADMIN_URL}
-  user waits until page contains heading 1    Sign in
+    user waits until page contains heading 1   Dashboard
+    user waits until page contains title caption  Welcome Bau1
+    user waits until page contains element   css:#selectTheme   180
 
-  environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
-  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
-  environment variable should be set   IDENTITY_COOKIE_BAU
-  set cookie from json   %{IDENTITY_COOKIE_BAU}
-
-  user goes to url  %{ADMIN_URL}
-  user waits until page contains heading 1   Dashboard
-  user waits until page contains title caption  Welcome Bau1
-  user waits until page contains element   css:#selectTheme   180
-
-  user checks breadcrumb count should be  2
-  user checks nth breadcrumb contains  1   Home
-  user checks nth breadcrumb contains  2   Administrator dashboard
+    user checks breadcrumb count should be  2
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Administrator dashboard
 
 user signs in as analyst1
-  user opens the browser
+    [Arguments]  ${open_browser}=True
+    run keyword if  ${open_browser}  user opens the browser
+    environment variable should be set   ADMIN_URL
+    user goes to url  %{ADMIN_URL}
+    user waits until page contains heading 1    Sign in
+    user signs in as  ANALYST
 
-  environment variable should be set   ADMIN_URL
-  user goes to url  %{ADMIN_URL}
-  user waits until page contains heading 1    Sign in
+    user waits until page contains heading 1  Dashboard
+    user waits until page contains title caption  Welcome Analyst1
+    user waits until page contains element   css:#selectTheme   180
 
-  environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
-  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}
-  environment variable should be set   IDENTITY_COOKIE_ANALYST
-  set cookie from json   %{IDENTITY_COOKIE_ANALYST}
+    user checks breadcrumb count should be  2
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Administrator dashboard
 
-  user goes to url  %{ADMIN_URL}
-  user waits until page contains heading 1  Dashboard
-  user waits until page contains title caption  Welcome Analyst1
-  user waits until page contains element   css:#selectTheme   180
-
-  user checks breadcrumb count should be  2
-  user checks nth breadcrumb contains  1   Home
-  user checks nth breadcrumb contains  2   Administrator dashboard
+user signs out
+    user clicks link  Sign out
+    user waits until page contains heading 1  Signed out
+    user waits until page contains  You have successfully signed out
 
 user selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until page contains element  id:my-publications-tab   60

@@ -130,6 +130,10 @@ def user_sets_focus_to_element(selector):
     sl.set_focus_to_element(selector)
 
 
+def set_to_local_storage(key: str, value: str):
+    sl.execute_javascript(f"localStorage.setItem('{key}', '{value}');")
+
+
 def set_cookie_from_json(cookie_json):
     cookie_dict = json.loads(cookie_json)
     del cookie_dict['domain']

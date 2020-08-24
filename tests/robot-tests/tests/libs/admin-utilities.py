@@ -1,27 +1,53 @@
 from selenium.webdriver.common.keys import Keys
 from robot.libraries.BuiltIn import BuiltIn
-
-sl = BuiltIn().get_library_instance('SeleniumLibrary')
 import time
 import os
 import json
 import requests
+from libs.setup_auth_variables import setup_auth_variables
+from tests.libs.utilities import set_to_local_storage
+from tests.libs.utilities import set_cookie_from_json
+
+sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
 
 def raise_assertion_error(err_msg):
-    sl.capture_page_screenshot()
+    sl.failure_occurred()
     raise AssertionError(err_msg)
+
+
+def user_signs_in_as(user: str):
+    try:
+        (local_storage_token, cookie_token) = setup_auth_variables(
+            user,
+            email=os.getenv(f'{user}_EMAIL'),
+            password=os.getenv(f'{user}_PASSWORD'),
+            driver=sl.driver
+        )
+
+        admin_url = os.getenv('ADMIN_URL')
+        assert admin_url
+
+        set_to_local_storage(
+            f'GovUk.Education.ExploreEducationStatistics.Adminuser:{admin_url}:GovUk.Education.ExploreEducationStatistics.Admin',
+            local_storage_token
+        )
+        set_cookie_from_json(cookie_token)
+
+        sl.go_to(admin_url)
+    except Exception as e:
+        raise_assertion_error(e)
 
 
 def admin_request(method, endpoint, body=None):
     assert method and endpoint
-    assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
+    assert os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN') is not None
     assert os.getenv('ADMIN_URL') is not None
 
     # To prevent InsecureRequestWarning
     requests.packages.urllib3.disable_warnings()
 
-    jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_BAU'))['access_token']
+    jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN'))['access_token']
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {jwt_token}',

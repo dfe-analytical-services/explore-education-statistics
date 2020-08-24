@@ -22,7 +22,7 @@ from pabot.pabot import main as pabot_run_cli
 from robot import run_cli as robot_run_cli
 
 import scripts.keyword_profile as kp
-from scripts.get_auth_tokens import get_identity_info
+from libs.setup_auth_variables import setup_auth_variables
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
@@ -141,7 +141,7 @@ else:
 def admin_request(method, endpoint, body=None):
     assert method and endpoint
     assert os.getenv('ADMIN_URL') is not None
-    assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
+    assert os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN') is not None
 
     if method == 'POST':
         assert body is not None, 'POST requests require a body'
@@ -149,7 +149,7 @@ def admin_request(method, endpoint, body=None):
     # To prevent InsecureRequestWarning
     requests.packages.urllib3.disable_warnings()
 
-    jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_BAU'))['access_token']
+    jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN'))['access_token']
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {jwt_token}',
@@ -167,15 +167,14 @@ def admin_request(method, endpoint, body=None):
 
         # Delete identify files and re-attempt to fetch them
         setup_authentication(clear_existing=True)
-        jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {jwt_token}',
-        }
+        jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_ADMIN'])['access_token']
         response = requests.request(
             method,
             url=f'{os.getenv("ADMIN_URL")}{endpoint}',
-            headers=headers,
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {jwt_token}',
+            },
             json=body,
             verify=False
         )
@@ -216,66 +215,28 @@ def delete_test_topic():
         admin_request('DELETE', f'/api/topics/{os.getenv("TEST_TOPIC_ID")}')
 
 
+def setup_authentication(clear_existing=False):
+    # Don't need BAU user if running general_public tests
+    if "general_public" not in args.tests:
+        setup_auth_variables(
+            user='ADMIN',
+            email=os.getenv('ADMIN_EMAIL'),
+            password=os.getenv('ADMIN_PASSWORD'),
+            clear_existing=clear_existing
+        )
+
+    # Don't need analyst user if running admin/bau or admin_and_public/bau tests
+    if f"{os.sep}bau" not in args.tests:
+        setup_auth_variables(
+            user='ANALYST',
+            email=os.getenv('ANALYST_EMAIL'),
+            password=os.getenv('ANALYST_PASSWORD'),
+            clear_existing=clear_existing
+        )
+
+
 # Auth not required with general_public tests
 if args.tests and "general_public" not in args.tests:
-    def authenticate_user(user, email, password, clear_existing=True):
-        assert user and email and password
-
-        local_storage_name = f'IDENTITY_LOCAL_STORAGE_{user}'
-        cookie_name = f'IDENTITY_COOKIE_{user}'
-
-        local_storage_file = Path(f'{local_storage_name}.json')
-        cookie_file = Path(f'{cookie_name}.json')
-
-        if clear_existing:
-            local_storage_file.unlink(True)
-            cookie_file.unlink(True)
-
-        if local_storage_file.exists() and cookie_file.exists():
-            print(f'Getting {user} authentication information from local files... ', flush=True)
-
-            os.environ[local_storage_name] = local_storage_file.read_text()
-            os.environ[cookie_name] = cookie_file.read_text()
-        else:
-            print(f'Logging in to obtain {user} authentication information... ', flush=True)
-
-            os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
-                url=os.getenv('ADMIN_URL'),
-                email=email,
-                password=password,
-                chromedriver_version=args.chromedriver_version
-            )
-
-            # Cache auth info to files for efficiency
-            local_storage_file.write_text(os.environ[local_storage_name])
-            cookie_file.write_text(os.environ[cookie_name])
-
-            print('Done!', flush=True)
-
-        assert os.getenv(local_storage_name) is not None
-        assert os.getenv(cookie_name) is not None
-
-
-    def setup_authentication(clear_existing=False):
-        # Don't need BAU user if running general_public tests
-        if "general_public" not in args.tests:
-            authenticate_user(
-                user='BAU',
-                email=os.getenv('ADMIN_EMAIL'),
-                password=os.getenv('ADMIN_PASSWORD'),
-                clear_existing=clear_existing
-            )
-
-        # Don't need analyst user if running admin/bau or admin_and_public/bau tests
-        if f"{os.sep}bau" not in args.tests:
-            authenticate_user(
-                user='ANALYST',
-                email=os.getenv('ANALYST_EMAIL'),
-                password=os.getenv('ANALYST_PASSWORD'),
-                clear_existing=clear_existing
-            )
-
-
     setup_authentication()
 
     # NOTE(mark): Tests that alter data only occur on local and dev environments

@@ -19,10 +19,6 @@ do this on failure
   capture large screenshot
   set selenium timeout  3
 
-set to local storage
-  [Arguments]    ${key}   ${value}
-  execute javascript  localStorage.setItem('${key}', '${value}');
-
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
@@ -338,28 +334,6 @@ user waits until results table appears
   [Arguments]   ${wait_time}
   user waits until page contains element   css:table thead th    ${wait_time}
   user waits until page does not contain element  css:[class^="dfe-LoadingSpinner"]
-
-user logs into microsoft online
-  [Arguments]  ${email}   ${password}
-  user waits until page contains element  xpath://div[text()="Sign in"]
-  sleep  1
-  user presses keys     ${email}
-  user waits until page contains element    css:input[value="Next"]
-  wait until element is enabled   css:input[value="Next"]
-  user clicks element   css:input[value="Next"]
-
-  user waits until page contains element  xpath://div[text()="Enter password"]
-  sleep  1
-  user presses keys     ${password}
-  user waits until page contains element    css:input[value="Sign in"]
-  wait until element is enabled   css:input[value="Sign in"]
-  user clicks element   css:input[value="Sign in"]
-
-  user waits until page contains element  xpath://div[text()="Stay signed in?"]
-  user waits until page contains element    css:input[value="No"]
-  wait until element is enabled   css:input[value="No"]
-  sleep  1
-  user clicks element   css:input[value="No"]
 
 user checks publication bullet contains link
   [Arguments]   ${publication}   ${link}
