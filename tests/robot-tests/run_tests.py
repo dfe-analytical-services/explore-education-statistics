@@ -22,10 +22,21 @@ from pabot.pabot import main as pabot_run_cli
 from robot import run_cli as robot_run_cli
 
 import scripts.keyword_profile as kp
-from libs.setup_auth_variables import setup_auth_variables
+from tests.libs.setup_auth_variables import setup_auth_variables
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
+
+# This is super awkward but we have to explicitly
+# add the current directory to PYTHONPATH otherwise
+# the subprocesses started by pabot will not be able
+# to locate lib modules correctly for some reason.
+pythonpath = os.getenv('PYTHONPATH')
+
+if pythonpath:
+    os.environ['PYTHONPATH'] += f':{str(current_dir)}'
+else:
+    os.environ['PYTHONPATH'] = str(current_dir)
 
 # Parse arguments
 parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",

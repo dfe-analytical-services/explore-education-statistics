@@ -4,7 +4,7 @@ import time
 import os
 import json
 import requests
-from libs.setup_auth_variables import setup_auth_variables
+from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.utilities import set_to_local_storage
 from tests.libs.utilities import set_cookie_from_json
 
