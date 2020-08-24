@@ -252,18 +252,6 @@ def capture_large_screenshot():
     sl.set_window_size(page_width, original_height)
 
 
-def user_checks_table_column_heading_contains(table_selector, row, column, expected,
-                                              timeout=30):
-    user_waits_until_parent_contains_element(
-        table_selector,
-        f'xpath://thead/tr[{row}]/th[{column}][text()="{expected}"]',
-        timeout=timeout)
-
-
-def user_gets_table_row_with_heading(table_selector, heading: str):
-    return get_child_element(table_selector, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
-
-
 def user_gets_row_number_with_heading(table_locator: str, heading: str):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
     rows = get_child_elements(table_locator, 'css:tbody tr')
@@ -284,13 +272,6 @@ def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
     raise_assertion_error(f'Indicator "{indicator}" not found!')
 
 
-def user_checks_row_contains_heading(row_elem, heading):
-    try:
-        user_waits_until_parent_contains_element(row_elem, f'xpath:.//th[text()="{heading}"]')
-    except:
-        raise_assertion_error(f'Heading "{heading}" not found for provided row element.')
-
-
 def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     try:
         elem = get_child_element(row_elem, f'xpath:.//td[{cell_num}]')
@@ -300,41 +281,6 @@ def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     if expected_text not in elem.text:
         raise_assertion_error(
             f'TD tag num "{cell_num}" for row element didn\'t contain text "{expected_text}". Found text "{elem.text}"')
-
-
-def user_checks_results_table_row_heading_contains(row, column, expected):
-    elem = sl.get_webelement(f'//table/tbody/tr[{row}]/th[{column}]')
-    if expected not in elem.text:
-        raise_assertion_error(
-            f'"{expected}" not found in th tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
-
-
-def user_checks_table_heading_in_offset_row_contains(table_locator: str, row: int,
-                                                     offset: int, column: int,
-                                                     expected: str):
-    offset_row = int(row) + int(offset)
-    elem = get_child_element(table_locator, f'xpath://tbody/tr[{offset_row}]/th[{column}]')
-
-    if expected not in elem.text:
-        raise_assertion_error(
-            f'"{expected}" not found in th tag in results table tbody row {offset_row}, column {column}. Found text "{elem.text}".')
-
-
-def user_checks_results_table_cell_contains(row, column, expected):
-    elem = sl.get_webelement(f'//table/tbody/tr[{row}]/td[{column}]')
-    if expected not in elem.text:
-        raise_assertion_error(
-            f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
-
-
-def user_checks_table_cell_in_offset_row_contains(table_locator: str, row: int, offset: int,
-                                                  column: int, expected: str):
-    offset_row = int(row) + int(offset)
-    elem = get_child_element(table_locator, f'xpath://tbody/tr[{offset_row}]/td[{column}]')
-
-    if expected not in elem.text:
-        raise_assertion_error(
-            f'"{expected}" not found in td tag in results table tbody row {offset_row}, column {column}. Found text "{elem.text}".')
 
 
 def user_checks_list_contains_x_elements(list_locator, num):

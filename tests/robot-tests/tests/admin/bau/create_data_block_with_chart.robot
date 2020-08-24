@@ -186,6 +186,9 @@ Embed data block into release content
 Validate embedded table rows
     [Tags]  HappyPath
     ${table}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"] table
+    user scrolls to element   xpath://button[text()="${CONTENT_SECTION_NAME}"]
+    user waits until page contains element  ${table}   30
+
     user checks table column heading contains  ${table}  1  1  Admission Numbers
 
     ${row}=  user gets row number with heading  ${table}  Bolton 001 (E02000984)
@@ -247,7 +250,8 @@ Navigate to Chart tab
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until page contains heading 2  ${DATABLOCK_NAME}
-    user clicks link  Chart
+    user waits until page does not contain loading spinner
+    user clicks link   Chart
     user waits until page contains heading 3  Choose chart type
 
 Configure basic line chart
@@ -335,6 +339,7 @@ Configure basic vertical bar chart
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
     user clicks link  Chart
     user waits until page contains heading 3  Choose chart type
     user clicks button  Vertical bar
@@ -416,6 +421,7 @@ Configure basic horizontal bar chart
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
     user clicks link  Chart
     user waits until page contains heading 3  Choose chart type
     user clicks button  Horizontal bar
@@ -497,6 +503,7 @@ Configure basic geographic chart
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
     user clicks link  Chart
     user waits until page contains heading 3  Choose chart type
     user clicks button  Geographic
@@ -557,6 +564,7 @@ Configure basic infographic chart
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
     user clicks link  Chart
     user waits until page contains heading 3  Choose chart type
     user clicks button  Choose an infographic as alternative
@@ -591,6 +599,7 @@ Delete chart from data block
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until page does not contain loading spinner
     user clicks link  Chart
     user clicks button  Delete chart
     user clicks button  Confirm
@@ -599,5 +608,6 @@ Delete chart from data block
 Delete data block
     [Tags]  HappyPath
     user clicks button  Delete this data block
+    user waits until page does not contain loading spinner
     user clicks button  Confirm
     user waits until page contains heading 2  Create new data block

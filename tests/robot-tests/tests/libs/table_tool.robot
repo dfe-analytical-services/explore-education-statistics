@@ -5,7 +5,7 @@ Resource   ./common.robot
 user waits until results table appears
     [Arguments]   ${wait_time}
     user waits until page contains element   css:table thead th    ${wait_time}
-    user waits until page does not contain element  css:[class^="dfe-LoadingSpinner"]
+    user waits until page does not contain loading spinner
 
 user clicks indicator checkbox
     [Arguments]  ${indicator_label}

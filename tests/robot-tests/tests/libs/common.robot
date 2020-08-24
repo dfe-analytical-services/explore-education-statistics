@@ -6,6 +6,7 @@ Library     OperatingSystem
 Library    file_operations.py
 Library    utilities.py
 
+Resource   ./tables.robot
 Resource   ./table_tool.robot
 
 *** Variables ***
@@ -113,6 +114,9 @@ user waits for page to finish loading
     # this sleep in a keyword such that if we find a way to check whether the JS processing has finished in the
     # future, we can change it here.
     sleep  0.2
+
+user waits until page does not contain loading spinner
+    user waits until page does not contain element  css:[class^="LoadingSpinner"]
 
 user sets focus to element
     [Arguments]  ${selector}
@@ -251,7 +255,6 @@ user clicks testid element
 
 user clicks link
     [Arguments]   ${text}
-    user scrolls to element  link:${text}
     wait until element is visible   link:${text}
     wait until element is enabled  link:${text}
     click link  ${text}
@@ -362,11 +365,6 @@ user opens details dropdown
     user waits until element is visible  ${elem}
     user clicks element  ${elem}
     user waits until parent contains element  ${parent}  xpath:.//details/summary[@aria-expanded="true" and contains(., "${text}")]
-
-user waits until results table appears
-    [Arguments]   ${wait_time}
-    user waits until page contains element   css:table thead th    ${wait_time}
-    user waits until page does not contain element  css:[class^="dfe-LoadingSpinner"]
 
 user checks publication bullet contains link
     [Arguments]   ${publication}   ${link}

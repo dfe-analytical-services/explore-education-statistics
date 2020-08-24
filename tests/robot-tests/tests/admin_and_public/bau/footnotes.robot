@@ -166,9 +166,9 @@ Add data block to release
     user clicks button  Add secondary stats
     user waits until page contains element  secondaryStats-dataBlockSelectForm-selectedDataBlock
     user selects from list by label  secondaryStats-dataBlockSelectForm-selectedDataBlock  ${FOOTNOTE_DATABLOCK_NAME}
+    user waits until page contains element    css:table
     user clicks button  Embed
-    user waits until page contains link  Table
-    user clicks link  Table
+    user clicks element   id:releaseHeadlines-dataBlock-tables-tab
     user checks page contains  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
