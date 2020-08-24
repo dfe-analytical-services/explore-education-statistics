@@ -407,7 +407,7 @@ user clicks select all for category
 
 user checks breadcrumb count should be
     [Arguments]  ${count}
-    page should contain element  css:[data-testid="breadcrumbs--list"] li   limit=${count}
+    user waits until page contains element  css:[data-testid="breadcrumbs--list"] li   limit=${count}
 
 user checks nth breadcrumb contains
     [Arguments]   ${num}   ${text}

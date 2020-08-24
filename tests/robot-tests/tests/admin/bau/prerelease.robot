@@ -122,8 +122,24 @@ Invite users to prerelease for scheduled release
     user clicks button  Invite new user  ${details}
     user checks summary list contains  Pre release access  analyst1@example.com  parent=${details}
 
+Validate prerelease has not started for Analyst user
+    [Tags]  HappyPath
+    user changes to analyst1
+    user goes to url   ${RELEASE_URL}/prerelease
+
+    user waits until page contains heading 1  Pre Release access is not yet available
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre Release access
+
+    ${day}=         get datetime  %d  1
+    ${month_word}=  get datetime  %B  1
+    ${year}=        get datetime  %Y  1
+    user checks page contains   Pre Release access will be available from ${day} ${month_word} ${year} at 00:00 until ${day} ${month_word} ${year} at 23:59.
+
 Start prerelease
     [Tags]  HappyPath
+    user changes to bau1
     ${day}=         get datetime  %d  1
     ${month}=       get datetime  %m  1
     ${month_word}=  get datetime  %B  1
@@ -157,5 +173,17 @@ Validate prerelease has started
     user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
     user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
 
-    user opens accordion section  Test section one
-    user checks accordion section contains text   Test section one  Test content block for ${PUBLICATION_NAME}
+Validate prerelease has started for Analyst user
+    [Tags]  HappyPath
+    user changes to analyst1
+    user goes to url   ${RELEASE_URL}/prerelease
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre Release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until page contains heading 1  ${PUBLICATION_NAME}
+
+    user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
+    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}

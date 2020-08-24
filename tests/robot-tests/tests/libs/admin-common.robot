@@ -35,6 +35,14 @@ user signs in as analyst1
     user checks nth breadcrumb contains  1   Home
     user checks nth breadcrumb contains  2   Administrator dashboard
 
+user changes to bau1
+    user signs out
+    user signs in as bau1  False
+
+user changes to analyst1
+    user signs out
+    user signs in as analyst1  False
+
 user signs out
     user clicks link  Sign out
     user waits until page contains heading 1  Signed out
