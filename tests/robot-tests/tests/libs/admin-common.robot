@@ -81,6 +81,29 @@ user creates release for publication
     user waits until page contains element  xpath://span[text()="Edit release"]
     user waits until page contains heading 2  Release summary
 
+user adds basic release content
+    [Arguments]  ${publication}
+    user clicks button  Add a summary text block
+    user waits until element contains  id:releaseSummary  This section is empty
+    user clicks button   Edit block  id:releaseSummary
+    user presses keys  Test summary text for ${publication}
+    user clicks button   Save  id:releaseSummary
+    user waits until element contains  id:releaseSummary  Test summary text for ${publication}
+
+    user clicks button  Add a headlines text block  id:releaseHeadlines
+    user waits until element contains  id:releaseHeadlines  This section is empty
+    user clicks button  Edit block  id:releaseHeadlines
+    user presses keys   Test headlines summary text for ${publication}
+    user clicks button  Save  id:releaseHeadlines
+    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${publication}
+
+    user waits until button is enabled  Add new section
+    user clicks button  Add new section
+
+    user changes accordion section title  1   Test section one
+    user adds text block to editable accordion section   Test section one
+    user adds content to accordion section text block  Test section one   1    Test content block for ${publication}
+
 user creates approved methodology
     [Arguments]  ${title}
     user waits until page contains heading 1  Manage methodologies

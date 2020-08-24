@@ -9,6 +9,7 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - prerelease %{RUN_IDENTIFIER}
+${RELEASE_URL}
 
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
@@ -27,7 +28,7 @@ Verify new publication
 Create new release
     [Tags]  HappyPath
     user opens accordion section  ${PUBLICATION_NAME}
-    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Calendar Year  2000
 
 Verify release summary
@@ -36,22 +37,25 @@ Verify release summary
     user waits until page contains heading 2  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
+Add basic release content
+    [Tags]  HappyPath
+    user clicks link  Manage content
+    user waits until page contains heading 1  ${PUBLICATION_NAME}
+    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user adds basic release content  ${PUBLICATION_NAME}
+
 Go to "Release status" tab
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until page contains heading 2  Release status
     user waits until page contains button  Edit release status
 
-Approve release
+Approve release and wait for it to be Scheduled
     [Tags]  HappyPath
-    ${PUBLISH_DATE_DAY}=         get datetime  %d  2
-    ${PUBLISH_DATE_MONTH}=       get datetime  %m  2
-    ${PUBLISH_DATE_MONTH_WORD}=  get datetime  %B  2
-    ${PUBLISH_DATE_YEAR}=        get datetime  %Y  2
-    set suite variable  ${PUBLISH_DATE_DAY}
-    set suite variable  ${PUBLISH_DATE_MONTH}
-    set suite variable  ${PUBLISH_DATE_MONTH_WORD}
-    set suite variable  ${PUBLISH_DATE_YEAR}
+    ${day}=         get datetime  %d  2
+    ${month}=       get datetime  %m  2
+    ${month_word}=  get datetime  %B  2
+    ${year}=        get datetime  %Y  2
 
     user clicks button  Edit release status
     user clicks radio   Approved for publication
@@ -59,41 +63,36 @@ Approve release
     user waits until page contains element   xpath://label[text()="On a specific date"]/../input
     user clicks radio   On a specific date
     user waits until page contains   Publish date
-    user enters text into element  id:releaseStatusForm-publishScheduled-day    ${PUBLISH_DATE_DAY}
-    user enters text into element  id:releaseStatusForm-publishScheduled-month  ${PUBLISH_DATE_MONTH}
-    user enters text into element  id:releaseStatusForm-publishScheduled-year   ${PUBLISH_DATE_YEAR}
+    user enters text into element  id:releaseStatusForm-publishScheduled-day    ${day}
+    user enters text into element  id:releaseStatusForm-publishScheduled-month  ${month}
+    user enters text into element  id:releaseStatusForm-publishScheduled-year   ${year}
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   1
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button   Update status
 
-Wait for release process status to be Scheduled
-    [Tags]  HappyPath
     user waits until page contains heading 2  Release status
     user checks summary list contains  Current status  Approved
-    user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user checks summary list contains  Next release expected  January 2001
     user waits for release process status to be  Scheduled  90
 
-Navigate to Prerelease page
+Navigate to prerelease page
     [Tags]  HappyPath
     ${current_url}=  get location
-    ${release_url}=  remove substring from right of string  ${current_url}  /status
-    ${prerelease_url}=   evaluate  "${release_url}" + "/prerelease"
-    user goes to url   ${prerelease_url}
+    ${RELEASE_URL}=  remove substring from right of string  ${current_url}  /status
+    set suite variable  ${RELEASE_URL}
+    user goes to url   ${RELEASE_URL}/prerelease
 
-Validate Prerelease page is displayed
+Validate prerelease has not started
     [Tags]  HappyPath
     user waits until page contains heading 1  Pre Release access is not yet available
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre Release access
-
-Validate Prerelease page displays correct message
-    [Tags]  HappyPath   NotAgainstLocal
-    ${PREREL_DATE_DAY}=         get datetime  %d  1
-    ${PREREL_DATE_MONTH_WORD}=  get datetime  %B  1
-    ${PREREL_DATE_YEAR}=        get datetime  %Y  1
-    user checks page contains   Pre Release access will be available from ${PREREL_DATE_DAY} ${PREREL_DATE_MONTH_WORD} ${PREREL_DATE_YEAR} at 09:30 until ${PREREL_DATE_DAY} ${PREREL_DATE_MONTH_WORD} ${PREREL_DATE_YEAR} at 23:59.
+    ${day}=         get datetime  %d  1
+    ${month_word}=  get datetime  %B  1
+    ${year}=        get datetime  %Y  1
+    user checks page contains   Pre Release access will be available from ${day} ${month_word} ${year} at 00:00 until ${day} ${month_word} ${year} at 23:59.
 
 Navigate to Admin dashboard
     [Tags]  HappyPath
@@ -106,23 +105,57 @@ Go to View scheduled releases tab
     user clicks element   id:scheduled-releases-tab
     user waits until page contains element   xpath://*[@id="scheduled-releases-tab" and @aria-selected="true"]
 
-Invite a new user to prerelease for scheduled release
+Invite users to prerelease for scheduled release
     [Tags]  HappyPath
-    set test variable  ${details_selector}  xpath://*[@data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]/details/summary//*[text()="Calendar Year 2000 (not Live)"]
-    user waits until page contains element  ${details_selector}
-    user waits until element is visible  ${details_selector}
-    user clicks element   ${details_selector}
+    ${details}=  user gets child details element  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]  Calendar Year 2000 (not Live)
+    user opens details dropdown  Calendar Year 2000 (not Live)  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]
+    user waits until parent contains element   ${details}   xpath:.//*[text()="Manage pre release access"]
 
-    ${details_dropdown}=   get webelement   xpath://*[@data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]/details
-    user waits until parent contains element   ${details_dropdown}   xpath:.//*[text()="Manage pre release access"]
-    ${invite_input}=  get child element   ${details_dropdown}   xpath:.//label[text()="Invite a new user"]/../input
+    ${invite_input}=  get child element   ${details}   css:input[name="email"]
 
-    user waits until element is visible   ${invite_input}
-    user clicks element  ${invite_input}
-    user presses keys  mark@hiveit.co.uk
+    # This is GOV.UK Notify's test email address
+    user enters text into element  ${invite_input}  simulate-delivered@notifications.service.gov.uk
+    user clicks button  Invite new user  ${details}
+    user checks summary list contains  Pre release access  simulate-delivered@notifications.service.gov.uk (invited)  parent=${details}
 
-    ${invite_button}=  get child element  ${details_dropdown}   xpath:.//button[text()="Invite new user"]
-    user waits until element is visible  ${invite_button}
-    user clicks element   ${invite_button}
+    user enters text into element  ${invite_input}  analyst1@example.com
+    user clicks button  Invite new user  ${details}
+    user checks summary list contains  Pre release access  analyst1@example.com  parent=${details}
 
-    user waits until parent contains element  ${details_dropdown}  xpath:.//dt[.="Pre release access"]/../dd[.="mark@hiveit.co.uk (invited)"]
+Start prerelease
+    [Tags]  HappyPath
+    ${day}=         get datetime  %d  1
+    ${month}=       get datetime  %m  1
+    ${month_word}=  get datetime  %B  1
+    ${year}=        get datetime  %Y  1
+    user goes to url  ${RELEASE_URL}/status
+    user clicks button  Edit release status
+    user enters text into element  id:releaseStatusForm-publishScheduled-day    ${day}
+    user enters text into element  id:releaseStatusForm-publishScheduled-month  ${month}
+    user enters text into element  id:releaseStatusForm-publishScheduled-year   ${year}
+    user clicks button   Update status
+
+    user waits until page contains heading 2  Release status
+    user checks summary list contains  Current status  Approved
+    user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
+    user waits for release process status to be  Scheduled  90
+
+Validate prerelease has started
+    [Tags]  HappyPath
+    ${current_url}=  get location
+    ${RELEASE_URL}=  remove substring from right of string  ${current_url}  /status
+    set suite variable  ${RELEASE_URL}
+    user goes to url   ${RELEASE_URL}/prerelease
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre Release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until page contains heading 1  ${PUBLICATION_NAME}
+
+    user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
+    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
+
+    user opens accordion section  Test section one
+    user checks accordion section contains text   Test section one  Test content block for ${PUBLICATION_NAME}

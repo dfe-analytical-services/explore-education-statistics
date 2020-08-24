@@ -279,8 +279,10 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list contains
-    [Arguments]  ${term}    ${description}   ${wait}=${timeout}
-    user waits until element is visible  xpath://dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]    ${wait}
+    [Arguments]  ${term}    ${description}   ${wait}=${timeout}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]    timeout=${wait}
+    ${element}=  get child element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
+    user waits until element is visible  ${element}
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}
