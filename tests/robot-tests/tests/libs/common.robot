@@ -3,9 +3,10 @@ Library     SeleniumLibrary  timeout=${timeout}  implicit_wait=${implicit_wait} 
 Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
-#Library    email_guerrillamail.py
 Library    file_operations.py
 Library    utilities.py
+
+Resource   ./table_tool.robot
 
 *** Variables ***
 ${browser}    chrome
@@ -389,6 +390,7 @@ user checks radio is checked
 
 user clicks checkbox
     [Arguments]  ${label}
+    user scrolls to element  xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
     user clicks element  xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
 
 user checks checkbox is checked
@@ -408,34 +410,6 @@ user checks checkbox input is not checked
     [Arguments]    ${selector}
     user waits until page contains element  ${selector}
     checkbox should not be selected   ${selector}
-
-user clicks indicator checkbox
-    [Arguments]  ${indicator_label}
-    user clicks element  xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]
-
-user checks indicator checkbox is checked
-    [Arguments]  ${indicator_label}
-    user checks checkbox input is checked  xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "${indicator_label}")]/../input[@type="checkbox"]
-
-user clicks subheaded indicator checkbox
-    [Arguments]  ${subheading_label}   ${indicator_label}
-    user clicks element  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input[@type="checkbox"]
-
-user checks subheaded indicator checkbox is checked
-    [Arguments]  ${subheading_label}  ${indicator_label}
-    user checks checkbox input is checked  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input[@type="checkbox"]
-
-user clicks category checkbox
-    [Arguments]  ${subheading_label}  ${category_label}
-    user clicks element  xpath://legend[text()="${subheading_label}"]/..//label[text()="${category_label}"]/../input[@type="checkbox"]
-
-user checks category checkbox is checked
-    [Arguments]  ${subheading_label}  ${category_label}
-    user checks checkbox input is checked  xpath://legend[text()="${subheading_label}"]/..//label[text()="${category_label}"]/../input[@type="checkbox"]
-
-user clicks select all for category
-    [Arguments]  ${category_label}
-    user clicks element  xpath://legend[text()="{category_label}"]/..//button[contains(text(), "Select")]
 
 user checks breadcrumb count should be
     [Arguments]  ${count}

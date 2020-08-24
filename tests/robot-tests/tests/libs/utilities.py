@@ -252,23 +252,6 @@ def capture_large_screenshot():
     sl.set_window_size(page_width, original_height)
 
 
-def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
-    try:
-        sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]',
-            timeout=timeout)
-    except:
-        raise_assertion_error(f'Previous step wasn\'t found!')
-
-    try:
-        sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]',
-            timeout=timeout)
-    except:
-        raise_assertion_error(
-            f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
-
-
 def user_checks_table_column_heading_contains(table_selector, row, column, expected,
                                               timeout=30):
     user_waits_until_parent_contains_element(
@@ -303,14 +286,14 @@ def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
 
 def user_checks_row_contains_heading(row_elem, heading):
     try:
-        user_waits_until_parent_contains_element(row_elem, f'.//th[text()="{heading}"]')
+        user_waits_until_parent_contains_element(row_elem, f'xpath:.//th[text()="{heading}"]')
     except:
         raise_assertion_error(f'Heading "{heading}" not found for provided row element.')
 
 
 def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     try:
-        elem = get_child_element(row_elem, f'.//td[{cell_num}]')
+        elem = get_child_element(row_elem, f'xpath:.//td[{cell_num}]')
     except:
         raise_assertion_error(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
 
