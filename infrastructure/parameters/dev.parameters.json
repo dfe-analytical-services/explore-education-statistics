@@ -23,6 +23,12 @@
     "publishReleaseContentCronSchedule": {
       "value": "0 30 * * * *"
     },
+    "preReleaseMinutesBeforeStart": {
+      "value": 1440
+    },
+    "preReleaseMinutesBeforeEnd": {
+      "value": 1
+    },
     "useSubnets": {
       "value": true
     },
