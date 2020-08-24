@@ -303,14 +303,14 @@ def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
 
 def user_checks_row_contains_heading(row_elem, heading):
     try:
-        row_elem.find_element_by_xpath(f'.//th[text()="{heading}"]')
+        user_waits_until_parent_contains_element(row_elem, f'.//th[text()="{heading}"]')
     except:
         raise_assertion_error(f'Heading "{heading}" not found for provided row element.')
 
 
 def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     try:
-        elem = row_elem.find_element_by_xpath(f'.//td[{cell_num}]')
+        elem = get_child_element(row_elem, f'.//td[{cell_num}]')
     except:
         raise_assertion_error(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
 
@@ -320,7 +320,7 @@ def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
 
 
 def user_checks_results_table_row_heading_contains(row, column, expected):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')
+    elem = sl.get_webelement(f'//table/tbody/tr[{row}]/th[{column}]')
     if expected not in elem.text:
         raise_assertion_error(
             f'"{expected}" not found in th tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
@@ -338,7 +338,7 @@ def user_checks_table_heading_in_offset_row_contains(table_locator: str, row: in
 
 
 def user_checks_results_table_cell_contains(row, column, expected):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/td[{column}]')
+    elem = sl.get_webelement(f'//table/tbody/tr[{row}]/td[{column}]')
     if expected not in elem.text:
         raise_assertion_error(
             f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
@@ -397,14 +397,14 @@ def user_waits_until_details_dropdown_contains_publication(details_heading, publ
 
 def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
     try:
-        sl.driver.find_element_by_xpath(
+        sl.wait_until_page_contains_element(
             f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]')
     except:
         raise_assertion_error(f'Cannot find details component "{details_heading}"')
 
     try:
-        sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
+        sl.wait_until_page_contains_element(
+                f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
     except:
         raise_assertion_error(f'Cannot find link "{download_link}" in "{details_heading}"')
 
