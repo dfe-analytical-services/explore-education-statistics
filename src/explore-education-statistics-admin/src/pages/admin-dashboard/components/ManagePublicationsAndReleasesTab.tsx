@@ -19,11 +19,12 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useStorageItem from '@common/hooks/useStorageItem';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useMemo } from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useHistory, useLocation } from 'react-router';
 import PublicationSummary from './PublicationSummary';
 
 const ManagePublicationsAndReleasesTab = () => {
   const { themeId, topicId } = useQueryParams<ThemeTopicParams>();
+  const location = useLocation();
   const history = useHistory();
 
   const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<
@@ -101,7 +102,7 @@ const ManagePublicationsAndReleasesTab = () => {
     // theme/topic if they haven't already been set.
     if (selectedTheme?.id !== themeId || selectedTopic?.id !== topicId) {
       history.replace(
-        appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+        appendQuery<ThemeTopicParams>(location.pathname, {
           themeId: selectedTheme?.id,
           topicId: selectedTopic?.id,
         }),

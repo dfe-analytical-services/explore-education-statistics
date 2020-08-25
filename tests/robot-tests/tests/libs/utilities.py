@@ -37,7 +37,7 @@ def user_waits_until_parent_contains_element(parent_locator: str, child_locator:
         if is_noney(limit):
             return waiting._wait_until(
                 parent_contains_matching_element,
-                "Element '%s' did not appear in <TIMEOUT>." % child_locator,
+                "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
                 timeout, error
             )
 
@@ -49,7 +49,7 @@ def user_waits_until_parent_contains_element(parent_locator: str, child_locator:
 
         waiting._wait_until(
             parent_contains_matching_elements,
-            'Parent "%s" did not contain "%s" %s element(s) within <TIMEOUT>.' % (
+            "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (
                 parent_locator, limit, child_locator),
             timeout, error
         )
@@ -71,7 +71,8 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: str, child_
         if is_noney(limit):
             return waiting._wait_until(
                 parent_does_not_contain_matching_element,
-                "Element '%s' did not disappear in <TIMEOUT>." % child_locator,
+                "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (
+                parent_locator, child_locator),
                 timeout, error
             )
 
@@ -83,7 +84,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: str, child_
 
         waiting._wait_until(
             parent_does_not_contain_matching_elements,
-            'Parent "%s" should not have contained "%s" %s element(s) within <TIMEOUT>.' % (
+            "Parent '%s' should not have contained %s '%s' element(s) within <TIMEOUT>." % (
                 parent_locator, limit, child_locator),
             timeout, error
         )
@@ -127,6 +128,10 @@ def user_waits_for_page_to_finish_loading():
 def user_sets_focus_to_element(selector):
     sl.wait_until_page_contains_element(selector)
     sl.set_focus_to_element(selector)
+
+
+def set_to_local_storage(key: str, value: str):
+    sl.execute_javascript(f"localStorage.setItem('{key}', '{value}');")
 
 
 def set_cookie_from_json(cookie_json):
@@ -237,8 +242,10 @@ def user_checks_accordion_section_contains_text(accordion_section_text, text):
 
 
 def user_gets_accordion_button_element(accordion_text):
-    sl.wait_until_page_contains_element(f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
-    return sl.get_webelement(f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
+    sl.wait_until_page_contains_element(
+        f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
+    return sl.get_webelement(
+        f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
 
 
 def user_gets_accordion_section_element(accordion_text):
@@ -255,7 +262,8 @@ def user_gets_accordion_content_element(accordion_text):
 
 
 def user_gets_child_details_element(parent, details_text):
-    user_waits_until_parent_contains_element(parent, f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
+    user_waits_until_parent_contains_element(parent,
+                                             f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
     return get_child_element(parent, f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
 
 

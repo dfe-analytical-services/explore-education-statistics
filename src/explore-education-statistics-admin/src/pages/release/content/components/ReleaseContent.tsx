@@ -20,7 +20,7 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import React, { useCallback, useMemo } from 'react';
 
-const ReleaseContentSection = () => {
+const ReleaseContent = () => {
   const { value: config } = useConfig();
   const { isEditing } = useEditingContext();
   const { release } = useReleaseContentState();
@@ -95,37 +95,34 @@ const ReleaseContentSection = () => {
 
   return (
     <>
-      <h2 className="govuk-heading-l dfe-print-break-before">
-        <span className="govuk-caption-l">{release.title}</span>
-        {release.publication.title}
-      </h2>
-
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <div className="govuk-grid-row">
             <BasicReleaseSummary release={release} />
           </div>
 
-          {release.summarySection && (
-            <>
-              <EditableSectionBlocks
-                releaseId={release.id}
-                allowComments
-                sectionId={release.summarySection.id}
-                content={release.summarySection.content}
-                onBlockContentSave={updateBlock}
-                onBlockDelete={removeBlock}
-                onBlockCommentsChange={updateBlockComments}
-              />
-              {isEditing && release.summarySection.content?.length === 0 && (
-                <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-                  <Button variant="secondary" onClick={addBlock}>
-                    Add a summary text block
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
+          <div id="releaseSummary">
+            {release.summarySection && (
+              <>
+                <EditableSectionBlocks
+                  releaseId={release.id}
+                  allowComments
+                  sectionId={release.summarySection.id}
+                  content={release.summarySection.content}
+                  onBlockContentSave={updateBlock}
+                  onBlockDelete={removeBlock}
+                  onBlockCommentsChange={updateBlockComments}
+                />
+                {isEditing && release.summarySection.content?.length === 0 && (
+                  <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+                    <Button variant="secondary" onClick={addBlock}>
+                      Add a summary text block
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
 
           {release.downloadFiles && !isEditing && (
             <Details summary="Download associated files">
@@ -217,4 +214,4 @@ const ReleaseContentSection = () => {
   );
 };
 
-export default ReleaseContentSection;
+export default ReleaseContent;

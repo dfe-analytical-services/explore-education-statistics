@@ -19,10 +19,6 @@ do this on failure
   capture large screenshot
   set selenium timeout  3
 
-set to local storage
-  [Arguments]    ${key}   ${value}
-  execute javascript  localStorage.setItem('${key}', '${value}');
-
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
@@ -115,8 +111,8 @@ user waits until page contains
   wait until page contains   ${pageText}    timeout=${wait}
 
 user waits until page contains element
-  [Arguments]    ${element}        ${wait}=${timeout}
-  wait until page contains element  ${element}   timeout=${wait}
+  [Arguments]    ${element}  ${wait}=${timeout}  ${limit}=None
+  wait until page contains element  ${element}  timeout=${wait}  limit=${limit}
 
 user waits until page does not contain
   [Arguments]    ${pageText}
@@ -227,10 +223,10 @@ user clicks link
   click link  ${text}
 
 user clicks button
-  [Arguments]   ${text}
-  user waits until element is visible  xpath://button[text()="${text}"]
-  user waits until element is enabled  xpath://button[text()="${text}"]
-  click button  ${text}
+  [Arguments]   ${text}  ${parent}=css:body
+  user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
+  ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
+  user clicks element  ${button}
 
 user waits until page contains button
   [Arguments]  ${text}
@@ -279,8 +275,10 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list contains
-    [Arguments]  ${term}    ${description}   ${wait}=${timeout}
-    user waits until element is visible  xpath://dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]    ${wait}
+    [Arguments]  ${term}    ${description}   ${wait}=${timeout}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]    timeout=${wait}
+    ${element}=  get child element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
+    user waits until element is visible  ${element}
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}
@@ -323,46 +321,19 @@ user checks page contains link with text and url
   [Arguments]  ${text}  ${href}
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
-user checks page contains details section
-  [Arguments]  ${text}
-  user checks page contains element  xpath://details/summary//*[text()="${text}"]
-
 user opens details dropdown
-  [Arguments]  ${text}
-  ${elem}=  get webelement  xpath://details/summary//*[text()="${text}"]
-  scroll element into view   ${elem}
-  wait until element is visible   ${elem}
-  wait until element is enabled   ${elem}
-  click element   ${elem}
-  wait until page contains element    xpath://details/summary//*[text()="${text}"]/../../*[@aria-expanded]
+  [Arguments]  ${text}  ${parent}=css:body
+  user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+  ${elem}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+  user waits until element is visible  ${elem}
+  user clicks element  ${elem}
+  user waits until parent contains element  ${parent}  xpath:.//details/summary[@aria-expanded="true" and contains(., "${text}")]
 
 user waits until results table appears
   # Extra timeout until EES-234
   [Arguments]   ${wait_time}
   user waits until page contains element   css:table thead th    ${wait_time}
   user waits until page does not contain element  css:[class^="dfe-LoadingSpinner"]
-
-user logs into microsoft online
-  [Arguments]  ${email}   ${password}
-  user waits until page contains element  xpath://div[text()="Sign in"]
-  sleep  1
-  user presses keys     ${email}
-  user waits until page contains element    css:input[value="Next"]
-  wait until element is enabled   css:input[value="Next"]
-  user clicks element   css:input[value="Next"]
-
-  user waits until page contains element  xpath://div[text()="Enter password"]
-  sleep  1
-  user presses keys     ${password}
-  user waits until page contains element    css:input[value="Sign in"]
-  wait until element is enabled   css:input[value="Sign in"]
-  user clicks element   css:input[value="Sign in"]
-
-  user waits until page contains element  xpath://div[text()="Stay signed in?"]
-  user waits until page contains element    css:input[value="No"]
-  wait until element is enabled   css:input[value="No"]
-  sleep  1
-  user clicks element   css:input[value="No"]
 
 user checks publication bullet contains link
   [Arguments]   ${publication}   ${link}
@@ -436,7 +407,7 @@ user clicks select all for category
 
 user checks breadcrumb count should be
     [Arguments]  ${count}
-    page should contain element  css:[data-testid="breadcrumbs--list"] li   limit=${count}
+    user waits until page contains element  css:[data-testid="breadcrumbs--list"] li   limit=${count}
 
 user checks nth breadcrumb contains
     [Arguments]   ${num}   ${text}

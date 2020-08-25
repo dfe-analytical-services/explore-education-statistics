@@ -1,7 +1,7 @@
 import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
-import ReleaseContentSection from '@admin/pages/release/content/components/ReleaseContentSection';
+import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import {
   ReleaseContentProvider,
   ReleaseContextState,
@@ -22,7 +22,11 @@ import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 const ReleaseContentPageLoaded = () => {
-  const { canUpdateRelease, unresolvedComments } = useReleaseContentState();
+  const {
+    canUpdateRelease,
+    unresolvedComments,
+    release,
+  } = useReleaseContentState();
 
   return (
     <EditingContextProvider
@@ -62,7 +66,13 @@ const ReleaseContentPageLoaded = () => {
             <div
               className={isEditing ? 'dfe-page-editing' : 'dfe-page-preview'}
             >
-              <ReleaseContentSection />
+              <span className="govuk-caption-l">{release.title}</span>
+
+              <h2 className="govuk-heading-l dfe-print-break-before">
+                {release.publication.title}
+              </h2>
+
+              <ReleaseContent />
             </div>
           </div>
         </>

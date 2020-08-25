@@ -4,12 +4,9 @@ import React from 'react';
 
 const SignedOutPage = () => {
   return (
-    <Page>
-      <h1 className="govuk-heading-l">
-        <span className="govuk-caption-l">Explore education statistics</span>
-        Signed out
-      </h1>
-      <p className="govuk-body">You have successfully signed out.</p>
+    <Page title="Signed out" caption="Explore education statistics">
+      <p>You have successfully signed out.</p>
+
       <a
         href={loginService.getSignInLink()}
         className="govuk-button govuk-button--start"
