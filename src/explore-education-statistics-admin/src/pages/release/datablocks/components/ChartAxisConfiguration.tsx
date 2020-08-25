@@ -219,8 +219,7 @@ const ChartAxisConfiguration = ({
     let schema: ObjectSchema<FormValues> = Yup.object({
       size: Yup.number()
         .required('Enter size of axis')
-        .positive('Size of axis must be positive')
-        .max(100, 'Size of axis must be less than 100px'),
+        .positive('Size of axis must be positive'),
       tickConfig: Yup.string().oneOf(
         ['default', 'startEnd', 'custom'],
         'Select a valid tick display type',
@@ -346,7 +345,6 @@ const ChartAxisConfiguration = ({
                     id={`${id}-size`}
                     name="size"
                     min={0}
-                    max={100}
                     label="Size of axis (px)"
                     width={3}
                   />
