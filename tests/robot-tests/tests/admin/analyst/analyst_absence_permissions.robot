@@ -17,19 +17,10 @@ Validate Analyst1 can see correct themes and topics
     user checks list contains label   id:selectTopic   Exclusions
     user checks list contains label   id:selectTopic   Pupil absence
 
-Validate Analyst1 can see correct draft releases
+Validate Analyst1 can see correct draft and scheduled releases tabs
     [Tags]  HappyPath
-    user checks element should contain   id:draft-releases-tab   View draft releases (0)
-    user clicks element   id:draft-releases-tab
-    user waits until page contains  There are currently no draft releases
-    user checks element does not contain  id:draft-releases  Pupil absence in schools in England
-    user checks element does not contain  id:draft-releases  Permanent and fixed-period exclusions in England
-
-Validate Analyst1 can see correct scheduled releases
-    [Tags]  HappyPath
-    user checks element should contain   id:scheduled-releases-tab   View scheduled releases (0)
-    user clicks element   id:scheduled-releases-tab
-    user waits until element contains  id:scheduled-releases   There are currently no scheduled releases
+    user checks element should contain   id:draft-releases-tab   View draft releases
+    user checks element should contain   id:scheduled-releases-tab   View scheduled releases
 
 Validate Analyst1 cannot create a publication for Pupils absence topic
     [Tags]  HappyPath
@@ -44,35 +35,27 @@ Validate Analyst1 cannot create a release for Pupil absence topic
     user opens accordion section  Pupil absence in schools in England
     user checks page does not contain element   xpath://*[data-testid="Create new release link for Pupil absence in schools in England"]
 
-Validate Analyst1 can see Absence release summary
+Navigate to Absence release
     [Tags]  HappyPath
     user opens details dropdown  Academic Year 2016/17 (Live - Latest release)
     user clicks element  css:[data-testid="Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)"]
     user waits until page contains heading 1  Pupil absence in schools in England
     user waits until page contains heading 2  Release summary
+
+Validate Analyst1 can see Absence release summary
+    [Tags]  HappyPath   NotAgainstLocal
     user checks summary list contains  Publication title  Pupil absence in schools in England
     user checks summary list contains  Time period  Academic Year
     user checks summary list contains  Release period  2016/17
-    user checks summary list contains  Lead statistician  Data Analyst
+    user checks summary list contains  Lead statistician  Sean Gibson
     user checks summary list contains  Scheduled release  25 April 2018
     user checks summary list contains  Next release expected  22 March 2019
     user checks summary list contains  Release type  Official Statistics
 
-Validate Analyst1 cannot see 'Upload data files' button
-    [Tags]  HappyPath
-    user clicks link  Manage data
-    user waits until page contains  This release has been approved
-    user checks page does not contain element  css:#upload-data-files-button
-
-Validate Analyst1 cannot see data blocks
-    [Tags]  HappyPath
-    user clicks link  Manage data blocks
-    user waits until page contains  This release is currently not editable
-
 Validate Analyst1 can see Manage content page
     [Tags]  HappyPath
     user clicks link  Manage content
-    user waits until page contains element   xpath://h2[text()="Pupil absence in schools in England"]/span[text()="Academic Year 2016/17"]    120
+    user waits until page contains heading 2   Pupil absence in schools in England
 
 Validate Analyst1 can see 'Manage content' page key stats
     [Tags]  HappyPath
@@ -98,10 +81,3 @@ Validate Analyst1 can see 'Manage content' page accordion sections
     user checks accordion is in position  Methodology                       10
     user checks accordion is in position  Contact us                        11
     user checks there are x accordion sections  11
-
-Validate Analyst1 cannot Approve the 'Pupil absence in schools in England' release
-    [Tags]  HappyPath
-    user clicks element  link:Release status
-    user waits until page contains heading 2  Release status
-    user checks summary list contains  Current status  Approved
-    user checks page does not contain button  Edit release status

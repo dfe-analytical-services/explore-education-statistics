@@ -217,8 +217,8 @@ user clicks testid element
 
 user clicks link
   [Arguments]   ${text}
-  wait until element is visible   link:${text}
   user scrolls to element  link:${text}
+  wait until element is visible   link:${text}
   wait until element is enabled  link:${text}
   click link  ${text}
 
