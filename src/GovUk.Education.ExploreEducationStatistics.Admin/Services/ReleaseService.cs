@@ -165,6 +165,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.UpdateRange(invites);
 
                     await _context.SaveChangesAsync();
+                    
+                    await _releaseSubjectService.SoftDeleteAllSubjectsOrBreakReleaseLinks(releaseId);
 
                     return true;
                 });
