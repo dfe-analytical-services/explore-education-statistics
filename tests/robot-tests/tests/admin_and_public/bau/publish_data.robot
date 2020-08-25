@@ -113,10 +113,10 @@ Go to "Release status" tab
 
 Approve release
     [Tags]  HappyPath
-    ${PUBLISH_DATE_DAY}=  get datetime  %d
-    ${PUBLISH_DATE_MONTH}=  get datetime  %m
-    ${PUBLISH_DATE_MONTH_WORD}=  get datetime  %B
-    ${PUBLISH_DATE_YEAR}=  get datetime  %Y
+    ${PUBLISH_DATE_DAY}=  get current datetime  %-d
+    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m
+    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B
+    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y
     set suite variable  ${PUBLISH_DATE_DAY}
     set suite variable  ${PUBLISH_DATE_MONTH}
     set suite variable  ${PUBLISH_DATE_MONTH_WORD}
