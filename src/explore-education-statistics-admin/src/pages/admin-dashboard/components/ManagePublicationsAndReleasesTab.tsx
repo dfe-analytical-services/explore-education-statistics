@@ -110,6 +110,7 @@ const ManagePublicationsAndReleasesTab = () => {
     }
   }, [
     history,
+    location.pathname,
     savedThemeTopic,
     selectedTheme,
     selectedTopic,
