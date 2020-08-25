@@ -143,6 +143,10 @@ user checks element contains
   wait until element contains  ${element}    ${text}
   element should contain    ${element}    ${text}
 
+user waits until page contains testid
+    [Arguments]  ${id}   ${wait}=${timeout}
+    user waits until page contains element   css:[data-testid="${id}"]   ${wait}
+
 user checks testid element contains
     [Arguments]  ${id}  ${text}
     user checks element contains  css:[data-testid="${id}"]   ${text}
@@ -217,8 +221,8 @@ user clicks testid element
 
 user clicks link
   [Arguments]   ${text}
-  wait until element is visible   link:${text}
   user scrolls to element  link:${text}
+  wait until element is visible   link:${text}
   wait until element is enabled  link:${text}
   click link  ${text}
 
