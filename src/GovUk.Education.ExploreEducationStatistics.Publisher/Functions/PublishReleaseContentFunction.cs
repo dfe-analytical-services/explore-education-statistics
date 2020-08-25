@@ -51,14 +51,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
 
             await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Started);
-            
+
             var context = new PublishContext(DateTime.UtcNow, false);
-            
+
             try
             {
                 await _contentService.UpdateContent(context, message.ReleaseId);
                 await _releaseService.SetPublishedDatesAsync(message.ReleaseId, context.Published);
-                
+
                 if (!PublisherUtils.IsDevelopment())
                 {
                     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
@@ -72,6 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             catch (Exception e)
             {
                 logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                logger.LogError(e.StackTrace);
+
                 await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Failed,
                     new ReleaseStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
             }

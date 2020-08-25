@@ -131,7 +131,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     };
                     release.Created = DateTime.UtcNow;
                     release.CreatedById = _userService.GetUserId();
-                    release.PreviousVersionId = release.Id;
 
                     _context.Releases.Add(release);
                     await _context.SaveChangesAsync();
@@ -165,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.UpdateRange(invites);
 
                     await _context.SaveChangesAsync();
-                    
+
                     await _releaseSubjectService.SoftDeleteAllSubjectsOrBreakReleaseLinks(releaseId);
 
                     return true;

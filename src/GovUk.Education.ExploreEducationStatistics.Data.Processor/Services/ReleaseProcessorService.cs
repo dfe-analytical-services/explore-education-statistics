@@ -36,10 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             // Avoid potential collisions
             Thread.Sleep(new Random().Next(1, 5) * 1000);
-            
+
             var release = CreateOrUpdateRelease(message, statisticsDbContext);
             RemoveSubjectIfExisting(subjectData.Name, release, statisticsDbContext);
-            
+
             var subject = CreateSubject(message.SubjectId, subjectData.Name, release, statisticsDbContext);
 
             if (!UpdateReleaseFileReferenceLinks(message, contentDbContext, release, subject))
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 throw new Exception(
                     "Unable to create release file links when importing : Check file references are correct");
             }
-            
+
             return subject;
         }
 
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var releaseSubject = statisticsDbContext.ReleaseSubject
                 .Include(rs => rs.Subject)
                 .FirstOrDefault(r => r.Subject.Name == name && r.ReleaseId == release.Id);
-            
+
             // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
             if (releaseSubject != null)
             {
@@ -112,14 +112,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Name = name
                 }
             ).Entity;
-            
+
             statisticsDbContext.ReleaseSubject.Add(
                 new ReleaseSubject
                 {
                     ReleaseId = release.Id,
                     SubjectId = subjectId
                 });
-            
+
             statisticsDbContext.SaveChanges();
 
             return newSubject;
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             Release release;
 
-            if (!statisticsDbContext.Release.Any((r => r.Id.Equals(message.Release.Id))))
+            if (!statisticsDbContext.Release.Any(r => r.Id.Equals(message.Release.Id)))
             {
                 release = new Release
                 {
@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext statisticsDbContext)
         {
             Topic topic;
-            
+
             if (!statisticsDbContext.Topic.Any(t => t.Id.Equals(message.Release.Publication.Topic.Id)))
             {
                 topic = new Topic
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             else
             {
                 theme = _mapper.Map(message.Release.Publication.Topic.Theme, (Theme) null);
-                theme = statisticsDbContext.Theme.Update(theme).Entity;  
+                theme = statisticsDbContext.Theme.Update(theme).Entity;
             }
             statisticsDbContext.SaveChanges();
             return theme;
