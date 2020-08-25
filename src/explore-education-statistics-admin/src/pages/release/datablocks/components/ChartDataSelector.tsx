@@ -240,7 +240,7 @@ const ChartDataSelector = ({
                   label="Time period"
                   formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
-                  placeholder="Any time period"
+                  placeholder="All time periods"
                   options={meta.timePeriodRange}
                   order={[]}
                 />
