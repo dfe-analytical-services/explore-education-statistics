@@ -79,9 +79,8 @@ Navigate to Footnotes tab
 
 Create subject footnote for new subject
     [Tags]  HappyPath
-    user waits until page contains element   id:add-footnote-button
     user clicks element   id:add-footnote-button
-    user waits until page contains element   xpath://fieldset[@datatest-id="footnote-subject UI test subject"]
+    user waits until page contains testid  footnote-subject UI test subject
     user clicks checkbox  Select all indicators and filters for this subject
     user clicks element   id:create-footnote-form-content
     user presses keys  UI tests subject footnote
@@ -89,9 +88,8 @@ Create subject footnote for new subject
 
 Create indicator footnote for new subject
     [Tags]  HappyPath
-    user waits until page contains element  css:#add-footnote-button
-    user clicks element  css:#add-footnote-button
-    user waits until page contains element   xpath://fieldset[@datatest-id="footnote-subject UI test subject"]
+    user clicks element  id:add-footnote-button
+    user waits until page contains testid  footnote-subject UI test subject
     user opens details dropdown  Indicators
     user clicks checkbox  Admission Numbers
     user clicks element   id:create-footnote-form-content
@@ -100,9 +98,8 @@ Create indicator footnote for new subject
 
 Create Random Filter Total footnote for new subject
     [Tags]  HappyPath
-    user waits until page contains element  css:#add-footnote-button
-    user clicks element  css:#add-footnote-button
-    user waits until page contains element   xpath://fieldset[@datatest-id="footnote-subject UI test subject"]
+    user clicks element  id:add-footnote-button
+    user waits until page contains testid  footnote-subject UI test subject
     user opens details dropdown   Random Filter
     user clicks checkbox   Total
     user clicks element   id:create-footnote-form-content
@@ -111,9 +108,8 @@ Create Random Filter Total footnote for new subject
 
 Create Random Filter Select all footnote for new subject
     [Tags]  HappyPath
-    user waits until page contains element  css:#add-footnote-button
-    user clicks element  css:#add-footnote-button
-    user waits until page contains element   xpath://fieldset[@datatest-id="footnote-subject UI test subject"]
+    user clicks element  id:add-footnote-button
+    user waits until page contains testid  footnote-subject UI test subject
     user opens details dropdown   Random Filter
     user clicks checkbox   Select all
     user clicks element   id:create-footnote-form-content
@@ -161,7 +157,8 @@ Create table
     [Documentation]   EES-615
     user clicks element   id:filtersForm-submit
     user waits until results table appears     180
-    user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 for 2019"]
+    user waits until element contains   id:dataTableCaption
+    ...  Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 for 2019
     user enters text into element  id:dataBlockDetailsForm-name         UI test table name
     user enters text into element  id:dataBlockDetailsForm-heading      UI test table title
     user enters text into element  id:dataBlockDetailsForm-source       UI test source
@@ -170,6 +167,7 @@ Create table
 
 Navigate to Create chart tab
     [Tags]  HappyPath
+    user waits until page contains link  Chart
     user clicks link  Chart
     user clicks button  Choose an infographic as alternative
     choose file   id:chartConfigurationForm-file       ${CURDIR}${/}files${/}dfe-logo.jpg
