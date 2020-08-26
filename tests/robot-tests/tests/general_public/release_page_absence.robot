@@ -30,11 +30,11 @@ Validate URL
 
 Validate Published date
     [Tags]     HappyPath    NotAgainstPreProd    Failing
-    user checks element contains  css:[data-testid="published-date"]   25 April 2018
+    user waits until element contains  css:[data-testid="published-date"]   25 April 2018
 
 Validate Next update date
     [Tags]     HappyPath    NotAgainstPreProd
-    user checks element contains  css:[data-testid="next-update"]      22 March 2019
+    user waits until element contains  css:[data-testid="next-update"]      22 March 2019
 
 Validate Email alerts link
     [Tags]     HappyPath
@@ -43,7 +43,7 @@ Validate Email alerts link
 Validate "About these statistics" -- "For Academic Year:"
     [Documentation]  DFE-197 DFE-845
     [Tags]  HappyPath
-    user checks element contains  css:[data-testid="release-name"]    2016/17
+    user waits until element contains  css:[data-testid="release-name"]    2016/17
 
 Validate "About these statistics" -- Number of other releases
     [Tags]  HappyPath
@@ -59,7 +59,7 @@ Validate "About these statistics" -- Number of other releases
 
 Validate "About these statistics" -- "Last updated"
     [Tags]    HappyPath
-    user checks element contains  id:releaseLastUpdated     19 April 2018
+    user waits until element contains  id:releaseLastUpdated     19 April 2018
 
     user checks number of release updates     2
     user opens details dropdown   See all 2 updates
@@ -145,14 +145,14 @@ Validate Key Statistics data block -- Charts tab
     user checks chart tooltip item contains  ${headline_chart}  2  Authorised absence rate (England): 3.4%
     user checks chart tooltip item contains  ${headline_chart}  3  Unauthorised absence rate (England): 1.3%
 
-    user checks element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(1)  Absence rates are the number of absence sessions expressed
-    user checks element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(2)  There may be discrepancies between totals and the sum of constituent parts
-    user checks element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(3)  x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
+    user waits until element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(1)  Absence rates are the number of absence sessions expressed
+    user waits until element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(2)  There may be discrepancies between totals and the sum of constituent parts
+    user waits until element contains  ${headline_chart} [data-testid="footnotes"] li:nth-of-type(3)  x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
 
 Validate Key Statistics data block -- Data tables tab
    [Tags]  HappyPath
    user clicks element   css:#releaseHeadlines-tables-tab
-   user checks element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
+   user waits until element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
 
    user checks table column heading contains  css:#releaseHeadlines-tables table  1   1   2012/13
    user checks table column heading contains  css:#releaseHeadlines-tables table  1   2   2013/14
@@ -202,7 +202,7 @@ Validate Regional and local authority (LA) breakdown table
     [Tags]  HappyPath   Failing
     [Documentation]  BAU-540
     user opens accordion section  Regional and local authority (LA) breakdown
-    user checks element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
+    user waits until element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
 
     user checks table column heading contains  css:#content_9_datablock-tables table   1   1   2016/17
 

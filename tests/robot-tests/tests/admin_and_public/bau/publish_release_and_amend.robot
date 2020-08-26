@@ -103,12 +103,12 @@ Navigate to newly published release page
 Verify release URL and page caption
     [Tags]  HappyPath
     user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
-    user checks element contains  css:[data-testid="page-title-caption"]  Financial Year 3000-01
+    user waits until element contains  css:[data-testid="page-title-caption"]  Financial Year 3000-01
 
 Verify publish and update dates
     [Tags]  HappyPath
-    user checks element contains  css:[data-testid="published-date"]   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
-    user checks element contains  css:[data-testid="next-update"] time   December 3001
+    user waits until element contains  css:[data-testid="published-date"]   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user waits until element contains  css:[data-testid="next-update"] time   December 3001
 
 Verify accordions are correct
     [Tags]  HappyPath
@@ -282,7 +282,7 @@ Navigate to amendment release page
 Verify amendment URL and page caption
     [Tags]  HappyPath
     user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
-    user checks element contains  css:[data-testid="page-title-caption"]  Financial Year 3000-01
+    user waits until element contains  css:[data-testid="page-title-caption"]  Financial Year 3000-01
 
 Verify amendment is displayed as the latest release
     [Tags]  HappyPath   Failing
@@ -292,8 +292,8 @@ Verify amendment is displayed as the latest release
 
 Verify amendment publish and update dates
     [Tags]  HappyPath
-    user checks element contains  css:[data-testid="published-date"]   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
-    user checks element contains  css:[data-testid="next-update"] time   January 3002
+    user waits until element contains  css:[data-testid="published-date"]   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user waits until element contains  css:[data-testid="next-update"] time   January 3002
 
 Verify amendment accordions are correct
     [Tags]  HappyPath

@@ -173,17 +173,13 @@ user waits until accordion section contains text
     ${section}=  user gets accordion content element  ${section_text}
     user waits until parent contains element   ${section}   xpath://*[text()="${text}"]
 
-user checks element contains
-    [Arguments]   ${element}    ${text}
-    wait until element contains  ${element}    ${text}
-
 user waits until page contains testid
     [Arguments]  ${id}   ${wait}=${timeout}
     user waits until page contains element   css:[data-testid="${id}"]   ${wait}
 
 user checks testid element contains
     [Arguments]  ${id}  ${text}
-    user checks element contains  css:[data-testid="${id}"]   ${text}
+    user waits until element contains  css:[data-testid="${id}"]   ${text}
 
 user checks element does not contain
     [Arguments]   ${element}    ${text}

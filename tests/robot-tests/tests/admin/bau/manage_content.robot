@@ -56,8 +56,8 @@ Add release note to release
     user clicks button   Add note
     user opens details dropdown  See all 1 updates  id:releaseLastUpdated
     ${date}=  get current datetime   %-d %B %Y
-    user checks element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
-    user checks element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
 
 Add related guidance link to release
     [Tags]  HappyPath

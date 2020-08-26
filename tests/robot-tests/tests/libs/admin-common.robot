@@ -52,7 +52,7 @@ user selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until page contains element  id:my-publications-tab   60
     user clicks element   id:my-publications-tab
     user waits until page contains element   id:selectTheme
-    user checks element contains  id:my-publications-tab  Manage publications and releases
+    user waits until element contains  id:my-publications-tab  Manage publications and releases
     user selects from list by label  id:selectTheme  ${theme}
     user waits until page contains element   id:selectTopic
     user selects from list by label  id:selectTopic  ${topic}
@@ -240,7 +240,7 @@ user checks accordion section text block contains
     [Arguments]  ${section_name}  ${block_num}  ${content}
     ${section}=  user gets accordion content element  ${section_name}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
-    user checks element contains  ${block}  ${content}
+    user waits until element contains  ${block}  ${content}
 
 user deletes editable accordion section content block
     [Arguments]  ${section_name}  ${block_num}

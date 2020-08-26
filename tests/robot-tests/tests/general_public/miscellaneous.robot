@@ -11,7 +11,7 @@ Verify public page loads
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}
-    user checks element contains  css:body   Explore education statistics
+    user waits until element contains  css:body   Explore education statistics
 
 Verify can accept cookie banner
     [Tags]  HappyPath   NotAgainstLocal
