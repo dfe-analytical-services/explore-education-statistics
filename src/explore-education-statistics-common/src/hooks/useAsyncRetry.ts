@@ -1,6 +1,6 @@
 import useAsyncCallback, {
   AsyncCallbackState,
-  AsyncStateSetter,
+  AsyncStateSetterParam,
 } from '@common/hooks/useAsyncCallback';
 import usePrevious from '@common/hooks/usePrevious';
 import isEqual from 'lodash/isEqual';
@@ -18,7 +18,7 @@ export interface AsyncRetryState<T> extends AsyncCallbackState<T> {
 export default function useAsyncRetry<T>(
   task: () => Promise<T>,
   deps: DependencyList = [],
-  initialState: AsyncStateSetter<T> = {
+  initialState: AsyncStateSetterParam<T> = {
     isLoading: true,
   },
 ): AsyncRetryState<T> {

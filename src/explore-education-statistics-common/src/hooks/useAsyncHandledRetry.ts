@@ -1,18 +1,24 @@
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
-import { AsyncState } from '@common/hooks/useAsyncCallback';
+import { AsyncStateSetterParam } from '@common/hooks/useAsyncCallback';
 import useAsyncRetry, { AsyncRetryState } from '@common/hooks/useAsyncRetry';
 import { OmitStrict } from '@common/types';
-import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { DependencyList, useEffect, useMemo } from 'react';
 
-export type AsyncHandledStateSetter<T> = OmitStrict<AsyncState<T>, 'error'>;
+export type AsyncHandledRetryStateSetterParam<T> =
+  | {
+      isLoading: boolean;
+    }
+  | {
+      isLoading?: false;
+      value?: T;
+    };
 
 export type AsyncHandledRetryState<T> = OmitStrict<
   AsyncRetryState<T>,
   'error' | 'setState'
 > & {
-  setState: (state: AsyncHandledStateSetter<T>) => void;
+  setState: (state: AsyncHandledRetryStateSetterParam<T>) => void;
 };
 
 /**
@@ -25,24 +31,32 @@ export type AsyncHandledRetryState<T> = OmitStrict<
 export default function useAsyncHandledRetry<T>(
   task: () => Promise<T>,
   deps: DependencyList = [],
-  initialState?: AsyncHandledStateSetter<T>,
+  initialState: AsyncHandledRetryStateSetterParam<T> = {
+    isLoading: true,
+  },
 ): AsyncHandledRetryState<T> {
   const { handleApiErrors } = useErrorControl();
 
-  const asyncRetry = useAsyncRetry(task, deps, initialState);
+  const { error, setState, ...state } = useAsyncRetry(
+    task,
+    deps,
+    pick(initialState, ['value', 'isLoading']) as AsyncStateSetterParam<T>,
+  );
 
   useEffect(() => {
-    if (asyncRetry.error) {
-      handleApiErrors(asyncRetry.error);
+    if (error) {
+      handleApiErrors(error);
     }
-  }, [asyncRetry.error, handleApiErrors]);
+  }, [error, handleApiErrors]);
 
   return useMemo(() => {
     return {
-      ...omit(asyncRetry, ['error', 'setState']),
-      setState: state => {
-        asyncRetry.setState(pick(state, ['value', 'isLoading']));
+      ...state,
+      setState: nextState => {
+        setState(
+          pick(nextState, ['value', 'isLoading']) as AsyncStateSetterParam<T>,
+        );
       },
     };
-  }, [asyncRetry]);
+  }, [setState, state]);
 }

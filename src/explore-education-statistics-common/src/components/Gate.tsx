@@ -1,4 +1,6 @@
-import useAsyncCallback from '@common/hooks/useAsyncCallback';
+import useAsyncCallback, {
+  AsyncStateSetterParam,
+} from '@common/hooks/useAsyncCallback';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { ReactNode, useEffect } from 'react';
 
@@ -27,9 +29,19 @@ const Gate = ({
   const [{ isLoading, value, error }, checkCondition] = useAsyncCallback(
     async () => (typeof condition === 'boolean' ? condition : condition()),
     [condition],
-    {
-      isLoading: typeof condition !== 'boolean',
-      value: typeof condition === 'boolean' ? condition : undefined,
+    () => {
+      let initialState: AsyncStateSetterParam<boolean> = {
+        isLoading: true,
+      };
+
+      if (typeof condition === 'boolean') {
+        initialState = {
+          isLoading: false,
+          value: condition,
+        };
+      }
+
+      return initialState;
     },
   );
 
