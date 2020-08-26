@@ -25,7 +25,7 @@ Go to Create publication page for "UI tests topic" topic
     user checks page does not contain button  ${PUBLICATION_NAME}
     user clicks link  Create new publication
     user waits until page contains title caption  ${TOPIC_NAME}
-    user waits until page contains heading 1    Create new publication
+    user waits until h1 is visible    Create new publication
 
 Selects no methodology
     [Tags]  HappyPath
@@ -53,13 +53,12 @@ Enter new publication title
 User redirects to the dashboard after saving publication
     [Tags]  HappyPath
     user clicks button   Save publication
-    user waits until page contains heading 1  Dashboard
+    user waits until h1 is visible  Dashboard
 
 Verify that new publication has been created
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button   ${PUBLICATION_NAME} (created)
-    user checks page contains accordion   ${PUBLICATION_NAME} (created)
+    user waits until page contains accordion section   ${PUBLICATION_NAME} (created)
     user opens accordion section  ${PUBLICATION_NAME} (created)
     user checks testid element contains  Team name for ${PUBLICATION_NAME} (created)  Post-16 statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME} (created)  post16.statistics@education.gov.uk
@@ -72,7 +71,7 @@ Go to edit publication
     [Tags]  HappyPath
     user clicks element  css:[data-testid="Edit publication link for ${PUBLICATION_NAME} (created)"]
     user waits until page contains title caption  ${PUBLICATION_NAME} (created)
-    user waits until page contains heading 1    Edit publication
+    user waits until h1 is visible    Edit publication
 
 Update publication
     [Tags]  HappyPath
@@ -88,10 +87,9 @@ Update publication
 
 Verify publication has been updated
     [Tags]  HappyPath
-    user waits until page contains heading 1  Dashboard
+    user waits until h1 is visible  Dashboard
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button   ${PUBLICATION_NAME}
-    user checks page contains accordion   ${PUBLICATION_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     user checks testid element contains  Team name for ${PUBLICATION_NAME}  Special educational needs statistics team
     user checks testid element contains  Team email for ${PUBLICATION_NAME}  sen.statistics@education.gov.uk
@@ -110,12 +108,12 @@ Create new release
     user clicks radio  National Statistics
     user clicks button   Create new release
     user waits until page contains title caption  Edit release
-    user waits until page contains heading 1  ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
 
 Verify created release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user waits until page contains heading 2  Release summary
+    user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
     user checks summary list contains  Time period  Spring Term
     user checks summary list contains  Release period  2025/26
@@ -128,7 +126,7 @@ Edit release summary
     [Tags]  HappyPath
     user waits until page contains link  Edit release summary
     user clicks link  Edit release summary
-    user waits until page contains heading 2  Edit release summary
+    user waits until h2 is visible  Edit release summary
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverageStartYear
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  Summer Term
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2026
@@ -138,7 +136,7 @@ Edit release summary
 Verify updated release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user waits until page contains heading 2  Release summary
+    user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
     user checks summary list contains  Time period  Summer Term
     user checks summary list contains  Release period  2026/27

@@ -28,7 +28,7 @@ Go to Notify me page for Absence publication
     user clicks link  Sign up for email alerts
 
     user waits until page contains title caption  Notify me     180
-    user waits until page contains heading 1  Pupil absence in schools in England
+    user waits until h1 is visible  Pupil absence in schools in England
 
     user checks breadcrumb count should be  4
     user checks nth breadcrumb contains  1   Home
@@ -44,5 +44,5 @@ Sign up for email alerts
     user clicks button   Subscribe
 
     # EES-1265
-    user waits until page contains heading 1   Subscribed     180
+    user waits until h1 is visible   Subscribed     180
     user checks page contains  Thank you. Check your email to confirm your subscription.

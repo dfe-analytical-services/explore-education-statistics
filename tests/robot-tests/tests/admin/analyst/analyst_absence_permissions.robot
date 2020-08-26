@@ -26,7 +26,7 @@ Validate Analyst1 cannot create a publication for Pupils absence topic
     [Tags]  HappyPath
     user clicks element   id:my-publications-tab
     user waits until page contains element   id:selectTheme
-    user waits until page contains heading 3  Pupil absence
+    user waits until h3 is visible  Pupil absence
     user checks page does not contain element   link:Create new publication
 
 Validate Analyst1 cannot create a release for Pupil absence topic
@@ -39,8 +39,8 @@ Navigate to Absence release
     [Tags]  HappyPath
     user opens details dropdown  Academic Year 2016/17 (Live - Latest release)
     user clicks element  css:[data-testid="Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)"]
-    user waits until page contains heading 1  Pupil absence in schools in England
-    user waits until page contains heading 2  Release summary
+    user waits until h1 is visible  Pupil absence in schools in England
+    user waits until h2 is visible  Release summary
 
 Validate Analyst1 can see Absence release summary
     [Tags]  HappyPath   NotAgainstLocal
@@ -55,7 +55,7 @@ Validate Analyst1 can see Absence release summary
 Validate Analyst1 can see Manage content page
     [Tags]  HappyPath
     user clicks link  Manage content
-    user waits until page contains heading 2   Pupil absence in schools in England
+    user waits until h2 is visible   Pupil absence in schools in England
 
 Validate Analyst1 can see 'Manage content' page key stats
     [Tags]  HappyPath

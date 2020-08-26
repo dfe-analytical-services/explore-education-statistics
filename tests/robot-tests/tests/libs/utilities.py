@@ -169,70 +169,18 @@ def user_should_be_at_top_of_page():
             f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
 
-def user_checks_page_contains_accordion(accordion_heading):
-    try:
-        sl.wait_until_page_contains_element(
-            f'xpath://*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
-        # sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
-    except:
-        raise_assertion_error(f"Accordion with heading '{accordion_heading}' not found!'")
-
-
 def user_checks_accordion_is_in_position(header_starts_with, position):
-    try:
+    elem = sl.get_webelement(
         # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
-        elem = sl.driver.find_element_by_xpath(
-            f'(.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")])[{position}]')
-    except:
-        raise_assertion_error(f"There are less than {position} accordion sections!")
-
+        f'xpath:(.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")])[{position}]')
     if not elem.text.strip().startswith(header_starts_with):
         raise_assertion_error(
             f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
 
 
-def user_checks_there_are_x_accordion_sections(num):
-    sl.page_should_contain_element(
-        'xpath:.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")]',
-        limit=num)
-
-
-def user_verifies_accordion_is_open(section_text):
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="true"]')
-    except NoSuchElementException:
-        raise_assertion_error(
-            f'Accordion section "{section_text}" should have attribute aria-expanded="true"')
-
-
-def user_verifies_accordion_is_closed(section_text):
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'Cannot find accordion with header {section_text}')
-
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="false"]')
-    except NoSuchElementException:
-        raise_assertion_error(
-            f'Accordion section "{section_text}" should have attribute aria-expanded="false"')
-
-
 def user_opens_accordion_section(section_text):
     sl.wait_until_page_contains_element(
         f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-
     elem = user_gets_accordion_button_element(section_text)
     if elem.get_attribute('aria-expanded') == "true":
         raise_assertion_error(f'Accordion section "{section_text}" already open!')
@@ -250,11 +198,6 @@ def user_closes_accordion_section(section_text):
     sl.click_element(elem)
     if elem.get_attribute('aria-expanded') == "true":
         raise_assertion_error(f'Accordion section "{section_text}" should be open!')
-
-
-def user_checks_accordion_section_contains_text(accordion_section_text, text):
-    elem = user_gets_accordion_content_element(accordion_section_text)
-    user_waits_until_parent_contains_element(elem, f'xpath://*[text()="{text}"]')
 
 
 def user_gets_accordion_button_element(accordion_text):
@@ -309,35 +252,6 @@ def capture_large_screenshot():
     sl.set_window_size(page_width, original_height)
 
 
-def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
-    try:
-        sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]',
-            timeout=timeout)
-    except:
-        raise_assertion_error(f'Previous step wasn\'t found!')
-
-    try:
-        sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]',
-            timeout=timeout)
-    except:
-        raise_assertion_error(
-            f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
-
-
-def user_checks_table_column_heading_contains(table_selector, row, column, expected,
-                                              timeout=30):
-    user_waits_until_parent_contains_element(
-        table_selector,
-        f'xpath://thead/tr[{row}]/th[{column}][text()="{expected}"]',
-        timeout=timeout)
-
-
-def user_gets_table_row_with_heading(table_selector, heading: str):
-    return get_child_element(table_selector, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
-
-
 def user_gets_row_number_with_heading(table_locator: str, heading: str):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
     rows = get_child_elements(table_locator, 'css:tbody tr')
@@ -358,57 +272,15 @@ def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
     raise_assertion_error(f'Indicator "{indicator}" not found!')
 
 
-def user_checks_row_contains_heading(row_elem, heading):
-    try:
-        row_elem.find_element_by_xpath(f'.//th[text()="{heading}"]')
-    except:
-        raise_assertion_error(f'Heading "{heading}" not found for provided row element.')
-
-
 def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     try:
-        elem = row_elem.find_element_by_xpath(f'.//td[{cell_num}]')
+        elem = get_child_element(row_elem, f'xpath:.//td[{cell_num}]')
     except:
         raise_assertion_error(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
 
     if expected_text not in elem.text:
         raise_assertion_error(
             f'TD tag num "{cell_num}" for row element didn\'t contain text "{expected_text}". Found text "{elem.text}"')
-
-
-def user_checks_results_table_row_heading_contains(row, column, expected):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')
-    if expected not in elem.text:
-        raise_assertion_error(
-            f'"{expected}" not found in th tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
-
-
-def user_checks_table_heading_in_offset_row_contains(table_locator: str, row: int,
-                                                     offset: int, column: int,
-                                                     expected: str):
-    offset_row = int(row) + int(offset)
-    elem = get_child_element(table_locator, f'xpath://tbody/tr[{offset_row}]/th[{column}]')
-
-    if expected not in elem.text:
-        raise_assertion_error(
-            f'"{expected}" not found in th tag in results table tbody row {offset_row}, column {column}. Found text "{elem.text}".')
-
-
-def user_checks_results_table_cell_contains(row, column, expected):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/td[{column}]')
-    if expected not in elem.text:
-        raise_assertion_error(
-            f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
-
-
-def user_checks_table_cell_in_offset_row_contains(table_locator: str, row: int, offset: int,
-                                                  column: int, expected: str):
-    offset_row = int(row) + int(offset)
-    elem = get_child_element(table_locator, f'xpath://tbody/tr[{offset_row}]/td[{column}]')
-
-    if expected not in elem.text:
-        raise_assertion_error(
-            f'"{expected}" not found in td tag in results table tbody row {offset_row}, column {column}. Found text "{elem.text}".')
 
 
 def user_checks_list_contains_x_elements(list_locator, num):
@@ -454,14 +326,14 @@ def user_waits_until_details_dropdown_contains_publication(details_heading, publ
 
 def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
     try:
-        sl.driver.find_element_by_xpath(
+        sl.wait_until_page_contains_element(
             f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]')
     except:
         raise_assertion_error(f'Cannot find details component "{details_heading}"')
 
     try:
-        sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
+        sl.wait_until_page_contains_element(
+                f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
     except:
         raise_assertion_error(f'Cannot find link "{download_link}" in "{details_heading}"')
 

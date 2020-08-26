@@ -21,10 +21,10 @@ Create Manage content test publication
 
 Verify Manage content test publication is created
     [Tags]  HappyPath
-    user checks page contains accordion  ${PUBLICATION_NAME}
+    user waits until page contains accordion section  ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
-    user checks accordion section contains text  ${PUBLICATION_NAME}    Methodology
-    user checks accordion section contains text  ${PUBLICATION_NAME}    Releases
+    user waits until accordion section contains text  ${PUBLICATION_NAME}    Methodology
+    user waits until accordion section contains text  ${PUBLICATION_NAME}    Releases
 
 Create release
     [Tags]  HappyPath
@@ -35,8 +35,8 @@ Create release
 Navigate to Manage content tab
     [Tags]  HappyPath
     user clicks link   Manage content
-    user waits until page contains heading 1  ${PUBLICATION_NAME}
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
 
 Add summary content to release
     [Tags]  HappyPath
@@ -56,8 +56,8 @@ Add release note to release
     user clicks button   Add note
     user opens details dropdown  See all 1 updates  id:releaseLastUpdated
     ${date}=  get current datetime   %-d %B %Y
-    user checks element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
-    user checks element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
 
 Add related guidance link to release
     [Tags]  HappyPath
