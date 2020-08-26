@@ -1,11 +1,22 @@
 import { ChartSymbol } from '@common/modules/charts/types/chart';
 
 export const colours: string[] = [
-  '#4763a5',
-  '#f5a450',
+  '#d4351c',
+  '#ffdd00',
+  '#00703c',
   '#1d70b8',
-  '#800080',
-  '#C0C0C0',
+  '#003078',
+  '#4c2c92',
+  '#6f72af',
+  '#912b88',
+  '#d53880',
+  '#f499be',
+  '#f47738',
+  '#b58840',
+  '#85994b',
+  '#28a197',
+  '#505a5f',
+  '#0b0c0c',
 ];
 
 export const symbols: ChartSymbol[] = [
