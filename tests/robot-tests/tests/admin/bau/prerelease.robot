@@ -52,10 +52,10 @@ Go to "Release status" tab
 
 Approve release and wait for it to be Scheduled
     [Tags]  HappyPath
-    ${day}=         get datetime  %d  2
-    ${month}=       get datetime  %m  2
-    ${month_word}=  get datetime  %B  2
-    ${year}=        get datetime  %Y  2
+    ${day}=         get current datetime  %-d  2
+    ${month}=       get current datetime  %-m  2
+    ${month_word}=  get current datetime  %B  2
+    ${year}=        get current datetime  %Y  2
 
     user clicks button  Edit release status
     user clicks radio   Approved for publication
@@ -89,10 +89,13 @@ Validate prerelease has not started
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre Release access
-    ${day}=         get datetime  %d  1
-    ${month_word}=  get datetime  %B  1
-    ${year}=        get datetime  %Y  1
-    user checks page contains   Pre Release access will be available from ${day} ${month_word} ${year} at 00:00 until ${day} ${month_word} ${year} at 23:59.
+
+    ${day}=         get current datetime  %d   1
+    ${month}=       get current datetime  %m   1
+    ${year}=        get current datetime  %Y   1
+    ${time_start}=  format uk to local datetime  ${year}-${month}-${day}T00:00:00  %-d %B %Y at %H:%M
+    ${time_end}=    format uk to local datetime  ${year}-${month}-${day}T23:59:00  %-d %B %Y at %H:%M
+    user checks page contains   Pre Release access will be available from ${time_start} until ${time_end}.
 
 Navigate to Admin dashboard
     [Tags]  HappyPath
@@ -132,18 +135,20 @@ Validate prerelease has not started for Analyst user
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre Release access
 
-    ${day}=         get datetime  %d  1
-    ${month_word}=  get datetime  %B  1
-    ${year}=        get datetime  %Y  1
-    user checks page contains   Pre Release access will be available from ${day} ${month_word} ${year} at 00:00 until ${day} ${month_word} ${year} at 23:59.
+    ${day}=         get current datetime  %d   1
+    ${month}=       get current datetime  %m   1
+    ${year}=        get current datetime  %Y   1
+    ${time_start}=  format uk to local datetime  ${year}-${month}-${day}T00:00:00  %-d %B %Y at %H:%M
+    ${time_end}=    format uk to local datetime  ${year}-${month}-${day}T23:59:00  %-d %B %Y at %H:%M
+    user checks page contains   Pre Release access will be available from ${time_start} until ${time_end}.
 
 Start prerelease
     [Tags]  HappyPath
     user changes to bau1
-    ${day}=         get datetime  %d  1
-    ${month}=       get datetime  %m  1
-    ${month_word}=  get datetime  %B  1
-    ${year}=        get datetime  %Y  1
+    ${day}=         get current datetime  %-d  1
+    ${month}=       get current datetime  %-m  1
+    ${month_word}=  get current datetime  %B  1
+    ${year}=        get current datetime  %Y  1
     user goes to url  ${RELEASE_URL}/status
     user clicks button  Edit release status
     user enters text into element  id:releaseStatusForm-publishScheduled-day    ${day}

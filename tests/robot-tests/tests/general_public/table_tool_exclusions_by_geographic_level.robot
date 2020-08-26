@@ -111,7 +111,7 @@ User validates permanent link works correctly
 
 User validates permalink contains correct date
     [Tags]  HappyPath
-    ${date}=  get datetime  %d %B %Y
+    ${date}=  get current datetime  %-d %B %Y
     user checks page contains element   xpath://*[@data-testid="created-date"]//time[text()="${date}"]
 
 User validates permalink table headers

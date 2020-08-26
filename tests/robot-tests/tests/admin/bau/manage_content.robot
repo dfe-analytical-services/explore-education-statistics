@@ -55,7 +55,7 @@ Add release note to release
     user enters text into element  css:textarea#reason  Test release note one
     user clicks button   Add note
     user opens details dropdown  See all 1 updates  id:releaseLastUpdated
-    ${date}=  get datetime   %d %B %Y
+    ${date}=  get current datetime   %-d %B %Y
     user checks element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
     user checks element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
 

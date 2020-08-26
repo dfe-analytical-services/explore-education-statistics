@@ -1,4 +1,6 @@
 import json
+
+import pytz
 import time
 import re
 import datetime
@@ -141,9 +143,23 @@ def set_cookie_from_json(cookie_json):
     sl.driver.add_cookie(cookie_dict)
 
 
-def get_datetime(strf, days=0):
-    now = datetime.datetime.now() + datetime.timedelta(days=days)
-    return now.strftime(strf).lstrip('0')
+def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
+    if os.name == 'nt':
+        strf = strf.replace('%-', '%#')
+
+    tz = pytz.timezone('Europe/London')
+
+    return tz.localize(datetime.datetime.fromisoformat(uk_local_datetime)) \
+        .astimezone().strftime(strf)
+
+
+def get_current_datetime(strf: str, offset_days: int = 0) -> str:
+    now = datetime.datetime.now() + datetime.timedelta(days=offset_days)
+
+    if os.name == 'nt':
+        strf = strf.replace('%-', '%#')
+
+    return now.strftime(strf)
 
 
 def user_should_be_at_top_of_page():
