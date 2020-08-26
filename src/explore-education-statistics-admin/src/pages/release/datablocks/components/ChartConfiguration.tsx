@@ -89,7 +89,7 @@ const ChartConfiguration = ({
       title: Yup.string().required('Enter chart title'),
       alt: Yup.string()
         .required('Enter chart alt text')
-        .max(125, 'Alt text must be less than 125 characters')
+        .max(300, 'Alt text must be less than 300 characters')
         .test({
           name: 'noRepeatTitle',
           message: 'Alt text should not repeat the title',
@@ -234,8 +234,8 @@ const ChartConfiguration = ({
               name="alt"
               label="Alt text"
               hint="Brief and accurate description of the chart in less than 125 characters. Should not repeat the title."
-              maxLength={125}
-              rows={2}
+              maxLength={300}
+              rows={3}
               onChange={replaceNewLines}
             />
 
