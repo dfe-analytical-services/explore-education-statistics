@@ -182,7 +182,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   options: {
     defaults: {
       height: 300,
-      legend: 'top',
+      legend: 'bottom',
     },
   },
   data: [
