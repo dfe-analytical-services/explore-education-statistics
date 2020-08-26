@@ -250,10 +250,10 @@ user clicks testid element
     user clicks element  css:[data-testid="${id}"]
 
 user clicks link
-    [Arguments]   ${text}
-    wait until element is visible   link:${text}
-    wait until element is enabled  link:${text}
-    click link  ${text}
+    [Arguments]   ${text}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  link:${text}
+    ${element}=  get child element  ${parent}  link:${text}
+    user clicks element  ${element}
 
 user clicks button
     [Arguments]   ${text}  ${parent}=css:body

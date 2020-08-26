@@ -34,7 +34,7 @@ function PublicationList({ publications }: Props) {
                 <Link
                   to="/find-statistics/[publication]"
                   as={`/find-statistics/${slug}`}
-                  data-testid={`view-stats-${slug}`}
+                  data-testid={`View stats link for ${title}`}
                 >
                   View statistics and data{' '}
                   <span className="govuk-visually-hidden">for {title}</span>
@@ -45,7 +45,7 @@ function PublicationList({ publications }: Props) {
                 <Link
                   to="/data-tables/[publication]"
                   as={`/data-tables/${slug}`}
-                  data-testid={`create-table-${slug}`}
+                  data-testid={`Create table link for ${title}`}
                 >
                   Create your own tables online{' '}
                   <span className="govuk-visually-hidden">for {title}</span>

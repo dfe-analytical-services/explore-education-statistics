@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Resource    ../../libs/charts.robot
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -10,6 +11,7 @@ Suite Teardown    user closes the browser
 ${RUN_IDENTIFIER}    %{RUN_IDENTIFIER}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish release %{RUN_IDENTIFIER}
+${DATABLOCK_NAME}    Dates data block name
 
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
@@ -97,7 +99,7 @@ Verify newly published release is on Find Statistics page
 
 Navigate to newly published release page
     [Tags]  HappyPath
-    user clicks element   css:[data-testid="view-stats-ui-tests-publish-release-${RUN_IDENTIFIER}"]
+    user clicks testid element  View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
 Verify release URL and page caption
@@ -195,14 +197,24 @@ Create data block table
 
 Save data block
     [Tags]  HappyPath
-    user enters text into element  id:dataBlockDetailsForm-name         Dates data block name
+    user enters text into element  id:dataBlockDetailsForm-name         ${DATABLOCK_NAME}
     user enters text into element  id:dataBlockDetailsForm-heading      Dates table title
     user enters text into element  id:dataBlockDetailsForm-source       Dates source
 
     user clicks button   Save data block
     user waits until page contains button    Delete this data block
 
-# TODO: Create chart
+Navigate to Create chart tab
+    [Tags]  HappyPath
+    user waits until page contains link  Chart
+    user clicks link  Chart
+    user clicks button  Choose an infographic as alternative
+    user chooses file  id:chartConfigurationForm-file       ${CURDIR}${/}files${/}test-infographic.png
+    user enters text into element  id:chartConfigurationForm-title  Sample title
+    user enters text into element  id:chartConfigurationForm-alt  Sample alt text
+    user clicks button   Save chart options
+    user waits until page contains  Chart preview
+    user checks infographic chart contains alt  id:chartBuilderPreview  Sample alt text
 
 Navigate to Manage content tab
     [Tags]  HappyPath
@@ -220,7 +232,10 @@ Add two accordion sections to release
 
 Add data block to first accordion section
     [Tags]  HappyPath
-    user adds data block to editable accordion section  Dates data block   Dates data block name
+    user adds data block to editable accordion section  Dates data block   ${DATABLOCK_NAME}
+    ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    user checks chart title contains  ${datablock}  Sample title
+    user checks infographic chart contains alt  ${datablock}  Sample alt text
 
 Add test text to second accordion section
     [Tags]  HappyPath
@@ -275,8 +290,7 @@ Verify amendment is on Find Statistics page again
 
 Navigate to amendment release page
     [Tags]  HappyPath
-    user scrolls to element  css:[data-testid="view-stats-ui-tests-publish-release-${RUN_IDENTIFIER}"]
-    user clicks element   css:[data-testid="view-stats-ui-tests-publish-release-${RUN_IDENTIFIER}"]
+    user clicks testid element  View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
 Verify amendment URL and page caption
@@ -302,15 +316,19 @@ Verify amendment accordions are correct
     user checks accordion is in position   National Statistics  3
     user checks accordion is in position   Contact us           4
 
-Verify Dates data block accordion section contains correct table
+Verify Dates data block accordion section
     [Tags]  HappyPath
     user opens accordion section  Dates data block
+    ${section}=  user gets accordion content element  Dates data block
 
-    ${section}=  get webelement  xpath://*[contains(@class, "govuk-accordion__section-button") and text()="Dates data block"]/../../..
+    user checks chart title contains  ${section}  Sample title
+    user checks infographic chart contains alt  ${section}  Sample alt text
+
+    user clicks link  Table  ${section}
     user waits until parent contains element  ${section}  xpath:.//*[@id="dataTableCaption" and text()="Dates table title"]
     user waits until parent contains element  ${section}  xpath:.//*[.="Source: Dates source"]
 
-    ${table}=  get child element  ${section}   xpath:.//table
+    ${table}=  get child element  ${section}   css:table
     user checks table column heading contains  ${table}  1   1   2020 Week 13
 
     ${row}=  user gets table row with heading  ${table}  Number of open settings

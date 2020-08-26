@@ -266,7 +266,7 @@ Verify newly published release is on Find Statistics page
 
 Navigate to newly published release page
     [Tags]  HappyPath
-    user clicks element   css:[data-testid="view-stats-ui-tests-footnotes-%{RUN_IDENTIFIER}"]
+    user clicks testid element  View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
 Check footnote on data block

@@ -245,7 +245,7 @@ Validate table column headings for table highlight
     [Tags]  HappyPath
     user checks table column heading contains  css:table  1  1  Admission Numbers
 
-Validate table rows for Bolton 001 (E02000984)
+Validate table rows for table highlight
     [Tags]  HappyPath
     ${table}=  set variable  css:table
 
